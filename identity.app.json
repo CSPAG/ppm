@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/@vollholz/iam-testkit/schema/identity-app.schema.json",
+  "product": "ppm",
+  "displayName": "PPM",
+  "publicBaseUrl": "https://ppm.project-suite.ch",
+  "keycloakUrl": "https://id.project-suite.ch",
+  "realm": {
+    "entra": true,
+    "m2m": true,
+    "mcp": true,
+    "smtp": null
+  },
+  "paths": {
+    "model": "src/platform/authz/model.ts"
+  },
+  "database": {
+    "schema": "ppm"
+  }
+}

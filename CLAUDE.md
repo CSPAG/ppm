@@ -26,6 +26,6 @@ Fachliche Spezifikation: [`docs/PPM-Master.md`](docs/PPM-Master.md).
 - **Verwaltete Dateien** von identity-kit (Kopf «Verwaltet von identity-kit», `.identity-kit.lock`) nie von Hand
   ändern; Einstellungen in `identity.app.json`, dann `npm run identity:sync`.
 - **Sprache:** Code-Kommentare, Doku und Oberfläche Deutsch, Schweizer Rechtschreibung ohne Eszett (auch nicht in
-  Kommentaren und Tests, dort `ß`), Oberfläche in Du-Form, sichtbar «Organisation» statt «Mandant».
+  Kommentaren und Tests, dort `\u00df`), Oberfläche in Du-Form, sichtbar «Organisation» statt «Mandant».
 - **Branch-Namen** `<typ>/<kurze-beschreibung>` mit `typ` ∈ `feat|fix|refactor|chore|docs`, z. B.
   `feat/projekt-phasen`.

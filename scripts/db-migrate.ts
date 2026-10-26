@@ -4,8 +4,9 @@
  */
 import { model } from '../src/platform/authz/model.ts';
 import { runMigrations } from '../src/platform/db/migrate.ts';
+import { secretEnv } from './lib/env.ts';
 
-const url = process.env.DATABASE_ADMIN_URL ?? (process.env.DATABASE_ADMIN_URL_FILE ? (await import('node:fs')).readFileSync(process.env.DATABASE_ADMIN_URL_FILE, 'utf8').trim() : '');
+const url = secretEnv('DATABASE_ADMIN_URL');
 if (!url) {
   console.error(JSON.stringify({ level: 'fatal', msg: 'DATABASE_ADMIN_URL (bzw. _FILE) fehlt – Verbindung der Besitzer-Rolle ppm_owner' }));
   process.exit(78);

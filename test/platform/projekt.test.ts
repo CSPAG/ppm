@@ -59,6 +59,9 @@ describe('projekt', { skip }, () => {
     const d = await t.req({ method: 'DELETE', url: `/v1/projekte/${p.id}`, token: anna, headers: { 'if-match': 'W/"2"' } });
     assert.equal(d.statusCode, 204);
     assert.equal((await t.req({ method: 'GET', url: `/v1/projekte/${p.id}`, token: anna })).statusCode, 404);
+    const after = await t.req({ method: 'GET', url: `/v1/projekte/${p.id}/history`, token: bruno });
+    assert.equal(after.statusCode, 200, 'Verlauf bleibt nach dem Löschen lesbar');
+    assert.deepEqual(json(after).items.map((v: { action: string }) => v.action), ['deleted', 'updated', 'created']);
 
     const audit = (await db.inspect.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE resource_type = 'projekt' AND resource_id = $1 ORDER BY id", [p.id])).rows.map(r => r.action);
     assert.deepEqual(audit, ['projekt.created', 'projekt.updated', 'projekt.deleted']);
@@ -157,5 +160,6 @@ describe('projekt', { skip }, () => {
     const v = json(await t.req({ method: 'GET', url: loc, token: bruno }));
     assert.equal(v.status, 'queued');
     assert.equal((await t.req({ method: 'GET', url: loc, token: anna })).statusCode, 404, 'fremder Vorgang');
+    assert.equal((await t.req({ method: 'POST', url: '/v1/projekte::zusammenfassen', token: bruno })).statusCode, 404, 'nur mit einem Doppelpunkt');
   });
 });

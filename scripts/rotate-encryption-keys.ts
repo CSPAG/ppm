@@ -11,17 +11,18 @@ import pg from 'pg';
 import { model } from '../src/platform/authz/model.ts';
 import { ROTATIONS } from '../src/platform/modules/index.ts';
 import { rotateKeys } from '../src/platform/ops/rotation.ts';
+import { secretEnv } from './lib/env.ts';
 
-const env = process.env;
 const dryRun = process.argv.includes('--dry-run');
-const raw = env.ENCRYPTION_KEYS || (env.ENCRYPTION_KEYS_FILE ? (await import('node:fs')).readFileSync(env.ENCRYPTION_KEYS_FILE, 'utf8').trim() : '');
-if (!raw || !env.DATABASE_ADMIN_URL || !(env.DATABASE_WORKER_URL || env.DATABASE_URL)) {
-  console.error('rotate-keys: ENCRYPTION_KEYS, DATABASE_ADMIN_URL und DATABASE_WORKER_URL (oder DATABASE_URL) nötig');
+const raw = secretEnv('ENCRYPTION_KEYS');
+const adminUrl = secretEnv('DATABASE_ADMIN_URL'), runtimeUrl = secretEnv('DATABASE_WORKER_URL') ?? secretEnv('DATABASE_URL');
+if (!raw || !adminUrl || !runtimeUrl) {
+  console.error('rotate-keys: ENCRYPTION_KEYS, DATABASE_ADMIN_URL und DATABASE_WORKER_URL (oder DATABASE_URL) nötig, auch als _FILE');
   process.exit(78);
 }
 const keys = parseEncryptionKeys(raw);
-const admin = new pg.Pool({ connectionString: env.DATABASE_ADMIN_URL, max: 2 });
-const runtime = new pg.Pool({ connectionString: env.DATABASE_WORKER_URL || env.DATABASE_URL, max: 2 });
+const admin = new pg.Pool({ connectionString: adminUrl, max: 2 });
+const runtime = new pg.Pool({ connectionString: runtimeUrl, max: 2 });
 try {
   const n = await rotateKeys(admin, runtime, keys, [...ROTATIONS], { dryRun, settings: fullView(model) });
   console.log(`${dryRun ? 'Probelauf' : 'Neu versiegelt'} mit Schlüssel ${keys[0]!.id}:`, n);

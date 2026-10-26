@@ -81,9 +81,12 @@ spec:
         - ipBlock: { cidr: 192.0.2.0/24 }
       ports:
         - { protocol: TCP, port: 5432 }
-    # Keycloak (Mitgliederabgleich), ausgehende Webhooks (SSRF-Schutz im Code)
+    # Keycloak (Mitgliederabgleich), ausgehende Webhooks: dieselben Ports, die core/ssrf.ts › checkUrl zulässt
+    # (80, 443, 1024–65535); private Ziele sperrt der SSRF-Schutz im Code
     - ports:
+        - { protocol: TCP, port: 80 }
         - { protocol: TCP, port: 443 }
+        - { protocol: TCP, port: 1024, endPort: 65535 }
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

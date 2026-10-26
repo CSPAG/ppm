@@ -1,0 +1,94 @@
+/*
+ * Farb-Tokens hell und dunkel. `data-theme` setzt public/theme.js vor dem ersten Zeichnen (Wahl oder System).
+ * iam-web färbt nur über `--iam-*`; hier auf die Tokens der App abgebildet (ausserhalb einer Ebene, geht vor).
+ * Kontraste nach WCAG 2.2 AA: Text mindestens 4.5:1, Bedienelemente und Fokus mindestens 3:1.
+ */
+:root {
+  color-scheme: light;
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --hover: #eceff3;
+  --line: #dde1e6;
+  --line-2: #b9c0c9;
+  --text: #1a1d21;
+  --text-2: #4f5763;
+  --text-3: #5b636f;
+  --accent: #1f5f8b;
+  --accent-hover: #174a6d;
+  --accent-text: #ffffff;
+  --accent-soft: #dbe9f3;
+  --ok: #23683f;
+  --ok-soft: #ddf0e3;
+  --warn: #8a5300;
+  --warn-soft: #fcebcb;
+  --bad: #a8321c;
+  --bad-soft: #f8ddd7;
+  --bad-text: #ffffff;
+  --focus: #1f5f8b;
+  --shadow: 0 16px 48px -16px rgba(20, 25, 30, 0.3), 0 2px 6px rgba(20, 25, 30, 0.08);
+  --backdrop: rgba(15, 18, 21, 0.45);
+  --font: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --radius: 8px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f1215;
+  --surface: #161a1f;
+  --surface-2: #1c2127;
+  --hover: #232931;
+  --line: #2b3239;
+  --line-2: #4a545f;
+  --text: #e6e9ed;
+  --text-2: #a9b1bb;
+  --text-3: #98a1ab;
+  --accent: #7cb6e3;
+  --accent-hover: #9cc8ea;
+  --accent-text: #0b1b29;
+  --accent-soft: #16304a;
+  --ok: #5bc48a;
+  --ok-soft: #173826;
+  --warn: #e8a93c;
+  --warn-soft: #3b2b10;
+  --bad: #f08470;
+  --bad-soft: #41201a;
+  --bad-text: #2a0d07;
+  --focus: #9cc8ea;
+  --shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --backdrop: rgba(0, 0, 0, 0.6);
+}
+
+/* Bausteine von iam-web in den Farben der App */
+:root {
+  --iam-bg: var(--bg);
+  --iam-surface: var(--surface);
+  --iam-surface-2: var(--surface-2);
+  --iam-hover: var(--hover);
+  --iam-line: var(--line);
+  --iam-line-2: var(--line-2);
+  --iam-text: var(--text);
+  --iam-text-2: var(--text-2);
+  --iam-text-3: var(--text-3);
+  --iam-accent: var(--accent);
+  --iam-accent-hover: var(--accent-hover);
+  --iam-accent-text: var(--accent-text);
+  --iam-accent-soft: var(--accent-soft);
+  --iam-ok: var(--ok);
+  --iam-ok-soft: var(--ok-soft);
+  --iam-warn: var(--warn);
+  --iam-warn-soft: var(--warn-soft);
+  --iam-bad: var(--bad);
+  --iam-bad-soft: var(--bad-soft);
+  --iam-bad-text: var(--bad-text);
+  --iam-info: var(--accent);
+  --iam-info-soft: var(--accent-soft);
+  --iam-off: var(--text-3);
+  --iam-off-soft: var(--hover);
+  --iam-focus: var(--focus);
+  --iam-shadow: var(--shadow);
+  --iam-font: var(--font);
+  --iam-font-display: var(--font);
+  --iam-font-mono: var(--font-mono);
+}

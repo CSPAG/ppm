@@ -1,0 +1,49 @@
+/* Rahmen: Kopf, Rail, Inhalt; ab 760 px Rail links, darunter als Schublade über den Menüknopf */
+.shell { min-height: 100vh; display: flex; flex-direction: column; }
+.skip {
+  position: absolute; left: 8px; top: -48px; z-index: 100; padding: 8px 12px; border-radius: var(--radius);
+  background: var(--accent); color: var(--accent-text); text-decoration: none;
+}
+.skip:focus { top: 8px; }
+.topbar {
+  position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px; min-height: 56px;
+  padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.brand-mark {
+  width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center;
+  background: var(--accent); color: var(--accent-text); font-size: 15px;
+}
+.org {
+  max-width: 28ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2);
+  padding-left: 10px; border-left: 1px solid var(--line);
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600;
+  background: var(--accent-soft); color: var(--text);
+}
+.palette-btn kbd { border: 1px solid var(--line-2); border-radius: 4px; padding: 0 4px; color: var(--text-2); }
+.shell-body { flex: 1; display: flex; min-height: 0; }
+.rail {
+  width: 232px; flex: none; padding: 16px 10px; border-right: 1px solid var(--line); background: var(--surface);
+  display: flex; flex-direction: column; gap: 20px;
+}
+.rail-nav ul, .rail-iam ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.rail-i {
+  display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 8px 10px; border-radius: var(--radius);
+  color: var(--text-2); text-decoration: none; font-weight: 500;
+}
+.rail-i:hover { background: var(--hover); color: var(--text); }
+.rail-i.rail-on { background: var(--accent-soft); color: var(--text); }
+.main { flex: 1; min-width: 0; outline: none; }
+.only-narrow { display: none; }
+@media (max-width: 759px) {
+  .rail { display: none; }
+  .only-narrow { display: grid; }
+  .only-wide { display: none; }
+  .palette-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .org { max-width: 12ch; }
+  .topbar { padding: 8px; gap: 4px; }
+  .brand-name { display: none; }
+}
+.overlay-left .rail-nav, .overlay-left .rail-iam { margin-bottom: 16px; }

@@ -130,7 +130,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 
 ## 9. Use Cases
 
-● = Kernablauf. Business Cases je Use Case, Traceability-Matrix und ausformulierte Use Cases (UC-003, UC-004): [anhang/use-cases.md](anhang/use-cases.md).
+● = Kernablauf. Business Cases je Use Case, Traceability-Matrix und alle 18 ausformulierten Use Cases: [anhang/use-cases.md](anhang/use-cases.md).
 
 | ID | Use Case | Kern | Heimat-Arbeitsraum | Primärakteur |
 |---|---|---|---|---|
@@ -171,6 +171,8 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
    - **Weitere Beschriebe:** Handlungsfelder mit Leitsatz und Stossrichtungen als Stammdaten (ZM.01.01); Projektidee nach Vorlage des PM-Handbuchs (DM.01.01–02); Gate Review Packet 5 Arbeitstage vor der Sitzung, Protokoll nach 2–3 Arbeitstagen (PP.04.01–02).
    - **Herleitungen:** Q8 und Q9 bei 36 bestehenden Business Cases als Beleg nachgetragen.
    - **UC-003 und UC-004** an Q8 angepasst; die [OFFEN] zu Reihenfolge, Rhythmus, Frist und Freigabe durch den Sponsor sind geschlossen.
+9. **UC-006** «PRAT-Sitzung vorbereiten und durchführen» nach Q8 Kap. 8.1–8.5 ausformuliert. Offen dort: Vorlage an den SNS-VR in P0 und P1, Weiterleitung an den VR ausserhalb des Quartalsreportings.
+10. **Alle 18 Use Cases ausformuliert** (CSP-Vorlage). Fehlende Grundlagen sind als [OFFEN] markiert und unter «Aus den Use Cases» in den offenen Punkten gesammelt.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -186,10 +188,13 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 
 ## 12. Offene Punkte
 
+Alle offenen Punkte mit Fundstelle und Vorschlag von CSP als Fragen K01–K25: [anhang/klaerungsliste.md](anhang/klaerungsliste.md).
+
 Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung für Kategorie B und C, Reihenfolge Vertragsfreigabe und Gate, Berichtsrhythmus und Frist, Freigabe des Berichts durch den Sponsor (keine), Ampel (eine Ampel plus Trend), Zuordnung Kategorie A = Transformationsprogramm, PM-Handbuch als Quelle.
 
 - **Abkürzungen:** Ausschreibung der Direktionskürzel AeD, DPF, DLF, DMS, DP, DTI (laut Q8 ICT) und DIB bzw. DBI (Q8 schreibt beides; Infrastruktur); PFLE (Q6 F1), DRC (Dashboard), «CP» in Phase 1 (Q6 F6, Q8 Abb. 4) und «Streams» (F2)?
 - **Sponsoren-Koalition:** Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL (Q8 Abb. 7). Q7 verlangt Freigabe durch «Auftraggeber» und «Sponsor» getrennt – ist das dieselbe Person?
+- **SNS-VR und VR:** Wie werden Geschäfte in P0 und P1 dem SNS-VR vorgelegt und dessen Entscheide erfasst? Gibt es Weiterleitungen an den VR ausserhalb des Quartalsreportings (UC-006 A1, A4)?
 - **Programmauftraggeber:** VR (Q8 Kap. 1, 5.1) oder VR-Präsident (Q8 Glossar «VRP»)?
 - **Kategorie B:** Gelten Quality-Check durch UE, monatliches Dashboard und Projektvertrag auch für GL-Projekte? Sitzungsrhythmus der GLPA?
 - **Kategorie C:** Soll das System Direktionsportfolios überhaupt führen, oder genügt eine Projektliste ohne Governance?
@@ -200,12 +205,13 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 - **Abweichung:** Ab welcher Schwelle ist eine Abweichung wesentlich? Q8 spricht von «definierten Toleranzen», nennt aber keine.
 - **Ressourcen:** Reicht die Planung in FTE × Monate je Rolle und Phase («Ressourcensteuerung auf Top-Level», Q8 Abb. 3), oder braucht es Kapazitätsplanung je Pool?
 - **Datenübernahme:** Werden die Projekte aus dem heutigen Excel-Dashboard initial übernommen?
+- **Aus den Use Cases:** Wer benennt Sponsor und Projektleitung bei der Freigabe der Initialisierung (UC-001)? Darf die UE eine Idee allein zurückweisen (UC-001 A3)? Wie wird mit fehlenden Statusberichten umgegangen (UC-005 A3)? Wie werden sistierte Vorhaben wieder aufgenommen (UC-015)? Gilt eine neue Version des Phasenmodells auch für laufende Phasen (UC-017)? Werden Benutzer aus HR-System oder Verzeichnisdienst übernommen (UC-016)?
 - **ICT und Infrastruktur:** Wie werden die eigenen Projekt- und Investitionsprozesse von DTI und DBI angebunden (Meldung, Status, Freigaben)?
 
 ## 13. Nächste Schritte
 
-1. PDFs im Anhang mit dem Generator neu erzeugen (Stand Entscheid 8; braucht die CSP-Skills).
-2. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren, auf Basis von Q8 Kap. 8.1–8.5.
+1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
+2. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 3. V10 mit der Insel Gruppe klären.
 4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
 5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
@@ -217,14 +223,14 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 |---|---|
 | [anhang/funktionsbaum.md](anhang/funktionsbaum.md) | Funktionsbaum mit allen Business Cases im Detail |
 | [anhang/use-cases.md](anhang/use-cases.md) | Use-Case-Liste, Traceability-Matrix, ausformulierte Use Cases |
+| [anhang/klaerungsliste.md](anhang/klaerungsliste.md) | offene Fragen K01–K25 mit Fundstelle und Vorschlag |
 | [anhang/daten/](anhang/daten/) | Funktionsbaum und Use Cases als JSON |
-| [anhang/pdf/](anhang/pdf/) | gestaltete PDFs im CSP-Design (Stand vor Entscheid 8, neu zu erzeugen) |
 | [anhang/quellen/](anhang/quellen/) | Kundenunterlagen Q6–Q9 im Original und als Text (Q6–Q8 intern, Q9 öffentlich) |
 | [anhang/generator/](anhang/generator/) | Python-Skripte für PDFs, Markdown und JSON |
 
 **Pflege**
 
 - Dieses Masterdokument ist führend. Neue Entscheide, Annahmen und offene Punkte zuerst hier eintragen.
-- Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py` und `anhang/generator/uc_daten.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
+- Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py`, `anhang/generator/uc_daten.py` und für die ausformulierten Use Cases `anhang/generator/uc_texte.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
 - IDs nie umnummerieren; Neues hinten anfügen, Gestrichenes als «entfällt» markieren.
 - Der Generator setzt die CSP-Skills `csp-dokumente` und `csp-grafiken` voraus (Pfade `/mnt/skills/plugins/csp-solutions:*`) sowie `symbol.html`, `pruef.html` und `csp-assets/` im Arbeitsordner.

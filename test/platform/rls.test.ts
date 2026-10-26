@@ -14,6 +14,7 @@ import { model } from '../../src/platform/authz/model.ts';
 import { withTenant } from '../../src/platform/db/pool.ts';
 import { createTestDb, skipDb, type TestDatabase } from './harness.ts';
 import { tenant } from './api.ts';
+import { APP_TENANT_TABLES } from '../../src/platform/ops/tenants.ts';
 
 const skip = await skipDb();
 
@@ -94,6 +95,8 @@ describe('PostgreSQL RLS', { skip }, () => {
     const noTenant = rows.filter(r => !r.tenant && !KIT_TABLES.includes(r.t)).map(r => r.t);
     assert.deepEqual(noTenant, [], 'Tabelle der App ohne tenant_id');
     for (const t of Object.keys(MATRIX)) assert.ok(rows.some(r => r.t === t), `MATRIX nennt ${t}, die Tabelle fehlt`);
+    // `tenant delete` (ops/tenants.ts) löscht genau die Tabellen der App
+    assert.deepEqual([...APP_TENANT_TABLES].sort(), Object.keys(MATRIX).sort(), 'APP_TENANT_TABLES in ops/tenants.ts nachführen');
   });
 
   for (const [table, m] of Object.entries(MATRIX)) {

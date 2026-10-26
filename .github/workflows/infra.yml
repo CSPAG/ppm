@@ -68,8 +68,11 @@ jobs:
   plan:
     name: Plan (${{ matrix.dir }})
     needs: [check]
-    # Pull Requests aus Forks bekommen keine Geheimnisse
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    # Pull Requests aus Forks bekommen keine Geheimnisse. Im PR erst, wenn das State-Backend eingerichtet ist
+    # (Variable TF_STATE_BUCKET, deploy/hetzner/README.md); bis dahin nur «Prüfen». «Run workflow» bricht ohne ab.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event.pull_request.head.repo.full_name == github.repository && vars.TF_STATE_BUCKET != '')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: ${{ github.event_name == 'pull_request' && 'infra-plan' || 'production' }}

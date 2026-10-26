@@ -1,0 +1,208 @@
+# OpenTofu für Hetzner (infra/hetzner: VMs, Netz, Firewalls, Volume) und DNS (infra/dns). infra/keycloak hat einen
+# eigenen, von identity-kit verwalteten Workflow (keycloak.yml).
+#
+#   pull_request (infra/hetzner/**, infra/dns/**): Prüfen (fmt, validate, tflint) ohne Geheimnisse, danach Plan mit
+#       Lese-Token (Environment «infra-plan», nur für Branches dieses Repositorys, ohne State-Sperre); Plan in der
+#       Zusammenfassung des Laufs
+#   «Run workflow» (nur main): Plan (Freigabe im Environment «production», Plan verschlüsselt als Artefakt)
+#       → Apply genau dieses Plans (zweite Freigabe)
+#
+# Secrets: HCLOUD_TOKEN (production, Lesen und Schreiben), HCLOUD_TOKEN_READ (infra-plan, nur Lesen), S3_ACCESS_KEY,
+# S3_SECRET_KEY, TF_STATE_PASSPHRASE (beide Environments). Variablen: deploy/hetzner/README.md.
+name: Infrastruktur
+
+on:
+  pull_request:
+    paths: ["infra/hetzner/**", "infra/dns/**", ".github/workflows/infra.yml"]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Teil
+        type: choice
+        options: [hetzner, dns]
+        default: hetzner
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('infra-pr-{0}', github.ref) || 'infra-production' }}
+  cancel-in-progress: false # nie einen laufenden Plan/Apply abbrechen (State-Sperre)
+
+env:
+  TOFU_VERSION: 1.13.1
+  TFLINT_VERSION: v0.64.0
+  TF_IN_AUTOMATION: "1"
+  TF_INPUT: "0"
+
+jobs:
+  check:
+    name: Prüfen (${{ matrix.dir }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: [hetzner, dns]
+    defaults:
+      run:
+        working-directory: infra/${{ matrix.dir }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+      - uses: terraform-linters/setup-tflint@v6.3.2
+        with:
+          tflint_version: ${{ env.TFLINT_VERSION }}
+      - run: tofu fmt -check -recursive -diff .
+      - name: tofu validate
+        env:
+          TF_VAR_state_passphrase: nur-fuer-die-pruefung-ohne-state
+        run: tofu init -backend=false >/dev/null && tofu validate
+      - run: tflint --init >/dev/null && tflint --format compact
+
+  plan:
+    name: Plan (${{ matrix.dir }})
+    needs: [check]
+    # Pull Requests aus Forks bekommen keine Geheimnisse
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: ${{ github.event_name == 'pull_request' && 'infra-plan' || 'production' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: ${{ github.event_name == 'pull_request' && fromJSON('["hetzner","dns"]') || fromJSON(format('["{0}"]', inputs.target)) }}
+    defaults:
+      run:
+        working-directory: infra/${{ matrix.dir }}
+    outputs:
+      changes: ${{ steps.plan.outputs.changes }}
+    env:
+      HCLOUD_TOKEN: ${{ github.event_name == 'pull_request' && secrets.HCLOUD_TOKEN_READ || secrets.HCLOUD_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+      TF_VAR_state_passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
+      # infra/hetzner
+      TF_VAR_location: ${{ vars.HCLOUD_LOCATION }}
+      TF_VAR_app_server_type: ${{ vars.HCLOUD_APP_SERVER_TYPE }}
+      TF_VAR_db_server_type: ${{ vars.HCLOUD_DB_SERVER_TYPE }}
+      TF_VAR_ssh_key_names: ${{ vars.HCLOUD_SSH_KEY_NAMES || '[]' }}
+      TF_VAR_deploy_ssh_public_key: ${{ vars.DEPLOY_SSH_PUBLIC_KEY }}
+      TF_VAR_admin_cidrs: ${{ vars.ADMIN_CIDRS }}
+      TF_VAR_existing_network_name: ${{ vars.HCLOUD_NETWORK_NAME }}
+      # infra/dns
+      TF_VAR_zone: ${{ vars.DNS_ZONE || 'project-suite.ch' }}
+      TF_VAR_app_ipv4: ${{ vars.APP_IPV4 }}
+      TF_VAR_app_ipv6: ${{ vars.APP_IPV6 }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+      - name: tofu init (Backend aus Variablen)
+        env:
+          BUCKET: ${{ vars.TF_STATE_BUCKET }}
+          REGION: ${{ vars.TF_STATE_REGION }}
+          ENDPOINT: ${{ vars.TF_STATE_ENDPOINT }}
+          DIR: ${{ matrix.dir }}
+        run: |
+          for v in BUCKET REGION ENDPOINT; do [ -n "${!v}" ] || { echo "::error::Variable TF_STATE_$v fehlt"; exit 1; }; done
+          cat > "$RUNNER_TEMP/backend.hcl" <<EOF
+          bucket                      = "$BUCKET"
+          key                         = "ppm/$DIR.tfstate"
+          region                      = "$REGION"
+          endpoints                   = { s3 = "$ENDPOINT" }
+          use_path_style              = true
+          skip_credentials_validation = true
+          skip_region_validation      = true
+          skip_requesting_account_id  = true
+          skip_s3_checksum            = true
+          use_lockfile                = true
+          EOF
+          tofu init -no-color -backend-config="$RUNNER_TEMP/backend.hcl" >/dev/null
+      - name: tofu plan
+        id: plan
+        env:
+          LOCK: ${{ github.event_name == 'pull_request' && 'false' || 'true' }}
+        run: |
+          set +e
+          tofu plan -no-color -detailed-exitcode -lock="$LOCK" -lock-timeout=5m -out=infra.tfplan > plan.txt 2>&1
+          rc=$?
+          set -e
+          cat plan.txt
+          [ "$rc" != 1 ] || exit 1
+          changes=false; [ "$rc" != 2 ] || changes=true
+          echo "changes=$changes" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Plan infra/${{ matrix.dir }} ($([ "$changes" = true ] && echo 'Änderungen' || echo 'keine Änderungen'))"
+            echo '```'
+            sed -n '/^OpenTofu will perform\|^OpenTofu used the selected\|^No changes/,$p' plan.txt | head -c 60000
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7.0.2
+        if: github.event_name == 'workflow_dispatch' && steps.plan.outputs.changes == 'true'
+        with:
+          name: infra-${{ matrix.dir }}-tfplan
+          path: infra/${{ matrix.dir }}/infra.tfplan
+          retention-days: 3
+
+  apply:
+    name: Apply ${{ inputs.target }} (nach Freigabe)
+    needs: [plan]
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.plan.outputs.changes == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production # Pflicht-Reviewer
+    defaults:
+      run:
+        working-directory: infra/${{ inputs.target }}
+    env:
+      HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+      TF_VAR_state_passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+      - uses: actions/download-artifact@v8.0.2
+        with:
+          name: infra-${{ inputs.target }}-tfplan
+          path: infra/${{ inputs.target }}
+      - name: tofu init (Backend aus Variablen)
+        env:
+          BUCKET: ${{ vars.TF_STATE_BUCKET }}
+          REGION: ${{ vars.TF_STATE_REGION }}
+          ENDPOINT: ${{ vars.TF_STATE_ENDPOINT }}
+          DIR: ${{ inputs.target }}
+        run: |
+          cat > "$RUNNER_TEMP/backend.hcl" <<EOF
+          bucket                      = "$BUCKET"
+          key                         = "ppm/$DIR.tfstate"
+          region                      = "$REGION"
+          endpoints                   = { s3 = "$ENDPOINT" }
+          use_path_style              = true
+          skip_credentials_validation = true
+          skip_region_validation      = true
+          skip_requesting_account_id  = true
+          skip_s3_checksum            = true
+          use_lockfile                = true
+          EOF
+          tofu init -no-color -backend-config="$RUNNER_TEMP/backend.hcl" >/dev/null
+      # Genau der freigegebene Plan; hat sich der State inzwischen geändert, bricht OpenTofu ab («Saved plan is stale»)
+      - run: tofu apply -no-color -lock-timeout=5m infra.tfplan
+      - name: Ausgaben
+        run: |
+          { echo "### Ausgaben infra/${{ inputs.target }}"; echo '```'; tofu output -no-color; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

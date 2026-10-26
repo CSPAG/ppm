@@ -1,0 +1,82 @@
+# Caddy vor PPM (deploy/compose.prod.yaml): TLS mit ACME, genau ein Host, Wartungsseite.
+#   /mcp, /mcp/*, /.well-known/oauth-protected-resource*  → mcp:8081 (Profil mcp, RFC 9728)
+#   alles andere                                           → api:8080 (REST-API, BFF, Webapp)
+# Die Betriebs-Endpunkte (OPS_PORT 9090) sind nie von aussen erreichbar; Caddy nutzt sie nur für Health Checks.
+#
+# Die App setzt ihre CSP je Antwortart selbst; Caddy ergänzt nur eine strenge Fallback-CSP, wo keine gesetzt ist
+# (z. B. Fehlerseiten des Proxys).
+{
+	email {$ACME_EMAIL}
+	admin off
+	servers {
+		protocols h1 h2 h3
+	}
+}
+
+{$PPM_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		# Fallback-CSP: nur, wenn die Antwort keine eigene hat
+		?Content-Security-Policy "default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+		-Server
+		-X-Powered-By
+	}
+
+	# Wartungsmodus: Datei maintenance.on im Zustandsverzeichnis (rollout.sh maintenance-on|off)
+	@wartung file {
+		root /srv/state
+		try_files maintenance.on
+	}
+	handle @wartung {
+		header Retry-After "300"
+		header Cache-Control "no-store"
+		root * /srv/maintenance
+		rewrite * /index.html
+		file_server {
+			status 503
+		}
+	}
+
+	@mcp path /mcp /mcp/* /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/*
+	handle @mcp {
+		reverse_proxy mcp:8081 {
+			lb_try_duration 10s
+			health_uri /readyz
+			health_port 9090
+			health_interval 5s
+			# Streamable HTTP (SSE): Antworten sofort weitergeben
+			flush_interval -1
+		}
+	}
+
+	handle {
+		reverse_proxy api:8080 {
+			lb_try_duration 10s
+			health_uri /readyz
+			health_port 9090
+			health_interval 5s
+		}
+	}
+
+	# App nicht erreichbar (z. B. während eines Neustarts): Wartungsseite statt Fehlermeldung des Proxys
+	handle_errors 502 503 504 {
+		header Retry-After "60"
+		header Cache-Control "no-store"
+		root * /srv/maintenance
+		rewrite * /index.html
+		file_server {
+			status 503
+		}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

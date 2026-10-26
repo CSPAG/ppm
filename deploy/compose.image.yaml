@@ -1,0 +1,67 @@
+# Lokal das Image gegen den Dev-Stack testen (PostgreSQL und Keycloak aus deploy/compose.dev.yaml, Konfiguration aus
+# der .env von «npm run dev:env»). Gleiche Härtung wie in Produktion: UID 1000, Root-Dateisystem schreibgeschützt,
+# keine Capabilities.
+#
+#   npm run dev:up
+#   docker compose --env-file .env -f deploy/compose.image.yaml build      # braucht ~/.npmrc mit read:packages
+#   docker compose --env-file .env -f deploy/compose.image.yaml up         # migrate, dann api, worker, mcp
+#
+# Netz des Hosts: die Adressen der .env (localhost:5433, Issuer von Keycloak) gelten im Container unverändert, auch
+# der Issuer in den Tokens. Deshalb vorher «npm run dev:api/dev:worker/dev:mcp» beenden (gleiche Ports). Auf dem Mac
+# braucht das Docker Desktop mit aktiviertem Host-Netz (Einstellungen › Resources › Network).
+#
+# Schlüsseldateien der .env (…_FILE=.local/keys/…) sind relativ zur Wurzel des Repositorys; .local wird deshalb nach
+# /app/.local eingehängt (nur lesbar).
+
+name: ppm-image
+
+x-app: &app
+  image: ${PPM_IMAGE:-ppm:local}
+  build:
+    context: ..
+    dockerfile: Dockerfile
+    secrets: [npmrc]
+  env_file: [../.env]
+  network_mode: host
+  user: "1000:1000"
+  read_only: true
+  tmpfs:
+    - /tmp:size=64m,mode=1777
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  stop_grace_period: 30s
+  volumes:
+    - ../.local:/app/.local:ro
+
+services:
+  migrate:
+    <<: *app
+    command: [migrate]
+    healthcheck: { disable: true }
+
+  api:
+    <<: *app
+    command: [api]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    <<: *app
+    command: [worker]
+    # eigener Betriebs-Endpunkt neben dem der API (gleiches Host-Netz)
+    environment:
+      OPS_PORT: "9091"
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  mcp:
+    <<: *app
+    command: [mcp]
+    environment:
+      OPS_PORT: "9092"
+    depends_on:
+      api: { condition: service_healthy }
+
+secrets:
+  npmrc:
+    file: ${NPMRC_FILE:-~/.npmrc}

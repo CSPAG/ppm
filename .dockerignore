@@ -1,0 +1,26 @@
+# Build-Kontext des Images: nur, was die Stufen brauchen (Dockerfile). Alles andere bleibt draussen –
+# insbesondere Geheimnisse (.env, .local/, Schlüssel), Abhängigkeiten des Hosts und Build-Ergebnisse.
+**/node_modules
+**/dist
+**/.terraform
+**/*.tfstate*
+**/*.log
+.git
+.github
+.env
+.env.*
+.local
+coverage
+web/test-results
+web/playwright-report
+docs
+infra
+!infra/keycloak/platform.ts
+deploy
+!deploy/docker-entrypoint.sh
+*.md
+!web/**/*.md
+Dockerfile
+.dockerignore
+renovate.json
+.sops.yaml

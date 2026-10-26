@@ -13,3 +13,9 @@ coverage/
 infra/**/.terraform/
 infra/**/*.tfstate*
 deploy/hetzner/secrets/*.dec.*
+deploy/prod.env
+deploy/secrets/
+deploy/state/
+deploy/hetzner/db/db.env
+deploy/hetzner/db/secrets/
+infra/**/backend.hcl

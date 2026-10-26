@@ -1,0 +1,202 @@
+# Ausrollen auf die App-VM bei Hetzner (deploy/hetzner/README.md). Nur von Hand («Run workflow») und erst nach
+# Freigabe im Environment «production» (Pflicht-Reviewer).
+#
+#   deploy           Image per Digest (Eingabe image: sha256:… oder Tag wie main/1.2.3, wird zum Digest aufgelöst),
+#                    Signatur und Provenienz prüfen, Dateien und Geheimnisse übertragen, rollout.sh deploy
+#   rollback         vorheriges Image (ohne Migrationen)
+#   maintenance-on   Wartungsseite ein (503)
+#   maintenance-off  Wartungsseite aus
+#   status           Dienste und Images anzeigen
+#
+# Environment «production»: Secrets SSH_PRIVATE_KEY, SOPS_AGE_KEY, HCLOUD_TOKEN (SSH für den Runner vorübergehend in
+# der Firewall öffnen), optional GHCR_READ_TOKEN (falls das Paket privat
+# ist); Variablen APP_HOST, SSH_KNOWN_HOSTS, optional SSH_USER (Standard deploy), PPM_DOMAIN (Standard
+# ppm.project-suite.ch).
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Aktion
+        type: choice
+        options: [deploy, rollback, maintenance-on, maintenance-off, status]
+        default: status
+      image:
+        description: "Nur deploy: Digest (sha256:…) oder Tag (main, 1.2.3)"
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false # nie einen laufenden Rollout abbrechen
+
+env:
+  # renovate: datasource=github-releases depName=getsops/sops
+  SOPS_VERSION: v3.13.3
+  # renovate: datasource=github-releases depName=sigstore/cosign
+  COSIGN_VERSION: v3.1.3
+  ACTION: ${{ inputs.action }}
+  APP_HOST: ${{ vars.APP_HOST }}
+  SSH_USER: ${{ vars.SSH_USER || 'deploy' }}
+  PPM_DOMAIN: ${{ vars.PPM_DOMAIN || 'ppm.project-suite.ch' }}
+  REMOTE_DIR: /opt/ppm
+
+jobs:
+  run:
+    name: ${{ inputs.action }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production # Pflicht-Reviewer
+    permissions:
+      contents: read
+      packages: read # Digest auflösen, Signatur lesen
+      attestations: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: SSH einrichten
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+        run: |
+          [ -n "$APP_HOST" ] || { echo "::error::Variable APP_HOST fehlt im Environment production"; exit 1; }
+          [ -n "$SSH_KNOWN_HOSTS" ] || { echo "::error::Variable SSH_KNOWN_HOSTS fehlt (ssh-keyscan der App-VM, geprüft)"; exit 1; }
+          install -d -m 0700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy && chmod 0600 ~/.ssh/id_deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf 'Host app\n  HostName %s\n  User %s\n  IdentityFile ~/.ssh/id_deploy\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n' \
+            "$APP_HOST" "$SSH_USER" > ~/.ssh/config
+
+      # GitHub-Runner haben wechselnde Adressen: SSH für die Adresse dieses Runners in der Firewall ppm-app für die
+      # Dauer des Laufs öffnen (Hetzner-API), im letzten Schritt wieder auf die ursprünglichen Regeln zurücksetzen.
+      # Ohne HCLOUD_TOKEN (z. B. eigener Runner in ADMIN_CIDRS) entfällt das.
+      - name: SSH in der Firewall für diesen Runner öffnen
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+          FIREWALL: ${{ vars.HCLOUD_APP_FIREWALL || 'ppm-app' }}
+        run: |
+          [ -n "$HCLOUD_TOKEN" ] || { echo "HCLOUD_TOKEN nicht gesetzt – Firewall bleibt unverändert"; exit 0; }
+          api() { curl -fsS -H "Authorization: Bearer $HCLOUD_TOKEN" -H 'Content-Type: application/json' "$@"; }
+          ip="$(curl -fsS https://api.ipify.org)"
+          [[ "$ip" =~ ^[0-9.]+$ ]] || { echo "::error::Adresse des Runners nicht ermittelt"; exit 1; }
+          fw="$(api "https://api.hetzner.cloud/v1/firewalls?name=$FIREWALL" | jq '.firewalls[0]')"
+          [ "$fw" != null ] || { echo "::error::Firewall $FIREWALL nicht gefunden"; exit 1; }
+          id="$(jq -r .id <<<"$fw")"
+          jq '{rules: .rules}' <<<"$fw" > "$RUNNER_TEMP/fw-rules.json"
+          echo "FIREWALL_ID=$id" >> "$GITHUB_ENV"
+          jq --arg ip "$ip/32" '{rules: (.rules + [{direction: "in", protocol: "tcp", port: "22", source_ips: [$ip], description: "deploy.yml (vorübergehend)"}])}' \
+            "$RUNNER_TEMP/fw-rules.json" | api -X POST --data @- "https://api.hetzner.cloud/v1/firewalls/$id/actions/set_rules" >/dev/null
+          sleep 10 # Regeln wirken nach wenigen Sekunden
+
+      - name: Image zum Digest auflösen
+        if: inputs.action == 'deploy'
+        env:
+          REF: ${{ inputs.image }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin >/dev/null
+          if [[ "$REF" =~ ^sha256:[0-9a-f]{64}$ ]]; then digest="$REF"
+          else
+            [[ "$REF" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "::error::Ungültiger Tag «$REF»"; exit 1; }
+            digest="$(docker buildx imagetools inspect "$image:$REF" --format '{{json .Manifest.Digest}}' | tr -d '"')"
+          fi
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "::error::Digest nicht ermittelt"; exit 1; }
+          echo "IMAGE_REF=$image@$digest" >> "$GITHUB_ENV"
+          echo "Image: $image@$digest"
+
+      - uses: sigstore/cosign-installer@v4.1.2
+        if: inputs.action == 'deploy'
+        with:
+          cosign-release: ${{ env.COSIGN_VERSION }}
+
+      - name: Signatur und Provenienz prüfen (nur Images aus ci.yml auf main bzw. Tags v*)
+        if: inputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cosign verify "$IMAGE_REF" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity-regexp "^https://github.com/${GITHUB_REPOSITORY}/\.github/workflows/ci\.yml@refs/(heads/main|tags/v.+)$" \
+            > /dev/null
+          gh attestation verify "oci://$IMAGE_REF" --repo "$GITHUB_REPOSITORY" --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml"
+
+      - name: Geheimnisse entschlüsseln (SOPS)
+        if: inputs.action == 'deploy'
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: |
+          (
+            cd "$RUNNER_TEMP"
+            base="https://github.com/getsops/sops/releases/download/${SOPS_VERSION}"
+            curl -fsSLO "$base/sops-${SOPS_VERSION}.linux.amd64"
+            curl -fsSL "$base/sops-${SOPS_VERSION}.checksums.txt" | grep " sops-${SOPS_VERSION}.linux.amd64$" | sha256sum -c -
+            install -m 0755 "sops-${SOPS_VERSION}.linux.amd64" sops
+          )
+          umask 077
+          dir="$RUNNER_TEMP/secrets"; mkdir -p "$dir"
+          "$RUNNER_TEMP/sops" decrypt --output-type json deploy/hetzner/secrets/app.enc.yaml > "$RUNNER_TEMP/app.json"
+          for key in $(jq -r 'keys[]' "$RUNNER_TEMP/app.json"); do
+            [[ "$key" =~ ^[a-z0-9_.]+$ ]] || { echo "::error::Ungültiger Schlüssel «$key»"; exit 1; }
+            jq -j --arg k "$key" '.[$k]' "$RUNNER_TEMP/app.json" > "$dir/$key"
+          done
+          rm -f "$RUNNER_TEMP/app.json"
+          echo "Geheimnisse: $(cd "$dir" && printf '%s ' *)"
+
+      - name: Dateien und Geheimnisse übertragen
+        if: inputs.action == 'deploy'
+        env:
+          GHCR_READ_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+        run: |
+          grep -v '^\s*#' deploy/hetzner/prod.env | grep -q '<' && { echo "::error::deploy/hetzner/prod.env enthält Platzhalter"; exit 1; }
+          rsync -rlt --chmod=D0750,F0640 deploy/compose.prod.yaml deploy/caddy deploy/maintenance "app:$REMOTE_DIR/"
+          rsync -t --chmod=F0640 deploy/hetzner/prod.env "app:$REMOTE_DIR/prod.env"
+          rsync -t --chmod=F0750 deploy/hetzner/rollout.sh "app:$REMOTE_DIR/rollout.sh"
+          rsync -r --delete --chmod=D0700,F0400 "$RUNNER_TEMP/secrets/" "app:$REMOTE_DIR/secrets/"
+          if [ -n "$GHCR_READ_TOKEN" ]; then
+            printf '%s' "$GHCR_READ_TOKEN" | ssh app "docker login ghcr.io -u token --password-stdin" >/dev/null
+          fi
+
+      - name: rollout.sh ${{ inputs.action }}
+        run: |
+          # shellcheck disable=SC2029 # Argumente bewusst auf dem Client erweitert
+          ssh app "$REMOTE_DIR/rollout.sh $ACTION ${IMAGE_REF:-}" 2>&1 | tee "$RUNNER_TEMP/rollout.log"
+
+      - name: Rauchtest von aussen
+        if: inputs.action == 'deploy' || inputs.action == 'rollback'
+        run: |
+          for _ in $(seq 1 20); do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "https://$PPM_DOMAIN/")" || true
+            case "$code" in 200|302) echo "https://$PPM_DOMAIN/ antwortet $code"; exit 0 ;; esac
+            sleep 3
+          done
+          echo "::error::https://$PPM_DOMAIN/ antwortet $code"; exit 1
+
+      - name: Zusammenfassung
+        if: always()
+        run: |
+          {
+            echo "### Deploy: $ACTION"
+            [ -n "${IMAGE_REF:-}" ] && echo "Image: \`$IMAGE_REF\`"
+            echo '```'
+            tail -n 40 "$RUNNER_TEMP/rollout.log" 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Aufräumen
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/secrets" ~/.ssh/id_deploy
+
+      - name: Firewall zurücksetzen
+        if: always() && env.FIREWALL_ID != ''
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+        run: |
+          curl -fsS -X POST -H "Authorization: Bearer $HCLOUD_TOKEN" -H 'Content-Type: application/json' \
+            --data @"$RUNNER_TEMP/fw-rules.json" "https://api.hetzner.cloud/v1/firewalls/$FIREWALL_ID/actions/set_rules" >/dev/null

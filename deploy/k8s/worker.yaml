@@ -1,0 +1,70 @@
+# Prozess worker: Warteschlange, Outbox, Aufräumen, Mitgliederabgleich; nur Betriebs-Endpunkt (9090)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ppm-worker
+  labels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: worker }
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: worker }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: worker }
+    spec:
+      serviceAccountName: ppm
+      automountServiceAccountToken: false
+      # länger als SHUTDOWN_DELAY + SHUTDOWN_TIMEOUT (5 s + 20 s)
+      terminationGracePeriodSeconds: 40
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: worker
+          image: ghcr.io/cspag/ppm
+          args: [worker]
+          ports:
+            - { name: ops, containerPort: 9090 }
+          envFrom:
+            - configMapRef: { name: ppm-config }
+          env:
+            - { name: NODE_EXTRA_CA_CERTS, value: /run/secrets/db-ca/ca.crt }
+            - { name: DATABASE_WORKER_URL_FILE, value: /run/secrets/ppm/database_worker_url }
+            - { name: ENCRYPTION_KEYS_FILE, value: /run/secrets/ppm/encryption_keys }
+            - { name: KEYCLOAK_SYNC_PRIVATE_KEY_FILE, value: /run/secrets/ppm/keycloak_sync_private_key }
+          startupProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet: { path: /readyz, port: ops }
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests: { cpu: 50m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: secrets, mountPath: /run/secrets/ppm, readOnly: true }
+            - { name: db-ca, mountPath: /run/secrets/db-ca, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: secrets
+          secret: { secretName: ppm-worker, defaultMode: 0440 }
+        - name: db-ca
+          configMap: { name: ppm-db-ca, defaultMode: 0444 }
+        - name: tmp
+          emptyDir: { medium: Memory, sizeLimit: 64Mi }

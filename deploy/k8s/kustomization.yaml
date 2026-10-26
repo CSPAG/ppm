@@ -1,0 +1,46 @@
+# Kustomize-Basis für PPM: api, worker, mcp (Profil mcp), Migrations-Job, NetworkPolicy, Ingress.
+#
+#   kustomize build deploy/k8s            # bzw. kubectl kustomize deploy/k8s
+#
+# Eine Umgebung ist ein Overlay mit dieser Basis als «resources» und setzt mindestens:
+#   - das Image per Digest:  kustomize edit set image ghcr.io/cspag/ppm=ghcr.io/cspag/ppm@sha256:…
+#   - Host und TLS des Ingress, falls nicht ppm.project-suite.ch
+#   - Netz der Datenbank in networkpolicy.yaml (ipBlock, Platzhalter 192.0.2.0/24)
+#
+# Nicht Teil der Basis (je Umgebung anlegen, z. B. mit SOPS oder External Secrets), Schlüssel = Dateiname:
+#   Secret ppm-migrate  database_admin_url
+#   Secret ppm-api      database_url, session_secret, encryption_keys, oidc_bff_private_key, keycloak_mgmt_private_key
+#   Secret ppm-worker   database_worker_url, encryption_keys, keycloak_sync_private_key
+#   Secret ppm-mcp      mcp_private_key, mcp_dpop_key
+#   ConfigMap ppm-db-ca ca.crt (private CA der Datenbank, NODE_EXTRA_CA_CERTS für jeden Dienst mit Datenbank)
+#   Secret ppm-tls      Zertifikat des Ingress (z. B. cert-manager)
+#
+# Reihenfolge beim Ausrollen: zuerst den Job ppm-migrate (alter Job vorher löschen, Jobs sind unveränderlich), auf
+# «Complete» warten, dann die Deployments. Mit Argo CD übernimmt das die Hook-Annotation des Jobs.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ppm
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: ppm
+    includeSelectors: false
+
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - migrate-job.yaml
+  - api.yaml
+  - worker.yaml
+  - mcp.yaml
+  - networkpolicy.yaml
+  - ingress.yaml
+
+configMapGenerator:
+  - name: ppm-config
+    envs: [config.env]
+
+images:
+  - name: ghcr.io/cspag/ppm
+    newTag: main

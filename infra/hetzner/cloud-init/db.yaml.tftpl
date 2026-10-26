@@ -1,0 +1,38 @@
+#cloud-config
+# DB-VM: Docker mit Compose, Volume für PostgreSQL unter /srv/pgdata, Benutzer deploy, /opt/ppm-db.
+# PostgreSQL, pgBackRest und die Timer der Sicherung richtet der Betrieb danach ein (deploy/hetzner/README.md).
+package_update: true
+package_upgrade: true
+packages:
+  - docker.io
+  - docker-compose-v2
+  - unattended-upgrades
+  - rsync
+users:
+  - name: deploy
+    uid: "1000"
+    groups: [docker]
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${deploy_ssh_public_key}
+mounts:
+  - ["${volume_device}", "/srv/pgdata", "ext4", "discard,nofail,defaults", "0", "2"]
+write_files:
+  - path: /etc/docker/daemon.json
+    permissions: "0644"
+    content: |
+      { "log-driver": "json-file", "log-opts": { "max-size": "50m", "max-file": "5" }, "live-restore": true }
+  - path: /etc/ssh/sshd_config.d/10-ppm.conf
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin prohibit-password
+runcmd:
+  - install -d -o deploy -g deploy -m 0750 /opt/ppm-db /opt/ppm-db/secrets
+  - mkdir -p /srv/pgdata
+  - mount -a
+  # UID 999 = postgres im offiziellen Image
+  - chown 999:999 /srv/pgdata && chmod 0700 /srv/pgdata
+  - systemctl enable --now docker
+  - systemctl restart ssh

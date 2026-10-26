@@ -1,0 +1,135 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "PPM: wöchentlich, Mindestalter 14 Tage, Sicherheitsupdates sofort, exakte Versionen und gepinnte Digests. Von identity-kit verwaltete Dateien bleiben unberührt (create-iam-app sync).",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigestsToSemver",
+    ":semanticCommitsDisabled"
+  ],
+  "timezone": "Europe/Zurich",
+  "schedule": [
+    "* 0-6 * * 1"
+  ],
+  "prHourlyLimit": 4,
+  "prConcurrentLimit": 10,
+  "labels": [
+    "abhaengigkeiten"
+  ],
+  "rangeStrategy": "pin",
+  "minimumReleaseAge": "14 days",
+  "internalChecksFilter": "strict",
+  "ignorePaths": [
+    "**/node_modules/**",
+    ".github/workflows/keycloak.yml",
+    ".github/workflows/identity-conformity.yml",
+    "infra/keycloak/**",
+    "docs/identity-kit.md"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "* 0-6 * * 1"
+    ]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "sicherheit"
+    ],
+    "schedule": [
+      "at any time"
+    ],
+    "minimumReleaseAge": "0 days"
+  },
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "description": "Baukasten aus identity-kit: gemeinsam, nie automatisch zusammenführen (Migrationshinweise in identity-kit/docs lesen)",
+      "matchPackageNames": [
+        "@vollholz/**"
+      ],
+      "groupName": "identity-kit",
+      "groupSlug": "identity-kit",
+      "automerge": false,
+      "labels": [
+        "identity-kit"
+      ]
+    },
+    {
+      "description": "TypeScript auf der Linie von identity-kit (5.9, nicht 6 oder 7)",
+      "matchPackageNames": [
+        "typescript"
+      ],
+      "allowedVersions": "<6"
+    },
+    {
+      "description": "Node 24 (LTS) im Image, in .nvmrc und den Typen",
+      "matchPackageNames": [
+        "node",
+        "@types/node"
+      ],
+      "allowedVersions": "<25"
+    },
+    {
+      "description": "PostgreSQL bleibt auf 17 (Wechsel der Hauptversion mit pg_upgrade und Plan)",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "postgres"
+      ],
+      "allowedVersions": "<18"
+    },
+    {
+      "description": "Actions, Images und Werkzeuge der Lieferkette gemeinsam",
+      "matchManagers": [
+        "github-actions",
+        "custom.regex"
+      ],
+      "groupName": "CI und Lieferkette"
+    },
+    {
+      "description": "Basis-Images (Digest-Updates wöchentlich gesammelt)",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "Basis-Images (Digests)"
+    },
+    {
+      "description": "Eigenes Image: Digest setzt der Deploy (Overlay bzw. rollout.sh), nicht Renovate",
+      "matchPackageNames": [
+        "ghcr.io/cspag/ppm"
+      ],
+      "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Versionen von Werkzeugen in Workflows (Kommentar «# renovate: …» über der Zeile)",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/(ci|deploy|infra)\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\s+[A-Z_]+:\\s*\"?(?<currentValue>[^\"\\s]+)\"?"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Images per Digest in Workflow-Variablen (CADDY_IMAGE)",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/ci\\.yml$/"
+      ],
+      "matchStrings": [
+        "[A-Z_]+_IMAGE:\\s*(?<depName>[a-z0-9./-]+):(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[0-9a-f]{64})"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}

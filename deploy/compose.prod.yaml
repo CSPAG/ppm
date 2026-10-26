@@ -1,0 +1,176 @@
+# Produktion mit Docker Compose (z. B. App-VM bei Hetzner, deploy/hetzner/README.md): Caddy (TLS, ein Host),
+# migrate (vor api und worker), api, worker, mcp. Die Datenbank läuft ausserhalb (DB-VM bzw. verwaltete Instanz).
+#
+#   docker compose --env-file prod.env -f compose.prod.yaml up -d --wait
+#
+# prod.env (Vorlage prod.env.example) enthält nur Werte ohne Geheimnisse; sie dient der Interpolation (PPM_IMAGE,
+# PPM_DOMAIN …) und wird allen Diensten der App übergeben.
+#
+# Geheimnisse je Dienst als Dateien (${PPM_SECRETS_DIR}/<name>, Eigentümer UID 1000, Modus 0400), eingehängt unter
+# /run/secrets/<name> und gelesen über <NAME>_FILE. Jeder Dienst bekommt nur, was sein Code liest
+# (docs/konfiguration.md › Spalte «Dienste», src/platform/config/env.ts › services):
+#
+#   Dienst       Geheimnisse
+#   migrate      database_admin_url
+#   api          database_url, session_secret, encryption_keys, oidc_bff_private_key, keycloak_mgmt_private_key
+#   worker       database_worker_url, encryption_keys, keycloak_sync_private_key
+#   mcp          mcp_private_key, mcp_dpop_key (keine Datenbank)
+#   tenant       database_admin_url, database_url (Profil werkzeuge, nur «docker compose run»)
+#   rotate-keys  database_admin_url, database_url, encryption_keys (Profil werkzeuge)
+#
+# Jeder Dienst mit Datenbank vertraut zusätzlich der privaten CA der Datenbank (db_ca.crt, NODE_EXTRA_CA_CERTS),
+# weil DATABASE_SSL=verify-full gilt.
+#
+# Wartung: liegt ${PPM_STATE_DIR}/maintenance.on, antwortet Caddy mit der Wartungsseite (503);
+# deploy/hetzner/rollout.sh maintenance-on|maintenance-off.
+
+name: ppm
+
+x-app: &app
+  image: ${PPM_IMAGE:?PPM_IMAGE fehlt (ghcr.io/cspag/ppm@sha256:…)}
+  env_file: [prod.env]
+  user: "1000:1000"
+  read_only: true
+  tmpfs:
+    - /tmp:size=64m,mode=1777
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  restart: unless-stopped
+  # länger als SHUTDOWN_DELAY + SHUTDOWN_TIMEOUT (5 s + 20 s)
+  stop_grace_period: 30s
+  networks: [app]
+  logging:
+    driver: json-file
+    options: { max-size: 20m, max-file: "5" }
+
+x-db-ca: &db-ca
+  NODE_EXTRA_CA_CERTS: /run/secrets/db_ca.crt
+
+services:
+  caddy:
+    image: caddy:2.11.7-alpine@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      PPM_DOMAIN: ${PPM_DOMAIN:?PPM_DOMAIN fehlt}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL fehlt}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./maintenance:/srv/maintenance:ro
+      - ${PPM_STATE_DIR:-./state}:/srv/state:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: [no-new-privileges:true]
+    networks: [edge]
+    logging:
+      driver: json-file
+      options: { max-size: 20m, max-file: "5" }
+
+  migrate:
+    <<: *app
+    command: [migrate]
+    restart: "no"
+    healthcheck: { disable: true }
+    environment:
+      <<: *db-ca
+      DATABASE_ADMIN_URL_FILE: /run/secrets/database_admin_url
+    secrets: [database_admin_url, db_ca.crt]
+
+  api:
+    <<: *app
+    command: [api]
+    networks: [app, edge]
+    environment:
+      <<: *db-ca
+      DATABASE_URL_FILE: /run/secrets/database_url
+      SESSION_SECRET_FILE: /run/secrets/session_secret
+      ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+      OIDC_BFF_PRIVATE_KEY_FILE: /run/secrets/oidc_bff_private_key
+      KEYCLOAK_MGMT_CLIENT_ID: ${KEYCLOAK_MGMT_CLIENT_ID:-ppm-admin}
+      KEYCLOAK_MGMT_PRIVATE_KEY_FILE: /run/secrets/keycloak_mgmt_private_key
+      # Entra-App der Plattform (optional): ENTRA_CLIENT_ID in prod.env, Geheimnis als Datei ergänzen
+      # ENTRA_CLIENT_SECRET_FILE: /run/secrets/entra_client_secret
+    secrets: [database_url, session_secret, encryption_keys, oidc_bff_private_key, keycloak_mgmt_private_key, db_ca.crt]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    <<: *app
+    command: [worker]
+    environment:
+      <<: *db-ca
+      DATABASE_WORKER_URL_FILE: /run/secrets/database_worker_url
+      ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+      KEYCLOAK_SYNC_CLIENT_ID: ${KEYCLOAK_SYNC_CLIENT_ID:-ppm-sync}
+      KEYCLOAK_SYNC_PRIVATE_KEY_FILE: /run/secrets/keycloak_sync_private_key
+    secrets: [database_worker_url, encryption_keys, keycloak_sync_private_key, db_ca.crt]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  mcp:
+    <<: *app
+    command: [mcp]
+    networks: [app, edge]
+    environment:
+      MCP_API_URL: http://api:8080
+      MCP_PRIVATE_KEY_FILE: /run/secrets/mcp_private_key
+      MCP_DPOP_KEY_FILE: /run/secrets/mcp_dpop_key
+    secrets: [mcp_private_key, mcp_dpop_key]
+    depends_on:
+      api: { condition: service_healthy }
+
+  # Werkzeuge des Betriebs, nur über «docker compose run --rm tenant list» bzw. «… rotate-keys --dry-run»
+  tenant:
+    <<: *app
+    profiles: [werkzeuge]
+    entrypoint: [/sbin/tini, --, /usr/local/bin/docker-entrypoint.sh, tenant]
+    command: [help]
+    restart: "no"
+    healthcheck: { disable: true }
+    environment:
+      <<: *db-ca
+      DATABASE_ADMIN_URL_FILE: /run/secrets/database_admin_url
+      DATABASE_URL_FILE: /run/secrets/database_url
+    secrets: [database_admin_url, database_url, db_ca.crt]
+
+  rotate-keys:
+    <<: *app
+    profiles: [werkzeuge]
+    entrypoint: [/sbin/tini, --, /usr/local/bin/docker-entrypoint.sh, rotate-keys]
+    command: []
+    restart: "no"
+    healthcheck: { disable: true }
+    environment:
+      <<: *db-ca
+      DATABASE_ADMIN_URL_FILE: /run/secrets/database_admin_url
+      DATABASE_URL_FILE: /run/secrets/database_url
+      ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+    secrets: [database_admin_url, database_url, encryption_keys, db_ca.crt]
+
+networks:
+  edge: {}
+  app: {}
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}
+
+secrets:
+  database_admin_url: { file: "${PPM_SECRETS_DIR:-./secrets}/database_admin_url" }
+  database_url: { file: "${PPM_SECRETS_DIR:-./secrets}/database_url" }
+  database_worker_url: { file: "${PPM_SECRETS_DIR:-./secrets}/database_worker_url" }
+  session_secret: { file: "${PPM_SECRETS_DIR:-./secrets}/session_secret" }
+  encryption_keys: { file: "${PPM_SECRETS_DIR:-./secrets}/encryption_keys" }
+  oidc_bff_private_key: { file: "${PPM_SECRETS_DIR:-./secrets}/oidc_bff_private_key" }
+  keycloak_mgmt_private_key: { file: "${PPM_SECRETS_DIR:-./secrets}/keycloak_mgmt_private_key" }
+  keycloak_sync_private_key: { file: "${PPM_SECRETS_DIR:-./secrets}/keycloak_sync_private_key" }
+  mcp_private_key: { file: "${PPM_SECRETS_DIR:-./secrets}/mcp_private_key" }
+  mcp_dpop_key: { file: "${PPM_SECRETS_DIR:-./secrets}/mcp_dpop_key" }
+  db_ca.crt: { file: "${PPM_SECRETS_DIR:-./secrets}/db_ca.crt" }

@@ -1,0 +1,60 @@
+# DB-VM: PostgreSQL 17 mit TLS (private CA) und pgBackRest (WAL-Archiv und Sicherungen in Hetzner Object Storage,
+# Wiederherstellung auf einen Zeitpunkt). Nur über das private Netz erreichbar.
+#
+#   docker compose --env-file db.env -f compose.yaml up -d --build --wait
+#
+# db.env (ohne Geheimnisse): DB_PRIVATE_IP, PGBACKREST_REPO1_S3_BUCKET, PGBACKREST_REPO1_S3_ENDPOINT,
+# PGBACKREST_REPO1_S3_REGION. Geheimnisse in secrets/ (0400): postgres_password, pgbackrest.env
+# (PGBACKREST_REPO1_S3_KEY, PGBACKREST_REPO1_S3_KEY_SECRET, PGBACKREST_REPO1_CIPHER_PASS), tls/server.crt,
+# tls/server.key (Eigentümer UID 999 = postgres im Image), tls/ca.crt.
+name: ppm-db
+
+services:
+  postgres:
+    build: .
+    image: ppm-postgres:17
+    restart: unless-stopped
+    shm_size: 256m
+    # nur an der privaten Adresse, nie öffentlich
+    ports:
+      - "${DB_PRIVATE_IP:?DB_PRIVATE_IP fehlt}:5432:5432"
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PGBACKREST_STANZA: ppm
+      PGBACKREST_REPO1_S3_BUCKET: ${PGBACKREST_REPO1_S3_BUCKET:?PGBACKREST_REPO1_S3_BUCKET fehlt}
+      PGBACKREST_REPO1_S3_ENDPOINT: ${PGBACKREST_REPO1_S3_ENDPOINT:?PGBACKREST_REPO1_S3_ENDPOINT fehlt}
+      PGBACKREST_REPO1_S3_REGION: ${PGBACKREST_REPO1_S3_REGION:?PGBACKREST_REPO1_S3_REGION fehlt}
+    env_file:
+      - secrets/pgbackrest.env
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - hba_file=/etc/postgresql/pg_hba.conf
+    volumes:
+      # Volume der VM (cloud-init hängt es unter /srv/pgdata ein)
+      - /srv/pgdata:/var/lib/postgresql/data
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./pgbackrest.conf:/etc/pgbackrest/pgbackrest.conf:ro
+      - ./secrets/tls:/etc/postgresql/tls:ro
+      - pgbackrest_spool:/var/spool/pgbackrest
+    secrets: [postgres_password]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    stop_grace_period: 120s
+    logging:
+      driver: json-file
+      options: { max-size: 50m, max-file: "5" }
+
+volumes:
+  pgbackrest_spool: {}
+
+secrets:
+  postgres_password:
+    file: secrets/postgres_password

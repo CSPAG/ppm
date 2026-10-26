@@ -1,0 +1,33 @@
+#cloud-config
+# App-VM: Docker mit Compose, Benutzer deploy (UID 1000 = Benutzer im Image, Eigentümer der Geheimnisse), /opt/ppm.
+# Der Inhalt von /opt/ppm kommt vom Workflow «Deploy» (deploy/hetzner/README.md).
+package_update: true
+package_upgrade: true
+packages:
+  - docker.io
+  - docker-compose-v2
+  - unattended-upgrades
+  - rsync
+users:
+  - name: deploy
+    uid: "1000"
+    groups: [docker]
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${deploy_ssh_public_key}
+write_files:
+  - path: /etc/docker/daemon.json
+    permissions: "0644"
+    content: |
+      { "log-driver": "json-file", "log-opts": { "max-size": "20m", "max-file": "5" }, "live-restore": true }
+  - path: /etc/ssh/sshd_config.d/10-ppm.conf
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin prohibit-password
+runcmd:
+  - install -d -o deploy -g deploy -m 0750 /opt/ppm /opt/ppm/secrets /opt/ppm/state
+  - chmod 0700 /opt/ppm/secrets
+  - systemctl enable --now docker
+  - systemctl restart ssh

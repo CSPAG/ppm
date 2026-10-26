@@ -1,0 +1,12 @@
+# SOPS: Geheimnisse der Hetzner-VMs (deploy/hetzner/secrets/*.enc.yaml), verschlüsselt mit age.
+#
+# PLATZHALTER: Die Empfänger sind noch nicht festgelegt (deploy/hetzner/README.md › Bestehendes Hetzner-Projekt
+# anbinden). Mit diesen Werten bricht «sops encrypt» ab – so entsteht keine Datei mit unbekanntem Schlüssel.
+# Ersetzen durch:
+#   - den öffentlichen age-Schlüssel des Deploy-Workflows (privat als Environment-Secret SOPS_AGE_KEY in «production»)
+#   - mindestens einen age-Schlüssel des Betriebs (Notfallzugang, offline aufbewahrt)
+creation_rules:
+  - path_regex: deploy/hetzner/secrets/[^/]+\.enc\.ya?ml$
+    age: >-
+      AGE-EMPFAENGER-DEPLOY-PLATZHALTER,
+      AGE-EMPFAENGER-BETRIEB-PLATZHALTER

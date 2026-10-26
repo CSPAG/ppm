@@ -1,0 +1,124 @@
+# Netz nur so weit wie nötig. Grundsatz: alles verboten, dann je Dienst erlaubt.
+#   Ingress-Controller → api:8080, mcp:8081    mcp → api:8080    Monitoring → :9090 (/metrics)
+#   api, worker, migrate → Datenbank:5432      alle → DNS        api, worker, mcp → HTTPS (Keycloak, Entra, Webhooks)
+# Namensräume des Ingress-Controllers (ingress-nginx) und des Monitorings (monitoring) sowie das Netz der Datenbank
+# (Platzhalter 192.0.2.0/24) im Overlay anpassen.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-dns
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: kube-system }
+          podSelector:
+            matchLabels: { k8s-app: kube-dns }
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-ops-monitoring
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: ppm }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: monitoring }
+      ports:
+        - { protocol: TCP, port: 9090 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-api
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: ingress-nginx }
+        - podSelector:
+            matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: mcp }
+      ports:
+        - { protocol: TCP, port: 8080 }
+  egress:
+    - to:
+        - ipBlock: { cidr: 192.0.2.0/24 }
+      ports:
+        - { protocol: TCP, port: 5432 }
+    # Keycloak (JWKS, Tokens, Admin-API), Microsoft Entra ID
+    - ports:
+        - { protocol: TCP, port: 443 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-worker
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: worker }
+  policyTypes: [Ingress, Egress]
+  egress:
+    - to:
+        - ipBlock: { cidr: 192.0.2.0/24 }
+      ports:
+        - { protocol: TCP, port: 5432 }
+    # Keycloak (Mitgliederabgleich), ausgehende Webhooks (SSRF-Schutz im Code)
+    - ports:
+        - { protocol: TCP, port: 443 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-mcp
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: mcp }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: ingress-nginx }
+      ports:
+        - { protocol: TCP, port: 8081 }
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+      ports:
+        - { protocol: TCP, port: 8080 }
+    # Keycloak (Token Exchange, JWKS)
+    - ports:
+        - { protocol: TCP, port: 443 }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ppm-migrate
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: migrate }
+  policyTypes: [Ingress, Egress]
+  egress:
+    - to:
+        - ipBlock: { cidr: 192.0.2.0/24 }
+      ports:
+        - { protocol: TCP, port: 5432 }

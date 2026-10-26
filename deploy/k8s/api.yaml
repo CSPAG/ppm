@@ -1,0 +1,96 @@
+# Prozess api: REST-API, BFF, Webapp (8080) und Betriebs-Endpunkt (9090)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ppm-api
+  labels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+    spec:
+      serviceAccountName: ppm
+      automountServiceAccountToken: false
+      # länger als SHUTDOWN_DELAY + SHUTDOWN_TIMEOUT (5 s + 20 s)
+      terminationGracePeriodSeconds: 40
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: api
+          image: ghcr.io/cspag/ppm
+          args: [api]
+          ports:
+            - { name: http, containerPort: 8080 }
+            - { name: ops, containerPort: 9090 }
+          envFrom:
+            - configMapRef: { name: ppm-config }
+          env:
+            - { name: NODE_EXTRA_CA_CERTS, value: /run/secrets/db-ca/ca.crt }
+            - { name: DATABASE_URL_FILE, value: /run/secrets/ppm/database_url }
+            - { name: SESSION_SECRET_FILE, value: /run/secrets/ppm/session_secret }
+            - { name: ENCRYPTION_KEYS_FILE, value: /run/secrets/ppm/encryption_keys }
+            - { name: OIDC_BFF_PRIVATE_KEY_FILE, value: /run/secrets/ppm/oidc_bff_private_key }
+            - { name: KEYCLOAK_MGMT_PRIVATE_KEY_FILE, value: /run/secrets/ppm/keycloak_mgmt_private_key }
+          startupProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet: { path: /readyz, port: ops }
+            periodSeconds: 5
+            timeoutSeconds: 3
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 512Mi }
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: secrets, mountPath: /run/secrets/ppm, readOnly: true }
+            - { name: db-ca, mountPath: /run/secrets/db-ca, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: secrets
+          secret: { secretName: ppm-api, defaultMode: 0440 }
+        - name: db-ca
+          configMap: { name: ppm-db-ca, defaultMode: 0444 }
+        - name: tmp
+          emptyDir: { medium: Memory, sizeLimit: 64Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ppm-api
+  labels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+spec:
+  selector: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }
+  ports:
+    - { name: http, port: 8080, targetPort: http }
+    - { name: ops, port: 9090, targetPort: ops }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ppm-api
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: ppm, app.kubernetes.io/component: api }

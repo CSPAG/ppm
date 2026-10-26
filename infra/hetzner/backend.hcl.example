@@ -1,0 +1,13 @@
+# Backend für lokale Läufe (cp backend.hcl.example backend.hcl; tofu init -backend-config=backend.hcl).
+# In CI setzt .github/workflows/infra.yml dieselben Werte aus den Environment-Variablen TF_STATE_*.
+# Zugangsdaten nur über AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (S3_ACCESS_KEY / S3_SECRET_KEY).
+bucket                      = "<state-bucket>"
+key                         = "ppm/hetzner.tfstate"
+region                      = "<region, z. B. fsn1>"
+endpoints                   = { s3 = "https://<region>.your-objectstorage.com" }
+use_path_style              = true
+skip_credentials_validation = true
+skip_region_validation      = true
+skip_requesting_account_id  = true
+skip_s3_checksum            = true
+use_lockfile                = true

@@ -191,6 +191,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 - **Abkürzungen:** Ausschreibung der Direktionskürzel AeD, DPF, DLF, DMS, DP, DTI (laut Q8 ICT) und DIB bzw. DBI (Q8 schreibt beides; Infrastruktur); PFLE (Q6 F1), DRC (Dashboard), «CP» in Phase 1 (Q6 F6, Q8 Abb. 4) und «Streams» (F2)?
 - **Sponsoren-Koalition:** Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL (Q8 Abb. 7). Q7 verlangt Freigabe durch «Auftraggeber» und «Sponsor» getrennt – ist das dieselbe Person?
+- **SNS-VR und VR:** Wie werden Geschäfte in P0 und P1 dem SNS-VR vorgelegt und dessen Entscheide erfasst? Gibt es Weiterleitungen an den VR ausserhalb des Quartalsreportings (UC-006 A1, A4)?
 - **Programmauftraggeber:** VR (Q8 Kap. 1, 5.1) oder VR-Präsident (Q8 Glossar «VRP»)?
 - **Kategorie B:** Gelten Quality-Check durch UE, monatliches Dashboard und Projektvertrag auch für GL-Projekte? Sitzungsrhythmus der GLPA?
 - **Kategorie C:** Soll das System Direktionsportfolios überhaupt führen, oder genügt eine Projektliste ohne Governance?

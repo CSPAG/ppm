@@ -1,0 +1,1163 @@
+[
+ {
+  "bm": "ZM",
+  "name": "Zielmanagement",
+  "domains": [
+   {
+    "bd": "ZM.01",
+    "name": "Strategie und Handlungsfelder",
+    "business_cases": [
+     {
+      "id": "ZM.01.01",
+      "name": "Strategische Handlungsfelder pflegen",
+      "ziel": "Die fünf Handlungsfelder als oberste Ordnung für Ziele und Vorhaben führen.",
+      "akteure": "GL, ADM",
+      "herleitung": "Q6 F1, F8",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     },
+     {
+      "id": "ZM.01.02",
+      "name": "Strategische Ziele festlegen",
+      "ziel": "Mehrjahresziele je Handlungsfeld festhalten und jährlich aktualisieren.",
+      "akteure": "VR, GL",
+      "herleitung": "Q6 F2 Strategie-Aktualisierung, F3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "ZM.02",
+    "name": "Jahresziele und Massnahmen",
+    "business_cases": [
+     {
+      "id": "ZM.02.01",
+      "name": "Jahresziele ableiten",
+      "ziel": "Aus den strategischen Zielen die Kernziele für das Folgejahr bestimmen.",
+      "akteure": "GL",
+      "herleitung": "Q6 F2 Zielsetzung, F3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     },
+     {
+      "id": "ZM.02.02",
+      "name": "Jahresziele freigeben",
+      "ziel": "Die Jahresziele durch den VR verbindlich freigeben lassen.",
+      "akteure": "VR",
+      "herleitung": "Q6 F2 «Freigabe: VR»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     },
+     {
+      "id": "ZM.02.03",
+      "name": "Hauptaktivitäten festlegen",
+      "ziel": "Jahresziele in Massnahmen mit Verantwortlichen übersetzen.",
+      "akteure": "GL",
+      "herleitung": "Q6 F2 Vorbereitung Umsetzung, F3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     },
+     {
+      "id": "ZM.02.04",
+      "name": "Zielmetrik definieren",
+      "ziel": "Für jedes Ziel festlegen, woran die Erreichung gemessen wird.",
+      "akteure": "GL",
+      "herleitung": "Q6 F1, F3 «Metrik»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "ZM.03",
+    "name": "Zielerreichung und Reviews",
+    "business_cases": [
+     {
+      "id": "ZM.03.01",
+      "name": "Zielerreichung erfassen",
+      "ziel": "Den Stand je Ziel anhand der Metrik nachführen.",
+      "akteure": "GL, UE",
+      "herleitung": "Q6 F1 «Zielerreichung»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-012"
+      ]
+     },
+     {
+      "id": "ZM.03.02",
+      "name": "Quartalsreporting an den VR erstellen",
+      "ziel": "Dem VR den Fortschritt zu Strategie und Zielen vorlegen, damit er nachsteuern kann.",
+      "akteure": "UE, CEO, VR",
+      "herleitung": "Q6 F1, F2 Quartals-Review",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-012"
+      ]
+     },
+     {
+      "id": "ZM.03.03",
+      "name": "Jahresrückblick auswerten",
+      "ziel": "Ergebnisse und Erkenntnisse des Jahres auswerten und den nächsten Zyklus planen.",
+      "akteure": "PRAT",
+      "herleitung": "Q6 F2 Rückblick Q4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-013"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "bm": "DM",
+  "name": "Demand Management",
+  "domains": [
+   {
+    "bd": "DM.01",
+    "name": "Projektideen",
+    "business_cases": [
+     {
+      "id": "DM.01.01",
+      "name": "Projektidee erfassen",
+      "ziel": "Einen Bedarf mit wenig Aufwand festhalten: Kurzbeschrieb, Problem, erwarteter Nutzen.",
+      "akteure": "AS",
+      "herleitung": "Q6 F8 «Pre P0 Ideen»; Q2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-001"
+      ]
+     },
+     {
+      "id": "DM.01.02",
+      "name": "Projektidee qualifizieren",
+      "ziel": "Am Eintritt P0 prüfen: strategisch relevant, Ziel klar, klinische Frage, ICT, Infrastruktur.",
+      "akteure": "UE, SP",
+      "herleitung": "Q6 F6 Eintritt P0",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-001"
+      ]
+     },
+     {
+      "id": "DM.01.03",
+      "name": "Projektideen zusammenführen",
+      "ziel": "Doppelspurigkeiten vermeiden, indem gleichartige Ideen zusammengelegt werden.",
+      "akteure": "UE",
+      "herleitung": "Q1; Q3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-001"
+      ]
+     },
+     {
+      "id": "DM.01.04",
+      "name": "Projektidee zurückweisen",
+      "ziel": "Eine nicht verfolgte Idee begründet abschliessen und Antragstellende informieren.",
+      "akteure": "UE",
+      "herleitung": "Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-001"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "DM.02",
+    "name": "Projektvertrag",
+    "business_cases": [
+     {
+      "id": "DM.02.01",
+      "name": "Projektvertrag erstellen",
+      "ziel": "Ausgangslage, Strategiebezug, Ziele, Lösung, Planung, Organisation, Ressourcen, Risiken und Change für Phase 1 erfassen.",
+      "akteure": "PL, SP",
+      "herleitung": "Q7 Kap. 1–11; Q6 F8",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "DM.02.02",
+      "name": "Projektvertrag zur Prüfung einreichen",
+      "ziel": "Den Vertrag in den Status «in Prüfung» bringen.",
+      "akteure": "PL",
+      "herleitung": "Q7 Kopf «Status»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "DM.02.03",
+      "name": "Projektvertrag überarbeiten",
+      "ziel": "Rückmeldungen aus Review oder Gremium einarbeiten und erneut einreichen.",
+      "akteure": "PL",
+      "herleitung": "Q7 Kap. 12; Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002",
+       "UC-003"
+      ]
+     },
+     {
+      "id": "DM.02.04",
+      "name": "Projektvertrag zurückziehen",
+      "ziel": "Ein nicht mehr verfolgtes Vorhaben aus dem Prozess nehmen.",
+      "akteure": "SP",
+      "herleitung": "Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "DM.02.05",
+      "name": "Quality Review durchführen",
+      "ziel": "Vollständigkeit und Einhaltung des PM-Handbuchs prüfen.",
+      "akteure": "UE",
+      "herleitung": "Q7 Kap. 12",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002",
+       "UC-003"
+      ]
+     },
+     {
+      "id": "DM.02.06",
+      "name": "Projektvertrag freigeben",
+      "ziel": "Auftraggeber, Sponsor, PL und CTL vereinbaren die Durchführung; die Version wird zur Baseline.",
+      "akteure": "AG, SP, PL, CTL",
+      "herleitung": "Q7 Kap. 12, Handhabung",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002",
+       "UC-003"
+      ]
+     },
+     {
+      "id": "DM.02.07",
+      "name": "Projektvertrag als Dokument ausgeben",
+      "ziel": "Den Vertrag aus den erfassten Daten im Layout der Vorlage erzeugen.",
+      "akteure": "PL, UE",
+      "herleitung": "Q7 Vorlage; Q3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "bm": "PP",
+  "name": "Portfolioplanung",
+  "domains": [
+   {
+    "bd": "PP.01",
+    "name": "Strategische Ausrichtung",
+    "business_cases": [
+     {
+      "id": "PP.01.01",
+      "name": "Strategische Ziele erfassen",
+      "ziel": "Aufgegangen in ZM.01.02.",
+      "akteure": "–",
+      "herleitung": "Q6 F1–F3",
+      "entfaellt": true,
+      "use_cases": []
+     },
+     {
+      "id": "PP.01.02",
+      "name": "Bewertungsmodell festlegen",
+      "ziel": "Das Kriterienraster mit Kriterien und Gewichten definieren.",
+      "akteure": "UE, PRAT",
+      "herleitung": "Q6 F1 Kriterienraster, F8",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.01.03",
+      "name": "Portfoliokategorien und Budgetrahmen festlegen",
+      "ziel": "Investitionen steuern: Kategorien mit Budgetrahmen definieren.",
+      "akteure": "UE, FI, PRAT",
+      "herleitung": "Q5 [OFFEN]",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PP.02",
+    "name": "Bewertung und Priorisierung",
+    "business_cases": [
+     {
+      "id": "PP.02.01",
+      "name": "Vorhaben bewerten",
+      "ziel": "Nutzen, Risiko und Ressourcenbedarf eines Vorhabens einstufen.",
+      "akteure": "UE",
+      "herleitung": "Q6 F8, F9",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.02.02",
+      "name": "Vorhaben priorisieren",
+      "ziel": "Eine begründete Rangfolge je Portfolioebene festlegen.",
+      "akteure": "PRAT, GLPA, DIR",
+      "herleitung": "Q6 F1, F2, F7",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.02.03",
+      "name": "Abhängigkeiten zwischen Vorhaben erfassen",
+      "ziel": "Abhängigkeiten zu anderen Projekten mit Ansprechperson festhalten.",
+      "akteure": "UE, PL",
+      "herleitung": "Q7 Kap. 6; Q4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002",
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.02.04",
+      "name": "Projektkategorie zuordnen",
+      "ziel": "Kategorie A strategisch, B Geschäftsleitung oder C Direktion festlegen und damit das Portfolio.",
+      "akteure": "UE, GL",
+      "herleitung": "Q7 Kopf; Q6 F1, F4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-001"
+      ]
+     },
+     {
+      "id": "PP.02.05",
+      "name": "Vorhaben mit strategischen Zielen verknüpfen",
+      "ziel": "Handlungsfeld, strategisches Ziel und allenfalls Jahresziel zuordnen.",
+      "akteure": "PL, SP",
+      "herleitung": "Q7 Kap. 2; Q6 F3, F7",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PP.03",
+    "name": "Szenarien und Balancing",
+    "business_cases": [
+     {
+      "id": "PP.03.01",
+      "name": "Portfolioszenario erstellen",
+      "ziel": "Varianten der Zusammensetzung durchspielen, ohne den Ist-Stand zu verändern.",
+      "akteure": "UE",
+      "herleitung": "Q1; Q5",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.03.02",
+      "name": "Szenario gegen Budget und Kapazität prüfen",
+      "ziel": "Die Wasserlinie ziehen: was mit den verfügbaren Mitteln umsetzbar ist.",
+      "akteure": "UE, FI",
+      "herleitung": "Q6 F8 «Waterline»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.03.03",
+      "name": "Szenarien vergleichen",
+      "ziel": "Die beste Variante nach Kosten, Nutzen, Risiko und Strategiebeitrag ermitteln.",
+      "akteure": "UE, PRAT",
+      "herleitung": "Q3; Q5",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PP.03.04",
+      "name": "Portfolio in Matrixsicht beurteilen",
+      "ziel": "Vorhaben nach Nutzen und Risiko einordnen: priorisieren, rasch umsetzen, opportunistisch, hinterfragen.",
+      "akteure": "UE, PRAT",
+      "herleitung": "Q6 F9",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PP.04",
+    "name": "Portfolioentscheide",
+    "business_cases": [
+     {
+      "id": "PP.04.01",
+      "name": "Entscheidungsvorlage vorbereiten",
+      "ziel": "Dem Ausschuss vollständige Entscheidungsgrundlagen zur Sitzung bereitstellen.",
+      "akteure": "UE",
+      "herleitung": "Q6 F4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006"
+      ]
+     },
+     {
+      "id": "PP.04.02",
+      "name": "Portfolioentscheid erfassen",
+      "ziel": "Priorisierung und Freigabe von Streams und Projekten festhalten.",
+      "akteure": "PRAT",
+      "herleitung": "Q6 F2 Monatlicher Review",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006"
+      ]
+     },
+     {
+      "id": "PP.04.03",
+      "name": "Portfolio-Roadmap publizieren",
+      "ziel": "Die beschlossene Planung intern kommunizieren.",
+      "akteure": "UE",
+      "herleitung": "Q6 F2, F3 «VR-Roadmap»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-011"
+      ]
+     },
+     {
+      "id": "PP.04.04",
+      "name": "Projektorganisation festlegen",
+      "ziel": "Sponsor, Sponsoren-Koalition, PL, CTL und Kernteam mit AKV benennen.",
+      "akteure": "SP, UE",
+      "herleitung": "Q7 Kap. 8; Q6 F4, F5",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "PP.04.05",
+      "name": "Gate-Reviews einplanen",
+      "ziel": "Die nächsten PRAT-Gate-Reviews aller Vorhaben als Traktandenplanung bündeln.",
+      "akteure": "UE",
+      "herleitung": "Q7 Kap. 7.2; Q6 F2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "bm": "PS",
+  "name": "Portfoliosteuerung",
+  "domains": [
+   {
+    "bd": "PS.01",
+    "name": "Statusberichterstattung",
+    "business_cases": [
+     {
+      "id": "PS.01.01",
+      "name": "Statusbericht erfassen",
+      "ziel": "Phase, Abschlusstermin, nächsten Meilenstein, Status und Trend melden.",
+      "akteure": "PL",
+      "herleitung": "Q6 F7 Dashboard",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-004"
+      ]
+     },
+     {
+      "id": "PS.01.02",
+      "name": "Statusbericht prüfen",
+      "ziel": "Plausibilität sicherstellen und Rückfragen an die Projektleitung stellen.",
+      "akteure": "UE",
+      "herleitung": "Q6 F4; Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-005"
+      ]
+     },
+     {
+      "id": "PS.01.03",
+      "name": "Ausstehende Statusberichte nachverfolgen",
+      "ziel": "Fehlende Berichte erkennen und einfordern.",
+      "akteure": "UE",
+      "herleitung": "Q2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-005"
+      ]
+     },
+     {
+      "id": "PS.01.04",
+      "name": "Terminabweichungen analysieren",
+      "ziel": "Baseline und aufdatierte Phasen- und Abschlusstermine über alle Vorhaben vergleichen.",
+      "akteure": "UE",
+      "herleitung": "Q7 Kap. 7.2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-005"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PS.02",
+    "name": "Phasen, Gates, Meilensteine",
+    "business_cases": [
+     {
+      "id": "PS.02.01",
+      "name": "Phasenfreigabe beantragen",
+      "ziel": "Den Gate-Übergang mit Antworten auf die Leitfragen beantragen.",
+      "akteure": "PL, SP",
+      "herleitung": "Q6 F6",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-003"
+      ]
+     },
+     {
+      "id": "PS.02.02",
+      "name": "Phasenfreigabe entscheiden",
+      "ziel": "Am Gate zwischen P0 und P4 über die Weiterführung entscheiden.",
+      "akteure": "PRAT",
+      "herleitung": "Q6 F6",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-003",
+       "UC-006"
+      ]
+     },
+     {
+      "id": "PS.02.03",
+      "name": "Meilenstein abnehmen",
+      "ziel": "Meilensteine und Ergebnisse im monatlichen Review abnehmen.",
+      "akteure": "PRAT, SP",
+      "herleitung": "Q6 F2 Monatlicher Review",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006"
+      ]
+     },
+     {
+      "id": "PS.02.04",
+      "name": "Meilensteinplan pflegen",
+      "ziel": "Lieferergebnisse und Meilensteine je Phase mit Termin führen, Baseline und aufdatiert.",
+      "akteure": "PL",
+      "herleitung": "Q7 Kap. 7; Q6 F7",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002",
+       "UC-004"
+      ]
+     },
+     {
+      "id": "PS.02.05",
+      "name": "Projektvertrag fortschreiben",
+      "ziel": "Am Gate um die Inhalte der nächsten Phase ergänzen und als neue Version vorlegen.",
+      "akteure": "PL",
+      "herleitung": "Q7 Handhabung, Kap. 7.1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-003"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PS.03",
+    "name": "Änderungen und Eskalationen",
+    "business_cases": [
+     {
+      "id": "PS.03.01",
+      "name": "Änderung am Projektvertrag beantragen",
+      "ziel": "Wesentliche Änderung an Zielen, Umfang, Terminen oder Budget vorlegen.",
+      "akteure": "PL",
+      "herleitung": "Q7 Kap. 12",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-007"
+      ]
+     },
+     {
+      "id": "PS.03.02",
+      "name": "Änderung am Projektvertrag entscheiden",
+      "ziel": "Die Änderung freigeben oder ablehnen; die Baseline wird nachgeführt.",
+      "akteure": "AG",
+      "herleitung": "Q7 Kap. 12",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-007"
+      ]
+     },
+     {
+      "id": "PS.03.03",
+      "name": "Eskalation behandeln",
+      "ziel": "Ungelöste Probleme dem Ausschuss zum Entscheid vorlegen.",
+      "akteure": "PL, SP, PRAT",
+      "herleitung": "Q6 F2, F4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006"
+      ]
+     },
+     {
+      "id": "PS.03.04",
+      "name": "Vertragsversionen vergleichen",
+      "ziel": "Hauptänderungen seit der letzten Version zeigen.",
+      "akteure": "PL, UE, PRAT",
+      "herleitung": "Q7 Kopf",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-003",
+       "UC-007"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PS.04",
+    "name": "Abschluss",
+    "business_cases": [
+     {
+      "id": "PS.04.01",
+      "name": "Vorhaben abschliessen",
+      "ziel": "Am Exit-Gate P4 Kosten/Nutzen prüfen und an die Linie übergeben.",
+      "akteure": "PL, SP, PRAT",
+      "herleitung": "Q6 F6 Exit P4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-015"
+      ]
+     },
+     {
+      "id": "PS.04.02",
+      "name": "Vorhaben sistieren oder abbrechen",
+      "ziel": "Ein Vorhaben begründet anhalten oder beenden und Ressourcen freigeben.",
+      "akteure": "PRAT",
+      "herleitung": "Q6 F9 «ggf. stoppen»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006",
+       "UC-015"
+      ]
+     },
+     {
+      "id": "PS.04.03",
+      "name": "Lessons Learned erfassen",
+      "ziel": "Erkenntnisse für künftige Vorhaben festhalten.",
+      "akteure": "PL, UE",
+      "herleitung": "Q6 F2 Rückblick; Q3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-013",
+       "UC-015"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PS.05",
+    "name": "Stakeholder und Kommunikation",
+    "business_cases": [
+     {
+      "id": "PS.05.01",
+      "name": "Stakeholder erfassen",
+      "ziel": "Betroffene Gruppen mit Interesse, Einfluss und geplanten Massnahmen festhalten.",
+      "akteure": "PL, SP",
+      "herleitung": "Q7 Kap. 11.1; Q6 F2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "PS.05.02",
+      "name": "Kommunikationsplan erstellen",
+      "ziel": "Massnahmen mit Adressat und Ziel planen.",
+      "akteure": "PL, SP",
+      "herleitung": "Q7 Kap. 11.2; Q6 F2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "PS.05.03",
+      "name": "Kommunikationsmassnahme nachführen",
+      "ziel": "Durchgeführte Massnahmen wie einen Meilenstein als erledigt melden.",
+      "akteure": "PL",
+      "herleitung": "Q6 F7 Meilenstein",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-004"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "bm": "PC",
+  "name": "Portfoliocontrolling",
+  "domains": [
+   {
+    "bd": "PC.01",
+    "name": "Finanzen",
+    "business_cases": [
+     {
+      "id": "PC.01.01",
+      "name": "Projektbudget planen",
+      "ziel": "Kosten je Phase mit Lieferant, Offerte und CAPEX/OPEX planen.",
+      "akteure": "PL, FI",
+      "herleitung": "Q7 Kap. 9.1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "PC.01.02",
+      "name": "Ist-Kosten übernehmen",
+      "ziel": "Aktuelle Ist-Kosten aus dem ERP verfügbar haben, ohne Handerfassung.",
+      "akteure": "FI (System)",
+      "herleitung": "Q2 [OFFEN]",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-010"
+      ]
+     },
+     {
+      "id": "PC.01.03",
+      "name": "Kostenprognose aktualisieren",
+      "ziel": "Die erwarteten Gesamtkosten bis Projektende realistisch ausweisen.",
+      "akteure": "PL",
+      "herleitung": "Q5",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-004"
+      ]
+     },
+     {
+      "id": "PC.01.04",
+      "name": "Budgetabweichungen analysieren",
+      "ziel": "Überschreitungen im Portfolio früh erkennen und Ursachen klären.",
+      "akteure": "FI, UE",
+      "herleitung": "Q3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-010"
+      ]
+     },
+     {
+      "id": "PC.01.05",
+      "name": "Budgetbedarf in den Budgetprozess übergeben",
+      "ziel": "Aus den Kosten je Phase den Jahresbedarf CAPEX/OPEX ableiten und einspeisen.",
+      "akteure": "GL, FI",
+      "herleitung": "Q6 F2; Q7 Kap. 9.1 [OFFEN]",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-010",
+       "UC-011"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PC.02",
+    "name": "Risiken",
+    "business_cases": [
+     {
+      "id": "PC.02.01",
+      "name": "Portfoliorisiko erfassen",
+      "ziel": "Vorhabenübergreifende Risiken mit Bewertung festhalten.",
+      "akteure": "UE",
+      "herleitung": "Q6 F9; Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008"
+      ]
+     },
+     {
+      "id": "PC.02.02",
+      "name": "Risikolage des Portfolios beurteilen",
+      "ziel": "Die Gesamtrisikolage aus Projekt- und Portfoliorisiken überblicken.",
+      "akteure": "UE, PRAT",
+      "herleitung": "Q6 F9",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-006",
+       "UC-014"
+      ]
+     },
+     {
+      "id": "PC.02.03",
+      "name": "Risikomassnahme verfolgen",
+      "ziel": "Sicherstellen, dass beschlossene Massnahmen umgesetzt werden.",
+      "akteure": "UE, PL",
+      "herleitung": "Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-004"
+      ]
+     },
+     {
+      "id": "PC.02.04",
+      "name": "Projektrisiko erfassen",
+      "ziel": "Risiken mit Eintrittswahrscheinlichkeit und Auswirkung (hoch/mittel/tief) und Massnahme festhalten.",
+      "akteure": "PL",
+      "herleitung": "Q7 Kap. 10; Q6 F9",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002",
+       "UC-004"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PC.03",
+    "name": "Nutzen und KPIs",
+    "business_cases": [
+     {
+      "id": "PC.03.01",
+      "name": "Projekt-KPIs festlegen",
+      "ziel": "Messbare Nutzen- und Projekt-KPIs mit Zielwert definieren (bisher «Nutzenziele festlegen»).",
+      "akteure": "SP, PL",
+      "herleitung": "Q6 F1, F2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "PC.03.02",
+      "name": "Nutzenrealisierung überprüfen",
+      "ziel": "In Stabilisierung und am Exit prüfen, ob der Nutzen stabil erreicht ist.",
+      "akteure": "SP, UE",
+      "herleitung": "Q6 F6 P3–P4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-003",
+       "UC-015"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "PC.04",
+    "name": "Reporting",
+    "business_cases": [
+     {
+      "id": "PC.04.01",
+      "name": "Portfolio-Dashboard einsehen",
+      "ziel": "Den Stand je Portfolioebene auf einen Blick erfassen, auch als Funnel nach Phase.",
+      "akteure": "PRAT, GLPA, DIR",
+      "herleitung": "Q6 F1, F7, F8",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-014"
+      ]
+     },
+     {
+      "id": "PC.04.02",
+      "name": "Portfoliobericht erstellen",
+      "ziel": "Den periodischen Bericht für das jeweilige Gremium bereitstellen.",
+      "akteure": "UE",
+      "herleitung": "Q6 F1 «Projekt Reporting»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-012",
+       "UC-014"
+      ]
+     },
+     {
+      "id": "PC.04.03",
+      "name": "Ad-hoc-Auswertung erstellen",
+      "ziel": "Spezifische Fragen mit Filtern und Auswertungen beantworten.",
+      "akteure": "UE, FI",
+      "herleitung": "Q3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-014"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "bm": "RK",
+  "name": "Ressourcen und Kapazitäten",
+  "domains": [
+   {
+    "bd": "RK.01",
+    "name": "Kapazitätsangebot",
+    "business_cases": [
+     {
+      "id": "RK.01.01",
+      "name": "Kapazitätsangebot planen",
+      "ziel": "Die für Vorhaben verfügbare Kapazität je Ressourcenpool festlegen.",
+      "akteure": "RM",
+      "herleitung": "Q4 [OFFEN]",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-009"
+      ]
+     },
+     {
+      "id": "RK.01.02",
+      "name": "Personal- und Abwesenheitsdaten übernehmen",
+      "ziel": "Das Kapazitätsangebot ohne Doppelerfassung aktuell halten.",
+      "akteure": "RM (System)",
+      "herleitung": "Q2 [OFFEN]",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-009"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "RK.02",
+    "name": "Bedarf und Zuteilung",
+    "business_cases": [
+     {
+      "id": "RK.02.01",
+      "name": "Ressourcenbedarf anmelden",
+      "ziel": "Den Bedarf eines Vorhabens anmelden, mindestens als Grösse S/M/L.",
+      "akteure": "PL",
+      "herleitung": "Q6 F8",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     },
+     {
+      "id": "RK.02.02",
+      "name": "Ressourcen zuteilen",
+      "ziel": "Angemeldeten Bedarf mit konkreten Personen decken.",
+      "akteure": "RM",
+      "herleitung": "Q3",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-009"
+      ]
+     },
+     {
+      "id": "RK.02.03",
+      "name": "Ressourcenkonflikt auflösen",
+      "ziel": "Überbuchungen zwischen Vorhaben gemäss Priorität bereinigen.",
+      "akteure": "RM, UE",
+      "herleitung": "Q6 F9 «sofern Kapazität verfügbar»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-009"
+      ]
+     },
+     {
+      "id": "RK.02.04",
+      "name": "Auslastung analysieren",
+      "ziel": "Engpässe und Unterauslastung erkennen.",
+      "akteure": "RM, UE",
+      "herleitung": "Q6 F8 «Waterline»",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-008",
+       "UC-009"
+      ]
+     },
+     {
+      "id": "RK.02.05",
+      "name": "Ressourcenbedarf präzisieren",
+      "ziel": "Personal in FTE und Monaten je Rolle und Phase planen.",
+      "akteure": "PL",
+      "herleitung": "Q7 Kap. 9.2; Q6 F6",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-003"
+      ]
+     },
+     {
+      "id": "RK.02.06",
+      "name": "ICT- und Infrastrukturbedarf anmelden",
+      "ziel": "Den Bedarf früh bei den zuständigen Stellen melden, damit die Gates ihn prüfen können.",
+      "akteure": "PL, SP",
+      "herleitung": "Q6 F6 Leitfragen ICT, Infrastruktur",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-002"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "bm": "AM",
+  "name": "Application Management",
+  "domains": [
+   {
+    "bd": "AM.01",
+    "name": "Benutzer und Berechtigungen",
+    "business_cases": [
+     {
+      "id": "AM.01.01",
+      "name": "Benutzer verwalten",
+      "ziel": "Personen Zugang zum System geben oder entziehen.",
+      "akteure": "ADM",
+      "herleitung": "Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-016"
+      ]
+     },
+     {
+      "id": "AM.01.02",
+      "name": "Rolle mit Berechtigungen definieren",
+      "ziel": "Die Rollen der Programm- und Projektebene abbilden.",
+      "akteure": "ADM",
+      "herleitung": "Q6 F4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-016"
+      ]
+     },
+     {
+      "id": "AM.01.03",
+      "name": "Stellvertretung regeln",
+      "ziel": "Abwesenheiten ohne liegende Freigaben überbrücken.",
+      "akteure": "alle, ADM",
+      "herleitung": "Q3; Q2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-016"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "AM.02",
+    "name": "Stammdaten und Konfiguration",
+    "business_cases": [
+     {
+      "id": "AM.02.01",
+      "name": "Organisationseinheiten verwalten",
+      "ziel": "Organisation inklusive Direktionen aktuell halten.",
+      "akteure": "ADM",
+      "herleitung": "Q6 F1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-017"
+      ]
+     },
+     {
+      "id": "AM.02.02",
+      "name": "Codetabellen pflegen",
+      "ziel": "Auswahlwerte wie Status, Trend und Grössen S/M/L zentral pflegen.",
+      "akteure": "ADM",
+      "herleitung": "Q6 F7, F8",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-017"
+      ]
+     },
+     {
+      "id": "AM.02.03",
+      "name": "Phasenmodell und Gates konfigurieren",
+      "ziel": "Phasen P0–P4, Gates, Leitfragen sowie Standard-Lieferergebnisse und -Meilensteine abbilden.",
+      "akteure": "ADM, UE",
+      "herleitung": "Q6 F6; Q7 Kap. 7.1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-017"
+      ]
+     },
+     {
+      "id": "AM.02.04",
+      "name": "Portfolioebenen und Gremien konfigurieren",
+      "ziel": "Drei Portfolios mit Gremium und Dashboard abbilden.",
+      "akteure": "ADM, UE",
+      "herleitung": "Q6 F1, F4",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-017"
+      ]
+     }
+    ]
+   },
+   {
+    "bd": "AM.03",
+    "name": "Vorlagen, Schnittstellen, Protokoll",
+    "business_cases": [
+     {
+      "id": "AM.03.01",
+      "name": "Vorlagen verwalten",
+      "ziel": "Vorlagen wie den Projektvertrag und die Berichte bereitstellen.",
+      "akteure": "ADM, UE",
+      "herleitung": "Q7",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-018"
+      ]
+     },
+     {
+      "id": "AM.03.02",
+      "name": "Schnittstelle konfigurieren",
+      "ziel": "Datenaustausch mit Umsystemen einrichten und überwachen.",
+      "akteure": "ADM",
+      "herleitung": "Q2",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-018"
+      ]
+     },
+     {
+      "id": "AM.03.03",
+      "name": "Änderungsprotokoll einsehen",
+      "ziel": "Nachvollziehen, wer wann was geändert hat.",
+      "akteure": "ADM, UE",
+      "herleitung": "Q1",
+      "entfaellt": false,
+      "use_cases": [
+       "UC-018"
+      ]
+     }
+    ]
+   }
+  ]
+ }
+]

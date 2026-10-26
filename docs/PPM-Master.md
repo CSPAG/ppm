@@ -204,7 +204,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. PDFs im Anhang mit dem Generator neu erzeugen (Stand Entscheid 8; braucht die CSP-Skills).
+1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 2. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren, auf Basis von Q8 Kap. 8.1–8.5.
 3. V10 mit der Insel Gruppe klären.
 4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
@@ -218,7 +218,6 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 | [anhang/funktionsbaum.md](anhang/funktionsbaum.md) | Funktionsbaum mit allen Business Cases im Detail |
 | [anhang/use-cases.md](anhang/use-cases.md) | Use-Case-Liste, Traceability-Matrix, ausformulierte Use Cases |
 | [anhang/daten/](anhang/daten/) | Funktionsbaum und Use Cases als JSON |
-| [anhang/pdf/](anhang/pdf/) | gestaltete PDFs im CSP-Design (Stand vor Entscheid 8, neu zu erzeugen) |
 | [anhang/quellen/](anhang/quellen/) | Kundenunterlagen Q6–Q9 im Original und als Text (Q6–Q8 intern, Q9 öffentlich) |
 | [anhang/generator/](anhang/generator/) | Python-Skripte für PDFs, Markdown und JSON |
 

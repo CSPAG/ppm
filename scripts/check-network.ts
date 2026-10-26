@@ -11,6 +11,9 @@ const root = join(import.meta.dirname, '..');
 
 /** Netz-Adapter mit Begründung. Neue Einträge nur mit Begründung und Eintrag in docs/zielarchitektur.md. */
 export const NETWORK_ADAPTERS: Record<string, string> = {
+  'src/platform/ops/server.ts': 'Betriebs-Endpunkt (/healthz, /readyz, /metrics) auf OPS_PORT',
+  'src/platform/core/ssrf.ts': 'Ausgehende Abrufe an Adressen aus Daten (Webhooks) mit SSRF-Schutz und fester Gesamtfrist',
+  'src/platform/mcp/server.ts': 'MCP-Dienst: eigener HTTP-Server und Bereitschaftsprüfung der REST-API; Aufrufe der API nur über ApiClient aus @vollholz/iam',
 };
 
 const SKIP = new Set(['node_modules', 'dist', '.git', 'test-results', 'playwright-report']);

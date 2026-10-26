@@ -188,6 +188,8 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 
 ## 12. Offene Punkte
 
+Alle offenen Punkte mit Fundstelle und Vorschlag von CSP als Fragen K01–K25: [anhang/klaerungsliste.md](anhang/klaerungsliste.md).
+
 Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung für Kategorie B und C, Reihenfolge Vertragsfreigabe und Gate, Berichtsrhythmus und Frist, Freigabe des Berichts durch den Sponsor (keine), Ampel (eine Ampel plus Trend), Zuordnung Kategorie A = Transformationsprogramm, PM-Handbuch als Quelle.
 
 - **Abkürzungen:** Ausschreibung der Direktionskürzel AeD, DPF, DLF, DMS, DP, DTI (laut Q8 ICT) und DIB bzw. DBI (Q8 schreibt beides; Infrastruktur); PFLE (Q6 F1), DRC (Dashboard), «CP» in Phase 1 (Q6 F6, Q8 Abb. 4) und «Streams» (F2)?
@@ -209,7 +211,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 ## 13. Nächste Schritte
 
 1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
-2. Use Cases mit PL, UE und PRAT durchgehen; [OFFEN] klären.
+2. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 3. V10 mit der Insel Gruppe klären.
 4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
 5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
@@ -221,6 +223,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 |---|---|
 | [anhang/funktionsbaum.md](anhang/funktionsbaum.md) | Funktionsbaum mit allen Business Cases im Detail |
 | [anhang/use-cases.md](anhang/use-cases.md) | Use-Case-Liste, Traceability-Matrix, ausformulierte Use Cases |
+| [anhang/klaerungsliste.md](anhang/klaerungsliste.md) | offene Fragen K01–K25 mit Fundstelle und Vorschlag |
 | [anhang/daten/](anhang/daten/) | Funktionsbaum und Use Cases als JSON |
 | [anhang/quellen/](anhang/quellen/) | Kundenunterlagen Q6–Q9 im Original und als Text (Q6–Q8 intern, Q9 öffentlich) |
 | [anhang/generator/](anhang/generator/) | Python-Skripte für PDFs, Markdown und JSON |

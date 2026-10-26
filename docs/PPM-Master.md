@@ -7,7 +7,7 @@
 | Stand | 26. Oktober 2026 |
 | Status | Entwurf, nicht mit dem Kunden validiert |
 | Verantwortlich | André Hochreutener, CSP AG |
-| Umfang | 7 Business Modules · 23 Business Domains · 87 Business Cases · 18 Use Cases |
+| Umfang | 7 Business Modules · 23 Business Domains · 89 Business Cases · 18 Use Cases |
 
 ## Inhalt
 
@@ -118,7 +118,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 - **BM PC Portfoliocontrolling**
   - BD PC.01 Finanzen: 01 Projektbudget planen; 02 Ist-Kosten übernehmen; 03 Kostenprognose aktualisieren; 04 Budgetabweichungen analysieren; 05 Budgetbedarf in den Budgetprozess übergeben
   - BD PC.02 Risiken: 01 Portfoliorisiko erfassen; 02 Risikolage des Portfolios beurteilen; 03 Risikomassnahme verfolgen; 04 Projektrisiko erfassen
-  - BD PC.03 Nutzen und KPIs: 01 Projekt-KPIs festlegen; 02 Nutzenrealisierung überprüfen
+  - BD PC.03 Nutzen und KPIs: 01 Projekt-KPIs festlegen; 02 Nutzenrealisierung überprüfen; 03 KPI-Werte nachführen; 04 Business Case fortschreiben
   - BD PC.04 Reporting: 01 Portfolio-Dashboard einsehen; 02 Portfoliobericht erstellen; 03 Ad-hoc-Auswertung erstellen
 - **BM RK Ressourcen und Kapazitäten**
   - BD RK.01 Kapazitätsangebot: 01 Kapazitätsangebot planen; 02 Personal- und Abwesenheitsdaten übernehmen
@@ -140,12 +140,12 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 | UC-004 | Monatlich berichten | ● | Projekt | PL |
 | UC-005 | Statusberichte prüfen und nachverfolgen |  | Portfolio | UE |
 | UC-006 | PRAT-Sitzung vorbereiten und durchführen | ● | Gremium (+ Portfolio) | UE, PRAT |
-| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt | PL, AG |
+| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt | PL, SP |
 | UC-008 | Portfolio priorisieren und ausbalancieren | ● | Portfolio (+ Gremium) | UE, PRAT |
 | UC-009 | Ressourcen planen und zuteilen |  | Portfolio (+ Projekt) | RM |
 | UC-010 | Portfoliofinanzen überwachen |  | Portfolio | FI, UE |
 | UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele (+ Portfolio) | GL, VR |
-| UC-012 | Quartalsreporting an den VR erstellen |  | Ziele (+ Portfolio) | UE, CEO |
+| UC-012 | Quartalsreporting an den VR erstellen |  | Ziele (+ Portfolio) | UE, PRAT |
 | UC-013 | Jahresrückblick auswerten |  | Gremium (+ Ziele) | PRAT |
 | UC-014 | Portfolio auswerten |  | Portfolio | PRAT, GLPA, DIR, UE |
 | UC-015 | Vorhaben abschliessen oder abbrechen |  | Projekt (+ Gremium) | PL, PRAT |
@@ -161,27 +161,20 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 4. Portfoliorelevante Aspekte auf Projektebene ergänzt: PS.02.04 Meilensteinplan pflegen, PC.02.04 Projektrisiko erfassen, RK.02.05 Ressourcenbedarf präzisieren, RK.02.06 ICT- und Infrastrukturbedarf anmelden.
 5. Q7 eingearbeitet: **Projektvertrag als strukturiertes Objekt je Projekt**, Dokument wird daraus erzeugt. DM.02 heisst «Projektvertrag»; neu DM.02.05–07, PS.02.05, PS.03.04; Zusammenzug im PPM über PS.01.04 Terminabweichungen und PP.04.05 Gate-Reviews einplanen. Änderungen am Vertrag gibt der Auftraggeber frei (PS.03.02).
 6. **UX-Prinzip** festgelegt (siehe unten); 18 Use Cases definiert, UC-003 und UC-004 ausformuliert.
-7. **Q8 PM-Handbuch 0.92 und Q9 Strategie 2035** als Quellen aufgenommen. Eingearbeitet sind die Fakten in Abschnitt 4 bis 6 sowie in den Annahmen und offenen Punkten. Funktionsbaum und Use Cases sind noch **unverändert**; die Änderungen daraus stehen als Vorschläge V1–V13 unten.
+7. **Q8 PM-Handbuch 0.92 und Q9 Strategie 2035** als Quellen aufgenommen; Fakten in Abschnitt 4 bis 6, Annahmen und offenen Punkten eingearbeitet.
+8. Änderungen aus Q8 und Q9 im Funktionsbaum und in den Use Cases übernommen (Vorschläge V1–V9, V11–V13):
+   - **Neu:** PC.03.03 «KPI-Werte nachführen» (UC-004) und PC.03.04 «Business Case fortschreiben» (UC-002, UC-003, UC-015).
+   - **Gremienweg:** PS.02.02 entscheidet je Phase und Kategorie (PRAT; in P0 und P1 bis zur Freigabe von P2 zusätzlich SNS-VR; Kategorie B GLPA); AM.02.04 bildet den Gremienweg ab.
+   - **Projektvertrag:** SP, PL und CTL unterzeichnen; die Freigabe für die nächste Phase erteilt das Gremium im Gate-Entscheid (DM.02.06). Änderungen entscheidet der SP, Änderungen an Scope, Budget oder Ressourcen der PRAT (PS.03.02). Der Akteur AG geht in SP auf.
+   - **Reporting:** Statusbericht nach Q8 mit Stichtag 25., Status im Plan/kritisch, Trend, Abweichungen je Dimension, Abhängigkeiten und anstehenden Entscheiden (PS.01.01); «kritisch» führt bei Entscheidbedarf zur Eskalation (PS.03.03, neu in UC-004). Quartalsreporting an den VR durch den PRAT (ZM.03.02, UC-012).
+   - **Konfiguration:** Codetabellen Status und Trend (AM.02.02); Phasenmodell mit Leitfragen je Wertestrom und Standard-Lieferergebnissen je Phase (AM.02.03).
+   - **Weitere Beschriebe:** Handlungsfelder mit Leitsatz und Stossrichtungen als Stammdaten (ZM.01.01); Projektidee nach Vorlage des PM-Handbuchs (DM.01.01–02); Gate Review Packet 5 Arbeitstage vor der Sitzung, Protokoll nach 2–3 Arbeitstagen (PP.04.01–02).
+   - **Herleitungen:** Q8 und Q9 bei 36 bestehenden Business Cases als Beleg nachgetragen.
+   - **UC-003 und UC-004** an Q8 angepasst; die [OFFEN] zu Reihenfolge, Rhythmus, Frist und Freigabe durch den Sponsor sind geschlossen.
 
 **Vorgeschlagen, nicht entschieden**
 
-Aus Q8 und Q9 abgeleitet; IDs werden erst beim Entscheid vergeben. Bei Annahme sind `daten.py`, `uc_daten.py`, Anhang, JSON und PDFs nachzuführen.
-
-| Nr | Vorschlag | Betrifft | Beleg |
-|---|---|---|---|
-| V1 | PC.03.03 «KPI-Werte nachführen» aufnehmen (war bereits vorgeschlagen): Ist-Werte der klinischen und nicht-klinischen KPIs ab P2/P3 laufend melden. Q8 belegt das jetzt. | PC.03, UC-004 | Q6 F1, F2; Q8 Anhang 1 (Erfolgsmessung, KPI-Monitoring-Reports) |
-| V2 | Neuer BC in PC.03 **«Business Case fortschreiben»**: Kosten/Nutzen je Phase führen (P0 initial, P1 Baseline, P2–P3 Update, P4 Abschluss), als Nachweis für Gate und Priorisierung. | PC.03, UC-002, UC-003, UC-015 | Q8 Kap. 7, 13, Abb. 4, Anhang 1 |
-| V3 | **Gremium je Phase und Kategorie**: Gate-Entscheid in P0/P1 bis Freigabe P2 über SNS-VR, danach PRAT; Kategorie B über GLPA. PS.02.02 um SNS und GLPA erweitern; AM.02.04 konfiguriert den Gremienweg je Phase und Kategorie. | PS.02.02, AM.02.04, UC-003, UC-006 | Q8 Kap. 5.1, 7, 8.1 |
-| V4 | **Freigabe Projektvertrag = Gate-Entscheid**: Reihenfolge Quality-Check UE → Abstimmung Sponsor → Freigabe durch PRAT im Gate; Unterzeichnung AG/SP, PL, CTL bleibt. Schliesst «[OFFEN] Reihenfolge» in UC-003. | DM.02.06, UC-002, UC-003 | Q8 Kap. 5.1, 8.1, 8.2; Q7 Kap. 12 |
-| V5 | **Änderung entscheiden**: Akteur AG → SP (gleiche Rolle); Änderungen an Scope, Budget oder Ressourcen gibt der PRAT frei. | PS.03.02, UC-007 | Q8 Kap. 1, 8.5 |
-| V6 | **Statusbericht nach Q8**: Status grün/rot, Trend, Abweichungen je Dimension (Inhalt, Termin, Ressourcen, Budget), Abhängigkeiten, anstehende Entscheide; Stichtag 25.; Status rot löst eine Eskalation aus (PS.03.03). Keine Freigabe durch den Sponsor. Schliesst die [OFFEN] in UC-004. | PS.01.01, PS.03.03, UC-004, UC-005 | Q8 Kap. 8.3, 8.4, 9 |
-| V7 | **Quartalsreporting an den VR**: Der PRAT berichtet, UE erstellt aus dem Dashboard; Inhalt gemäss Q8 Kap. 8.7. Primärakteur UC-012 anpassen. | ZM.03.02, UC-012 | Q8 Kap. 8.7 |
-| V8 | **Konfiguration**: Codetabellen Status {im Plan, kritisch} und Trend {aufwärts, gleichbleibend, abwärts}; Phasenmodell mit Standard-Lieferergebnissen und Meilensteinen je Phase und Leitfragen je Wertestrom. | AM.02.02, AM.02.03 | Q8 Kap. 7, 9, Anhang 1 |
-| V9 | **Handlungsfelder nach Q9**: offizielle Namen, Leitsatz und Stossrichtungen führen; Bezeichnungen im Dashboard («MA, Kultur, Compliance», «Markt & Vernetzung») darauf vereinheitlichen. | ZM.01.01, ZM.01.02 | Q9 S. 8–11; Q6 F7 |
-| V10 | **Bewertung qualitativ**: Priorisierungskriterien und Kriterienraster «Tiering» als Kriterienkatalog mit Gesamtbeurteilung statt gewichtetem Score; als Herleitung ergänzen. | PP.01.02, PP.02.01, PP.02.04 | Q8 Kap. 6.1, 6.2, Abb. 2 |
-| V11 | **PRAT-Geschäft nach Q8**: Gate Review Packet 5 Arbeitstage vorher (Quality-Check UE, Versand an PRAT), Sitzungsablauf, Protokoll nach 2–3 Arbeitstagen; Anlässe für Einladung der Projekte. Grundlage für UC-006. | PP.04.01, PP.04.05, UC-006 | Q8 Kap. 8.2, 8.5, Abb. 5 |
-| V12 | **Projektidee nach Template**: Ausgangslage, Zielsetzung, Strategiebezug, betroffene Bereiche, erste Einschätzung von Nutzen, Aufwand und Relevanz; Herkunft (Innovationsprozess, Strategieprozess). | DM.01.01, DM.01.02, UC-001 | Q8 Kap. 6.1, 13 |
-| V13 | **Herleitungen ergänzen**: Q8 als Beleg bei bestehenden BCs nachtragen, u. a. DM.02.05 (Quality-Check), PS.01.01–02, PS.02.01–03, PS.03.03, PS.04.01 (Abschlussbericht), PS.04.03, PS.05.01–03 (ADKAR, Stakeholder), PC.02.01–04, PC.04.01–02, AM.03.01 (Templates). Bisher nur analytisch belegt, jetzt auch empirisch: DM.01.03, DM.01.04. | Funktionsbaum | Q8 |
+- **V10 Bewertungsmodell:** PP.01.02 «Bewertungsmodell festlegen» verlangt heute «Kriterien und Gewichte». Laut Q8 sind Kriterienraster und Priorisierungskriterien eine Orientierung für eine Gesamtbeurteilung, kein Rechenmodell. Vorschlag: Das System führt die Kriterien als Checkliste mit Einschätzung je Kriterium, rechnet aber keinen gewichteten Score. Offen, bis die Insel Gruppe entschieden hat, ob sie einen Score will (siehe offene Punkte).
 
 ## 11. Annahmen
 
@@ -193,14 +186,14 @@ Aus Q8 und Q9 abgeleitet; IDs werden erst beim Entscheid vergeben. Bei Annahme s
 
 ## 12. Offene Punkte
 
-Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung für Kategorie B und C, Reihenfolge Vertragsfreigabe und Gate (V4), Berichtsrhythmus und Frist, Ampel (eine Ampel plus Trend), Zuordnung Kategorie A = Transformationsprogramm, PM-Handbuch als Quelle.
+Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung für Kategorie B und C, Reihenfolge Vertragsfreigabe und Gate, Berichtsrhythmus und Frist, Freigabe des Berichts durch den Sponsor (keine), Ampel (eine Ampel plus Trend), Zuordnung Kategorie A = Transformationsprogramm, PM-Handbuch als Quelle.
 
 - **Abkürzungen:** Ausschreibung der Direktionskürzel AeD, DPF, DLF, DMS, DP, DTI (laut Q8 ICT) und DIB bzw. DBI (Q8 schreibt beides; Infrastruktur); PFLE (Q6 F1), DRC (Dashboard), «CP» in Phase 1 (Q6 F6, Q8 Abb. 4) und «Streams» (F2)?
 - **Sponsoren-Koalition:** Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL (Q8 Abb. 7). Q7 verlangt Freigabe durch «Auftraggeber» und «Sponsor» getrennt – ist das dieselbe Person?
 - **Programmauftraggeber:** VR (Q8 Kap. 1, 5.1) oder VR-Präsident (Q8 Glossar «VRP»)?
 - **Kategorie B:** Gelten Quality-Check durch UE, monatliches Dashboard und Projektvertrag auch für GL-Projekte? Sitzungsrhythmus der GLPA?
 - **Kategorie C:** Soll das System Direktionsportfolios überhaupt führen, oder genügt eine Projektliste ohne Governance?
-- **Kriterienraster:** Bleibt es bei der qualitativen Gesamtbeurteilung (Q8), oder braucht die Priorisierung (Q6 F9 Matrix) doch Gewichte und einen Score?
+- **Kriterienraster (V10):** Bleibt es bei der qualitativen Gesamtbeurteilung (Q8), oder braucht die Priorisierung (Q6 F9 Matrix) doch Gewichte und einen Score?
 - **Zeithorizont:** Sind die «3–5-Jahresziele» (Q6 F1) und «Dreijahresziele» (F2) die strategischen Ziele 2030 (F3)? Ist die Ebene «kurz-, mittel- und langfristige Ziele» (Q9) eine eigene Stufe?
 - **Finanzen:** Kosten je Phase vs. Budget je Jahr – Umrechnung? Quelle der Ist-Kosten? Struktur des Business Case (Kosten/Nutzen, Top Line/Bottom Line, Q6 F8)?
 - **Pflichtangaben je Phase:** Q8 Anhang 1 nennt Lieferergebnisse, aber keine Pflichtfelder des Projektvertrags je Phase. Abgleich mit Q7 nötig. Wann erscheint die Finalversion von Q8?
@@ -211,9 +204,9 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Vorschläge V1–V13 entscheiden; danach Funktionsbaum, Use Cases, Anhang, JSON und PDFs nachführen.
-2. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren, auf Basis von Q8 Kap. 8.1–8.5 (V3, V11).
-3. UC-003 und UC-004 an Q8 anpassen und die dort geklärten [OFFEN] schliessen (V4, V6).
+1. PDFs im Anhang mit dem Generator neu erzeugen (Stand Entscheid 8; braucht die CSP-Skills).
+2. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren, auf Basis von Q8 Kap. 8.1–8.5.
+3. V10 mit der Insel Gruppe klären.
 4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
 5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
 6. Offene Punkte mit der Insel Gruppe klären.
@@ -225,13 +218,13 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 | [anhang/funktionsbaum.md](anhang/funktionsbaum.md) | Funktionsbaum mit allen Business Cases im Detail |
 | [anhang/use-cases.md](anhang/use-cases.md) | Use-Case-Liste, Traceability-Matrix, ausformulierte Use Cases |
 | [anhang/daten/](anhang/daten/) | Funktionsbaum und Use Cases als JSON |
-| [anhang/pdf/](anhang/pdf/) | gestaltete PDFs im CSP-Design |
+| [anhang/pdf/](anhang/pdf/) | gestaltete PDFs im CSP-Design (Stand vor Entscheid 8, neu zu erzeugen) |
 | [anhang/quellen/](anhang/quellen/) | Kundenunterlagen Q6–Q9 im Original und als Text (Q6–Q8 intern, Q9 öffentlich) |
-| [anhang/generator/](anhang/generator/) | Python-Skripte für die PDFs |
+| [anhang/generator/](anhang/generator/) | Python-Skripte für PDFs, Markdown und JSON |
 
 **Pflege**
 
 - Dieses Masterdokument ist führend. Neue Entscheide, Annahmen und offene Punkte zuerst hier eintragen.
-- Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py` und `anhang/generator/uc_daten.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
+- Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py` und `anhang/generator/uc_daten.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
 - IDs nie umnummerieren; Neues hinten anfügen, Gestrichenes als «entfällt» markieren.
 - Der Generator setzt die CSP-Skills `csp-dokumente` und `csp-grafiken` voraus (Pfade `/mnt/skills/plugins/csp-solutions:*`) sowie `symbol.html`, `pruef.html` und `csp-assets/` im Arbeitsordner.

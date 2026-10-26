@@ -46,33 +46,40 @@ Fachliche Spezifikation eines Systems für Strategieumsetzung und PPM der Insel 
 |---|---|---|---|
 | Q6 | Insel Gruppe, Eckpunkte PPM, 9 Folien (F1 Strategieumsetzung, F2 Jahreszyklus, F3 Zielstruktur, F4 Portfolios und Rollen, F5 Projektorganisation, F6 Phasen und Gates mit Leitfragen, F7 Dashboard, F8–F9 Portfolio-Mockups, ausgeblendet) | empirisch | [quellen/Q6_Eckpunkte_PPM.pptx](anhang/quellen/Q6_Eckpunkte_PPM.pptx), Text: [Q6_Eckpunkte_PPM.md](anhang/quellen/Q6_Eckpunkte_PPM.md), Dashboard: [Q6_F7_Dashboard.png](anhang/quellen/Q6_F7_Dashboard.png) |
 | Q7 | Insel Gruppe, Vorlage Projektvertrag (Kopf, Kap. 1–13, Freigabe); Basis ist das PM-Handbuch der Insel Gruppe | empirisch | [quellen/Q7_Vorlage_Projektvertrag.docx](anhang/quellen/Q7_Vorlage_Projektvertrag.docx), Text: [Q7_Vorlage_Projektvertrag.md](anhang/quellen/Q7_Vorlage_Projektvertrag.md) |
+| Q8 | Insel Gruppe, Handbuch zum strategischen Projekt- und Programmmanagement (PM-Handbuch), Version 0.92 vom 02.09.2026, präfinal (Kap. 1 Geltungsbereich, 4 Governance, 5 Rollen, 6 Portfolio- und Priorisierungsmodell, 7 Phasenmodell und Lieferergebnisse, 8 Steuerung und Reporting, 9 Status und Eskalation, 10 Risiko, 11 Change und Kommunikation, 12 Kernteam, 13 Templates, 14 Glossar, Anhang 1 Deliverable-Matrix) | empirisch | [quellen/Q8_PM-Handbuch_Insel_0.92.docx](anhang/quellen/Q8_PM-Handbuch_Insel_0.92.docx), Text mit transkribierten Abbildungen: [Q8_PM-Handbuch_Insel_0.92.md](anhang/quellen/Q8_PM-Handbuch_Insel_0.92.md), Abbildungen: `Q8_Abb*`, [Q8_Anhang1_Deliverable-Matrix.png](anhang/quellen/Q8_Anhang1_Deliverable-Matrix.png) |
+| Q9 | Insel Gruppe, Strategie 2035, vom VR am 13.06.2025 verabschiedet (Vorwort, Werte, Vision, fünf Handlungsfelder mit Leitsatz und Stossrichtungen), öffentlich, [insel.ch](https://www.insel.ch/fileadmin/Insel_Gruppe/Dokumente/Publikationen/ING-Strategie-2035-de.pdf) | empirisch | [quellen/Q9_Strategie_2035.pdf](anhang/quellen/Q9_Strategie_2035.pdf), Text: [Q9_Strategie_2035.md](anhang/quellen/Q9_Strategie_2035.md) |
 | Q1 | Lebenszyklus der Geschäftsobjekte | analytisch | – |
 | Q2 | Event-Partitionierung (externe, zeitliche, interne Ereignisse) | analytisch | – |
 | Q3 | Ziele je Akteur | analytisch | – |
 | Q4 | PMI, The Standard for Portfolio Management | Referenzstandard | – |
 | Q5 | AXELOS, Management of Portfolios (MoP) | Referenzstandard | – |
 
-Q6 und Q7 enthalten Kundenmaterial (Klassifikation intern) und Personennamen im Dashboard. Nur in privaten Repositories ablegen.
+Q6, Q7 und Q8 enthalten Kundenmaterial (Klassifikation intern) und Personennamen (Dashboard Q6, Dokumentbesitz Q8). Nur in privaten Repositories ablegen. Q9 ist öffentlich.
 
 ## 4. Fachliche Eckpunkte der Insel Gruppe
 
-- **Zielkette:** Strategie → 5 strategische Handlungsfelder (Mitarbeitende & Kultur, Patientenorientierung, Medizin der Zukunft, Markt & Vernetzung, Wirtschaftlichkeit) → strategische Ziele (Mehrjahresziele) → Jahresziele → Hauptaktivitäten → Projekte; je Ziel eine Metrik.
-- **Drei Portfolios = Projektkategorien:** A strategisches Transformationsportfolio (Gremium PRAT), B Projekte der Geschäftsleitung (GLPA), C Projekte der Direktionen (DIR). Zuordnung über ein Kriterienraster.
-- **Phasenmodell:** Pre-P0 Ideen, P0 Initialisierung, P1 Konzept & Planung, P2 Implementierung, P3 Stabilisierung & Monitoring, P4 Abschluss; Gates P0 Eintritt, P0–P1, P1–P2, P2–P3 (Go-Live), P3–P4, P4 Exit mit Leitfragen je Dimension Nutzen, Klinik, ICT, Infrastruktur.
+- **Zielkette (Q9, Q6 F1, F3):** Strategie 2035 (vom VR am 13.06.2025 verabschiedet; Vision und Werte Respekt, Exzellenz, Verantwortung) → 5 strategische Handlungsfelder mit Leitsatz und Stossrichtungen: Mitarbeitende und Unternehmenskultur · Patientenorientierung · Medizin der Zukunft · Marktpositionierung und Vernetzung · Wirtschaftlichkeit → strategische Ziele (Horizont 2030) → Jahresziele (z. B. 2027) → Hauptaktivitäten → Projekte; je Ziel eine Metrik. Q9 nennt zwischen strategischen Zielen und Massnahmen/Projekten «kurz-, mittel- und langfristige Ziele».
+- **Drei Portfolios = Projektkategorien (Q8 Kap. 1, 6):** A strategisches Transformationsportfolio = Transformationsprogramm (Gremium PRAT), B taktisch-operatives Portfolio der Geschäftsleitung (GLPA), C operative Portfolios der Direktionen (DIR). Geltung des PM-Handbuchs: für A verbindlich (Programm- und Projekt-Governance), für B die Projekt-Governance (Phasenmodell, Rollen, Steuerung, Reporting), für C keine Vorgaben, Orientierung empfohlen; C braucht kein Reporting an die GL. Zuordnung über das Kriterienraster «Tiering» (Relevanz, Anzahl betroffener Direktionen, Abhängigkeiten, Bedarf an zentraler Priorisierung und Finanzierung, Change-Aufwand) als Gesamtbeurteilung, nicht als starre Logik.
+- **Priorisierung (Q8 Kap. 6.1):** Ideen kommen aus Innovationsprozess und jährlichem Strategieprozess in den Ideenpool; Ablauf: Erfassung → erste Bewertung der strategischen Relevanz → Entscheid strategisch, taktisch-operativ oder operativ → Priorisierung → Freigabe Initialisierung. Kriterien: Strategiebeitrag, Transformationsrelevanz, Anzahl betroffener Bereiche, Komplexität und Abhängigkeiten, Finanzierungsbedarf, Ressourcenverfügbarkeit, Kommunikations- und Change-Aufwand.
+- **Phasenmodell:** Pre-P0 Ideen, P0 Initialisierung (mit optionaler Vorstudie), P1 Konzept & Planung, P2 Implementierung, P3 Stabilisierung & Monitoring, P4 Abschluss; Gates P0 Eintritt, P0–P1, P1–P2, P2–P3 (Go-Live), P3–P4, P4 Exit mit je fünf Leitfragen entlang der **Werteströme** Business Value (Nutzen), Projektmanagement, klinische Transformation und Lösungsdesign, Integration ICT (DTI) und Infrastruktur (DBI) (Q6 F6, Q8 Kap. 7.6, Abb. 4, 6). Lieferergebnisse je Phase: Business Case P0 initial, P1 Baseline, P2–P3 Update, P4 Abschluss; Projektvertrag für die jeweils nächste Phase; Lösungskonzept (P1); Abschlussbericht (P4); Details in der Deliverable-Matrix (Q8 Anhang 1).
+- **Gremienweg (Q8 Kap. 5.1, 8.1, 8.2):** PL → Projektsponsor → UE (Quality-Check, Traktandierung) → PRAT entscheidet über Gates, Freigaben und Projektvereinbarungen je Phase. In P0 und P1 laufen relevante Meilensteine und Gates bis zur Freigabe von P2 zusätzlich über den SNS-VR; ab P2 steuert der PRAT, der VR wird quartalsweise informiert. Gate Review Packet 5 Arbeitstage vor der Sitzung; im PRAT ca. 20 Min. Präsentation PL/CTL, 10 Min. Diskussion, 5 Min. Entscheid; Protokoll nach 2–3 Arbeitstagen. Für Kategorie B entscheidet die GLPA (Q8 Kap. 7).
 - **Jahreszyklus (F2):** Strategie-Aktualisierung (VR mit GL), Zielsetzung (Freigabe VR, Input Budgetprozess), Vorbereitung und Start Umsetzung, monatlicher operativer Review (PRAT: Priorisierung, Freigaben, Meilensteine, Eskalationen), quartalsweiser strategischer Review (VR), Jahresrückblick (PRAT).
-- **Projektvertrag (Q7):** zentrales, lebendes Steuerungsdokument je Projekt; wird an jedem Gate für die nächste Phase fortgeschrieben; Status geplant / in Arbeit / in Prüfung / abgenommen; Quality Review durch UE; Freigabe durch Auftraggeber, Sponsor, PL, CTL; die freigegebene Version ist verbindlich (Baseline).
+- **Reporting und Status (Q8 Kap. 8.3–8.7, 9):** Das Dashboard ist «Single Source of Truth», heute in Excel geführt. PL aktualisiert mindestens monatlich bis zum 25., bei wesentlichen Entwicklungen sofort; UE konsolidiert und prüft bis Monatsende; ab dem 1. geht das Dashboard an die Gremien. Inhalt: Status, Fortschritt und Meilensteine, Risiken und Eskalationen, Abweichungen bei Inhalt, Termin, Ressourcen, Budget, Abhängigkeiten, anstehende Entscheide und Meilensteinfreigaben. Die Programmleitung (UE) berichtet monatlich an den PRAT, der PRAT quartalsweise an den VR. Status zweistufig: grün «im Plan» / rot «kritisch», dazu Trend aufwärts / gleichbleibend / abwärts. Rot heisst Eskalation, beurteilt nach Zeit, Kosten/Aufwand, Ergebnis/Qualität.
+- **Projektvertrag (Q7; in Q8 «Projektvereinbarung»):** zentrales, lebendes Steuerungsdokument je Projekt; wird an jedem Gate für die nächste Phase fortgeschrieben; Status geplant / in Arbeit / in Prüfung / abgenommen; Quality Review durch UE; Unterzeichnung durch Auftraggeber/Sponsor, PL, CTL; Freigabe je Phase durch den PRAT (Q8 Kap. 5.1); die freigegebene Version ist verbindlich (Baseline).
+- **Risiko, Change, Kommunikation (Q8 Kap. 10, 11):** pragmatischer Minimalstandard, kein formalisiertes Risikomodell; Programmleitung führt projektübergreifende Risiken und Abhängigkeiten. Change nach ADKAR; UE und Unternehmenskommunikation unterstützen bedarfsorientiert.
+- **PL und CTL (Q8 Abb. 7):** PL führt bei Zeit, Budget und Lieferergebnis, CTL bei klinischer Qualität und Patientensicherheit; bei Konflikt entscheiden Sponsor oder Sponsoren-Koalition.
 
 ## 5. Akteure
 
-VR Verwaltungsrat (Programmauftraggeber) · SNS VR-Ausschuss · CEO Programmsponsor · PRAT Programmausschuss Transformation (GL) · UE Unternehmensentwicklung (Programmleitung) · GL Geschäftsleitung · GLPA Gremium GL-Portfolio [OFFEN] · DIR Gremium Direktionen [OFFEN] · AG Auftraggeber/in · SP Projektsponsor (GL-Mitglied bzw. Direktion) · PL Projektleitung · CTL Clinical Transformation Lead · KT Kernteam · AS Antragsteller/in · FI Finanzen [OFFEN] · RM Ressourcenmanagement [OFFEN] · ADM Administrator/in
+VR Verwaltungsrat (Programmauftraggeber) · SNS Strategie-, Nominations- und Strukturausschuss des VR (Schnittstelle PRAT ↔ VR; Gates in P0 und P1) · CEO Programmsponsor · PRAT Programmausschuss Transformation (GL) · UE Unternehmensentwicklung (Programmleitung) · PMO Project Management Office (unterstützt die Programmleitung bei Reporting und Dokumentation) · GL Geschäftsleitung · GLPA GL Portfolio Ausschuss (Portfolio B) · DIR Direktionen (Portfolio C; im Kernteam vertreten als AeD, DPF, DLF, DMS, DTI, DP, DIB) · AG/SP Projektauftraggeber und -sponsor, eine Rolle (GL-Mitglied, bei B die GL, bei C die Direktion; Q8 Kap. 1) · PL Projektleitung · CTL Clinical Transformation Lead · KT Kernteam · AS Antragsteller/in · KOM Unternehmenskommunikation (Change und Kommunikation, mit UE) · DTI/DBI zuständige Stellen für ICT und Infrastruktur · FI Finanzen [OFFEN] · RM Ressourcenmanagement [OFFEN] · ADM Administrator/in
 
 ## 6. Systemgrenze
 
 **Im System:** strategische Ziele, Jahresziele, Metriken · Ideen und Projektverträge · Bewertung, Priorisierung, Szenarien · Portfolioentscheide und Roadmap · Status, Gates, Änderungen, Abschluss · Finanzen, Risiken, Nutzen, Reporting · Ressourcen und Kapazitäten · Stakeholder und Kommunikation · drei Portfolioebenen.
 
-**Ausserhalb / Umsysteme:** Strategiearbeit (Trends, PESTEL) · Budgetprozess (erhält Input) · ERP (Ist-Kosten, offen) · HR-System · operatives Projektmanagement (Aufgaben, Arbeitspakete, Detailplanung).
+**Ausserhalb / Umsysteme:** Strategiearbeit (Trends, PESTEL, Vision und Werte) · Budgetprozess (erhält Input) · ERP (Ist-Kosten, offen) · HR-System · ICT- und Infrastruktur-Projektprozesse mit eigenen Investitionsfreigaben (DTI, DBI; Q8 Abb. 4) · operatives Projektmanagement (Aufgaben, Arbeitspakete, Detailplanung, RAID-Log mit Actions und Issues, Lösungskonzept, SOPs, Change-Management-Plan) · heutiges Excel-Dashboard (wird abgelöst; Datenübernahme offen).
 
-**Regel Projektebene:** Auf Projektebene hält das System nur Portfoliorelevantes – Status, Meilensteine, Budget, Risiken, Ressourcen, KPIs, Kommunikation – also alles, was das Portfolio zusammenzieht oder ein Gate als Nachweis braucht. Keine zu operative Projektleitung.
+**Regel Projektebene:** Auf Projektebene hält das System nur Portfoliorelevantes – Status, Meilensteine, Budget, Risiken, Ressourcen, KPIs, Business Case, Kommunikation, Entscheide und Eskalationen – also alles, was das Portfolio zusammenzieht oder ein Gate als Nachweis braucht. Keine zu operative Projektleitung.
 
 ## 7. UX-Prinzip: Arbeitsräume
 
@@ -154,35 +161,62 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 4. Portfoliorelevante Aspekte auf Projektebene ergänzt: PS.02.04 Meilensteinplan pflegen, PC.02.04 Projektrisiko erfassen, RK.02.05 Ressourcenbedarf präzisieren, RK.02.06 ICT- und Infrastrukturbedarf anmelden.
 5. Q7 eingearbeitet: **Projektvertrag als strukturiertes Objekt je Projekt**, Dokument wird daraus erzeugt. DM.02 heisst «Projektvertrag»; neu DM.02.05–07, PS.02.05, PS.03.04; Zusammenzug im PPM über PS.01.04 Terminabweichungen und PP.04.05 Gate-Reviews einplanen. Änderungen am Vertrag gibt der Auftraggeber frei (PS.03.02).
 6. **UX-Prinzip** festgelegt (siehe unten); 18 Use Cases definiert, UC-003 und UC-004 ausformuliert.
+7. **Q8 PM-Handbuch 0.92 und Q9 Strategie 2035** als Quellen aufgenommen. Eingearbeitet sind die Fakten in Abschnitt 4 bis 6 sowie in den Annahmen und offenen Punkten. Funktionsbaum und Use Cases sind noch **unverändert**; die Änderungen daraus stehen als Vorschläge V1–V13 unten.
 
-Vorgeschlagen, **nicht entschieden:** PC.03.03 «KPI-Werte nachführen» (laufende Ist-Werte der Projekt-KPIs, Q6 F1, F2).
+**Vorgeschlagen, nicht entschieden**
+
+Aus Q8 und Q9 abgeleitet; IDs werden erst beim Entscheid vergeben. Bei Annahme sind `daten.py`, `uc_daten.py`, Anhang, JSON und PDFs nachzuführen.
+
+| Nr | Vorschlag | Betrifft | Beleg |
+|---|---|---|---|
+| V1 | PC.03.03 «KPI-Werte nachführen» aufnehmen (war bereits vorgeschlagen): Ist-Werte der klinischen und nicht-klinischen KPIs ab P2/P3 laufend melden. Q8 belegt das jetzt. | PC.03, UC-004 | Q6 F1, F2; Q8 Anhang 1 (Erfolgsmessung, KPI-Monitoring-Reports) |
+| V2 | Neuer BC in PC.03 **«Business Case fortschreiben»**: Kosten/Nutzen je Phase führen (P0 initial, P1 Baseline, P2–P3 Update, P4 Abschluss), als Nachweis für Gate und Priorisierung. | PC.03, UC-002, UC-003, UC-015 | Q8 Kap. 7, 13, Abb. 4, Anhang 1 |
+| V3 | **Gremium je Phase und Kategorie**: Gate-Entscheid in P0/P1 bis Freigabe P2 über SNS-VR, danach PRAT; Kategorie B über GLPA. PS.02.02 um SNS und GLPA erweitern; AM.02.04 konfiguriert den Gremienweg je Phase und Kategorie. | PS.02.02, AM.02.04, UC-003, UC-006 | Q8 Kap. 5.1, 7, 8.1 |
+| V4 | **Freigabe Projektvertrag = Gate-Entscheid**: Reihenfolge Quality-Check UE → Abstimmung Sponsor → Freigabe durch PRAT im Gate; Unterzeichnung AG/SP, PL, CTL bleibt. Schliesst «[OFFEN] Reihenfolge» in UC-003. | DM.02.06, UC-002, UC-003 | Q8 Kap. 5.1, 8.1, 8.2; Q7 Kap. 12 |
+| V5 | **Änderung entscheiden**: Akteur AG → SP (gleiche Rolle); Änderungen an Scope, Budget oder Ressourcen gibt der PRAT frei. | PS.03.02, UC-007 | Q8 Kap. 1, 8.5 |
+| V6 | **Statusbericht nach Q8**: Status grün/rot, Trend, Abweichungen je Dimension (Inhalt, Termin, Ressourcen, Budget), Abhängigkeiten, anstehende Entscheide; Stichtag 25.; Status rot löst eine Eskalation aus (PS.03.03). Keine Freigabe durch den Sponsor. Schliesst die [OFFEN] in UC-004. | PS.01.01, PS.03.03, UC-004, UC-005 | Q8 Kap. 8.3, 8.4, 9 |
+| V7 | **Quartalsreporting an den VR**: Der PRAT berichtet, UE erstellt aus dem Dashboard; Inhalt gemäss Q8 Kap. 8.7. Primärakteur UC-012 anpassen. | ZM.03.02, UC-012 | Q8 Kap. 8.7 |
+| V8 | **Konfiguration**: Codetabellen Status {im Plan, kritisch} und Trend {aufwärts, gleichbleibend, abwärts}; Phasenmodell mit Standard-Lieferergebnissen und Meilensteinen je Phase und Leitfragen je Wertestrom. | AM.02.02, AM.02.03 | Q8 Kap. 7, 9, Anhang 1 |
+| V9 | **Handlungsfelder nach Q9**: offizielle Namen, Leitsatz und Stossrichtungen führen; Bezeichnungen im Dashboard («MA, Kultur, Compliance», «Markt & Vernetzung») darauf vereinheitlichen. | ZM.01.01, ZM.01.02 | Q9 S. 8–11; Q6 F7 |
+| V10 | **Bewertung qualitativ**: Priorisierungskriterien und Kriterienraster «Tiering» als Kriterienkatalog mit Gesamtbeurteilung statt gewichtetem Score; als Herleitung ergänzen. | PP.01.02, PP.02.01, PP.02.04 | Q8 Kap. 6.1, 6.2, Abb. 2 |
+| V11 | **PRAT-Geschäft nach Q8**: Gate Review Packet 5 Arbeitstage vorher (Quality-Check UE, Versand an PRAT), Sitzungsablauf, Protokoll nach 2–3 Arbeitstagen; Anlässe für Einladung der Projekte. Grundlage für UC-006. | PP.04.01, PP.04.05, UC-006 | Q8 Kap. 8.2, 8.5, Abb. 5 |
+| V12 | **Projektidee nach Template**: Ausgangslage, Zielsetzung, Strategiebezug, betroffene Bereiche, erste Einschätzung von Nutzen, Aufwand und Relevanz; Herkunft (Innovationsprozess, Strategieprozess). | DM.01.01, DM.01.02, UC-001 | Q8 Kap. 6.1, 13 |
+| V13 | **Herleitungen ergänzen**: Q8 als Beleg bei bestehenden BCs nachtragen, u. a. DM.02.05 (Quality-Check), PS.01.01–02, PS.02.01–03, PS.03.03, PS.04.01 (Abschlussbericht), PS.04.03, PS.05.01–03 (ADKAR, Stakeholder), PC.02.01–04, PC.04.01–02, AM.03.01 (Templates). Bisher nur analytisch belegt, jetzt auch empirisch: DM.01.03, DM.01.04. | Funktionsbaum | Q8 |
 
 ## 11. Annahmen
 
-- Strategiearbeit und PESTEL-Analyse liegen ausserhalb des Systems.
-- Das Transformationsprogramm entspricht dem strategischen Portfolio (Kategorie A).
+- Strategiearbeit und PESTEL-Analyse liegen ausserhalb des Systems; Vision und Werte (Q9) ebenfalls.
 - Der Projektvertrag wird als Daten je Projekt geführt; das Dokument entsteht daraus.
+- «Projektvereinbarung» (Q8) und «Projektvertrag» (Q7, Q8 Abb. 4 und Anhang 1) bezeichnen dasselbe; die Spezifikation bleibt bei «Projektvertrag».
+- Q8 Kap. 7.4 «Phase 4: Stabilisierung & Monitoring» ist ein Schreibfehler für Phase 3.
+- Kategorie C nutzt das System freiwillig; die Funktionen werden nicht eingeschränkt, Pflichten (Gates, Reporting) gelten nur für A und B.
 
 ## 12. Offene Punkte
 
-- **Abkürzungen:** Wofür stehen GLPA, DIR, AeD, PFLE, DMS, DRC, «CP» (Gate-Modell F6) und «Streams» (F2)?
-- **Auftraggeber und Sponsor:** verschiedene Personen? Was ist die Sponsoren-Koalition?
-- **Kategorie B und C:** Gelten Projektvertrag, Gates und Quality Review auch dort? Entscheiden GLPA und DIR an den Gates?
-- **Kriterienraster:** Kriterien und Gewichte für Kategorie A/B/C?
-- **Zeithorizont:** Strategie 2035 (F1) oder Ziele 2030 (F3)? 3–5- oder Dreijahresziele?
-- **Finanzen:** Kosten je Phase vs. Budget je Jahr – Umrechnung? Quelle der Ist-Kosten?
-- **PM-Handbuch:** als Quelle anfordern (Pflichtangaben je Phase).
-- **Reihenfolge:** Vertragsfreigabe vor oder nach dem PRAT-Gate-Entscheid?
-- **Berichtswesen:** Rhythmus, Frist, Freigabe des Statusberichts durch den Sponsor? Projektstatus als eine Ampel oder je Dimension?
-- **Abweichung:** Ab welcher Schwelle ist eine Abweichung wesentlich?
-- **Ressourcen:** Reicht die Planung in FTE × Monate je Rolle und Phase, oder braucht es Kapazitätsplanung je Pool?
+Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung für Kategorie B und C, Reihenfolge Vertragsfreigabe und Gate (V4), Berichtsrhythmus und Frist, Ampel (eine Ampel plus Trend), Zuordnung Kategorie A = Transformationsprogramm, PM-Handbuch als Quelle.
+
+- **Abkürzungen:** Ausschreibung der Direktionskürzel AeD, DPF, DLF, DMS, DP, DTI (laut Q8 ICT) und DIB bzw. DBI (Q8 schreibt beides; Infrastruktur); PFLE (Q6 F1), DRC (Dashboard), «CP» in Phase 1 (Q6 F6, Q8 Abb. 4) und «Streams» (F2)?
+- **Sponsoren-Koalition:** Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL (Q8 Abb. 7). Q7 verlangt Freigabe durch «Auftraggeber» und «Sponsor» getrennt – ist das dieselbe Person?
+- **Programmauftraggeber:** VR (Q8 Kap. 1, 5.1) oder VR-Präsident (Q8 Glossar «VRP»)?
+- **Kategorie B:** Gelten Quality-Check durch UE, monatliches Dashboard und Projektvertrag auch für GL-Projekte? Sitzungsrhythmus der GLPA?
+- **Kategorie C:** Soll das System Direktionsportfolios überhaupt führen, oder genügt eine Projektliste ohne Governance?
+- **Kriterienraster:** Bleibt es bei der qualitativen Gesamtbeurteilung (Q8), oder braucht die Priorisierung (Q6 F9 Matrix) doch Gewichte und einen Score?
+- **Zeithorizont:** Sind die «3–5-Jahresziele» (Q6 F1) und «Dreijahresziele» (F2) die strategischen Ziele 2030 (F3)? Ist die Ebene «kurz-, mittel- und langfristige Ziele» (Q9) eine eigene Stufe?
+- **Finanzen:** Kosten je Phase vs. Budget je Jahr – Umrechnung? Quelle der Ist-Kosten? Struktur des Business Case (Kosten/Nutzen, Top Line/Bottom Line, Q6 F8)?
+- **Pflichtangaben je Phase:** Q8 Anhang 1 nennt Lieferergebnisse, aber keine Pflichtfelder des Projektvertrags je Phase. Abgleich mit Q7 nötig. Wann erscheint die Finalversion von Q8?
+- **Abweichung:** Ab welcher Schwelle ist eine Abweichung wesentlich? Q8 spricht von «definierten Toleranzen», nennt aber keine.
+- **Ressourcen:** Reicht die Planung in FTE × Monate je Rolle und Phase («Ressourcensteuerung auf Top-Level», Q8 Abb. 3), oder braucht es Kapazitätsplanung je Pool?
+- **Datenübernahme:** Werden die Projekte aus dem heutigen Excel-Dashboard initial übernommen?
+- **ICT und Infrastruktur:** Wie werden die eigenen Projekt- und Investitionsprozesse von DTI und DBI angebunden (Meldung, Status, Freigaben)?
 
 ## 13. Nächste Schritte
 
-1. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren.
-2. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
-3. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
-4. Offene Punkte mit der Insel Gruppe klären; PM-Handbuch als Quelle einarbeiten.
+1. Vorschläge V1–V13 entscheiden; danach Funktionsbaum, Use Cases, Anhang, JSON und PDFs nachführen.
+2. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren, auf Basis von Q8 Kap. 8.1–8.5 (V3, V11).
+3. UC-003 und UC-004 an Q8 anpassen und die dort geklärten [OFFEN] schliessen (V4, V6).
+4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
+5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
+6. Offene Punkte mit der Insel Gruppe klären.
 
 ## 14. Anhang und Pflege
 
@@ -192,7 +226,7 @@ Vorgeschlagen, **nicht entschieden:** PC.03.03 «KPI-Werte nachführen» (laufen
 | [anhang/use-cases.md](anhang/use-cases.md) | Use-Case-Liste, Traceability-Matrix, ausformulierte Use Cases |
 | [anhang/daten/](anhang/daten/) | Funktionsbaum und Use Cases als JSON |
 | [anhang/pdf/](anhang/pdf/) | gestaltete PDFs im CSP-Design |
-| [anhang/quellen/](anhang/quellen/) | Kundenunterlagen Q6, Q7 im Original und als Text (intern) |
+| [anhang/quellen/](anhang/quellen/) | Kundenunterlagen Q6–Q9 im Original und als Text (Q6–Q8 intern, Q9 öffentlich) |
 | [anhang/generator/](anhang/generator/) | Python-Skripte für die PDFs |
 
 **Pflege**

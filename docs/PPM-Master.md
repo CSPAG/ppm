@@ -130,7 +130,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 
 ## 9. Use Cases
 
-● = Kernablauf. Business Cases je Use Case, Traceability-Matrix und ausformulierte Use Cases (UC-003, UC-004, UC-006): [anhang/use-cases.md](anhang/use-cases.md).
+● = Kernablauf. Business Cases je Use Case, Traceability-Matrix und alle 18 ausformulierten Use Cases: [anhang/use-cases.md](anhang/use-cases.md).
 
 | ID | Use Case | Kern | Heimat-Arbeitsraum | Primärakteur |
 |---|---|---|---|---|
@@ -172,6 +172,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
    - **Herleitungen:** Q8 und Q9 bei 36 bestehenden Business Cases als Beleg nachgetragen.
    - **UC-003 und UC-004** an Q8 angepasst; die [OFFEN] zu Reihenfolge, Rhythmus, Frist und Freigabe durch den Sponsor sind geschlossen.
 9. **UC-006** «PRAT-Sitzung vorbereiten und durchführen» nach Q8 Kap. 8.1–8.5 ausformuliert. Offen dort: Vorlage an den SNS-VR in P0 und P1, Weiterleitung an den VR ausserhalb des Quartalsreportings.
+10. **Alle 18 Use Cases ausformuliert** (CSP-Vorlage). Fehlende Grundlagen sind als [OFFEN] markiert und unter «Aus den Use Cases» in den offenen Punkten gesammelt.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -202,12 +203,13 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 - **Abweichung:** Ab welcher Schwelle ist eine Abweichung wesentlich? Q8 spricht von «definierten Toleranzen», nennt aber keine.
 - **Ressourcen:** Reicht die Planung in FTE × Monate je Rolle und Phase («Ressourcensteuerung auf Top-Level», Q8 Abb. 3), oder braucht es Kapazitätsplanung je Pool?
 - **Datenübernahme:** Werden die Projekte aus dem heutigen Excel-Dashboard initial übernommen?
+- **Aus den Use Cases:** Wer benennt Sponsor und Projektleitung bei der Freigabe der Initialisierung (UC-001)? Darf die UE eine Idee allein zurückweisen (UC-001 A3)? Wie wird mit fehlenden Statusberichten umgegangen (UC-005 A3)? Wie werden sistierte Vorhaben wieder aufgenommen (UC-015)? Gilt eine neue Version des Phasenmodells auch für laufende Phasen (UC-017)? Werden Benutzer aus HR-System oder Verzeichnisdienst übernommen (UC-016)?
 - **ICT und Infrastruktur:** Wie werden die eigenen Projekt- und Investitionsprozesse von DTI und DBI angebunden (Meldung, Status, Freigaben)?
 
 ## 13. Nächste Schritte
 
 1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
-2. Weitere Kernabläufe ausformulieren: UC-002, UC-008, UC-011.
+2. Use Cases mit PL, UE und PRAT durchgehen; [OFFEN] klären.
 3. V10 mit der Insel Gruppe klären.
 4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
 5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
@@ -226,6 +228,6 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 **Pflege**
 
 - Dieses Masterdokument ist führend. Neue Entscheide, Annahmen und offene Punkte zuerst hier eintragen.
-- Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py` und `anhang/generator/uc_daten.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
+- Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py`, `anhang/generator/uc_daten.py` und für die ausformulierten Use Cases `anhang/generator/uc_texte.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
 - IDs nie umnummerieren; Neues hinten anfügen, Gestrichenes als «entfällt» markieren.
 - Der Generator setzt die CSP-Skills `csp-dokumente` und `csp-grafiken` voraus (Pfade `/mnt/skills/plugins/csp-solutions:*`) sowie `symbol.html`, `pruef.html` und `csp-assets/` im Arbeitsordner.

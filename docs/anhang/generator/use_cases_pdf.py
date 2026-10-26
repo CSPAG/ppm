@@ -1,6 +1,7 @@
 import html
 from daten import BAUM
 from uc_daten import UCS
+from uc_texte import TEXTE
 E = html.escape
 BCNAME = {c[0]: c[1] for m in BAUM for d in m[2] for c in d[2] if len(c) == 5}
 AKTIV = [(m[0], c[0], c[1]) for m in BAUM for d in m[2] for c in d[2] if len(c) == 5]
@@ -104,107 +105,23 @@ def uc_kopf(u, aus, uc_text, res, ui, akteure, vorb):
   </div>'''
 
 U = {u[0]: u for u in UCS}
-# ---- UC-003
-u3 = U["UC-003"]
-S.append(seite(uc_kopf(u3,
-  "Eine Phase nähert sich dem Ende. Der nächste Gate-Review ist im Projektvertrag eingeplant (Kap. 7.2); das System legt der Projektleitung eine Gate-Aufgabe in den Eingang.",
-  "PL schreibt Projektvertrag und Business Case für die nächste Phase fort und beantwortet die Leitfragen des Gates. UE führt den Quality-Check durch, Sponsor, PL und CTL unterzeichnen. Das zuständige Gremium entscheidet am Gate und gibt damit den Vertrag für die nächste Phase frei: der PRAT, in P0 und P1 bis zur Freigabe von P2 zusätzlich der SNS-VR, bei Kategorie B die GLPA.",
-  "Neue Vertragsversion freigegeben und als Baseline gespeichert, Gate-Entscheid mit Datum dokumentiert, Vorhaben in der nächsten Phase, Dashboard aktuell.",
-  "Eingang; Projektakte im Gate-Modus mit Vertragskapiteln, Leitfragen und Versionsvergleich; Traktandum im Arbeitsraum Gremium.",
-  [("PL","löst aus, schreibt Vertrag und Business Case fort, beantwortet Leitfragen, unterzeichnet"),("UE","führt den Quality-Check durch, stellt das Gate Review Packet bereit"),("SP, CTL","stimmen die Vorlage ab und unterzeichnen"),("PRAT, SNS, GLPA","entscheiden am Gate je nach Phase und Kategorie und geben den Vertrag frei")],
-  ["PL ist angemeldet und für das Vorhaben berechtigt (AM.01.02).","Vorhaben hat einen freigegebenen Projektvertrag der laufenden Phase.","Ein Gate-Review ist eingeplant (PP.04.05)."])))
-S.append(seite(titel("UC-003.", "Standardablauf.", kicker="Use Case · Gate-Übergang") + '<div class="abstand-s">' + ablauf([
- ("1","","PL öffnet die Gate-Aufgabe im Eingang.","System öffnet die Projektakte im Gate-Modus: Leitfragen des Gates je Wertestrom (Nutzen, Projekt, Klinik, ICT, Infrastruktur), die Standard-Lieferergebnisse der Phase und die Kapitel, die für die nächste Phase zu ergänzen sind."),
- ("2","","PL legt eine neue Vertragsversion an.","System übernimmt die freigegebene Version als Entwurf mit neuer Versionsnummer und Phase."),
- ("3","A1, A2","PL ergänzt die Kapitel, etwa Planung, Kosten je Phase, Personal, Risiken, Stakeholder und Kommunikation, und schreibt den Business Case fort.","System speichert und zeigt laufend die Abweichungen zur Baseline."),
- ("4","","PL beantwortet die Leitfragen des Gates.","System speichert die Antworten zur Version."),
- ("5","","PL prüft die Zusammenfassung der Hauptänderungen und ergänzt «Andere».","System erzeugt die Hauptänderungen zu Scope, Zeitplan, Ressourcen/Budget, Annahmen und Key-Risiken aus dem Versionsvergleich."),
- ("6","A3","PL reicht den Vertrag zur Prüfung ein.","System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality-Check in den Eingang."),
- ("7","A4","UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt.","System protokolliert den Quality-Check und legt SP, PL und CTL je eine Unterzeichnungsaufgabe an."),
- ("8","A5","SP, PL und CTL unterzeichnen.","System protokolliert die Unterzeichnung und setzt das Vorhaben auf die Traktandenliste des nächsten Gate-Reviews des zuständigen Gremiums."),
- ("9","","UE stellt das Gate Review Packet spätestens 5 Arbeitstage vor der Sitzung bereit (UC-006).","System stellt das Packet aus Vertrag, Business Case, Leitfragen und Hauptänderungen zusammen."),
- ("10","A6","Das Gremium gibt die nächste Phase und den Vertrag frei; UE erfasst den Entscheid.","System speichert den Entscheid, setzt den Status «abgenommen» und die Version als neue Baseline, wechselt die Phase, aktualisiert das Dashboard und informiert PL und SP."),
-]) + '</div>'))
-S.append(seite(titel("UC-003.", "Alternativabläufe.", kicker="Use Case · Gate-Übergang") + '<div class="abstand-s">' +
- alt_block("A1","Gate P1–P2",3,"Das Vorhaben will in die Implementierung.",[
-   ("A1.1","","System verlangt Personal in FTE und Monaten je Rolle und Phase sowie Kosten P2–P4 statt der Grösse S/M/L."),
-   ("A1.2","PL erfasst die Angaben.","System speichert sie im Vertrag und stellt sie der Ressourcen- und Finanzplanung bereit.")],"weiter bei Schritt 4.") +
- alt_block("A2","Gate ab P3",3,"Das Gate betrifft Stabilisierung oder Exit.",[
-   ("A2.1","","System zeigt die Projekt-KPIs mit Zielwert und den nachgeführten Ist-Werten (PC.03.03)."),
-   ("A2.2","PL und SP erfassen erreichte Werte und Beurteilung.","System speichert die Nutzenprüfung. Beim Exit-Gate P4 weiter in UC-015.")],"weiter bei Schritt 4.") +
- alt_block("A3","Pflichtangaben fehlen",6,"Für die Phase verlangte Angaben sind leer [OFFEN: Pflichtfelder je Phase; das PM-Handbuch (Q8 Anhang 1) nennt nur Lieferergebnisse].",[
-   ("A3.1","","System listet die fehlenden Angaben."),("A3.2","PL ergänzt sie.","System prüft erneut.")],"weiter bei Schritt 6.") +
- '</div>'))
-S.append(seite(titel("UC-003.", "Alternativabläufe, Fortsetzung.", kicker="Use Case · Gate-Übergang") + '<div class="abstand-s">' +
- alt_block("A4","Review mit Rückmeldungen",7,"UE stellt Mängel fest.",[
-   ("A4.1","UE erfasst Rückmeldungen.","System setzt den Status «in Arbeit» und informiert PL.")],"weiter bei Schritt 3.") +
- alt_block("A5","Freigabe verweigert",8,"SP, PL oder CTL unterzeichnet nicht.",[
-   ("A5.1","Rolle erfasst die Begründung.","System setzt den Status «in Arbeit» und informiert PL.")],"weiter bei Schritt 3.") +
- alt_block("A6","Gremium gibt nicht frei",10,"Das Gremium stellt zurück, erteilt Auflagen oder stoppt.",[
-   ("A6.1","UE erfasst Entscheid und Auflagen.","System informiert PL und SP; die Baseline bleibt unverändert.")],"bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.") + '</div>', kasten("Ein Gate, ein Durchgang.","Vertrag, Quality-Check, Unterschrift, Entscheid.")))
-
-# ---- UC-004
-u4 = U["UC-004"]
-S.append(seite(uc_kopf(u4,
-  "Der monatliche Stichtag (25.) naht, oder eine wesentliche Entwicklung verlangt eine Meldung ausserhalb des Rhythmus (Q8 Kap. 8.3, 8.4). Das System legt der Projektleitung eine Berichtsaufgabe in den Eingang.",
-  "PL aktualisiert in einem Durchgang Meilensteine, Kostenprognose, Risiken, KPI-Werte und Kommunikationsmassnahmen und gibt Status, Trend, Abweichungen, Abhängigkeiten und anstehende Entscheide ab. Das System erstellt daraus den Statusbericht der Periode.",
-  "Statusbericht eingereicht, mit Status, Trend und Vergleich zur Vorperiode; Projektdaten aktualisiert; Dashboard aktuell; Prüfaufgabe bei der UE.",
-  "Eingang; Projektakte, Bereich Bericht; Dashboard-Zeile des Vorhabens (Q6 F7).",
-  [("PL","löst aus, aktualisiert die Daten, reicht ein"),("UE","erhält den Bericht zur Prüfung (UC-005)"),("SP","wird bei Status «kritisch» informiert; gibt den Bericht nicht frei")],
-  ["PL ist angemeldet und für das Vorhaben berechtigt (AM.01.02).","Vorhaben ist in Phase P0 bis P3 und hat einen freigegebenen Projektvertrag.","Die Berichtsperiode ist offen."])))
-S.append(seite(titel("UC-004.", "Standardablauf.", kicker="Use Case · Monatlich berichten") + '<div class="abstand-s">' + ablauf([
- ("1","A3","PL öffnet die Berichtsaufgabe im Eingang.","System zeigt die Berichtsmaske mit den Werten der Vorperiode: Phase, Abschluss per, nächster Meilenstein, Status, Trend, dazu Meilensteine, Kosten, Risiken und Kommunikation."),
- ("2","A1","PL meldet erreichte Meilensteine und aufdatierte Termine.","System speichert im Meilensteinplan und markiert Abweichungen zur Baseline."),
- ("3","","PL aktualisiert die Kostenprognose.","System zeigt die Prognose gegenüber dem Budget je Phase [OFFEN: Quelle Ist-Kosten]."),
- ("4","","PL aktualisiert Risiken und Massnahmen.","System speichert im Risikoregister des Vorhabens."),
- ("5","","PL meldet erledigte Kommunikationsmassnahmen.","System setzt sie auf erledigt."),
- ("6","","PL erfasst ab der Implementierung die Ist-Werte der Projekt-KPIs.","System speichert sie zum Zielwert."),
- ("7","A2","PL wählt Status (im Plan/kritisch) und Trend, beurteilt die Abweichungen bei Inhalt, Termin, Ressourcen und Budget und erfasst nächsten Meilenstein, Abhängigkeiten und anstehende Entscheide.","System prüft die Pflichtangaben des Berichts."),
- ("8","","PL reicht den Bericht ein.","System speichert den Bericht als Stand der Periode, aktualisiert das Dashboard und legt der UE die Prüfaufgabe an; die UE konsolidiert bis Monatsende (UC-005)."),
-]) + '</div>', kasten("Einmal erfassen, überall sehen.","Der Bericht ist eine Sicht auf die Projektdaten.")))
-S.append(seite(titel("UC-004.", "Alternativabläufe.", kicker="Use Case · Monatlich berichten") + '<div class="abstand-s">' +
- alt_block("A1","Wesentliche Abweichung",2,"Termine, Kosten oder Umfang weichen wesentlich vom Projektvertrag ab [OFFEN: Schwelle].",[
-   ("A1.1","","System weist darauf hin, dass eine Änderung am Projektvertrag zu beantragen ist."),
-   ("A1.2","PL startet den Änderungsantrag (UC-007) oder eine Eskalation (UC-006).","System verknüpft Antrag bzw. Eskalation mit dem Bericht.")],"weiter bei Schritt 3.") +
- alt_block("A2","Status «kritisch»",7,"PL wählt den Status «kritisch».",[
-   ("A2.1","","System verlangt Begründung und Massnahme."),
-   ("A2.2","PL erfasst beides und hält fest, ob ein Entscheid des PRAT nötig ist.","System markiert das Vorhaben im Dashboard, informiert SP und UE und legt bei Entscheidbedarf eine Eskalation an (PS.03.03, UC-006).")],"weiter bei Schritt 8.") +
- alt_block("A3","Frist verpasst",1,"Bis zum 25. ist kein Bericht eingereicht.",[
-   ("A3.1","","System erinnert PL und zeigt der UE den fehlenden Bericht (PS.01.03).")],"weiter bei Schritt 1.") + '</div>'))
-
-# ---- UC-006
-u6 = U["UC-006"]
-S.append(seite(uc_kopf(u6,
-  "Die monatliche PRAT-Sitzung steht an. Das konsolidierte Dashboard des Vormonats ist final (UC-005). Eingeplante Gate-Reviews (PP.04.05), gemeldete Eskalationen (PS.03.03) und Änderungsanträge (UC-007) liegen als Traktandenvorschläge im Arbeitsraum Gremium.",
-  "UE stellt die Traktandenliste zusammen, prüft die Unterlagen und versendet sie spätestens 5 Arbeitstage vor der Sitzung. In der Sitzung berichtet die Programmleitung über das Portfolio, die eingeladenen Projekte stellen ihre Geschäfte vor, der PRAT entscheidet. UE erfasst die Entscheide und versendet das Protokoll innert 2–3 Arbeitstagen.",
-  "Entscheide je Traktandum erfasst und mit den Vorhaben verknüpft; Phasen, Baselines, Meilensteine und Dashboard nachgeführt; Auflagen als Aufgaben bei den Verantwortlichen; Protokoll versendet.",
-  "Eingang; Arbeitsraum Gremium mit Sitzung, Traktandenliste, Unterlagen und Entscheidmaske; Portfolio-Dashboard und Risikolage aus dem Arbeitsraum Portfolio.",
-  [("UE","bereitet vor, versendet Unterlagen, berichtet als Programmleitung, erfasst Entscheide, versendet das Protokoll"),("PRAT","berät und entscheidet"),("PL, CTL","stellen das Geschäft ihres Vorhabens vor"),("SP","hat die Vorlage vorab abgestimmt, vertritt das Vorhaben")],
-  ["UE ist angemeldet und für das Gremium PRAT berechtigt (AM.01.02).","Der Sitzungstermin ist im Gremium erfasst (AM.02.04).","Das Dashboard des Vormonats ist final (UC-005)."])))
-S.append(seite(titel("UC-006.", "Standardablauf.", kicker="Use Case · PRAT-Sitzung") + '<div class="abstand-s">' + ablauf([
- ("1","","UE öffnet die Aufgabe «Sitzung vorbereiten» im Eingang.","System öffnet die Sitzung im Arbeitsraum Gremium mit Traktandenvorschlägen: Portfoliobericht, eingeplante Gate-Reviews, anstehende Meilensteinabnahmen, Eskalationen, Änderungen mit Wirkung auf Scope, Budget oder Ressourcen, Priorisierungs- und Szenarioentscheide."),
- ("2","A1","UE stellt die Traktandenliste zusammen und lädt je Geschäft PL, CTL und SP ein.","System legt die Traktanden mit Zeitbedarf an, für ein Gate-Review rund 35 Minuten (Präsentation 20, Diskussion 10, Entscheid 5), und informiert die Eingeladenen."),
- ("3","A2","UE prüft je Traktandum, ob die Unterlagen vollständig sind und den Quality-Check bestanden haben (UC-003).","System zeigt je Traktandum den Stand der Unterlagen."),
- ("4","","UE stellt den Portfoliobericht zusammen.","System erzeugt ihn aus dem Dashboard: Gesamtstatus, Status und Trend je Vorhaben, Risikolage, Abhängigkeiten, Eskalationen, anstehende Meilensteine, Freigaben und Abnahmen."),
- ("5","","UE versendet die Unterlagen spätestens 5 Arbeitstage vor der Sitzung.","System stellt Traktandenliste, Portfoliobericht und Gate Review Packets den PRAT-Mitgliedern im Arbeitsraum Gremium bereit und protokolliert den Versand."),
- ("6","","In der Sitzung berichtet UE über das Portfolio.","System zeigt Dashboard und Risikolage des Portfolios."),
- ("7","A3, A4","Je Traktandum stellen PL und CTL das Geschäft vor, der PRAT berät und entscheidet, UE erfasst den Entscheid mit Begründung.","System speichert den Entscheid am Traktandum und am Vorhaben und löst die Folgeschritte aus: Gate freigegeben (UC-003), Meilenstein abgenommen, Änderung freigegeben (UC-007), Eskalation erledigt, Priorisierung festgehalten, Vorhaben sistiert oder abgebrochen (UC-015)."),
- ("8","","UE schliesst die Sitzung.","System erzeugt den Protokollentwurf aus Traktanden und Entscheiden und aktualisiert das Dashboard."),
- ("9","","UE bereinigt das Protokoll und versendet es innert 2–3 Arbeitstagen.","System versendet es an den PRAT und die Beteiligten und schlägt nicht behandelte Traktanden für die nächste Sitzung vor."),
-]) + '</div>'))
-S.append(seite(titel("UC-006.", "Alternativabläufe.", kicker="Use Case · PRAT-Sitzung") + '<div class="abstand-s">' +
- alt_block("A1","Geschäft über den SNS-VR",2,"Ein Vorhaben in P0 oder P1 legt einen relevanten Meilenstein oder ein Gate bis zur Freigabe von P2 vor.",[
-   ("A1.1","","System markiert das Traktandum «via SNS-VR»."),
-   ("A1.2","UE erfasst in Schritt 7 die Stellungnahme des PRAT.","System legt das Geschäft dem SNS-VR vor; der Entscheid gilt erst mit dem SNS-VR [OFFEN: Ablauf und Erfassung im SNS-VR].")],"weiter bei Schritt 3.") +
- alt_block("A2","Unterlagen fehlen",3,"Das Gate Review Packet liegt 5 Arbeitstage vor der Sitzung nicht vor oder hat den Quality-Check nicht bestanden.",[
-   ("A2.1","UE verschiebt das Traktandum auf die nächste Sitzung.","System informiert PL und SP und plant das Traktandum neu ein.")],"weiter bei Schritt 3 mit dem nächsten Traktandum.") +
- '</div>'))
-S.append(seite(titel("UC-006.", "Alternativabläufe, Fortsetzung.", kicker="Use Case · PRAT-Sitzung") + '<div class="abstand-s">' +
- alt_block("A3","Zurückgestellt oder mit Auflagen",7,"Der PRAT stellt das Geschäft zurück oder entscheidet mit Auflagen.",[
-   ("A3.1","UE erfasst die Auflagen mit Termin und Verantwortlichen.","System legt die Auflagen als Aufgaben in den Eingang der Verantwortlichen und plant das Traktandum für eine Folgesitzung ein.")],"weiter bei Schritt 7 mit dem nächsten Traktandum.") +
- alt_block("A4","Weiterleitung an den VR",7,"Der PRAT stellt besonderen Entscheidungs- oder Eskalationsbedarf fest.",[
-   ("A4.1","UE erfasst die Weiterleitung an den VR.","System markiert das Geschäft und nimmt es in das nächste Quartalsreporting an den VR auf (UC-012) [OFFEN: Weiterleitung auch ausserhalb des Quartalsrhythmus?].")],"weiter bei Schritt 7 mit dem nächsten Traktandum.") +
- '</div>', kasten("Eine Sitzung, ein Durchgang.","Traktanden, Unterlagen, Entscheide, Protokoll.")))
+for u in UCS:
+    T = TEXTE.get(u[0])
+    if not T:
+        continue
+    i = u[0]
+    S.append(seite(uc_kopf(u, T['aus'], T['uc'], T['res'], T['ui'], T['akteure'], T['vorb'])))
+    k = kasten(*T['kasten']) if T.get('kasten') else ''
+    alts = T['alts']
+    S.append(seite(titel(f"{i}.", "Standardablauf.", kicker=f"Use Case · {T['kurz']}") + '<div class="abstand-s">' + ablauf(T['ablauf']) + '</div>',
+                   k if T.get('kasten_bei') == 'ablauf' or not alts else ''))
+    pos = 0
+    for nr_s, anzahl in enumerate(T['seiten']):
+        teil = alts[pos:pos + anzahl]; pos += anzahl
+        letzte = pos >= len(alts)
+        S.append(seite(titel(f"{i}.", "Alternativabläufe." if nr_s == 0 else "Alternativabläufe, Fortsetzung.", kicker=f"Use Case · {T['kurz']}")
+                       + '<div class="abstand-s">' + ''.join(alt_block(*a) for a in teil) + '</div>',
+                       k if letzte and T.get('kasten_bei') == 'alt' else ''))
 
 # Prüfregeln + offen + Kontakt
 REGELN = ["Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum; Übergaben in einen anderen Raum laufen über den Eingang.",

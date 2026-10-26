@@ -125,7 +125,7 @@ Alle 89 aktiven Business Cases sind durch mindestens einen Use Case realisiert. 
 
 ## Ausformulierte Use Cases
 
-Nach CSP-Vorlage. Ausformuliert sind bisher UC-003 und UC-004; als Nächstes UC-006.
+Nach CSP-Vorlage. Ausformuliert sind bisher UC-003, UC-004 und UC-006.
 
 
 ### UC-003 Gate-Übergang durchführen
@@ -289,3 +289,79 @@ Ende: weiter bei Schritt 8.
 | A3.1 |  | System erinnert PL und zeigt der UE den fehlenden Bericht (PS.01.03). |
 
 Ende: weiter bei Schritt 1.
+
+### UC-006 PRAT-Sitzung vorbereiten und durchführen
+
+**Referenz Funktionsbaum:** PP.04.01 Entscheidungsvorlage vorbereiten, PP.04.02 Portfolioentscheid erfassen, PP.04.05 Gate-Reviews einplanen, PS.02.02 Phasenfreigabe entscheiden, PS.02.03 Meilenstein abnehmen, PS.03.03 Eskalation behandeln, PS.04.02 Vorhaben sistieren oder abbrechen, PC.02.02 Risikolage des Portfolios beurteilen
+
+**Arbeitsraum:** Gremium
+
+#### Beschreibung
+- **Ausgangslage:** Die monatliche PRAT-Sitzung steht an. Das konsolidierte Dashboard des Vormonats ist final (UC-005). Eingeplante Gate-Reviews (PP.04.05), gemeldete Eskalationen (PS.03.03) und Änderungsanträge (UC-007) liegen als Traktandenvorschläge im Arbeitsraum Gremium.
+- **Use Case:** UE stellt die Traktandenliste zusammen, prüft die Unterlagen und versendet sie spätestens 5 Arbeitstage vor der Sitzung. In der Sitzung berichtet die Programmleitung über das Portfolio, die eingeladenen Projekte stellen ihre Geschäfte vor, der PRAT entscheidet. UE erfasst die Entscheide und versendet das Protokoll innert 2–3 Arbeitstagen.
+- **Resultat:** Entscheide je Traktandum erfasst und mit den Vorhaben verknüpft; Phasen, Baselines, Meilensteine und Dashboard nachgeführt; Auflagen als Aufgaben bei den Verantwortlichen; Protokoll versendet.
+- **User Interfaces:** Eingang; Arbeitsraum Gremium mit Sitzung, Traktandenliste, Unterlagen und Entscheidmaske; Portfolio-Dashboard und Risikolage aus dem Arbeitsraum Portfolio.
+
+#### Beteiligte Akteure
+| Akteur | Rolle im Use Case |
+|---|---|
+| UE | bereitet vor, versendet Unterlagen, berichtet als Programmleitung, erfasst Entscheide, versendet das Protokoll |
+| PRAT | berät und entscheidet |
+| PL, CTL | stellen das Geschäft ihres Vorhabens vor |
+| SP | hat die Vorlage vorab abgestimmt, vertritt das Vorhaben |
+
+#### Vorbedingungen
+- UE ist angemeldet und für das Gremium PRAT berechtigt (AM.01.02).
+- Der Sitzungstermin ist im Gremium erfasst (AM.02.04).
+- Das Dashboard des Vormonats ist final (UC-005).
+
+#### Ablauf
+
+**Standardablauf**
+
+| Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
+|---|---|---|---|
+| 1 |  | UE öffnet die Aufgabe «Sitzung vorbereiten» im Eingang. | System öffnet die Sitzung im Arbeitsraum Gremium mit Traktandenvorschlägen: Portfoliobericht, eingeplante Gate-Reviews, anstehende Meilensteinabnahmen, Eskalationen, Änderungen mit Wirkung auf Scope, Budget oder Ressourcen, Priorisierungs- und Szenarioentscheide. |
+| 2 | A1 | UE stellt die Traktandenliste zusammen und lädt je Geschäft PL, CTL und SP ein. | System legt die Traktanden mit Zeitbedarf an, für ein Gate-Review rund 35 Minuten (Präsentation 20, Diskussion 10, Entscheid 5), und informiert die Eingeladenen. |
+| 3 | A2 | UE prüft je Traktandum, ob die Unterlagen vollständig sind und den Quality-Check bestanden haben (UC-003). | System zeigt je Traktandum den Stand der Unterlagen. |
+| 4 |  | UE stellt den Portfoliobericht zusammen. | System erzeugt ihn aus dem Dashboard: Gesamtstatus, Status und Trend je Vorhaben, Risikolage, Abhängigkeiten, Eskalationen, anstehende Meilensteine, Freigaben und Abnahmen. |
+| 5 |  | UE versendet die Unterlagen spätestens 5 Arbeitstage vor der Sitzung. | System stellt Traktandenliste, Portfoliobericht und Gate Review Packets den PRAT-Mitgliedern im Arbeitsraum Gremium bereit und protokolliert den Versand. |
+| 6 |  | In der Sitzung berichtet UE über das Portfolio. | System zeigt Dashboard und Risikolage des Portfolios. |
+| 7 | A3, A4 | Je Traktandum stellen PL und CTL das Geschäft vor, der PRAT berät und entscheidet, UE erfasst den Entscheid mit Begründung. | System speichert den Entscheid am Traktandum und am Vorhaben und löst die Folgeschritte aus: Gate freigegeben (UC-003), Meilenstein abgenommen, Änderung freigegeben (UC-007), Eskalation erledigt, Priorisierung festgehalten, Vorhaben sistiert oder abgebrochen (UC-015). |
+| 8 |  | UE schliesst die Sitzung. | System erzeugt den Protokollentwurf aus Traktanden und Entscheiden und aktualisiert das Dashboard. |
+| 9 |  | UE bereinigt das Protokoll und versendet es innert 2–3 Arbeitstagen. | System versendet es an den PRAT und die Beteiligten und schlägt nicht behandelte Traktanden für die nächste Sitzung vor. |
+
+**Alternativablauf**
+
+**A1 Geschäft über den SNS-VR (ab Schritt 2):** Bedingung: Ein Vorhaben in P0 oder P1 legt einen relevanten Meilenstein oder ein Gate bis zur Freigabe von P2 vor.
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A1.1 |  | System markiert das Traktandum «via SNS-VR». |
+| A1.2 | UE erfasst in Schritt 7 die Stellungnahme des PRAT. | System legt das Geschäft dem SNS-VR vor; der Entscheid gilt erst mit dem SNS-VR [OFFEN: Ablauf und Erfassung im SNS-VR]. |
+
+Ende: weiter bei Schritt 3.
+
+**A2 Unterlagen fehlen (ab Schritt 3):** Bedingung: Das Gate Review Packet liegt 5 Arbeitstage vor der Sitzung nicht vor oder hat den Quality-Check nicht bestanden.
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A2.1 | UE verschiebt das Traktandum auf die nächste Sitzung. | System informiert PL und SP und plant das Traktandum neu ein. |
+
+Ende: weiter bei Schritt 3 mit dem nächsten Traktandum.
+
+**A3 Zurückgestellt oder mit Auflagen (ab Schritt 7):** Bedingung: Der PRAT stellt das Geschäft zurück oder entscheidet mit Auflagen.
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A3.1 | UE erfasst die Auflagen mit Termin und Verantwortlichen. | System legt die Auflagen als Aufgaben in den Eingang der Verantwortlichen und plant das Traktandum für eine Folgesitzung ein. |
+
+Ende: weiter bei Schritt 7 mit dem nächsten Traktandum.
+
+**A4 Weiterleitung an den VR (ab Schritt 7):** Bedingung: Der PRAT stellt besonderen Entscheidungs- oder Eskalationsbedarf fest.
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A4.1 | UE erfasst die Weiterleitung an den VR. | System markiert das Geschäft und nimmt es in das nächste Quartalsreporting an den VR auf (UC-012) [OFFEN: Weiterleitung auch ausserhalb des Quartalsrhythmus?]. |
+
+Ende: weiter bei Schritt 7 mit dem nächsten Traktandum.

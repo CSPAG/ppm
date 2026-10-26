@@ -172,6 +172,40 @@ S.append(seite(titel("UC-004.", "Alternativabläufe.", kicker="Use Case · Monat
  alt_block("A3","Frist verpasst",1,"Bis zum 25. ist kein Bericht eingereicht.",[
    ("A3.1","","System erinnert PL und zeigt der UE den fehlenden Bericht (PS.01.03).")],"weiter bei Schritt 1.") + '</div>'))
 
+# ---- UC-006
+u6 = U["UC-006"]
+S.append(seite(uc_kopf(u6,
+  "Die monatliche PRAT-Sitzung steht an. Das konsolidierte Dashboard des Vormonats ist final (UC-005). Eingeplante Gate-Reviews (PP.04.05), gemeldete Eskalationen (PS.03.03) und Änderungsanträge (UC-007) liegen als Traktandenvorschläge im Arbeitsraum Gremium.",
+  "UE stellt die Traktandenliste zusammen, prüft die Unterlagen und versendet sie spätestens 5 Arbeitstage vor der Sitzung. In der Sitzung berichtet die Programmleitung über das Portfolio, die eingeladenen Projekte stellen ihre Geschäfte vor, der PRAT entscheidet. UE erfasst die Entscheide und versendet das Protokoll innert 2–3 Arbeitstagen.",
+  "Entscheide je Traktandum erfasst und mit den Vorhaben verknüpft; Phasen, Baselines, Meilensteine und Dashboard nachgeführt; Auflagen als Aufgaben bei den Verantwortlichen; Protokoll versendet.",
+  "Eingang; Arbeitsraum Gremium mit Sitzung, Traktandenliste, Unterlagen und Entscheidmaske; Portfolio-Dashboard und Risikolage aus dem Arbeitsraum Portfolio.",
+  [("UE","bereitet vor, versendet Unterlagen, berichtet als Programmleitung, erfasst Entscheide, versendet das Protokoll"),("PRAT","berät und entscheidet"),("PL, CTL","stellen das Geschäft ihres Vorhabens vor"),("SP","hat die Vorlage vorab abgestimmt, vertritt das Vorhaben")],
+  ["UE ist angemeldet und für das Gremium PRAT berechtigt (AM.01.02).","Der Sitzungstermin ist im Gremium erfasst (AM.02.04).","Das Dashboard des Vormonats ist final (UC-005)."])))
+S.append(seite(titel("UC-006.", "Standardablauf.", kicker="Use Case · PRAT-Sitzung") + '<div class="abstand-s">' + ablauf([
+ ("1","","UE öffnet die Aufgabe «Sitzung vorbereiten» im Eingang.","System öffnet die Sitzung im Arbeitsraum Gremium mit Traktandenvorschlägen: Portfoliobericht, eingeplante Gate-Reviews, anstehende Meilensteinabnahmen, Eskalationen, Änderungen mit Wirkung auf Scope, Budget oder Ressourcen, Priorisierungs- und Szenarioentscheide."),
+ ("2","A1","UE stellt die Traktandenliste zusammen und lädt je Geschäft PL, CTL und SP ein.","System legt die Traktanden mit Zeitbedarf an, für ein Gate-Review rund 35 Minuten (Präsentation 20, Diskussion 10, Entscheid 5), und informiert die Eingeladenen."),
+ ("3","A2","UE prüft je Traktandum, ob die Unterlagen vollständig sind und den Quality-Check bestanden haben (UC-003).","System zeigt je Traktandum den Stand der Unterlagen."),
+ ("4","","UE stellt den Portfoliobericht zusammen.","System erzeugt ihn aus dem Dashboard: Gesamtstatus, Status und Trend je Vorhaben, Risikolage, Abhängigkeiten, Eskalationen, anstehende Meilensteine, Freigaben und Abnahmen."),
+ ("5","","UE versendet die Unterlagen spätestens 5 Arbeitstage vor der Sitzung.","System stellt Traktandenliste, Portfoliobericht und Gate Review Packets den PRAT-Mitgliedern im Arbeitsraum Gremium bereit und protokolliert den Versand."),
+ ("6","","In der Sitzung berichtet UE über das Portfolio.","System zeigt Dashboard und Risikolage des Portfolios."),
+ ("7","A3, A4","Je Traktandum stellen PL und CTL das Geschäft vor, der PRAT berät und entscheidet, UE erfasst den Entscheid mit Begründung.","System speichert den Entscheid am Traktandum und am Vorhaben und löst die Folgeschritte aus: Gate freigegeben (UC-003), Meilenstein abgenommen, Änderung freigegeben (UC-007), Eskalation erledigt, Priorisierung festgehalten, Vorhaben sistiert oder abgebrochen (UC-015)."),
+ ("8","","UE schliesst die Sitzung.","System erzeugt den Protokollentwurf aus Traktanden und Entscheiden und aktualisiert das Dashboard."),
+ ("9","","UE bereinigt das Protokoll und versendet es innert 2–3 Arbeitstagen.","System versendet es an den PRAT und die Beteiligten und schlägt nicht behandelte Traktanden für die nächste Sitzung vor."),
+]) + '</div>'))
+S.append(seite(titel("UC-006.", "Alternativabläufe.", kicker="Use Case · PRAT-Sitzung") + '<div class="abstand-s">' +
+ alt_block("A1","Geschäft über den SNS-VR",2,"Ein Vorhaben in P0 oder P1 legt einen relevanten Meilenstein oder ein Gate bis zur Freigabe von P2 vor.",[
+   ("A1.1","","System markiert das Traktandum «via SNS-VR»."),
+   ("A1.2","UE erfasst in Schritt 7 die Stellungnahme des PRAT.","System legt das Geschäft dem SNS-VR vor; der Entscheid gilt erst mit dem SNS-VR [OFFEN: Ablauf und Erfassung im SNS-VR].")],"weiter bei Schritt 3.") +
+ alt_block("A2","Unterlagen fehlen",3,"Das Gate Review Packet liegt 5 Arbeitstage vor der Sitzung nicht vor oder hat den Quality-Check nicht bestanden.",[
+   ("A2.1","UE verschiebt das Traktandum auf die nächste Sitzung.","System informiert PL und SP und plant das Traktandum neu ein.")],"weiter bei Schritt 3 mit dem nächsten Traktandum.") +
+ '</div>'))
+S.append(seite(titel("UC-006.", "Alternativabläufe, Fortsetzung.", kicker="Use Case · PRAT-Sitzung") + '<div class="abstand-s">' +
+ alt_block("A3","Zurückgestellt oder mit Auflagen",7,"Der PRAT stellt das Geschäft zurück oder entscheidet mit Auflagen.",[
+   ("A3.1","UE erfasst die Auflagen mit Termin und Verantwortlichen.","System legt die Auflagen als Aufgaben in den Eingang der Verantwortlichen und plant das Traktandum für eine Folgesitzung ein.")],"weiter bei Schritt 7 mit dem nächsten Traktandum.") +
+ alt_block("A4","Weiterleitung an den VR",7,"Der PRAT stellt besonderen Entscheidungs- oder Eskalationsbedarf fest.",[
+   ("A4.1","UE erfasst die Weiterleitung an den VR.","System markiert das Geschäft und nimmt es in das nächste Quartalsreporting an den VR auf (UC-012) [OFFEN: Weiterleitung auch ausserhalb des Quartalsrhythmus?].")],"weiter bei Schritt 7 mit dem nächsten Traktandum.") +
+ '</div>', kasten("Eine Sitzung, ein Durchgang.","Traktanden, Unterlagen, Entscheide, Protokoll.")))
+
 # Prüfregeln + offen + Kontakt
 REGELN = ["Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum; Übergaben in einen anderen Raum laufen über den Eingang.",
  "Jede wiederkehrende Aufgabe ist aus dem Eingang erreichbar.",
@@ -180,7 +214,8 @@ REGELN = ["Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum; Übergaben in e
 OFFEN = [("Pflichtfelder","Welche Angaben des Projektvertrags sind je Phase Pflicht? Das PM-Handbuch nennt nur Lieferergebnisse."),
  ("Abweichung","Ab welcher Schwelle ist eine Abweichung wesentlich? Das PM-Handbuch nennt «Toleranzen» ohne Werte."),
  ("Kategorie B","Gelten Quality-Check und monatliches Dashboard auch für GL-Projekte?"),
- ("Sponsoren-Koalition","Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL.")]
+ ("Sponsoren-Koalition","Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL."),
+ ("SNS-VR","Wie werden Geschäfte in P0 und P1 dem SNS-VR vorgelegt und dessen Entscheide erfasst?")]
 reg = ''.join(f'<li>{E(x)}</li>' for x in REGELN)
 off = ''.join(f'<li>{E(a)} <span class="neben">{E(b)}</span></li>' for a,b in OFFEN)
 S.append(f'''<section class="seite"><div class="inhalt">

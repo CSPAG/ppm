@@ -130,7 +130,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
 
 ## 9. Use Cases
 
-● = Kernablauf. Business Cases je Use Case, Traceability-Matrix und ausformulierte Use Cases (UC-003, UC-004): [anhang/use-cases.md](anhang/use-cases.md).
+● = Kernablauf. Business Cases je Use Case, Traceability-Matrix und ausformulierte Use Cases (UC-003, UC-004, UC-006): [anhang/use-cases.md](anhang/use-cases.md).
 
 | ID | Use Case | Kern | Heimat-Arbeitsraum | Primärakteur |
 |---|---|---|---|---|
@@ -171,6 +171,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
    - **Weitere Beschriebe:** Handlungsfelder mit Leitsatz und Stossrichtungen als Stammdaten (ZM.01.01); Projektidee nach Vorlage des PM-Handbuchs (DM.01.01–02); Gate Review Packet 5 Arbeitstage vor der Sitzung, Protokoll nach 2–3 Arbeitstagen (PP.04.01–02).
    - **Herleitungen:** Q8 und Q9 bei 36 bestehenden Business Cases als Beleg nachgetragen.
    - **UC-003 und UC-004** an Q8 angepasst; die [OFFEN] zu Reihenfolge, Rhythmus, Frist und Freigabe durch den Sponsor sind geschlossen.
+9. **UC-006** «PRAT-Sitzung vorbereiten und durchführen» nach Q8 Kap. 8.1–8.5 ausformuliert. Offen dort: Vorlage an den SNS-VR in P0 und P1, Weiterleitung an den VR ausserhalb des Quartalsreportings.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -205,7 +206,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 ## 13. Nächste Schritte
 
 1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
-2. UC-006 «PRAT-Sitzung vorbereiten und durchführen» ausformulieren, auf Basis von Q8 Kap. 8.1–8.5.
+2. Weitere Kernabläufe ausformulieren: UC-002, UC-008, UC-011.
 3. V10 mit der Insel Gruppe klären.
 4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
 5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.

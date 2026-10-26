@@ -65,7 +65,7 @@ deploy() {
 rollback() {
   local prev
   prev="$(previous)"
-  [ -n "$prev" ] && [ "$prev" != "$(current)" ] || fail "kein vorheriges Image in $RELEASES"
+  if [ -z "$prev" ] || [ "$prev" = "$(current)" ]; then fail "kein vorheriges Image in $RELEASES"; fi
   log "Rollback auf $prev (Datenbank bleibt auf dem Stand der Migrationen)"
   docker pull --quiet "$prev" >/dev/null
   start_services "$prev" || fail "Rollback auf $prev nicht gesund"

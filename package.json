@@ -31,7 +31,7 @@
     "env:docs": "node scripts/env-docs.ts",
     "openapi:export": "node scripts/openapi-export.ts",
     "api:types": "npm run openapi:export && npm run api:types --prefix web",
-    "e2e": "node scripts/e2e-db.ts && npm run e2e --prefix web",
+    "e2e": "node --env-file=.env scripts/e2e-db.ts && npm run e2e --prefix web",
     "smoke": "node --env-file=.env scripts/smoke.ts",
     "identity:conformity": "iam-conformity-test",
     "identity:platform-json": "node infra/keycloak/platform.ts > infra/keycloak/platform.json",

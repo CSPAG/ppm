@@ -1,0 +1,43 @@
+# Lokaler Stack für die Entwicklung: PostgreSQL 17 (Rollen über Init-Skript aus db/bootstrap.sql) und Keycloak 26 im
+# Dev-Modus. Nur an 127.0.0.1. Werte aus der .env im Hauptcheckout (npm run dev:env):
+#   docker compose --env-file .env -f deploy/compose.dev.yaml up -d --wait     (npm run dev:up)
+name: ppm-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?npm run dev:env}
+      PPM_OWNER_PASSWORD: ${PPM_OWNER_PASSWORD:?npm run dev:env}
+      PPM_RUNTIME_PASSWORD: ${PPM_RUNTIME_PASSWORD:?npm run dev:env}
+      PPM_WORKER_PASSWORD: ${PPM_WORKER_PASSWORD:?npm run dev:env}
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5433}:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../db/bootstrap.sql:/opt/ppm/bootstrap.sql:ro
+      - ./dev/postgres-init.sh:/docker-entrypoint-initdb.d/10-ppm.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ppm"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  keycloak:
+    # Version, gegen die identity-kit getestet ist (product-realm 2.0.0); lokal ohne quay.io: KEYCLOAK_IMAGE=keycloak/keycloak:26.8.1
+    image: ${KEYCLOAK_IMAGE:-quay.io/keycloak/keycloak:26.8.1@sha256:79c623a22abacf3fe6c00a5fb30f5b7843d717b234033b80995891c06116d244}
+    command: ["start-dev", "--http-port=8180", "--health-enabled=true"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?npm run dev:env}
+      KC_HOSTNAME: http://localhost:8180
+    ports: ["127.0.0.1:8180:8180"]
+    volumes: [kcdata:/opt/keycloak/data]
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+volumes:
+  pgdata:
+  kcdata:

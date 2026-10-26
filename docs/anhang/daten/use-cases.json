@@ -35,6 +35,7 @@
    "PC.01.01",
    "PC.02.04",
    "PC.03.01",
+   "PC.03.04",
    "PS.02.04",
    "PS.05.01",
    "PS.05.02",
@@ -58,7 +59,8 @@
    "DM.02.05",
    "DM.02.06",
    "RK.02.05",
-   "PC.03.02"
+   "PC.03.02",
+   "PC.03.04"
   ]
  },
  {
@@ -74,7 +76,9 @@
    "PC.01.03",
    "PC.02.03",
    "PC.02.04",
-   "PS.05.03"
+   "PC.03.03",
+   "PS.05.03",
+   "PS.03.03"
   ]
  },
  {
@@ -113,7 +117,7 @@
   "name": "Änderung am Projektvertrag beantragen und entscheiden",
   "heimat": "Projekt",
   "beruehrt": "",
-  "primaerakteur": "PL, AG",
+  "primaerakteur": "PL, SP",
   "kernablauf": false,
   "business_cases": [
    "PS.03.01",
@@ -193,7 +197,7 @@
   "name": "Quartalsreporting an den VR erstellen",
   "heimat": "Ziele",
   "beruehrt": "Portfolio",
-  "primaerakteur": "UE, CEO",
+  "primaerakteur": "UE, PRAT",
   "kernablauf": false,
   "business_cases": [
    "ZM.03.01",
@@ -238,7 +242,8 @@
    "PS.04.01",
    "PS.04.02",
    "PS.04.03",
-   "PC.03.02"
+   "PC.03.02",
+   "PC.03.04"
   ]
  },
  {

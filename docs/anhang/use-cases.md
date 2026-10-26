@@ -9,20 +9,20 @@ Entwurf, Stand 26. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen;
 | ID | Use Case | Kern | Heimat | berührt | Primärakteur | Business Cases |
 |---|---|---|---|---|---|---|
 | UC-001 | Projektidee erfassen und qualifizieren |  | Portfolio | Projekt | AS, UE | DM.01.01, DM.01.02, DM.01.03, DM.01.04, PP.02.04 |
-| UC-002 | Projektvertrag erarbeiten und freigeben | ● | Projekt |  | PL | DM.02.01, DM.02.02, DM.02.03, DM.02.04, DM.02.05, DM.02.06, DM.02.07, PP.02.03, PP.02.05, PP.04.04, PC.01.01, PC.02.04, PC.03.01, PS.02.04, PS.05.01, PS.05.02, RK.02.01, RK.02.06 |
-| UC-003 | Gate-Übergang durchführen | ● | Projekt | Gremium | PL | PS.02.01, PS.02.02, PS.02.05, PS.03.04, DM.02.03, DM.02.05, DM.02.06, RK.02.05, PC.03.02 |
-| UC-004 | Monatlich berichten | ● | Projekt |  | PL | PS.01.01, PS.02.04, PC.01.03, PC.02.03, PC.02.04, PS.05.03 |
+| UC-002 | Projektvertrag erarbeiten und freigeben | ● | Projekt |  | PL | DM.02.01, DM.02.02, DM.02.03, DM.02.04, DM.02.05, DM.02.06, DM.02.07, PP.02.03, PP.02.05, PP.04.04, PC.01.01, PC.02.04, PC.03.01, PC.03.04, PS.02.04, PS.05.01, PS.05.02, RK.02.01, RK.02.06 |
+| UC-003 | Gate-Übergang durchführen | ● | Projekt | Gremium | PL | PS.02.01, PS.02.02, PS.02.05, PS.03.04, DM.02.03, DM.02.05, DM.02.06, RK.02.05, PC.03.02, PC.03.04 |
+| UC-004 | Monatlich berichten | ● | Projekt |  | PL | PS.01.01, PS.02.04, PC.01.03, PC.02.03, PC.02.04, PC.03.03, PS.05.03, PS.03.03 |
 | UC-005 | Statusberichte prüfen und nachverfolgen |  | Portfolio |  | UE | PS.01.02, PS.01.03, PS.01.04 |
 | UC-006 | PRAT-Sitzung vorbereiten und durchführen | ● | Gremium | Portfolio | UE, PRAT | PP.04.01, PP.04.02, PP.04.05, PS.02.02, PS.02.03, PS.03.03, PS.04.02, PC.02.02 |
-| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt |  | PL, AG | PS.03.01, PS.03.02, PS.03.04 |
+| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt |  | PL, SP | PS.03.01, PS.03.02, PS.03.04 |
 | UC-008 | Portfolio priorisieren und ausbalancieren | ● | Portfolio | Gremium | UE, PRAT | PP.01.02, PP.01.03, PP.02.01, PP.02.02, PP.02.03, PP.03.01, PP.03.02, PP.03.03, PP.03.04, PC.02.01, RK.02.04 |
 | UC-009 | Ressourcen planen und zuteilen |  | Portfolio | Projekt | RM | RK.01.01, RK.01.02, RK.02.02, RK.02.03, RK.02.04 |
 | UC-010 | Portfoliofinanzen überwachen |  | Portfolio |  | FI, UE | PC.01.02, PC.01.04, PC.01.05 |
 | UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele | Portfolio | GL, VR | ZM.01.01, ZM.01.02, ZM.02.01, ZM.02.02, ZM.02.03, ZM.02.04, PP.04.03, PC.01.05 |
-| UC-012 | Quartalsreporting an den VR erstellen |  | Ziele | Portfolio | UE, CEO | ZM.03.01, ZM.03.02, PC.04.02 |
+| UC-012 | Quartalsreporting an den VR erstellen |  | Ziele | Portfolio | UE, PRAT | ZM.03.01, ZM.03.02, PC.04.02 |
 | UC-013 | Jahresrückblick auswerten |  | Gremium | Ziele | PRAT | ZM.03.03, PS.04.03 |
 | UC-014 | Portfolio auswerten |  | Portfolio |  | PRAT, GLPA, DIR, UE | PC.04.01, PC.04.02, PC.04.03, PC.02.02 |
-| UC-015 | Vorhaben abschliessen oder abbrechen |  | Projekt | Gremium | PL, PRAT | PS.04.01, PS.04.02, PS.04.03, PC.03.02 |
+| UC-015 | Vorhaben abschliessen oder abbrechen |  | Projekt | Gremium | PL, PRAT | PS.04.01, PS.04.02, PS.04.03, PC.03.02, PC.03.04 |
 | UC-016 | Benutzer, Rollen und Stellvertretungen verwalten |  | Administration |  | ADM | AM.01.01, AM.01.02, AM.01.03 |
 | UC-017 | Stammdaten und Governance konfigurieren |  | Administration |  | ADM, UE | AM.02.01, AM.02.02, AM.02.03, AM.02.04 |
 | UC-018 | Vorlagen und Schnittstellen verwalten |  | Administration |  | ADM | AM.03.01, AM.03.02, AM.03.03 |
@@ -78,7 +78,7 @@ Entwurf, Stand 26. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen;
 | PS.02.05 Projektvertrag fortschreiben |  |  | ● |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | PS.03.01 Änderung am Projektvertrag beantragen |  |  |  |  |  |  | ● |  |  |  |  |  |  |  |  |  |  |  |
 | PS.03.02 Änderung am Projektvertrag entscheiden |  |  |  |  |  |  | ● |  |  |  |  |  |  |  |  |  |  |  |
-| PS.03.03 Eskalation behandeln |  |  |  |  |  | ● |  |  |  |  |  |  |  |  |  |  |  |  |
+| PS.03.03 Eskalation behandeln |  |  |  | ● |  | ● |  |  |  |  |  |  |  |  |  |  |  |  |
 | PS.03.04 Vertragsversionen vergleichen |  |  | ● |  |  |  | ● |  |  |  |  |  |  |  |  |  |  |  |
 | PS.04.01 Vorhaben abschliessen |  |  |  |  |  |  |  |  |  |  |  |  |  |  | ● |  |  |  |
 | PS.04.02 Vorhaben sistieren oder abbrechen |  |  |  |  |  | ● |  |  |  |  |  |  |  |  | ● |  |  |  |
@@ -97,6 +97,8 @@ Entwurf, Stand 26. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen;
 | PC.02.04 Projektrisiko erfassen |  | ● |  | ● |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | PC.03.01 Projekt-KPIs festlegen |  | ● |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | PC.03.02 Nutzenrealisierung überprüfen |  |  | ● |  |  |  |  |  |  |  |  |  |  |  | ● |  |  |  |
+| PC.03.03 KPI-Werte nachführen |  |  |  | ● |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| PC.03.04 Business Case fortschreiben |  | ● | ● |  |  |  |  |  |  |  |  |  |  |  | ● |  |  |  |
 | PC.04.01 Portfolio-Dashboard einsehen |  |  |  |  |  |  |  |  |  |  |  |  |  | ● |  |  |  |  |
 | PC.04.02 Portfoliobericht erstellen |  |  |  |  |  |  |  |  |  |  |  | ● |  | ● |  |  |  |  |
 | PC.04.03 Ad-hoc-Auswertung erstellen |  |  |  |  |  |  |  |  |  |  |  |  |  | ● |  |  |  |  |
@@ -119,7 +121,7 @@ Entwurf, Stand 26. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen;
 | AM.03.02 Schnittstelle konfigurieren |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | ● |
 | AM.03.03 Änderungsprotokoll einsehen |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | ● |
 
-Alle 87 aktiven Business Cases sind durch mindestens einen Use Case realisiert. PP.01.01 entfällt.
+Alle 89 aktiven Business Cases sind durch mindestens einen Use Case realisiert. PP.01.01 entfällt.
 
 ## Ausformulierte Use Cases
 
@@ -128,23 +130,23 @@ Nach CSP-Vorlage. Ausformuliert sind bisher UC-003 und UC-004; als Nächstes UC-
 
 ### UC-003 Gate-Übergang durchführen
 
-**Referenz Funktionsbaum:** PS.02.01 Phasenfreigabe beantragen, PS.02.02 Phasenfreigabe entscheiden, PS.02.05 Projektvertrag fortschreiben, PS.03.04 Vertragsversionen vergleichen, DM.02.03 Projektvertrag überarbeiten, DM.02.05 Quality Review durchführen, DM.02.06 Projektvertrag freigeben, RK.02.05 Ressourcenbedarf präzisieren, PC.03.02 Nutzenrealisierung überprüfen
+**Referenz Funktionsbaum:** PS.02.01 Phasenfreigabe beantragen, PS.02.02 Phasenfreigabe entscheiden, PS.02.05 Projektvertrag fortschreiben, PS.03.04 Vertragsversionen vergleichen, DM.02.03 Projektvertrag überarbeiten, DM.02.05 Quality Review durchführen, DM.02.06 Projektvertrag freigeben, RK.02.05 Ressourcenbedarf präzisieren, PC.03.02 Nutzenrealisierung überprüfen, PC.03.04 Business Case fortschreiben
 
 **Arbeitsraum:** Projekt
 
 #### Beschreibung
-- **Ausgangslage:** Eine Phase nähert sich dem Ende. Der nächste PRAT-Gate-Review ist im Projektvertrag eingeplant (Kap. 7.2); das System legt der Projektleitung eine Gate-Aufgabe in den Eingang.
-- **Use Case:** PL schreibt den Projektvertrag für die nächste Phase fort und beantwortet die Leitfragen des Gates. UE führt das Quality Review durch, Auftraggeber, Sponsor, PL und CTL geben frei, das PRAT entscheidet am Gate.
+- **Ausgangslage:** Eine Phase nähert sich dem Ende. Der nächste Gate-Review ist im Projektvertrag eingeplant (Kap. 7.2); das System legt der Projektleitung eine Gate-Aufgabe in den Eingang.
+- **Use Case:** PL schreibt Projektvertrag und Business Case für die nächste Phase fort und beantwortet die Leitfragen des Gates. UE führt den Quality-Check durch, Sponsor, PL und CTL unterzeichnen. Das zuständige Gremium entscheidet am Gate und gibt damit den Vertrag für die nächste Phase frei: der PRAT, in P0 und P1 bis zur Freigabe von P2 zusätzlich der SNS-VR, bei Kategorie B die GLPA.
 - **Resultat:** Neue Vertragsversion freigegeben und als Baseline gespeichert, Gate-Entscheid mit Datum dokumentiert, Vorhaben in der nächsten Phase, Dashboard aktuell.
 - **User Interfaces:** Eingang; Projektakte im Gate-Modus mit Vertragskapiteln, Leitfragen und Versionsvergleich; Traktandum im Arbeitsraum Gremium.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| PL | löst aus, schreibt den Vertrag fort, beantwortet Leitfragen |
-| UE | führt das Quality Review durch, bereitet das Traktandum vor |
-| AG, SP, CTL | geben den Projektvertrag frei |
-| PRAT | entscheidet am Gate |
+| PL | löst aus, schreibt Vertrag und Business Case fort, beantwortet Leitfragen, unterzeichnet |
+| UE | führt den Quality-Check durch, stellt das Gate Review Packet bereit |
+| SP, CTL | stimmen die Vorlage ab und unterzeichnen |
+| PRAT, SNS, GLPA | entscheiden am Gate je nach Phase und Kategorie und geben den Vertrag frei |
 
 #### Vorbedingungen
 - PL ist angemeldet und für das Vorhaben berechtigt (AM.01.02).
@@ -157,16 +159,16 @@ Nach CSP-Vorlage. Ausformuliert sind bisher UC-003 und UC-004; als Nächstes UC-
 
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
-| 1 |  | PL öffnet die Gate-Aufgabe im Eingang. | System öffnet die Projektakte im Gate-Modus: Leitfragen des Gates je Dimension (Nutzen, Klinik, ICT, Infrastruktur) und die Kapitel, die für die nächste Phase zu ergänzen sind. |
+| 1 |  | PL öffnet die Gate-Aufgabe im Eingang. | System öffnet die Projektakte im Gate-Modus: Leitfragen des Gates je Wertestrom (Nutzen, Projekt, Klinik, ICT, Infrastruktur), die Standard-Lieferergebnisse der Phase und die Kapitel, die für die nächste Phase zu ergänzen sind. |
 | 2 |  | PL legt eine neue Vertragsversion an. | System übernimmt die freigegebene Version als Entwurf mit neuer Versionsnummer und Phase. |
-| 3 | A1, A2 | PL ergänzt die Kapitel, etwa Planung, Kosten je Phase, Personal, Risiken, Stakeholder und Kommunikation. | System speichert und zeigt laufend die Abweichungen zur Baseline. |
+| 3 | A1, A2 | PL ergänzt die Kapitel, etwa Planung, Kosten je Phase, Personal, Risiken, Stakeholder und Kommunikation, und schreibt den Business Case fort. | System speichert und zeigt laufend die Abweichungen zur Baseline. |
 | 4 |  | PL beantwortet die Leitfragen des Gates. | System speichert die Antworten zur Version. |
 | 5 |  | PL prüft die Zusammenfassung der Hauptänderungen und ergänzt «Andere». | System erzeugt die Hauptänderungen zu Scope, Zeitplan, Ressourcen/Budget, Annahmen und Key-Risiken aus dem Versionsvergleich. |
-| 6 | A3 | PL reicht den Vertrag zur Prüfung ein. | System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality Review in den Eingang. |
-| 7 | A4 | UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt. | System protokolliert das Review und legt AG, SP, PL und CTL je eine Freigabeaufgabe an. |
-| 8 | A5 | AG, SP, PL und CTL geben frei. | System protokolliert die Freigaben, setzt den Status «abgenommen» und setzt das Vorhaben auf die Traktandenliste des nächsten Gate-Reviews [OFFEN: Reihenfolge Freigabe und Gate-Entscheid]. |
-| 9 |  | UE bereitet das Traktandum vor (UC-006). | System stellt die Entscheidungsvorlage aus Vertrag, Leitfragen und Hauptänderungen zusammen. |
-| 10 | A6 | PRAT gibt die nächste Phase frei; UE erfasst den Entscheid. | System speichert den Entscheid, setzt die Version als neue Baseline, wechselt die Phase, aktualisiert das Dashboard und informiert PL und SP. |
+| 6 | A3 | PL reicht den Vertrag zur Prüfung ein. | System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality-Check in den Eingang. |
+| 7 | A4 | UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt. | System protokolliert den Quality-Check und legt SP, PL und CTL je eine Unterzeichnungsaufgabe an. |
+| 8 | A5 | SP, PL und CTL unterzeichnen. | System protokolliert die Unterzeichnung und setzt das Vorhaben auf die Traktandenliste des nächsten Gate-Reviews des zuständigen Gremiums. |
+| 9 |  | UE stellt das Gate Review Packet spätestens 5 Arbeitstage vor der Sitzung bereit (UC-006). | System stellt das Packet aus Vertrag, Business Case, Leitfragen und Hauptänderungen zusammen. |
+| 10 | A6 | Das Gremium gibt die nächste Phase und den Vertrag frei; UE erfasst den Entscheid. | System speichert den Entscheid, setzt den Status «abgenommen» und die Version als neue Baseline, wechselt die Phase, aktualisiert das Dashboard und informiert PL und SP. |
 
 **Alternativablauf**
 
@@ -183,12 +185,12 @@ Ende: weiter bei Schritt 4.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A2.1 |  | System zeigt die Projekt-KPIs mit Zielwert. |
+| A2.1 |  | System zeigt die Projekt-KPIs mit Zielwert und den nachgeführten Ist-Werten (PC.03.03). |
 | A2.2 | PL und SP erfassen erreichte Werte und Beurteilung. | System speichert die Nutzenprüfung. Beim Exit-Gate P4 weiter in UC-015. |
 
 Ende: weiter bei Schritt 4.
 
-**A3 Pflichtangaben fehlen (ab Schritt 6):** Bedingung: Für die Phase verlangte Angaben sind leer [OFFEN: Pflichtangaben je Phase gemäss PM-Handbuch].
+**A3 Pflichtangaben fehlen (ab Schritt 6):** Bedingung: Für die Phase verlangte Angaben sind leer [OFFEN: Pflichtfelder je Phase; das PM-Handbuch (Q8 Anhang 1) nennt nur Lieferergebnisse].
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
@@ -205,7 +207,7 @@ Ende: weiter bei Schritt 6.
 
 Ende: weiter bei Schritt 3.
 
-**A5 Freigabe verweigert (ab Schritt 8):** Bedingung: Eine der vier Rollen gibt nicht frei.
+**A5 Freigabe verweigert (ab Schritt 8):** Bedingung: SP, PL oder CTL unterzeichnet nicht.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
@@ -213,7 +215,7 @@ Ende: weiter bei Schritt 3.
 
 Ende: weiter bei Schritt 3.
 
-**A6 PRAT gibt nicht frei (ab Schritt 10):** Bedingung: PRAT stellt zurück, erteilt Auflagen oder stoppt.
+**A6 Gremium gibt nicht frei (ab Schritt 10):** Bedingung: Das Gremium stellt zurück, erteilt Auflagen oder stoppt.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
@@ -223,13 +225,13 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
 
 ### UC-004 Monatlich berichten
 
-**Referenz Funktionsbaum:** PS.01.01 Statusbericht erfassen, PS.02.04 Meilensteinplan pflegen, PC.01.03 Kostenprognose aktualisieren, PC.02.03 Risikomassnahme verfolgen, PC.02.04 Projektrisiko erfassen, PS.05.03 Kommunikationsmassnahme nachführen
+**Referenz Funktionsbaum:** PS.01.01 Statusbericht erfassen, PS.02.04 Meilensteinplan pflegen, PC.01.03 Kostenprognose aktualisieren, PC.02.03 Risikomassnahme verfolgen, PC.02.04 Projektrisiko erfassen, PC.03.03 KPI-Werte nachführen, PS.05.03 Kommunikationsmassnahme nachführen, PS.03.03 Eskalation behandeln
 
 **Arbeitsraum:** Projekt
 
 #### Beschreibung
-- **Ausgangslage:** Der Berichtsstichtag ist erreicht [OFFEN: Rhythmus, vermutlich monatlich zum operativen Review des PRAT, Q6 F2]. Das System legt der Projektleitung eine Berichtsaufgabe in den Eingang.
-- **Use Case:** PL aktualisiert in einem Durchgang Meilensteine, Kostenprognose, Risiken und Kommunikationsmassnahmen und gibt Status und Trend ab. Das System erstellt daraus den Statusbericht der Periode.
+- **Ausgangslage:** Der monatliche Stichtag (25.) naht, oder eine wesentliche Entwicklung verlangt eine Meldung ausserhalb des Rhythmus (Q8 Kap. 8.3, 8.4). Das System legt der Projektleitung eine Berichtsaufgabe in den Eingang.
+- **Use Case:** PL aktualisiert in einem Durchgang Meilensteine, Kostenprognose, Risiken, KPI-Werte und Kommunikationsmassnahmen und gibt Status, Trend, Abweichungen, Abhängigkeiten und anstehende Entscheide ab. Das System erstellt daraus den Statusbericht der Periode.
 - **Resultat:** Statusbericht eingereicht, mit Status, Trend und Vergleich zur Vorperiode; Projektdaten aktualisiert; Dashboard aktuell; Prüfaufgabe bei der UE.
 - **User Interfaces:** Eingang; Projektakte, Bereich Bericht; Dashboard-Zeile des Vorhabens (Q6 F7).
 
@@ -238,7 +240,7 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
 |---|---|
 | PL | löst aus, aktualisiert die Daten, reicht ein |
 | UE | erhält den Bericht zur Prüfung (UC-005) |
-| SP | wird bei Status «kritisch» informiert [OFFEN: Freigabe des Berichts?] |
+| SP | wird bei Status «kritisch» informiert; gibt den Bericht nicht frei |
 
 #### Vorbedingungen
 - PL ist angemeldet und für das Vorhaben berechtigt (AM.01.02).
@@ -256,8 +258,9 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
 | 3 |  | PL aktualisiert die Kostenprognose. | System zeigt die Prognose gegenüber dem Budget je Phase [OFFEN: Quelle Ist-Kosten]. |
 | 4 |  | PL aktualisiert Risiken und Massnahmen. | System speichert im Risikoregister des Vorhabens. |
 | 5 |  | PL meldet erledigte Kommunikationsmassnahmen. | System setzt sie auf erledigt. |
-| 6 | A2 | PL wählt Status und Trend und erfasst den nächsten Meilenstein mit Kommentar. | System prüft die Pflichtangaben des Berichts. |
-| 7 |  | PL reicht den Bericht ein. | System speichert den Bericht als Stand der Periode, aktualisiert das Dashboard und legt der UE die Prüfaufgabe an (UC-005). |
+| 6 |  | PL erfasst ab der Implementierung die Ist-Werte der Projekt-KPIs. | System speichert sie zum Zielwert. |
+| 7 | A2 | PL wählt Status (im Plan/kritisch) und Trend, beurteilt die Abweichungen bei Inhalt, Termin, Ressourcen und Budget und erfasst nächsten Meilenstein, Abhängigkeiten und anstehende Entscheide. | System prüft die Pflichtangaben des Berichts. |
+| 8 |  | PL reicht den Bericht ein. | System speichert den Bericht als Stand der Periode, aktualisiert das Dashboard und legt der UE die Prüfaufgabe an; die UE konsolidiert bis Monatsende (UC-005). |
 
 **Alternativablauf**
 
@@ -270,16 +273,16 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
 
 Ende: weiter bei Schritt 3.
 
-**A2 Status «kritisch» (ab Schritt 6):** Bedingung: PL wählt den Status «kritisch».
+**A2 Status «kritisch» (ab Schritt 7):** Bedingung: PL wählt den Status «kritisch».
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
 | A2.1 |  | System verlangt Begründung und Massnahme. |
-| A2.2 | PL erfasst beides. | System markiert das Vorhaben im Dashboard und informiert SP und UE. |
+| A2.2 | PL erfasst beides und hält fest, ob ein Entscheid des PRAT nötig ist. | System markiert das Vorhaben im Dashboard, informiert SP und UE und legt bei Entscheidbedarf eine Eskalation an (PS.03.03, UC-006). |
 
-Ende: weiter bei Schritt 7.
+Ende: weiter bei Schritt 8.
 
-**A3 Frist verpasst (ab Schritt 1):** Bedingung: Bis zur Frist ist kein Bericht eingereicht [OFFEN: Frist].
+**A3 Frist verpasst (ab Schritt 1):** Bedingung: Bis zum 25. ist kein Bericht eingereicht.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|

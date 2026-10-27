@@ -10,7 +10,7 @@ import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
+import { IdeenBereich, IdeeNeuPage, IdeePage, nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -117,12 +117,17 @@ function ZielzyklusRoute() {
 }
 
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
-const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
+const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', validateSearch: searchOf.ideen, component: IdeenRoute });
 
 function IdeenRoute() {
-  const navigate = useNavigate();
+  const search = ideenRoute.useSearch();
+  const navigate = useNavigate({ from: ideenRoute.fullPath });
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <IdeenPage gehe={gehe} />;
+  // Ideenpool und Funnel mit Ansicht und Filtern in der Adresse (AP-E4-2, K4 Prüfen 5)
+  const setSearch = useCallback<SetIdeenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <IdeenBereich search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
 const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });

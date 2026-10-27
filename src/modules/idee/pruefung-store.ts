@@ -31,11 +31,11 @@ export async function pool(tx: Tx, o: { stand?: Stand[]; handlungsfeld?: string;
   if (o.herkunft) { args.push(o.herkunft); where.push(`i.herkunft = $${args.length}`); }
   const key = o.sort === 'wartet' ? 'i.stand_at' : "coalesce(i.eingereicht_at, i.created_at)";
   const cmp = o.sort === 'wartet' ? '>' : '<';
-  const dir = o.sort === 'wartet' ? 'ASC' : 'DESC';
+  const richtung = o.sort === 'wartet' ? 'ASC' : 'DESC';
   if (o.after) { args.push(o.after.at, o.after.id); where.push(`(${key}, i.id) ${cmp} ($${args.length - 1}::timestamptz, $${args.length}::uuid)`); }
   args.push(o.limit + 1);
   return (await tx.query<PoolRow & { sort_at: Date }>(
-    `SELECT ${POOL_COLS}, ${key} AS sort_at FROM ${T} i WHERE ${where.join(' AND ')} ORDER BY ${key} ${dir}, i.id ${dir} LIMIT $${args.length}`, args)).rows;
+    `SELECT ${POOL_COLS}, ${key} AS sort_at FROM ${T} i WHERE ${where.join(' AND ')} ORDER BY ${key} ${richtung}, i.id ${richtung} LIMIT $${args.length}`, args)).rows;
 }
 
 export async function funnel(tx: Tx): Promise<{ stufen: { stand: Stand; anzahl: number }[]; letzte: Date | null }> {

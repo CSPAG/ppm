@@ -11,7 +11,9 @@ export const navigation: NavRegistrierung = {
   bereiche: [
     // Arbeitsraum «Ziele»: bis zum Zielzyklus (Etappe E6) nur die Handlungsfelder (BC ZM.01.01)
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
-    // Arbeitsraum «Administration»: die Verwalten-Seiten des Baukastens kommen nach Recht aus `useIamNav()` dazu (UC-016)
+    // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03); die Verwalten-Seiten des Baukastens kommen nach Recht
+    // aus `useIamNav()` dazu (UC-016)
+    { raum: 'administration', pfad: '/administration/phasenmodell', label: T.bereich.phasenmodell, recht: 'phasenmodell:read' },
   ],
   aktionen: [
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },

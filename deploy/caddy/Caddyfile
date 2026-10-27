@@ -37,9 +37,12 @@
 		}
 	}
 
-	# Betriebs-Endpunkte nie nach aussen
+	# Betriebs-Endpunkte nie nach aussen. Als eigener handle-Block: ein blosses «respond» käme in der festen Reihenfolge
+	# der Direktiven erst nach «handle» und würde nie greifen (api:8080 beantwortete /healthz und /readyz öffentlich).
 	@ops path /metrics /metrics/* /healthz /readyz
-	respond @ops 404
+	handle @ops {
+		respond 404
+	}
 
 	handle /mcp* {
 		reverse_proxy mcp:8081 {

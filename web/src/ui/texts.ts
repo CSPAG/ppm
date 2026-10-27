@@ -5,8 +5,8 @@
  */
 export const T = {
   app: 'PPM',
-  nav: { main: 'Hauptnavigation', ziele: 'Ziele', palette: 'Befehle', skip: 'Zum Inhalt springen' },
-  theme: { label: 'Farbschema', light: 'Hell', dark: 'Dunkel', system: 'Wie System' },
+  nav: { main: 'Navigation', ziele: 'Ziele', palette: 'Befehle', skip: 'Zum Inhalt springen', open: 'Navigation öffnen', omni: 'Seiten und Befehle suchen …' },
+  theme: { label: 'Farbschema', light: 'Hell', dark: 'Dunkel', system: 'Wie System', toggle: 'Hell/Dunkel umschalten' },
   palette: { title: 'Befehle', placeholder: 'Befehl oder Seite suchen …', empty: 'Nichts gefunden.', hint: 'Strg+K' },
   common: {
     save: 'Speichern', cancel: 'Abbrechen', close: 'Schliessen', delete: 'Löschen', edit: 'Bearbeiten', retry: 'Erneut versuchen',
@@ -14,7 +14,7 @@ export const T = {
   },
   notFound: { title: 'Seite nicht gefunden', text: 'Diese Seite gibt es nicht (mehr). Prüfen Sie die Adresse oder kehren Sie zur Übersicht zurück.', back: 'Zur Übersicht' },
   handlungsfeld: {
-    title: 'Handlungsfelder', one: 'Handlungsfeld', create: 'Neues Handlungsfeld', search: 'Handlungsfelder durchsuchen',
+    title: 'Handlungsfelder', sub: 'Strategische Handlungsfelder mit Leitsatz und Stossrichtungen, oberste Ordnung für Ziele und Vorhaben.', one: 'Handlungsfeld', create: 'Neues Handlungsfeld', search: 'Handlungsfelder durchsuchen',
     empty: 'Noch keine Handlungsfelder erfasst. Die Handlungsfelder der Strategie ordnen Ziele und Vorhaben.',
     emptySearch: 'Kein Handlungsfeld passt zur Suche.',
     label: 'Bezeichnung', leitsatz: 'Leitsatz', stossrichtungen: 'Stossrichtungen', position: 'Reihenfolge',

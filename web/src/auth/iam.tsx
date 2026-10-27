@@ -6,7 +6,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { useRouter, useRouterState } from '@tanstack/react-router';
 import { IamProvider, type IamFeatures, type IamLinkProps, type IamResources, type IamRouter } from '@vollholz/iam-web';
-import '@vollholz/iam-web/styles.css';
 import { useMemo, type ReactNode } from 'react';
 import './permissions.ts';
 

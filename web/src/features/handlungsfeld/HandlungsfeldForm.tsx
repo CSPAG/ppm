@@ -39,7 +39,7 @@ export function HandlungsfeldForm({ formId, initial, onSubmit, busy, children, s
   };
   const describedBy = (k: keyof FormValues, hint?: boolean) =>
     [hint ? `${id}-${k}-h` : '', errors[k] ? `${id}-${k}-e` : ''].filter(Boolean).join(' ') || undefined;
-  const error = (k: keyof FormValues) => errors[k] ? <p id={`${id}-${k}-e`} className="field-error">{errors[k]}</p> : null;
+  const error = (k: keyof FormValues) => errors[k] ? <p id={`${id}-${k}-e`} className="ferr">{errors[k]}</p> : null;
   return (
     <form id={formId} className="form" onSubmit={submit} noValidate aria-busy={busy}>
       <div className="field">
@@ -58,7 +58,7 @@ export function HandlungsfeldForm({ formId, initial, onSubmit, busy, children, s
         <label htmlFor={`${id}-stossrichtungen`}>{T.handlungsfeld.stossrichtungen}</label>
         <textarea id={`${id}-stossrichtungen`} name="stossrichtungen" value={v.stossrichtungen} onChange={e => setV({ ...v, stossrichtungen: e.target.value })} rows={5}
           aria-invalid={errors.stossrichtungen ? true : undefined} aria-describedby={describedBy('stossrichtungen', true)} />
-        <p id={`${id}-stossrichtungen-h`} className="muted">{T.handlungsfeld.stossrichtungenHint}</p>
+        <p id={`${id}-stossrichtungen-h`} className="hint">{T.handlungsfeld.stossrichtungenHint}</p>
         {error('stossrichtungen')}
       </div>
       <div className="field">

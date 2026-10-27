@@ -1,0 +1,12 @@
+/* Bausteine aus @vollholz/iam-web in den Farben und Schriften der App (Tokens aus base.css, hell und dunkel; wie vollholz/assets) */
+:root{
+  --iam-bg:var(--bg); --iam-surface:var(--surface); --iam-surface-2:var(--surface-2); --iam-hover:var(--hover);
+  --iam-line:var(--line); --iam-line-2:var(--line-2);
+  --iam-text:var(--fg); --iam-text-2:var(--fg-2); --iam-text-3:var(--fg-3);
+  --iam-accent:var(--accent); --iam-accent-hover:var(--accent-hover); --iam-accent-text:var(--accent-fg); --iam-accent-soft:var(--accent-soft);
+  --iam-ok:var(--ok); --iam-ok-soft:var(--ok-soft); --iam-warn:var(--warn); --iam-warn-soft:var(--warn-soft);
+  --iam-bad:var(--bad); --iam-bad-soft:var(--bad-soft); --iam-bad-text:var(--surface); --iam-info:var(--info); --iam-info-soft:var(--info-soft);
+  --iam-off:var(--off); --iam-off-soft:var(--off-soft);
+  --iam-focus:var(--accent); --iam-shadow:var(--shadow);
+  --iam-font:var(--f-body); --iam-font-display:var(--f-display); --iam-font-mono:var(--f-mono);
+}

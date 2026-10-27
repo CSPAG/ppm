@@ -22,7 +22,7 @@ function CreateDrawer({ onClose, onCreated }: { onClose(): void; onCreated(id: s
   return (
     <Drawer title={T.handlungsfeld.create} onClose={onClose} footer={<>
       <button type="button" className="btn" onClick={onClose}>{T.common.cancel}</button>
-      <button type="submit" form={formId} className="btn btn-primary" disabled={create.isPending}>{T.common.save}</button>
+      <button type="submit" form={formId} className="btn primary" disabled={create.isPending}>{T.common.save}</button>
     </>}>
       {create.error ? <ErrorState error={create.error} /> : null}
       <HandlungsfeldForm formId={formId} initial={toValues()} busy={create.isPending} serverErrors={describeError(create.error).fields}
@@ -54,24 +54,27 @@ function ViewDrawer({ loaded: { item, etag }, onClose, onEdit }: { loaded: Loade
   const history = useHandlungsfeldHistory(item.id);
   return (
     <Drawer title={item.label} onClose={onClose} actions={<>
-      {item.can.write ? <button type="button" className="btn btn-ghost" onClick={onEdit}><Icon name="edit" />{T.common.edit}</button> : null}
-      {item.can.delete ? <button type="button" className="btn btn-ghost" onClick={() => setConfirm(true)}><Icon name="trash" />{T.common.delete}</button> : null}
+      {item.can.write ? <button type="button" className="btn sm" onClick={onEdit}><Icon name="edit" />{T.common.edit}</button> : null}
+      {item.can.delete ? <button type="button" className="btn sm danger" onClick={() => setConfirm(true)}><Icon name="trash" />{T.common.delete}</button> : null}
     </>}>
-      <dl className="props">
-        <dt>{T.handlungsfeld.leitsatz}</dt><dd>{item.leitsatz || <span className="muted">{T.handlungsfeld.noLeitsatz}</span>}</dd>
+      <dl className="attrs">
+        <dt>{T.handlungsfeld.leitsatz}</dt><dd className="wrap">{item.leitsatz || <span className="empty">{T.handlungsfeld.noLeitsatz}</span>}</dd>
         <dt>{T.handlungsfeld.stossrichtungen}</dt>
-        <dd>{item.stossrichtungen.length ? <ul>{item.stossrichtungen.map((s, i) => <li key={i}>{s}</li>)}</ul> : <span className="muted">{T.handlungsfeld.noStossrichtungen}</span>}</dd>
-        <dt>{T.handlungsfeld.position}</dt><dd>{item.position}</dd>
+        <dd className="wrap">{item.stossrichtungen.length ? <ul>{item.stossrichtungen.map((s, i) => <li key={i}>{s}</li>)}</ul> : <span className="empty">{T.handlungsfeld.noStossrichtungen}</span>}</dd>
+        <dt>{T.handlungsfeld.position}</dt><dd className="mono">{item.position}</dd>
       </dl>
-      {!item.can.write ? <p className="muted">{T.handlungsfeld.noRight}</p> : null}
-      <section aria-labelledby={`h-${item.id}`} className="history">
-        <h3 id={`h-${item.id}`}><Icon name="history" /> {T.handlungsfeld.history}</h3>
+      {!item.can.write ? <p className="note">{T.handlungsfeld.noRight}</p> : null}
+      <section aria-labelledby={`h-${item.id}`} className="grp">
+        <h3 id={`h-${item.id}`} className="grp-h"><Icon name="clock" /> {T.handlungsfeld.history}</h3>
         {history.isPending ? <Loading /> : history.error ? <ErrorState error={history.error} /> : (
-          <ol>
+          <ol className="tl">
             {history.data.map(h => (
               <li key={h.version}>
-                <strong>{T.handlungsfeld.version(h.version)}</strong> {T.handlungsfeld.actions[h.action] ?? h.action}
-                {' · '}{fmtDateTime(h.changedAt)}{h.changedBy ? <> · <PersonName id={h.changedBy} /></> : null}
+                <span className="tl-dot" aria-hidden="true" />
+                <div>
+                  <strong>{T.handlungsfeld.version(h.version)}</strong> {T.handlungsfeld.actions[h.action] ?? h.action}
+                  <div className="t">{fmtDateTime(h.changedAt)}{h.changedBy ? <> · <PersonName id={h.changedBy} /></> : null}</div>
+                </div>
               </li>
             ))}
           </ol>
@@ -99,10 +102,10 @@ function EditDrawer({ loaded, onDone, onReload }: { loaded: Loaded; onDone(): vo
   return (
     <Drawer title={`${T.common.edit}: ${base.item.label}`} onClose={onDone} footer={<>
       <button type="button" className="btn" onClick={onDone}>{T.common.cancel}</button>
-      <button type="submit" form={formId} className="btn btn-primary" disabled={update.isPending || conflict}>{T.common.save}</button>
+      <button type="submit" form={formId} className="btn primary" disabled={update.isPending || conflict}>{T.common.save}</button>
     </>}>
       {conflict ? (
-        <div className="notice notice-warn" role="alert">
+        <div className="notice" role="alert">
           <p>{T.handlungsfeld.conflict}</p>
           <button type="button" className="btn" onClick={async () => { await onReload(); update.reset(); }}>{T.common.reload}</button>
         </div>

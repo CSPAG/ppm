@@ -14,7 +14,7 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | Routing | TanStack Router, code-basiert, typisierte Suchparameter (`src/search.ts`) |
 | API-Client | `openapi-fetch` mit Typen aus `openapi-typescript` (`src/api/schema.d.ts` aus `web/openapi.json`) |
 | Anmeldung und Rechte | `@vollholz/iam-web` (`IamProvider`, Organisation je Tab, Kontomenü, `AccessSheet`, Verwalten › Mitglieder, Anmeldung, Organisationen) |
-| Stil | eigenes CSS mit Farb-Tokens hell und dunkel (`src/styles/tokens.css`), `--iam-*` darauf abgebildet; Schriften lokal; `public/theme.js` setzt das Farbschema vor dem ersten Zeichnen |
+| Stil | Erscheinungsbild der Werkbank aus [vollholz/assets](https://github.com/vollholz/assets) (`web/src/styles/`): Topbar mit Suche als Befehlspalette, Navigation links, Arbeitsfläche als Karte, Schublade rechts; Farb-Tokens hell und dunkel in `src/styles/base.css`, Ergänzungen in `app.css`, `--iam-*` in `iam.css`; Schriften IBM Plex Sans und Mono, Schibsted Grotesk (lokal, `@fontsource`), Icons in `src/ui/icons.ts`; `public/theme.js` setzt das Farbschema vor dem ersten Zeichnen |
 | Tests | Vitest + Testing Library; Playwright + axe (WCAG 2.2 AA) |
 | Lint | ESLint 9 mit `typescript-eslint`, `react-hooks`, `jsx-a11y` |
 
@@ -26,7 +26,7 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | `src/router.tsx`, `search.ts` | Routen der App und Verwalten-Seiten des Baukastens (`makeIamRoutes`); Suchparameter je Seite |
 | `src/api/` | Client mit CSRF, `X-Tenant`, problem+json, 401/403 an die Sitzung; Hilfen für 412, 404, Idempotency-Key |
 | `src/auth/` | `IamProvider`, Sitzung, Rechte der App |
-| `src/shell/` | AppShell, Rail, Befehlspalette (Strg+K), Farbschema, NotFound, `context.ts` |
+| `src/shell/` | AppShell (Topbar, Navigation, Arbeitsfläche), Rail, Befehlspalette (Strg+K), Hell/Dunkel, NotFound, `context.ts` |
 | `src/ui/` | Overlay mit Fokusfalle, Toasts, Zustände leer/Fehler/laden, Icons, Texte (`texts.ts`) |
 | `src/features/handlungsfeld/` | Arbeitsraum «Ziele» › Handlungsfelder (`/ziele/handlungsfelder`): Liste mit Suche und Cursor, Schublade über `?o=<id>` (`?o=neu` zum Anlegen), Bearbeiten mit 412-Hinweis, Löschen, Verlauf |
 | `src/styles/`, `src/test/`, `e2e/` | Tokens und Layout; Testhilfen; Playwright-Tests |

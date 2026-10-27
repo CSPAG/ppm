@@ -3,15 +3,18 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
+import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
+import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
+import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
-import { sucheZiele, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
+import { sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
@@ -31,6 +34,12 @@ export const navigation: NavRegistrierung = {
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
     { raum: 'ziele', pfad: '/ziele/strategische-ziele', label: zieleTexte.bereich, recht: 'ziel:read' },
+    // Zielerreichung je Quartal (BC ZM.03.01, AP-E6-3); führt ins zuletzt abgeschlossene Quartal
+    { raum: 'ziele', pfad: '/ziele/zielerreichung', label: zielerreichungTexte.bereich, recht: 'ziel:read' },
+    // Arbeitsraum «Portfolio»: Ressourcen mit Auslastung und Kapazität (BC RK.01.01, RK.02.04, AP-E5-4)
+    { raum: 'portfolio', pfad: '/portfolio/ressourcen', label: ressourcenTexte.bereich, recht: 'ressource:read' },
+    // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
+    { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussTexte.bereich, recht: 'statusbericht:review' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
     // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach
     // Recht aus `useIamNav()` dazu (UC-016)
@@ -53,8 +62,17 @@ export const navigation: NavRegistrierung = {
     { id: 'portfolio-anlegen', label: portfoliosTexte.aktionAnlegen, icon: 'plus', pfad: '/administration/portfolios?o=neu', recht: 'portfolio:admin' },
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
     { id: 'ziel-anlegen', label: zieleTexte.aktionAnlegen, icon: 'plus', pfad: '/ziele/strategische-ziele?o=neu', recht: 'ziel:write' },
+    { id: 'auslastung-analysieren', label: ressourcenTexte.aktionAuslastung, icon: 'grid', pfad: ressourcenPfad.auslastung, recht: 'ressource:read' },
+    { id: 'kapazitaet-planen', label: ressourcenTexte.aktionKapazitaet, icon: 'calendar', pfad: ressourcenPfad.kapazitaet, recht: 'ressource:write' },
   ],
   suchen: [
+    // «Statusbericht erstellen» mit Projektwahl (K1 Einstieg Befehlspalette): Bericht der laufenden Periode
+    {
+      id: 'statusbericht', recht: 'statusbericht:write',
+      suchen: async (q, signal) => (await sucheProjekte(q, signal)).filter(p => p.lebenszyklus === 'aktiv' && p.phase !== 'P4').map(p => ({
+        id: `statusbericht:${p.id}`, label: berichtTexte.palette(p.nummer, p.name), detail: berichtTexte.reiter, icon: 'doc', pfad: `/projekte/${p.nummer}/bericht?periode=${laufendePeriode()}`,
+      })),
+    },
     {
       id: 'projekte', recht: 'projekt:read',
       suchen: async (q, signal) => (await sucheProjekte(q, signal)).map(p => ({

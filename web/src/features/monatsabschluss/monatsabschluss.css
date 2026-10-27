@@ -1,0 +1,54 @@
+/*
+ * Monatsabschluss (UI-15, UI-16): Posteingang mit Auswahl und Sammelleiste, Badges der Auffälligkeiten, Rückfrage in der
+ * Zeile, Vergleich in der Schublade, Balken der Terminabweichungen. Farben nur aus den Tokens (hell und dunkel).
+ */
+.ma-perioden .ma-zurueck{transform:rotate(180deg)}
+.ma-banner{padding:12px 22px 0}
+.ma-tabs{padding:0 22px;border-bottom:1px solid var(--line)}
+.ma-check{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-2)}
+.ma-select select{height:30px;border:1px solid var(--line-2);border-radius:7px;padding:0 24px 0 8px;background-color:var(--surface);color:var(--fg)}
+.ma-select select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.ma-sammel{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 22px;background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.ma-sammel-n{font-weight:600;margin-right:4px}
+.ma-tab tbody tr{cursor:pointer}
+.ma-tab tbody tr:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ma-tab tbody tr.sel td{background:var(--accent-soft)}
+.ma-tab tbody tr.ma-rf{cursor:default}
+.ma-tab tbody tr.ma-rf td{background:var(--surface-2);padding:12px 22px}
+.ma-tab td{vertical-align:top}
+.ma-pf{font-size:12px;color:var(--fg-3);font-weight:400}
+.ma-akt{white-space:nowrap}
+.ma-akt .btn+.btn{margin-left:6px}
+.ma-auff{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px}
+.ma-badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:11px;font-size:12px;font-weight:500;color:var(--fg);border:1px solid var(--warn);background:var(--surface)}
+.ma-badge .ico{width:13px;height:13px;color:var(--warn)}
+.ma-rf-a{display:flex;gap:8px;margin-top:8px}
+.ma-rf-drawer{margin:12px 0}
+.ma-rf-liste{list-style:none;margin:0;padding:0}
+.ma-rf-liste li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ma-rf-liste p{margin:0}
+.ma-bericht section{margin-top:16px}
+.ma-bericht .hinweis{margin-bottom:10px}
+.ma-vergleich{font-size:13px}
+.ma-vergleich th,.ma-vergleich td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:normal}
+.ma-vergleich tbody th{font-weight:500;color:var(--fg-2);width:34%}
+.ma-vergleich tr.diff td:first-of-type{font-weight:600}
+.ma-geaendert{font-weight:400;font-size:12px;color:var(--fg-2)}
+.ma-leer{margin:0;padding:12px 22px;color:var(--fg-2);border-bottom:1px solid var(--line)}
+.ma-tasten{padding:0 22px 16px}
+.ma-termine-kopf{padding:12px 22px 0}
+.ma-termine-kopf .grp-h{margin:0}
+.ma-abw{display:inline-flex;align-items:center;gap:8px}
+.ma-balken{display:inline-block;width:96px;height:8px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.ma-balken span{display:block;height:100%}
+.ma-balken .spaet{background:var(--warn)}
+.ma-balken .ok{background:var(--ok)}
+.ma-phasen{list-style:none;margin:0;padding:0;font-size:12.5px}
+.ma-link{color:var(--fg);text-decoration:none;font-weight:500}
+.ma-link:hover{text-decoration:underline}
+.ma-link:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (max-width:767px){
+  .ma-banner,.ma-tabs,.ma-leer,.ma-tasten,.ma-termine-kopf,.ma-sammel{padding-left:14px;padding-right:14px}
+  .ma-akt{white-space:normal}
+  .ma-tasten{display:none}
+}

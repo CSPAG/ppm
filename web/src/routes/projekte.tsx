@@ -9,11 +9,13 @@ import { useCallback } from 'react';
 import {
   MeineProjektePage, PROJEKTNUMMER, ProjektAkte, projektTexte, ProjektUebersicht, type ProjekteSearch, type Reiter, type SetProjekteSearch,
 } from '../features/projekt/index.ts';
+import { BerichtPage, berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
 import { searchOf } from '../search.ts';
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektTexte.akte.uebersicht },
+  { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -50,5 +52,14 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <ProjektUebersicht nummer={nr} />;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute])] as const;
+  // Statusbericht (UI-13, K1): `/projekte/<nr>/bericht?periode=2026-10`
+  const berichtRoute = createRoute({ getParentRoute: () => akteRoute, path: '/bericht', validateSearch: searchOf.bericht, component: BerichtRoute });
+
+  function BerichtRoute() {
+    const { nr } = akteRoute.useParams();
+    const { periode } = berichtRoute.useSearch();
+    return <BerichtPage nummer={nr} periode={periode ?? laufendePeriode()} />;
+  }
+
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, berichtRoute])] as const;
 }

@@ -166,6 +166,10 @@ PL erhält eine Erinnerung, die UE sieht den Bericht als «ausstehend» (UC-005 
 - Entscheid: Eine Sammelaufgabe je Periode für die UE statt einer Aufgabe je Bericht (I-B3). Präzisiert UC-005 Ausgangslage.
 - Entscheid: Sammelbestätigung nur für Berichte ohne Auffälligkeit. Präzisiert UC-005 Schritt 3; mit der UE bestätigen
   ([UX-OF-7](../fahrplan.md#offene-fragen)).
+- Umsetzung (AP-E1-2): «Termine» ist eine Ansicht des Monatsabschlusses (`?ansicht=termine`) statt eines eigenen
+  Bereichs (I-N6); die Tastenkürzel des Posteingangs stehen unter der Liste, bis die Shell eine Hilfe `?` hat.
+  Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der
+  Vorperiode, jede Prognose über Budget. Bestätigen hat «Rückgängig» im Toast, solange die Periode offen ist.
 - Offen: Schwelle der wesentlichen Abweichung (K11). Bis zur Klärung warnt das System ab +4 Wochen Termin oder +10 %
   Prognose je Phase (Vorschlag, als Standardwert im Phasenmodell konfigurierbar).
 - Offen: Wann erscheint die Berichtsaufgabe ([UX-OF-4](../fahrplan.md#offene-fragen)); Umgang mit verspäteten Berichten nach dem

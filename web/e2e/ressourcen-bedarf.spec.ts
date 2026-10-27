@@ -25,7 +25,9 @@ test('Bedarf zuteilen: Liste, Schublade, gedeckt; Überbuchungen; barrierefrei',
   await page.goto('/portfolio/ressourcen/bedarf?von=2030-01&bis=2030-02');
   await expect(page.getByRole('heading', { level: 1, name: 'Ressourcen' })).toBeVisible();
   const zeile = page.getByRole('row', { name: new RegExp(`E2E Bedarf ${lauf}`) });
-  await expect(zeile.getByText('offen')).toBeVisible();
+  // Stand «offen» im Abzeichen; «offen» steht auch in der Spalte Priorität (ohne Rang)
+  await expect(zeile.locator('.stand', { hasText: 'offen' })).toBeVisible();
+  await expect(zeile.getByText('0 von 1 FTE × Monate')).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 

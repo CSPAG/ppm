@@ -27,6 +27,7 @@ COPY src ./src
 COPY scripts ./scripts
 COPY test ./test
 COPY infra/keycloak/platform.ts ./infra/keycloak/platform.ts
+COPY infra/dns/dns.ts ./infra/dns/dns.ts
 COPY identity.app.json ./
 RUN npm run typecheck && touch /tmp/check-ok
 

@@ -12,6 +12,9 @@ infra/*
 !infra/keycloak
 infra/keycloak/*
 !infra/keycloak/platform.ts
+!infra/dns
+infra/dns/*
+!infra/dns/dns.ts
 deploy/*
 !deploy/docker-entrypoint.sh
 docs

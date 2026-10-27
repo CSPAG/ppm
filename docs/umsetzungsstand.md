@@ -16,7 +16,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | in Arbeit (PR 1 Tabellen und API; PR 2 Oberfläche UI-44, UI-45 folgt) | – | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | offen | – | – |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
-| AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | in Arbeit (PR 1: 050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»; PR 2: Oberfläche UI-47) | – | A-02, A-07, A-08, A-23, A-45 |
+| AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | teilweise: PR 1 umgesetzt (050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»); PR 2 Oberfläche UI-47 in Arbeit | #19 | A-02, A-07, A-08, A-23, A-45 |
 | AP-E0-6 | Register Projektdaten | 060–069 | offen | – | – |
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche in Arbeit | #22 | A-31, A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
@@ -41,7 +41,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | offen | – | – |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
-| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Oberfläche UI-38 und Aufgabe «Jahresziele vervollständigen» folgt) | – | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1 |
+| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API umgesetzt: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Aufgabe «Jahresziele vervollständigen» über den Eingang; PR 3 Oberfläche UI-38 folgt nach AP-E0-4) | #28 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1 |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
 | AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
@@ -62,10 +62,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 |---|---|---|---|---|---|---|
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
 | ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
-| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
+| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche in Arbeit | #28 |
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
-| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
-| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
+| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche in Arbeit | #28 |
+| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche in Arbeit | #28 |
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
@@ -86,7 +86,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | offen | – |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus in Arbeit (AP-E6-1); aus Vertrag Kap. 2 offen (AP-E3-1) | – |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus: API umgesetzt (AP-E6-1); aus Vertrag Kap. 2 offen (AP-E3-1) | #28 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
@@ -145,7 +145,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | offen | – |
-| AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | in Arbeit | – |
+| AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | teilweise (API, Gremienweg; Oberfläche folgt) | #19 |
 | AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | offen | – |
 | AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks) | Gerüst (695ab82) |
 | AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | offen | – |
@@ -188,7 +188,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K5-3 | Entscheidungsvorlage ohne Dateien | 0 Dateien | Aufgabentest | AP-E5-5 | offen |
 | K5-4 | Projekte unter der Wasserlinie und Engpass nennen | ≥ 90 % | Aufgabentest | AP-E5-3 | offen |
 | K6-1 | Jahresziel mit Metrik und Hauptaktivität | ≤ 3 Min. | Aufgabentest | AP-E6-1 | offen |
-| K6-2 | Projekt ↔ strategisches Ziel | ≤ 2 Klicks | Test | AP-E6-1 | offen |
+| K6-2 | Projekt ↔ strategisches Ziel | ≤ 2 Klicks | Test | AP-E6-1 | API je Richtung 1 Aufruf (test/app/zielzyklus.test.ts, #28); Oberfläche folgt |
 | K6-3 | Zielerreichung 30 Ziele | ≤ 20 Min. | Aufgabentest | AP-E6-3 | offen |
 | K6-4 | Entwurf Quartalsreporting | ≤ 30 Min., ohne Dateien | Aufgabentest | AP-E6-4 | offen |
 | E0 | Q-L1, Q-L6, Q-B1–B6 auf allen Bausteinen; G1 je Rolle | wie qualitaetsziele.md | CI, Review | AP-E0-0, AP-E0-8 | offen |

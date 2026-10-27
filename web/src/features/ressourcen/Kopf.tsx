@@ -7,9 +7,7 @@ import { Icon } from '../../ui/index.ts';
 import { TR } from './texte.ts';
 
 export type Reiter = 'auslastung' | 'kapazitaet' | 'bedarf';
-export const PFAD: Record<Reiter, string> = { auslastung: '/portfolio/ressourcen/auslastung', kapazitaet: '/portfolio/ressourcen/kapazitaet', bedarf: '/portfolio/ressourcen/bedarf' };
-export type Reiter = 'auslastung' | 'kapazitaet';
-export const PFAD = { auslastung: '/portfolio/ressourcen/auslastung', kapazitaet: '/portfolio/ressourcen/kapazitaet' } as const satisfies Record<Reiter, string>;
+export const PFAD = { auslastung: '/portfolio/ressourcen/auslastung', kapazitaet: '/portfolio/ressourcen/kapazitaet', bedarf: '/portfolio/ressourcen/bedarf' } as const satisfies Record<Reiter, string>;
 
 export interface KopfProps {
   reiter: Reiter;

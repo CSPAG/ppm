@@ -7,6 +7,7 @@ import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
 import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
+import { projekteRoutes } from './routes/projekte.tsx';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
@@ -103,7 +104,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, phasenmodellRoute, organisationRoute, codetabellenRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, ...projekteRoutes(rootRoute), zieleRoute, handlungsfelderRoute, strategischeZieleRoute, phasenmodellRoute, organisationRoute, codetabellenRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

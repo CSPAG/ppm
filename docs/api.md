@@ -134,6 +134,22 @@ Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategis
 Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
 `baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
 über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
+## Projekte
+
+Projekte mit Nummer «JJJJ-NNN» (A-47), Portfolio, Phase und Lebenszyklus, Projektorganisation mit Sponsor,
+Sponsoren-Koalition, Projektleitung, CTL und Kernteam (BC PP.04.04, UC-002 Schritt 2, UC-014 A1). Lesen nach Rolle an der
+Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektrollen, UE und Gremium (A-34). Endzustände
+(`abgebrochen`, `abgeschlossen`, `zurueckgezogen`) sind lesend (409). Fähigkeiten: `can: { write, organisation }`.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/projekte?rolle=&portfolio=&phase=&lebenszyklus=&nummer=&q=&cursor=&limit=` | `projekt:read` irgendwo | sortiert nach Nummer; `rolle` = eigene Funktion (`sp`, `pl`, `ctl`, `kt`, `koalition`), `portfolio` = Schlüssel |
+| `GET /v1/projekte/kopf` | `projekt:read` irgendwo | laufende Projekte mit eigener Funktion (Kopfkarte im Eingang) |
+| `POST /v1/projekte` | `projekt:create` an org oder am Portfolio | Nummer fortlaufend je Jahr der Anlage, Phase ohne Angabe P0 |
+| `GET /v1/projekte/{id}` | `projekt:read` | `ETag` |
+| `PATCH /v1/projekte/{id}` | `projekt:write` | Name, Federführung, Handlungsfeld, «vertraulich»; `If-Match` Pflicht |
+| `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
+| `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
 
 ## Webhooks und Ereignisse
 
@@ -158,6 +174,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
 | `ch.ppm.vertrag.drafted`, `.chapter_updated`, `.submitted`, `.baselined` | Projektvertrag: Entwurf angelegt, Kapitel gespeichert, zur Prüfung eingereicht, Version Baseline |
 | `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
+| `ch.ppm.projekt.created`, `ch.ppm.projekt.updated` | Projekt angelegt bzw. geändert |
+| `ch.ppm.projekt.organisation_changed` | Projektorganisation festgelegt |
+| `ch.ppm.projekt.phase_changed` | Phase nachgeführt (Gate-Entscheid) |
+| `ch.ppm.projekt.suspended`, `.resumed`, `.cancelled`, `.completed`, `.withdrawn` | Lebenszyklus: sistiert, wieder aufgenommen, abgebrochen, abgeschlossen, zurückgezogen |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

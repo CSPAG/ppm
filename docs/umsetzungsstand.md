@@ -15,7 +15,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
 | AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | umgesetzt (PR 1 Tabellen und API, PR 2 Oberfläche UI-44, UI-45) | #20, #26 | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | umgesetzt (Modul, 030, Fristen in Arbeitstagen über `stammdaten`, UI-46) | #17 | A-10, A-12, A-13, A-27, A-43 |
-| AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
+| AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | in Arbeit | – | A-04, A-34, A-47 |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | offen | – | – |
 | AP-E0-6 | Register Projektdaten | 060–069 | in Arbeit (PR 1 Tabellen 060, API, MCP `get_projektdaten`; PR 2 Einhängen in die Projektübersicht folgt) | – | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche in Arbeit | #22 | A-31, A-44 |
@@ -94,7 +94,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | offen | – |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | offen | – |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
-| PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | offen | – |
+| PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | in Arbeit | – |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | offen | – |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | offen | – |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |

@@ -11,6 +11,7 @@ import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
+import { projektModule } from './modules/projekt/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { vertragModule } from './modules/vertrag/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
@@ -26,16 +27,19 @@ export const app = defineApp({
     stammdatenModule,
     handlungsfeldModule,
     phasenmodellModule,
+    projektModule,
     projektdatenModule,
     zielModule,
     vertragModule,
     webhooksModule,
   ],
-  // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4)
+  // Personenverzeichnis: Stellvertretung wählen (alle Rollen, UC-016 Schritt 4); Namen auflösen und Personen auswählen,
+  // wer Handlungsfelder oder Projekte liest (Projektorganisation, PP.04.04)
   people: {
     permissions: [
       'handlungsfeld:read',
       'stammdaten:read',
+      'projekt:read',
     ],
   },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App

@@ -31,7 +31,10 @@ export const matrix: Matrix = {
   tags: ['Projektvertrag'],
   seed: async (api, a, mark) => {
     const t = await tenant(api.t.runtime, 'acme');
+    // Projekt von A: das aus matrix/projekt.ts bzw. projektdaten.ts (Name = Marke), sonst direkt in der Datenbank
     const projekt = await full(api.t.runtime, t, async tx => {
+      const da = (await tx.query<{ id: string }>('SELECT id FROM ppm.projekt WHERE name = $1 ORDER BY nummer LIMIT 1', [mark])).rows[0];
+      if (da) return da.id;
       const pf = (await tx.query<{ id: string }>(
         "INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'vertrag', 'Vertrag', true) RETURNING id", [t])).rows[0]!.id;
       return (await tx.query<{ id: string }>(
@@ -59,7 +62,7 @@ export const matrix: Matrix = {
     const t = await tenant(api.t.runtime, 'acme');
     const stand = await full(api.t.runtime, t, async tx => (await tx.query<{ x: string }>(
       `SELECT v.nummer || ':' || v.stand || ':' || v.version || ':' || (SELECT string_agg(k.version::text, ',' ORDER BY k.kapitel) FROM ppm.vertrag_kapitel k WHERE k.version_id = v.id) AS x
-         FROM ppm.vertrag_version v JOIN ppm.projekt p ON p.id = v.projekt_id WHERE p.name = $1`, [mark])).rows.map(r => r.x));
+         FROM ppm.vertrag_version v JOIN ppm.projekt p ON p.id = v.projekt_id WHERE p.name = $1 AND v.nummer = '0.1'`, [mark])).rows.map(r => r.x));
     assert.deepEqual(stand, [`0.1:in_arbeit:1:${Array(13).fill('1').join(',')}`]);
   },
 };

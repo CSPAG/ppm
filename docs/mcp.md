@@ -33,6 +33,8 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 | `get_phasenmodell` | `GET /v1/phasenmodelle/aktuell` bzw. `/{id}` | `phasenmodell:read` | `readOnlyHint` |
 | `get_projektdaten` | `GET /v1/projekte/{id}/<register>` je Register | `projekt:read` | `readOnlyHint`; Kosten `null` ohne `finanzen:read` |
 | `get_vertrag` | `GET /v1/projekte/{id}/vertrag`, Kapitel und Pflichtangaben einer Version | `projekt:read` | `readOnlyHint`; Beträge `null` ohne `finanzen:read` |
+| `list_projekte` | `GET /v1/projekte` | `projekt:read` | `readOnlyHint` |
+| `get_projekt` | `GET /v1/projekte/{id}` und `…/organisation` | `projekt:read` | `readOnlyHint` |
 
 Neues Werkzeug: im Modell unter `mcpTools` eintragen (Titel, Recht, `readOnly`), in `mcp/tools.ts` als Aufruf der
 REST-API umsetzen; nie direkt auf Module oder die Datenbank zugreifen.

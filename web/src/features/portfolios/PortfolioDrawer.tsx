@@ -230,7 +230,10 @@ function WegForm({ loaded, weg, gremien, onDone, onReload }: {
       return { gate: g.code, gremiumId: entscheidend.id, zusaetzlichGremiumId: w.startsWith('e+') ? w.slice(2) : null };
     });
     // ETag = Version des Portfolios (der Gremienweg gehört zum Portfolio)
-    save.mutate({ id: loaded.item.id, etag: loaded.etag, body: { schritte } }, { onSuccess: () => { toast.show(TP.gremienwegSaved); onDone(); } });
+    // mutateAsync: Nach dem Speichern trägt der Hook die neue Version ein, das Formular baut sich neu auf (Schlüssel =
+    // Version); Rückrufe von mutate() kämen dann nicht mehr an (keine Meldung, Schublade bliebe im Bearbeiten)
+    save.mutateAsync({ id: loaded.item.id, etag: loaded.etag, body: { schritte } })
+      .then(() => { toast.show(TP.gremienwegSaved); onDone(); }, () => undefined);
   };
   return (
     <Drawer title={`${TP.gremienweg}: ${loaded.item.name}`} onClose={onDone} footer={<>

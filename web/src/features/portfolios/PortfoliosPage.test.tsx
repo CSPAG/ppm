@@ -93,7 +93,13 @@ describe('Portfolios und Gremien', () => {
   });
 
   it('Gremienweg bearbeiten: PUT mit If-Match des Portfolios', async () => {
-    const api = stub({ [`PUT /v1/portfolios/${PA}/gremienweg`]: () => json({ ...WEG, version: 4 }, 200, { ETag: 'W/"4"' }) });
+    // wie der Server: nach dem Speichern liefern Portfolio und Gremienweg die neue Version
+    let version = 3;
+    const api = stub({
+      [`GET /v1/portfolios/${PA}`]: () => json(portfolio({ version }), 200, { ETag: `W/"${version}"` }),
+      [`GET /v1/portfolios/${PA}/gremienweg`]: () => json({ ...WEG, version }, 200, { ETag: `W/"${version}"` }),
+      [`PUT /v1/portfolios/${PA}/gremienweg`]: () => { version = 4; return json({ ...WEG, version }, 200, { ETag: 'W/"4"' }); },
+    });
     renderWithIam(<Page initial={{ o: 'transformation' }} />, UE);
     await userEvent.click(await screen.findByRole('button', { name: TP.gremienwegBearbeiten }));
     const eintritt = await screen.findByLabelText('Gate Eintritt P0');
@@ -103,6 +109,8 @@ describe('Portfolios und Gremien', () => {
     await waitFor(() => expect(api.calls.some(c => c.method === 'PUT')).toBe(true));
     const put = api.calls.find(c => c.method === 'PUT')!;
     expect(put.headers.get('If-Match')).toBe('W/"3"');
+    expect(await screen.findByText(TP.gremienwegSaved)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: TP.gremienwegBearbeiten })).toBeInTheDocument();
     expect(await put.json()).toEqual({ schritte: [
       { gate: 'EINTRITT_P0', gremiumId: PRAT, zusaetzlichGremiumId: SNS },
       { gate: 'P0_P1', gremiumId: PRAT, zusaetzlichGremiumId: SNS },

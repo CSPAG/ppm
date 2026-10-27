@@ -24,7 +24,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E1-1 | Statusbericht erfassen | 090–099 | in Arbeit (PR 1 #30: 090, Periode und Statusbericht, API mit Vorbelegung aus der Vorperiode, Einreichen mit Rückgängig; PR 2: Berichtsaufgabe am 18., Register, Oberfläche UI-13) | – | A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
-| AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | in Arbeit (PR 1: 130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; PR 2: Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
+| AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | offen | – | – |
@@ -91,11 +91,11 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.04 | Portfolio in Matrixsicht beurteilen | 008 | E5 | AP-E5-2 | offen | – |
-| PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | in Arbeit (API, Oberfläche) | #32, #39 |
+| PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | offen | – |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
-| PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | in Arbeit (API, Oberfläche) | #32, #39 |
+| PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | in Arbeit (API) | – |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |
 | PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | offen | – |

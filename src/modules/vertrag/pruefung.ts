@@ -89,8 +89,9 @@ export const unterzeichnung = {
   registrieren(fn: BeiUnterzeichnet) { nachUnterzeichnung.push(fn); },
 };
 
-const link = (p: store.ProjektKopf, ansicht: 'pruefen' | 'unterzeichnen' | 'bearbeiten') =>
-  ansicht === 'bearbeiten' ? `/projekte/${p.nummer}/vertrag?version=entwurf` : `/projekte/${p.nummer}/vertrag?version=entwurf&ansicht=${ansicht}`;
+/** Ziel der Aufgabe (I-B1): Unterzeichnen öffnet die Zusammenfassung (UI-12), Überarbeiten die Projektakte. */
+const link = (p: store.ProjektKopf, ansicht: 'unterzeichnen' | 'bearbeiten') =>
+  ansicht === 'unterzeichnen' ? `/projekte/${p.nummer}/vertrag/unterzeichnen` : `/projekte/${p.nummer}/vertrag?version=entwurf`;
 const kontext = (p: store.ProjektKopf, v: store.VersionRow) => `${p.nummer} ${p.name} · Version ${v.nummer} für ${v.zielphase}`;
 
 /** Aufgabe «Projektvertrag überarbeiten» an die Projektleitung (fachmodell.md 4.2) mit dem Grund im Kontext. */

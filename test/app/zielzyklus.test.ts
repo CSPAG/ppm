@@ -56,6 +56,12 @@ describe('Zielzyklus', { skip }, () => {
     const p = await call('PATCH', '/v1/ziele/2027', { ...gl, 'if-match': 'W/"1"' }, { vorlageBis: '2026-11-20' });
     assert.equal(p.statusCode, 200, p.body);
     assert.equal(p.json().vorlageBis, '2026-11-20');
+    // Aufgabe «Jahresziele vervollständigen» im Eingang aller mit ziel:write, Frist = geplante Vorlage (Fachmodell 4.2)
+    const eingang = (h: Record<string, string>) => call('GET', '/v1/eingang', h).then(r => (r.json().items as { titel: string; kontext: string | null; link: string; frist: string | null }[])
+      .filter(a => a.titel === 'Jahresziele 2027 vervollständigen'));
+    const [a1] = await eingang(gl);
+    assert.deepEqual([a1?.kontext, a1?.link, a1?.frist], ['Vorlage an den VR bis 20.11.2026', '/ziele/2027', '2026-11-20']);
+    assert.deepEqual(await eingang(leser), [], 'nur mit ziel:write');
 
     const a = await call('POST', '/v1/jahresziele', gl, { jahr: 2027, strategischesZielId: ziel21, text: ' Sachkosten um 2 % senken ', metrik: 'Sachkosten', zielwert: '−2 %' });
     assert.equal(a.statusCode, 201, a.body);

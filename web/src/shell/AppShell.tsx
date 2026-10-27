@@ -4,20 +4,25 @@
  * Schubladen rechts. Strg/⌘ K öffnet die Befehlspalette.
  */
 import { useRouterState } from '@tanstack/react-router';
-import { AccountMenu, BreakGlassBanner, initials, MyRightsDialog, useIam } from '@vollholz/iam-web';
+import { AccountMenu, BreakGlassBanner, initials, MyRightsDialog, useIam, useIamConfig } from '@vollholz/iam-web';
 import { useEffect, useState, type ReactNode } from 'react';
 import { applyTheme, avatarColor, Icon, T } from '../ui/index.ts';
 import { BottomNav, MehrBlatt } from './BottomNav.tsx';
 import { CommandPalette } from './CommandPalette.tsx';
 import { useShell } from './context.ts';
-import { aufteilenUnten, useNavigation } from './nav.ts';
+import { aufteilenUnten, useNavigation, useZaehler } from './nav.ts';
 import { BereichLeiste, Rail } from './Rail.tsx';
 import { ThemeToggle } from './ThemeSwitch.tsx';
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { me, orgName } = useIam();
+  const { me, orgName, canSomewhere } = useIam();
+  const { router } = useIamConfig();
   const path = useRouterState({ select: s => s.location.pathname });
-  const { raeume, aktionen, suchen } = useNavigation(useShell(), path);
+  const reg = useShell();
+  const { raeume, aktionen, suchen } = useNavigation(reg, path);
+  const zaehler = useZaehler(reg);
+  // Persönliches im Kontomenü (IA: Profil und Stellvertretung, UC-016 Schritt 4)
+  const konto = (reg.konto ?? []).filter(k => canSomewhere(k.recht));
   const { unten, mehr } = aufteilenUnten(raeume);
   const [palette, setPalette] = useState(false);
   const [rechte, setRechte] = useState(false);
@@ -48,6 +53,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ThemeToggle />
             <AccountMenu avatar={avatar} extraItems={close => (
               <>
+                {konto.map(k => (
+                  <button key={k.id} type="button" role="menuitem" className="iam-menu-i" onClick={() => { close(); router.navigate(k.pfad); }}>
+                    <Icon name={k.icon} className="iam-ico" />{k.label}
+                  </button>
+                ))}
                 {(['light', 'dark', 'system'] as const).map(m => (
                   <button key={m} type="button" role="menuitem" className="iam-menu-i" onClick={() => { applyTheme(m); close(); }}>
                     <Icon name="eye" className="iam-ico" />{`${T.theme.label}: ${T.theme[m]}`}
@@ -58,17 +68,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <div className="shell">
-          <Rail raeume={raeume} />
+          <Rail raeume={raeume} zaehler={zaehler} />
           <main className="main" id="main" tabIndex={-1}>
             <BreakGlassBanner />
             <BereichLeiste raum={raeume.find(r => r.aktiv)} />
             {children}
           </main>
         </div>
-        <BottomNav unten={unten} mehr={mehr} mehrOffen={mehrOffen} onMehr={() => setMehrAt(mehrOffen ? null : path)} />
+        <BottomNav unten={unten} mehr={mehr} mehrOffen={mehrOffen} onMehr={() => setMehrAt(mehrOffen ? null : path)} zaehler={zaehler} />
       </div>
       {palette ? <CommandPalette raeume={raeume} aktionen={aktionen} suchen={suchen} onClose={() => setPalette(false)} /> : null}
-      {mehrOffen ? <MehrBlatt raeume={mehr} onClose={() => setMehrAt(null)} onRechte={() => { setMehrAt(null); setRechte(true); }} /> : null}
+      {mehrOffen ? <MehrBlatt raeume={mehr} konto={konto} zaehler={zaehler} onClose={() => setMehrAt(null)} onRechte={() => { setMehrAt(null); setRechte(true); }} /> : null}
       {rechte ? <MyRightsDialog onClose={() => setRechte(false)} /> : null}
     </>
   );

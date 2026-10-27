@@ -59,3 +59,12 @@ export function useEingangMutations() {
   });
   return { erledigen, gelesen };
 }
+
+/**
+ * Zähler offener Aufgaben für die Navigation (I-N3). Eigener Schlüssel unter `eingang`, damit jede Änderung im Eingang
+ * (Erledigen, Stellvertretung) ihn mit neu lädt.
+ */
+export const anzahlOffen = {
+  queryKey: [...eingangKeys.all, 'zaehler'] as const,
+  laden: async (signal: AbortSignal) => (await api.GET('/v1/eingang/anzahl', { signal })).data!.offen,
+};

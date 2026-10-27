@@ -1,7 +1,8 @@
 /**
  * Kopfkarten der Startseite je Rolle (fachmodell.md 4.1, informationsarchitektur.md «Startseite je Rolle»): Jedes
- * Fachmodul bietet `GET /v1/<modul>/kopf`; hier trägt das Paket des Moduls mit einer Zeile ein, mit welchem Recht die
- * Karte erscheint und wie sie aussieht. Wer mehrere Rollen hat, sieht mehrere Karten (Telefon: untereinander).
+ * Fachmodul bietet `GET /v1/<modul>/kopf` und eine Karte in seinem Feature; die App meldet sie in `src/kopfkarten.ts`
+ * an (eine Zeile je Modul, Recht und Karte), der Router gibt sie an die Startseite. So importiert kein Feature aus
+ * `features/eingang`. Wer mehrere Rollen hat, sieht mehrere Karten (Telefon: untereinander).
  */
 import type { ComponentType } from 'react';
 import type { AppPermission } from '../../auth/permissions.ts';
@@ -13,6 +14,3 @@ export interface KopfKarte {
   /** Karte; lädt ihre Kopfdaten selbst (`GET /v1/<modul>/kopf`). */
   Karte: ComponentType;
 }
-
-/** Eine Zeile je Modul, in der Reihenfolge der Module (src/app.ts). */
-export const KOPFKARTEN: readonly KopfKarte[] = [];

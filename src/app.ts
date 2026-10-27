@@ -10,6 +10,7 @@ import { defineApp } from '@vollholz/platform';
 import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
+import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
@@ -25,6 +26,7 @@ export const app = defineApp({
     stammdatenModule,
     handlungsfeldModule,
     phasenmodellModule,
+    portfolioModule,
     projektModule,
     zielModule,
     webhooksModule,

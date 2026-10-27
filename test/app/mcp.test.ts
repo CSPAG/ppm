@@ -64,6 +64,7 @@ describe('MCP-Dienst', { skip }, () => {
       'list_aufgaben',
       'list_handlungsfelder',
       'list_org_einheiten',
+      'list_portfolios',
       'list_ziele',
     ]);
     assert.ok(tools.every(t => t.annotations?.readOnlyHint === true));
@@ -72,6 +73,10 @@ describe('MCP-Dienst', { skip }, () => {
     const text = call.json().result.content[0].text as string;
     assert.match(text, /Patientenorientierung/);
     assert.ok(!text.includes('Fremdes Handlungsfeld'));
+    const portfolios = await rpc(token, 'tools/call', { name: 'list_portfolios', arguments: {} });
+    assert.equal(portfolios.statusCode, 200, portfolios.body);
+    assert.ok(!portfolios.json().result.isError, portfolios.body);
+    assert.ok(Array.isArray(JSON.parse(portfolios.json().result.content[0].text as string).items));
     assert.ok(idp.exchanges >= 1, 'Token Exchange');
   });
 

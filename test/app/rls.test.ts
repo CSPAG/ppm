@@ -30,6 +30,11 @@ const TENANT_TABLES: Record<string, (tx: Tx, tenantId: string) => Promise<string
   outbox_event: async (tx, t) => { await tx.query("INSERT INTO ppm.outbox_event (tenant_id, type) VALUES ($1, 'probe.created')", [t]); return "type = 'probe.created'"; },
   handlungsfeld: async (tx, t) => { await tx.query("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Probe')", [t]); return "label = 'Probe'"; },
   handlungsfeld_version: async () => "label = 'Probe'",   // entsteht per Trigger mit dem Handlungsfeld
+  strategisches_ziel: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.strategisches_ziel (tenant_id, handlungsfeld_id, nummer, text) SELECT $1, id, '1.1', 'Probe' FROM ppm.handlungsfeld WHERE tenant_id = $1 AND label = 'Probe'", [t]);
+    return "text = 'Probe'";
+  },
+  strategisches_ziel_version: async () => "text = 'Probe'",   // entsteht per Trigger mit dem Ziel
   webhook_subscription: async (tx, t) => {
     await tx.query("INSERT INTO ppm.webhook_subscription (tenant_id, url, secret_enc, event_types) VALUES ($1, 'https://example.ch/probe', 'x', '{handlungsfeld.created}')", [t]);
     return "url = 'https://example.ch/probe'";
@@ -74,6 +79,12 @@ const POLICIES = [
   "ppm.handlungsfeld.handlungsfeld_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('handlungsfeld:write'::text) CHECK app.has_permission('handlungsfeld:write'::text)",
   "ppm.handlungsfeld.handlungsfeld_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('handlungsfeld:delete'::text) CHECK -",
   "ppm.handlungsfeld_version.handlungsfeld_version_read RESTRICTIVE SELECT ppm_app USING app.has_permission('handlungsfeld:read'::text) CHECK -",
+  // Lesesicht der strategischen Ziele (080_strategisches_ziel): Muster ORG, Verlauf STAND
+  "ppm.strategisches_ziel.strategisches_ziel_read RESTRICTIVE SELECT ppm_app USING app.has_permission('ziel:read'::text) CHECK -",
+  "ppm.strategisches_ziel.strategisches_ziel_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('ziel:write'::text)",
+  "ppm.strategisches_ziel.strategisches_ziel_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('ziel:write'::text) CHECK app.has_permission('ziel:write'::text)",
+  "ppm.strategisches_ziel.strategisches_ziel_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ziel:write'::text) CHECK -",
+  "ppm.strategisches_ziel_version.strategisches_ziel_version_read RESTRICTIVE SELECT ppm_app USING app.has_permission('ziel:read'::text) CHECK -",
   // Webhooks (002_webhooks): Zustellung über alle Mandanten im Worker
   'ppm.webhook_delivery.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
   'ppm.webhook_delivery.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',
@@ -197,6 +208,21 @@ describe('PostgreSQL RLS', { skip }, () => {
       await tx.query('ROLLBACK TO SAVEPOINT s');
       assert.equal((await tx.query(`UPDATE ${S}.handlungsfeld SET position = 1`)).rowCount, 0);
     });
+  });
+
+  test('Lesesicht: strategische Ziele mit ziel:read lesen, nur mit ziel:write schreiben; Verlauf nur anhängbar (AP-E0-9)', async () => {
+    await withTenant(t.runtime, { tenantId: A, settings: { 'app.org_permissions': '{handlungsfeld:read}' } }, async tx => {
+      assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.strategisches_ziel`)).rows[0].n, 0);
+      assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.strategisches_ziel_version`)).rows[0].n, 0);
+    });
+    await withTenant(t.runtime, { tenantId: A, settings: { 'app.org_permissions': '{ziel:read}' } }, async tx => {
+      assert.deepEqual((await tx.query<{ text: string }>(`SELECT text FROM ${S}.strategisches_ziel`)).rows.map(r => r.text), ['Probe']);
+      assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.strategisches_ziel_version`)).rows[0].n, 1);
+      assert.equal((await tx.query(`UPDATE ${S}.strategisches_ziel SET metrik = 'x'`)).rowCount, 0);
+      assert.equal((await tx.query(`DELETE FROM ${S}.strategisches_ziel`)).rowCount, 0);
+    });
+    await assert.rejects(full(t.runtime, A, tx => tx.query(`UPDATE ${S}.strategisches_ziel_version SET text = 'x'`)), /permission denied/);
+    await assert.rejects(full(t.runtime, A, tx => tx.query(`DELETE FROM ${S}.strategisches_ziel_version`)), /permission denied/);
   });
 
   test('Verlauf ist nur anhängbar; Worker sieht Warteschlange über alle Mandanten, aber keine Handlungsfelder ohne Kontext', async () => {

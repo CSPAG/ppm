@@ -8,13 +8,14 @@ import { join } from 'node:path';
 import { defineApp } from '@vollholz/platform';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
+import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
 
 export const MIGRATIONS_DIR = join(import.meta.dirname, '..', 'db', 'migrations');
 
 export const app = defineApp({
   platform,
-  modules: [handlungsfeldModule, webhooksModule],
+  modules: [handlungsfeldModule, zielModule, webhooksModule],
   people: { permissions: ['handlungsfeld:read'] },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App
   migrations: { dir: MIGRATIONS_DIR },

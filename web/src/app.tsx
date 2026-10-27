@@ -4,16 +4,13 @@
  */
 import { Outlet } from '@tanstack/react-router';
 import { AppIam } from './auth/index.ts';
-import { AppShell, ShellCtx, type ShellContext } from './shell/index.ts';
-import { T } from './ui/index.ts';
-
-// Arbeitsräume nach docs/ux/informationsarchitektur.md; weitere kommen mit ihren Etappen (docs/ux/fahrplan.md)
-const shell: ShellContext = { nav: [{ to: '/ziele', label: T.nav.ziele, icon: 'target' }] };
+import { navigation } from './nav.ts';
+import { AppShell, ShellCtx } from './shell/index.ts';
 
 export function Root() {
   return (
     <AppIam>
-      <ShellCtx.Provider value={shell}>
+      <ShellCtx.Provider value={navigation}>
         <AppShell><Outlet /></AppShell>
       </ShellCtx.Provider>
     </AppIam>

@@ -21,16 +21,21 @@ export const TAG_EINGANG = 'Eingang';
 export const TAG_MITTEILUNGEN = 'Mitteilungen';
 export const TAG_STELLVERTRETUNGEN = 'Stellvertretungen';
 
-/** Recht, das jede Rolle enthält: Eingang, Mitteilungen und Stellvertretung hat jede Person (UC-016 Schritt 4). */
+/**
+ * Recht, das jede Rolle enthält (Fachmodell 3.3): Eingang, Mitteilungen und Stellvertretung hat jede Person mit einer
+ * Rolle irgendwo – auch, wer nur eine Projektrolle hat (UC-016 Schritt 4).
+ */
 const JEDE_PERSON = 'tenant:read';
 
-/** Angemeldete Person; Maschinen-Clients haben keinen Eingang. */
-async function person(req: FastifyRequest): Promise<string> {
-  await req.need(JEDE_PERSON);
+type Person = (req: FastifyRequest) => Promise<string>;
+
+/** Angemeldete Person mit einer Rolle in der Organisation; Maschinen-Clients haben keinen Eingang. */
+const personOf = (deps: Deps): Person => async req => {
   const p = req.requirePrincipal();
+  if (!(await deps.iam.access.canSomewhere(p, JEDE_PERSON))) throw forbidden('Für den Eingang fehlt eine Rolle in dieser Organisation.');
   if (p.kind !== 'user') throw forbidden('Der Eingang gehört einer Person; Maschinen-Clients haben keinen.');
   return p.principalId;
-}
+};
 
 function aufgabeOut(r: store.AufgabeRow): AufgabeOut {
   return {
@@ -69,7 +74,8 @@ const datum = (iso: string) => { const [y, m, d] = iso.split('-'); return `${Num
 /** Kalendertag in Europe/Zurich (YYYY-MM-DD). */
 const heute = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(new Date());
 
-export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
+export function registerRoutes(app: FastifyInstance, deps: Deps): void {
+  const person = personOf(deps);
   for (const s of [Aufgabe, AufgabeList, AufgabeAnzahl, Mitteilung, MitteilungList, Stellvertretung, StellvertretungList, StellvertretungCreate]) app.addSchema(s);
 
   // ---- Aufgaben («Zu tun», BC AM.01.03, UX-E3)

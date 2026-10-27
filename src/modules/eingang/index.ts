@@ -5,6 +5,7 @@
  * immer in ihrer Transaktion (README.md).
  */
 import { defineModule } from '@vollholz/platform';
+import { eingangTools } from './mcp.ts';
 import { registerRoutes, TAG_EINGANG, TAG_MITTEILUNGEN, TAG_STELLVERTRETUNGEN } from './routes.ts';
 import { aktivierenJob } from './stellvertretung.ts';
 
@@ -20,4 +21,5 @@ export const eingangModule = defineModule({
   ],
   register: registerRoutes,
   jobs: [aktivierenJob],
+  mcpTools: eingangTools,
 });

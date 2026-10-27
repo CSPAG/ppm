@@ -2,11 +2,11 @@
  * Mandantentrennung direkt in PostgreSQL (Leitentscheidung L4, Spezifikation 5.3, 7): Die Datenbank selbst verhindert
  * Fremdzugriffe, auch wenn die Anwendung einen Fehler hätte.
  *
- * Vollständig gegen den Katalog: Jede Tabelle mit tenant_id steht in `TENANT_TABLES` (Tabellen der App, mit Testdaten
- * für die Matrix) oder in `KIT_TABLES` (Tabellen von @vollholz/iam, geprüft im Paket); jede Tabelle ohne tenant_id mit
- * Rechten der Laufzeit in `WITHOUT_TENANT`; jede Policy ausser tenant_isolation in `POLICIES`; jede SECURITY-DEFINER-
- * Funktion in `SECURITY_DEFINER`. Neue Tabellen, Policies oder Ausnahmen kommen mit Begründung hierher – sonst schlägt
- * der Test fehl.
+ * Vollständig gegen den Katalog: Jede Tabelle mit tenant_id steht in der Matrix ihres Moduls (`test/app/matrix/<modul>.ts`,
+ * mit Testdaten) oder in `KIT_TABLES` (Tabellen von @vollholz/iam, geprüft im Paket); jede Tabelle ohne tenant_id mit
+ * Rechten der Laufzeit in `WITHOUT_TENANT`; jede Policy ausser tenant_isolation in der Matrix ihres Moduls bzw. in
+ * `POLICIES` (Baukasten); jede SECURITY-DEFINER-Funktion in `SECURITY_DEFINER`. Neue Tabellen und Policies kommen in die
+ * Matrix des Moduls, Ausnahmen mit Begründung hierher – sonst schlägt der Test fehl.
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
@@ -16,51 +16,13 @@ import {
 } from '@vollholz/iam-testkit';
 import { withTenant, type Tx } from '@vollholz/platform';
 import { createTestDb, full, skipDb, tenant, type Harness } from './harness.ts';
+import { MATRIX } from './matrix/index.ts';
 
 const skip = await skipDb();
 const S = 'ppm';
 
-/** Tabellen der App mit tenant_id: je eine Zeile für den Mandanten anlegen (volle Sicht), liefert eine Bedingung auf sie. */
-const TENANT_TABLES: Record<string, (tx: Tx, tenantId: string) => Promise<string>> = {
-  job: async (tx, t) => { await tx.query("INSERT INTO ppm.job (tenant_id, kind) VALUES ($1, 'probe')", [t]); return "kind = 'probe'"; },
-  idempotency_key: async (tx, t) => {
-    await tx.query("INSERT INTO ppm.idempotency_key (tenant_id, principal_id, key, method, path, request_hash, expires_at) VALUES ($1, gen_random_uuid(), 'probe', 'POST', '/x', 'h', now() + interval '1 h')", [t]);
-    return "key = 'probe'";
-  },
-  outbox_event: async (tx, t) => { await tx.query("INSERT INTO ppm.outbox_event (tenant_id, type) VALUES ($1, 'probe.created')", [t]); return "type = 'probe.created'"; },
-  handlungsfeld: async (tx, t) => { await tx.query("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Probe')", [t]); return "label = 'Probe'"; },
-  handlungsfeld_version: async () => "label = 'Probe'",   // entsteht per Trigger mit dem Handlungsfeld
-  // Eingang (070_eingang): Schreiben nur über das Modul (app.eingang_intern), Personen als Principal
-  aufgabe: async (tx, t) => {
-    await tx.query("SELECT set_config('app.eingang_intern', 'on', true)");
-    await tx.query("INSERT INTO ppm.aufgabe (tenant_id, art, bezug_typ, bezug_id, empfaenger_recht, titel, link) VALUES ($1, 'probe.pruefen', 'probe', 'p', 'handlungsfeld:read', 'Probe', '/eingang')", [t]);
-    await tx.query("SELECT set_config('app.eingang_intern', '', true)");
-    return "titel = 'Probe'";
-  },
-  mitteilung: async (tx, t) => {
-    await tx.query("SELECT set_config('app.eingang_intern', 'on', true)");
-    await tx.query(`INSERT INTO ppm.mitteilung (tenant_id, empfaenger_person, bezug_typ, bezug_id, text)
-      SELECT $1, id, 'probe', 'p', 'Probe' FROM ppm.principal WHERE subject = 'probe-vertretene'`, [t]);
-    await tx.query("SELECT set_config('app.eingang_intern', '', true)");
-    return "text = 'Probe'";
-  },
-  stellvertretung: async (tx, t) => {
-    await tx.query(`INSERT INTO ppm.stellvertretung (tenant_id, vertretene_person, vertreter_person, von, bis)
-      SELECT $1, a.id, b.id, current_date, current_date + 7 FROM ppm.principal a, ppm.principal b
-       WHERE a.subject = 'probe-vertretene' AND b.subject = 'probe-vertreter'`, [t]);
-    return 'true';
-  },
-  webhook_subscription: async (tx, t) => {
-    await tx.query("INSERT INTO ppm.webhook_subscription (tenant_id, url, secret_enc, event_types) VALUES ($1, 'https://example.ch/probe', 'x', '{handlungsfeld.created}')", [t]);
-    return "url = 'https://example.ch/probe'";
-  },
-  webhook_delivery: async (tx, t) => {
-    await tx.query(`INSERT INTO ppm.webhook_delivery (tenant_id, subscription_id, event_id, event_type, event_data, event_created_at)
-      SELECT $1, s.id, e.id, e.type, e.data, e.created_at FROM ppm.webhook_subscription s, ppm.outbox_event e
-       WHERE s.url = 'https://example.ch/probe' AND e.type = 'probe.created'`, [t]);
-    return 'true';
-  },
-};
+/** Tabellen der App mit tenant_id je Modul (test/app/matrix/<modul>.ts): Testdaten und Bedingung auf die eigene Zeile. */
+const TENANT_TABLES = MATRIX.tables;
 
 /** Tabellen von @vollholz/iam mit tenant_id: RLS, Policies und Trennung prüft das Paket selbst (und die Prüfungen unten). */
 const KIT_TABLES = ['principal', 'authz_tuple', 'member_invitation', 'audit_log', 'audit_anchor', 'entra_connection', 'entra_consent', 'entra_consent_link'];
@@ -73,7 +35,7 @@ const WITHOUT_TENANT: Record<string, string> = {
   'ppm.replay_guard': 'Replay-Schutz (DPoP-Proofs, Logout-Tokens), nur Schlüssel und Ablauf',
 };
 
-/** Policies ausser tenant_isolation, so wie PostgreSQL sie ausgibt. */
+/** Policies ausser tenant_isolation, so wie PostgreSQL sie ausgibt: die des Baukastens hier, die der Module in ihrer Matrix. */
 const POLICIES = [
   // @vollholz/iam
   'ppm.tenant.tenant_self PERMISSIVE ALL ppm_app USING (id = app.tenant_id()) CHECK (id = app.tenant_id())',
@@ -81,34 +43,7 @@ const POLICIES = [
   'ppm.principal.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
   'ppm.authz_tuple.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
   'ppm.audit_log.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
-  // Scheduler (platform_001_core): lesen über alle Mandanten, schreiben ohne Kontext oder nur im gesetzten Mandanten
-  'ppm.job.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
-  'ppm.job.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',
-  'ppm.outbox_event.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
-  'ppm.outbox_event.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',
-  'ppm.idempotency_key.sched_cleanup PERMISSIVE DELETE ppm_sched USING (expires_at < now()) CHECK -',
-  'ppm.idempotency_key.sched_read PERMISSIVE SELECT ppm_sched USING (expires_at < now()) CHECK -',
-  // Lesesicht der Handlungsfelder (001_handlungsfeld): Recht an der Organisation
-  "ppm.handlungsfeld.handlungsfeld_read RESTRICTIVE SELECT ppm_app USING app.has_permission('handlungsfeld:read'::text) CHECK -",
-  "ppm.handlungsfeld.handlungsfeld_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('handlungsfeld:write'::text)",
-  "ppm.handlungsfeld.handlungsfeld_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('handlungsfeld:write'::text) CHECK app.has_permission('handlungsfeld:write'::text)",
-  "ppm.handlungsfeld.handlungsfeld_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('handlungsfeld:delete'::text) CHECK -",
-  "ppm.handlungsfeld_version.handlungsfeld_version_read RESTRICTIVE SELECT ppm_app USING app.has_permission('handlungsfeld:read'::text) CHECK -",
-  // Eingang (070_eingang): AUFGABE und EIGEN; Schreiben in Aufgaben und Mitteilungen nur über das Modul (app.eingang_intern)
-  "ppm.aufgabe.aufgabe_insert RESTRICTIVE INSERT ppm_app USING - CHECK (current_setting('app.eingang_intern'::text, true) = 'on'::text)",
-  "ppm.aufgabe.aufgabe_read RESTRICTIVE SELECT ppm_app USING ((current_setting('app.eingang_intern'::text, true) = 'on'::text) OR ((app.principal_id() IS NULL) AND app.write_all()) OR (empfaenger_person = app.principal_id()) OR ((empfaenger_recht IS NOT NULL) AND CASE ort_typ WHEN 'org'::text THEN app.has_permission(empfaenger_recht) ELSE app.has_permission(empfaenger_recht, ort_typ, ort_id) END) OR (EXISTS ( SELECT 1 FROM ppm.stellvertretung s WHERE ((s.tenant_id = aufgabe.tenant_id) AND (s.vertretene_person = aufgabe.empfaenger_person) AND (s.vertreter_person = app.principal_id()) AND ((((now() AT TIME ZONE 'Europe/Zurich'::text))::date >= s.von) AND (((now() AT TIME ZONE 'Europe/Zurich'::text))::date <= s.bis)))))) CHECK -",
-  "ppm.aufgabe.aufgabe_update RESTRICTIVE UPDATE ppm_app USING (current_setting('app.eingang_intern'::text, true) = 'on'::text) CHECK (current_setting('app.eingang_intern'::text, true) = 'on'::text)",
-  "ppm.mitteilung.mitteilung_insert RESTRICTIVE INSERT ppm_app USING - CHECK (current_setting('app.eingang_intern'::text, true) = 'on'::text)",
-  "ppm.mitteilung.mitteilung_read RESTRICTIVE SELECT ppm_app USING ((empfaenger_person = app.principal_id()) OR (current_setting('app.eingang_intern'::text, true) = 'on'::text) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -",
-  'ppm.mitteilung.mitteilung_update RESTRICTIVE UPDATE ppm_app USING (empfaenger_person = app.principal_id()) CHECK (empfaenger_person = app.principal_id())',
-  'ppm.stellvertretung.stellvertretung_delete RESTRICTIVE DELETE ppm_app USING ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -',
-  'ppm.stellvertretung.stellvertretung_insert RESTRICTIVE INSERT ppm_app USING - CHECK ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all()))',
-  'ppm.stellvertretung.stellvertretung_read RESTRICTIVE SELECT ppm_app USING ((vertretene_person = app.principal_id()) OR (vertreter_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -',
-  'ppm.stellvertretung.stellvertretung_update RESTRICTIVE UPDATE ppm_app USING ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all()))',
-  // Webhooks (002_webhooks): Zustellung über alle Mandanten im Worker
-  'ppm.webhook_delivery.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
-  'ppm.webhook_delivery.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',
-  'ppm.webhook_subscription.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
+  ...MATRIX.policies,
 ];
 
 /** SECURITY-DEFINER-Funktionen mit Begründung (alle aus @vollholz/iam; die App hat keine eigenen). */
@@ -146,8 +81,6 @@ describe('PostgreSQL RLS', { skip }, () => {
     A = await tenant(t.runtime, 'alpha');
     B = await tenant(t.runtime, 'beta');
     for (const id of [A, B]) {
-      await full(t.runtime, id, tx => tx.query(`INSERT INTO ppm.principal (tenant_id, kind, subject, display_name)
-        VALUES ($1, 'user', 'probe-vertretene', 'Probe'), ($1, 'user', 'probe-vertreter', 'Probe')`, [id]));
       await full(t.runtime, id, async tx => { for (const [name, seed] of Object.entries(TENANT_TABLES)) where[name] = await seed(tx, id); });
     }
   });
@@ -159,7 +92,7 @@ describe('PostgreSQL RLS', { skip }, () => {
         WHERE n.nspname = $1 AND c.relkind IN ('r', 'p') AND EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid = c.oid AND a.attname = 'tenant_id' AND NOT a.attisdropped)
         ORDER BY 1`, [S])).rows.map(r => r.t);
     const known = new Set([...Object.keys(TENANT_TABLES), ...KIT_TABLES]);
-    assert.deepEqual(tables.filter(x => !known.has(x)), [], 'neue Tabelle: in TENANT_TABLES aufnehmen (Testdaten)');
+    assert.deepEqual(tables.filter(x => !known.has(x)), [], 'neue Tabelle: in test/app/matrix/<modul>.ts aufnehmen (Testdaten)');
     assert.deepEqual([...known].filter(x => !tables.includes(x)), [], 'Eintrag ohne Tabelle');
     // RLS mit FORCE auf jeder dieser Tabellen
     const weak = (await t.inspect.query<{ t: string }>(

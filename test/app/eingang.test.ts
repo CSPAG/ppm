@@ -196,6 +196,21 @@ describe('Eingang', { skip }, () => {
     assert.equal(nach.rowCount, 0);
   });
 
+  test('nur Projektrolle: Eingang und Aufgaben an das Recht am Projekt', async () => {
+    const projekt = '22222222-2222-4222-8222-222222222222';
+    const pl = await login(api, 'demo', 'u-nur-pl', null);
+    await grant(api, tenantId, `user:${pl.principalId}`, 'pl', { type: 'projekt', id: projekt });
+    const h = { authorization: pl.authorization };
+    await sys(tx => aufgabe.oeffnen(tx, { art: 'kpi.erfassen', bezug: { typ: 'projekt', id: projekt }, empfaenger: { recht: 'kpi:write', ort: { typ: 'projekt', id: projekt } }, titel: 'KPI-Werte erfassen', link: '/projekte' }));
+    await sys(tx => aufgabe.oeffnen(tx, { art: 'kpi.erfassen', bezug: { typ: 'projekt', id: 'anderes' }, empfaenger: { recht: 'kpi:write', ort: { typ: 'projekt', id: '33333333-3333-4333-8333-333333333333' } }, titel: 'Anderes Projekt', link: '/projekte' }));
+    const r = await call('GET', '/v1/eingang', h);
+    assert.equal(r.statusCode, 200, r.body);
+    assert.deepEqual(r.json().items.map((a: { titel: string }) => a.titel), ['KPI-Werte erfassen']);
+    assert.equal((await call('GET', '/v1/stellvertretungen', h)).statusCode, 200);
+    await sys(tx => aufgabe.entfallen(tx, { art: 'kpi.erfassen', bezug: { typ: 'projekt', id: projekt } }));
+    await sys(tx => aufgabe.entfallen(tx, { art: 'kpi.erfassen', bezug: { typ: 'projekt', id: 'anderes' } }));
+  });
+
   test('Lesesicht: ohne das Modul kein Schreiben in Aufgaben und Mitteilungen', async () => {
     const id = await sys(tx => aufgabe.oeffnen(tx, { art: 'probe.rls', bezug: { typ: 'probe', id: 'r' }, empfaenger: { person: anna.id }, titel: 'RLS', link: '/eingang' }));
     await assert.rejects(sys(tx => tx.query("UPDATE ppm.aufgabe SET titel = 'x' WHERE id = $1 RETURNING id", [id]).then(r => { if (!r.rowCount) throw new Error('keine Zeile'); })));

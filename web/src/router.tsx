@@ -4,7 +4,7 @@
  */
 import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
-import { useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
@@ -218,7 +218,7 @@ function DashboardRoute() {
   const setSearch = useCallback<SetDashboardSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
   }, [navigate]);
-  return <DashboardPage search={search} setSearch={setSearch} />;
+  return <Suspense fallback={null}><DashboardPage search={search} setSearch={setSearch} /></Suspense>;
 }
 
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)

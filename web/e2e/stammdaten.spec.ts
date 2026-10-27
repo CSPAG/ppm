@@ -57,7 +57,7 @@ test('Codetabellen: Vorgabe laden, Wert hinzufügen, deaktivieren und rückgäng
   await page.getByRole('button', { name: 'Vorgabe laden' }).first().click();
   await expect(page.getByText(/Werte angelegt|bereits vollständig geladen/)).toBeVisible();
   await page.getByRole('button', { name: 'Trend', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Trend' }).getByRole('cell', { name: 'gleichbleibend', exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Trend' }).getByRole('cell', { name: 'gleichbleibend', exact: true }).first()).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 

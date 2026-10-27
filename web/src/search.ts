@@ -7,6 +7,7 @@ import { validateHandlungsfeldSearch, type HandlungsfeldSearch } from './feature
 import { validateProjekteSearch, type ProjekteSearch } from './features/projekt/index.ts';
 import { validatePhasenmodellSearch, type PhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { validatePortfoliosSearch, type PortfoliosSearch } from './features/portfolios/index.ts';
+import { validateSitzungSearch, type SitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
 import { validateZielSearch, type ZielSearch } from './features/ziele/index.ts';
@@ -25,3 +26,6 @@ export const searchOf = {
 
 export type { HandlungsfeldSearch, PhasenmodellSearch, PortfoliosSearch, ZielSearch };
 export type { HandlungsfeldSearch, PhasenmodellSearch, ProjekteSearch, ZielSearch };
+  sitzung: validateSitzungSearch,
+
+export type { HandlungsfeldSearch, PhasenmodellSearch, SitzungSearch, ZielSearch };

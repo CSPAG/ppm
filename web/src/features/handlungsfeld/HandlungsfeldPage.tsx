@@ -1,13 +1,19 @@
 /**
  * Seite «Handlungsfelder» im Arbeitsraum «Ziele» (BC ZM.01.01): Liste in ihrer Reihenfolge mit Suche und Cursor
- * («Mehr laden»), Schublade über `?o=`. Bearbeiten nach `can` der Antwort; «Neues Handlungsfeld» nur mit dem Recht.
+ * («Mehr laden») als Datenliste, Schublade über `?o=`. Bearbeiten nach `can` der Antwort; «Neues Handlungsfeld» nur mit dem Recht.
  */
 import { useEffect, useId, useState } from 'react';
 import { useSession } from '../../auth/index.ts';
-import { Empty, ErrorState, Icon, Loading, T } from '../../ui/index.ts';
-import { useHandlungsfeldList } from './api.ts';
+import { Datenliste, Icon, T, type Spalte } from '../../ui/index.ts';
+import { useHandlungsfeldList, type Handlungsfeld } from './api.ts';
 import { HandlungsfeldDrawer } from './HandlungsfeldDrawer.tsx';
 import type { HandlungsfeldSearch, SetHandlungsfeldSearch } from './search.ts';
+
+const SPALTEN: Spalte<Handlungsfeld>[] = [
+  { key: 'label', titel: T.handlungsfeld.label, art: 'name', zelle: h => h.label },
+  { key: 'leitsatz', titel: T.handlungsfeld.leitsatz, karte: true, zelle: h => h.leitsatz || <span className="empty">{T.handlungsfeld.noLeitsatz}</span> },
+  { key: 'stossrichtungen', titel: T.handlungsfeld.stossrichtungen, art: 'zahl', zelle: h => h.stossrichtungen.length },
+];
 
 export function HandlungsfeldPage({ search, setSearch }: { search: HandlungsfeldSearch; setSearch: SetHandlungsfeldSearch }) {
   const { can } = useSession();
@@ -45,30 +51,10 @@ export function HandlungsfeldPage({ search, setSearch }: { search: Handlungsfeld
         </label>
       </div>
       <div className="body">
-        {list.isPending ? <Loading /> : list.error ? <ErrorState error={list.error} onRetry={() => void list.refetch()} /> : items.length === 0 ? (
-          <Empty>{q ? T.handlungsfeld.emptySearch : T.handlungsfeld.empty}</Empty>
-        ) : (
-          <>
-            <table>
-              <caption className="sr">{T.handlungsfeld.title}</caption>
-              <thead><tr><th scope="col"><span className="th">{T.handlungsfeld.label}</span></th><th scope="col"><span className="th">{T.handlungsfeld.leitsatz}</span></th><th scope="col"><span className="th">{T.handlungsfeld.stossrichtungen}</span></th></tr></thead>
-              <tbody>
-                {items.map(h => (
-                  <tr key={h.id} className={search.o === h.id ? 'cur' : undefined} aria-current={search.o === h.id ? 'true' : undefined} onClick={() => setSearch({ o: h.id })}>
-                    <td className="nm"><button type="button" className="rowlink" onClick={e => { e.stopPropagation(); setSearch({ o: h.id }); }}>{h.label}</button></td>
-                    <td>{h.leitsatz || <span className="empty">{T.handlungsfeld.noLeitsatz}</span>}</td>
-                    <td className="num">{h.stossrichtungen.length}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {list.hasNextPage ? (
-              <div className="list-foot">
-                <button type="button" className="btn" onClick={() => void list.fetchNextPage()} disabled={list.isFetchingNextPage}>{T.common.more}</button>
-              </div>
-            ) : null}
-          </>
-        )}
+        <Datenliste<Handlungsfeld> titel={T.handlungsfeld.title} spalten={SPALTEN} zeilen={items} schluessel={h => h.id}
+          oeffnen={h => setSearch({ o: h.id })} aktuell={search.o} laedt={list.isPending} fehler={list.error} erneut={() => void list.refetch()}
+          leer={T.handlungsfeld.empty} gefiltert={!!q} leerGefiltert={T.handlungsfeld.emptySearch} zuruecksetzen={() => setText('')}
+          mehr={{ vorhanden: list.hasNextPage, laedt: list.isFetchingNextPage, laden: () => void list.fetchNextPage() }} />
       </div>
       {search.o ? <HandlungsfeldDrawer id={search.o} onClose={() => setSearch({ o: undefined })} onOpen={id => setSearch({ o: id }, { replace: true })} /> : null}
     </section>

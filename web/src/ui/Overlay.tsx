@@ -6,7 +6,7 @@
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from './Icon.tsx';
-import { T } from './texts.ts';
+import { T } from './texte/index.ts';
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const stack: HTMLElement[] = [];

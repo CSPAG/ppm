@@ -30,7 +30,9 @@ export function RoadmapPage({ search, setSearch, projektOeffnen }: RoadmapPagePr
   const vorschauAktiv = darfPublizieren && search.ansicht === 'vorschau' && jahr !== undefined;
   const vorschau = useRoadmapVorschau(jahr ?? 0, vorschauAktiv);
   const verzoegert = useVerzoegert(liste.isPending || roadmap.isPending);
-  const jahre = [...new Set([...(liste.data ?? []).map(r => r.jahr), ...(jahr ? [jahr] : [])])].sort((a, b) => b - a);
+  // Die UE wählt auch das Folgejahr, das noch nicht publiziert ist (Vorschau und Publikation, K6 Schritt 8)
+  const folgejahr = darfPublizieren ? [new Date().getFullYear() + 1] : [];
+  const jahre = [...new Set([...(liste.data ?? []).map(r => r.jahr), ...(jahr ? [jahr] : []), ...folgejahr])].sort((a, b) => b - a);
 
   return (
     <section aria-labelledby="page-title" className="rm">

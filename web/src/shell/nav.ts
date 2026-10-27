@@ -30,7 +30,9 @@ export const UNTEN_ANZAHL = 3;
 
 /** Bereich eines Arbeitsraums (I-N5: `/<arbeitsraum>/<bereich>`), sichtbar mit dem Recht irgendwo. */
 export interface BereichEintrag {
-  raum: ArbeitsraumId; pfad: string; label: string; recht: AppPermission;
+  raum: ArbeitsraumId; pfad: string; label: string;
+  /** Recht oder Liste von Rechten, von denen eines genügt. */
+  recht: AppPermission | readonly AppPermission[];
   /** Adressen mit Parametern, unter denen der Bereich aktiv ist (z. B. `/ziele/2026` für den Zielzyklus); ersetzt `pfad` als Prüfung. */
   muster?: RegExp;
 }
@@ -79,7 +81,7 @@ export function sichtbareRaeume(
 ): SichtbarerRaum[] {
   const alle: { raum: ArbeitsraumId; pfad: string; label: string; muster?: RegExp }[] = [
     ...verwalten.map(v => ({ raum: 'administration' as const, pfad: v.path, label: v.title })),
-    ...reg.bereiche.filter(b => darf(b.recht)),
+    ...reg.bereiche.filter(b => (typeof b.recht === 'string' ? [b.recht] : b.recht).some(darf)),
   ];
   return ARBEITSRAEUME.flatMap(r => {
     const bereiche = alle.filter(b => b.raum === r.id).map(b => ({ pfad: b.pfad, label: b.label, aktiv: b.muster ? b.muster.test(path) : liegtIn(path, b.pfad) }));

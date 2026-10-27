@@ -29451,7 +29451,7 @@ export interface paths {
         };
         /**
          * Auswahl für den Assistenten
-         * @description Handlungsfelder mit Leitsatz und ihren strategischen Zielen, aktive Bereiche und Herkunft (K4 Schritt 2) – mit `idee:create`, auch ohne Leserecht auf Ziele.
+         * @description Handlungsfelder mit Leitsatz und ihren strategischen Zielen, aktive Bereiche und Herkunft (K4 Schritt 2) – mit `idee:create` oder `idee:read` (Pool und Prüfung), auch ohne Leserecht auf Ziele.
          */
         get: {
             parameters: {

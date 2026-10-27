@@ -22,9 +22,11 @@ export interface ZieljahrRow {
 }
 export const ZJ_COLS = "id, jahr, stand, to_char(vorlage_bis, 'YYYY-MM-DD') AS vorlage_bis, vorgelegt_at, freigabe_at, freigabe_text, version, created_at, updated_at";
 
-export async function getJahr(tx: Tx, jahr: number, sperren = false): Promise<ZieljahrRow | null> {
-  // FOR SHARE: Vorlegen (AP-E6-2) wartet, bis laufende Änderungen an Jahreszielen abgeschlossen sind
-  return (await tx.query<ZieljahrRow>(`SELECT ${ZJ_COLS} FROM ${ZJ} WHERE jahr = $1${sperren ? ' FOR SHARE' : ''}`, [jahr])).rows[0] ?? null;
+export async function getJahr(tx: Tx, jahr: number, sperren: boolean | 'exklusiv' = false): Promise<ZieljahrRow | null> {
+  // FOR SHARE: Vorlegen (AP-E6-2) wartet, bis laufende Änderungen an Jahreszielen abgeschlossen sind;
+  // FOR UPDATE für Übergänge des Zieljahrs selbst (zwei gleichzeitige Übergänge: einer gewinnt, der andere 412 statt Deadlock)
+  const lock = sperren === 'exklusiv' ? ' FOR UPDATE' : sperren ? ' FOR SHARE' : '';
+  return (await tx.query<ZieljahrRow>(`SELECT ${ZJ_COLS} FROM ${ZJ} WHERE jahr = $1${lock}`, [jahr])).rows[0] ?? null;
 }
 
 export async function createJahr(tx: Tx, jahr: number, vorlageBis: string | null): Promise<ZieljahrRow> {

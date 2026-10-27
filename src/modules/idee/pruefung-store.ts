@@ -107,6 +107,11 @@ export async function pruefAngaben(tx: Tx, id: string) {
     `SELECT vorgesehener_sponsor, kategorie, kategorie_begruendung, portfolio_id FROM ${T} WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
+/** Sperrt die Idee bis zum Ende der Transaktion (Prüfhandlungen nacheinander). */
+export async function sperren(tx: Tx, id: string): Promise<void> {
+  await tx.query(`SELECT 1 FROM ${T} WHERE id = $1 FOR UPDATE`, [id]);
+}
+
 /** Setzt Felder der Idee ohne Versionsprüfung der Anfrage (die Route prüft `If-Match` vorher in derselben Transaktion). */
 export async function setzen(tx: Tx, id: string, felder: Record<string, unknown>): Promise<void> {
   const keys = Object.keys(felder);

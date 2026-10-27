@@ -13,9 +13,9 @@ import './idee.css';
 
 export function IdeeAnsicht({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
   const titleId = useId();
-  const { can } = useSession();
+  const { can, canSomewhere } = useSession();
   // Bezeichnungen des Strategiebezugs aus der Auswahl des Assistenten (auch ohne Leserecht auf Ziele)
-  const auswahl = useAuswahl(can('idee:create')).data;
+  const auswahl = useAuswahl(can('idee:create') || canSomewhere('idee:read')).data;
   const feld = auswahl?.handlungsfelder.find(h => h.id === idee.handlungsfeldId);
   const ziel = feld?.ziele.find(z => z.id === idee.strategischesZielId);
   const stufe = (s: string | null, t: string) => (s ? `${TI.stufen[s]}${t ? ` – ${t}` : ''}` : '');

@@ -30,7 +30,7 @@ export const navigation: NavRegistrierung = {
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
     { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
-    { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: 'idee:create' },
+    { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: ['idee:create', 'idee:read'] },
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite
     { raum: 'ziele', pfad: `/ziele/${new Date().getFullYear() + 1}`, label: zielzyklusTexte.bereich, recht: 'ziel:read', muster: /^\/ziele\/\d{4}\/?$/ },
     // Arbeitsraum «Ziele»: Handlungsfelder (BC ZM.01.01)

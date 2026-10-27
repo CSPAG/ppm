@@ -25,12 +25,12 @@ const FELDER = ['titel', 'ausgangslage', 'zielsetzung', 'handlungsfeld', 'strate
 
 export function PruefungPage({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
   const titleId = useId();
-  const { can } = useSession();
+  const { can, canSomewhere } = useSession();
   const toast = useToast();
   const p = usePruefung(idee.id);
   const write = can('idee:write');
   const aehnliche = useAehnliche(idee.id, write);
-  const auswahl = useAuswahl(can('idee:create')).data;
+  const auswahl = useAuswahl(can('idee:create') || canSomewhere('idee:read')).data;
   const m = usePruefungMutations(idee.id);
   const [dialog, setDialog] = useState<null | 'rueckfrage' | 'zurueckweisen' | { mit: Aehnlich }>(null);
   const fuehrendeNr = useIdeeNummer(idee.stand === 'zusammengefuehrt' ? idee.fuehrendeIdeeId : null).data;

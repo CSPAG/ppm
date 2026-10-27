@@ -63,6 +63,8 @@ describe('Projektidee einreichen', { skip }, () => {
       [['Patientenorientierung', 'Der Mensch im Mittelpunkt.', ['1.1']], ['Wirtschaftlichkeit', '', ['2.1']]]);
     assert.deepEqual(a.bereiche.map((x: { kuerzel: string }) => x.kuerzel), ['DPF']);
     assert.deepEqual(a.herkunft.map((x: { schluessel: string }) => x.schluessel), ['innovationsprozess', 'strategieprozess', 'bereich']);
+    // Pool und Prüfung (idee:read ohne idee:create) brauchen dieselben Bezeichnungen
+    assert.equal((await call('GET', '/v1/ideen/auswahl', ue)).statusCode, 200);
     assert.equal((await call('GET', '/v1/ideen/auswahl', nobody)).statusCode, 403);
   });
 

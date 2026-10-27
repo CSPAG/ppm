@@ -75,7 +75,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, _deps: Deps): void 
     await req.need('ziel:write');
     const who = actorOf(req);
     const row = await req.tx(async tx => {
-      const before = await zyklus.getJahr(tx, jahr, true);
+      const before = await zyklus.getJahr(tx, jahr, 'exklusiv');
       if (!before) throw notFound(`Zielzyklus ${jahr}`);
       if (before.version !== version) throw preconditionFailed(before.version);
       if (before.stand !== 'in_arbeit') throw conflict(`Die Jahresziele ${jahr} sind nicht in Arbeit und können nicht vorgelegt werden.`, { reason: 'stand', stand: before.stand });
@@ -109,7 +109,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, _deps: Deps): void 
     }
     const who = actorOf(req);
     const row = await req.tx(async tx => {
-      const before = await zyklus.getJahr(tx, jahr, true);
+      const before = await zyklus.getJahr(tx, jahr, 'exklusiv');
       if (!before) throw notFound(`Zielzyklus ${jahr}`);
       if (before.version !== version) throw preconditionFailed(before.version);
       if (before.stand !== 'zur_freigabe') throw conflict(`Die Jahresziele ${jahr} liegen dem VR nicht zur Freigabe vor.`, { reason: 'stand', stand: before.stand });

@@ -39,6 +39,8 @@ const titelVon = (r: store.Row) => r.titel || `Idee ${r.nummer}`;
 
 /** Idee für eine Prüfhandlung: vorhanden (sonst 404), Version per If-Match (412), Stand passend (409). */
 async function laden(tx: Tx, id: string, version: number, staende: readonly Stand[]): Promise<store.Row> {
+  // Zeile sperren: Version und Stand gelten bis zum Ende der Transaktion (parallele Prüfhandlungen mit demselben If-Match)
+  await ps.sperren(tx, id);
   const r = await store.get(tx, id);
   if (!r || r.stand === 'entwurf') throw notFound('Idee');
   if (r.version !== version) throw preconditionFailed(r.version);
@@ -273,6 +275,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     const who = actorOf(req);
     return req.tx(async tx => {
       const r = await laden(tx, id, version, ABSCHLIESSBAR);
+      await ps.sperren(tx, fuehrendeIdeeId);
       const f = await store.get(tx, fuehrendeIdeeId);
       if (!f || f.stand === 'entwurf') throw notFound('Führende Idee');
       if (!ABSCHLIESSBAR.includes(f.stand)) throw conflict('Die führende Idee ist nicht mehr offen.');

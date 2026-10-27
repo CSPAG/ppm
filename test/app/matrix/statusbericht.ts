@@ -35,7 +35,7 @@ export const matrix: Matrix = {
       const pf = (await tx.query<{ id: string }>(
         "INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'bericht', 'Bericht', true) RETURNING id", [t])).rows[0]!.id;
       return (await tx.query<{ id: string }>(
-        "INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, '2026-901', $2, $3, 'P1') RETURNING id", [t, mark, pf])).rows[0]!.id;
+        "INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, '2026-951', $2, $3, 'P1') RETURNING id", [t, mark, pf])).rows[0]!.id;
     });
     const s = await api.app.inject({ method: 'PUT', url: `/v1/projekte/${projekt}/berichte/${periode()}`, headers: { ...a, 'if-match': 'W/"0"' }, payload: { entscheide: mark } });
     assert.equal(s.statusCode, 200, s.body);
@@ -51,7 +51,7 @@ export const matrix: Matrix = {
   unchanged: async (api, a, mark) => {
     const t = await tenant(api.t.runtime, 'acme');
     const rows = await full(api.t.runtime, t, async tx => (await tx.query<{ entscheide: string; version: number; stand: string }>(
-      'SELECT b.entscheide, b.version, b.stand FROM ppm.statusbericht b JOIN ppm.projekt p ON p.id = b.projekt_id WHERE p.name = $1', [mark])).rows);
+      "SELECT b.entscheide, b.version, b.stand FROM ppm.statusbericht b JOIN ppm.projekt p ON p.id = b.projekt_id WHERE p.nummer = '2026-951' AND p.name = $1", [mark])).rows);
     assert.deepEqual(rows, [{ entscheide: mark, version: 1, stand: 'entwurf' }]);
     void a;
   },

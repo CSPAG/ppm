@@ -55,10 +55,11 @@ test('Statusbericht nur mit der Tastatur einreichen und rückgängig machen (K1-
   await tabTo(page, imPlan, 80);
   await page.keyboard.press('Space');
   interaktionen++;
-  const trend = page.getByRole('radio', { name: 'gleichbleibend' });
-  await tabTo(page, trend, 10);
-  await page.keyboard.press('Space');
+  // Tab hält in einer Optionsgruppe nur an der ersten Option (ohne Wahl); weiter mit den Pfeiltasten, die zugleich wählen
+  await tabTo(page, page.getByRole('radio', { name: 'aufwärts' }), 10);
+  await page.keyboard.press('ArrowDown');
   interaktionen++;
+  await expect(page.getByRole('radio', { name: 'gleichbleibend' })).toBeChecked();
   await expect(page.getByText('Alle Pflichtangaben sind erfasst.')).toBeVisible();
   await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
 
@@ -84,7 +85,8 @@ test('«Kritisch» sperrt das Einreichen ohne Begründung und Massnahme; dunkel 
   await page.getByRole('radio', { name: 'Kritisch' }).check();
   await expect(page.getByRole('alert').filter({ hasText: 'Begründung und Massnahme fehlen' })).toBeVisible();
   await page.getByRole('button', { name: 'Statusbericht einreichen' }).click();
-  await expect(page.getByText(/^Angaben fehlen: /)).toBeVisible();
+  // Sperre als Regelmeldung «Sperre: Angaben fehlen: …» (Hinweis mit Stufe vor dem Text, I-P1)
+  await expect(page.getByText(/Angaben fehlen: /)).toBeVisible();
   await page.emulateMedia({ colorScheme: 'dark' });
   await expectAccessible(page);
   await page.setViewportSize({ width: 360, height: 800 });

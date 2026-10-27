@@ -48,6 +48,7 @@ export const matrix: Matrix = {
     return {
       'GET /v1/projekte/:id/vertrag': f('GET', i => `/v1/projekte/${i.vertragProjekt}/vertrag`),
       'POST /v1/projekte/:id/vertrag/entwuerfe': f('POST', i => `/v1/projekte/${i.vertragProjekt}/vertrag/entwuerfe`, { body: { anlass: 'initial' } }),
+      'GET /v1/projekte/:id/vertrag/ziele': f('GET', i => `/v1/projekte/${i.vertragProjekt}/vertrag/ziele`),
       'GET /v1/vertragsversionen/:id': f('GET', v),
       'GET /v1/vertragsversionen/:id/kapitel/:nr': f('GET', i => `${v(i)}/kapitel/1`),
       'PUT /v1/vertragsversionen/:id/kapitel/:nr': f('PUT', i => `${v(i)}/kapitel/4`, { body: { inhalt: { loesungsansatz: 'gehackt', annahmen: '' } }, ifMatch: true }),

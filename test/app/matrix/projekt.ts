@@ -63,6 +63,8 @@ export const matrix: Matrix = {
     'GET /v1/projekte/:id': i => ({ method: 'GET', url: `/v1/projekte/${i.projekt}`, kind: 'foreign' }),
     'PATCH /v1/projekte/:id': i => ({ method: 'PATCH', url: `/v1/projekte/${i.projekt}`, body: { name: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'GET /v1/projekte/:id/organisation': i => ({ method: 'GET', url: `/v1/projekte/${i.projekt}/organisation`, kind: 'foreign' }),
+    // Übernahme (AP-E0-7): Prüflauf von B mit eigenem Portfolio, speichert nichts
+    'POST /v1/projekte/uebernahme': () => ({ method: 'POST', url: '/v1/projekte/uebernahme', body: { csv: 'Projektname;Projektphase\nProjekt B;P0', portfolio: 'transformation', speichern: false }, kind: 'create' }),
     'PUT /v1/projekte/:id/organisation': i => ({ method: 'PUT', url: `/v1/projekte/${i.projekt}/organisation`, body: { mitglieder: [] }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
   },
   unchanged: async (api, a, mark) => {

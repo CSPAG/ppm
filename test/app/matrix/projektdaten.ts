@@ -59,7 +59,10 @@ export const matrix: Matrix = {
   },
   policies: [
     // Muster KIND (fachmodell.md 3.4); KPI-Werte mit kpi:write
-    ...kind('meilenstein'), ...kind('kpi'), ...kind('kpi_wert', 'kpi:write'), ...kind('stakeholder'), ...kind('ressourcenbedarf'),
+    ...kind('meilenstein'), ...kind('kpi'), ...kind('kpi_wert', 'kpi:write'), ...kind('stakeholder'),
+    // Ressourcenbedarf: «gedeckt» führt auch das Modul ressource nach (350_zuteilung, AP-E7-2)
+    ...kind('ressourcenbedarf').filter(z => !z.includes('_update ')),
+    "ppm.ressourcenbedarf.ressourcenbedarf_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('ressource:write'::text)) CHECK (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('ressource:write'::text))",
     // Meldung: nur anhängen
     ...kind('meldung').slice(0, 2),
     // Abhängigkeit: sichtbar bei beiden Projekten
@@ -145,8 +148,8 @@ export const matrix: Matrix = {
     const texte = await full(api.t.runtime, t, async tx => (await tx.query<{ x: string }>(
       `SELECT x FROM (SELECT text || ':' || version AS x FROM ppm.meilenstein UNION ALL SELECT text || ':' || version || ':' || prognose FROM ppm.kosten
         UNION ALL SELECT text || ':' || version FROM ppm.risiko UNION ALL SELECT text || ':' || version FROM ppm.kpi
-        UNION ALL SELECT gruppe || ':' || version FROM ppm.stakeholder UNION ALL SELECT rolle || ':' || version FROM ppm.ressourcenbedarf
+        UNION ALL SELECT gruppe || ':' || version FROM ppm.stakeholder UNION ALL SELECT rolle || ':' || gedeckt FROM ppm.ressourcenbedarf
         UNION ALL SELECT kommentar || ':' || version || ':' || wert FROM ppm.kpi_wert UNION ALL SELECT text FROM ppm.meldung) s ORDER BY x`)).rows.map(r => r.x));
-    assert.deepEqual(texte, [`${mark}`, ...Array(5).fill(`${mark}:1`), `${mark}:1:1.0000`, `${mark}:1:1000.00`, 'pl:1'].sort());
+    assert.deepEqual(texte, [`${mark}`, ...Array(5).fill(`${mark}:1`), `${mark}:1:1.0000`, `${mark}:1:1000.00`, 'pl:true'].sort());
   },
 };

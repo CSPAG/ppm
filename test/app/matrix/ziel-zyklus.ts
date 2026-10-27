@@ -46,11 +46,11 @@ export const matrix: Matrix = {
     "ppm.hauptaktivitaet.hauptaktivitaet_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('ziel:write'::text)",
     "ppm.hauptaktivitaet.hauptaktivitaet_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('ziel:write'::text) CHECK app.has_permission('ziel:write'::text)",
     "ppm.hauptaktivitaet.hauptaktivitaet_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ziel:write'::text) CHECK -",
-    // Muster KIND: sichtbar mit dem Projekt
+    // Muster KIND: sichtbar mit dem Projekt; schreiben mit ziel:write oder projekt:write am Projekt (301)
     'ppm.ziel_projekt.ziel_projekt_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.ziel_projekt.ziel_projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id)",
-    "ppm.ziel_projekt.ziel_projekt_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) CHECK app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id)",
-    "ppm.ziel_projekt.ziel_projekt_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) CHECK -",
+    "ppm.ziel_projekt.ziel_projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id))",
+    "ppm.ziel_projekt.ziel_projekt_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id))",
+    "ppm.ziel_projekt.ziel_projekt_delete RESTRICTIVE DELETE ppm_app USING (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK -",
   ],
   seed: async (api, a, mark) => {
     const call = async (method: string, url: string, payload?: unknown) => {
@@ -72,6 +72,9 @@ export const matrix: Matrix = {
     const ha = await call('POST', '/v1/hauptaktivitaeten', { jahreszielId: jz.id, text: mark });
     // Projekt von A ohne Routen des Moduls projekt (Tabelle aus 010)
     const projekt = await full(api.t.runtime, t, async tx => {
+      // dasselbe Projekt wie matrix/projektdaten.ts, falls schon angelegt (Nummer eindeutig)
+      const da = (await tx.query<{ id: string }>('SELECT id FROM ppm.projekt WHERE name = $1', [mark])).rows[0];
+      if (da) return da.id;
       const pf = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'ziel-probe', $2, true) RETURNING id", [t, mark])).rows[0]!.id;
       return (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-901', $2, $3) RETURNING id", [t, mark, pf])).rows[0]!.id;
     });

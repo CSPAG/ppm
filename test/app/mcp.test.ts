@@ -60,6 +60,7 @@ describe('MCP-Dienst', { skip }, () => {
     // alphabetisch, eine Zeile je Werkzeug (konfliktarm für parallele Pakete)
     assert.deepEqual(tools.map(t => t.name).sort(), [
       'get_handlungsfeld',
+      'get_phasenmodell',
       'list_aufgaben',
       'list_handlungsfelder',
       'list_org_einheiten',

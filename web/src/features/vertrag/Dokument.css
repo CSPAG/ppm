@@ -1,0 +1,6 @@
+/* Dokumentausgabe (UI-11): Beschriftung, zwei Schaltflächen, Hinweis auf Personendaten (G12) */
+.dokument-ausgabe{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-left:auto}
+.dokument-ausgabe .dokument-t{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.dokument-ausgabe .dokument-acts{display:flex;gap:6px}
+.dokument-ausgabe p{margin:0}
+.dokument-ausgabe .hinweis{flex-basis:100%}

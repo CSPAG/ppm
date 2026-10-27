@@ -12,6 +12,8 @@ export const MATRIX = sammle([
   (await import('./projektdaten.ts')).matrix,
   (await import('./ziel.ts')).matrix,
   (await import('./vertrag.ts')).matrix,
+  (await import('./vertrag-dokument.ts')).matrix,
+  (await import('./vorlage.ts')).matrix,
   (await import('./vertrag-pruefung.ts')).matrix,
   (await import('./ziel-zyklus.ts')).matrix,
   (await import('./ziel-freigabe.ts')).matrix,

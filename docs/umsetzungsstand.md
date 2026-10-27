@@ -32,7 +32,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | in Arbeit (PR 1: 180, `pruefung*` im Modul `vertrag`: Quality-Check mit Kommentar je Kapitel, Unterschriften SP/PL/CTL mit Stellvertretung, Verweigern mit Begründung, Aufgaben; PR 2: Oberfläche UI-12 `/projekte/<nr>/vertrag/pruefen` und `…/unterzeichnen`, Aufgabe «Quality-Check» verweist auf die Prüfansicht) | #64, #75 | A-04, A-31 |
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
-| AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | offen | – | – |
+| AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | in Arbeit (Modul `vorlage` mit Grundbestand Projektvertrag nach Q7 und Ausgabe PDF/Word ohne Fremdbibliothek, `GET /v1/vorlagen`; `GET /v1/vertragsversionen/:id/dokument?format=pdf|docx`; Baustein `DokumentAusgabe` im Kopf der Projektakte › Vertrag, nachgeladen mit der Seite) | – | Format PDF und Word (Vorschlag K2, «Format offen»); Grundbestand als Vorlage im Code, ohne Tabelle `vorlage` (Hochladen, Fassungen und Feldzuordnung mit AP-E7-7, Migration 210–219 ungenutzt); Beträge ohne `finanzen:read` «nicht verfügbar» (A-33); Unterschriften in Kap. 12 «noch keine» bis AP-E3-2; Export im Audit (`vertrag.exported`) |
 | AP-E4-1 | Projektidee einreichen | 220–229 | umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`; Assistent, Meine Ideen, Ansicht, Rückfragen beantworten); offen: Kopfkarte «Ideen» auf der Startseite (Eintrag über Feature-Grenze), E2E bis CI läuft | #36, #50 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
@@ -79,7 +79,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.02.04 | Projektvertrag zurückziehen | 002 | E3 | AP-E3-1 | offen | – |
 | DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API, Prüfansicht UI-12) | – |
 | DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | – |
-| DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | offen | – |
+| DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | in Arbeit (API; «Als Dokument herunterladen» im Kopf der Projektakte › Vertrag) | – |
 | PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
 | PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
@@ -146,7 +146,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | umgesetzt | #19, #24 |
-| AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | offen | – |
+| AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | in Arbeit (Grundfunktion: Grundbestand Projektvertrag, Liste; Verwaltung mit AP-E7-7) | – |
 | AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks) | Gerüst (695ab82) |
 | AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | offen | – |
 

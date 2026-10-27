@@ -10,6 +10,7 @@
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
 import { baselineSetzen } from './baseline.ts';
+import { registerDokumentRoutes } from './dokument-routes.ts';
 import { entwurfsanlass } from './entwurf.ts';
 import { vertragTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
@@ -24,6 +25,7 @@ export const vertragModule = defineModule({
     registerRoutes(app, deps);
     registerZielauswahl(app, deps, TAG); // Ziele zur Wahl in Kap. 2 (PP.02.05)
     registerPruefungRoutes(app, deps);
+    registerDokumentRoutes(app, deps); // Dokumentausgabe Word/PDF (AP-E3-5)
   },
   mcpTools: { ...vertragTools },
 });

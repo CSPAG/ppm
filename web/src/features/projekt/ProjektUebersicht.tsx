@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { ErrorState, fmtPhase, Icon, Loading, type Phase } from '../../ui/index.ts';
 import { useOrganisation, useProjektNachNummer, type Organisation, type Projekt } from './api.ts';
 import { OrganisationDrawer } from './OrganisationDrawer.tsx';
+import { RegisterUebersicht } from './RegisterUebersicht.tsx';
 import { TP } from './texte.ts';
 
 const PHASEN = ['P0', 'P1', 'P2', 'P3', 'P4'] as const;
@@ -91,6 +92,7 @@ export function ProjektUebersicht({ nummer }: { nummer: string }) {
           </>
         )}
       </section>
+      <RegisterUebersicht projektId={p.id} />
       {bearbeiten && org.data ? <OrganisationDrawer projektId={p.id} titel={`${p.nummer} · ${p.name}`} geladen={org.data}
         neuLaden={async () => (await org.refetch()).data} onClose={() => setBearbeiten(false)} /> : null}
     </div>

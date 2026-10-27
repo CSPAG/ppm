@@ -7,6 +7,7 @@ import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
 import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
+import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -158,6 +159,7 @@ const routeTree = rootRoute.addChildren([
   eingangRoute,
   kontoRoute,
   stellvertretungRoute,
+  ...projekteRoutes(rootRoute),
   zieleRoute,
   handlungsfelderRoute,
   strategischeZieleRoute,

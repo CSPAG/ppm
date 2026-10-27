@@ -2738,6 +2738,1402 @@
           }
         }
       },
+      "Phasenmodell": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "stand",
+          "beschreibung",
+          "inKraftAb",
+          "inKraftVon",
+          "version",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "phasen",
+          "gates",
+          "kapitelWirkung",
+          "fristen",
+          "toleranzen",
+          "pruefung",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "minimum": 1,
+            "description": "Laufende Nummer der Version.",
+            "type": "integer"
+          },
+          "stand": {
+            "description": "Entwurf (bearbeitbar), in Kraft (gilt), abgelöst.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeloest"
+                ]
+              }
+            ]
+          },
+          "beschreibung": {
+            "description": "Was sich mit dieser Version ändert.",
+            "type": "string"
+          },
+          "inKraftAb": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inKraftVon": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Bearbeitungsstand (ETag).",
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phasen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code",
+                "name",
+                "position",
+                "ergebnisse",
+                "pflichtangaben"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code der Phase (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "PRE_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer"
+                },
+                "ergebnisse": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "art",
+                      "text"
+                    ],
+                    "properties": {
+                      "art": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "lieferergebnis"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "meilenstein"
+                            ]
+                          }
+                        ]
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "gates": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code",
+                "name",
+                "vonPhase",
+                "nachPhase",
+                "position",
+                "leitfragen",
+                "pflichtangaben"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code des Gates (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EINTRITT_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0_P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1_P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2_P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3_P4"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EXIT_P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "vonPhase": {
+                  "description": "Code der Phase (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "PRE_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P4"
+                      ]
+                    }
+                  ]
+                },
+                "nachPhase": {
+                  "anyOf": [
+                    {
+                      "description": "Code der Phase (fest).",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PRE_P0"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P0"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P1"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P2"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P3"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P4"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "position": {
+                  "type": "integer"
+                },
+                "leitfragen": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "wertestrom",
+                      "text"
+                    ],
+                    "properties": {
+                      "wertestrom": {
+                        "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                        "description": "Schlüssel des Werts in der Codetabelle «Werteströme».",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 1000,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "kapitelWirkung": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "dimension"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                  "type": "integer"
+                },
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "scope"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "budget"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ressourcen"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "fristen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "schluessel",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "schluessel": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_aufgabe"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_stichtag"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "gate_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sitzung_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "versand"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "protokoll"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "minimum": 0,
+                  "maximum": 365,
+                  "type": "integer"
+                },
+                "einheit": {
+                  "description": "Tag im Monat (Monatszyklus), Arbeitstage (Q8, UX-E11) oder Kalendertage.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "tag_im_monat"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "toleranzen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Standard für Projekte; ohne Wert keine Warnung «wesentlich» (A-10).",
+              "type": "object",
+              "required": [
+                "dimension",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "termin"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kosten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "umfang"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "prozent"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "pruefung": {
+            "description": "Prüfbericht (I-P4): Hinweise und Warnungen vor dem In-Kraft-Setzen.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "stufe",
+                "regel",
+                "text",
+                "ort"
+              ],
+              "properties": {
+                "stufe": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "hinweis"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "warnung"
+                      ]
+                    }
+                  ]
+                },
+                "regel": {
+                  "description": "Schlüssel der Regel.",
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "ort": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "art",
+                    "code"
+                  ],
+                  "properties": {
+                    "art": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "phase"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "gate"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "frist"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "toleranz"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "wirkung"
+                          ]
+                        }
+                      ]
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "description": "Was die anfragende Person damit darf (Recht und Stand).",
+            "type": "object",
+            "required": [
+              "write",
+              "activate"
+            ],
+            "properties": {
+              "write": {
+                "description": "Entwurf bearbeiten oder verwerfen.",
+                "type": "boolean"
+              },
+              "activate": {
+                "description": "Entwurf in Kraft setzen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PhasenmodellKurz": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "stand",
+          "beschreibung",
+          "inKraftAb",
+          "inKraftVon",
+          "version",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "minimum": 1,
+            "description": "Laufende Nummer der Version.",
+            "type": "integer"
+          },
+          "stand": {
+            "description": "Entwurf (bearbeitbar), in Kraft (gilt), abgelöst.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeloest"
+                ]
+              }
+            ]
+          },
+          "beschreibung": {
+            "description": "Was sich mit dieser Version ändert.",
+            "type": "string"
+          },
+          "inKraftAb": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inKraftVon": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Bearbeitungsstand (ETag).",
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PhasenmodellList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor",
+          "can"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhasenmodellKurz"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "create"
+            ],
+            "properties": {
+              "create": {
+                "description": "Entwurf anlegen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PhasenmodellCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "quelle": {
+            "description": "`aktuell`: Kopie der Version in Kraft (Standard, sofern vorhanden); `vorgabe`: Vorgabe des PM-Handbuchs.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "aktuell"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "vorgabe"
+                ]
+              }
+            ]
+          },
+          "beschreibung": {
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
+      "PhasenmodellPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "beschreibung": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "phasen": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code der Phase (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "PRE_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Bezeichnung in der Oberfläche.",
+                  "type": "string"
+                },
+                "ergebnisse": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "art",
+                      "text"
+                    ],
+                    "properties": {
+                      "art": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "lieferergebnis"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "meilenstein"
+                            ]
+                          }
+                        ]
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "gates": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code des Gates (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EINTRITT_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0_P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1_P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2_P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3_P4"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EXIT_P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Bezeichnung in der Oberfläche.",
+                  "type": "string"
+                },
+                "leitfragen": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "wertestrom",
+                      "text"
+                    ],
+                    "properties": {
+                      "wertestrom": {
+                        "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                        "description": "Schlüssel des Werts in der Codetabelle «Werteströme».",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 1000,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "kapitelWirkung": {
+            "maxItems": 39,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "dimension"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                  "type": "integer"
+                },
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "scope"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "budget"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ressourcen"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "fristen": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "schluessel",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "schluessel": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_aufgabe"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_stichtag"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "gate_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sitzung_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "versand"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "protokoll"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "minimum": 0,
+                  "maximum": 365,
+                  "type": "integer"
+                },
+                "einheit": {
+                  "description": "Tag im Monat (Monatszyklus), Arbeitstage (Q8, UX-E11) oder Kalendertage.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "tag_im_monat"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "toleranzen": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Standard für Projekte; ohne Wert keine Warnung «wesentlich» (A-10).",
+              "type": "object",
+              "required": [
+                "dimension",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "termin"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kosten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "umfang"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "prozent"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "StrategischesZiel": {
         "additionalProperties": false,
         "type": "object",
@@ -19830,6 +21226,788 @@
         }
       }
     },
+    "/v1/phasenmodelle": {
+      "get": {
+        "summary": "Versionen des Phasenmodells auflisten",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Neueste zuerst, Cursor-Paginierung.",
+        "parameters": [
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhasenmodellList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Entwurf anlegen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Kopie der Version in Kraft oder Vorgabe des PM-Handbuchs (ohne Version in Kraft immer die Vorgabe). Höchstens ein Entwurf; besteht einer, 409 mit seiner ID.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhasenmodellCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phasenmodelle/aktuell": {
+      "get": {
+        "summary": "Phasenmodell in Kraft lesen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Die Version, die für neue Projekte und das nächste Gate laufender Projekte gilt (A-13).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phasenmodelle/{id}": {
+      "get": {
+        "summary": "Version des Phasenmodells lesen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Mit Phasen, Gates, Leitfragen, Ergebnissen, Pflichtangaben, Kapitelwirkung, Fristen, Toleranzen und Prüfbericht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Entwurf ändern",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Nur mit `If-Match`. Jede angegebene Liste ersetzt die bisherige (je Phase bzw. Gate nur die genannten Teile). Versionen in Kraft oder abgelöst sind unveränderlich (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhasenmodellPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Entwurf verwerfen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Nur mit `If-Match` und nur als Entwurf; Versionen in Kraft oder abgelöst bleiben (409).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Verworfen"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phasenmodelle/{id}/in-kraft-setzen": {
+      "post": {
+        "summary": "Entwurf in Kraft setzen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "UC-017 Schritt 5: Der Entwurf gilt ab sofort für neue Projekte und für laufende ab ihrem nächsten Gate (A-13); die bisherige Version ist abgelöst. Nur mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/strategische-ziele": {
       "get": {
         "summary": "Strategische Ziele auflisten",
@@ -22753,6 +24931,10 @@
     {
       "name": "Handlungsfelder",
       "description": "Strategische Handlungsfelder mit Leitsatz und Stossrichtungen – oberste Ordnung für Ziele und Vorhaben."
+    },
+    {
+      "name": "Phasenmodell",
+      "description": "Phasen, Gates mit Leitfragen je Wertestrom, Standard-Ergebnisse, Pflichtangaben, Fristen und Toleranzen – versioniert, nach dem PM-Handbuch."
     },
     {
       "name": "Ziele",

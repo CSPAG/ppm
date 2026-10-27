@@ -5,12 +5,13 @@
  * `akteRoute`; der Rahmen erhält den Inhalt als Kind und kennt die Features nicht.
  */
 import { createRoute, Outlet, redirect, useNavigate, type AnyRoute } from '@tanstack/react-router';
-import { useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 import {
   MeineProjektePage, PROJEKTNUMMER, ProjektAkte, projektTexte, ProjektUebersicht, type ProjekteSearch, type Reiter, type SetProjekteSearch,
 } from '../features/projekt/index.ts';
 import { VertragPage, vertragTexte, type SetVertragSearch, type VertragSearch } from '../features/vertrag/index.ts';
 import { searchOf } from '../search.ts';
+import { Loading } from '../ui/index.ts';
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
@@ -62,7 +63,7 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     const setSearch = useCallback<SetVertragSearch>((next, o) => {
       void navigate({ search: (prev: VertragSearch) => ({ ...prev, ...next }), replace: o?.replace ?? false });
     }, [navigate]);
-    return <VertragPage nummer={nr} search={search} setSearch={setSearch} />;
+    return <Suspense fallback={<Loading />}><VertragPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
   }
 
   return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute])] as const;

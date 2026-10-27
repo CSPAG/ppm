@@ -41,7 +41,7 @@ export const TP = {
   keinePl: 'keine Projektleitung',
   // Projektakte (Rahmen)
   akte: {
-    reiter: 'Bereiche der Projektakte', uebersicht: 'Übersicht', zurueck: 'Zu den Projekten',
+    reiter: 'Bereiche der Projektakte', inhalt: 'Inhalt der Projektakte', uebersicht: 'Übersicht', zurueck: 'Zu den Projekten',
     nichtGefunden: 'Dieses Projekt gibt es nicht, oder Sie sehen es nicht.',
     beendet: (stand: string) => `Das Projekt ist ${stand}. Die Projektakte kann nur noch gelesen werden.`,
     sistiert: 'Das Projekt ist sistiert. Es wird mit einem Entscheid des Gremiums wieder aufgenommen.',

@@ -58,14 +58,16 @@ export async function get(tx: Tx, id: string): Promise<Row | null> {
 /**
  * Nächste Nummer «JJJJ-NNN» im Jahr der Anlage (Zeitzone der Organisation, A-47). Die Sperre in der fachlichen
  * Transaktion reiht Anlagen derselben Organisation und desselben Jahres; die Zählung mit voller Sicht (eigene
- * Transaktion) sieht auch Projekte, die die Person nicht lesen darf, und liefert nur die Nummer zurück.
+ * Transaktion) sieht auch Projekte, die die Person nicht lesen darf, und liefert nur die Nummer zurück. Projekte, die
+ * diese Transaktion schon angelegt hat (Übernahme mehrerer Zeilen), sieht nur sie selbst: darum zählt auch sie.
  */
 export async function naechsteNummer(tx: Tx, ctx: { db: Db; tenantId: string }): Promise<string> {
   const jahr = (await tx.query<{ j: number }>("SELECT extract(year FROM now() AT TIME ZONE 'Europe/Zurich')::int AS j")).rows[0]!.j;
   await tx.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`ppm:projekt-nummer:${ctx.tenantId}:${jahr}`]);
-  const letzte = await fullTx(ctx.db, ctx.tenantId, async full => (await full.query<{ n: number | null }>(
-    `SELECT max(split_part(nummer, '-', 2)::int) AS n FROM ${T} WHERE nummer LIKE $1`, [`${jahr}-%`])).rows[0]!.n ?? 0);
-  return `${jahr}-${String(letzte + 1).padStart(3, '0')}`;
+  const max = `SELECT max(split_part(nummer, '-', 2)::int) AS n FROM ${T} WHERE nummer LIKE $1`;
+  const alle = await fullTx(ctx.db, ctx.tenantId, async full => (await full.query<{ n: number | null }>(max, [`${jahr}-%`])).rows[0]!.n ?? 0);
+  const eigene = (await tx.query<{ n: number | null }>(max, [`${jahr}-%`])).rows[0]!.n ?? 0;
+  return `${jahr}-${String(Math.max(alle, eigene) + 1).padStart(3, '0')}`;
 }
 
 /** Legt an und liefert die ID; ohne RETURNING, damit ein Projekt, das die Person danach nicht lesen darf, kein RLS-Fehler ist. */

@@ -18,8 +18,8 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | offen | – | – |
 | AP-E0-6 | Register Projektdaten | 060–069 | offen | – | – |
-| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | offen | – | – |
-| AP-E0-9 | Strategische Ziele | 080–089 | PR 1 umgesetzt (080, Modul `ziel`, `list_ziele`); PR 2 Oberfläche in Arbeit | #13 | A-15 |
+| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche in Arbeit | #22 | A-31, A-44 |
+| AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | offen | – | – |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
@@ -41,7 +41,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | offen | – | – |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
-| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | offen | – | – |
+| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Oberfläche UI-38 und Aufgabe «Jahresziele vervollständigen» folgt) | – | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1 |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
 | AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
@@ -61,11 +61,11 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | BC | Business Case | UC | Etappe | Arbeitspaket | Stand | PR |
 |---|---|---|---|---|---|---|
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
-| ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | API umgesetzt (Schritt 2), Oberfläche in Arbeit | #13 |
-| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | offen | – |
+| ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
+| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
-| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | offen | – |
-| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | offen | – |
+| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
+| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
@@ -86,7 +86,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | offen | – |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | offen | – |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus in Arbeit (AP-E6-1); aus Vertrag Kap. 2 offen (AP-E3-1) | – |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
@@ -141,7 +141,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | offen | – |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
-| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | offen | – |
+| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit | – |
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | offen | – |
@@ -200,4 +200,5 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, «Sie» | Zielgrössen |
 |---|---|---|---|---|---|---|---|
+| #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | ohne Befund (E2E hell, dunkel; jsdom) | 360 px ohne Überlauf (E2E «schmal»); 768/1440 nicht eigens geprüft | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
 | #26 | AP-E0-2 | Liste + Schublade (UI-44, UI-45); Z1–Z3, Z5, Z7, Z8, Z10 | ja (Vitest, E2E) | ja (Vitest, E2E) | 360 px im E2E | ja (`features/stammdaten/texte.ts`) | keine im Ablauf |

@@ -98,7 +98,7 @@ export function PruefungPage({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
           </section>
 
           <Leitfragen pruefung={item} etag={etag} titleId={titleId} speichern={(body, ok) => m.leitfragen.mutate({ etag, body }, { onSuccess: ok, onError: fehler })} busy={m.leitfragen.isPending} />
-          <Raster pruefung={item} titleId={titleId} setzen={(kriterium, einschaetzung) => m.raster.mutate({ etag, body: { raster: [{ kriterium, einschaetzung }] } }, { onError: fehler })} />
+          <Raster key={JSON.stringify(item.raster)} pruefung={item} titleId={titleId} setzen={(kriterium, einschaetzung) => m.raster.mutate({ etag, body: { raster: [{ kriterium, einschaetzung }] } }, { onError: fehler })} />
           <KategorieWahl pruefung={item} titleId={titleId} busy={m.kategorie.isPending}
             zuordnen={body => m.kategorie.mutate({ etag, body }, { onSuccess: () => toast.show(TP.gespeichert), onError: fehler })} />
         </div>
@@ -179,6 +179,8 @@ function Leitfragen({ pruefung, titleId, speichern, busy }: {
 function Raster({ pruefung, titleId, setzen }: { pruefung: Pruefung; titleId: string; setzen(kriterium: Pruefung['raster'][number]['kriterium'], e: Stufe | null): void }) {
   const id = useId();
   const darf = pruefung.can.pruefen;
+  // Wahl sofort anzeigen (I-R2 optimistisch); die Antwort des Servers setzt den Abschnitt neu (Schlüssel im Aufruf)
+  const [wahl, setWahl] = useState<Record<string, Stufe | null>>(() => Object.fromEntries(pruefung.raster.map(r => [r.kriterium, r.einschaetzung])));
   return (
     <section aria-labelledby={`${titleId}-r`} className="idee-abschnitt">
       <h2 id={`${titleId}-r`}>{TP.raster}</h2>
@@ -190,7 +192,7 @@ function Raster({ pruefung, titleId, setzen }: { pruefung: Pruefung; titleId: st
             <div className="idee-stufen" role="radiogroup" aria-label={TP.kriterien[r.kriterium]}>
               {STUFEN.map(s => (
                 <label key={s} className="idee-wahl">
-                  <input type="radio" name={`${id}-${r.kriterium}`} value={s} checked={r.einschaetzung === s} disabled={!darf} onChange={() => setzen(r.kriterium, s)} />
+                  <input type="radio" name={`${id}-${r.kriterium}`} value={s} checked={wahl[r.kriterium] === s} disabled={!darf} onChange={() => { setWahl(w => ({ ...w, [r.kriterium]: s })); setzen(r.kriterium, s); }} />
                   <span>{TP.stufen[s]}</span>
                 </label>
               ))}

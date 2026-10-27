@@ -200,6 +200,8 @@ export const model = defineModel({
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
     // portfolio
     list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
+    // ziel
+    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },
   features: { audit: true },
 });

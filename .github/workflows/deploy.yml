@@ -1,0 +1,93 @@
+# Deploy auf die Hetzner App-VM (deploy/hetzner/rollout.sh). Nur von Hand, mit Freigabe im Environment «production».
+# Aktionen: deploy (Image mit Digest aus «CI»), rollback, maintenance-on, maintenance-off, status.
+#
+# Environment «production»: Secrets DEPLOY_SSH_KEY, SOPS_AGE_KEY; Variablen APP_HOST (deploy@<app-vm>),
+# DEPLOY_KNOWN_HOSTS (ssh-keyscan), ACME_EMAIL. Einrichtung: deploy/hetzner/README.md.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Aktion
+        type: choice
+        options: [status, deploy, rollback, maintenance-on, maintenance-off]
+        default: status
+      image:
+        description: "Nur deploy: Image mit Digest (ghcr.io/cspag/ppm@sha256:…)"
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  rollout:
+    name: ${{ inputs.action }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://ppm.project-suite.ch
+    permissions:
+      contents: read
+      packages: read
+      id-token: write # Signatur des Images prüfen (cosign verify, keyless)
+    env:
+      APP_HOST: ${{ vars.APP_HOST }}
+      ACME_EMAIL: ${{ vars.ACME_EMAIL }}
+      IMAGE: ${{ inputs.image }}
+      SOPS_VERSION: v3.13.3
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - name: Eingaben prüfen
+        if: inputs.action == 'deploy'
+        run: |
+          echo "$IMAGE" | grep -Eq '^ghcr\.io/cspag/ppm@sha256:[a-f0-9]{64}$' \
+            || { echo "::error::Image mit Digest angeben (ghcr.io/cspag/ppm@sha256:…)"; exit 1; }
+      - uses: sigstore/cosign-installer@v4.1.2
+        if: inputs.action == 'deploy'
+      - name: Signatur und Herkunft des Images prüfen
+        if: inputs.action == 'deploy'
+        run: |
+          cosign verify "$IMAGE" \
+            --certificate-identity-regexp '^https://github\.com/CSPAG/ppm/\.github/workflows/ci\.yml@refs/(heads/main|tags/v.+)$' \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com > /dev/null
+      - name: SOPS installieren
+        if: inputs.action == 'deploy'
+        run: |
+          curl -fsSLo /usr/local/bin/sops "https://github.com/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux.amd64"
+          chmod +x /usr/local/bin/sops
+      - name: SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 0700 ~/.ssh
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)" >/dev/null && echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+          printf '%s\n' "$DEPLOY_SSH_KEY" | ssh-add - >/dev/null
+      - name: ${{ inputs.action }}
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+          ACTION: ${{ inputs.action }}
+        run: |
+          if [ "$ACTION" = deploy ]; then deploy/hetzner/rollout.sh deploy "$IMAGE"; else deploy/hetzner/rollout.sh "$ACTION"; fi \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Rauchtest von aussen
+        if: inputs.action == 'deploy' || inputs.action == 'rollback'
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://ppm.project-suite.ch/v1/openapi.json) && [ "$code" = 200 ] && exit 0
+            sleep 2
+          done
+          echo "::error::https://ppm.project-suite.ch/v1/openapi.json antwortet nicht mit 200"; exit 1

@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ppm-api
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: ppm-api } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ppm-mcp
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: ppm-mcp } }

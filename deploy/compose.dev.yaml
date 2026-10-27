@@ -1,0 +1,66 @@
+# Lokale Abhängigkeiten für die Entwicklung: PostgreSQL 17, Keycloak 26 (Dev-Modus) und Mailpit (SMTP-Testserver),
+# nur auf 127.0.0.1.
+#
+#   npm run dev:up      (= docker compose --env-file .env -f deploy/compose.dev.yaml up -d --wait)
+#
+# Passwörter kommen aus der .env im Hauptverzeichnis (npm run dev:env erzeugt sie zufällig). Die Rollen der App legt
+# das Init-Skript beim ersten Start aus db/bootstrap.sql an (ppm_owner, _app, _sched, _runtime, _worker).
+# Daten liegen in benannten Volumes; npm run dev:down -- -v setzt alles zurück.
+name: ppm-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?POSTGRES_SUPERUSER_PASSWORD fehlt (npm run dev:env)}
+      DB_OWNER_PASSWORD: ${DB_OWNER_PASSWORD:?DB_OWNER_PASSWORD fehlt (npm run dev:env)}
+      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD:?DB_RUNTIME_PASSWORD fehlt (npm run dev:env)}
+      DB_WORKER_PASSWORD: ${DB_WORKER_PASSWORD:?DB_WORKER_PASSWORD fehlt (npm run dev:env)}
+    # Statement-Log für langsame Abfragen hilft beim Entwickeln; Rollen und RLS wie in Produktion
+    command: ["postgres", "-c", "log_min_duration_statement=500", "-c", "max_connections=200"]
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../db/bootstrap.sql:/bootstrap/bootstrap.sql:ro
+      - ./dev/postgres-init.sh:/docker-entrypoint-initdb.d/10-ppm.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ppm"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b
+    restart: unless-stopped
+    command: ["start-dev", "--http-port=8180", "--health-enabled=true", "--features=organization"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD fehlt (npm run dev:env)}
+      KC_HOSTNAME: http://localhost:8180
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "127.0.0.1:${KEYCLOAK_PORT:-8180}:8180"
+    volumes:
+      - kcdata:/opt/keycloak/data
+    healthcheck:
+      # Das Image hat kein curl: Bash-/dev/tcp gegen den Management-Port (9000, /health/ready)
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
+
+  # Fängt alle E-Mails ab (MAIL_ADAPTER=smtp, SMTP_URL=smtp://localhost:1025, SMTP_ALLOW_INSECURE=true aus npm run dev:env);
+  # Ansicht unter http://localhost:8025
+  mailpit:
+    image: ghcr.io/axllent/mailpit:v1.32.0@sha256:0790692be935ea4420d085694f7985b1f692ca6a8771ab0e0bd8ba75ac180498
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
+
+volumes:
+  pgdata:
+  kcdata:

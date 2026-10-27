@@ -1,0 +1,61 @@
+# Das gebaute Image lokal gegen die Entwicklungs-Abhängigkeiten (compose.dev.yaml) starten – Rauchtest vor dem Push:
+#
+#   docker build --secret id=npmrc,src=$HOME/.npmrc -t ppm:local .
+#   docker compose --env-file .env -f deploy/compose.dev.yaml -f deploy/compose.image.yaml up -d --wait
+#
+# Werte aus der .env (npm run dev:env); Dienste sprechen PostgreSQL und Keycloak über das Compose-Netz an.
+services:
+  migrate:
+    image: ${IMAGE:-ppm:local}
+    command: ["migrate"]
+    environment:
+      NODE_ENV: development
+      DATABASE_ADMIN_URL: postgres://ppm_owner:${DB_OWNER_PASSWORD}@postgres:5432/ppm
+      OIDC_ISSUER_URL: http://localhost:8180/realms/ppm
+    depends_on:
+      postgres: { condition: service_healthy }
+    read_only: true
+    restart: "no"
+
+  api:
+    image: ${IMAGE:-ppm:local}
+    command: ["api"]
+    env_file: [../.env]
+    environment:
+      DATABASE_URL: postgres://ppm_runtime:${DB_RUNTIME_PASSWORD}@postgres:5432/ppm
+      DATABASE_ADMIN_URL: ""
+      DATABASE_WORKER_URL: ""
+    ports: ["127.0.0.1:8090:8080"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      keycloak: { condition: service_healthy }
+    read_only: true
+    tmpfs: [/tmp]
+
+  worker:
+    image: ${IMAGE:-ppm:local}
+    command: ["worker"]
+    env_file: [../.env]
+    environment:
+      DATABASE_URL: ""
+      DATABASE_ADMIN_URL: ""
+      DATABASE_WORKER_URL: postgres://ppm_worker:${DB_WORKER_PASSWORD}@postgres:5432/ppm
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    read_only: true
+    tmpfs: [/tmp]
+
+  mcp:
+    image: ${IMAGE:-ppm:local}
+    command: ["mcp"]
+    env_file: [../.env]
+    environment:
+      DATABASE_URL: ""
+      DATABASE_ADMIN_URL: ""
+      DATABASE_WORKER_URL: ""
+      MCP_API_URL: http://api:8080
+    ports: ["127.0.0.1:8091:8081"]
+    depends_on:
+      api: { condition: service_healthy }
+    read_only: true
+    tmpfs: [/tmp]

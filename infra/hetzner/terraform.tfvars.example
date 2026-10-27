@@ -1,0 +1,9 @@
+# Als terraform.tfvars kopieren (nicht versionieren, keine Geheimnisse hier).
+location        = "nbg1"
+app_server_type = "cx32"
+db_server_type  = "cx32"
+db_volume_size  = 40
+admin_cidrs     = [] # z. B. ["203.0.113.10/32"]
+ssh_keys = {
+  # "vorname" = "ssh-ed25519 AAAA… vorname@laptop"
+}

@@ -1,0 +1,26 @@
+# Variablen ohne Geheimnis (Liste: docs/konfiguration.md). Overlay überschreibt Adressen je Umgebung.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ppm-config
+data:
+  NODE_ENV: production
+  PUBLIC_BASE_URL: https://ppm.project-suite.ch
+  OIDC_ISSUER_URL: https://identity.project-suite.ch/realms/ppm
+  DATABASE_SSL: verify-full
+  KEYCLOAK_MGMT_CLIENT_ID: ppm-admin
+  KEYCLOAK_SYNC_CLIENT_ID: ppm-sync
+  MCP_PUBLIC_URL: https://ppm.project-suite.ch/mcp
+  MCP_API_URL: http://ppm-api:8080
+  HTTP_PORT: "8080"
+  MCP_PORT: "8081"
+  OPS_PORT: "9090"
+  TRUST_PROXY: "1"
+  SHARED_STATE: postgres
+  SHUTDOWN_DELAY: 5s
+  SHUTDOWN_TIMEOUT: 25s
+  METRICS_ENABLED: "true"
+  # E-Mail (createMailer): aus, bis ein Mailserver eingerichtet ist; für smtp im Secret ppm-worker den Schlüssel
+  # smtp_url füllen (MAIL_FROM und SMTP_URL_FILE setzt nur worker.yaml)
+  MAIL_ADAPTER: aus
+  LOG_LEVEL: info

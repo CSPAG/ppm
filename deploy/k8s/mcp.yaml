@@ -1,0 +1,78 @@
+# MCP-Dienst: Client der REST-API, ohne Datenbank-Login
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ppm-mcp
+  labels: { app.kubernetes.io/name: ppm-mcp, app.kubernetes.io/component: mcp }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: ppm-mcp }
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: ppm-mcp, app.kubernetes.io/component: mcp }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: /metrics
+    spec:
+      serviceAccountName: ppm
+      # > SHUTDOWN_DELAY (5s) + SHUTDOWN_TIMEOUT (25s)
+      terminationGracePeriodSeconds: 40
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: mcp
+          image: ppm
+          args: ["mcp"]
+          envFrom: [{ configMapRef: { name: ppm-config } }]
+          env:
+            - { name: OTEL_SERVICE_NAME, value: ppm-mcp }
+            - { name: MCP_PRIVATE_KEY_FILE, value: /run/secrets/mcp_private_key }
+            - { name: MCP_DPOP_KEY_FILE, value: /run/secrets/mcp_dpop_key }
+          ports:
+            - { name: http, containerPort: 8081 }
+            - { name: ops, containerPort: 9090 }
+          readinessProbe:
+            httpGet: { path: /readyz, port: ops }
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 15
+            failureThreshold: 4
+          startupProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 2
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: secrets, mountPath: /run/secrets, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - { name: secrets, secret: { secretName: ppm-mcp, defaultMode: 0400 } }
+        - { name: tmp, emptyDir: { medium: Memory, sizeLimit: 64Mi } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ppm-mcp
+  labels: { app.kubernetes.io/name: ppm-mcp }
+spec:
+  selector: { app.kubernetes.io/name: ppm-mcp }
+  ports:
+    - { name: http, port: 8081, targetPort: http }

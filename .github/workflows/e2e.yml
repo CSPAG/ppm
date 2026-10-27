@@ -1,0 +1,102 @@
+# End-to-End (Playwright, nur Chromium) gegen den echten Stack, wie lokal mit `npm run dev:setup` und `npm run e2e`:
+#   deploy/compose.dev.yaml   PostgreSQL 17 (Rollen, Datenbank ppm_e2e), Keycloak 26.8.1 (start-dev), Mailpit
+#   scripts/e2e.sh            Migrationen, Realm mit Organisationen und Testpersonen je Rolle (scripts/keycloak-setup.ts),
+#                             API mit dem Build der Webapp und Worker, dann web/e2e/ in den Projekten hell, dunkel, 360 px
+# Wegwerf-Instanzen mit Zufallsgeheimnissen aus `npm run dev:env`; keine Secrets ausser dem Lesetoken für @vollholz/*.
+# Bei Fehlern: Spuren und Bildschirmfotos (web/test-results), Protokolle von API, Worker und Keycloak als Artefakt.
+name: E2E
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+      - "src/**"
+      - "shared/**"
+      - "db/**"
+      - "scripts/**"
+      - "infra/keycloak/**"
+      - "deploy/compose.dev.yaml"
+      - "deploy/dev/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".nvmrc"
+      - ".github/workflows/e2e.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "src/**"
+      - "shared/**"
+      - "db/**"
+      - "scripts/**"
+      - "infra/keycloak/**"
+      - "deploy/compose.dev.yaml"
+      - "deploy/dev/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".nvmrc"
+      - ".github/workflows/e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # wie in ci.yml (docs/identity-kit.md)
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_READ_TOKEN || secrets.GITHUB_TOKEN }}
+
+jobs:
+  e2e:
+    name: E2E (Playwright, Chromium)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://npm.pkg.github.com
+          scope: "@vollholz"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+      - name: Stack (PostgreSQL, Keycloak, Mailpit) im Hintergrund starten
+        run: |
+          npm run dev:env
+          docker compose --env-file .env -f deploy/compose.dev.yaml up -d
+      - run: npm ci
+      - run: npm run web:install
+      - run: npm run web:build
+      - name: Chromium für Playwright
+        working-directory: web
+        run: npx playwright install --with-deps --only-shell chromium
+      - name: Stack bereit
+        run: docker compose --env-file .env -f deploy/compose.dev.yaml up -d --wait --wait-timeout 300
+      - name: npm run e2e
+        run: npm run e2e
+      - name: Protokolle von Keycloak und PostgreSQL
+        if: failure()
+        run: |
+          mkdir -p .local/e2e
+          tail -n 80 .local/e2e/api.log 2>/dev/null || true
+          docker compose --env-file .env -f deploy/compose.dev.yaml logs --no-color keycloak postgres > .local/e2e/stack.log 2>&1 || true
+      - uses: actions/upload-artifact@v7.0.1
+        if: failure()
+        with:
+          name: e2e-ergebnisse
+          path: |
+            web/test-results
+            .local/e2e
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true

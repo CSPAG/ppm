@@ -1,0 +1,17 @@
+# SOPS: Verschlüsselung der Geheimnisse im Repository (age). Empfänger = öffentliche age-Schlüssel der Betriebspersonen
+# und der des Deploy-Workflows (Secret SOPS_AGE_KEY im Environment «production»).
+#
+# Einrichten (deploy/hetzner/README.md › Schritt 5):
+#   age-keygen -o ~/.config/sops/age/keys.txt        # je Person; öffentlicher Teil «age1…» unten eintragen
+#   age-keygen -o deploy-key.txt                      # Deploy-Workflow; Inhalt als Secret SOPS_AGE_KEY, Datei löschen
+# Nach jeder Änderung der Empfänger: sops updatekeys deploy/hetzner/secrets.sops.yaml
+#
+# PLATZHALTER: Die Empfänger unten sind noch nicht gesetzt (neues Hetzner-Projekt, offener Punkt).
+creation_rules:
+  - path_regex: ^deploy/hetzner/secrets\.sops\.yaml$
+    age: >-
+      age1PLATZHALTER_BETRIEB_PERSON_1,
+      age1PLATZHALTER_DEPLOY_WORKFLOW
+  - path_regex: ^infra/.*\.sops\.(yaml|json)$
+    age: >-
+      age1PLATZHALTER_BETRIEB_PERSON_1

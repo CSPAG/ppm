@@ -1,0 +1,30 @@
+# Kustomize-Basis für Kubernetes: api, worker, mcp, Migrations-Job, NetworkPolicy, Ingress.
+# Ein Overlay je Umgebung setzt Image-Digest (images:), Host, Secrets und ConfigMap-Werte:
+#
+#   kustomize build deploy/k8s | kubeconform -strict -summary
+#
+# Secrets (je Dienst getrennt) liefert das Overlay, z. B. über SOPS/External Secrets: ppm-api,
+# ppm-worker, ppm-mcp, ppm-migrate (Schlüssel = Dateinamen, gemountet unter /run/secrets;
+# je Dienst wie in deploy/hetzner/secrets.sops.yaml.example, z. B. smtp_url nur in ppm-worker, leer bei MAIL_ADAPTER=aus).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ppm
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: ppm
+    includeSelectors: false
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - serviceaccount.yaml
+  - migrate-job.yaml
+  - api.yaml
+  - worker.yaml
+  - mcp.yaml
+  - networkpolicy.yaml
+  - ingress.yaml
+  - pdb.yaml
+images:
+  - name: ppm
+    newName: ghcr.io/cspag/ppm
+    # Overlay setzt digest: sha256:…

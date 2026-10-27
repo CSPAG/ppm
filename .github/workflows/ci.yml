@@ -1,0 +1,329 @@
+# CI von PPM: jeder Pull Request und jeder Push auf main bzw. ein Tag.
+#   check         PostgreSQL 17, Rollen (db/bootstrap.sql), Migrationen, Typen, Modulgrenzen, Tests, generierte Doku aktuell
+#   web           Oberfläche: Installation, Typen/ESLint/Vitest, Build, Client-Typen aktuell
+#   dependencies  npm audit (Laufzeit, hoch), Signaturen, OSV-Scanner – für beide Lockfiles
+#   manifests     Kubernetes (kubeconform), Compose, Caddyfile
+#   image         Build (Multi-Arch), Rauchtest (Exit 78 ohne Konfiguration, UID 1000), Trivy, SBOM;
+#                 auf main/Tags Push nach GHCR mit Digest, Provenienz und cosign (keyless)
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # @vollholz/* aus GitHub Packages (docs/identity-kit.md, identity-kit › docs/ausrollen.md). Reicht GITHUB_TOKEN nicht
+  # (403), ein persönliches Token (classic, nur read:packages) als Secret NPM_READ_TOKEN hinterlegen.
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_READ_TOKEN || secrets.GITHUB_TOKEN }}
+  IMAGE_NAME: ghcr.io/cspag/ppm
+
+jobs:
+  check:
+    name: Backend (Typen, Grenzen, Tests)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+    services:
+      postgres:
+        image: postgres:17-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      POSTGRES_SUPERUSER_PASSWORD: postgres
+      POSTGRES_PORT: "5433"
+      NODE_ENV: test
+      OIDC_ISSUER_URL: http://localhost:8180/realms/ppm
+      DATABASE_ADMIN_URL: postgres://ppm_owner:owner@localhost:5433/ppm
+      DATABASE_URL: postgres://ppm_runtime:runtime@localhost:5433/ppm
+      DATABASE_WORKER_URL: postgres://ppm_worker:worker@localhost:5433/ppm
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://npm.pkg.github.com
+          scope: "@vollholz"
+          cache: npm
+      - run: npm ci
+      - name: Rollen und Datenbank (db/bootstrap.sql)
+        run: |
+          sudo apt-get install -y --no-install-recommends postgresql-client >/dev/null
+          psql "postgres://postgres:postgres@localhost:5433/postgres" -v ON_ERROR_STOP=1 \
+            -v p=ppm -v db=ppm -v owner_pw=owner -v runtime_pw=runtime -v worker_pw=worker \
+            -f db/bootstrap.sql
+      - name: Migrationen (App und Baukasten)
+        run: npm run db:migrate
+      - name: Migrationen ein zweites Mal (idempotent)
+        run: npm run db:migrate
+      - run: npm run typecheck
+      - name: Modulgrenzen, Netz-Adapter, Texte
+        run: npm run arch
+      - run: npm test
+      - name: Prüforganisation mit org-admin (sonst meldet die Konformität «keine aktive Organisation»)
+        run: psql "$DATABASE_ADMIN_URL" -f db/ci-org.sql
+      - name: Konformität Identity-Kit (Datenbank)
+        run: npx iam-conformity-test --db --no-repo --markdown "$GITHUB_STEP_SUMMARY"
+      - name: Generierte Dateien aktuell (.env.example, docs/konfiguration.md, web/openapi.json)
+        run: |
+          npm run env:docs
+          npm run openapi:export
+          git diff --exit-code -- .env.example docs/konfiguration.md web/openapi.json \
+            || { echo "::error::Generierte Dateien veraltet: npm run env:docs && npm run openapi:export ausführen und committen"; exit 1; }
+
+  web:
+    name: Oberfläche (Typen, ESLint, Vitest, Build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://npm.pkg.github.com
+          scope: "@vollholz"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm run web:install
+      - run: npm run web:check
+      - run: npm run web:build
+      - name: Start-Bundle höchstens 250 kB gzip (Q-L6)
+        run: npm run web:size
+      - name: Client-Typen passen zu web/openapi.json
+        run: |
+          npm run api:types
+          git diff --exit-code -- web/src/api/schema.d.ts \
+            || { echo "::error::web/src/api/schema.d.ts veraltet: npm run api:types ausführen und committen"; exit 1; }
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: web-dist
+          path: web/dist
+          retention-days: 3
+
+  dependencies:
+    name: Abhängigkeiten (Audit, Signaturen, OSV)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://npm.pkg.github.com
+          scope: "@vollholz"
+      - name: Backend
+        run: |
+          npm ci --ignore-scripts
+          npm audit --omit=dev --audit-level=high
+          npm audit signatures
+      - name: Oberfläche
+        working-directory: web
+        run: |
+          npm ci --ignore-scripts
+          npm audit --omit=dev --audit-level=high
+          npm audit signatures
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.7.0
+        with:
+          scan-args: |-
+            --lockfile=package-lock.json
+            --lockfile=web/package-lock.json
+
+  manifests:
+    name: Manifeste (Kubernetes, Compose, Caddy)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      KUBECONFORM_VERSION: v0.8.0
+      CADDY_IMAGE: caddy:2.11-alpine@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Kubernetes (kustomize build | kubeconform)
+        run: |
+          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar -xz kubeconform
+          kubectl kustomize deploy/k8s | ./kubeconform -strict -summary -kubernetes-version 1.33.0 -
+      - name: Compose
+        env:
+          POSTGRES_SUPERUSER_PASSWORD: x
+          DB_OWNER_PASSWORD: x
+          DB_RUNTIME_PASSWORD: x
+          DB_WORKER_PASSWORD: x
+          KEYCLOAK_ADMIN_PASSWORD: x
+          IMAGE: ghcr.io/cspag/ppm@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          ACME_EMAIL: betrieb@example.ch
+        run: |
+          touch .env
+          cp deploy/prod.env.example deploy/prod.env
+          mkdir -p deploy/secrets && for s in database_url database_worker_url database_admin_url database_ca session_secret \
+            encryption_keys oidc_bff_private_key keycloak_mgmt_private_key keycloak_sync_private_key mcp_private_key mcp_dpop_key smtp_url; do
+            echo x > "deploy/secrets/$s"; done
+          docker compose -f deploy/compose.dev.yaml config -q
+          docker compose -f deploy/compose.dev.yaml -f deploy/compose.image.yaml config -q
+          docker compose -f deploy/compose.prod.yaml config -q
+      - name: Caddyfile
+        run: |
+          docker run --rm -v "$PWD/deploy/caddy:/etc/caddy:ro" -e ACME_EMAIL=betrieb@example.ch \
+            "$CADDY_IMAGE" caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - name: Shell-Skripte
+        run: |
+          shellcheck -s sh scripts/e2e.sh deploy/docker-entrypoint.sh deploy/dev/postgres-init.sh deploy/hetzner/rollout.sh deploy/hetzner/db/setup.sh
+
+  image:
+    name: Image (Build, Rauchtest, Scan, SBOM, Signatur)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    needs: [check, web]
+    permissions:
+      contents: read
+      packages: write # Push nach GHCR (nur main/Tags)
+      id-token: write # cosign keyless, Provenienz
+      attestations: write
+    env:
+      PUBLISH: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-qemu-action@v4.4.0
+      - uses: docker/setup-buildx-action@v4.4.1
+      - name: npmrc für das Build-Secret (nur während npm ci gemountet)
+        run: |
+          umask 077
+          printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/npmrc"
+      - id: meta
+        uses: docker/metadata-action@v6.2.0
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+          labels: |
+            org.opencontainers.image.title=ppm
+      - name: Build (amd64, lokal für den Rauchtest)
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: ppm:ci
+          secret-files: npmrc=${{ runner.temp }}/npmrc
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            REVISION=${{ github.sha }}
+            CREATED=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Rauchtest – ohne Konfiguration Exit 78, Benutzer 1000
+        run: |
+          set +e
+          for cmd in api worker mcp migrate; do
+            docker run --rm --read-only --tmpfs /tmp ppm:ci "$cmd"; code=$?
+            [ "$code" -eq 78 ] || { echo "::error::$cmd ohne Konfiguration: Exit $code statt 78"; exit 1; }
+          done
+          uid="$(docker run --rm --entrypoint id ppm:ci -u)"
+          [ "$uid" = "1000" ] || { echo "::error::UID $uid statt 1000"; exit 1; }
+          docker run --rm --entrypoint sh ppm:ci -c 'command -v npm || command -v corepack || command -v yarn' \
+            && { echo "::error::npm/corepack/yarn im Image"; exit 1; }
+          docker run --rm --entrypoint sh ppm:ci -c 'touch /app/x 2>/dev/null' \
+            && { echo "::error::/app ist für den Prozess beschreibbar"; exit 1; }
+          echo "Rauchtest bestanden"
+      - name: Trivy (kritische und hohe Lücken mit Fix)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ppm:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0.24.3
+        with:
+          image: ppm:ci
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+          upload-artifact: false
+      - name: SBOM (SPDX)
+        uses: anchore/sbom-action@v0.24.3
+        with:
+          image: ppm:ci
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: sbom
+          path: sbom.*.json
+      - uses: docker/login-action@v4.7.0
+        if: env.PUBLISH == 'true'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build und Push (amd64, arm64)
+        id: push
+        if: env.PUBLISH == 'true'
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          secret-files: npmrc=${{ runner.temp }}/npmrc
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            REVISION=${{ github.sha }}
+            CREATED=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha
+      - name: Provenienz (GitHub Attestation)
+        if: env.PUBLISH == 'true'
+        uses: actions/attest-build-provenance@v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+      - uses: sigstore/cosign-installer@v4.1.2
+        if: env.PUBLISH == 'true'
+      - name: Signieren (cosign keyless) und SBOM anhängen
+        if: env.PUBLISH == 'true'
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          cosign sign --yes "${IMAGE_NAME}@${DIGEST}"
+          cosign attest --yes --type cyclonedx --predicate sbom.cdx.json "${IMAGE_NAME}@${DIGEST}"
+          cosign attest --yes --type spdxjson --predicate sbom.spdx.json "${IMAGE_NAME}@${DIGEST}"
+          echo "### Image" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`${IMAGE_NAME}@${DIGEST}\`" >> "$GITHUB_STEP_SUMMARY"
+      - name: npmrc entfernen
+        if: always()
+        run: rm -f "$RUNNER_TEMP/npmrc"

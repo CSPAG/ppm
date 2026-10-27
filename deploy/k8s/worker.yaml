@@ -1,0 +1,75 @@
+# Worker: Warteschlange, Outbox, Aufräumen, Mitgliederabgleich (kein Port ausser Betrieb)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ppm-worker
+  labels: { app.kubernetes.io/name: ppm-worker, app.kubernetes.io/component: worker }
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: ppm-worker }
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: ppm-worker, app.kubernetes.io/component: worker }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: /metrics
+    spec:
+      serviceAccountName: ppm
+      # > SHUTDOWN_DELAY (5s) + SHUTDOWN_TIMEOUT (25s)
+      terminationGracePeriodSeconds: 40
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: worker
+          image: ppm
+          args: ["worker"]
+          envFrom: [{ configMapRef: { name: ppm-config } }]
+          env:
+            - { name: OTEL_SERVICE_NAME, value: ppm-worker }
+            - { name: DATABASE_WORKER_URL_FILE, value: /run/secrets/database_worker_url }
+            # CA der Datenbank (DATABASE_SSL=verify-full; createPool nimmt keine eigene CA an)
+            - { name: NODE_EXTRA_CA_CERTS, value: /run/secrets/database_ca }
+            - { name: ENCRYPTION_KEYS_FILE, value: /run/secrets/encryption_keys }
+            - { name: KEYCLOAK_SYNC_PRIVATE_KEY_FILE, value: /run/secrets/keycloak_sync_private_key }
+            # Verwaltung im Worker (JobContext.admin, z. B. Zugang nach dem Austritt entfernen)
+            - { name: KEYCLOAK_MGMT_PRIVATE_KEY_FILE, value: /run/secrets/keycloak_mgmt_private_key }
+            # E-Mail versendet nur der Worker; bei MAIL_ADAPTER=smtp Pflicht, der Schlüssel smtp_url bleibt bei «aus» leer
+            - { name: SMTP_URL_FILE, value: /run/secrets/smtp_url }
+            - { name: MAIL_FROM, value: "PPM <noreply@ppm.project-suite.ch>" }
+          ports:
+            - { name: ops, containerPort: 9090 }
+          readinessProbe:
+            httpGet: { path: /readyz, port: ops }
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 15
+            failureThreshold: 4
+          startupProbe:
+            httpGet: { path: /healthz, port: ops }
+            periodSeconds: 2
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: secrets, mountPath: /run/secrets, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - { name: secrets, secret: { secretName: ppm-worker, defaultMode: 0400 } }
+        - { name: tmp, emptyDir: { medium: Memory, sizeLimit: 64Mi } }

@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.woff2 binary
+package-lock.json linguist-generated
+web/src/api/schema.d.ts linguist-generated
+docs/konfiguration.md linguist-generated
+.env.example linguist-generated

@@ -1,0 +1,26 @@
+# Nur, was das Image braucht; Geheimnisse und lokale Zustände nie in den Build-Kontext
+**/node_modules
+**/.env
+**/.env.*
+!.env.example
+.git
+.github
+**/*.tfstate*
+**/.terraform
+**/.tofu
+infra/*
+!infra/keycloak
+infra/keycloak/*
+!infra/keycloak/platform.ts
+deploy/*
+!deploy/docker-entrypoint.sh
+docs
+web/dist
+web/test-results
+web/playwright-report
+web/e2e
+coverage
+*.md
+!web/**/*.md
+**/*.local
+.identity

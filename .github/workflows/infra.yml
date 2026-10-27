@@ -1,0 +1,121 @@
+# Infrastruktur auf Hetzner (infra/hetzner) mit OpenTofu. DNS liegt bei Hostpoint (ohne API, von Hand: deploy/hetzner/README.md).
+#   pull_request: nur fmt und validate (ohne Geheimnisse)
+#   «Run workflow»: plan oder apply; apply nur mit Freigabe im Environment «production», genau den Plan
+#
+# Environment «production»: Secrets HCLOUD_TOKEN, S3_ACCESS_KEY, S3_SECRET_KEY, TF_STATE_PASSPHRASE;
+# Variablen HETZNER_BACKEND_HCL, HETZNER_TFVARS (Inhalt von backend.hcl bzw. terraform.tfvars, ohne Geheimnisse).
+name: Infrastruktur
+
+on:
+  pull_request:
+    paths: ["infra/hetzner/**", ".github/workflows/infra.yml"]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Aktion
+        type: choice
+        options: [plan, apply]
+        default: plan
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('infra-pr-{0}', github.ref) || 'infra-production' }}
+  cancel-in-progress: false
+
+env:
+  TOFU_VERSION: 1.13.1
+  TF_IN_AUTOMATION: "1"
+
+jobs:
+  check:
+    name: Prüfen (fmt, validate)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: infra/hetzner
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+      - run: tofu fmt -check -recursive
+      - run: tofu init -backend=false -input=false
+      - run: tofu validate
+
+  plan:
+    name: Plan
+    if: github.event_name == 'workflow_dispatch'
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    defaults:
+      run:
+        working-directory: infra/hetzner
+    env:
+      HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+      TF_VAR_state_passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
+      BACKEND_HCL: ${{ vars.HETZNER_BACKEND_HCL }}
+      TFVARS: ${{ vars.HETZNER_TFVARS }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+      - run: |
+          printf '%s\n' "$BACKEND_HCL" > backend.hcl
+          printf '%s\n' "$TFVARS" > terraform.tfvars
+          tofu init -input=false -backend-config=backend.hcl
+          tofu plan -input=false -lock-timeout=5m -out=tfplan
+          tofu show -no-color tfplan > plan.txt
+          { echo '### Plan'; echo '```'; tail -c 60000 plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      # Plan ist mit TF_STATE_PASSPHRASE verschlüsselt (encryption › plan)
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: tfplan-hetzner
+          path: infra/hetzner/tfplan
+          retention-days: 1
+
+  apply:
+    name: Apply
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'apply'
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    defaults:
+      run:
+        working-directory: infra/hetzner
+    env:
+      HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+      TF_VAR_state_passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
+      BACKEND_HCL: ${{ vars.HETZNER_BACKEND_HCL }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: tfplan-hetzner
+          path: infra/hetzner
+      - run: |
+          printf '%s\n' "$BACKEND_HCL" > backend.hcl
+          tofu init -input=false -backend-config=backend.hcl
+          tofu apply -input=false -lock-timeout=5m tfplan

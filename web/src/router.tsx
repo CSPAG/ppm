@@ -1,0 +1,49 @@
+/**
+ * Routen (TanStack Router, code-basiert): Seiten der App mit typisierten Suchparametern (`search.ts`) und die
+ * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen).
+ */
+import { createRootRoute, createRoute, createRouter, lazyRouteComponent, redirect, useNavigate } from '@tanstack/react-router';
+import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
+import { useCallback } from 'react';
+import { Root } from './app.tsx';
+import { features, paths } from './auth/index.ts';
+import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { searchOf } from './search.ts';
+import { NotFound } from './shell/index.ts';
+
+const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/',
+  beforeLoad: () => { throw redirect({ to: '/ziele/handlungsfelder', replace: true }); },
+});
+
+// Arbeitsraum «Ziele»: bis zum Zielzyklus (Etappe E6) nur die Handlungsfelder
+const zieleRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele',
+  beforeLoad: () => { throw redirect({ to: '/ziele/handlungsfelder', replace: true }); },
+});
+
+const handlungsfelderRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/handlungsfelder', validateSearch: searchOf.handlungsfelder, component: HandlungsfelderRoute,
+});
+
+function HandlungsfelderRoute() {
+  const search = handlungsfelderRoute.useSearch();
+  const navigate = useNavigate({ from: handlungsfelderRoute.fullPath });
+  const setSearch = useCallback<SetHandlungsfeldSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <HandlungsfeldPage search={search} setSearch={setSearch} />;
+}
+
+const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
+  createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
+
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, ...iamRoutes]);
+
+export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
+
+declare module '@tanstack/react-router' {
+  interface Register { router: typeof router }
+}

@@ -3,7 +3,7 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
-import { eingangTexte } from './features/eingang/index.ts';
+import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
@@ -64,6 +64,10 @@ export const navigation: NavRegistrierung = {
     { id: 'auslastung-analysieren', label: ressourcenTexte.aktionAuslastung, icon: 'grid', pfad: ressourcenPfad.auslastung, recht: 'ressource:read' },
     { id: 'kapazitaet-planen', label: ressourcenTexte.aktionKapazitaet, icon: 'calendar', pfad: ressourcenPfad.kapazitaet, recht: 'ressource:write' },
   ],
+  // Zähler offener Aufgaben an «Eingang» (I-N3); jede Rolle enthält tenant:read
+  zaehler: [{ raum: 'eingang', recht: 'tenant:read', queryKey: anzahlOffen.queryKey, laden: anzahlOffen.laden, text: eingangTexte.zaehler }],
+  // Kontomenü und «Mehr»: Profil und Stellvertretung (UI-43, UC-016 Schritt 4)
+  konto: [{ id: 'stellvertretung', label: kontoTexte.titel, icon: 'users', pfad: '/konto/stellvertretung', recht: 'tenant:read' }],
   suchen: [
     {
       id: 'projekte', recht: 'projekt:read',

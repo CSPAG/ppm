@@ -53,13 +53,20 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 
 Nach Arbeitsräumen ([ux/informationsarchitektur.md](ux/informationsarchitektur.md#navigation), UX-E2): Eingang, Projekte,
 Portfolio, Gremien, Ziele, Administration, in dieser Reihenfolge (`src/shell/nav.ts`). Ein Arbeitsraum erscheint nur, wenn die
-Person mindestens einen seiner Bereiche sehen darf (I-N2); leere Arbeitsräume gibt es nicht.
+Person mindestens einen seiner Bereiche sehen darf (I-N2); leere Arbeitsräume gibt es nicht. In der Administration stehen
+die Verwalten-Seiten des Baukastens («Benutzer und Rollen») zuerst, dann die Bereiche der App (IA «Arbeitsräume»).
+
+- **Zähler (I-N3):** `zaehler` in `src/nav.ts` setzt einen Zähler an einen Arbeitsraum (heute: offene Aufgaben an
+  «Eingang» aus `GET /v1/eingang/anzahl`); sichtbar als Zahl, für Bildschirmleser im Namen des Links; neu geladen jede
+  Minute und nach jeder Änderung im Eingang.
+- **Konto:** `konto` in `src/nav.ts` setzt persönliche Seiten ins Kontomenü und unter «Mehr» (heute: Profil und
+  Stellvertretung, UI-43).
 
 | Breite | Darstellung |
 |---|---|
 | ab 1024 px | Leiste links mit Namen, darunter die Bereiche des aktiven Arbeitsraums |
 | 768–1023 px | schmale Leiste mit Symbol und Name; Bereiche als Leiste über der Arbeitsfläche |
-| unter 768 px | Leiste unten mit den ersten drei sichtbaren aus Eingang, Projekte, Gremien (sonst die nächsten), dazu «Mehr» als Blatt von unten mit den übrigen Arbeitsräumen und dem Konto (Person, Organisation, Farbschema, Meine Rollen und Rechte, Organisation wechseln, Abmelden) |
+| unter 768 px | Leiste unten mit den ersten drei sichtbaren aus Eingang, Projekte, Gremien (sonst die nächsten), dazu «Mehr» als Blatt von unten mit den übrigen Arbeitsräumen und dem Konto (Person, Organisation, Farbschema, Profil und Stellvertretung, Meine Rollen und Rechte, Organisation wechseln, Abmelden) |
 
 **Ein Feature trägt sich in `src/nav.ts` ein**, die Shell kennt keine Features:
 

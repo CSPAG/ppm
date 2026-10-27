@@ -2,3 +2,4 @@
 export { EingangPage } from './EingangPage.tsx';
 export { validateEingangSearch, type EingangSearch, type SetEingangSearch } from './search.ts';
 export { E as eingangTexte } from './texte.ts';
+export { anzahlOffen } from './api.ts';

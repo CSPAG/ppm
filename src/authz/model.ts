@@ -204,6 +204,9 @@ export const model = defineModel({
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
+    // idee
+    list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },
+    get_idee: { title: 'Projektidee lesen', permission: 'idee:read', readOnly: true },
   },
   features: { audit: true },
 });

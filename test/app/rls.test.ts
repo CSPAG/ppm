@@ -30,6 +30,26 @@ const TENANT_TABLES: Record<string, (tx: Tx, tenantId: string) => Promise<string
   outbox_event: async (tx, t) => { await tx.query("INSERT INTO ppm.outbox_event (tenant_id, type) VALUES ($1, 'probe.created')", [t]); return "type = 'probe.created'"; },
   handlungsfeld: async (tx, t) => { await tx.query("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Probe')", [t]); return "label = 'Probe'"; },
   handlungsfeld_version: async () => "label = 'Probe'",   // entsteht per Trigger mit dem Handlungsfeld
+  // Eingang (070_eingang): Schreiben nur über das Modul (app.eingang_intern), Personen als Principal
+  aufgabe: async (tx, t) => {
+    await tx.query("SELECT set_config('app.eingang_intern', 'on', true)");
+    await tx.query("INSERT INTO ppm.aufgabe (tenant_id, art, bezug_typ, bezug_id, empfaenger_recht, titel, link) VALUES ($1, 'probe.pruefen', 'probe', 'p', 'handlungsfeld:read', 'Probe', '/eingang')", [t]);
+    await tx.query("SELECT set_config('app.eingang_intern', '', true)");
+    return "titel = 'Probe'";
+  },
+  mitteilung: async (tx, t) => {
+    await tx.query("SELECT set_config('app.eingang_intern', 'on', true)");
+    await tx.query(`INSERT INTO ppm.mitteilung (tenant_id, empfaenger_person, bezug_typ, bezug_id, text)
+      SELECT $1, id, 'probe', 'p', 'Probe' FROM ppm.principal WHERE subject = 'probe-vertretene'`, [t]);
+    await tx.query("SELECT set_config('app.eingang_intern', '', true)");
+    return "text = 'Probe'";
+  },
+  stellvertretung: async (tx, t) => {
+    await tx.query(`INSERT INTO ppm.stellvertretung (tenant_id, vertretene_person, vertreter_person, von, bis)
+      SELECT $1, a.id, b.id, current_date, current_date + 7 FROM ppm.principal a, ppm.principal b
+       WHERE a.subject = 'probe-vertretene' AND b.subject = 'probe-vertreter'`, [t]);
+    return 'true';
+  },
   webhook_subscription: async (tx, t) => {
     await tx.query("INSERT INTO ppm.webhook_subscription (tenant_id, url, secret_enc, event_types) VALUES ($1, 'https://example.ch/probe', 'x', '{handlungsfeld.created}')", [t]);
     return "url = 'https://example.ch/probe'";
@@ -74,6 +94,17 @@ const POLICIES = [
   "ppm.handlungsfeld.handlungsfeld_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('handlungsfeld:write'::text) CHECK app.has_permission('handlungsfeld:write'::text)",
   "ppm.handlungsfeld.handlungsfeld_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('handlungsfeld:delete'::text) CHECK -",
   "ppm.handlungsfeld_version.handlungsfeld_version_read RESTRICTIVE SELECT ppm_app USING app.has_permission('handlungsfeld:read'::text) CHECK -",
+  // Eingang (070_eingang): AUFGABE und EIGEN; Schreiben in Aufgaben und Mitteilungen nur über das Modul (app.eingang_intern)
+  "ppm.aufgabe.aufgabe_insert RESTRICTIVE INSERT ppm_app USING - CHECK (current_setting('app.eingang_intern'::text, true) = 'on'::text)",
+  "ppm.aufgabe.aufgabe_read RESTRICTIVE SELECT ppm_app USING ((current_setting('app.eingang_intern'::text, true) = 'on'::text) OR ((app.principal_id() IS NULL) AND app.write_all()) OR (empfaenger_person = app.principal_id()) OR ((empfaenger_recht IS NOT NULL) AND CASE ort_typ WHEN 'org'::text THEN app.has_permission(empfaenger_recht) ELSE app.has_permission(empfaenger_recht, ort_typ, ort_id) END) OR (EXISTS ( SELECT 1 FROM ppm.stellvertretung s WHERE ((s.tenant_id = aufgabe.tenant_id) AND (s.vertretene_person = aufgabe.empfaenger_person) AND (s.vertreter_person = app.principal_id()) AND ((((now() AT TIME ZONE 'Europe/Zurich'::text))::date >= s.von) AND (((now() AT TIME ZONE 'Europe/Zurich'::text))::date <= s.bis)))))) CHECK -",
+  "ppm.aufgabe.aufgabe_update RESTRICTIVE UPDATE ppm_app USING (current_setting('app.eingang_intern'::text, true) = 'on'::text) CHECK (current_setting('app.eingang_intern'::text, true) = 'on'::text)",
+  "ppm.mitteilung.mitteilung_insert RESTRICTIVE INSERT ppm_app USING - CHECK (current_setting('app.eingang_intern'::text, true) = 'on'::text)",
+  "ppm.mitteilung.mitteilung_read RESTRICTIVE SELECT ppm_app USING ((empfaenger_person = app.principal_id()) OR (current_setting('app.eingang_intern'::text, true) = 'on'::text) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -",
+  'ppm.mitteilung.mitteilung_update RESTRICTIVE UPDATE ppm_app USING (empfaenger_person = app.principal_id()) CHECK (empfaenger_person = app.principal_id())',
+  'ppm.stellvertretung.stellvertretung_delete RESTRICTIVE DELETE ppm_app USING ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -',
+  'ppm.stellvertretung.stellvertretung_insert RESTRICTIVE INSERT ppm_app USING - CHECK ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all()))',
+  'ppm.stellvertretung.stellvertretung_read RESTRICTIVE SELECT ppm_app USING ((vertretene_person = app.principal_id()) OR (vertreter_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -',
+  'ppm.stellvertretung.stellvertretung_update RESTRICTIVE UPDATE ppm_app USING ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK ((vertretene_person = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.write_all()))',
   // Webhooks (002_webhooks): Zustellung über alle Mandanten im Worker
   'ppm.webhook_delivery.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
   'ppm.webhook_delivery.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',
@@ -115,6 +146,8 @@ describe('PostgreSQL RLS', { skip }, () => {
     A = await tenant(t.runtime, 'alpha');
     B = await tenant(t.runtime, 'beta');
     for (const id of [A, B]) {
+      await full(t.runtime, id, tx => tx.query(`INSERT INTO ppm.principal (tenant_id, kind, subject, display_name)
+        VALUES ($1, 'user', 'probe-vertretene', 'Probe'), ($1, 'user', 'probe-vertreter', 'Probe')`, [id]));
       await full(t.runtime, id, async tx => { for (const [name, seed] of Object.entries(TENANT_TABLES)) where[name] = await seed(tx, id); });
     }
   });

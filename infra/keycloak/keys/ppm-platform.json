@@ -3,9 +3,9 @@
     {
       "kty": "EC",
       "crv": "P-256",
-      "x": "7I-upppZ77TgOalyRZxpu5MA9ytPBEt3CTonTBrnDuw",
-      "y": "8Z0z6tagSgEdD_NFoaESTN5MAV-uJXeCqkC0IH4ouDY",
-      "kid": "sUpruv59lrZtZKrPxEYj4sOwQ1O_byWg9srELd5BsrE",
+      "x": "TKTz7EJ_cSKMVSoQ0VP-hfkcYlu9yBkn9GsPSpb2ZmQ",
+      "y": "iz8Rhkn0WRteMbt94_bNbQKZi63firuOIc60iJLNV34",
+      "kid": "jhLoTmRgBvIY0PRpIgjbqd4QjLU8KYHEiLmE5eBR9S8",
       "alg": "ES256",
       "use": "sig"
     }

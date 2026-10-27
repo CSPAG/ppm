@@ -1,0 +1,25 @@
+/*
+ * Zielerreichung (UI-40, Arbeitsfläche): Tabelle mit direkter Eingabe. Texte umbrechen statt abschneiden; Jahresziele
+ * eingerückt unter ihrem strategischen Ziel; auf dem Telefon Karten mit allen Feldern (I-L6, Datenliste in app.css).
+ */
+.ze-kopf{gap:12px}
+.ze-kopf progress{width:180px;max-width:40vw;height:8px;accent-color:var(--accent)}
+.ze-hinweis{padding:4px 22px 0}
+.ze-tab tbody td{white-space:normal;max-width:none;vertical-align:top;padding-top:10px;padding-bottom:10px;height:auto}
+.ze-strategisch td{background:var(--surface-2)}
+.ze-strategisch .ze-nr,.ze-strategisch .ze-text{font-weight:600}
+.ze-jahresziel td.nm{padding-left:28px}
+.ze-nr{font-family:var(--f-mono);white-space:nowrap}
+.ze-text{min-width:180px}
+.ze-in input{height:32px;width:100%;min-width:110px;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background:var(--surface);color:var(--fg);outline:0}
+.ze-in input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ze-in input[aria-invalid="true"]{border-color:var(--bad)}
+.ze-st{min-width:130px}
+.ze-st .ico{width:13px;height:13px;vertical-align:-2px}
+.ze-fehler{color:var(--bad);display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+.ze-zurueck{transform:rotate(180deg)}
+@media (max-width:767px){
+  .ze-hinweis{padding:4px 14px 0}
+  .ze-jahresziel td.nm{padding-left:0}
+  .ze-tab td.ze-in input{margin-top:2px}
+}

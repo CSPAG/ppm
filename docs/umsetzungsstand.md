@@ -18,13 +18,13 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | umgesetzt (040, 041; Modul und Feature `projekt`, Rahmen der Projektakte mit Reitern in `web/src/routes/projekte.tsx`) | #21, #25 | A-04, A-34, A-47; `POST /v1/projekte` mit `projekt:create`; Status, Trend und Meilenstein in der Projektzeile folgen mit AP-E1-1/AP-E0-6 |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | umgesetzt (050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»; Oberfläche UI-47; E2E offen bis CI läuft) | #19 (Merge-Zug #46), #24 | A-02, A-07, A-08, A-23, A-45 |
 | AP-E0-6 | Register Projektdaten | 060–069 | PR 1 umgesetzt (Tabellen 060, API, MCP `get_projektdaten`); PR 2 Einhängen in die Projektübersicht folgt | #29 | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
-| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche (`/eingang`, `/konto/stellvertretung`) in Prüfung | #22 | A-31, A-44 |
+| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | umgesetzt (070, Modul `eingang` mit Schnittstelle `aufgabe`/`mitteilung`/`stellvertretung`, `list_aufgaben`; Seiten `/eingang`, `/konto/stellvertretung`); offen: Zähler an «Eingang» und Eintrag im Kontomenü (Shell) | #22, #31 | A-31 (Unterschrift in Vertretung prüft AP-E3-2 mit `stellvertretung.aktiv`), A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
-| AP-E1-1 | Statusbericht erfassen | 090–099 | in Arbeit (PR 1 #30: 090, Periode und Statusbericht, API mit Vorbelegung aus der Vorperiode, Einreichen mit Rückgängig; PR 2: Berichtsaufgabe am 18., Register, Oberfläche UI-13) | – | A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
-| AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
+| AP-E1-1 | Statusbericht erfassen | 090–099 | teilweise: PR 1 umgesetzt (090, Periode und Statusbericht, API mit Vorbelegung aus Vorperiode und Meilensteinplan, Einreichen mit Rückgängig); PR 2 in Arbeit (Berichtsaufgabe ab dem 18. über den Eingang, erledigt beim Einreichen, Mitteilung an den Sponsor bei «kritisch»); PR 3 Oberfläche UI-13 nach AP-E0-4 PR 2 | #30 (via #46) | A-07, A-08 (Aufgabe nur in Portfolios mit Pflichten), A-26, A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
+| AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | in Arbeit (PR 1: 100, Prüfung, Rückfrage, Einfordern, Abschluss mit «nicht gemeldet», Terminabweichungen, Aufgaben, MCP `get_periode`; PR 2: Oberfläche UI-15, UI-16 in Arbeit) | #41 | A-11, A-28, A-37; Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der Vorperiode, jede Prognose über Budget (K1-4); berichtspflichtig = aktiv, P0–P3, Portfolio mit Pflichten (A-07, A-08); «Periode abschliessen» per Job am Stichtag, eingereiht beim ersten Einreichen (Stichtag aus dem Phasenmodell; ohne Phasenmodell in Kraft sofort); Tabelle `einforderung` (fachmodell.md 2.8) |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
-| AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | in Arbeit (PR 1: 130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; PR 2: Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
+| AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | offen | – | – |
@@ -38,12 +38,12 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
-| AP-E5-4 | Kapazität und Auslastung | 270–279 | in Arbeit (PR 1: 270, Modul `ressource`, `get_auslastung`; PR 2 Oberfläche UI-23, UI-24 folgt) | – | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
+| AP-E5-4 | Kapazität und Auslastung | 270–279 | umgesetzt (270, Modul `ressource`, `get_auslastung`; Portfolio › Ressourcen mit Auslastung UI-23 und Kapazität UI-24; Bedarfsliste UI-25 mit AP-E7-2; E2E offen bis CI läuft) | #35 (über #46), #40 | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
 | AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API umgesetzt: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Aufgabe «Jahresziele vervollständigen» über den Eingang umgesetzt; `projektZuordnen` für den Vertrag mit 301; PR 3 Oberfläche UI-38 Zielzyklus in Review) | #28, #34, #38 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
-| AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
+| AP-E6-3 | Zielerreichung | 320–329 | teilweise (PR 1: 320, `/v1/zielerreichung/:quartal`, Seite Ziele › Zielerreichung UI-40; PR 2 Aufgabe im Eingang folgt) | #37 | Zielerreichung je strategischem Ziel und Jahresziel des Jahres (`ziel_typ`); `beurteilung` als Kommentar ohne Skala (keine festgelegt); ein Stand je Ziel und Quartal, Änderungen im Audit; Jahresziele nur im Quartal ihres Jahres; Aufgabe `zielerreichung.erfassen` (Job nach Quartalsende) folgt in PR 2, sobald es ein Muster für zeitgesteuerte Aufgaben je Organisation gibt (wie AP-E1-1, Job am 18.) |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
 | AP-E7-1 | Abschluss, Sistierung, Abbruch, Lessons Learned | 340–349 | offen | – | – |
 | AP-E7-2 | Ressourcen zuteilen, Konflikte | 350–359 | offen | – | – |
@@ -66,7 +66,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
 | ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
 | ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
-| ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
+| ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | teilweise (UC-012 Schritte 1–2; Aufgabe im Eingang folgt in PR 2) | #37 |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
 | DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | API umgesetzt, Oberfläche in Arbeit | #36 |
@@ -91,15 +91,15 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.04 | Portfolio in Matrixsicht beurteilen | 008 | E5 | AP-E5-2 | offen | – |
-| PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | in Arbeit (API, Oberfläche) | #32, #39 |
+| PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | offen | – |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
-| PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | in Arbeit (API, Oberfläche) | #32, #39 |
-| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | in Arbeit (API) | – |
-| PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |
-| PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | offen | – |
-| PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | offen | – |
+| PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
+| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | API umgesetzt, Berichtsaufgabe in Arbeit, Oberfläche offen | #30 |
+| PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
+| PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
+| PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
 | PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |
@@ -131,17 +131,17 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | offen | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
-| RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | in Arbeit (API) | – |
+| RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | offen | – |
-| RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | in Arbeit (API) | – |
+| RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | umgesetzt (auch je Szenario über die Schnittstelle für AP-E5-3) | #35, #40 |
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
-| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit (API umgesetzt) | #22 |
+| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | umgesetzt | #22, #31 |
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |
@@ -206,4 +206,5 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | PR 2 AP-E4-1 | AP-E4-1 | Assistent (4 Schritte), Liste, Ansicht; Z1, Z2, Z5, Z7, Z8, Z10, Entwurf, in Ergänzung | ja (Fokus auf Schrittüberschrift, Radiogruppen, Vitest) | ohne Befund (jsdom; E2E hell, dunkel) | 360 px im E2E «schmal» | ja (`features/idee/texte.ts`), «Sie» | K4-1, K4-2 Aufgabentest |
 | #17 | AP-E0-3 | Arbeitsfläche; Z1, Z2, Z5, Z7–Z10 | vollständig, Strg+Z/Strg+Umschalt+Z | ohne Befund | geprüft (360/1024/1280/1440) | ja | keine Zielgrössen (kein Kernablauf für UC-017) |
 | #24 | AP-E0-5 | UI-47 Liste + Schublade (Portfolio › Gremium); Z1, Z2, Z5, Z7 (412), Z8, Z10 im Test | Formulare, Schubladen, Auswahl je Gate; E2E nur mit Tastatur in die Administration | Vitest-axe Liste und Schubladen; E2E hell, dunkel (E2E offen bis CI läuft) | 360 px im E2E (Projekt «schmal»), 768/1440 hell/dunkel | `features/portfolios/texte.ts`, «Sie» (check-address) | – (kein Kernablauf; UC-017) |
+| #40 | AP-E5-4 | Bericht (Auslastung) + Schublade, Arbeitsfläche (Kapazität); Z1, Z2, Z4, Z5, Z7, Z8, Z10, ungültiger Zeitraum | ja (Reiter, Zellen, Raster mit Pfeilen, Eingabetaste, Strg+Z) | ohne Befund (jsdom; E2E hell, dunkel) | 360 und 1440 px ohne Überlauf (Chromium), 768 nicht eigens | ja (Feature-Texte), «Sie» | Q-L5 50 × 31 virtualisiert (Test mit Messung) |
 | #48 | AP-E3-1 | Arbeitsfläche (UI-07); Z1, Z2, Z5, Z7, Z8, Z9 (Banner in Prüfung/Baseline), Z10 über den Rahmen | ↑/↓ Kapitel, Alt+N nächste fehlende Angabe, Strg+Z/Strg+Umschalt+Z | ohne Befund (jsdom, Vitest); E2E hell/dunkel offen (ohne Keycloak in der Session) | Layout 360/768/1200 px nach CSS-Brüchen; E2E offen | ja (`features/vertrag/texte.ts`), «Sie» | K2-4 als Vitest (1 Klick je Angabe, Fokus an der Stelle) und API-Test |

@@ -6,3 +6,6 @@ export { TZ as zieleTexte } from './texte.ts';
 export { ZielzyklusPage, type ZielzyklusPageProps } from './ZielzyklusPage.tsx';
 export { validateZielzyklusSearch, ZIELJAHR, type SetZielzyklusSearch, type ZielzyklusSearch } from './ZielzyklusSearch.ts';
 export { TZZ as zielzyklusTexte } from './ZielzyklusTexte.ts';
+export { ZielerreichungPage } from './ZielerreichungPage.tsx';
+export { abgeschlossenesQuartal, validateZielerreichungSearch, type QuartalNr, type ZielerreichungSearch } from './ZielerreichungSearch.ts';
+export { TZE as zielerreichungTexte } from './ZielerreichungTexte.ts';

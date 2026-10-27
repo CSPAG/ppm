@@ -23,15 +23,16 @@ export const abweichungVon = (a: Partial<AbweichungIn> | null | undefined): Abwe
 /**
  * Vorbelegung eines neuen Berichts aus der Vorperiode (UC-004 Schritt 1, K1 I-F2): alle Werte ausser Status und Trend,
  * die jeden Monat bewusst gewählt werden (K1 Entscheid). «Entscheid des PRAT nötig» ebenfalls nicht, weil es eine
- * Eskalation auslöst (UC-004 A2.2).
+ * Eskalation auslöst (UC-004 A2.2). Den nächsten Meilenstein liefert der Meilensteinplan, wenn er einen offenen hat
+ * (K1 Schritt 7: «aus dem Plan vorausgefüllt»).
  */
-export function vorbelegung(vor: store.Row | null): Required<StatusberichtPutIn> {
+export function vorbelegung(vor: store.Row | null, plan: string | null = null): Required<StatusberichtPutIn> {
   return {
     anlass: 'monatlich',
     status: null,
     trend: null,
     abschlussPer: vor?.abschluss_per ?? null,
-    naechsterMeilenstein: vor?.naechster_meilenstein ?? '',
+    naechsterMeilenstein: plan ?? vor?.naechster_meilenstein ?? '',
     abweichung: abweichungVon(vor?.abweichung),
     abhaengigkeiten: vor?.abhaengigkeiten ?? '',
     entscheide: vor?.entscheide ?? '',
@@ -104,4 +105,11 @@ export function pruefeBearbeitbar(...a: Parameters<typeof sperre>): void {
 /** Rückgängig: nur die einreichende Person, nur solange der Bericht eingereicht ist, innert der Frist. */
 export function rueckgaengigMoeglich(r: store.Row, principalId: string, sekunden: number | null): boolean {
   return r.stand === 'eingereicht' && r.eingereicht_by === principalId && sekunden !== null && sekunden <= RUECKGAENGIG_SEKUNDEN + KULANZ_SEKUNDEN;
+}
+
+/** Meilenstein des Plans, wie ihn der Bericht nennt: «Abnahme Pilot (30.06.2027)». */
+export function meilensteinText(m: { text: string; termin: string | null }): string {
+  if (!m.termin) return m.text;
+  const [j, mo, t] = m.termin.split('-');
+  return `${m.text} (${t}.${mo}.${j})`.slice(0, 500);
 }

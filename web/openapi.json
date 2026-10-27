@@ -8707,6 +8707,270 @@
           }
         }
       },
+      "ZielerreichungEintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "zielTyp",
+          "zielId",
+          "quartal",
+          "stand",
+          "beurteilung",
+          "erfasstAt",
+          "erfasstVon",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "zielTyp": {
+            "description": "Strategisches Ziel oder Jahresziel.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "strategisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "jahresziel"
+                ]
+              }
+            ]
+          },
+          "zielId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "quartal": {
+            "type": "string"
+          },
+          "stand": {
+            "type": "string"
+          },
+          "beurteilung": {
+            "type": "string"
+          },
+          "erfasstAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "erfasstVon": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZielPerson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "ZielerreichungZiel": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "typ",
+          "id",
+          "strategischesZielId",
+          "nummer",
+          "text",
+          "metrik",
+          "zielwert",
+          "eintrag",
+          "letzter"
+        ],
+        "properties": {
+          "typ": {
+            "description": "Strategisches Ziel oder Jahresziel.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "strategisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "jahresziel"
+                ]
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "strategischesZielId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "metrik": {
+            "type": "string"
+          },
+          "zielwert": {
+            "type": "string"
+          },
+          "eintrag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZielerreichungEintrag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "letzter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZielerreichungEintrag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ZielerreichungQuartal": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "quartal",
+          "jahr",
+          "ziele",
+          "fortschritt",
+          "can"
+        ],
+        "properties": {
+          "quartal": {
+            "type": "string"
+          },
+          "jahr": {
+            "type": "integer"
+          },
+          "ziele": {
+            "description": "Nach Nummer: je strategisches Ziel, gefolgt von seinen Jahreszielen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZielerreichungZiel"
+            }
+          },
+          "fortschritt": {
+            "additionalProperties": false,
+            "description": "Kopf «24 von 30 Zielen nachgeführt» (K6 Schritt 10).",
+            "type": "object",
+            "required": [
+              "nachgefuehrt",
+              "gesamt"
+            ],
+            "properties": {
+              "nachgefuehrt": {
+                "minimum": 0,
+                "description": "Ziele mit Stand in diesem Quartal.",
+                "type": "integer"
+              },
+              "gesamt": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Stände erfassen (zielerreichung:write).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ZielerreichungCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zielTyp",
+          "zielId",
+          "stand"
+        ],
+        "properties": {
+          "zielTyp": {
+            "description": "Strategisches Ziel oder Jahresziel.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "strategisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "jahresziel"
+                ]
+              }
+            ]
+          },
+          "zielId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "stand": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Neuer Stand der Metrik, z. B. «−1,4 %».",
+            "type": "string"
+          },
+          "beurteilung": {
+            "maxLength": 2000,
+            "description": "Kommentar und Beurteilung des Stands; leer erlaubt.",
+            "type": "string"
+          }
+        }
+      },
+      "ZielerreichungPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "stand": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Neuer Stand der Metrik, z. B. «−1,4 %».",
+            "type": "string"
+          },
+          "beurteilung": {
+            "maxLength": 2000,
+            "description": "Kommentar und Beurteilung des Stands; leer erlaubt.",
+            "type": "string"
+          }
+        }
+      },
       "Versandfrist": {
         "additionalProperties": false,
         "type": "object",
@@ -10510,6 +10774,1009 @@
           }
         },
         "additionalProperties": false
+      },
+      "Auffaelligkeit": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "description": "Status gegenüber der Vorperiode geändert.",
+            "type": "object",
+            "required": [
+              "art",
+              "von",
+              "nach"
+            ],
+            "properties": {
+              "art": {
+                "type": "string",
+                "enum": [
+                  "status"
+                ]
+              },
+              "von": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              "nach": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "art",
+              "tage",
+              "bezug",
+              "text"
+            ],
+            "properties": {
+              "art": {
+                "type": "string",
+                "enum": [
+                  "termin"
+                ]
+              },
+              "tage": {
+                "minimum": 1,
+                "description": "Grösste Verschiebung in Kalendertagen.",
+                "type": "integer"
+              },
+              "bezug": {
+                "description": "Meilenstein gegenüber der Baseline oder «Abschluss per» gegenüber der Vorperiode.",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "baseline"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "vorperiode"
+                    ]
+                  }
+                ]
+              },
+              "text": {
+                "description": "Betroffener Meilenstein bzw. «Abschluss per».",
+                "type": "string"
+              }
+            }
+          },
+          {
+            "additionalProperties": false,
+            "description": "Prognose einer Phase über dem Budget (nur mit `finanzen:read`).",
+            "type": "object",
+            "required": [
+              "art",
+              "prozent",
+              "phase"
+            ],
+            "properties": {
+              "art": {
+                "type": "string",
+                "enum": [
+                  "budget"
+                ]
+              },
+              "prozent": {
+                "description": "Prognose über dem Budget der Baseline, in Prozent (gerundet auf eine Stelle).",
+                "type": "number"
+              },
+              "phase": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "PeriodeZeile": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "projektNummer",
+          "projektName",
+          "portfolioId",
+          "portfolioName",
+          "phase",
+          "stand",
+          "entwurf",
+          "status",
+          "trend",
+          "abschlussPer",
+          "naechsterMeilenstein",
+          "vorperiode",
+          "auffaelligkeiten",
+          "nachRueckfrage",
+          "rueckfrage",
+          "eingereichtAt",
+          "geprueftAt",
+          "eingefordertAt",
+          "version",
+          "can"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projektNummer": {
+            "type": "string"
+          },
+          "projektName": {
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolioName": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "eingereicht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "geprueft"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausstehend"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "nicht_gemeldet"
+                ]
+              }
+            ]
+          },
+          "entwurf": {
+            "type": "boolean"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "abschlussPer": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "naechsterMeilenstein": {
+            "type": "string"
+          },
+          "vorperiode": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "periode",
+                  "status",
+                  "trend"
+                ],
+                "properties": {
+                  "periode": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "im_plan"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "kritisch"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "trend": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "auffaelligkeiten": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Auffaelligkeit"
+            }
+          },
+          "nachRueckfrage": {
+            "type": "boolean"
+          },
+          "rueckfrage": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "text",
+                  "gestelltAt"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "gestelltAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "geprueftAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eingefordertAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "bestaetigen",
+              "rueckfrage",
+              "einfordern",
+              "zuruecknehmen"
+            ],
+            "properties": {
+              "bestaetigen": {
+                "type": "boolean"
+              },
+              "rueckfrage": {
+                "type": "boolean"
+              },
+              "einfordern": {
+                "type": "boolean"
+              },
+              "zuruecknehmen": {
+                "description": "Bestätigung rückgängig machen (Toast «Rückgängig»).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "Periodenstand": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "periode",
+          "stand",
+          "abgeschlossenAt",
+          "abgeschlossenBy",
+          "version",
+          "anzahl",
+          "fristen",
+          "vorperiode",
+          "abschluss",
+          "can"
+        ],
+        "properties": {
+          "periode": {
+            "type": "string"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "offen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeschlossen"
+                ]
+              }
+            ]
+          },
+          "abgeschlossenAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "abgeschlossenBy": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "anzahl": {
+            "additionalProperties": false,
+            "description": "Über alle berichtspflichtigen Projekte der Periode (ohne Filter).",
+            "type": "object",
+            "required": [
+              "projekte",
+              "eingereicht",
+              "zurueckgegeben",
+              "geprueft",
+              "ausstehend",
+              "nichtGemeldet",
+              "auffaellig"
+            ],
+            "properties": {
+              "projekte": {
+                "type": "integer"
+              },
+              "eingereicht": {
+                "type": "integer"
+              },
+              "zurueckgegeben": {
+                "type": "integer"
+              },
+              "geprueft": {
+                "type": "integer"
+              },
+              "ausstehend": {
+                "type": "integer"
+              },
+              "nichtGemeldet": {
+                "type": "integer"
+              },
+              "auffaellig": {
+                "type": "integer"
+              }
+            }
+          },
+          "fristen": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "berichtAufgabe",
+              "stichtag",
+              "abschlussBis"
+            ],
+            "properties": {
+              "berichtAufgabe": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "description": "Tag der Berichtsaufgabe (A-26); null ohne Phasenmodell in Kraft.",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "stichtag": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "description": "Stichtag der Berichte (Q8 Kap. 8.4); null ohne Phasenmodell in Kraft.",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "abschlussBis": {
+                "format": "date",
+                "description": "Monatsende: Abschluss durch die Unternehmensentwicklung (UC-005 Schritt 5).",
+                "type": "string"
+              }
+            }
+          },
+          "vorperiode": {
+            "type": "string"
+          },
+          "abschluss": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "moeglich",
+              "sperre",
+              "geprueft",
+              "nichtGemeldet"
+            ],
+            "properties": {
+              "moeglich": {
+                "type": "boolean"
+              },
+              "sperre": {
+                "anyOf": [
+                  {
+                    "description": "Warum der Abschluss gesperrt ist (Text der Regel).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "geprueft": {
+                "type": "integer"
+              },
+              "nichtGemeldet": {
+                "description": "Projekte, für die die Werte der Vorperiode mit «nicht gemeldet» übernommen werden.",
+                "type": "integer"
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "pruefen",
+              "abschliessen"
+            ],
+            "properties": {
+              "pruefen": {
+                "type": "boolean"
+              },
+              "abschliessen": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PeriodeUebersicht": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kopf",
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "kopf": {
+            "$ref": "#/components/schemas/Periodenstand"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeriodeZeile"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PeriodeAuswahl": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projekte"
+        ],
+        "properties": {
+          "projekte": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PeriodeSammelergebnis": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "erledigt",
+          "uebersprungen",
+          "unbekannt",
+          "kopf"
+        ],
+        "properties": {
+          "erledigt": {
+            "type": "array",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          "uebersprungen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "projektNummer",
+                "grund"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "projektNummer": {
+                  "type": "string"
+                },
+                "grund": {
+                  "description": "`auffaellig`: einzeln prüfen (A-28); `stand`: Aktion im Stand des Projekts nicht möglich.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "auffaellig"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "stand"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "unbekannt": {
+            "description": "Projekte, die es nicht gibt oder die die Person nicht sieht (nicht genannt).",
+            "type": "integer"
+          },
+          "kopf": {
+            "$ref": "#/components/schemas/Periodenstand"
+          }
+        }
+      },
+      "RueckfrageCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Rückfrage im Wortlaut der Unternehmensentwicklung (UC-005 A2).",
+            "type": "string"
+          }
+        }
+      },
+      "Rueckfrage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "antwort",
+          "gestelltBy",
+          "gestelltAt",
+          "beantwortetAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "antwort": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gestelltBy": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gestelltAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "beantwortetAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "RueckfrageList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rueckfrage"
+            }
+          }
+        }
+      },
+      "Terminabweichung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "projektNummer",
+          "projektName",
+          "phase",
+          "phasen",
+          "abschluss",
+          "maxTage"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projektNummer": {
+            "type": "string"
+          },
+          "projektName": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          },
+          "phasen": {
+            "description": "Ende je Phase: letzter Meilenstein bzw. letztes Lieferergebnis der Phase.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "phase",
+                "baseline",
+                "aktuell",
+                "tage"
+              ],
+              "properties": {
+                "phase": {
+                  "type": "string"
+                },
+                "baseline": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "aktuell": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "tage": {
+                  "description": "Abweichung in Kalendertagen (positiv = später).",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "abschluss": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "baseline",
+                  "aktuell",
+                  "tage"
+                ],
+                "properties": {
+                  "baseline": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "aktuell": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "tage": {
+                    "description": "Abweichung in Kalendertagen (positiv = später).",
+                    "type": "integer"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxTage": {
+            "type": "integer"
+          }
+        }
+      },
+      "TerminabweichungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "ohneBaseline"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Terminabweichung"
+            }
+          },
+          "ohneBaseline": {
+            "description": "Projekte ohne Termine der Baseline (Z4).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "projektNummer",
+                "projektName"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "projektNummer": {
+                  "type": "string"
+                },
+                "projektName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "StatusberichteKopf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "pruefen"
+        ],
+        "properties": {
+          "pruefen": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Nur mit `statusbericht:review`.",
+                "type": "object",
+                "required": [
+                  "periode",
+                  "eingereicht",
+                  "ausstehend",
+                  "auffaellig",
+                  "abschlussBis"
+                ],
+                "properties": {
+                  "periode": {
+                    "description": "Periode, an der die Unternehmensentwicklung arbeitet: die Vorperiode, solange sie offen ist und Berichte hat, sonst die laufende.",
+                    "type": "string"
+                  },
+                  "eingereicht": {
+                    "type": "integer"
+                  },
+                  "ausstehend": {
+                    "type": "integer"
+                  },
+                  "auffaellig": {
+                    "type": "integer"
+                  },
+                  "abschlussBis": {
+                    "format": "date",
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
       },
       "KpiPlan": {
         "additionalProperties": false,
@@ -40688,6 +41955,528 @@
         }
       }
     },
+    "/v1/zielerreichung/{quartal}": {
+      "get": {
+        "summary": "Zielerreichung eines Quartals",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Strategische Ziele und die Jahresziele des Jahres mit Metrik, Zielwert, Stand des Quartals und letztem Stand davor; Fortschritt «nachgeführt von gesamt» (UC-012 Schritte 1–2, K6 Schritt 10).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielerreichungQuartal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Stand erfassen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Stand eines Ziels im Quartal mit Kommentar. Unbekanntes Ziel: 404; Jahresziel eines anderen Jahres: 422; schon erfasst: 409 (dann ändern).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZielerreichungCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielerreichungEintrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/zielerreichung/{quartal}/{id}": {
+      "patch": {
+        "summary": "Stand ändern",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Stand oder Kommentar; Datum und Person werden neu gesetzt. Nur mit `If-Match` (412).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZielerreichungPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielerreichungEintrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stand entfernen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Das Ziel gilt im Quartal wieder als nicht nachgeführt. Nur mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Entfernt"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/gremien/{kuerzel}/sitzungen": {
       "get": {
         "summary": "Sitzungen eines Gremiums",
@@ -43188,6 +44977,1355 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/perioden/{periode}": {
+      "get": {
+        "summary": "Berichte der Periode (Monatsabschluss)",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Posteingang der Unternehmensentwicklung (UC-005 Schritt 1, K1): je berichtspflichtigem Projekt Stand (eingereicht, zurückgegeben, geprüft, ausstehend; nach dem Abschluss geprüft oder nicht gemeldet), Status und Trend mit Vorperiode und Auffälligkeiten (Schritt 2). Standardsortierung «auffällig zuerst» (I-L5). Der Kopf zählt alle Projekte unabhängig vom Filter und zeigt die Wirkung des Abschlusses (I-R1). Recht `statusbericht:review` an der Organisation bzw. mit `portfolio` am Portfolio.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "eingereicht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "zurueckgegeben"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "geprueft"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ausstehend"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "nicht_gemeldet"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "stand",
+            "required": false
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "auffaellig",
+            "required": false,
+            "description": "Nur Berichte mit (true) bzw. ohne (false) Auffälligkeit."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "auffaellig"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "nummer"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "description": "Standard `auffaellig`: auffällige zuerst, dann übrige eingereichte, zurückgegebene, ausstehende, geprüfte (I-L5)."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 500,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodeUebersicht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/perioden/{periode}/bestaetigen": {
+      "post": {
+        "summary": "Berichte gesammelt bestätigen",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Sammelbestätigung (UC-005 Schritt 3, I-L4, A-28): bestätigt die gewählten eingereichten Berichte ohne Auffälligkeit; Berichte mit Auffälligkeit und solche in einem anderen Stand werden übersprungen und genannt.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodeAuswahl"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodeSammelergebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/perioden/{periode}/einfordern": {
+      "post": {
+        "summary": "Ausstehende Berichte einfordern",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Einfordern (UC-005 A1, PS.01.03): die Projektleitung erhält im Eingang «Statusbericht ‹Monat› erstellen · eingefordert»; die Zeile zeigt «eingefordert am». Projekte mit eingereichtem Bericht werden übersprungen.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodeAuswahl"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodeSammelergebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/perioden/{periode}/terminabweichungen": {
+      "get": {
+        "summary": "Terminabweichungen über alle Projekte",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerminabweichungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/statusberichte/kopf": {
+      "get": {
+        "summary": "Kennzahlen der Statusberichte für die Startseite",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusberichteKopf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/pruefen": {
+      "post": {
+        "summary": "Statusbericht bestätigen",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodeZeile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/pruefung-zuruecknehmen": {
+      "post": {
+        "summary": "Bestätigung zurücknehmen",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Rückgängig nach dem Bestätigen (Toast, I-R1 Stufe 1): der Bericht ist wieder «eingereicht». Nur in offener Periode.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodeZeile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/rueckfragen": {
+      "get": {
+        "summary": "Rückfragen zum Statusbericht",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Rückfragen der Unternehmensentwicklung, neueste zuerst; die offene steht im Bericht der Projektleitung zuoberst (K1 «zurückgegeben»).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RueckfrageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Rückfrage stellen",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»). Sie erhält im Eingang «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RueckfrageCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodeZeile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/perioden/{periode}/abschliessen": {
+      "post": {
+        "summary": "Periode abschliessen",
+        "tags": [
+          "Monatsabschluss"
+        ],
+        "description": "Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): gesperrt, solange eingereichte Berichte ungeprüft sind (409 mit Anzahl). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/\"0\"`, solange es sie nicht gibt).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Periodenstand"
                 }
               }
             }
@@ -45971,6 +49109,10 @@
     {
       "name": "Statusberichte",
       "description": "Monatlicher Statusbericht je Projekt und Periode: Vorbelegung aus der Vorperiode, Entwurf, Einreichen mit Rückgängig."
+    },
+    {
+      "name": "Monatsabschluss",
+      "description": "Prüfung und Abschluss der Periode durch die Unternehmensentwicklung: Posteingang mit Auffälligkeiten, Bestätigen, Rückfrage, Einfordern, Terminabweichungen, «nicht gemeldet» (AP-E1-2)."
     },
     {
       "name": "Projektvertrag",

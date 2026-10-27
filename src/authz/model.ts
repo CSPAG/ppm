@@ -202,6 +202,8 @@ export const model = defineModel({
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
+    // statusbericht
+    list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
   },
   features: { audit: true },
 });

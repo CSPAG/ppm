@@ -21,7 +21,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | offen | – | – |
 | AP-E0-9 | Strategische Ziele | 080–089 | PR 1 umgesetzt (080, Modul `ziel`, `list_ziele`); PR 2 Oberfläche in Arbeit | #13 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
-| AP-E1-1 | Statusbericht erfassen | 090–099 | offen | – | – |
+| AP-E1-1 | Statusbericht erfassen | 090–099 | in Arbeit (PR 1: 090, Periode und Statusbericht, API mit Vorbelegung aus der Vorperiode, Einreichen mit Rückgängig; PR 2: Berichtsaufgabe am 18., Register, Oberfläche UI-13) | – | A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | offen | – | – |
@@ -96,7 +96,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | offen | – |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | offen | – |
-| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | offen | – |
+| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | in Arbeit (API) | – |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |
 | PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | offen | – |
 | PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | offen | – |

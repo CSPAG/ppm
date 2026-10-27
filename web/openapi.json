@@ -2534,6 +2534,713 @@
           }
         }
       },
+      "StatusberichtAbweichung": {
+        "additionalProperties": false,
+        "description": "Beurteilung der Abweichung je Dimension.",
+        "type": "object",
+        "required": [
+          "inhalt",
+          "termin",
+          "ressourcen",
+          "budget"
+        ],
+        "properties": {
+          "inhalt": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "stufe",
+              "kommentar"
+            ],
+            "properties": {
+              "stufe": {
+                "anyOf": [
+                  {
+                    "pattern": "^[a-z0-9_]{1,40}$",
+                    "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kommentar": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            }
+          },
+          "termin": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "stufe",
+              "kommentar"
+            ],
+            "properties": {
+              "stufe": {
+                "anyOf": [
+                  {
+                    "pattern": "^[a-z0-9_]{1,40}$",
+                    "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kommentar": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            }
+          },
+          "ressourcen": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "stufe",
+              "kommentar"
+            ],
+            "properties": {
+              "stufe": {
+                "anyOf": [
+                  {
+                    "pattern": "^[a-z0-9_]{1,40}$",
+                    "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kommentar": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            }
+          },
+          "budget": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "stufe",
+              "kommentar"
+            ],
+            "properties": {
+              "stufe": {
+                "anyOf": [
+                  {
+                    "pattern": "^[a-z0-9_]{1,40}$",
+                    "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kommentar": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "StatusberichtFehlend": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "feld",
+          "text"
+        ],
+        "properties": {
+          "feld": {
+            "description": "Feld im Bericht, z. B. `status` oder `abweichung.budget`.",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "Statusbericht": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "projektId",
+          "projektNummer",
+          "projektName",
+          "periode",
+          "periodeStand",
+          "stand",
+          "phase",
+          "anlass",
+          "status",
+          "trend",
+          "abschlussPer",
+          "naechsterMeilenstein",
+          "abweichung",
+          "abhaengigkeiten",
+          "entscheide",
+          "begruendung",
+          "massnahme",
+          "entscheidNoetig",
+          "vorperiode",
+          "fehlend",
+          "eingereichtAt",
+          "eingereichtBy",
+          "geprueftAt",
+          "version",
+          "updatedAt",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projektNummer": {
+            "type": "string"
+          },
+          "projektName": {
+            "type": "string"
+          },
+          "periode": {
+            "type": "string"
+          },
+          "periodeStand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "offen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeschlossen"
+                ]
+              }
+            ]
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "eingereicht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "geprueft"
+                ]
+              }
+            ]
+          },
+          "phase": {
+            "type": "string"
+          },
+          "anlass": {
+            "description": "Monatlich oder ausserhalb des Rhythmus (UC-004 Ausgangslage).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monatlich"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausserordentlich"
+                ]
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9_]{1,40}$",
+                "description": "Schlüssel aus der Codetabelle `trend` (Vorgabe aufwaerts, gleichbleibend, abwaerts).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "abschlussPer": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Geplanter Abschluss des Projekts.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "naechsterMeilenstein": {
+            "maxLength": 500,
+            "type": "string"
+          },
+          "abweichung": {
+            "$ref": "#/components/schemas/StatusberichtAbweichung"
+          },
+          "abhaengigkeiten": {
+            "maxLength": 4000,
+            "type": "string"
+          },
+          "entscheide": {
+            "maxLength": 4000,
+            "description": "Anstehende Entscheide.",
+            "type": "string"
+          },
+          "begruendung": {
+            "maxLength": 4000,
+            "description": "Pflicht bei «kritisch» (UC-004 A2).",
+            "type": "string"
+          },
+          "massnahme": {
+            "maxLength": 4000,
+            "description": "Pflicht bei «kritisch» (UC-004 A2).",
+            "type": "string"
+          },
+          "entscheidNoetig": {
+            "description": "Entscheid des PRAT nötig (UC-004 A2.2); nur bei «kritisch».",
+            "type": "boolean"
+          },
+          "vorperiode": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "periode",
+                  "status",
+                  "trend",
+                  "stand"
+                ],
+                "properties": {
+                  "periode": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "anyOf": [
+                      {
+                        "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "im_plan"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "kritisch"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "trend": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "stand": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fehlend": {
+            "description": "Fehlende Pflichtangaben für das Einreichen (Seitenpanel «Bereit zum Einreichen», I-P4).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusberichtFehlend"
+            }
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eingereichtBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "geprueftAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 0,
+            "description": "0: noch nicht gespeichert; mit `If-Match: W/\"0\"` anlegen.",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write",
+              "einreichen",
+              "zurueckziehen"
+            ],
+            "properties": {
+              "write": {
+                "description": "Entwurf speichern.",
+                "type": "boolean"
+              },
+              "einreichen": {
+                "type": "boolean"
+              },
+              "zurueckziehen": {
+                "description": "Rückgängig innert 10 s nach dem Einreichen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "StatusberichtKurz": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "periode",
+          "anlass",
+          "stand",
+          "status",
+          "trend",
+          "phase",
+          "eingereichtAt",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "periode": {
+            "type": "string"
+          },
+          "anlass": {
+            "description": "Monatlich oder ausserhalb des Rhythmus (UC-004 Ausgangslage).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monatlich"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausserordentlich"
+                ]
+              }
+            ]
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "eingereicht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "geprueft"
+                ]
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "type": "string"
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "StatusberichtList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusberichtKurz"
+            }
+          }
+        }
+      },
+      "StatusberichtPut": {
+        "type": "object",
+        "properties": {
+          "anlass": {
+            "description": "Monatlich oder ausserhalb des Rhythmus (UC-004 Ausgangslage).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monatlich"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausserordentlich"
+                ]
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9_]{1,40}$",
+                "description": "Schlüssel aus der Codetabelle `trend` (Vorgabe aufwaerts, gleichbleibend, abwaerts).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "abschlussPer": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Geplanter Abschluss des Projekts.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "naechsterMeilenstein": {
+            "maxLength": 500,
+            "type": "string"
+          },
+          "abweichung": {
+            "$ref": "#/components/schemas/StatusberichtAbweichung"
+          },
+          "abhaengigkeiten": {
+            "maxLength": 4000,
+            "type": "string"
+          },
+          "entscheide": {
+            "maxLength": 4000,
+            "description": "Anstehende Entscheide.",
+            "type": "string"
+          },
+          "begruendung": {
+            "maxLength": 4000,
+            "description": "Pflicht bei «kritisch» (UC-004 A2).",
+            "type": "string"
+          },
+          "massnahme": {
+            "maxLength": 4000,
+            "description": "Pflicht bei «kritisch» (UC-004 A2).",
+            "type": "string"
+          },
+          "entscheidNoetig": {
+            "description": "Entscheid des PRAT nötig (UC-004 A2.2); nur bei «kritisch».",
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -18321,6 +19028,666 @@
         }
       }
     },
+    "/v1/projekte/{id}/berichte": {
+      "get": {
+        "summary": "Statusberichte eines Projekts",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Alle gespeicherten Berichte, neueste Periode zuerst (Verlauf, Vorperiode).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusberichtList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}": {
+      "get": {
+        "summary": "Statusbericht der Periode lesen",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Gespeicherter Bericht oder, solange keiner gespeichert ist, die Vorbelegung aus der Vorperiode (UC-004 Schritt 1) mit `version` 0 – alle Werte ausser Status und Trend (K1). `fehlend` nennt die Pflichtangaben, die für das Einreichen noch fehlen.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Entwurf des Statusberichts speichern",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Automatisches Speichern (I-R3): nur die gesendeten Felder ändern sich; der erste Aufruf (`If-Match: W/\"0\"`) legt den Entwurf mit der Vorbelegung an. Nur im Stand Entwurf oder zurückgegeben, in offener Periode, für aktive Projekte in P0–P3 (sonst 409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusberichtPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/einreichen": {
+      "post": {
+        "summary": "Statusbericht einreichen",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Prüft die Pflichtangaben (UC-004 Schritt 7, A2; sonst 422 mit allen fehlenden Angaben in `errors`) und reicht den Bericht zur Prüfung ein (Schritt 8). Danach nur lesbar, bis die Unternehmensentwicklung ihn prüft oder zurückgibt; innert 10 s mit `…/zurueckziehen` rückgängig.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/zurueckziehen": {
+      "post": {
+        "summary": "Einreichen rückgängig machen",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Rückgängig im Toast nach dem Einreichen (K1 Schritt 8, G6): nur durch die einreichende Person, innert 10 s und solange der Bericht nicht geprüft ist (sonst 409). Der Bericht ist wieder ein Entwurf.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -18635,6 +20002,10 @@
     {
       "name": "Ziele",
       "description": "Strategische Ziele je Handlungsfeld mit Metrik, Zielwert und Verlauf; ab Etappe E6 Zielzyklus, Jahresziele und Zielerreichung."
+    },
+    {
+      "name": "Statusberichte",
+      "description": "Monatlicher Statusbericht je Projekt und Periode: Vorbelegung aus der Vorperiode, Entwurf, Einreichen mit Rückgängig."
     },
     {
       "name": "Webhooks",

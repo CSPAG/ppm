@@ -8,5 +8,6 @@ export const MATRIX = sammle([
   (await import('./portfolio.ts')).matrix,
   (await import('./projekt.ts')).matrix,
   (await import('./ziel.ts')).matrix,
+  (await import('./statusbericht.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
 ]);

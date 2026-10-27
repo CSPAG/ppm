@@ -9,6 +9,7 @@ import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
+import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
 import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
@@ -67,6 +68,33 @@ function PhasenmodellRoute() {
   return <PhasenmodellPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Gremien»: Sitzungen (UI-33, UC-006, K3); Adresse der Sitzung `/gremien/<kuerzel>/sitzungen/<datum>` (I-N5)
+const gremienRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien',
+  beforeLoad: () => { throw redirect({ to: '/gremien/sitzungen', replace: true }); },
+});
+
+const sitzungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/sitzungen', component: SitzungenRoute });
+
+function SitzungenRoute() {
+  const navigate = useNavigate();
+  return <SitzungenPage gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const sitzungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum', validateSearch: searchOf.sitzung, component: SitzungRoute,
+});
+
+function SitzungRoute() {
+  const { kuerzel, datum } = sitzungRoute.useParams();
+  const search = sitzungRoute.useSearch();
+  const navigate = useNavigate({ from: sitzungRoute.fullPath });
+  const setSearch = useCallback<SetSitzungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -75,7 +103,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, phasenmodellRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, gremienRoute, sitzungenRoute, sitzungRoute, phasenmodellRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

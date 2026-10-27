@@ -1,0 +1,87 @@
+/**
+ * Texte des Features «Bericht» (UI-13, Kernablauf K1; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie»
+ * (UX-E7), Schweizer Rechtschreibung, Texte aus K1 «Texte» und «Regeln und Rückmeldungen».
+ */
+export const TB = {
+  reiter: 'Bericht',
+  palette: (nr: string, name: string) => `Statusbericht erstellen: ${nr} ${name}`,
+  titel: (monat: string) => `Statusbericht ${monat}`,
+  periode: 'Periode',
+  anlass: { monatlich: 'monatlich', ausserordentlich: 'ausserordentlich' } as Record<string, string>,
+  ausserordentlich: 'Meldung ausserhalb des Rhythmus',
+  ausserordentlichHint: 'Für eine wesentliche Entwicklung zwischen zwei Monatsberichten (UC-004).',
+  kopf: {
+    phase: 'Phase', abschlussPer: 'Abschluss per', naechster: 'Nächster Meilenstein', vorperiode: 'Vorperiode',
+    keineVorperiode: 'Erster Bericht des Projekts',
+    vorperiodeText: (monat: string, status: string, trend: string) => `${monat}: ${status} · ${trend}`,
+  },
+  stand: { entwurf: 'Entwurf', eingereicht: 'eingereicht', zurueckgegeben: 'zurückgegeben', geprueft: 'geprüft' } as Record<string, string>,
+  gespeichert: 'Gespeichert', speichert: 'Speichert …', ungespeichert: 'Ungespeicherte Änderungen',
+  abschnitte: {
+    meilensteine: 'Meilensteine', kosten: 'Kosten', risiken: 'Risiken', kommunikation: 'Kommunikation', kpis: 'KPIs', beurteilung: 'Beurteilung',
+  },
+  meilenstein: {
+    leer: 'Keine überfälligen Meilensteine und keine in den nächsten drei Monaten.',
+    erreicht: 'Erreicht', erreichtAm: (d: string) => `erreicht am ${d}`, neuerTermin: 'Neuer Termin', termin: 'Termin', baseline: 'Baseline',
+    abweichung: (w: string) => `${w} gegenüber Baseline`, ueberfaellig: 'überfällig',
+    erreichtMelden: (t: string) => `${t} als erreicht melden`, terminVon: (t: string) => `Neuer Termin für ${t}`,
+  },
+  wesentlich: {
+    termin: (text: string, neu: string, alt: string, w: string) => `${text} neu ${neu} statt ${alt} laut Baseline (${w}). Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.`,
+    kosten: (phase: string, p: string) => `Prognose ${phase} ${p} über Budget. Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.`,
+    regel: 'Termin', regelKosten: 'Kosten',
+  },
+  kosten: {
+    leer: 'Keine Kostenpositionen im Register.', budget: 'Budget', ist: 'Ist-Kosten', prognose: 'Prognose',
+    istFehlt: 'Ist-Kosten noch nicht verfügbar', prognoseVon: (t: string) => `Prognose für ${t} in CHF`,
+    summe: (phase: string, prognose: string, diff: string) => `Prognose ${phase}: ${prognose} · ${diff}`,
+    ueber: (p: string) => `${p} über Budget`, unter: (p: string) => `${p} unter Budget`, imBudget: 'im Budget', ohneBudget: 'ohne Budget',
+    keinRecht: 'Beträge sehen nur Rollen mit Recht auf Finanzen.',
+  },
+  risiko: {
+    leer: 'Keine Projektrisiken erfasst.', massnahme: 'Massnahme', keineMassnahme: 'keine Massnahme',
+    stand: { offen: 'offen', umgesetzt: 'umgesetzt' } as Record<string, string>,
+    umgesetzt: (t: string) => `Massnahme zu «${t}» umgesetzt`, ewaw: (ew: string, aw: string) => `EW ${ew} · AW ${aw}`,
+  },
+  kommunikation: {
+    leer: 'In dieser Periode sind keine Kommunikationsmassnahmen fällig.', erledigt: (t: string) => `${t} erledigt`,
+  },
+  kpi: {
+    leer: 'Keine Projekt-KPIs erfasst.', ziel: 'Zielwert', letzter: 'Letzter Ist-Wert', neu: (t: string) => `Ist-Wert ${t}`, keiner: 'noch keiner',
+    abP2: 'KPI-Werte erfassen Sie ab der Implementierung (P2).',
+  },
+  beurteilung: {
+    status: 'Status', trend: 'Trend', vorperiode: (w: string) => `Vorperiode: ${w}`,
+    statusWerte: { im_plan: 'Im Plan', kritisch: 'Kritisch' } as Record<string, string>,
+    trendWerte: { aufwaerts: 'aufwärts', gleichbleibend: 'gleichbleibend', abwaerts: 'abwärts' } as Record<string, string>,
+    abweichung: 'Abweichung', dimension: { inhalt: 'Inhalt', termin: 'Termin', ressourcen: 'Ressourcen', budget: 'Budget' } as Record<string, string>,
+    stufen: { keine: 'keine', gering: 'gering', wesentlich: 'wesentlich' } as Record<string, string>,
+    stufeWaehlen: 'wählen', kommentar: (d: string) => `Kommentar ${d}`,
+    naechster: 'Nächster Meilenstein', abschlussPer: 'Abschluss per', abhaengigkeiten: 'Abhängigkeiten', entscheide: 'Anstehende Entscheide',
+    begruendung: 'Begründung', massnahme: 'Massnahme', entscheidNoetig: 'Entscheid des PRAT nötig',
+    kritischHinweis: 'Kritisch: Begründung und Massnahme fehlen. Sponsor und Unternehmensentwicklung brauchen beides, um handeln zu können.',
+    wirkungKritisch: 'Ihr Sponsor und die Unternehmensentwicklung werden beim Einreichen informiert. Mit «Entscheid des PRAT nötig» wird eine Eskalation für die nächste PRAT-Sitzung angelegt.',
+  },
+  panel: {
+    titel: 'Bereit zum Einreichen', bereit: 'Alle Pflichtangaben sind erfasst.',
+    fehlt: (n: number) => (n === 1 ? '1 Angabe fehlt' : `${n} Angaben fehlen`),
+    wirkung: 'Die Unternehmensentwicklung erhält den Bericht zur Prüfung. Das Dashboard zeigt ihn sofort.',
+    einreichen: 'Statusbericht einreichen',
+    nichtBearbeitbar: (stand: string) => `Stand: ${stand}. Einreichen ist nicht möglich.`,
+    sperre: (liste: string) => `Angaben fehlen: ${liste}. Ergänzen Sie sie, um den Bericht einzureichen.`,
+  },
+  eingereicht: (monat: string) => `Statusbericht ${monat} eingereicht. Die Unternehmensentwicklung prüft ihn bis Monatsende.`,
+  rueckgaengig: 'Rückgängig',
+  zurueckgezogen: 'Einreichen rückgängig gemacht. Der Bericht ist wieder ein Entwurf.',
+  banner: {
+    eingereicht: (seit: string) => `In Prüfung bei der Unternehmensentwicklung seit ${seit}. Ändern ist erst nach einer Rückfrage möglich.`,
+    geprueft: 'Der Bericht ist geprüft. Er kann nicht mehr geändert werden.',
+    zurueckgegeben: 'Rückfrage der Unternehmensentwicklung: Der Bericht ist wieder bearbeitbar. Reichen Sie ihn nach der Korrektur erneut ein.',
+    abgeschlossen: (monat: string) => `${monat} ist abgeschlossen. Das Dashboard ist für die Gremien freigegeben.`,
+    nurLesen: 'Sie können diesen Bericht nur ansehen.',
+    keinBericht: 'Dieses Projekt berichtet nicht monatlich (Phase P4 oder nicht aktiv).',
+    zukunft: 'Diese Periode hat noch nicht begonnen.',
+  },
+  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüfen Sie Ihre letzte Eingabe.',
+  projektFehlt: 'Dieses Projekt gibt es nicht, oder Sie sehen es nicht.',
+};

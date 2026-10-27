@@ -3,6 +3,7 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
+import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
@@ -69,6 +70,13 @@ export const navigation: NavRegistrierung = {
   // Kontomenü und «Mehr»: Profil und Stellvertretung (UI-43, UC-016 Schritt 4)
   konto: [{ id: 'stellvertretung', label: kontoTexte.titel, icon: 'users', pfad: '/konto/stellvertretung', recht: 'tenant:read' }],
   suchen: [
+    // «Statusbericht erstellen» mit Projektwahl (K1 Einstieg Befehlspalette): Bericht der laufenden Periode
+    {
+      id: 'statusbericht', recht: 'statusbericht:write',
+      suchen: async (q, signal) => (await sucheProjekte(q, signal)).filter(p => p.lebenszyklus === 'aktiv' && p.phase !== 'P4').map(p => ({
+        id: `statusbericht:${p.id}`, label: berichtTexte.palette(p.nummer, p.name), detail: berichtTexte.reiter, icon: 'doc', pfad: `/projekte/${p.nummer}/bericht?periode=${laufendePeriode()}`,
+      })),
+    },
     {
       id: 'projekte', recht: 'projekt:read',
       suchen: async (q, signal) => (await sucheProjekte(q, signal)).map(p => ({

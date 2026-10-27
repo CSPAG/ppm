@@ -8568,6 +8568,808 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/eingang": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Offene Aufgaben («Zu tun»)
+         * @description Alle offenen Aufgaben der Person aus allen Rollen, nach Frist (ohne Frist zuletzt), dann nach Eingang; auch Aufgaben von Personen, die sie heute vertritt (mit `vertretung`). Cursor-Paginierung.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description `frist`: nur Aufgaben mit Frist. */
+                    filter?: "frist";
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AufgabeList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/eingang/anzahl": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Anzahl offener Aufgaben
+         * @description Für den Zähler an «Eingang» (I-N3) und den Kopf des Eingangs.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AufgabeAnzahl"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/eingang/aufgaben/{id}/erledigen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aufgabe von Hand erledigen
+         * @description Nur Aufgaben ohne fachlichen Übergang (`can.erledigen`); alle anderen schliesst die Handlung selbst (z. B. Einreichen). Sonst 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Aufgabe"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mitteilungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mitteilungen
+         * @description Mitteilungen an die Person, neueste zuerst, mit Anzahl ungelesener.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Nur ungelesene. */
+                    ungelesen?: boolean;
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MitteilungList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mitteilungen/{id}/gelesen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mitteilung als gelesen markieren
+         * @description Idempotent.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Gelesen */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/stellvertretungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stellvertretungen
+         * @description Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StellvertretungList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Stellvertretung erfassen
+         * @description Für die angemeldete Person. Im Zeitraum sieht die Vertretung deren Aufgaben und erhält befristet deren Rollen an Portfolios und Projekten; Unterschriften nur, wenn ausdrücklich erteilt (A-31). Die Vertretung erhält eine Mitteilung.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StellvertretungCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Stellvertretung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/stellvertretungen/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Stellvertretung beenden
+         * @description Nur die vertretene Person; die befristeten Rollen der Vertretung entfallen sofort.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Beendet */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/org-einheiten": {
         parameters: {
             query?: never;
@@ -12433,6 +13235,1670 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ziele/{jahr}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Zielzyklus eines Jahres
+         * @description Strategische Ziele mit Jahreszielen, Hauptaktivitäten und zugeordneten Projekten (nur sichtbare), dazu der Prüfbericht: Jahresziele ohne Metrik, ohne Hauptaktivität und Projekt. Ohne gestarteten Zielzyklus `zieljahr: null`.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Jahr des Zielzyklus. */
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Zielzyklus"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Zielzyklus starten
+         * @description Legt das Zieljahr «in Arbeit» an (UC-011 Schritt 1); schon gestartet: 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    /** @description Jahr des Zielzyklus. */
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ZieljahrCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Zieljahr"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Zielzyklus ändern
+         * @description Geplante Vorlage an den VR; nur «in Arbeit» (sonst 409) und mit `If-Match` (412).
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    /** @description Jahr des Zielzyklus. */
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ZieljahrPatch"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Zieljahr"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/jahresziele": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Jahresziele auflisten
+         * @description Sortiert nach Jahr und Nummer, Cursor-Paginierung, Filter nach Jahr und strategischem Ziel.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Nur Jahresziele dieses Jahres. */
+                    jahr?: number;
+                    /** @description Nur Jahresziele unter diesem strategischen Ziel. */
+                    strategischesZiel?: string;
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["JahreszielList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Jahresziel hinzufügen
+         * @description Unter einem strategischen Ziel (unbekannt: 404) im gestarteten Zielzyklus «in Arbeit» (sonst 404 bzw. 409). Ohne Nummer: Nummer des strategischen Ziels und laufende Nummer («2.1.3»); Nummer schon vergeben: 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["JahreszielCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Jahresziel"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/jahresziele/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jahresziel lesen */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Jahresziel"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Jahresziel löschen
+         * @description Mit seinen Hauptaktivitäten; zugeordnete Projekte bleiben beim strategischen Ziel. Nur «in Arbeit» und mit `If-Match`.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Gelöscht */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Jahresziel ändern
+         * @description Text, Nummer, Metrik und Zielwert; nur «in Arbeit» (409) und mit `If-Match` (412).
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["JahreszielPatch"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Jahresziel"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/hauptaktivitaeten": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hauptaktivitäten eines Jahresziels */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Hauptaktivitäten dieses Jahresziels. */
+                    jahresziel: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HauptaktivitaetList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Hauptaktivität hinzufügen
+         * @description Unter einem Jahresziel (unbekannt: 404) mit verantwortlicher Person; nur «in Arbeit».
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["HauptaktivitaetCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Hauptaktivitaet"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hauptaktivitaeten/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hauptaktivität lesen */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Hauptaktivitaet"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Hauptaktivität löschen
+         * @description Nur «in Arbeit» und mit `If-Match`.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Gelöscht */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Hauptaktivität ändern
+         * @description Nur «in Arbeit» (409) und mit `If-Match` (412).
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["HauptaktivitaetPatch"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Hauptaktivitaet"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/projekte/{id}/ziele": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ziele eines Projekts
+         * @description Strategische Ziele und Jahresziele, zu denen das Projekt beiträgt, mit Adresse im Arbeitsraum Ziele (K6-2).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjektZielList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Projekt einem Ziel zuordnen
+         * @description Zu einem strategischen Ziel oder einem Jahresziel (das strategische Ziel folgt daraus; widersprechen sie sich: 422). Unbekanntes Projekt oder Ziel: 404; schon zugeordnet: 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProjektZielCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjektZiel"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projekte/{id}/ziele/{zuordnungId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Zuordnung lösen */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    zuordnungId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Gelöst */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks": {
         parameters: {
             query?: never;
@@ -13045,6 +15511,135 @@ export interface components {
             clientId: string | null;
             lastSeenAt: string | null;
         };
+        Aufgabe: {
+            /** Format: uuid */
+            id: string;
+            /** @description Art der Aufgabe `<modul>.<verb>` (Fachmodell 4.2), z. B. `statusbericht.erstellen`. */
+            art: string;
+            titel: string;
+            kontext: string | null;
+            /** @description Adresse in der Oberfläche, die direkt zur Aktion führt (I-B1). */
+            link: string;
+            frist: string | null;
+            fristArt: ("kalendertage" | "arbeitstage") | null;
+            bezug: {
+                typ: string;
+                id: string;
+            };
+            /** @description `person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort. */
+            empfaenger: "person" | "recht";
+            vertretung: {
+                person: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                };
+                /**
+                 * Format: date
+                 * @description Kalendertag (YYYY-MM-DD).
+                 * @example 2026-10-25
+                 */
+                bis: string;
+            } | null;
+            /** Format: date-time */
+            createdAt: string;
+            can: {
+                /** @description Nur Aufgaben ohne fachlichen Übergang sind von Hand erledigbar. */
+                erledigen: boolean;
+            };
+        };
+        AufgabeList: {
+            items: components["schemas"]["Aufgabe"][];
+            nextCursor: string | null;
+        };
+        AufgabeAnzahl: {
+            /** @description Offene Aufgaben der Person (Zähler an «Eingang», I-N3). */
+            offen: number;
+            ueberfaellig: number;
+            naechsteFrist: string | null;
+        };
+        Mitteilung: {
+            /** Format: uuid */
+            id: string;
+            text: string;
+            link: string | null;
+            bezug: {
+                typ: string;
+                id: string;
+            };
+            gelesenAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        MitteilungList: {
+            items: components["schemas"]["Mitteilung"][];
+            nextCursor: string | null;
+            ungelesen: number;
+        };
+        Stellvertretung: {
+            /** Format: uuid */
+            id: string;
+            vertretene: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            vertreter: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /**
+             * Format: date
+             * @description Kalendertag (YYYY-MM-DD).
+             * @example 2026-10-25
+             */
+            von: string;
+            /**
+             * Format: date
+             * @description Kalendertag (YYYY-MM-DD).
+             * @example 2026-10-25
+             */
+            bis: string;
+            /** @description Die Vertretung darf in Vertretung unterzeichnen (UX-OF-10, A-31). */
+            unterschriften: boolean;
+            /** @description Heute im Zeitraum. */
+            aktiv: boolean;
+            /** @description `eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten. */
+            richtung: "eigene" | "fuer_andere";
+            /** Format: date-time */
+            createdAt: string;
+            can: {
+                beenden: boolean;
+            };
+        };
+        StellvertretungList: {
+            items: components["schemas"]["Stellvertretung"][];
+        };
+        StellvertretungCreate: {
+            /**
+             * Format: uuid
+             * @description Person, die vertritt (aus dem Personenverzeichnis).
+             */
+            vertreter: string;
+            /**
+             * Format: date
+             * @description Kalendertag (YYYY-MM-DD).
+             * @example 2026-10-25
+             */
+            von: string;
+            /**
+             * Format: date
+             * @description Kalendertag (YYYY-MM-DD).
+             * @example 2026-10-25
+             */
+            bis: string;
+            /**
+             * @description Unterschriften ausdrücklich erteilen (A-31).
+             * @default false
+             */
+            unterschriften: boolean;
+        };
         OrgEinheit: {
             /** Format: uuid */
             id: string;
@@ -13511,6 +16106,230 @@ export interface components {
             metrik?: string;
             /** @description Angestrebter Wert der Metrik. */
             zielwert?: string;
+        };
+        Zieljahr: {
+            jahr: number;
+            /** @description Bearbeitungsstand der Jahresziele; ab «zur_freigabe» gesperrt. */
+            stand: "in_arbeit" | "zur_freigabe" | "in_kraft";
+            vorlageBis: string | null;
+            freigabeAt: string | null;
+            freigabeText: string;
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            can: {
+                /** @description Jahresziele und Hauptaktivitäten bearbeiten (nur «in Arbeit»). */
+                write: boolean;
+            };
+        };
+        ZieljahrCreate: {
+            vorlageBis?: string | null;
+        };
+        ZieljahrPatch: {
+            vorlageBis: string | null;
+        };
+        /** @description Person mit Anzeigename. */
+        ZielPerson: {
+            /** Format: uuid */
+            id: string;
+            name: string | null;
+        };
+        ZielProjekt: {
+            /** Format: uuid */
+            zuordnungId: string;
+            /** Format: uuid */
+            projektId: string;
+            /** @description Projektnummer, Schlüssel der Projektakte (/projekte/<nummer>). */
+            nummer: string;
+            name: string;
+            phase: string;
+            lebenszyklus: string;
+        };
+        Zielzyklus: {
+            jahr: number;
+            zieljahr: components["schemas"]["Zieljahr"] | null;
+            /** @description Alle strategischen Ziele, sortiert nach Nummer; Handlungsfelder über /v1/handlungsfelder. */
+            strategischeZiele: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                handlungsfeldId: string;
+                nummer: string;
+                text: string;
+                metrik: string;
+                zielwert: string;
+                /** @description Projekte, die dem strategischen Ziel ohne Jahresziel zugeordnet sind. */
+                projekte: components["schemas"]["ZielProjekt"][];
+                jahresziele: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    text: string;
+                    metrik: string;
+                    zielwert: string;
+                    version: number;
+                    hauptaktivitaeten: {
+                        /** Format: uuid */
+                        id: string;
+                        text: string;
+                        verantwortlich: components["schemas"]["ZielPerson"] | null;
+                        position: number;
+                        version: number;
+                    }[];
+                    projekte: components["schemas"]["ZielProjekt"][];
+                }[];
+            }[];
+            /** @description Prüfbericht (K6 Regeln). */
+            pruefung: {
+                /** @description Jahresziele ohne Metrik oder Zielwert (sperrt die Vorlage, UC-011 Schritt 5). */
+                ohneMetrik: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                }[];
+                /** @description Jahresziele ohne Hauptaktivität und ohne Projekt (Hinweis). */
+                ohneUmsetzung: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                }[];
+            };
+            can: {
+                /** @description Zielzyklus starten (noch nicht gestartet, ziel:write). */
+                start: boolean;
+                /** @description Jahresziele und Hauptaktivitäten bearbeiten. */
+                write: boolean;
+                /** @description Projekte zuordnen (ziel:write). */
+                zuordnen: boolean;
+            };
+        };
+        Jahresziel: {
+            /** Format: uuid */
+            id: string;
+            jahr: number;
+            /** Format: uuid */
+            strategischesZielId: string;
+            nummer: string;
+            text: string;
+            metrik: string;
+            zielwert: string;
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string | null;
+            can: {
+                /** @description Ändern und löschen (nur solange das Jahr «in Arbeit» ist). */
+                write: boolean;
+            };
+        };
+        JahreszielCreate: {
+            jahr: number;
+            /** Format: uuid */
+            strategischesZielId: string;
+            /**
+             * @description Nummer, eindeutig im Jahr; Vorgabe: Nummer des strategischen Ziels und laufende Nummer («2.1.3»).
+             * @example 2.1.3
+             */
+            nummer?: string;
+            /** @description Formulierung. */
+            text: string;
+            /** @description Woran die Erreichung gemessen wird (ZM.02.04); leer = fehlt. */
+            metrik?: string;
+            /** @description Angestrebter Wert der Metrik. */
+            zielwert?: string;
+        };
+        JahreszielPatch: {
+            /**
+             * @description Nummer, eindeutig im Jahr; Vorgabe: Nummer des strategischen Ziels und laufende Nummer («2.1.3»).
+             * @example 2.1.3
+             */
+            nummer?: string;
+            /** @description Formulierung. */
+            text?: string;
+            /** @description Woran die Erreichung gemessen wird (ZM.02.04); leer = fehlt. */
+            metrik?: string;
+            /** @description Angestrebter Wert der Metrik. */
+            zielwert?: string;
+        };
+        JahreszielList: {
+            items: components["schemas"]["Jahresziel"][];
+            nextCursor: string | null;
+        };
+        Hauptaktivitaet: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            jahreszielId: string;
+            text: string;
+            verantwortlich: components["schemas"]["ZielPerson"] | null;
+            position: number;
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            can: {
+                write: boolean;
+            };
+        };
+        HauptaktivitaetCreate: {
+            /** Format: uuid */
+            jahreszielId: string;
+            /** @description Formulierung. */
+            text: string;
+            verantwortlich?: string | null;
+            position?: number;
+        };
+        HauptaktivitaetPatch: {
+            /** @description Formulierung. */
+            text?: string;
+            verantwortlich?: string | null;
+            position?: number;
+        };
+        HauptaktivitaetList: {
+            items: components["schemas"]["Hauptaktivitaet"][];
+        };
+        ProjektZiel: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projektId: string;
+            strategischesZiel: {
+                /** Format: uuid */
+                id: string;
+                nummer: string;
+                text: string;
+            };
+            jahresziel: {
+                /** Format: uuid */
+                id: string;
+                jahr: number;
+                nummer: string;
+                text: string;
+            } | null;
+            /** @description Adresse des Ziels im Arbeitsraum Ziele. */
+            link: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ProjektZielList: {
+            items: components["schemas"]["ProjektZiel"][];
+            can: {
+                /** @description Zuordnungen ändern. */
+                write: boolean;
+            };
+        };
+        /** @description Strategisches Ziel oder Jahresziel (das strategische Ziel folgt daraus). */
+        ProjektZielCreate: {
+            /** Format: uuid */
+            strategischesZielId?: string;
+            /** Format: uuid */
+            jahreszielId?: string;
         };
         WebhookSubscription: {
             /** Format: uuid */

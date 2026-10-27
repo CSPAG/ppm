@@ -63,7 +63,8 @@ export const matrix: Matrix = {
     'PUT /v1/projekte/:id/organisation': i => ({ method: 'PUT', url: `/v1/projekte/${i.projekt}/organisation`, body: { mitglieder: [] }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
   },
   unchanged: async (api, a, mark) => {
-    const mine = (await api.app.inject({ method: 'GET', url: '/v1/projekte', headers: a })).json().items;
+    // nur Projekte dieser Matrix (andere Module legen eigene an, z. B. ziel-zyklus)
+    const mine = (await api.app.inject({ method: 'GET', url: '/v1/projekte?portfolio=transformation', headers: a })).json().items;
     assert.deepEqual(mine.map((x: { name: string; version: number }) => [x.name, x.version]), [[mark, 1]]);
     const o = (await api.app.inject({ method: 'GET', url: `/v1/projekte/${mine[0].id}/organisation`, headers: a })).json();
     assert.deepEqual([o.version, o.mitglieder.map((m: { akv: string }) => m.akv)], [1, [mark]]);

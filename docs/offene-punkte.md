@@ -23,3 +23,18 @@ in der [Klärungsliste](anhang/klaerungsliste.md) (K01–K25) und für die Oberf
 | <a id="op-14"></a>OP-14 | npm-Version | Mit npm 10.9 bricht `npm install` in `web/` ab (`edgesOut`); mit npm 11 läuft es. | npm ≥ 11 in CI und Doku voraussetzen | Team |
 | <a id="op-15"></a>OP-15 | Kubernetes-Platzhalter | `deploy/k8s/`: DB-CIDR, Namespaces und Issuer sind Platzhalter; Secrets je Dienst liefert ein Overlay. | Nur falls OP-01 Kubernetes ergibt | Betrieb |
 | <a id="op-16"></a>OP-16 | Organisation löschen | `tenant delete` (`tenantDelete` in `@vollholz/platform`) schaltet in seiner Transaktion `FORCE RLS` und Benutzer-Trigger der Mandantentabellen kurz aus (exklusive Sperren); das Protokoll des Mandanten geht mit ihm, ein Eintrag bleibt im Protokoll der Plattform. | Nur in Wartungsfenstern nutzen; Löschfunktion im Baukasten prüfen | Team, identity-kit |
+| <a id="op-17"></a>OP-17 | GitHub-Attestation | `actions/attest-build-provenance` scheitert für das private Repository (Plan von CSPAG ohne Attestationen). Der Schritt läuft nur mit Variable `ENABLE_GITHUB_ATTESTATIONS=true`; Provenienz aus dem Build, Signatur und SBOM über cosign keyless, geprüft in «Deploy» mit `cosign verify`. | Bei Planwechsel oder öffentlichem Repository Variable setzen | CSP, Team |
+
+## Für die Person
+
+Was nur die Betriebsperson kann (Freigaben, Merge, Schritte mit SSH); Stand Einrichtung Hetzner, 27.10.2026.
+
+| Nr. | Was | Wo |
+|---|---|---|
+| 1 | Pull Request CSPAG/ppm#10 mergen (CI: Attestation nur mit `ENABLE_GITHUB_ATTESTATIONS`) | GitHub |
+| 2 | Erster Rollout freigeben: Workflow «Deploy» › `deploy` mit dem Digest aus «CI» auf `main` › «Approve» | GitHub › Actions |
+| 3 | Environment `production`: «Required reviewers» und «Deployment branches» = nur `main` prüfen | GitHub › Settings › Environments |
+| 4 | Host-Schlüssel der DB-VM in der Hetzner Console vergleichen (`SHA256:PWCDsc3UYGI1FO8sxwFb/w/m/r4HJURs4qmkhQ/ZcyE`, CSPAG/ppm#8) | Hetzner Console › `ppm-db` |
+| 5 | Erste Organisation und Betrieb anlegen (`npm run identity:first-org`, OP-06), nach dem ersten Rollout | lokale Session, [Schritt 14](../deploy/hetzner/lokale-session.md#schritt-14-erste-organisation-betrieb-rauchtest) |
+| 6 | PITR auf einer Wegwerf-VM üben, Ergebnis in `docs/betrieb.md` | lokale Session, [Schritt 15](../deploy/hetzner/lokale-session.md#schritt-15-pitr-üben) |
+| 7 | `%APPDATA%\sops\age\keys.txt` im Passwortmanager sichern; entscheiden, ob PPM einen eigenen age-Schlüssel bekommt (heute derselbe wie nachtschicht, OP-07) | Rechner der Person |

@@ -223,6 +223,7 @@ export const model = defineModel({
     get_periode: { title: 'Monatsabschluss einer Periode lesen', permission: 'statusbericht:review', readOnly: true },
     // ressource
     get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
+    list_bedarfe: { title: 'Bedarfsliste mit Deckung', permission: 'ressource:read', readOnly: true },
     // idee
     list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },
     get_idee: { title: 'Projektidee lesen', permission: 'idee:read', readOnly: true },

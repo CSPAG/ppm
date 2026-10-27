@@ -171,6 +171,24 @@ elf folgenden, höchstens 60 Monate.
 | `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
 | `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
 
+Bedarfsliste, Zuteilung und Konflikte (AP-E7-2; RK.02.02, RK.02.03; UC-009 Schritte 3–4, A1, A2). Zugeteilt wird je
+Bedarf, Person und Monat ein Anteil in FTE (höchstens eine Stelle je Person, Beschäftigungsgrad aus dem HR-System offen);
+nur Bedarf in FTE × Monate (A-20). Zuteilungen einzelner Personen sehen RM, UE, die Person selbst und die Projektleitung
+des Projekts (darstellung.md), auch in der Lesesicht. Jede Änderung führt «gedeckt» im Register nach, informiert Person
+und Projektleitung (Mitteilung) und führt die Sammelaufgaben `bedarf.decken` und `konflikt.aufloesen` nach (zusätzlich
+stündlich). Priorität kommt aus der Priorisierung (`prioritaetQuelleSetzen`), sonst `null`.
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/bedarfe?stand=&rolle=&projekt=&von=&bis=` | `ressource:read` | mit Deckung (`benoetigt`, `zugeteilt` in FTE-Monaten), `stand` (`offen`, `teilweise`, `gedeckt`, `ungedeckt`), Lücke, Priorität; `anzahl` je Stand; nach Priorität und Beginn |
+| `GET /v1/bedarfe/{id}` | `ressource:read` | Deckung je Monat und Zuteilungen |
+| `GET /v1/bedarfe/{id}/personen?q=` | `ressource:write` | Personen mit Zuteilung und freier Kapazität je Monat des Bedarfs |
+| `POST /v1/bedarfe/{id}/zuteilungen` | `ressource:write` | Person mit Anteil für den ganzen Bedarf oder `vonMonat`–`bisMonat` (ausserhalb 422, doppelt 409); Antwort mit berührten Überbuchungen (Warnung) |
+| `PATCH`, `DELETE /v1/zuteilungen/{id}` | `ressource:write` | Anteil ändern bzw. entfernen, `If-Match` Pflicht |
+| `PUT`, `DELETE /v1/bedarfe/{id}/luecke` | `ressource:write` | Lücke melden (Stand `ungedeckt`) bzw. zurücknehmen; bei gedecktem Bedarf 409 |
+| `GET /v1/zuteilungen/konflikte?von=&bis=` | `ressource:read` | Personen über einer Stelle, Rollen über dem erfassten Angebot; Beteiligte nach Priorität |
+| `GET /v1/zuteilungen?person=ich\|{id}&projekt=&von=&bis=` | eigene: jede Person; Projekt: `projekt:read` (Zeilen nur für Projektleitung, RM, UE); Person: `ressource:read` | Zuteilungen lesen |
+
 ## Sitzungen
 
 Sitzungen der Gremien vorbereiten (BC PP.04.01, PP.04.05; UC-006 Schritte 1–5, A1, A2; Kernablauf K3). Die Sitzung
@@ -245,6 +263,8 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.zuteilung.created`, `.updated`, `.deleted` | Zuteilung einer Person zum Ressourcenbedarf (je Monat) |
+| `ch.ppm.ressourcenbedarf.gap_reported`, `.gap_withdrawn` | Lücke gemeldet bzw. zurückgenommen (UC-009 A2) |
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |

@@ -46,7 +46,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E6-3 | Zielerreichung | 320–329 | teilweise (PR 1: 320, `/v1/zielerreichung/:quartal`, Seite Ziele › Zielerreichung UI-40; PR 2 Aufgabe im Eingang folgt) | #37 | Zielerreichung je strategischem Ziel und Jahresziel des Jahres (`ziel_typ`); `beurteilung` als Kommentar ohne Skala (keine festgelegt); ein Stand je Ziel und Quartal, Änderungen im Audit; Jahresziele nur im Quartal ihres Jahres; Aufgabe `zielerreichung.erfassen` (Job nach Quartalsende) folgt in PR 2, sobald es ein Muster für zeitgesteuerte Aufgaben je Organisation gibt (wie AP-E1-1, Job am 18.) |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
 | AP-E7-1 | Abschluss, Sistierung, Abbruch, Lessons Learned | 340–349 | offen | – | – |
-| AP-E7-2 | Ressourcen zuteilen, Konflikte | 350–359 | offen | – | – |
+| AP-E7-2 | Ressourcen zuteilen, Konflikte | 350–359 | in Arbeit: PR 1 (350, `zuteilung*` im Modul `ressource`: Bedarfsliste, Zuteilung, Konflikte, Lücke, Sammelaufgaben, MCP `list_bedarfe`); PR 2 Oberfläche UI-25 folgt | – | A-20; eine Person höchstens eine Stelle (Beschäftigungsgrad aus dem HR-System offen, RK.01.02, K23); Pool-Konflikt nur gegen erfasstes Angebot; Priorität über `prioritaetQuelleSetzen` der Priorisierung (ohne: nach Projektnummer); «gedeckt» im Register darf auch `ressource:write` ändern (Policy in 350) |
 | AP-E7-3 | Schnittstellen und Änderungsprotokoll | 360–369 | offen | – | – |
 | AP-E7-4 | Finanzen | 370–379 | offen | – | – |
 | AP-E7-5 | Jahresrückblick | 380–389 | offen | – | – |
@@ -134,8 +134,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
-| RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | offen | – |
-| RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | offen | – |
+| RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | API in Arbeit (AP-E7-2 PR 1) | – |
+| RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | API in Arbeit (AP-E7-2 PR 1) | – |
 | RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | umgesetzt (auch je Szenario über die Schnittstelle für AP-E5-3) | #35, #40 |
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |

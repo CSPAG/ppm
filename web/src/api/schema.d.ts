@@ -27405,6 +27405,1103 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/bedarfe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bedarfsliste
+         * @description Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Nur Bedarfe in diesen Ständen. */
+                    stand?: ("offen" | "teilweise" | "gedeckt" | "ungedeckt")[];
+                    rolle?: string;
+                    projekt?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    von?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    bis?: string;
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BedarfList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/bedarfe/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bedarf mit Zuteilungen
+         * @description Bedarf, Deckung je Monat und die Zuteilungen der Personen (UC-009 Schritt 3).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BedarfDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/bedarfe/{id}/personen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Personen mit freier Kapazität
+         * @description Personen der Organisation mit ihrer Zuteilung und freien Kapazität je Monat des Bedarfs (UC-009 Schritt 3); frei = eine Stelle minus alle Zuteilungen (Beschäftigungsgrad aus dem HR-System offen, RK.01.02).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Suche in Name und E-Mail. */
+                    q?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PersonBelegungList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/bedarfe/{id}/zuteilungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Person zuteilen
+         * @description Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt: 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ZuteilungCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ZuteilungErgebnis"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/zuteilungen/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Zuteilung entfernen
+         * @description Nur mit `If-Match`. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Entfernt */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Anteil ändern
+         * @description Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412. Informiert Person und Projektleitung.
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ZuteilungPatch"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ZuteilungErgebnis"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/bedarfe/{id}/luecke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Lücke melden
+         * @description Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf 409.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LueckeMelden"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Bedarf"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * Lücke zurücknehmen
+         * @description Die Meldung entfällt; der Bedarf ist wieder offen bzw. teilweise gedeckt.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Bedarf"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/zuteilungen/konflikte": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Überbuchungen
+         * @description Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Ohne Zeitraum der laufende Monat und die elf folgenden.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    von?: string;
+                    bis?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["KonfliktList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/zuteilungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Zuteilungen lesen
+         * @description Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description `ich` für die eigenen Zuteilungen. */
+                    person?: "ich" | string;
+                    projekt?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    von?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    bis?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ZuteilungList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks": {
         parameters: {
             query?: never;
@@ -30975,6 +32072,192 @@ export interface components {
                 /** @description Anzahl betroffener Projekte in diesem Monat. */
                 projekte: number;
             }[];
+        };
+        Luecke: {
+            text: string;
+            /** Format: date-time */
+            gemeldetAt: string;
+            gemeldetBy: string | null;
+        };
+        Bedarf: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projektId: string;
+            projekt: {
+                nummer: string;
+                name: string;
+            } | null;
+            phase: string;
+            /** @description Rolle = Pool (A-20). */
+            rolle: string;
+            /** @description Bedarf in FTE je Monat. */
+            fte: number;
+            vonMonat: string;
+            bisMonat: string;
+            bemerkung: string;
+            /** @description Bedarf in FTE-Monaten. */
+            benoetigt: number;
+            /** @description Zugeteilt in FTE-Monaten (je Monat höchstens bis zum Bedarf gezählt). */
+            zugeteilt: number;
+            /**
+             * @description `offen`: nichts zugeteilt; `teilweise`: nicht in jedem Monat gedeckt; `gedeckt`: in jedem Monat voll zugeteilt; `ungedeckt`: Lücke gemeldet (UC-009 A2).
+             * @enum {string}
+             */
+            stand: "offen" | "teilweise" | "gedeckt" | "ungedeckt";
+            prioritaet: {
+                /** @description 1 = höchste Priorität. */
+                rang: number;
+                /** @description Herkunft der Rangfolge (Priorisierung). */
+                quelle: string;
+            } | null;
+            luecke: components["schemas"]["Luecke"] | null;
+        };
+        BedarfList: {
+            items: components["schemas"]["Bedarf"][];
+            nextCursor: string | null;
+            /** @description Anzahl je Stand (ohne Filter nach Stand). */
+            anzahl: {
+                offen: number;
+                teilweise: number;
+                gedeckt: number;
+                ungedeckt: number;
+            };
+            /** @description Ob die anfragende Person zuteilen darf (ressource:write). */
+            can: {
+                write: boolean;
+            };
+        };
+        BedarfDetail: {
+            bedarf: components["schemas"]["Bedarf"];
+            /** @description Je Monat des Bedarfs: Bedarf und Summe der Zuteilungen in FTE. */
+            monate: {
+                monat: string;
+                bedarf: number;
+                zugeteilt: number;
+            }[];
+            /** @description Nach Person und Monat. */
+            zuteilungen: components["schemas"]["Zuteilung"][];
+            can: {
+                write: boolean;
+            };
+        };
+        Zuteilung: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            bedarfId: string;
+            /** Format: uuid */
+            projektId: string;
+            /** Format: uuid */
+            personId: string;
+            personName: string | null;
+            monat: string;
+            fte: number;
+            version: number;
+            /** Format: date-time */
+            updatedAt: string;
+            /** @description Was die anfragende Person damit darf (ändern, entfernen). */
+            can: {
+                write: boolean;
+            };
+        };
+        /** @description Ohne Zeitraum der ganze Zeitraum des Bedarfs. */
+        ZuteilungCreate: {
+            /** Format: uuid */
+            personId: string;
+            /** @description Anteil der Person je Monat (höchstens eine Stelle). */
+            fte: number;
+            /**
+             * @description Monat «JJJJ-MM».
+             * @example 2027-04
+             */
+            vonMonat?: string;
+            /**
+             * @description Monat «JJJJ-MM».
+             * @example 2027-04
+             */
+            bisMonat?: string;
+        };
+        ZuteilungPatch: {
+            fte: number;
+        };
+        KonfliktBeteiligt: {
+            /** Format: uuid */
+            zuteilungId: string;
+            /** Format: uuid */
+            projektId: string;
+            projekt: {
+                nummer: string;
+                name: string;
+            } | null;
+            /** Format: uuid */
+            personId: string;
+            personName: string | null;
+            rolle: string;
+            fte: number;
+            version: number;
+            prioritaet: {
+                /** @description 1 = höchste Priorität. */
+                rang: number;
+                /** @description Herkunft der Rangfolge (Priorisierung). */
+                quelle: string;
+            } | null;
+        };
+        Konflikt: {
+            /**
+             * @description `person`: mehr als eine Stelle zugeteilt; `pool`: Rolle mit mehr Zuteilung als Angebot.
+             * @enum {string}
+             */
+            art: "person" | "pool";
+            monat: string;
+            personId: string | null;
+            personName: string | null;
+            rolle: string | null;
+            /** @description Zugeteilt in FTE. */
+            summe: number;
+            /** @description Höchstens: eine Stelle bzw. das Angebot der Rolle. */
+            grenze: number;
+            /** @description Nach Priorität, höchste zuerst (UC-009 A1.1). */
+            beteiligte: components["schemas"]["KonfliktBeteiligt"][];
+        };
+        ZuteilungErgebnis: {
+            bedarf: components["schemas"]["Bedarf"];
+            /** @description Die angelegten bzw. die geänderte Zuteilung. */
+            zuteilungen: components["schemas"]["Zuteilung"][];
+            /** @description Überbuchungen, die die Änderung berührt (Warnung, UC-009 A1). */
+            konflikte: components["schemas"]["Konflikt"][];
+        };
+        KonfliktList: {
+            von: string;
+            bis: string;
+            items: components["schemas"]["Konflikt"][];
+            /** @description false: keine Rangfolge; Beteiligte nach Projektnummer. */
+            prioritaetVorhanden: boolean;
+            can: {
+                write: boolean;
+            };
+        };
+        ZuteilungList: {
+            items: components["schemas"]["Zuteilung"][];
+        };
+        LueckeMelden: {
+            /** @description Warum der Bedarf nicht gedeckt werden kann. */
+            text: string;
+        };
+        PersonBelegung: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @description Je Monat des Bedarfs: bereits zugeteilt und frei (eine Stelle minus Zuteilung). */
+            monate: {
+                monat: string;
+                zugeteilt: number;
+                frei: number;
+            }[];
+        };
+        PersonBelegungList: {
+            items: components["schemas"]["PersonBelegung"][];
         };
         WebhookSubscription: {
             /** Format: uuid */

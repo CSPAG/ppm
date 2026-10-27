@@ -7,9 +7,10 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
+import { projektdaten } from '../projektdaten/index.ts';
 import { record } from '../../platform.ts';
 import {
-  abweichungVon, fehlend, laufendePeriode, pruefeBearbeitbar, pruefePflichtangaben, rueckgaengigMoeglich, sperre, vorbelegung, werteVon,
+  abweichungVon, fehlend, laufendePeriode, meilensteinText, pruefeBearbeitbar, pruefePflichtangaben, rueckgaengigMoeglich, sperre, vorbelegung, werteVon,
 } from './bericht.ts';
 import { nachEinreichen, nachZurueckziehen } from './folgen.ts';
 import {
@@ -26,6 +27,8 @@ const ort = (id: string) => ({ type: 'projekt', id });
 interface Lage {
   projekt: store.ProjektRow; periode: string; laufend: string; periodeStand: 'offen' | 'abgeschlossen';
   bericht: store.Row | null; vor: store.Row | null; sekunden: number | null;
+  /** Nächster offener Meilenstein aus dem Plan (nur für die Vorbelegung gelesen). */
+  plan: string | null;
 }
 
 async function lage(tx: Tx, projektId: string, periode: string, o: { sperren?: boolean } = {}): Promise<Lage> {
@@ -38,7 +41,17 @@ async function lage(tx: Tx, projektId: string, periode: string, o: { sperren?: b
     periodeStand: await store.periodeStand(tx, periode),
     vor: await store.vorperiode(tx, projektId, periode),
     sekunden: bericht?.eingereicht_at ? await store.sekundenSeitEinreichen(tx, bericht.id) : null,
+    plan: bericht ? null : await naechsterMeilenstein(tx, projektId),
   };
+}
+
+/** Frühester nicht erreichter Meilenstein des Meilensteinplans (Register, PS.02.04), Termin aktuell vor Baseline. */
+async function naechsterMeilenstein(tx: Tx, projektId: string): Promise<string | null> {
+  const offen = (await projektdaten.lesen(tx, 'meilenstein', { projektId }))
+    .filter(m => m.art === 'meilenstein' && !m.erreichtAm)
+    .map(m => ({ text: String(m.text), termin: (m.terminAktuell ?? m.terminBaseline ?? null) as string | null }))
+    .sort((a, b) => (a.termin ?? '9999').localeCompare(b.termin ?? '9999'));
+  return offen[0] ? meilensteinText(offen[0]) : null;
 }
 
 const snapshot = (r: store.Row) => ({
@@ -54,7 +67,7 @@ function out(l: Lage, schreiben: boolean, principalId: string | null): Statusber
     ? { anlass: r.anlass, status: r.status, trend: r.trend, abschlussPer: r.abschluss_per, naechsterMeilenstein: r.naechster_meilenstein,
         abweichung: abweichungVon(r.abweichung), abhaengigkeiten: r.abhaengigkeiten, entscheide: r.entscheide, begruendung: r.begruendung,
         massnahme: r.massnahme, entscheidNoetig: r.entscheid_noetig }
-    : vorbelegung(l.vor);
+    : vorbelegung(l.vor, l.plan);
   const bearbeitbar = schreiben && !sperre(l.projekt, l.periode, l.laufend, l.periodeStand, r);
   return {
     id: r?.id ?? null, projektId: l.projekt.id, projektNummer: l.projekt.nummer, projektName: l.projekt.name,
@@ -142,7 +155,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
         if (!r) throw preconditionFailed(vorher.bericht.version);
         await record(tx, who, { action: 'statusbericht.updated', resourceType: 'statusbericht', resourceId: r.id, data: { before: snapshot(vorher.bericht), after: snapshot(r) }, event: snapshot(r) });
       } else {
-        r = await store.create(tx, id, periode, vorher.projekt.phase, { ...vorbelegung(vorher.vor), ...felder });
+        r = await store.create(tx, id, periode, vorher.projekt.phase, { ...vorbelegung(vorher.vor, vorher.plan), ...felder });
         await record(tx, who, { action: 'statusbericht.created', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       }
       return { ...vorher, bericht: r, periodeStand: 'offen' as const };

@@ -24,7 +24,7 @@ Fachlich führt das [Masterdokument](PPM-Master.md) mit [Funktionsbaum](anhang/f
 
 Das Gerüst enthält davon nur das Beispielmodul **Handlungsfelder** (BC ZM.01.01, Stammdaten aus Etappe E0 im
 [Fahrplan](ux/fahrplan.md)) und das Modul **Webhooks** (BC AM.03.02, Profil outbox). Die Module entstehen in den
-Etappen des Fahrplans. Querschnittliche Anforderungen: mehrere Organisationen in einer Datenbank mit harter Trennung,
+Etappen des Fahrplans nach dem Bauplan [fachmodell.md](fachmodell.md) (Modulschnitt, Arbeitspakete). Querschnittliche Anforderungen: mehrere Organisationen in einer Datenbank mit harter Trennung,
 Anmeldung über Keycloak (auch Microsoft Entra ID je Organisation), Maschinenzugriff und MCP, Nachvollziehbarkeit
 (Audit), Betrieb in einem Image.
 
@@ -138,9 +138,11 @@ nur mit TODO, Begründung und Eintrag hier.
 
 ## Checkliste «Neues Modul anlegen»
 
-0. Vor dem Modul: Business Cases und Use Cases im [Funktionsbaum](anhang/funktionsbaum.md) bzw. in den
+0. Vor dem Modul: Schnitt, Tabellen, Rechte, Migrationsbereich und Besitz des Arbeitspakets im Bauplan
+   [fachmodell.md](fachmodell.md) nachschlagen (verbindlich; Stand in [umsetzungsstand.md](umsetzungsstand.md)).
+   Business Cases und Use Cases im [Funktionsbaum](anhang/funktionsbaum.md) bzw. in den
    [Use Cases](anhang/use-cases.md), bei Oberfläche den Kernablauf in [ux/ablaeufe/](ux/ablaeufe/) lesen. Keine
-   Regel bauen, die dort fehlt (`[OFFEN]` bleibt offen).
+   Regel bauen, die dort fehlt (`[OFFEN]` bleibt offen; es gilt die Annahme `A-nn` aus dem Bauplan).
 1. Ordner `src/modules/<x>/` mit `index.ts` als einziger öffentlicher Schnittstelle (Muster: `modules/handlungsfeld/`:
    `index.ts` mit `defineModule` – Tag, Routen, MCP-Werkzeuge, bei Bedarf Jobs –, `routes.ts`, `store.ts`,
    `schemas.ts`, `mcp.ts`).
@@ -150,7 +152,7 @@ nur mit TODO, Begründung und Eintrag hier.
    (das Modul registriert sich), nicht importieren.
 4. Generisches (Schemas, Cursor, ETag, Audit) kommt aus `@vollholz/platform` bzw. `src/platform.ts`, nie ins Modul;
    fehlt etwas, gehört es ins Paket (identity-kit).
-5. Tabellen in einer neuen Migration `db/migrations/NNN_<x>.sql`: `tenant_id` zuerst im Primärschlüssel und in
+5. Tabellen in einer neuen Migration `db/migrations/NNN_<x>.sql` (Nummer aus dem Bereich des Arbeitspakets): `tenant_id` zuerst im Primärschlüssel und in
    Indizes, `SELECT app.secure_tenant_tables()`, Policies der Lesesicht (ohne Typ im Modell mit
    `app.has_permission('<recht>')` wie `001_handlungsfeld.sql`, mit Typ über `app.read_all()`, `app.has_tuple(…)`), `GRANT` nur an `ppm_app` bzw.
    `_sched`; jede Tabelle mit Testdaten in die Matrix von `test/app/rls.test.ts` (`TENANT_TABLES`, `POLICIES`).

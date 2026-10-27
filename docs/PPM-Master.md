@@ -93,6 +93,8 @@ Der Funktionsbaum ist eine thematische Zerlegung, keine Navigationsstruktur. Das
 
 Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben laufen über den Eingang · jede wiederkehrende Aufgabe ist aus dem Eingang erreichbar · Daten werden einmal erfasst (Bericht, Vorlage und Dashboard sind Sichten auf den Projektvertrag) · Prototyp der Kernabläufe wird mit PL, UE und PRAT an realen Fällen getestet.
 
+Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungskontexte je Rolle, Informationsarchitektur mit Sichtbarkeit je Rolle und abgeleitetem UI-Katalog, sechs Kernabläufe K1–K6 mit messbaren Zielgrössen, Darstellungsregeln, Glossar der Oberfläche und Fahrplan.
+
 ## 8. Funktionsbaum
 
 Übersicht mit aktiven Business Cases (Kurz-ID = letzte Stelle). Ziel des Users, Akteure, Herleitung und Use Cases je Business Case: [anhang/funktionsbaum.md](anhang/funktionsbaum.md). Entfallen: PP.01.01 (→ ZM.01.02).
@@ -173,6 +175,7 @@ Prüfregeln: Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum, Übergaben la
    - **UC-003 und UC-004** an Q8 angepasst; die [OFFEN] zu Reihenfolge, Rhythmus, Frist und Freigabe durch den Sponsor sind geschlossen.
 9. **UC-006** «PRAT-Sitzung vorbereiten und durchführen» nach Q8 Kap. 8.1–8.5 ausformuliert. Offen dort: Vorlage an den SNS-VR in P0 und P1, Weiterleitung an den VR ausserhalb des Quartalsreportings.
 10. **Alle 18 Use Cases ausformuliert** (CSP-Vorlage). Fehlende Grundlagen sind als [OFFEN] markiert und unter «Aus den Use Cases» in den offenen Punkten gesammelt.
+11. **UX-Schicht** erstellt ([ux/](ux/README.md)) auf Basis des CSP-UX-Rahmens 1.1: sechs Kernabläufe K1 Statusbericht (UC-004, 005), K2 Projektvertrag (UC-002, 003, 007), K3 Gremiumssitzung (UC-006), K4 Projektidee (UC-001), K5 Priorisierung (UC-008), K6 Ziele (UC-011, 012); Projektentscheide UX-E1–E11, offene Fragen UX-OF-1–18. Präzisierungen und Lücken an den Use Cases stehen unter [Rückfluss an die Anforderungen](ux/fahrplan.md#rückfluss-an-die-anforderungen) und sind noch nicht in Funktionsbaum und Use Cases übernommen.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -213,14 +216,15 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 2. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 3. V10 mit der Insel Gruppe klären.
-4. Grobe Skizzen der Arbeitsräume Projekt und Gremium.
-5. Prototyp-Test der Kernabläufe mit PL, UE und PRAT vorbereiten.
+4. Rückfluss der UX-Schicht an die Use Cases entscheiden und übernehmen; offene Fragen UX-OF-1–18 mit der Insel Gruppe klären ([ux/fahrplan.md](ux/fahrplan.md#offene-fragen)).
+5. Prototyp-Test der Kernabläufe K1–K6 mit PL, UE und PRAT vorbereiten (Durchspielen nach [ux/rahmen/pruefung.md](ux/rahmen/pruefung.md)), beginnend mit K1 und K3.
 6. Offene Punkte mit der Insel Gruppe klären.
 
 ## 14. Anhang und Pflege
 
 | Pfad | Inhalt |
 |---|---|
+| [ux/](ux/README.md) | UX-Schicht: Nutzungskontexte, Informationsarchitektur, Kernabläufe K1–K6, Darstellung, Fahrplan, UX-Rahmen |
 | [anhang/funktionsbaum.md](anhang/funktionsbaum.md) | Funktionsbaum mit allen Business Cases im Detail |
 | [anhang/use-cases.md](anhang/use-cases.md) | Use-Case-Liste, Traceability-Matrix, ausformulierte Use Cases |
 | [anhang/klaerungsliste.md](anhang/klaerungsliste.md) | offene Fragen K01–K25 mit Fundstelle und Vorschlag |
@@ -233,4 +237,5 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 - Dieses Masterdokument ist führend. Neue Entscheide, Annahmen und offene Punkte zuerst hier eintragen.
 - Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py`, `anhang/generator/uc_daten.py` und für die ausformulierten Use Cases `anhang/generator/uc_texte.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
 - IDs nie umnummerieren; Neues hinten anfügen, Gestrichenes als «entfällt» markieren.
+- UX-Schicht: Ändert sich ein Use Case eines Kernablaufs, den Ablauf in `ux/ablaeufe/` nachführen. Vor jeder Oberfläche den Kernablauf lesen; jede Umsetzung mit Oberfläche erfüllt die UX-Definition of Done (`ux/rahmen/pruefung.md`). `ux/rahmen/` nicht projektbezogen ändern.
 - Der Generator setzt die CSP-Skills `csp-dokumente` und `csp-grafiken` voraus (Pfade `/mnt/skills/plugins/csp-solutions:*`) sowie `symbol.html`, `pruef.html` und `csp-assets/` im Arbeitsordner.

@@ -33,7 +33,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | offen | – | – |
-| AP-E4-1 | Projektidee einreichen | 220–229 | in Arbeit (PR 1 Tabellen und API: 220, Modul `idee`, `list_ideen`, `get_idee`; PR 2 Oberfläche Assistent und Meine Ideen folgt) | – | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
+| AP-E4-1 | Projektidee einreichen | 220–229 | PR 1 umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`); PR 2 Oberfläche (Assistent, Meine Ideen, Ansicht) in Arbeit | #36 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
@@ -69,7 +69,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
-| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | API in Arbeit, Oberfläche folgt | – |
+| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | API umgesetzt, Oberfläche in Arbeit | #36 |
 | DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | offen | – |
@@ -179,8 +179,8 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K3-3 | Entscheid erfassen | ≤ 60 s je Traktandum | Test (Messung im Sitzungsmodus) | AP-E2-2 | offen |
 | K3-4 | Protokoll ≤ 3 Arbeitstage | 100 % | Betrieb | AP-E2-2 | offen |
 | K3-5 | Antrag und Hauptänderungen finden (PPM-5) | ≥ 90 %, ≤ 30 s, Tablet | Aufgabentest | AP-E2-2 | offen |
-| K4-1 | Idee ohne Hilfe einreichen | ≥ 90 % | Aufgabentest | AP-E4-1 | offen |
-| K4-2 | Zeit zum Einreichen | ≤ 10 Min. | Aufgabentest | AP-E4-1 | offen |
+| K4-1 | Idee ohne Hilfe einreichen | ≥ 90 % | Aufgabentest | AP-E4-1 | beim Aufgabentest zu messen (Assistent mit Hilfe je Feld, Sperre mit Sprung zum Schritt) |
+| K4-2 | Zeit zum Einreichen | ≤ 10 Min. | Aufgabentest | AP-E4-1 | beim Aufgabentest zu messen |
 | K4-3 | Ideen mit Rückfrage | ≤ 20 % | Betrieb | AP-E4-2 | offen |
 | K4-4 | Einreichung → bereit für das Gremium | Median ≤ 20 Arbeitstage | Betrieb | AP-E4-2 | offen |
 | K5-1 | Rang verschieben → Wasserlinie | ≤ 200 ms, ≤ 1 s bei 60 Projekten | Test | AP-E5-3 | offen |
@@ -202,4 +202,5 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 |---|---|---|---|---|---|---|---|
 | #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | ohne Befund (E2E hell, dunkel; jsdom) | 360 px ohne Überlauf (E2E «schmal»); 768/1440 nicht eigens geprüft | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
 | #26 | AP-E0-2 | Liste + Schublade (UI-44, UI-45); Z1–Z3, Z5, Z7, Z8, Z10 | ja (Vitest, E2E) | ja (Vitest, E2E) | 360 px im E2E | ja (`features/stammdaten/texte.ts`) | keine im Ablauf |
+| PR 2 AP-E4-1 | AP-E4-1 | Assistent (4 Schritte), Liste, Ansicht; Z1, Z2, Z5, Z7, Z8, Z10, Entwurf, in Ergänzung | ja (Fokus auf Schrittüberschrift, Radiogruppen, Vitest) | ohne Befund (jsdom; E2E hell, dunkel) | 360 px im E2E «schmal» | ja (`features/idee/texte.ts`), «Sie» | K4-1, K4-2 Aufgabentest |
 | #17 | AP-E0-3 | Arbeitsfläche; Z1, Z2, Z5, Z7–Z10 | vollständig, Strg+Z/Strg+Umschalt+Z | ohne Befund | geprüft (360/1024/1280/1440) | ja | keine Zielgrössen (kein Kernablauf für UC-017) |

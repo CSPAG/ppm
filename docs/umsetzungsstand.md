@@ -21,7 +21,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | umgesetzt (070, Modul `eingang` mit Schnittstelle `aufgabe`/`mitteilung`/`stellvertretung`, `list_aufgaben`; Seiten `/eingang`, `/konto/stellvertretung`); offen: Zähler an «Eingang» und Eintrag im Kontomenü (Shell) | #22, #31 | A-31 (Unterschrift in Vertretung prüft AP-E3-2 mit `stellvertretung.aktiv`), A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
-| AP-E1-1 | Statusbericht erfassen | 090–099 | teilweise: PR 1 umgesetzt (090, Periode und Statusbericht, API mit Vorbelegung aus Vorperiode und Meilensteinplan, Einreichen mit Rückgängig); PR 2 in Arbeit (Berichtsaufgabe ab dem 18. über den Eingang, erledigt beim Einreichen, Mitteilung an den Sponsor bei «kritisch»); PR 3 Oberfläche UI-13 nach AP-E0-4 PR 2 | #30 (via #46) | A-07, A-08 (Aufgabe nur in Portfolios mit Pflichten), A-26, A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
+| AP-E1-1 | Statusbericht erfassen | 090–099 | umgesetzt (090; Periode und Statusbericht, API mit Vorbelegung aus Vorperiode und Meilensteinplan, Einreichen mit Rückgängig; Berichtsaufgabe ab dem 18. über den Eingang, erledigt beim Einreichen, Mitteilung an den Sponsor bei «kritisch»; Oberfläche UI-13 Reiter «Bericht» mit Registern im selben Durchgang). E2E `web/e2e/bericht.spec.ts` offen bis CI läuft | #30, #52, #58 | A-07, A-08 (Aufgabe nur in Portfolios mit Pflichten), A-10 (Warnung «wesentlich» nur mit Toleranz im Phasenmodell), A-26, A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten); UE bei «kritisch» ohne persönliche Mitteilung (Sammelaufgabe AP-E1-2) |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | in Arbeit (PR 1: 100, Prüfung, Rückfrage, Einfordern, Abschluss mit «nicht gemeldet», Terminabweichungen, Aufgaben, MCP `get_periode`; PR 2: Oberfläche UI-15, UI-16 in Arbeit) | #41 | A-11, A-28, A-37; Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der Vorperiode, jede Prognose über Budget (K1-4); berichtspflichtig = aktiv, P0–P3, Portfolio mit Pflichten (A-07, A-08); «Periode abschliessen» per Job am Stichtag, eingereiht beim ersten Einreichen (Stichtag aus dem Phasenmodell; ohne Phasenmodell in Kraft sofort); Tabelle `einforderung` (fachmodell.md 2.8) |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
@@ -96,7 +96,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
-| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | API umgesetzt, Berichtsaufgabe in Arbeit, Oberfläche offen | #30 |
+| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | umgesetzt | #30, #52, #58 |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
 | PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
 | PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
@@ -114,19 +114,19 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.04.03 | Lessons Learned erfassen | 013, 015 | E7 | AP-E7-1, AP-E7-5 | offen | – |
 | PS.05.01 | Stakeholder erfassen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
-| PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
+| PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
 | PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PC.01.02 | Ist-Kosten übernehmen | 010 | E7 | AP-E7-4 | offen | – |
-| PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
+| PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
 | PC.01.04 | Budgetabweichungen analysieren | 010 | E7 | AP-E7-4 | offen | – |
 | PC.01.05 | Budgetbedarf in den Budgetprozess übergeben | 010, 011 | E7 | AP-E7-4 | offen | – |
 | PC.02.01 | Portfoliorisiko erfassen | 008 | E5 | AP-E5-2 | offen | – |
 | PC.02.02 | Risikolage des Portfolios beurteilen | 006, 014 | E2 | AP-E2-3 | offen | – |
-| PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
+| PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
 | PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
-| PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht ab P2 (UI-13, Register AP-E0-6) in Arbeit | – |
+| PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht ab P2, UI-13) | #58 |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | offen | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |

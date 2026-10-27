@@ -219,6 +219,8 @@ export const model = defineModel({
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)
     projekt: { write: 'projekt:write', organisation: 'projekt:organisation' },
+    // ressource
+    get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
   },
   features: { audit: true },
 });

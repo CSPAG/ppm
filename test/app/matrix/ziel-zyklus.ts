@@ -72,6 +72,9 @@ export const matrix: Matrix = {
     const ha = await call('POST', '/v1/hauptaktivitaeten', { jahreszielId: jz.id, text: mark });
     // Projekt von A ohne Routen des Moduls projekt (Tabelle aus 010)
     const projekt = await full(api.t.runtime, t, async tx => {
+      // dasselbe Projekt wie matrix/projektdaten.ts, falls schon angelegt (Nummer eindeutig)
+      const da = (await tx.query<{ id: string }>('SELECT id FROM ppm.projekt WHERE name = $1', [mark])).rows[0];
+      if (da) return da.id;
       const pf = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'ziel-probe', $2, true) RETURNING id", [t, mark])).rows[0]!.id;
       return (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-901', $2, $3) RETURNING id", [t, mark, pf])).rows[0]!.id;
     });

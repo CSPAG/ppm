@@ -13,6 +13,7 @@ import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
+import { ressourceModule } from './modules/ressource/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { statusberichtModule } from './modules/statusbericht/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
@@ -33,6 +34,7 @@ export const app = defineApp({
     projektdatenModule,
     zielModule,
     statusberichtModule,
+    ressourceModule,
     webhooksModule,
   ],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4);

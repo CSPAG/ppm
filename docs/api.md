@@ -137,6 +137,18 @@ Monatlicher Statusbericht je Projekt und Periode `YYYY-MM` (BC PS.01.01, UC-004,
 
 Ereignisse: `statusbericht.created`, `statusbericht.updated`, `statusbericht.submitted`, `statusbericht.withdrawn`.
 
+## Ressourcen
+
+Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =
+Rolle (Codetabelle `ressourcenrolle`, A-20); Zeitraum `von`/`bis` als `JJJJ-MM`, ohne Angabe der laufende Monat und die
+elf folgenden, höchstens 60 Monate.
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/kapazitaet?von=&bis=` | `ressource:read` | Angebot je Rolle und Monat mit `version` je Zelle, `can.write` |
+| `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
+| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur

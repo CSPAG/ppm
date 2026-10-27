@@ -35,6 +35,7 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 | `get_projekt` | `GET /v1/projekte/{id}` und `…/organisation` | `projekt:read` | `readOnlyHint` |
 | `get_projektdaten` | `GET /v1/projekte/{id}/<register>` je Register | `projekt:read` | `readOnlyHint`; Kosten `null` ohne `finanzen:read` |
 | `list_statusberichte` | `GET /v1/projekte/{id}/berichte[/{periode}]` | `projekt:read` | `readOnlyHint`; mit Periode der ganze Bericht |
+| `get_auslastung` | `GET /v1/auslastung` | `ressource:read` | `readOnlyHint`; Zeitraum `von`/`bis`, optional `szenario` |
 
 Neues Werkzeug: im Modell unter `mcpTools` eintragen (Titel, Recht, `readOnly`), in `mcp/tools.ts` als Aufruf der
 REST-API umsetzen; nie direkt auf Module oder die Datenbank zugreifen.

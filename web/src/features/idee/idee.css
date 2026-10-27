@@ -1,0 +1,46 @@
+/* Feature «Ideen» (K4): Assistent mit Schrittanzeige, Auswahlgruppen, Zusammenfassung, Liste und Kopfkarte */
+.idee-schritte{display:flex;gap:6px;list-style:none;margin:0;padding:0 0 12px;flex-wrap:wrap}
+.idee-schritte li{display:flex;align-items:center;gap:6px;color:var(--fg-2);font-size:13px;padding:4px 10px 4px 4px;border-radius:999px;border:1px solid var(--line)}
+.idee-schritte li.on{color:var(--fg);border-color:var(--accent);font-weight:600}
+.idee-schritte li.done{color:var(--fg)}
+.idee-nr{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--hover);font-size:12px}
+.idee-schritte li.on .idee-nr{background:var(--accent);color:var(--accent-fg)}
+.idee-body{padding:16px 22px;display:flex;flex-direction:column;gap:14px;max-width:860px}
+.idee-h{font-size:17px;margin:4px 0 0}
+.idee-h:focus{outline:none}
+.idee-h:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.idee-form{padding-top:0}
+.idee-gruppe{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.idee-gruppe legend{font-weight:600;padding:0;margin-bottom:4px}
+.idee-gruppe .hint{font-size:12.5px;color:var(--fg-3);margin:0}
+.idee-gruppe .ferr{grid-column:auto;margin:0}
+.idee-stufen{display:flex;gap:8px;flex-wrap:wrap}
+.idee-liste{display:flex;flex-direction:column;gap:6px}
+.idee-spalten{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.idee-wahl{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface);cursor:pointer;min-height:40px}
+.idee-wahl:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.idee-wahl input{margin-top:3px;accent-color:var(--accent)}
+.idee-wahl input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.idee-karte span{display:flex;flex-direction:column;gap:2px}
+.idee-leitsatz{color:var(--fg-2);font-size:13px}
+.idee-fragen{display:flex;flex-direction:column;gap:10px}
+.idee-frage{border-left:3px solid var(--accent);padding:6px 0 6px 12px;display:flex;flex-direction:column;gap:6px}
+.idee-frage p{margin:0}
+.idee-attrs{display:flex;flex-direction:column;gap:0;margin:0}
+.idee-attr{display:grid;grid-template-columns:200px 1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.idee-attr dt{color:var(--fg-2)}
+.idee-attr dd{margin:0;min-width:0}
+.idee-wert{white-space:pre-wrap;overflow-wrap:anywhere}
+.idee-fuss{justify-content:space-between}
+.idee-stand{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}
+.idee-offen{display:inline-flex;gap:4px;align-items:center;font-size:12.5px;color:var(--fg-2)}
+.idee-fertig .emptystate{max-width:560px;margin:24px auto}
+.idee-fertig-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.idee-zf .hinweis-b ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.idee-kopf{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.idee-kopf h3,.idee-kopf p{margin:0}
+@media (max-width:600px){
+  .idee-body{padding:12px 16px}
+  .idee-attr{grid-template-columns:1fr auto}
+  .idee-attr dt{grid-column:1 / -1}
+}

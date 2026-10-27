@@ -149,6 +149,55 @@ elf folgenden, höchstens 60 Monate.
 | `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
 | `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
 
+## Sitzungen
+
+Sitzungen der Gremien vorbereiten (BC PP.04.01, PP.04.05; UC-006 Schritte 1–5, A1, A2; Kernablauf K3). Die Sitzung
+entsteht aus einem Sitzungstermin des Gremiums (von Hand oder 15 Arbeitstage vorher durch den Lauf der Fristen, A-27).
+Lesen mit `sitzung:read` am Portfolio des Gremiums, Traktanden und Unterlagen erst ab Versand; Eingeladene sehen ab
+Versand nur ihr Traktandum. Bearbeiten mit `sitzung:write` bis zum Versand. Fähigkeiten: `can: { write }`.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/gremien/{kuerzel}/sitzungen?von=&bis=&cursor=&limit=` | `sitzung:read` | Termine und Sitzungen ab heute; Termin ohne Sitzung mit `id: null` |
+| `POST /v1/gremien/{kuerzel}/sitzungen` | `sitzung:write` | `{ datum }` eines Termins (sonst 422), feste Traktanden der Registry |
+| `GET /v1/gremien/{kuerzel}/sitzungen/{datum}` | `sitzung:read` | Adresse der Oberfläche; `ETag` |
+| `GET /v1/sitzungen/kopf` | `sitzung:read` irgendwo | nächste Sitzungen mit Versandfrist (Eingang) |
+| `GET /v1/sitzungen/{id}` | `sitzung:read` | Traktandenliste mit Zeitbedarf, Zeitfenster, Unterlagenstand, Eingeladenen, Versandfrist; `ETag` |
+| `PATCH /v1/sitzungen/{id}` | `sitzung:write` | Beginn, Dauer, Ort; `If-Match` Pflicht |
+| `GET /v1/sitzungen/{id}/vorschlaege` | `sitzung:write` | Vorschläge je Art; verschobene der letzten Sitzung zuerst |
+| `POST /v1/sitzungen/{id}/traktanden` | `sitzung:write` | `{ vorschlagId }` aufnehmen oder `{ art, projektId, titel, antrag }` einplanen (PP.04.05); liefert die Sitzung |
+| `PUT /v1/sitzungen/{id}/traktanden` | `sitzung:write` | `{ reihenfolge }` aller Traktanden; `If-Match` (Sitzung) |
+| `GET /v1/sitzungen/{id}/versand` | `sitzung:write` | Vorschau der Wirkung (I-R1): Traktanden, Unterlagen, Eingeladene, Frist, Warnungen |
+| `POST /v1/sitzungen/{id}/versenden` | `sitzung:write` | `If-Match`; protokolliert Zeitpunkt und Arbeitstage vor der Sitzung (K3-1) |
+| `GET /v1/traktanden/{id}` | `sitzung:read` | Antrag, Unterlagen, Eingeladene |
+| `PATCH /v1/traktanden/{id}` | `sitzung:write` | Titel, Antrag, Zeitbedarf; `If-Match` |
+| `POST /v1/traktanden/{id}/entfernen` | `sitzung:write` | zurück zu den Vorschlägen |
+| `POST /v1/traktanden/{id}/verschieben` | `sitzung:write` | auf den nächsten Termin (UC-006 A2); ohne Termin 409 |
+| `PUT /v1/traktanden/{id}/einladungen` | `sitzung:write` | Eingeladene ersetzen; `If-Match` (Traktandum) |
+
+Andere Module registrieren ihre Traktandenart und schlagen Geschäfte vor, nur über `src/modules/sitzung/index.ts`
+(`registriereTraktandenart`, `traktandum.vorschlagen`); siehe [README des Moduls](../src/modules/sitzung/README.md).
+## Projektvertrag
+
+Versionen des Projektvertrags mit den Kapiteln 1–13 der Vorlage (Q7) als Daten (docs/fachmodell.md 2.10, AP-E3-1;
+DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5, A-29), genau eine Baseline. Lesen mit
+`projekt:read`, bearbeiten und einreichen mit `vertrag:write` am Projekt; Kapitel 9 (Kosten) nur mit `finanzen:read`
+(ohne: Beträge `null`, Speichern 403; A-33). Endzustände des Projekts sind lesend (409).
+
+| `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
+| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `gate`, `aenderung` folgen mit AP-E3-3, AP-E3-4 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
+| `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
+| `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |
+| `GET /v1/vertragsversionen/{id}/pflichtangaben` | `projekt:read` | Angaben des Gates in die Zielphase und der Zielphase (Phasenmodell, K13, A-12) mit `erfuellt`, `grund` und Sprungziel `kapitel`/`feld` (K2-4) |
+| `POST /v1/vertragsversionen/{id}/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung», `If-Match` Pflicht; fehlen Pflichtangaben: 422 mit `/kapitel/<nr>/<feld>` je Angabe; Aufgabe `vertrag.quality_check` an `vertrag:review` |
+
+Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategisches_ziel_id`), die Kapitel camelCase
+(`strategischesZielId`). Ab dem Gate P1–P2 verlangen `personal` FTE mit Monaten (nicht Grösse S/M/L) und `kosten` einen
+Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
+`baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
+über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur
@@ -174,7 +223,15 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
+| `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
+| `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.vertrag.drafted`, `.chapter_updated`, `.submitted`, `.baselined` | Projektvertrag: Entwurf angelegt, Kapitel gespeichert, zur Prüfung eingereicht, Version Baseline |
 | `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
+| `ch.ppm.sitzung.created`, `ch.ppm.sitzung.updated` | Sitzung angelegt bzw. Beginn, Dauer, Ort geändert |
+| `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |
+| `ch.ppm.sitzung.reordered` | Traktanden geordnet |
+| `ch.ppm.sitzung.dispatched` | Unterlagen versendet (mit Vorlauf in Arbeitstagen und Frist eingehalten) |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

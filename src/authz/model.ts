@@ -211,8 +211,13 @@ export const model = defineModel({
     list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
     // projektdaten
     get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
+    // vertrag
+    get_vertrag: { title: 'Projektvertrag lesen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
+    // sitzung
+    list_sitzungen: { title: 'Sitzungen eines Gremiums auflisten', permission: 'sitzung:read', readOnly: true },
+    get_sitzung: { title: 'Sitzung mit Traktandenliste lesen', permission: 'sitzung:read', readOnly: true },
     // statusbericht
     list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
     // ressource

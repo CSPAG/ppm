@@ -66,12 +66,13 @@ test('Unterzeichnen ab dem Eingang bei 360 px in höchstens 3 Interaktionen (K2-
   await expectNoOverflow(page);
   await expectAccessible(page);
 
-  await page.getByRole('button', { name: 'Unterzeichnen' }).click();
+  await page.getByRole('button', { name: 'Unterzeichnen', exact: true }).click();
   interaktionen++;
   await expect(page.getByText('Unterzeichnet. Der Vertrag ist vollständig unterzeichnet.')).toBeVisible();
   expect(interaktionen).toBeLessThanOrEqual(3);
   expect(Date.now() - start).toBeLessThanOrEqual(60_000);
-  await expect(page.getByText('Der Vertrag ist vollständig unterzeichnet.', { exact: true })).toBeVisible();
+  // Hinweis mit Stufe vorangestellt («Hinweis: …», I-P1)
+  await expect(page.locator('.hinweis').filter({ hasText: 'Der Vertrag ist vollständig unterzeichnet.' })).toBeVisible();
   await expect(page.getByText('3 von 3')).toBeVisible();
 
   await page.emulateMedia({ colorScheme: 'dark' });

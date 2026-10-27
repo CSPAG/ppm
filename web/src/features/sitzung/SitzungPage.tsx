@@ -13,6 +13,7 @@ import type { SetSitzungSearch, SitzungSearch } from './search.ts';
 import { fmtMinuten, standFamilie, Traktandenliste } from './Traktandenliste.tsx';
 import { TS } from './texte.ts';
 import { Vorschlagsliste } from './Vorschlagsliste.tsx';
+import { SitzungsmodusEinstieg } from './SitzungsmodusPage.tsx';
 import './sitzung.css';
 
 /** «Mi 5.11. · in 4 Arbeitstagen» aus der Frist des Servers (Arbeitstage mit Feiertagen der Organisation). */
@@ -49,7 +50,7 @@ function VersandDialog({ s, onClose, onVersenden, busy }: { s: Sitzung; onClose(
   );
 }
 
-export function SitzungPage({ kuerzel, datum, search }: { kuerzel: string; datum: string; search: SitzungSearch; setSearch: SetSitzungSearch }) {
+export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string; datum: string; search: SitzungSearch; setSearch: SetSitzungSearch; gehe?(pfad: string): void }) {
   const toast = useToast();
   const q = useSitzung(kuerzel, datum);
   const liste = useSitzungsliste(kuerzel);
@@ -146,7 +147,7 @@ export function SitzungPage({ kuerzel, datum, search }: { kuerzel: string; datum
             <div className="acts">
               <button type="button" className="btn primary" disabled={busy} onClick={() => setVersand(true)}><Icon name="send" />{TS.versenden}</button>
             </div>
-          ) : null}
+          ) : <div className="acts"><SitzungsmodusEinstieg kuerzel={kuerzel} datum={datum} stand={s.stand} gehe={gehe} /></div>}
         </div>
       </header>
       <div className="body sz-body">

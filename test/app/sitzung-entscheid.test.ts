@@ -9,7 +9,8 @@ import { after, before, describe, test } from 'node:test';
 import { full, skipDb } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../../src/modules/sitzung/index.ts';
-import { _abmelden } from '../../src/modules/sitzung/arten.ts';
+import { _abmelden, traktandenart, type Traktandenart } from '../../src/modules/sitzung/arten.ts';
+import { optionen } from '../../src/modules/sitzung/entscheid.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 
 const skip = await skipDb();
@@ -22,6 +23,18 @@ function mittwochIn(n: number): string {
 
 /** Folgen, die die Probe-Art «gate» erhält (wie vertrag in AP-E3-3: Baseline und Phase). */
 const folgen: EntscheidFolge[] = [];
+
+/**
+ * Art für den Test ersetzen: Registriert ein Modul die Art schon beim Laden (statusbericht: eskalation, meilenstein,
+ * AP-E2-4; vertrag: gate, AP-E3-3), wird sie für diesen Test durch die Probe ersetzt und danach wiederhergestellt.
+ */
+const wiederherstellen: (() => void)[] = [];
+function probeArt(a: Traktandenart): void {
+  const vorher = traktandenart(a.art);
+  if (vorher) _abmelden(a.art);
+  registriereTraktandenart(a);
+  wiederherstellen.push(() => { _abmelden(a.art); if (vorher) registriereTraktandenart(vorher); });
+}
 
 describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () => {
   let api: TestApi;
@@ -79,9 +92,9 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolio });
     mitglied = { authorization: m.authorization };
 
-    // gate mit Folge (wie vertrag, AP-E3-3), aenderung ohne Folge (Probe; eskalation registriert statusbericht, AP-E2-4); meilenstein bleibt
-    // unregistriert und erhält die Ergebnisse aus K3 Schritt 8
-    registriereTraktandenart({
+    // Probe-Arten: gate mit Folge (wie vertrag, AP-E3-3), eskalation und meilenstein ohne Folge (wie statusbericht,
+    // AP-E2-4); die Ergebnisse von meilenstein entsprechen K3 Schritt 8
+    probeArt({
       art: 'gate',
       ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }, { schluessel: 'mit_auflagen', label: 'Mit Auflagen freigegeben' },
         { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }, { schluessel: 'abgelehnt', label: 'Gestoppt' }],
@@ -92,14 +105,15 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
         folgen.push(e);
       },
     });
-    registriereTraktandenart({ art: 'aenderung', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }, { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }] });
+    probeArt({ art: 'eskalation', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }, { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }] });
+    probeArt({ art: 'meilenstein', ergebnisse: [{ schluessel: 'abgenommen', label: 'Abgenommen' }, { schluessel: 'nicht_abgenommen', label: 'Nicht abgenommen' }] });
 
     // Traktanden: Gate P2 (PRAT entscheidet), Gate P1 (via SNS-VR), zwei Eskalationen, Meilenstein
     const v = [
       { k: 'gateP2', art: 'gate', bezug: 'g-p2', projekt: () => p2.id, titel: 'Gate P2–P3' },
       { k: 'gateP1', art: 'gate', bezug: 'g-p1', projekt: () => p1.id, titel: 'Gate P1–P2' },
-      { k: 'esk1', art: 'aenderung', bezug: 'e-1', projekt: () => p2.id, titel: 'Eskalation Lieferverzug' },
-      { k: 'esk2', art: 'aenderung', bezug: 'e-2', projekt: () => p2.id, titel: 'Eskalation Budget' },
+      { k: 'esk1', art: 'eskalation', bezug: 'e-1', projekt: () => p2.id, titel: 'Eskalation Lieferverzug' },
+      { k: 'esk2', art: 'eskalation', bezug: 'e-2', projekt: () => p2.id, titel: 'Eskalation Budget' },
       { k: 'ms', art: 'meilenstein', bezug: 'm-1', projekt: () => p2.id, titel: 'Meilenstein Konzept' },
     ] as const;
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin1 }, 201);
@@ -112,7 +126,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     r = await ok('POST', `/v1/sitzungen/${s.id}/versenden`, { ...ue, 'if-match': `W/"${r.version}"` });
     sitzung = { id: s.id, version: r.version };
   });
-  after(async () => { _abmelden('gate'); _abmelden('aenderung'); await api?.close(); });
+  after(async () => { for (const w of wiederherstellen.reverse()) w(); await api?.close(); });
 
   const entscheid = (k: string, body: unknown, headers: Record<string, string> = {}) => call('PUT', `/v1/traktanden/${tid[k]}/entscheid`, { ...ue, ...headers }, body);
 
@@ -125,7 +139,9 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     const s = await ok('POST', `/v1/sitzungen/${sitzung.id}/starten`, { ...ue, 'if-match': `W/"${sitzung.version}"` });
     assert.deepEqual([s.stand, s.can.erfassen, s.can.schliessen], ['laufend', true, true]);
     const opt = Object.fromEntries(s.traktanden.map((t: { traktandumId: string; optionen: { schluessel: string }[] }) => [t.traktandumId, t.optionen.map(o => o.schluessel)]));
-    assert.deepEqual(opt[tid.ms!], ['abgenommen', 'nicht_abgenommen'], 'unregistrierte Art: Ergebnisse aus K3');
+    assert.deepEqual(opt[tid.ms!], ['abgenommen', 'nicht_abgenommen']);
+    assert.deepEqual(optionen('jahresrueckblick').map(o => o.schluessel), ['verabschiedet', 'anpassungen'], 'unregistrierte Art: Ergebnisse aus K3');
+    assert.deepEqual(optionen('portfoliobericht'), [], 'Kenntnisnahme');
     assert.deepEqual(opt[tid.esk1!], ['erledigt', 'zurueckgestellt'], 'Registry geht vor');
     sitzung.version = s.version;
   });
@@ -213,7 +229,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     // Nicht behandelt und zurückgestellt: Vorschläge der nächsten Sitzung mit Herkunft
     const n = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin2 }, 201);
     const vs = await ok('GET', `/v1/sitzungen/${n.id}/vorschlaege`, ue);
-    const esk = vs.gruppen.find((g: { art: string }) => g.art === 'aenderung').traktanden;
+    const esk = vs.gruppen.find((g: { art: string }) => g.art === 'eskalation').traktanden;
     assert.deepEqual(esk.map((t: { titel: string; verschobenVon: string }) => [t.titel, t.verschobenVon]).sort(),
       [['Eskalation Budget', termin1], ['Eskalation Lieferverzug', termin1]]);
     assert.equal(esk.find((t: { titel: string }) => t.titel === 'Eskalation Budget').id, tid.esk2, 'dasselbe Traktandum');

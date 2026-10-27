@@ -14523,6 +14523,897 @@
           }
         }
       },
+      "IdeePoolZeile": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "titel",
+          "stand",
+          "standAt",
+          "eingereichtAt",
+          "erfasstVon",
+          "handlungsfeldId",
+          "bereiche",
+          "herkunft",
+          "kategorie",
+          "rueckfragenOffen"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "eingereicht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_pruefung"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_ergaenzung"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "traktandiert"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "freigegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgestellt"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgewiesen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zusammengefuehrt"
+                ]
+              }
+            ]
+          },
+          "standAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "erfasstVon": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "handlungsfeldId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bereiche": {
+            "type": "array",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          "herkunft": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorie": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "A"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "B"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "C"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rueckfragenOffen": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      },
+      "IdeePoolList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IdeePoolZeile"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "IdeeFunnel": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "stufen",
+          "letzteEinreichung"
+        ],
+        "properties": {
+          "stufen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "stand",
+                "anzahl"
+              ],
+              "properties": {
+                "stand": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "entwurf"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "eingereicht"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "in_pruefung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "in_ergaenzung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "traktandiert"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "freigegeben"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zurueckgestellt"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zurueckgewiesen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zusammengefuehrt"
+                      ]
+                    }
+                  ]
+                },
+                "anzahl": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "letzteEinreichung": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "IdeeAehnliche": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "idee",
+                "gleichesHandlungsfeld",
+                "gemeinsameBereiche"
+              ],
+              "properties": {
+                "idee": {
+                  "$ref": "#/components/schemas/IdeePoolZeile"
+                },
+                "gleichesHandlungsfeld": {
+                  "type": "boolean"
+                },
+                "gemeinsameBereiche": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdeePruefung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "leitfragen",
+          "vorgesehenerSponsor",
+          "raster",
+          "vorschlag",
+          "kategorie",
+          "kategorieBegruendung",
+          "portfolioId",
+          "zustaendig",
+          "can"
+        ],
+        "properties": {
+          "leitfragen": {
+            "description": "Leitfragen zum Eintritt P0 aus dem Phasenmodell in Kraft mit den Antworten (UC-001 Schritt 4).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "position",
+                "wertestrom",
+                "frage",
+                "antwort"
+              ],
+              "properties": {
+                "position": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "wertestrom": {
+                  "type": "string"
+                },
+                "frage": {
+                  "type": "string"
+                },
+                "antwort": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "vorgesehenerSponsor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "raster": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kriterium",
+                "einschaetzung"
+              ],
+              "properties": {
+                "kriterium": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "relevanz"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "direktionen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abhaengigkeiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "priorisierung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "change"
+                      ]
+                    }
+                  ]
+                },
+                "einschaetzung": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "vorschlag": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Naheliegende Kategorie mit Herleitung (G11); die UE entscheidet (Q8 Kap. 6).",
+                "type": "object",
+                "required": [
+                  "kategorie",
+                  "hoch",
+                  "mittel",
+                  "tief"
+                ],
+                "properties": {
+                  "kategorie": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "A"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "B"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "C"
+                        ]
+                      }
+                    ]
+                  },
+                  "hoch": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "mittel": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "tief": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorie": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "A"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "B"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "C"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorieBegruendung": {
+            "type": "string"
+          },
+          "portfolioId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zustaendig": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Entscheidendes Gremium des Portfolios (A-45).",
+                "type": "object",
+                "required": [
+                  "kuerzel",
+                  "name"
+                ],
+                "properties": {
+                  "kuerzel": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "pruefen",
+              "abschliessen"
+            ],
+            "properties": {
+              "pruefen": {
+                "description": "Leitfragen, Raster, Kategorie und Rückfragen (`idee:write`, Idee eingereicht oder in Prüfung).",
+                "type": "boolean"
+              },
+              "abschliessen": {
+                "description": "Zurückweisen und Zusammenführen (`idee:write`, Idee offen im Pool).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "IdeeLeitfragenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "antworten"
+        ],
+        "properties": {
+          "antworten": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "position",
+                "antwort"
+              ],
+              "properties": {
+                "position": {
+                  "minimum": 0,
+                  "maximum": 999,
+                  "type": "integer"
+                },
+                "antwort": {
+                  "maxLength": 4000,
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "vorgesehenerSponsor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "IdeeRasterIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "raster"
+        ],
+        "properties": {
+          "raster": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kriterium",
+                "einschaetzung"
+              ],
+              "properties": {
+                "kriterium": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "relevanz"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "direktionen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abhaengigkeiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "priorisierung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "change"
+                      ]
+                    }
+                  ]
+                },
+                "einschaetzung": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdeeKategorieIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kategorie"
+        ],
+        "properties": {
+          "kategorie": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "A"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "B"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "C"
+                ]
+              }
+            ]
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "begruendung": {
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
+      "IdeeRueckfragenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fragen"
+        ],
+        "properties": {
+          "fragen": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "feld": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "titel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ausgangslage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "zielsetzung"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "handlungsfeld"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "strategischesZiel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "bereiche"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "nutzen"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "aufwand"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "relevanz"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "herkunft"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "text": {
+                  "minLength": 1,
+                  "maxLength": 2000,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdeeZurueckweisenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "begruendung"
+        ],
+        "properties": {
+          "begruendung": {
+            "minLength": 1,
+            "maxLength": 4000,
+            "type": "string"
+          }
+        }
+      },
+      "IdeeZusammenfuehrenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fuehrendeIdeeId"
+        ],
+        "properties": {
+          "fuehrendeIdeeId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        }
+      },
       "KapazitaetZelle": {
         "additionalProperties": false,
         "type": "object",
@@ -48223,6 +49114,1383 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/pool": {
+      "get": {
+        "summary": "Ideenpool",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Alle eingereichten Ideen (ohne Entwürfe) mit `idee:read`; Standard «wartet am längsten zuerst» (K4 Prüfen 5), Filter Stand, Handlungsfeld, Herkunft, Cursor.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "entwurf"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "eingereicht"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_pruefung"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_ergaenzung"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "traktandiert"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "freigegeben"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zurueckgestellt"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zurueckgewiesen"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zusammengefuehrt"
+                    ]
+                  }
+                ]
+              }
+            },
+            "in": "query",
+            "name": "stand",
+            "required": false,
+            "description": "Nur diese Stände (mehrfach); ohne Angabe alle ausser Entwurf."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "handlungsfeld",
+            "required": false
+          },
+          {
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "herkunft",
+            "required": false
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "wartet"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "neu"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "description": "`wartet` (Standard): am längsten im aktuellen Stand zuerst; `neu`: zuletzt eingereicht zuerst."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePoolList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/pool/funnel": {
+      "get": {
+        "summary": "Funnel «Pre-P0»",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Anzahl Ideen je Stand (ohne Entwürfe) und Zeitpunkt der letzten Einreichung (K4 Prüfen 5, UC-001 UI).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeeFunnel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/aehnliche": {
+      "get": {
+        "summary": "Ähnliche Ideen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Ideen mit gleichem Handlungsfeld oder gemeinsamen betroffenen Bereichen (UC-001 Schritt 3, A1); nur mit `idee:write` (A-32).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeeAehnliche"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/pruefung": {
+      "get": {
+        "summary": "Prüfung einer Idee",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Leitfragen zum Eintritt P0 mit Antworten, Kriterienraster mit Vorschlag, Kategorie und zuständiges Gremium; nur mit `idee:read` (Antragstellende sehen sie nicht, K4 Z8).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/leitfragen": {
+      "put": {
+        "summary": "Leitfragen zum Eintritt P0 beantworten",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Antworten je Position der Leitfragen des Phasenmodells in Kraft (Frage als Abschrift), vorgesehener Sponsor (UC-001 Schritt 4). Nur mit `If-Match` der Idee.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeLeitfragenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/raster": {
+      "put": {
+        "summary": "Kriterienraster einschätzen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Je Kriterium «hoch / mittel / tief» (null = offen); die Antwort zeigt die naheliegende Kategorie mit Herleitung (PP.02.04, G11). Nur mit `If-Match` der Idee.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeRasterIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/kategorie": {
+      "post": {
+        "summary": "Kategorie zuordnen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Kategorie A, B oder C als Gesamtbeurteilung der UE und damit Portfolio und zuständiges Gremium (UC-001 Schritt 5). Bei mehreren Portfolios der Kategorie (C: je Direktion) ist `portfolioId` nötig (sonst 422). Nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeKategorieIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/rueckfragen": {
+      "post": {
+        "summary": "Rückfrage stellen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu Ihrer Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeRueckfragenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/zurueckweisen": {
+      "post": {
+        "summary": "Idee zurückweisen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Mit Begründung (Pflicht, UC-001 A3): Stand «zurückgewiesen», Antragstellende und – bei zugeordnetem Portfolio – die Mitglieder des Gremiums werden informiert (A-06). Nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeZurueckweisenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/zusammenfuehren": {
+      "post": {
+        "summary": "Ideen zusammenführen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Schliesst diese Idee als «zusammengeführt» mit Verweis auf die führende Idee; Bereiche und Texte gehen in die führende über, beide Antragstellenden werden informiert (UC-001 A1, DM.01.03). Nur mit `If-Match` dieser Idee; die führende muss offen sein (sonst 409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeZusammenfuehrenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
                 }
               }
             }

@@ -2,8 +2,9 @@
 
 Für die Schritte des Playbooks ([identity-kit › docs/hetzner-einrichten.md](https://github.com/vollholz/identity-kit/blob/main/docs/hetzner-einrichten.md#3-ablauf)),
 die die Cloud-Session nicht kann (kein SSH, keine GitHub-Secrets). Ausführen in Claude Code auf dem Rechner der Person
-oder von Hand, im Checkout von `CSPAG/ppm` auf dem Branch des Einrichtungs-PRs. Befehle für PowerShell; unter Linux und
-macOS gelten dieselben Aufrufe mit `$VAR` statt `$env:VAR`.
+oder von Hand, im Checkout von `CSPAG/ppm` auf dem Branch des Einrichtungs-PRs. Befehle für PowerShell 7 bzw. Git Bash; unter Linux und
+macOS gelten dieselben Aufrufe mit `$VAR` statt `$env:VAR`. Aufrufe mit `sops -d --extract '["…"]'` nie in Windows
+PowerShell 5.1 (Anführungszeichen gehen verloren), sondern in Git Bash oder PowerShell 7.3+.
 
 Vorher immer `git pull`; Cloud- und lokale Session pushen nie gleichzeitig.
 
@@ -26,18 +27,28 @@ Vorher immer `git pull`; Cloud- und lokale Session pushen nie gleichzeitig.
 
 ## Schritt 8: GitHub-Environment `production`
 
-Werte stehen verschlüsselt in `infra/hetzner/betrieb.sops.yaml`; nichts abtippen:
+Werte stehen verschlüsselt in `infra/hetzner/betrieb.sops.yaml`; nichts abtippen. **In Git Bash**, nicht in
+PowerShell: Windows PowerShell 5.1 entfernt die inneren Anführungszeichen von `--extract '["github"]["…"]'`, `sops`
+bricht ab und `gh secret set` speichert dann einen leeren Wert (vermutete Ursache; bei der Einrichtung waren so alle Secrets leer). Die Schleife bricht
+bei einem leeren Wert ab und zeigt nur Längen:
 
-```powershell
-$r = "--env", "production", "--repo", "CSPAG/ppm"
-gh api -X PUT repos/CSPAG/ppm/environments/production > $null   # legt das Environment an, falls es fehlt
-foreach ($n in "HCLOUD_TOKEN","S3_ACCESS_KEY","S3_SECRET_KEY","TF_STATE_PASSPHRASE","INFOMANIAK_API_TOKEN","SOPS_AGE_KEY","DEPLOY_SSH_KEY","KEYCLOAK_IAC_PRIVATE_KEY") {
-  sops -d --extract "[`"github`"][`"$n`"]" infra/hetzner/betrieb.sops.yaml | gh secret set $n @r
-}
-foreach ($n in "HETZNER_BACKEND_HCL","HETZNER_TFVARS","APP_HOST","ACME_EMAIL") {   # HETZNER_TFVARS = infra/hetzner/production.tfvars
-  sops -d --extract "[`"variablen`"][`"$n`"]" infra/hetzner/betrieb.sops.yaml | gh variable set $n @r
-}
+```bash
+f=infra/hetzner/betrieb.sops.yaml; r=(--env production --repo CSPAG/ppm)
+gh api -X PUT repos/CSPAG/ppm/environments/production > /dev/null   # legt das Environment an, falls es fehlt
+for n in HCLOUD_TOKEN S3_ACCESS_KEY S3_SECRET_KEY TF_STATE_PASSPHRASE INFOMANIAK_API_TOKEN SOPS_AGE_KEY DEPLOY_SSH_KEY KEYCLOAK_IAC_PRIVATE_KEY; do
+  v="$(sops -d --extract "[\"github\"][\"$n\"]" "$f" </dev/null)" && [ -n "$v" ] || { echo "FEHLER: $n"; break; }
+  gh secret set "$n" "${r[@]}" --body "$v" </dev/null && echo "ok $n (${#v} Zeichen)"
+done
+# HETZNER_TFVARS = infra/hetzner/production.tfvars
+for n in HETZNER_BACKEND_HCL HETZNER_TFVARS APP_HOST ACME_EMAIL; do
+  v="$(sops -d --extract "[\"variablen\"][\"$n\"]" "$f" </dev/null)" && [ -n "$v" ] || { echo "FEHLER: $n"; break; }
+  gh variable set "$n" "${r[@]}" --body "$v" </dev/null && echo "ok $n"
+done
+unset v; gh secret list "${r[@]}"; gh variable list "${r[@]}"
 ```
+
+Prüfen: Workflow «Infrastruktur» › `plan` muss «No changes» zeigen. Stehen dort leere Werte statt `***`, sind die
+Secrets leer gesetzt.
 
 In *Settings › Environments › production* «Required reviewers» setzen (Sie selbst) und unter *Deployment branches*
 nur `main` zulassen. `DEPLOY_KNOWN_HOSTS` folgt in Schritt 10.

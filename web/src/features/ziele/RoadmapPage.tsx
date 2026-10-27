@@ -54,7 +54,9 @@ export function RoadmapPage({ search, setSearch, projektOeffnen }: RoadmapPagePr
           {jahre.map(j => <option key={j} value={j}>{j}</option>)}
         </select>
       </div>
-      <div className="body pad">
+      {/* scrollbar auch ohne Eingabefelder (nur lesen) mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body pad" tabIndex={0} role="region" aria-label={TR.inhalt(jahr ?? null)}>
         {vorschauAktiv && jahr ? <Vorschau jahr={jahr} q={vorschau} onFertig={() => setSearch({ ansicht: undefined })} projektOeffnen={projektOeffnen} />
           : liste.isPending || roadmap.isPending ? (verzoegert ? <Skelett zeilen={8} /> : null)
           : liste.error || roadmap.error ? <ErrorState error={liste.error ?? roadmap.error} onRetry={() => { void liste.refetch(); void roadmap.refetch(); }} />

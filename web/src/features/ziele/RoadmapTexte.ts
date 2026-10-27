@@ -3,6 +3,7 @@ import { fmtDatum } from '../../ui/index.ts';
 
 export const TR = {
   bereich: 'Roadmap',
+  inhalt: (jahr: number | null) => (jahr ? `Inhalt der Roadmap ${jahr}` : 'Inhalt der Roadmap'),
   titel: (jahr: number) => `Roadmap ${jahr}`,
   publiziert: (d: string) => `publiziert ${fmtDatum(d)}`,
   nichtPubliziert: 'nicht publiziert',

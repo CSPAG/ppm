@@ -30,7 +30,7 @@ Tests mit Datenbank brauchen `POSTGRES_SUPERUSER_PASSWORD` (und `POSTGRES_PORT`,
   aus `app.ts`. Neues Modul: Checkliste in [docs/zielarchitektur.md](docs/zielarchitektur.md#checkliste-neues-modul-anlegen).
 - **Jede neue Tabelle** mit Mandantendaten: `tenant_id` zuerst im Primärschlüssel, RLS `ENABLE` + `FORCE`
   (`SELECT app.secure_tenant_tables()`), Policies der Lesesicht, `GRANT` nur an `ppm_app`/`_sched`, Eintrag in
-  der Testmatrix von `test/app/rls.test.ts`.
+  der Testmatrix des Moduls (`test/app/matrix/<modul>.ts`, geprüft von `rls.test.ts` und `tenant-isolation.test.ts`).
 - Migrationen nur vorwärts (`db/migrations/NNN_name.sql`), Nummer nur aus dem Bereich des Arbeitspakets
   (`docs/fachmodell.md` Abschnitt 7); veröffentlichte nie ändern.
 - **Arbeitspakete:** nur die Dateien im Besitz des Pakets ändern; gemeinsame Dateien (`src/app.ts`, `src/authz/`,

@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { defineApp } from '@vollholz/platform';
 import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
+import { ideeModule } from './modules/idee/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
@@ -34,6 +35,7 @@ export const app = defineApp({
     projektdatenModule,
     zielModule,
     statusberichtModule,
+    ideeModule,
     ressourceModule,
     webhooksModule,
   ],

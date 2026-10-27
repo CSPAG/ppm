@@ -33,7 +33,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | offen | – | – |
-| AP-E4-1 | Projektidee einreichen | 220–229 | offen | – | – |
+| AP-E4-1 | Projektidee einreichen | 220–229 | in Arbeit (PR 1 Tabellen und API: 220, Modul `idee`, `list_ideen`, `get_idee`; PR 2 Oberfläche Assistent und Meine Ideen folgt) | – | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
@@ -69,7 +69,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
-| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | offen | – |
+| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | API in Arbeit, Oberfläche folgt | – |
 | DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | offen | – |

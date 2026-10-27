@@ -4,6 +4,7 @@
  * (I-L5), Fristen der Periode und die Regel, die den Abschluss sperrt.
  */
 import type { Tx } from '@vollholz/platform';
+import { fristDatum } from '../phasenmodell/index.ts';
 import { projektdaten, type Eintrag } from '../projektdaten/index.ts';
 import type { AuffaelligkeitOut, PeriodeZeileOut, ZeilenStand } from './pruefung-schemas.ts';
 import type * as pstore from './pruefung-store.ts';
@@ -25,13 +26,17 @@ export function vorperiodeVon(periode: string): string {
 }
 
 /**
- * Fristen der Periode (A-26, Q8 Kap. 8.4): Tag der Berichtsaufgabe und Stichtag kommen aus dem Phasenmodell in Kraft
- * (`bericht_aufgabe`, `bericht_stichtag`, docs/fachmodell.md 2.14) und nie als Konstante in den Code. Bis das Modul
- * phasenmodell (AP-E0-3) in `main` ist, sind sie null: der Kopf zeigt dann keinen Stichtag, und «Periode abschliessen»
- * öffnet sich mit dem ersten Einreichen.
+ * Fristen der Periode (A-26, Q8 Kap. 8.4) aus dem Phasenmodell in Kraft (`bericht_aufgabe`, `bericht_stichtag`,
+ * docs/fachmodell.md 2.14), nie als Konstante; ohne Phasenmodell in Kraft null («Periode abschliessen» öffnet sich dann
+ * mit dem ersten Einreichen).
  */
-export async function fristen(_tx: Tx, periode: string): Promise<{ berichtAufgabe: string | null; stichtag: string | null; abschlussBis: string }> {
-  return { berichtAufgabe: null, stichtag: null, abschlussBis: monatsende(periode) };
+export async function fristen(tx: Tx, periode: string): Promise<{ berichtAufgabe: string | null; stichtag: string | null; abschlussBis: string }> {
+  const erster = `${periode}-01`;
+  return {
+    berichtAufgabe: (await fristDatum(tx, 'bericht_aufgabe', erster))?.datum ?? null,
+    stichtag: (await fristDatum(tx, 'bericht_stichtag', erster))?.datum ?? null,
+    abschlussBis: monatsende(periode),
+  };
 }
 
 const TAG = 86_400_000;

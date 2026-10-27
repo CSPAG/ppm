@@ -6,6 +6,7 @@ export const MATRIX = sammle([
   (await import('./eingang.ts')).matrix,
   (await import('./stammdaten.ts')).matrix,
   (await import('./handlungsfeld.ts')).matrix,
+  (await import('./phasenmodell.ts')).matrix,
   (await import('./portfolio.ts')).matrix,
   (await import('./projekt.ts')).matrix,
   (await import('./projektdaten.ts')).matrix,

@@ -21977,6 +21977,784 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/{id}/vertrag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Projektvertrag: Versionen
+         * @description Alle Versionen des Projektvertrags (neueste zuerst) mit Entwurf und Baseline (UI-07). `can.entwerfen` nennt die Anlässe, für die jetzt ein Entwurf möglich ist.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Vertrag"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projekte/{id}/vertrag/entwuerfe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Projektvertrag: Entwurf anlegen
+         * @description Legt den Entwurf einer neuen Version mit allen 13 Kapiteln an (höchstens einer je Projekt, UX-E5; sonst 409 mit `entwurf`). Erster Vertrag (`initial`, UC-002 Schritt 1): Version 0.1, Ausgangslage, Zielsetzung und Strategiebezug aus der Projektidee, Lieferergebnisse und Meilensteine aus dem Phasenmodell.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragEntwurfCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragVersionDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vertragsversion lesen
+         * @description Kopf der Version und Kapitelnavigation mit «geändert gegenüber Baseline» und fehlenden Pflichtangaben je Kapitel (K2 Schritt 2). `ETag` der Version.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragVersionDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/kapitel/{nr}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kapitel lesen
+         * @description Inhalt eines Kapitels mit dem Inhalt der Basisversion (Abweichung zur Baseline am Feld). Beträge (Kap. 9) ohne `finanzen:read` als null (A-33). `ETag` des Kapitels.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    /** @description Kapitel 1–13 (Q7). */
+                    nr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragKapitel"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        /**
+         * Kapitel speichern
+         * @description Ersetzt den Inhalt eines Kapitels im Entwurf «in Arbeit» (automatisches Speichern, I-R3); `If-Match` Pflicht, bei fremder Änderung 412 (K2 Z7). Der Inhalt wird gegen das Schema des Kapitels geprüft (422 mit Pfad). Kapitel 9 nur mit `finanzen:read`.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                    /** @description Kapitel 1–13 (Q7). */
+                    nr: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragKapitelPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragKapitel"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/pflichtangaben": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pflichtangaben der Zielphase
+         * @description Verlangte Angaben aus dem Phasenmodell (Gate in die Zielphase und Zielphase, K13, A-12) mit Stand und Sprungziel (Kapitel, Feld) für das Seitenpanel (K2-4).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragPflichtangaben"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/einreichen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Zur Prüfung einreichen
+         * @description Entwurf «in Arbeit» → «in Prüfung» (DM.02.02, UC-002 Schritt 8); die UE erhält die Aufgabe «Quality-Check». Fehlen Pflichtangaben der Zielphase: 422 mit je einem Fehler `/kapitel/<nr>/<feld>` (UC-002 A3). Eine Änderung reicht die PL beim Sponsor ein (UC-007, nicht hier). `If-Match` Pflicht.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragVersionDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ideen": {
         parameters: {
             query?: never;
@@ -25654,6 +26432,354 @@ export interface components {
             massnahme?: string;
             /** @description Entscheid des PRAT nötig (UC-004 A2.2); nur bei «kritisch». */
             entscheidNoetig?: boolean;
+        };
+        KpiPlan: {
+            registerId: string | null;
+            /** @description Klinischer, nicht-klinischer oder Projekt-KPI. */
+            art: "klinisch" | "nicht_klinisch" | "projekt";
+            /** @description Bezeichnung des KPI. */
+            text: string;
+            /** @description Einheit. */
+            einheit: string;
+            /** @description Zielwert. */
+            zielwert: string;
+        };
+        AbhaengigkeitPlan: {
+            registerId: string | null;
+            /**
+             * Format: uuid
+             * @description Anderes Projekt (muss sichtbar sein).
+             */
+            zuProjektId: string;
+            /** @description Abhängigkeit. */
+            text: string;
+            /** @description Ansprechperson bzw. Projektleitung. */
+            ansprechperson: string;
+        };
+        MeilensteinPlan: {
+            registerId: string | null;
+            /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
+            phase: "P0" | "P1" | "P2" | "P3" | "P4";
+            /** @description Meilenstein oder Lieferergebnis. */
+            art: "meilenstein" | "lieferergebnis";
+            /** @description Tätigkeit, Lieferergebnis bzw. Meilenstein. */
+            text: string;
+            termin: string | null;
+        };
+        MitgliedPlan: {
+            /**
+             * Format: uuid
+             * @description Person aus dem Verzeichnis.
+             */
+            personId: string;
+            /** @description Sponsor, Sponsoren-Koalition, Projektleitung, CTL oder Kernteam. */
+            funktion: "sp" | "koalition" | "pl" | "ctl" | "kt";
+            /** @description Aufgaben, Kompetenzen, Verantwortung und Verpflichtung. */
+            akv: string;
+        };
+        KostenPlan: {
+            registerId: string | null;
+            /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
+            phase: "P0" | "P1" | "P2" | "P3" | "P4";
+            /** @description CAPEX oder OPEX. */
+            art: "capex" | "opex";
+            /** @description Position. */
+            text: string;
+            /** @description Lieferant. */
+            lieferant: string;
+            /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
+            offerte: string;
+            betrag: number | null;
+        };
+        PersonalPlan: {
+            registerId: string | null;
+            /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
+            phase: "P0" | "P1" | "P2" | "P3" | "P4";
+            /** @description Rolle (Codetabelle «Rollen des Ressourcenbedarfs»). */
+            rolle: string;
+            groesse: ("S" | "M" | "L") | null;
+            fte: number | null;
+            vonMonat: string | null;
+            bisMonat: string | null;
+            /** @description Benötigte Ressourcen inkl. Zeitraum. */
+            bemerkung: string;
+        };
+        RisikoPlan: {
+            registerId: string | null;
+            /** @description Risiko. */
+            text: string;
+            /** @description Eintrittswahrscheinlichkeit (EW). */
+            wahrscheinlichkeit: "hoch" | "mittel" | "tief";
+            /** @description Auswirkung (AW). */
+            auswirkung: "hoch" | "mittel" | "tief";
+            /** @description Massnahme. */
+            massnahme: string;
+            /** @description Verantwortlich für die Massnahme. */
+            verantwortlich: string;
+        };
+        StakeholderPlan: {
+            registerId: string | null;
+            /** @description Stakeholder. */
+            gruppe: string;
+            /** @description Interesse. */
+            interesse: string;
+            /** @description Einfluss auf den Projekterfolg. */
+            einfluss: string;
+            /** @description Geplante Massnahmen. */
+            massnahmen: string;
+        };
+        KommunikationPlan: {
+            registerId: string | null;
+            /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
+            phase: "P0" | "P1" | "P2" | "P3" | "P4";
+            /** @description Massnahme. */
+            text: string;
+            /** @description Adressat. */
+            adressat: string;
+            /** @description Ziel. */
+            ziel: string;
+            termin: string | null;
+        };
+        BeilagePlan: {
+            /** @description Bezeichnung. */
+            bezeichnung: string;
+            /** @description Version bzw. Datum. */
+            version: string;
+            /** @description Inhalt. */
+            inhalt: string;
+        };
+        /** Ausgangslage / Problembeschreibung */
+        Kapitel1: {
+            /** @description Beschreibung der Ausgangslage. */
+            ausgangslage: string;
+            /** @description Welche Problemstellung das Projekt adressiert. */
+            problemstellung: string;
+            /** @description Was geschieht, wenn das Projekt nicht durchgeführt wird. */
+            ohneProjekt: string;
+            /** @description Vorprojekte und Initiativen in derselben Thematik. */
+            vorprojekte: string;
+            /** @description Einzuhaltende Vorgaben und Rahmenbedingungen. */
+            rahmenbedingungen: string;
+        };
+        /** Strategiebezug */
+        Kapitel2: {
+            handlungsfeldId: string | null;
+            strategischesZielId: string | null;
+            jahreszielId: string | null;
+            /** @description Wie das Projekt zum Ziel beiträgt. */
+            beitrag: string;
+        };
+        /** Ziele und Nutzenbeitrag */
+        Kapitel3: {
+            /** @description Ziele des Projekts. */
+            ziele: string;
+            /** @description Nutzenbeitrag, qualitativ und quantitativ. */
+            nutzen: string;
+            /** @description Business Case: Nutzen als Text mit Verweis auf Beilagen; Kosten je Phase aus Kapitel 9 (A-19, K21 offen). */
+            businessCase: string;
+            /** @description Projekt-KPIs mit Zielwert (PC.03.01). */
+            kpis: components["schemas"]["KpiPlan"][];
+        };
+        /** Lösungsansatz */
+        Kapitel4: {
+            /** @description Wie der Lösungsansatz aussieht. */
+            loesungsansatz: string;
+            /** @description Annahmen, die dem Lösungsansatz zugrunde liegen. */
+            annahmen: string;
+        };
+        /** Abgrenzung */
+        Kapitel5: {
+            /** @description Im Projekt bearbeitete Themen. */
+            bearbeitet: string;
+            /** @description Nicht bearbeitete Themen. */
+            nichtBearbeitet: string;
+        };
+        /** Abhängigkeiten von anderen Projekten / Schnittstellen */
+        Kapitel6: {
+            /** @description Abhängigkeiten mit Ansprechperson; erscheinen auch beim anderen Projekt. */
+            abhaengigkeiten: components["schemas"]["AbhaengigkeitPlan"][];
+            /** @description Weitere Schnittstellen und mit wem sie zu koordinieren sind. */
+            schnittstellen: string;
+        };
+        /** Projektplanung und Lieferergebnisse */
+        Kapitel7: {
+            /** @description Tätigkeiten je Phase (7.1). */
+            vorgehen: string;
+            /** @description Lieferergebnisse und Meilensteine je Phase mit Termin (7.1). */
+            meilensteine: components["schemas"]["MeilensteinPlan"][];
+            /** @description Zusammenfassung Projektplanung (7.2). */
+            termine: {
+                projektStart: string | null;
+                phasenStart: string | null;
+                phasenExit: string | null;
+                /** @description Erwarteter Projektabschluss (ab Phase 2). */
+                projektabschluss: string | null;
+            };
+        };
+        /** Projektstruktur und Organisation */
+        Kapitel8: {
+            /** @description Wer welche Rolle im Projekt übernimmt. */
+            mitglieder: components["schemas"]["MitgliedPlan"][];
+        };
+        /** Ressourcen */
+        Kapitel9: {
+            /** @description Kosten je Phase (9.1). */
+            kosten: components["schemas"]["KostenPlan"][];
+            /** @description Personal je Phase und Rolle (9.2). */
+            personal: components["schemas"]["PersonalPlan"][];
+        };
+        /** Risiko-Management */
+        Kapitel10: {
+            /** @description Risiken mit Massnahme. */
+            risiken: components["schemas"]["RisikoPlan"][];
+        };
+        /** Change Management */
+        Kapitel11: {
+            /** @description Stakeholder-Management (11.1). */
+            stakeholder: components["schemas"]["StakeholderPlan"][];
+            /** @description Kommunikationsmassnahmen mit Adressat und Ziel (11.2). */
+            kommunikation: components["schemas"]["KommunikationPlan"][];
+        };
+        /** Freigabe */
+        Kapitel12: {
+            /** @description Bemerkungen zur Freigabe. */
+            bemerkung: string;
+        };
+        /** Beilagen */
+        Kapitel13: {
+            /** @description Beilagen zum Vertrag. */
+            beilagen: components["schemas"]["BeilagePlan"][];
+        };
+        VertragVersion: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projektId: string;
+            /** @description Versionsnummer («0.1», «1.0», «1.1»). */
+            nummer: string;
+            /**
+             * @description Anlass: erster Vertrag (UC-002), Gate (UC-003) oder Änderung (UC-007).
+             * @enum {string}
+             */
+            anlass: "initial" | "gate" | "aenderung";
+            /**
+             * @description Phase, für die der Vertrag gilt.
+             * @enum {string}
+             */
+            zielphase: "P0" | "P1" | "P2" | "P3" | "P4";
+            /**
+             * @description Bearbeitungsstand (fachmodell.md 2.10).
+             * @enum {string}
+             */
+            stand: "in_arbeit" | "in_pruefung" | "zur_unterzeichnung" | "unterzeichnet" | "traktandiert" | "abgenommen" | "abgelehnt" | "verworfen" | "zurueckgezogen";
+            /** @description Verbindliche, abgenommene Version. */
+            baseline: boolean;
+            baselineAt: string | null;
+            basisVersionId: string | null;
+            /** @description Begründung einer Änderung (UC-007 Schritt 2). */
+            begruendung: string;
+            eingereichtAt: string | null;
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            can: {
+                /** @description Kapitel bearbeiten (Entwurf in Arbeit, vertrag:write). */
+                write: boolean;
+                /** @description Zur Prüfung einreichen (Entwurf in Arbeit, vertrag:write); Pflichtangaben prüft die Route. */
+                einreichen: boolean;
+            };
+        };
+        VertragKapitelKopf: {
+            kapitel: number;
+            titel: string;
+            /** @description Geändert gegenüber der Basisversion (Punkt in der Kapitelnavigation, K2 Schritt 2). */
+            geaendert: boolean;
+            /** @description Fehlende Pflichtangaben der Zielphase in diesem Kapitel (Symbol «Angaben fehlen»). */
+            fehlend: number;
+            version: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        VertragVersionDetail: {
+            version: components["schemas"]["VertragVersion"];
+            kapitel: components["schemas"]["VertragKapitelKopf"][];
+        };
+        Vertrag: {
+            /** Format: uuid */
+            projektId: string;
+            /** @description Alle Versionen, neueste zuerst. */
+            versionen: components["schemas"]["VertragVersion"][];
+            entwurf: string | null;
+            baseline: string | null;
+            can: {
+                /** @description Anlässe, für die die Person jetzt einen Entwurf anlegen kann. */
+                entwerfen: ("initial" | "gate" | "aenderung")[];
+            };
+        };
+        VertragEntwurfCreate: {
+            /**
+             * @description Anlass: erster Vertrag (UC-002), Gate (UC-003) oder Änderung (UC-007).
+             * @enum {string}
+             */
+            anlass: "initial" | "gate" | "aenderung";
+            /** @description Begründung (Pflicht bei einer Änderung, UC-007 Schritt 2). */
+            begruendung?: string;
+        };
+        VertragKapitel: {
+            /** Format: uuid */
+            versionId: string;
+            kapitel: number;
+            titel: string;
+            /** @description Inhalt nach dem Schema des Kapitels (Komponenten Kapitel1 … Kapitel13). Beträge ohne Recht auf Beträge als null (A-33). */
+            inhalt: {
+                [key: string]: unknown;
+            };
+            basis: {
+                [key: string]: unknown;
+            } | null;
+            geaendert: boolean;
+            version: number;
+            /** Format: date-time */
+            updatedAt: string;
+            can: {
+                write: boolean;
+            };
+        };
+        VertragKapitelPut: {
+            /** @description Ganzer Inhalt nach dem Schema des Kapitels (Kapitel1 … Kapitel13). */
+            inhalt: {
+                [key: string]: unknown;
+            };
+        };
+        VertragPflichtangaben: {
+            /** Format: uuid */
+            versionId: string;
+            /**
+             * @description Phase.
+             * @enum {string}
+             */
+            zielphase: "P0" | "P1" | "P2" | "P3" | "P4";
+            /** @description Alle verlangten Angaben sind erfasst; Einreichen ist möglich. */
+            vollstaendig: boolean;
+            angaben: {
+                kapitel: number;
+                /** @description Feld im Kapitel (Sprungziel der Oberfläche). */
+                feld: string;
+                /** @description Was verlangt ist (aus dem Phasenmodell). */
+                text: string;
+                quelle: {
+                    /**
+                     * @description Gate in die Zielphase oder die Zielphase.
+                     * @enum {string}
+                     */
+                    art: "gate" | "phase";
+                    code: string;
+                };
+                erfuellt: boolean;
+                grund: string | null;
+            }[];
         };
         IdeeRueckfrage: {
             /** Format: uuid */

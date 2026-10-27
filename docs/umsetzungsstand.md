@@ -28,7 +28,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | offen | – | – |
-| AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | offen | – | – |
+| AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | in Arbeit (PR 1: 170, Modul `vertrag` mit Versionen, Kapiteln 1–13, Pflichtangaben, Einreichen, Baseline mit Register-Übernahme und Zuordnung zum Ziel, MCP `get_vertrag`; PR 2 Oberfläche folgt) | #43 | A-04 (Koalition als Liste in Kap. 8), A-12 (Pflichtangaben aus dem Phasenmodell; ab Gate P1–P2 Personal in FTE und Kosten bis P4), A-19 (Business Case als Text, Kosten aus Kap. 9), A-29; erster Vertrag eines übernommenen Projekts gilt für die laufende Phase; Register-Übernahme erst bei der Baseline; Beilagen ohne Datei |
 | AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | offen | – | – |
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
@@ -73,9 +73,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | offen | – |
-| DM.02.01 | Projektvertrag erstellen | 002 | E3 | AP-E3-1 | offen | – |
-| DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | offen | – |
-| DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | offen | – |
+| DM.02.01 | Projektvertrag erstellen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
+| DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
+| DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | in Arbeit (Kapitel bearbeiten, API) | – |
 | DM.02.04 | Projektvertrag zurückziehen | 002 | E3 | AP-E3-1 | offen | – |
 | DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | offen | – |
 | DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | offen | – |
@@ -86,7 +86,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus: API umgesetzt (AP-E6-1); `projektZuordnen` aus `ziel` für Vertrag Kap. 2 bereit (#38), Aufruf offen (AP-E3-1) | #28, #38 |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus: API umgesetzt (AP-E6-1); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1, in Arbeit) | #28, #38, #43 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
@@ -127,7 +127,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
 | PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | offen | – |
-| PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | offen | – |
+| PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | offen | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
@@ -172,7 +172,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K2-1 | Unterzeichnen auf dem Telefon (PPM-2) | ≤ 60 s, ≤ 3 Interaktionen | Test bei 360 px, Aufgabentest | AP-E3-2 | offen |
 | K2-2 | Quality-Checks ohne Rückmeldung | ≥ 70 % | Betrieb | AP-E3-2 | offen |
 | K2-3 | Eingereicht → unterzeichnet | Median ≤ 5 Arbeitstage | Betrieb | AP-E3-2 | offen |
-| K2-4 | Fehlende Pflichtangaben auffinden | 1 Klick, 100 % | Test | AP-E3-1 | offen |
+| K2-4 | Fehlende Pflichtangaben auffinden | 1 Klick, 100 % | Test | AP-E3-1 | API mit Sprungziel je Angabe getestet (`vertrag.test.ts`); Oberfläche in PR 2 |
 | K2-5 | Gate Review Packet ohne Dateien (PPM-4) | 0 Dateien | Aufgabentest, Betrieb | AP-E3-3 | offen |
 | K3-1 | Unterlagen ≥ 5 Arbeitstage vorher | 100 % | Betrieb (Versandprotokoll) | AP-E2-1 | offen |
 | K3-2 | Traktandenliste versandbereit | ≤ 30 Min. | Aufgabentest | AP-E2-1 | offen |

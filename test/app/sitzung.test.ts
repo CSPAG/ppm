@@ -82,7 +82,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolio });
     mitglied = { authorization: m.authorization };
 
-    // Arten, wie sie vertrag (gate, AP-E3-3) und statusbericht (eskalation, AP-E2-4) registrieren werden
+    // Probe-Arten: gate wie es vertrag (AP-E3-3) registrieren wird, abschluss ohne Unterlagen (noch nicht registriert)
     registriereTraktandenart({
       art: 'gate', ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }],
       zusammenfassung: async (_tx, b) => ({ antrag: `Freigabe Gate für ${b.projektId === p1.id ? p1.nummer : p2.nummer}` }),
@@ -91,9 +91,9 @@ describe('Sitzungen vorbereiten', { skip }, () => {
         return [{ art: 'packet', titel: 'Gate Review Packet', bereit: q === 'bestanden', qualityCheck: q, hinweis: q === 'bestanden' ? 'Quality-Check bestanden' : 'Quality-Check offen' }];
       },
     });
-    registriereTraktandenart({ art: 'eskalation', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }] });
+    registriereTraktandenart({ art: 'abschluss', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }] });
   });
-  after(async () => { _abmelden('gate'); _abmelden('eskalation'); await api?.close(); });
+  after(async () => { _abmelden('gate'); _abmelden('abschluss'); await api?.close(); });
 
   let sitzung: { id: string; version: number };
 
@@ -102,7 +102,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     const g1 = await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p1' }, projektId: p1.id, titel: `Gate P1–P2 ${p1.nummer}` }));
     assert.equal(await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p1' }, projektId: p1.id, titel: `Gate P1–P2 ${p1.nummer}`, antrag: 'Freigabe Phase P2' })), g1);
     await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p2' }, projektId: p2.id, titel: `Gate P2–P3 ${p2.nummer}` }));
-    await sys(tx => traktandum.vorschlagen(tx, { art: 'eskalation', bezug: { typ: 'eskalation', id: 'e-1' }, projektId: p2.id, titel: 'Eskalation Lieferverzug' }));
+    await sys(tx => traktandum.vorschlagen(tx, { art: 'abschluss', bezug: { typ: 'abschlussbericht', id: 'a-1' }, projektId: p2.id, titel: 'Eskalation Lieferverzug' }));
 
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin1 }, 201);
     assert.deepEqual([s.stand, s.traktanden.length, s.can.write, s.frist.arbeitstage], ['geplant', 0, true, 5]);
@@ -110,7 +110,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.equal((await call('POST', '/v1/gremien/prat/sitzungen', ue, { datum: mittwochIn(200) })).statusCode, 422, 'nur zu einem Termin');
 
     const v = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
-    assert.deepEqual(v.gruppen.map((x: { art: string; traktanden: unknown[] }) => [x.art, x.traktanden.length]), [['gate', 2], ['eskalation', 1]]);
+    assert.deepEqual(v.gruppen.map((x: { art: string; traktanden: unknown[] }) => [x.art, x.traktanden.length]), [['gate', 2], ['abschluss', 1]]);
     assert.equal(v.gruppen[0].traktanden[0].antrag, 'Freigabe Phase P2');
 
     let r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: g1 });
@@ -181,13 +181,13 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.deepEqual((await ok('GET', `/v1/sitzungen/${sitzung.id}`, gl)).traktanden, []);
     assert.equal((await call('GET', `/v1/sitzungen/${sitzung.id}`, plH)).statusCode, 404);
     assert.equal((await call('GET', `/v1/sitzungen/${sitzung.id}/vorschlaege`, mitglied)).statusCode, 403);
-    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, gl, { art: 'eskalation' })).statusCode, 403);
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, gl, { art: 'abschluss' })).statusCode, 403);
     assert.equal((await call('GET', '/v1/gremien/prat/sitzungen', nobody)).statusCode, 403);
   });
 
   test('Versand: Vorschau, Protokoll mit Arbeitstagen, Einladungen gebündelt, Mitglieder lesen ab Versand (K3 Abnahme 5, K3-1)', async () => {
     // Zur Eskalation nur den Sponsor einladen (Eingeladene festlegen, UC-006 Schritt 2)
-    const esk = (await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).traktanden.find((t: { art: string }) => t.art === 'eskalation');
+    const esk = (await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).traktanden.find((t: { art: string }) => t.art === 'abschluss');
     assert.equal((await call('PUT', `/v1/traktanden/${esk.id}/einladungen`, { ...ue, 'if-match': 'W/"99"' }, { einladungen: [] })).statusCode, 412);
     assert.equal((await call('PUT', `/v1/traktanden/${esk.id}/einladungen`, { ...ue, 'if-match': `W/"${esk.version}"` }, { einladungen: [{ personId: '00000000-0000-4000-8000-000000000009', funktion: 'weitere' }] })).statusCode, 422);
     const e = await ok('PUT', `/v1/traktanden/${esk.id}/einladungen`, { ...ue, 'if-match': `W/"${esk.version}"` }, { einladungen: [{ personId: sp, funktion: 'sp' }] });
@@ -206,7 +206,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.ok(s.versandVorlauf >= 5);
     assert.equal(s.can.write, false);
     assert.equal(s.traktanden.find((t: { art: string }) => t.art === 'gate').unterlagen.liste[0].hinweis, 'Quality-Check bestanden', 'Stand festgehalten');
-    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { art: 'eskalation' })).statusCode, 409, 'nach dem Versand fest');
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { art: 'abschluss' })).statusCode, 409, 'nach dem Versand fest');
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${s.version}"` })).statusCode, 409);
 
     // Protokoll: Audit sitzung.dispatched mit Vorlauf; Mitteilungen; Aufgabe «Unterlagen lesen» für die Mitglieder
@@ -251,7 +251,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.ok(eingang.includes(aufgaben[0]!.titel));
 
     // Versand erledigt die Aufgabe
-    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'eskalation', titel: 'Eskalation ohne Projekt' });
+    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'abschluss', titel: 'Eskalation ohne Projekt' });
     await ok('POST', `/v1/sitzungen/${s.id}/versenden`, { ...ue, 'if-match': `W/"${r.version}"` });
     const stand = await sys(async tx => (await tx.query<{ stand: string }>("SELECT stand FROM ppm.aufgabe WHERE art = 'sitzung.vorbereiten' AND bezug_id = $1", [s.id])).rows[0]!.stand);
     assert.equal(stand, 'erledigt');

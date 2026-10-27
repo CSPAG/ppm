@@ -4,6 +4,7 @@
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
+import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { sucheZiele, zieleTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
@@ -15,6 +16,8 @@ export const navigation: NavRegistrierung = {
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
     { raum: 'ziele', pfad: '/ziele/strategische-ziele', label: zieleTexte.bereich, recht: 'ziel:read' },
+    // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
+    { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussTexte.bereich, recht: 'statusbericht:review' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
     // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach
     // Recht aus `useIamNav()` dazu (UC-016)

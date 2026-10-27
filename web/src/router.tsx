@@ -8,6 +8,7 @@ import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
@@ -53,6 +54,20 @@ function StrategischeZieleRoute() {
   return <ZielePage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
+const monatsabschlussRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
+});
+
+function MonatsabschlussRoute() {
+  const search = monatsabschlussRoute.useSearch();
+  const navigate = useNavigate({ from: monatsabschlussRoute.fullPath });
+  const setSearch = useCallback<SetMonatsabschlussSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <MonatsabschlussPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
 const organisationRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/administration/organisation', validateSearch: searchOf.organisation, component: OrganisationRoute,
@@ -88,7 +103,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, organisationRoute, codetabellenRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, monatsabschlussRoute, organisationRoute, codetabellenRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

@@ -32,6 +32,7 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | `src/dev/` | Galerie der Bausteine unter `/dev/galerie`, nur im Entwicklungsbuild (`npm --prefix web run dev`), nicht im Produktionsbuild |
 | `src/features/handlungsfeld/` | Arbeitsraum «Ziele» › Handlungsfelder (`/ziele/handlungsfelder`): Liste mit Suche und Cursor, Schublade über `?o=<id>` (`?o=neu` zum Anlegen), Bearbeiten mit 412-Hinweis, Löschen, Verlauf |
 | `src/features/stammdaten/` | Arbeitsraum «Administration» › Organisation (`/administration/organisation`, Ansichten Einheiten und Feiertage über `?ansicht=feiertage`) und Codetabellen (`/administration/codetabellen`, Werte in der Schublade `?o=<tabelle>`), UI-44, UI-45; Bereiche sichtbar mit `stammdaten:write` |
+| `src/features/monatsabschluss/` | Arbeitsraum «Portfolio» › Monatsabschluss (`/portfolio/monatsabschluss?periode=2026-10`), UI-15, UI-16, K1: Posteingang der Periode (auffällige zuerst, Auswahl mit Sammelbestätigung und Einfordern, Tastatur ↑/↓ B R E Leertaste Enter, Rückfrage in der Zeile), Bericht im Vergleich zur Vorperiode in der Schublade (`?o=bericht:<nummer>`), Ansicht «Termine» (`?ansicht=termine`), «Periode abschliessen» mit Wirkungsvorschau; Bereich sichtbar mit `statusbericht:review` |
 | `src/styles/`, `src/test/`, `e2e/` | Tokens und Layout; Testhilfen; Playwright-Tests |
 
 ## Regeln

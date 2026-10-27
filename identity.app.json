@@ -23,5 +23,16 @@
     {
       "email": "platform-admin@project-suite.ch"
     }
+  ],
+  "organizations": [
+    {
+      "alias": "solutions",
+      "name": "Solutions",
+      "admins": [
+        {
+          "email": "andre.h@bluewin.ch"
+        }
+      ]
+    }
   ]
 }

@@ -3,6 +3,8 @@
 #
 # Environment «production»: Secrets DEPLOY_SSH_KEY, SOPS_AGE_KEY; Variablen APP_HOST (deploy@<app-vm>),
 # DEPLOY_KNOWN_HOSTS (ssh-keyscan), ACME_EMAIL. Einrichtung: deploy/hetzner/README.md.
+# Das Image auf ghcr.io ist privat: Runner (cosign) und VM (docker pull, Gate-Aktion registry-login) melden sich mit dem
+# kurzlebigen GITHUB_TOKEN dieses Laufs an und am Ende wieder ab.
 name: Deploy
 
 on:
@@ -58,10 +60,14 @@ jobs:
         if: inputs.action == 'deploy'
       - name: Signatur und Herkunft des Images prüfen
         if: inputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin > /dev/null
           cosign verify "$IMAGE" \
             --certificate-identity-regexp '^https://github\.com/CSPAG/ppm/\.github/workflows/ci\.yml@refs/(heads/main|tags/v.+)$' \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com > /dev/null
+          docker logout ghcr.io > /dev/null
       - name: SOPS installieren
         if: inputs.action == 'deploy'
         run: |
@@ -76,13 +82,22 @@ jobs:
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
           eval "$(ssh-agent -s)" >/dev/null && echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
           printf '%s\n' "$DEPLOY_SSH_KEY" | ssh-add - >/dev/null
+      - name: Anmeldung der VM bei ghcr.io (kurzlebiges Token dieses Laufs)
+        if: inputs.action == 'deploy' || inputs.action == 'rollback'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: printf '%s' "$GH_TOKEN" | deploy/hetzner/rollout.sh registry-login "$GITHUB_ACTOR"
       - name: ${{ inputs.action }}
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
           ACTION: ${{ inputs.action }}
         run: |
+          set -o pipefail # ohne «shell: bash» kein pipefail: ein Fehler des Rollouts ginge sonst im tee unter
           if [ "$ACTION" = deploy ]; then deploy/hetzner/rollout.sh deploy "$IMAGE"; else deploy/hetzner/rollout.sh "$ACTION"; fi \
             | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Abmeldung der VM bei ghcr.io
+        if: always() && (inputs.action == 'deploy' || inputs.action == 'rollback')
+        run: deploy/hetzner/rollout.sh registry-logout || true
       - name: Rauchtest von aussen
         if: inputs.action == 'deploy' || inputs.action == 'rollback'
         run: |

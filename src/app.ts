@@ -9,13 +9,14 @@ import { defineApp } from '@vollholz/platform';
 import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
+import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
 
 export const MIGRATIONS_DIR = join(import.meta.dirname, '..', 'db', 'migrations');
 
 export const app = defineApp({
   platform,
-  modules: [eingangModule, handlungsfeldModule, webhooksModule],
+  modules: [eingangModule, handlungsfeldModule, zielModule, webhooksModule],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4)
   people: { permissions: ['handlungsfeld:read', 'stammdaten:read'] },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App

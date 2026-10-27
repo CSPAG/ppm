@@ -33,7 +33,7 @@ Was nur die Betriebsperson kann (Freigaben, Merge, Schritte mit SSH); Stand Einr
 |---|---|---|
 | 1 | Pull Request CSPAG/ppm#10 mergen (CI: Attestation nur mit `ENABLE_GITHUB_ATTESTATIONS`) | GitHub |
 | 2 | Erster Rollout freigeben: Workflow «Deploy» › `deploy` mit dem Digest aus «CI» auf `main` › «Approve» | GitHub › Actions |
-| 3 | Environment `production`: «Required reviewers» und «Deployment branches» = nur `main` prüfen | GitHub › Settings › Environments |
+| 3 | Environment `production`: «Required reviewers» und «Deployment branches» = nur `main` setzen – fehlt heute, der erste Rollout lief ohne Freigabe los | GitHub › Settings › Environments |
 | 4 | Host-Schlüssel der DB-VM in der Hetzner Console vergleichen (`SHA256:PWCDsc3UYGI1FO8sxwFb/w/m/r4HJURs4qmkhQ/ZcyE`, CSPAG/ppm#8) | Hetzner Console › `ppm-db` |
 | 5 | Erste Organisation und Betrieb anlegen (`npm run identity:first-org`, OP-06), nach dem ersten Rollout | lokale Session, [Schritt 14](../deploy/hetzner/lokale-session.md#schritt-14-erste-organisation-betrieb-rauchtest) |
 | 6 | PITR auf einer Wegwerf-VM üben, Ergebnis in `docs/betrieb.md` | lokale Session, [Schritt 15](../deploy/hetzner/lokale-session.md#schritt-15-pitr-üben) |

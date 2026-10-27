@@ -36,7 +36,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E4-1 | Projektidee einreichen | 220–229 | PR 1 umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`); PR 2 Oberfläche (Assistent, Meine Ideen, Ansicht) in Arbeit | #36 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
-| AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
+| AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | in Arbeit (PR 1: 250, Modul `priorisierung`; PR 2 Oberfläche Bewertung UI-20 und Modell UI-19 folgt) | – | A-01, A-18; Modell «Entwurf»/«in Kraft», gilt das zuletzt in Kraft gesetzte; Entscheid des Gremiums als Text erfasst; Vorgabe = Kriterien aus UC-008 Schritt 2 ohne Zuordnung Nutzen/Risiko (A-39 legt die UE fest); Budgetrahmen je Portfolio; Modell lesen auch mit `priorisierung:read` am Portfolio (Gremium) |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | umgesetzt (270, Modul `ressource`, `get_auslastung`; Portfolio › Ressourcen mit Auslastung UI-23 und Kapazität UI-24; Bedarfsliste UI-25 mit AP-E7-2; E2E offen bis CI läuft) | #35 (über #46), #40 | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
@@ -80,9 +80,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | offen | – |
 | DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | offen | – |
 | DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | offen | – |
-| PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | offen | – |
-| PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | offen | – |
-| PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | offen | – |
+| PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
+| PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
+| PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |

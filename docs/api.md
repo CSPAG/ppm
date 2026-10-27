@@ -220,6 +220,21 @@ Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `sr
 `baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
 über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
 
+## Priorisierung
+
+Bewertungsmodell mit Kriterien und Budgetrahmen, Bewertung der Projekte (docs/fachmodell.md 2.12, AP-E5-1; PP.01.02,
+PP.01.03, PP.02.01; UC-008 Schritte 1–2, A1). Bewertung je Kriterium hoch/mittel/tief ohne Score (A-01); Budgetrahmen je
+Portfolio optional (A-18).
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/bewertungsmodelle`, `GET /v1/bewertungsmodelle/{id}`, `GET /v1/bewertungsmodelle/aktuell` | `priorisierung:read` | Versionen, neueste zuerst; `aktuell` = zuletzt in Kraft gesetzt (404 ohne); mit Kriterien, Budgetrahmen, Prüfbericht |
+| `POST /v1/bewertungsmodelle` | `priorisierung:write` | Entwurf als Kopie des Modells in Kraft, beim ersten Mal mit den Kriterien aus UC-008 Schritt 2; höchstens ein Entwurf (409) |
+| `PATCH /v1/bewertungsmodelle/{id}`, `DELETE …` | `priorisierung:write` | nur Entwurf (409), `If-Match`; Kriterien und Budgetrahmen als ganze Listen |
+| `POST /v1/bewertungsmodelle/{id}/in-kraft-setzen` | `priorisierung:write` | mit Entscheid des Gremiums (`beschluss`), `If-Match`; Sperren des Prüfberichts → 422; danach unveränderlich |
+| `GET /v1/portfolios/{id}/bewertungen?modell=` | `priorisierung:read` (Organisation oder Portfolio) | Raster aktive Projekte × Kriterien, Fortschritt; frühere Modellversion mit `modell` (G11) |
+| `PUT /v1/portfolios/{id}/bewertungen` | `priorisierung:write` | mehrere Zellen, alles oder nichts, nach dem Modell in Kraft (409 ohne); bewertete Zelle nur mit `version` (412); `einschaetzung: null` entfernt |
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur

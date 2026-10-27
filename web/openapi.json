@@ -14917,6 +14917,887 @@
           }
         }
       },
+      "Kriterium": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schluessel",
+          "text",
+          "beschreibung",
+          "dimension",
+          "position"
+        ],
+        "properties": {
+          "schluessel": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "beschreibung": {
+            "type": "string"
+          },
+          "dimension": {
+            "anyOf": [
+              {
+                "description": "Feste Zuordnung zur Achse der Matrix (A-39); null = keine.",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "nutzen"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "risiko"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "position": {
+            "type": "integer"
+          }
+        }
+      },
+      "Budgetrahmen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolioId",
+          "kategorie",
+          "betrag"
+        ],
+        "properties": {
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kategorie": {
+            "description": "Kategorie des Portfolios (A, B, C).",
+            "type": "string"
+          },
+          "betrag": {
+            "description": "Budgetrahmen in CHF.",
+            "type": "number"
+          }
+        }
+      },
+      "BewertungsmodellKurz": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "stand",
+          "aktuell",
+          "beschreibung",
+          "beschluss",
+          "inKraftAt",
+          "inKraftBy",
+          "version",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "description": "Laufende Nummer der Modellversion in der Organisation.",
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              }
+            ]
+          },
+          "aktuell": {
+            "description": "Das zuletzt in Kraft gesetzte Modell; nach ihm wird bewertet.",
+            "type": "boolean"
+          },
+          "beschreibung": {
+            "type": "string"
+          },
+          "beschluss": {
+            "description": "Entscheid des Gremiums, mit dem das Modell in Kraft gesetzt wurde (UC-008 A1.2).",
+            "type": "string"
+          },
+          "inKraftAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inKraftBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Bewertungsmodell": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "stand",
+          "aktuell",
+          "beschreibung",
+          "beschluss",
+          "inKraftAt",
+          "inKraftBy",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "kriterien",
+          "budgetrahmen",
+          "pruefung",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "description": "Laufende Nummer der Modellversion in der Organisation.",
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              }
+            ]
+          },
+          "aktuell": {
+            "description": "Das zuletzt in Kraft gesetzte Modell; nach ihm wird bewertet.",
+            "type": "boolean"
+          },
+          "beschreibung": {
+            "type": "string"
+          },
+          "beschluss": {
+            "description": "Entscheid des Gremiums, mit dem das Modell in Kraft gesetzt wurde (UC-008 A1.2).",
+            "type": "string"
+          },
+          "inKraftAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inKraftBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kriterien": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kriterium"
+            }
+          },
+          "budgetrahmen": {
+            "description": "Nur die Rahmen der Portfolios, die die Person sieht.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Budgetrahmen"
+            }
+          },
+          "pruefung": {
+            "description": "Prüfbericht (I-P1): Sperren verhindern das In-Kraft-Setzen, Hinweise nicht.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "stufe",
+                "text",
+                "pfad"
+              ],
+              "properties": {
+                "stufe": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sperre"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "hinweis"
+                      ]
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string"
+                },
+                "pfad": {
+                  "description": "JSON-Pointer auf die betroffene Angabe.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Entwurf ändern, verwerfen und in Kraft setzen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BewertungsmodellList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "can"
+        ],
+        "properties": {
+          "items": {
+            "description": "Neueste zuerst.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BewertungsmodellKurz"
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "create"
+            ],
+            "properties": {
+              "create": {
+                "description": "Entwurf anlegen (priorisierung:write und noch kein Entwurf).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BewertungsmodellPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "beschreibung": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "kriterien": {
+            "maxItems": 30,
+            "description": "Alle Kriterien in ihrer Reihenfolge (ersetzt die bisherigen); ohne Schlüssel wird er aus dem Text gebildet.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "schluessel": {
+                  "pattern": "^[a-z0-9_]{1,40}$",
+                  "description": "Fester Schlüssel des Kriteriums (Kleinbuchstaben, Ziffern, Unterstrich); bleibt über Modellversionen gleich.",
+                  "type": "string"
+                },
+                "text": {
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "beschreibung": {
+                  "maxLength": 1000,
+                  "type": "string"
+                },
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "description": "Feste Zuordnung zur Achse der Matrix (A-39); null = keine.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "nutzen"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "risiko"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "budgetrahmen": {
+            "maxItems": 100,
+            "description": "Alle Budgetrahmen (ersetzt die bisherigen); je Portfolio höchstens einer.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "portfolioId",
+                "betrag"
+              ],
+              "properties": {
+                "portfolioId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "betrag": {
+                  "minimum": 0,
+                  "maximum": 1000000000000,
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BewertungsmodellCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "beschreibung": {
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
+      "InKraftSetzen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "beschluss"
+        ],
+        "properties": {
+          "beschluss": {
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Entscheid des Gremiums, z. B. «PRAT 12.11.2026, Traktandum 4».",
+            "type": "string"
+          }
+        }
+      },
+      "Bewertungsraster": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolio",
+          "modell",
+          "projekte",
+          "bewertungen",
+          "fortschritt",
+          "can"
+        ],
+        "properties": {
+          "portfolio": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "schluessel",
+              "name",
+              "kategorie"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "schluessel": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kategorie": {
+                "type": "string"
+              }
+            }
+          },
+          "modell": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "nummer",
+                  "stand",
+                  "aktuell",
+                  "beschreibung",
+                  "beschluss",
+                  "inKraftAt",
+                  "inKraftBy",
+                  "version",
+                  "createdAt",
+                  "updatedAt",
+                  "kriterien"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nummer": {
+                    "description": "Laufende Nummer der Modellversion in der Organisation.",
+                    "type": "integer"
+                  },
+                  "stand": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "entwurf"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "in_kraft"
+                        ]
+                      }
+                    ]
+                  },
+                  "aktuell": {
+                    "description": "Das zuletzt in Kraft gesetzte Modell; nach ihm wird bewertet.",
+                    "type": "boolean"
+                  },
+                  "beschreibung": {
+                    "type": "string"
+                  },
+                  "beschluss": {
+                    "description": "Entscheid des Gremiums, mit dem das Modell in Kraft gesetzt wurde (UC-008 A1.2).",
+                    "type": "string"
+                  },
+                  "inKraftAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "inKraftBy": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "kriterien": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Kriterium"
+                    }
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projekte": {
+            "description": "Aktive Projekte des Portfolios, die die Person sieht (bei einem früheren Modell auch die damals bewerteten), nach Nummer.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer",
+                "name",
+                "phase",
+                "lebenszyklus",
+                "bewertet"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "phase": {
+                  "type": "string"
+                },
+                "lebenszyklus": {
+                  "type": "string"
+                },
+                "bewertet": {
+                  "description": "Anzahl bewerteter Kriterien.",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "bewertungen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "kriterium",
+                "einschaetzung",
+                "kommentar",
+                "version"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kriterium": {
+                  "type": "string"
+                },
+                "einschaetzung": {
+                  "anyOf": [
+                    {
+                      "description": "Einschätzung je Kriterium ohne Score (A-01).",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kommentar": {
+                  "type": "string"
+                },
+                "version": {
+                  "anyOf": [
+                    {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "fortschritt": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "bewertet",
+              "gesamt"
+            ],
+            "properties": {
+              "bewertet": {
+                "description": "Projekte mit allen Kriterien bewertet.",
+                "type": "integer"
+              },
+              "gesamt": {
+                "type": "integer"
+              }
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Bewerten (nur nach dem Modell in Kraft).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BewertungenPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zellen"
+        ],
+        "properties": {
+          "zellen": {
+            "minItems": 1,
+            "maxItems": 2000,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "kriterium",
+                "einschaetzung"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kriterium": {
+                  "pattern": "^[a-z0-9_]{1,40}$",
+                  "description": "Fester Schlüssel des Kriteriums (Kleinbuchstaben, Ziffern, Unterstrich); bleibt über Modellversionen gleich.",
+                  "type": "string"
+                },
+                "einschaetzung": {
+                  "description": "null entfernt die Bewertung des Kriteriums.",
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "description": "Einschätzung je Kriterium ohne Score (A-01).",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "kommentar": {
+                  "maxLength": 1000,
+                  "type": "string"
+                },
+                "version": {
+                  "minimum": 1,
+                  "description": "Gelesene Version; Pflicht, wenn die Zelle schon bewertet ist (sonst 412).",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BewertungenGespeichert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zellen"
+        ],
+        "properties": {
+          "zellen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "kriterium",
+                "einschaetzung",
+                "kommentar",
+                "version"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kriterium": {
+                  "type": "string"
+                },
+                "einschaetzung": {
+                  "anyOf": [
+                    {
+                      "description": "Einschätzung je Kriterium ohne Score (A-01).",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kommentar": {
+                  "type": "string"
+                },
+                "version": {
+                  "anyOf": [
+                    {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -48579,6 +49460,996 @@
         }
       }
     },
+    "/v1/bewertungsmodelle": {
+      "get": {
+        "summary": "Bewertungsmodelle auflisten",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Alle Versionen, neueste zuerst; `aktuell` ist das zuletzt in Kraft gesetzte (UC-008 A1).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BewertungsmodellList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Entwurf anlegen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Kopie des Modells in Kraft (Kriterien und Budgetrahmen), beim ersten Mal die Kriterien aus UC-008 Schritt 2. Höchstens ein Entwurf (sonst 409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BewertungsmodellCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bewertungsmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/bewertungsmodelle/aktuell": {
+      "get": {
+        "summary": "Bewertungsmodell in Kraft",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Das zuletzt in Kraft gesetzte Modell mit Kriterien und Budgetrahmen; 404, solange keines in Kraft ist.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bewertungsmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/bewertungsmodelle/{id}": {
+      "get": {
+        "summary": "Bewertungsmodell lesen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Mit Kriterien, Budgetrahmen und Prüfbericht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bewertungsmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Entwurf ändern",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Nur im Entwurf und mit `If-Match` (412 bei abweichender Version). Kriterien und Budgetrahmen werden als ganze Listen ersetzt; Schlüssel eindeutig, Portfolio je Budgetrahmen einmal (422).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BewertungsmodellPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bewertungsmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Entwurf verwerfen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Nur im Entwurf und mit `If-Match`; ein Modell in Kraft bleibt (409).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Verworfen"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/bewertungsmodelle/{id}/in-kraft-setzen": {
+      "post": {
+        "summary": "Entwurf in Kraft setzen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Mit dem Entscheid des Gremiums (UC-008 A1.2) und `If-Match`. Sperren im Prüfbericht verhindern es (422). Ab dann wird nach diesem Modell bewertet; frühere Modelle und ihre Bewertungen bleiben nachvollziehbar.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InKraftSetzen"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bewertungsmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolios/{id}/bewertungen": {
+      "get": {
+        "summary": "Bewertungsraster des Portfolios",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Aktive Projekte des Portfolios mit ihrer Bewertung je Kriterium (hoch/mittel/tief, A-01) nach dem Modell in Kraft oder einer früheren Version (`modell`, G11); Fortschritt «bewertet von gesamt».",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "modell",
+            "required": false,
+            "description": "Frühere Modellversion (G11); ohne Angabe das Modell in Kraft."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bewertungsraster"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Projekte bewerten",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Mehrere Zellen des Rasters auf einmal (automatisches Speichern), alles oder nichts, immer nach dem Modell in Kraft (sonst 409). Bewertete Zelle nur mit ihrer gelesenen `version` (sonst 412); `einschaetzung: null` entfernt die Bewertung. Nur aktive Projekte des Portfolios und Kriterien des Modells (422).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BewertungenPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BewertungenGespeichert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -48945,6 +50816,10 @@
     {
       "name": "Ressourcen",
       "description": "Kapazitätsangebot je Rolle (Pool) und Monat und Auslastung aus dem Ressourcenbedarf der Projekte, auch je Szenario."
+    },
+    {
+      "name": "Priorisierung",
+      "description": "Bewertungsmodell mit Kriterien und Budgetrahmen (Entwurf, in Kraft), Bewertung der Projekte je Kriterium; ab AP-E5-2 Matrix, Rangfolge und Szenarien."
     },
     {
       "name": "Webhooks",

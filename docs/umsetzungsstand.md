@@ -41,7 +41,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | in Arbeit (PR 1: 270, Modul `ressource`, `get_auslastung`; PR 2 Oberfläche UI-23, UI-24 folgt) | – | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
-| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API umgesetzt: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Aufgabe «Jahresziele vervollständigen» über den Eingang umgesetzt; `projektZuordnen` für den Vertrag mit 301; PR 3 Oberfläche UI-38 Zielzyklus in Review) | #28, #34, #38 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
+| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | umgesetzt (300 Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; Aufgabe «Jahresziele vervollständigen» über den Eingang; `projektZuordnen` für den Vertrag mit 301; Oberfläche UI-38 Zielzyklus; E2E offen bis CI läuft) | #28, #34, #38, #49 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
 | AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
@@ -62,10 +62,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 |---|---|---|---|---|---|---|
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
 | ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
-| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
+| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
-| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
-| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
+| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
+| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
@@ -86,7 +86,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus: API umgesetzt (AP-E6-1); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1, in Arbeit) | #28, #38, #43 |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus umgesetzt (AP-E6-1, API und Oberfläche); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1, in Arbeit) | #28, #38, #43, #49 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
@@ -188,7 +188,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K5-3 | Entscheidungsvorlage ohne Dateien | 0 Dateien | Aufgabentest | AP-E5-5 | offen |
 | K5-4 | Projekte unter der Wasserlinie und Engpass nennen | ≥ 90 % | Aufgabentest | AP-E5-3 | offen |
 | K6-1 | Jahresziel mit Metrik und Hauptaktivität | ≤ 3 Min. | Aufgabentest | AP-E6-1 | beim Aufgabentest zu messen (Ablauf im E2E web/e2e/zielzyklus.spec.ts) |
-| K6-2 | Projekt ↔ strategisches Ziel | ≤ 2 Klicks | Test | AP-E6-1 | Ziel → Projekt 1 Klick (ZielzyklusPage.test.tsx); Projekt → Ziel: API 1 Aufruf mit `link` (#28), Anzeige in der Projektübersicht offen (AP-E0-4/AP-E3-1) |
+| K6-2 | Projekt ↔ strategisches Ziel | ≤ 2 Klicks | Test | AP-E6-1 | Ziel → Projekt 1 Klick (ZielzyklusPage.test.tsx, #49); Projekt → Ziel: API 1 Aufruf mit `link` (#28), Anzeige in der Projektübersicht offen (AP-E0-4/AP-E3-1) |
 | K6-3 | Zielerreichung 30 Ziele | ≤ 20 Min. | Aufgabentest | AP-E6-3 | offen |
 | K6-4 | Entwurf Quartalsreporting | ≤ 30 Min., ohne Dateien | Aufgabentest | AP-E6-4 | offen |
 | E0 | Q-L1, Q-L6, Q-B1–B6 auf allen Bausteinen; G1 je Rolle | wie qualitaetsziele.md | CI, Review | AP-E0-0, AP-E0-8 | offen |

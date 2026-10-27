@@ -9,6 +9,7 @@ import { Suspense, useCallback } from 'react';
 import {
   MeineProjektePage, PROJEKTNUMMER, ProjektAkte, projektTexte, ProjektUebersicht, type ProjekteSearch, type Reiter, type SetProjekteSearch,
 } from '../features/projekt/index.ts';
+import { BerichtPage, berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
 import { PruefenPage, UnterzeichnenPage, VertragPage, vertragTexte, type SetVertragSearch, type VertragSearch } from '../features/vertrag/index.ts';
 import { searchOf } from '../search.ts';
 import { Loading } from '../ui/index.ts';
@@ -17,6 +18,7 @@ import { Loading } from '../ui/index.ts';
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektTexte.akte.uebersicht },
   { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
+  { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -53,6 +55,16 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <ProjektUebersicht nummer={nr} />;
   }
 
+  // Statusbericht (UI-13, K1): `/projekte/<nr>/bericht?periode=2026-10`
+  const berichtRoute = createRoute({ getParentRoute: () => akteRoute, path: '/bericht', validateSearch: searchOf.bericht, component: BerichtRoute });
+
+  function BerichtRoute() {
+    const { nr } = akteRoute.useParams();
+    const { periode } = berichtRoute.useSearch();
+    return <BerichtPage nummer={nr} periode={periode ?? laufendePeriode()} />;
+  }
+
+
   // Vertrag (UI-07, K2): `?kapitel=7&version=entwurf&feld=…` (informationsarchitektur.md, Adressen)
   const vertragRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag', validateSearch: searchOf.vertrag, component: VertragRoute });
 
@@ -78,5 +90,5 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><UnterzeichnenPage nummer={nr} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute])] as const;
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, berichtRoute])] as const;
 }

@@ -11,7 +11,7 @@ import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
 import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
+import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetModellSearch } from './features/priorisierung/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
@@ -29,7 +29,7 @@ import { NotFound } from './shell/index.ts';
 // Seiten der Features als eigene Chunks (Q-L6)
 const EingangPage = seite(() => import('./features/eingang/EingangPage.tsx'), 'EingangPage');
 const HandlungsfeldPage = seite(() => import('./features/handlungsfeld/HandlungsfeldPage.tsx'), 'HandlungsfeldPage');
-const IdeenPage = seite(() => import('./features/idee/IdeenPage.tsx'), 'IdeenPage');
+const IdeenBereich = seite(() => import('./features/idee/PoolSeite.tsx'), 'IdeenBereich');
 const IdeeNeuPage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeeNeuPage');
 const IdeePage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeePage');
 const AuslastungPage = seite(() => import('./features/ressourcen/AuslastungPage.tsx'), 'AuslastungPage');
@@ -171,12 +171,17 @@ function RoadmapRoute() {
 }
 
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
-const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
+const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', validateSearch: searchOf.ideen, component: IdeenRoute });
 
 function IdeenRoute() {
-  const navigate = useNavigate();
+  const search = ideenRoute.useSearch();
+  const navigate = useNavigate({ from: ideenRoute.fullPath });
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <IdeenPage gehe={gehe} />;
+  // Ideenpool und Funnel mit Ansicht und Filtern in der Adresse (AP-E4-2, K4 Prüfen 5)
+  const setSearch = useCallback<SetIdeenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <IdeenBereich search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
 const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });

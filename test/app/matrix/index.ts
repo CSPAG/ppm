@@ -27,6 +27,7 @@ export const MATRIX = sammle([
   (await import('./ressource.ts')).matrix,
   (await import('./ressource-zuteilung.ts')).matrix,
   (await import('./idee.ts')).matrix,
+  (await import('./idee-pruefung.ts')).matrix,
   (await import('./priorisierung.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
 ]);

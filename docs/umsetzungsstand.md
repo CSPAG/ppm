@@ -34,7 +34,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | in Arbeit (Modul `vorlage` mit Grundbestand Projektvertrag nach Q7 und Ausgabe PDF/Word ohne Fremdbibliothek, `GET /v1/vorlagen`; `GET /v1/vertragsversionen/:id/dokument?format=pdf|docx`; Baustein `DokumentAusgabe` im Kopf der Projektakte › Vertrag, nachgeladen mit der Seite) | – | Format PDF und Word (Vorschlag K2, «Format offen»); Grundbestand als Vorlage im Code, ohne Tabelle `vorlage` (Hochladen, Fassungen und Feldzuordnung mit AP-E7-7, Migration 210–219 ungenutzt); Beträge ohne `finanzen:read` «nicht verfügbar» (A-33); Unterschriften in Kap. 12 «noch keine» bis AP-E3-2; Export im Audit (`vertrag.exported`) |
 | AP-E4-1 | Projektidee einreichen | 220–229 | umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`; Assistent, Meine Ideen, Ansicht, Rückfragen beantworten); offen: Kopfkarte «Ideen» auf der Startseite (Eintrag über Feature-Grenze), E2E bis CI läuft | #36, #50 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
-| AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
+| AP-E4-2 | Ideenpool und Prüfung | 230–239 | in Arbeit (230 Leitfragen, Raster, Vorschlag; Pool mit Funnel, Prüfung, Rückfrage, Zurückweisen, Zusammenführen; Oberfläche Pool und Prüfansicht) | – | A-06 (UE weist allein zurück, Gremium des Portfolios per Mitteilung informiert), A-32; Vorschlag der Kategorie: Mehrheit «hoch» → A, Mehrheit «tief» → C, sonst B (Annahme bis zur Klärung, G11); Leitfragen als Abschrift aus dem Phasenmodell in Kraft; erste Prüfhandlung setzt «in Prüfung»; Bereich Portfolio › Ideen zeigt mit `idee:read` den Pool, «Meine Ideen» als Ansicht |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | umgesetzt (250, Modul `priorisierung`; Portfolio › Priorisierung mit Bewertung UI-20 und Modell UI-19; E2E grün) | #71, #79 | A-01, A-18; Modell «Entwurf»/«in Kraft», gilt das zuletzt in Kraft gesetzte; Entscheid des Gremiums als Text erfasst; Vorgabe = Kriterien aus UC-008 Schritt 2 ohne Zuordnung Nutzen/Risiko (A-39 legt die UE fest); Budgetrahmen je Portfolio; Modell lesen auch mit `priorisierung:read` am Portfolio (Gremium) |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
@@ -70,9 +70,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
 | DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | umgesetzt | #36, #50 |
-| DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | offen | – |
-| DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | offen | – |
-| DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | offen | – |
+| DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | in Arbeit | – |
+| DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | in Arbeit | – |
+| DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | in Arbeit | – |
 | DM.02.01 | Projektvertrag erstellen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
 | DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
 | DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | in Arbeit (Kapitel bearbeiten, API) | – |
@@ -85,7 +85,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | umgesetzt (hoch/mittel/tief ohne Score, A-01) | #71, #79 |
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register umgesetzt (AP-E0-6) | #29, #51 |
-| PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
+| PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | in Arbeit | – |
 | PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus umgesetzt (AP-E6-1, API und Oberfläche); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1, in Arbeit) | #28, #38, #43, #49 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
@@ -181,8 +181,8 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K3-5 | Antrag und Hauptänderungen finden (PPM-5) | ≥ 90 %, ≤ 30 s, Tablet | Aufgabentest | AP-E2-2 | offen |
 | K4-1 | Idee ohne Hilfe einreichen | ≥ 90 % | Aufgabentest | AP-E4-1 | beim Aufgabentest zu messen (Assistent mit Hilfe je Feld, Sperre mit Sprung zum Schritt) |
 | K4-2 | Zeit zum Einreichen | ≤ 10 Min. | Aufgabentest | AP-E4-1 | beim Aufgabentest zu messen |
-| K4-3 | Ideen mit Rückfrage | ≤ 20 % | Betrieb | AP-E4-2 | offen |
-| K4-4 | Einreichung → bereit für das Gremium | Median ≤ 20 Arbeitstage | Betrieb | AP-E4-2 | offen |
+| K4-3 | Ideen mit Rückfrage | ≤ 20 % | Betrieb | AP-E4-2 | im Betrieb aus den Ereignissen `idee.submitted` und `idee.questioned` |
+| K4-4 | Einreichung → bereit für das Gremium | Median ≤ 20 Arbeitstage | Betrieb | AP-E4-2 | im Betrieb aus `idee.submitted` bis Kategorie/Traktandierung (`idee.categorized`) |
 | K5-1 | Rang verschieben → Wasserlinie | ≤ 200 ms, ≤ 1 s bei 60 Projekten | Test | AP-E5-3 | offen |
 | K5-2 | 15 × 7 Bewertungen nur Tastatur | ≤ 10 Min. | Aufgabentest | AP-E5-1 | Test: 105 Einschätzungen mit 223 Tastendrücken ohne Maus (`BewertungPage.test.tsx`); Zeit beim Aufgabentest zu messen |
 | K5-3 | Entscheidungsvorlage ohne Dateien | 0 Dateien | Aufgabentest | AP-E5-5 | offen |
@@ -203,6 +203,7 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | ohne Befund (E2E hell, dunkel; jsdom) | 360 px ohne Überlauf (E2E «schmal»); 768/1440 nicht eigens geprüft | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
 | #26 | AP-E0-2 | Liste + Schublade (UI-44, UI-45); Z1–Z3, Z5, Z7, Z8, Z10 | ja (Vitest, E2E) | ja (Vitest, E2E) | 360 px im E2E | ja (`features/stammdaten/texte.ts`) | keine im Ablauf |
 | #39 | AP-E2-1 | Arbeitsfläche (UI-33 Vorbereiten); Z1, Z2, Z5, Z7 (412 → neu laden), Z8, Z9, Z10; Übersicht je Gremium | Alt+↑/↓ am Griff, Fokus folgt; Rückgängig im Toast | Komponenten ohne Befund; E2E hell/dunkel/360 px | 360 (E2E), 1024/1440 (Raster) | ja, `features/sitzung/texte.ts` | K3-1 Versandprotokoll mit Vorlauf (Betrieb); K3-2 beim Aufgabentest |
+| AP-E4-2 | AP-E4-2 | Liste mit Funnel (Ansicht in der Adresse), Prüfansicht zweispaltig, Dialoge; Z1, Z2, Z3, Z5, Z7, Z8, Z9 | ja (Radiogruppen, Dialoge mit Fokus, Funnel als Liste) | ohne Befund (jsdom); E2E offen bis CI läuft | 360 px im E2E «schmal» (offen bis CI läuft) | ja (`features/idee/PruefungTexte.ts`), «Sie» | K4-3, K4-4 Betrieb |
 | #50 | AP-E4-1 | Assistent (4 Schritte), Liste, Ansicht; Z1, Z2, Z5, Z7, Z8, Z10, Entwurf, in Ergänzung | ja (Fokus auf Schrittüberschrift, Radiogruppen, Vitest) | ohne Befund (jsdom); E2E hell, dunkel offen bis CI läuft | 360 px im E2E «schmal» (offen bis CI läuft) | ja (`features/idee/texte.ts`), «Sie» | K4-1, K4-2 Aufgabentest |
 | #17 | AP-E0-3 | Arbeitsfläche; Z1, Z2, Z5, Z7–Z10 | vollständig, Strg+Z/Strg+Umschalt+Z | ohne Befund | geprüft (360/1024/1280/1440) | ja | keine Zielgrössen (kein Kernablauf für UC-017) |
 | #24 | AP-E0-5 | UI-47 Liste + Schublade (Portfolio › Gremium); Z1, Z2, Z5, Z7 (412), Z8, Z10 im Test | Formulare, Schubladen, Auswahl je Gate; E2E nur mit Tastatur in die Administration | Vitest-axe Liste und Schubladen; E2E hell, dunkel (E2E offen bis CI läuft) | 360 px im E2E (Projekt «schmal»), 768/1440 hell/dunkel | `features/portfolios/texte.ts`, «Sie» (check-address) | – (kein Kernablauf; UC-017) |

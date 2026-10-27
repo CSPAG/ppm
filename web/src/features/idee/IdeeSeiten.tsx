@@ -5,17 +5,21 @@
  * Unbekannte Nummer und fehlender Zugriff: dieselbe Meldung (Z10).
  */
 import { useMemo, useState } from 'react';
+import { useSession } from '../../auth/index.ts';
 import { Empty, ErrorState, fmtDatum, Hinweis, Loading } from '../../ui/index.ts';
 import { useAuswahl, useEigeneEntwuerfe, useIdeeNachNummer } from './api.ts';
 import { IdeeAnsicht } from './IdeeAnsicht.tsx';
+import { PruefungPage } from './PruefungPage.tsx';
 import { IdeeAssistent, type Werte } from './IdeeAssistent.tsx';
 import type { IdeeNeuSearch, IdeeSearch, SetIdeeSearch } from './search.ts';
-import { ideePfad, Verweis, type Gehe } from './stand.tsx';
+import { ideePfad, MEINE_IDEEN, Verweis, type Gehe } from './stand.tsx';
 import { TI } from './texte.ts';
 
 export function IdeeNeuPage({ search, gehe }: { search: IdeeNeuSearch; gehe: Gehe }) {
   const [neu, setNeu] = useState(false);
   const entwuerfe = useEigeneEntwuerfe(!neu);
+  // Den Entwurf nur beim ersten Laden anbieten: Der Entwurf, den dieser Assistent beim Speichern anlegt, unterbricht ihn nicht
+  if (!neu && entwuerfe.data && !entwuerfe.data.length) setNeu(true);
   const vorbelegt = !!(search.ziel || search.herkunft);
   const auswahl = useAuswahl(vorbelegt);
   const vorbelegung = useMemo((): Partial<Werte> => {
@@ -51,6 +55,7 @@ export function IdeeNeuPage({ search, gehe }: { search: IdeeNeuSearch; gehe: Geh
 
 export function IdeePage({ nummer, search, setSearch, gehe }: { nummer: number | null; search: IdeeSearch; setSearch: SetIdeeSearch; gehe: Gehe }) {
   const q = useIdeeNachNummer(nummer);
+  const { canSomewhere } = useSession();
   if (nummer === null) return <NichtGefunden gehe={gehe} />;
   if (q.isPending) return <Loading />;
   if (q.error) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
@@ -58,13 +63,13 @@ export function IdeePage({ nummer, search, setSearch, gehe }: { nummer: number |
   if (q.data.item.can.bearbeiten) {
     return <IdeeAssistent key={q.data.item.id} start={q.data} schritt={search.schritt} onSchritt={n => setSearch({ schritt: n }, { replace: true })} gehe={gehe} />;
   }
-  return <IdeeAnsicht idee={q.data.item} gehe={gehe} />;
+  return canSomewhere('idee:read') ? <PruefungPage idee={q.data.item} gehe={gehe} /> : <IdeeAnsicht idee={q.data.item} gehe={gehe} />;
 }
 
 function NichtGefunden({ gehe }: { gehe: Gehe }) {
   return (
     <section className="body">
-      <Empty action={<Verweis pfad="/portfolio/ideen" gehe={gehe} className="btn">{TI.zurListe}</Verweis>}>{TI.nichtGefunden}</Empty>
+      <Empty action={<Verweis pfad={MEINE_IDEEN} gehe={gehe} className="btn">{TI.zurListe}</Verweis>}>{TI.nichtGefunden}</Empty>
     </section>
   );
 }

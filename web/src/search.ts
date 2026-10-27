@@ -6,7 +6,7 @@ import { validateBerichtSearch } from './features/bericht/index.ts';
 import { validateEingangSearch } from './features/eingang/index.ts';
 import { type HandlungsfeldSearch, validateHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { type ProjekteSearch, validateProjekteSearch } from './features/projekt/index.ts';
-import { validateIdeeNeuSearch, validateIdeeSearch } from './features/idee/index.ts';
+import { validateIdeeNeuSearch, validateIdeenSearch, validateIdeeSearch } from './features/idee/index.ts';
 import { type AuslastungSearch, type KapazitaetSearch, validateAuslastungSearch, validateBedarfSearch, validateKapazitaetSearch } from './features/ressourcen/index.ts';
 import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -29,6 +29,7 @@ export const searchOf = {
   strategischeZiele: validateZielSearch,
   zielzyklus: validateZielzyklusSearch,
   roadmap: validateRoadmapSearch,
+  ideen: validateIdeenSearch,
   ideeNeu: validateIdeeNeuSearch,
   idee: validateIdeeSearch,
   zielerreichung: validateZielerreichungSearch,

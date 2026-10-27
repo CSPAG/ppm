@@ -200,6 +200,8 @@ export const model = defineModel({
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
+    // portfolio
+    list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     // phasenmodell

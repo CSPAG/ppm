@@ -57,13 +57,17 @@ describe('MCP-Dienst', { skip }, () => {
     const list = await rpc(token, 'tools/list');
     assert.equal(list.statusCode, 200, list.body);
     const tools = list.json().result.tools as { name: string; annotations?: { readOnlyHint?: boolean } }[];
-    assert.deepEqual(tools.map(t => t.name).sort(), ['get_handlungsfeld', 'get_phasenmodell', 'list_handlungsfelder', 'list_org_einheiten', 'list_ziele']);
+    assert.deepEqual(tools.map(t => t.name).sort(), ['get_handlungsfeld', 'get_phasenmodell', 'list_handlungsfelder', 'list_org_einheiten', 'list_portfolios', 'list_ziele']);
     assert.ok(tools.every(t => t.annotations?.readOnlyHint === true));
     const call = await rpc(token, 'tools/call', { name: 'list_handlungsfelder', arguments: {} });
     assert.equal(call.statusCode, 200, call.body);
     const text = call.json().result.content[0].text as string;
     assert.match(text, /Patientenorientierung/);
     assert.ok(!text.includes('Fremdes Handlungsfeld'));
+    const portfolios = await rpc(token, 'tools/call', { name: 'list_portfolios', arguments: {} });
+    assert.equal(portfolios.statusCode, 200, portfolios.body);
+    assert.ok(!portfolios.json().result.isError, portfolios.body);
+    assert.ok(Array.isArray(JSON.parse(portfolios.json().result.content[0].text as string).items));
     assert.ok(idp.exchanges >= 1, 'Token Exchange');
   });
 

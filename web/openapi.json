@@ -2239,6 +2239,791 @@
           }
         }
       },
+      "Portfolio": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "kategorie",
+          "schluessel",
+          "name",
+          "pflichten",
+          "orgEinheitId",
+          "version",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kategorie": {
+            "description": "A Transformationsprogramm, B Geschäftsleitung, C Direktion.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "A"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "B"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "C"
+                ]
+              }
+            ]
+          },
+          "schluessel": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pflichten": {
+            "description": "Vertrag, Quality-Check, Gates und Monatsbericht sind Pflicht (A und B, A-07); bei C freiwillig (A-08).",
+            "type": "boolean"
+          },
+          "orgEinheitId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "admin"
+            ],
+            "properties": {
+              "admin": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PortfolioList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Portfolio"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PortfolioCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kategorie",
+          "schluessel",
+          "name"
+        ],
+        "properties": {
+          "kategorie": {
+            "description": "A Transformationsprogramm, B Geschäftsleitung, C Direktion.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "A"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "B"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "C"
+                ]
+              }
+            ]
+          },
+          "schluessel": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+            "description": "Schlüssel in Kleinbuchstaben, Ziffern und Bindestrichen; eindeutig in der Organisation, fest nach dem Anlegen.",
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Bezeichnung.",
+            "type": "string"
+          },
+          "orgEinheitId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PortfolioPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Bezeichnung.",
+            "type": "string"
+          },
+          "orgEinheitId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Gremium": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "portfolioId",
+          "kuerzel",
+          "name",
+          "art",
+          "rhythmus",
+          "version",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "art": {
+            "description": "`entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entscheidend"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "extern"
+                ]
+              }
+            ]
+          },
+          "rhythmus": {
+            "description": "Sitzungsrhythmus als Text, z. B. «monatlich».",
+            "type": "string"
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "admin"
+            ],
+            "properties": {
+              "admin": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "GremiumList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Gremium"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "GremiumCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolioId",
+          "kuerzel",
+          "name",
+          "art"
+        ],
+        "properties": {
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kuerzel": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+            "description": "Schlüssel in Kleinbuchstaben, Ziffern und Bindestrichen; eindeutig in der Organisation, fest nach dem Anlegen.",
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Bezeichnung.",
+            "type": "string"
+          },
+          "art": {
+            "description": "`entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entscheidend"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "extern"
+                ]
+              }
+            ]
+          },
+          "rhythmus": {
+            "maxLength": 200,
+            "type": "string"
+          }
+        }
+      },
+      "GremiumPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Bezeichnung.",
+            "type": "string"
+          },
+          "art": {
+            "description": "`entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entscheidend"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "extern"
+                ]
+              }
+            ]
+          },
+          "rhythmus": {
+            "maxLength": 200,
+            "type": "string"
+          }
+        }
+      },
+      "Gremienschritt": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gate",
+          "gremium",
+          "zusaetzlich",
+          "viaSns"
+        ],
+        "properties": {
+          "gate": {
+            "description": "Gate des Phasenmodells.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EINTRITT_P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P0_P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1_P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2_P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3_P4"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "EXIT_P4"
+                ]
+              }
+            ]
+          },
+          "gremium": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "kuerzel",
+              "name",
+              "art"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kuerzel": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "art": {
+                "description": "`entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02).",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "entscheidend"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "extern"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "zusaetzlich": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "kuerzel",
+                  "name",
+                  "art"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "kuerzel": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "art": {
+                    "description": "`entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02).",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "entscheidend"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "extern"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "viaSns": {
+            "description": "Geschäfte an diesem Gate laufen zusätzlich über das externe Gremium (SNS-VR, UC-006 A1).",
+            "type": "boolean"
+          }
+        }
+      },
+      "Gremienweg": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolioId",
+          "version",
+          "schritte",
+          "can"
+        ],
+        "properties": {
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Version des Portfolios (ETag für `PUT`).",
+            "type": "integer"
+          },
+          "schritte": {
+            "description": "Gates mit zuständigem Gremium in der Reihenfolge des Phasenmodells; Gates ohne Eintrag fehlen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Gremienschritt"
+            }
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "admin"
+            ],
+            "properties": {
+              "admin": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "GremienwegPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schritte"
+        ],
+        "properties": {
+          "schritte": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "gate",
+                "gremiumId"
+              ],
+              "properties": {
+                "gate": {
+                  "description": "Gate des Phasenmodells.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EINTRITT_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0_P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1_P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2_P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3_P4"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EXIT_P4"
+                      ]
+                    }
+                  ]
+                },
+                "gremiumId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "zusaetzlichGremiumId": {
+                  "anyOf": [
+                    {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Sitzungstermin": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "gremiumId",
+          "datum",
+          "createdAt",
+          "createdBy"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "gremiumId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "datum": {
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "Datum (JJJJ-MM-TT).",
+            "examples": [
+              "2026-11-18"
+            ],
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "SitzungsterminList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "can"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sitzungstermin"
+            }
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "admin"
+            ],
+            "properties": {
+              "admin": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SitzungsterminCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "datum"
+        ],
+        "properties": {
+          "datum": {
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "Datum (JJJJ-MM-TT).",
+            "examples": [
+              "2026-11-18"
+            ],
+            "type": "string"
+          }
+        }
+      },
       "StrategischesZiel": {
         "additionalProperties": false,
         "type": "object",
@@ -17610,6 +18395,1784 @@
         }
       }
     },
+    "/v1/portfolios": {
+      "get": {
+        "summary": "Portfolios auflisten",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Sortiert nach Kategorie und Name, Cursor-Paginierung.",
+        "parameters": [
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Portfolio anlegen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Pflichten folgen der Kategorie: A und B mit Pflichten (A-07), C ohne Pflicht-Gates und Pflicht-Reporting (A-08). Kategorie und Schlüssel sind danach fest.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolios/{id}": {
+      "get": {
+        "summary": "Portfolio lesen",
+        "tags": [
+          "Portfolios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Portfolio ändern",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Name und Direktion (nur Kategorie C); nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Portfolio löschen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Nur mit `If-Match` und nur ohne Gremien und Projekte (sonst 409).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Gelöscht"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolios/{id}/gremienweg": {
+      "get": {
+        "summary": "Gremienweg eines Portfolios",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Zuständiges Gremium je Gate und ob das Geschäft zusätzlich über den SNS-VR läuft (`viaSns`, Q8 Kap. 5.1, UC-006 A1). ETag = Version des Portfolios.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Gremienweg"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Gremienweg festlegen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Ersetzt den Gremienweg vollständig: je Gate das entscheidende Gremium des Portfolios (A-45) und optional ein externes Gremium zusätzlich (SNS-VR, A-02). Nur mit `If-Match` (Version des Portfolios); erhöht die Version des Portfolios.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GremienwegPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Gremienweg"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/gremien": {
+      "get": {
+        "summary": "Gremien auflisten",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Sortiert nach Name, Filter `portfolio`, Cursor-Paginierung.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GremiumList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Gremium anlegen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Je Portfolio genau ein entscheidendes Gremium (A-45, sonst 409); unbekanntes Portfolio 404; externe Gremien ohne Benutzer (SNS-VR, A-02). Portfolio und Kürzel sind danach fest.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GremiumCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Gremium"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/gremien/{id}": {
+      "get": {
+        "summary": "Gremium lesen",
+        "tags": [
+          "Portfolios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Gremium"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Gremium ändern",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Name, Art und Rhythmus; nur mit `If-Match`. Ein Gremium im Gremienweg behält seine Art (sonst 409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GremiumPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Gremium"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Gremium löschen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Nur mit `If-Match` und nur, wenn es nicht im Gremienweg steht (sonst 409); geplante Termine entfallen.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Gelöscht"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/gremien/{id}/termine": {
+      "get": {
+        "summary": "Sitzungstermine eines Gremiums",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Geplante Termine aufsteigend, optional im Zeitraum `von`–`bis`.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "example": "2026-11-18",
+            "in": "query",
+            "name": "von",
+            "required": false,
+            "description": "Datum (JJJJ-MM-TT)."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "example": "2026-11-18",
+            "in": "query",
+            "name": "bis",
+            "required": false,
+            "description": "Datum (JJJJ-MM-TT)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitzungsterminList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Sitzungstermin planen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Ein Termin je Gremium und Tag (sonst 409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SitzungsterminCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzungstermin"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/gremien/{id}/termine/{datum}": {
+      "delete": {
+        "summary": "Sitzungstermin entfernen",
+        "tags": [
+          "Portfolios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "example": "2026-11-18",
+            "in": "path",
+            "name": "datum",
+            "required": true,
+            "description": "Datum (JJJJ-MM-TT)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Entfernt"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/strategische-ziele": {
       "get": {
         "summary": "Strategische Ziele auflisten",
@@ -18631,6 +21194,10 @@
     {
       "name": "Handlungsfelder",
       "description": "Strategische Handlungsfelder mit Leitsatz und Stossrichtungen – oberste Ordnung für Ziele und Vorhaben."
+    },
+    {
+      "name": "Portfolios",
+      "description": "Portfolios A, B, C mit ihren Pflichten, Gremien mit Sitzungsterminen und Gremienweg je Gate (inkl. SNS-VR)."
     },
     {
       "name": "Ziele",

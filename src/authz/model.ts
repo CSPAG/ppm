@@ -222,6 +222,8 @@ export const model = defineModel({
     // statusbericht
     list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
     get_periode: { title: 'Monatsabschluss einer Periode lesen', permission: 'statusbericht:review', readOnly: true },
+    // auswertung
+    get_dashboard: { title: 'Dashboard der Periode lesen', permission: 'auswertung:read', readOnly: true },
     // ressource
     get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
     // idee

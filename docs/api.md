@@ -160,6 +160,14 @@ Ereignisse: `statusbericht.reviewed`, `statusbericht.review_withdrawn`, `statusb
 `periode.closed`. Aufgaben im Eingang: `statusbericht.pruefen` (Sammelaufgabe ab dem ersten Einreichen), `periode.abschliessen`
 (Job `statusbericht.periode_faellig` am Stichtag), `statusbericht.rueckfrage`, `statusbericht.erstellen` (eingefordert).
 
+## Dashboard
+
+Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/modules/auswertung/`, AP-E1-3). Nur lesend.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
+
 ## Ressourcen
 
 Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =

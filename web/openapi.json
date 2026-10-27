@@ -13234,6 +13234,448 @@
           }
         }
       },
+      "DashboardZeile": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "nummer",
+          "name",
+          "portfolioId",
+          "portfolio",
+          "handlungsfeld",
+          "projektleitung",
+          "phase",
+          "abschlussPer",
+          "naechsterMeilenstein",
+          "status",
+          "statusVorperiode",
+          "trend",
+          "meldung",
+          "werteAus",
+          "merkmale"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolio": {
+            "description": "Name des Portfolios.",
+            "type": "string"
+          },
+          "handlungsfeld": {
+            "anyOf": [
+              {
+                "description": "Nur mit `handlungsfeld:read`.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projektleitung": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P4"
+                ]
+              }
+            ]
+          },
+          "abschlussPer": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "naechsterMeilenstein": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Nächster offener Meilenstein aus dem Register, sonst die Angabe des Berichts (ohne Termin).",
+                "type": "object",
+                "required": [
+                  "termin",
+                  "text"
+                ],
+                "properties": {
+                  "termin": {
+                    "anyOf": [
+                      {
+                        "format": "date",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statusVorperiode": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "meldung": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "gemeldet"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausstehend"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "nicht_gemeldet"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ohne_pflicht"
+                ]
+              }
+            ]
+          },
+          "werteAus": {
+            "anyOf": [
+              {
+                "description": "Periode, aus der Status und Trend stammen (bei «nicht gemeldet» bzw. «ausstehend» eine frühere).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "merkmale": {
+            "description": "«Eskalation»: Bericht der Periode mit «Entscheid des PRAT nötig» (UC-004 A2.2).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "eskalation"
+              ]
+            }
+          }
+        }
+      },
+      "FunnelStufe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "phase",
+          "anzahl",
+          "imPlan",
+          "kritisch",
+          "ohneStatus",
+          "nichtGemeldet"
+        ],
+        "properties": {
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P4"
+                ]
+              }
+            ]
+          },
+          "anzahl": {
+            "type": "integer"
+          },
+          "imPlan": {
+            "type": "integer"
+          },
+          "kritisch": {
+            "type": "integer"
+          },
+          "ohneStatus": {
+            "description": "Ohne Status (nicht gemeldet ohne frühere Werte, ohne Pflicht).",
+            "type": "integer"
+          },
+          "nichtGemeldet": {
+            "description": "«nicht gemeldet» bzw. «ausstehend».",
+            "type": "integer"
+          }
+        }
+      },
+      "Dashboard": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "periode",
+          "periodeStand",
+          "abgeschlossenAt",
+          "perioden",
+          "portfolios",
+          "portfolio",
+          "items",
+          "funnel"
+        ],
+        "properties": {
+          "periode": {
+            "type": "string"
+          },
+          "periodeStand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "offen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeschlossen"
+                ]
+              }
+            ]
+          },
+          "abgeschlossenAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perioden": {
+            "description": "Perioden zur Auswahl, neueste zuerst.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "periode",
+                "stand"
+              ],
+              "properties": {
+                "periode": {
+                  "type": "string"
+                },
+                "stand": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "offen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abgeschlossen"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "portfolios": {
+            "description": "Portfolios, deren Dashboard die Person sieht (`auswertung:read`).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "schluessel",
+                "name",
+                "kategorie"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "schluessel": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "kategorie": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "description": "Gewähltes Portfolio (Schlüssel) oder null für alle sichtbaren.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "description": "Kritische zuerst, dann nicht gemeldete, sonst nach Nummer.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardZeile"
+            }
+          },
+          "funnel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FunnelStufe"
+            }
+          }
+        }
+      },
       "KpiPlan": {
         "additionalProperties": false,
         "type": "object",
@@ -49481,6 +49923,131 @@
         }
       }
     },
+    "/v1/dashboard": {
+      "get": {
+        "summary": "Dashboard der Periode",
+        "tags": [
+          "Dashboard"
+        ],
+        "description": "Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9_-]{1,40}$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false,
+            "description": "Schlüssel des Portfolios (I-N5), z. B. `transformation`."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "periode",
+            "required": false,
+            "description": "Ohne Angabe die letzte abgeschlossene Periode, sonst die laufende."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "liste"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "funnel"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "ansicht",
+            "required": false,
+            "description": "Darstellung der Oberfläche; die Antwort enthält Liste und Funnel."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/projekte/{id}/vertrag": {
       "get": {
         "summary": "Projektvertrag: Versionen",
@@ -52171,6 +52738,10 @@
     {
       "name": "Monatsabschluss",
       "description": "Prüfung und Abschluss der Periode durch die Unternehmensentwicklung: Posteingang mit Auffälligkeiten, Bestätigen, Rückfrage, Einfordern, Terminabweichungen, «nicht gemeldet» (AP-E1-2)."
+    },
+    {
+      "name": "Dashboard",
+      "description": "Dashboard der Periode: Projekte der sichtbaren Portfolios mit Status, Trend, Phase und Meldung, Funnel nach Phase."
     },
     {
       "name": "Projektvertrag",

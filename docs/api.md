@@ -71,6 +71,27 @@ Strategische Handlungsfelder mit Leitsatz und Stossrichtungen (BC ZM.01.01), Bei
 | `DELETE /v1/handlungsfelder/{id}` | `handlungsfeld:delete` | `If-Match` Pflicht, Verlauf bleibt |
 | `GET /v1/handlungsfelder/{id}/history` | `handlungsfeld:read` | alle Versionen, neueste zuerst |
 
+## Projektdaten
+
+Register je Projekt (docs/fachmodell.md 2.6, AP-E0-6): Meilensteine, Lieferergebnisse und Kommunikationsmassnahmen
+(PS.02.04, PS.05.02, PS.05.03), Kosten (PC.01.01, PC.01.03), Risiken (PC.02.04, PC.02.03; Portfoliorisiken PC.02.01),
+KPIs mit Werten (PC.03.01, PC.03.03), Stakeholder (PS.05.01), Abhängigkeiten (PP.02.03), Ressourcenbedarf (RK.02.01,
+RK.02.05, A-20) und Meldungen an ICT bzw. Infrastruktur (RK.02.06, A-22). Je Register `GET` (Cursor), `POST`, `PATCH`
+und `DELETE /v1/projekte/{id}/<register>/{eintragId}` mit `If-Match`; Endzustände des Projekts sind lesend (409).
+Baseline, Ist-Kosten, Abnahme durch das Gremium und «gedeckt» setzen nur obere Module (`projektdaten` in `index.ts`).
+
+| Register (Pfad unter `/v1/projekte/{id}/`) | Lesen | Pflegen | Hinweis |
+|---|---|---|---|
+| `meilensteine?phase=&art=` | `projekt:read` | `projekt:write` | `art`: `meilenstein`, `lieferergebnis`, `kommunikation` |
+| `kosten?phase=` | `projekt:read` und `finanzen:read` | `projekt:write` und `finanzen:read` | Beträge nur mit `finanzen:read` (A-33), auch in der Lesesicht; Beträge gehen nicht ins Ereignis |
+| `risiken` | `projekt:read` | `projekt:write` | höchste Auswirkung zuerst |
+| `kpis`, `kpis/{kpiId}/werte` | `projekt:read` | `projekt:write`; Werte `kpi:write` | `PUT …/werte/{JJJJ-MM}` ab Phase P2, `If-Match: W/"0"` für einen neuen Wert |
+| `stakeholder` | `projekt:read` | `projekt:write` | |
+| `abhaengigkeiten` | `projekt:read` | `projekt:write` | beide Richtungen (`ausgehend`, `eingehend`); das andere Projekt nur, wenn sichtbar |
+| `ressourcenbedarf?phase=` | `projekt:read` | `projekt:write` | Grösse S/M/L oder FTE mit `vonMonat`–`bisMonat`; je Rolle und Phase ein Eintrag |
+| `meldungen` | `projekt:read` | `projekt:write` | nur `GET` und `POST` (nur anhängen); Stelle `dti` oder `dbi` |
+| `/v1/portfolios/{id}/risiken` | `projekt:read` (org oder Portfolio) | `projekt:write` an der Organisation | Portfoliorisiken (PC.02.01) |
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur
@@ -85,6 +106,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.handlungsfeld.created` | Handlungsfeld angelegt |
 | `ch.ppm.handlungsfeld.updated` | Handlungsfeld geändert |
 | `ch.ppm.handlungsfeld.deleted` | Handlungsfeld gelöscht |
+| `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
+| `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
+| `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

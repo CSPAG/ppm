@@ -28,11 +28,14 @@ export function StellvertretungPage({ search, setSearch }: { search: KontoSearch
       key: 'wer', titel: K.liste.vertretung, art: 'text', karte: true,
       zelle: s => (s.richtung === 'eigene' ? K.liste.eigene(s.vertreter.name) : K.liste.fuerAndere(s.vertretene.name)),
     },
-    { key: 'zeitraum', titel: K.liste.zeitraum, karte: true, zelle: s => K.liste.von(fmtDatum(s.von), fmtDatum(s.bis)) },
     { key: 'unterschriften', titel: K.liste.unterschriften, zelle: s => (s.unterschriften ? K.liste.ja : K.liste.nein) },
-    { key: 'stand', titel: K.liste.stand, karte: true, zelle: s => <Stand familie={s.aktiv ? 'positiv' : 'wartet'} label={s.aktiv ? K.liste.aktiv : K.liste.geplant} /> },
+    // Stand mit Zeitraum in einer Spalte: auf dem Telefon höchstens drei Felder je Karte (I-L6), Beenden inbegriffen
     {
-      key: 'akt', titel: '', zelle: s => (s.can.beenden
+      key: 'stand', titel: K.liste.zeitraum, karte: true,
+      zelle: s => <Stand familie={s.aktiv ? 'positiv' : 'wartet'} label={s.aktiv ? K.liste.aktiv : K.liste.geplant} detail={K.liste.von(fmtDatum(s.von), fmtDatum(s.bis))} /> },
+    {
+      // Beenden auch auf dem Telefon in der Karte
+      key: 'akt', titel: '', karte: true, zelle: s => (s.can.beenden
         ? <button type="button" className="btn sm" aria-label={K.beendenAria(s.vertreter.name)} onClick={() => setBeenden(s)}>{K.beenden}</button>
         : null),
     },

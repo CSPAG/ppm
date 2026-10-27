@@ -42,7 +42,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
 | AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | umgesetzt (300 Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; Aufgabe «Jahresziele vervollständigen» über den Eingang; `projektZuordnen` für den Vertrag mit 301; Oberfläche UI-38 Zielzyklus; E2E offen bis CI läuft) | #28, #34, #38, #49 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
-| AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | in Arbeit (310, Vorlage an den VR mit Sperre ohne Metrik, Freigabe erfassen, Roadmap mit Vorschau und Publikation; Oberfläche UI-39, UI-31; E2E offen bis CI läuft) | – | A-35 (Roadmap für alle Angemeldeten); «Anpassungen verlangt» informiert die GL über die Aufgabe im Eingang (Recht `ziel:write`), keine Mitteilung je Person; Roadmap ohne vertrauliche Projekte (A-34) und ohne Zeitplan (Termine liegen in `projektdaten`, das `ziel` nicht nutzt); Unterlagen für den VR als gedruckte Zusammenfassung, Dokumentausgabe folgt mit `vorlage` |
+| AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | umgesetzt (310, Vorlage an den VR mit Sperre ohne Metrik, Freigabe erfassen, Roadmap mit Vorschau und Publikation; Oberfläche UI-39, UI-31; E2E) | #72 | A-35 (Roadmap für alle Angemeldeten); «Anpassungen verlangt» informiert die GL über die Aufgabe im Eingang (Recht `ziel:write`), keine Mitteilung je Person; Roadmap ohne vertrauliche Projekte (A-34) und ohne Zeitplan (Termine liegen in `projektdaten`, das `ziel` nicht nutzt); Unterlagen für den VR als gedruckte Zusammenfassung, Dokumentausgabe folgt mit `vorlage` |
 | AP-E6-3 | Zielerreichung | 320–329 | teilweise (PR 1: 320, `/v1/zielerreichung/:quartal`, Seite Ziele › Zielerreichung UI-40; PR 2 Aufgabe im Eingang folgt) | #37 | Zielerreichung je strategischem Ziel und Jahresziel des Jahres (`ziel_typ`); `beurteilung` als Kommentar ohne Skala (keine festgelegt); ein Stand je Ziel und Quartal, Änderungen im Audit; Jahresziele nur im Quartal ihres Jahres; Aufgabe `zielerreichung.erfassen` (Job nach Quartalsende) folgt in PR 2, sobald es ein Muster für zeitgesteuerte Aufgaben je Organisation gibt (wie AP-E1-1, Job am 18.) |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
 | AP-E7-1 | Abschluss, Sistierung, Abbruch, Lessons Learned | 340–349 | offen | – | – |
@@ -63,7 +63,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
 | ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
 | ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
-| ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | in Arbeit (API und Oberfläche UI-39) | – |
+| ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | umgesetzt (#72) | #72 |
 | ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
 | ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | teilweise (UC-012 Schritte 1–2; Aufgabe im Eingang folgt in PR 2) | #37 |
@@ -93,7 +93,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.03.04 | Portfolio in Matrixsicht beurteilen | 008 | E5 | AP-E5-2 | offen | – |
 | PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | in Arbeit (API) | – |
-| PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | in Arbeit (API und Oberfläche UI-31) | – |
+| PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | umgesetzt (#72) | #72 |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | umgesetzt | #30, #52, #58 |

@@ -2,13 +2,13 @@
  * Routen (TanStack Router, code-basiert): Seiten der App mit typisierten Suchparametern (`search.ts`) und die
  * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen).
  */
-import { createRootRoute, createRoute, createRouter, lazyRouteComponent, redirect, useNavigate } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
 import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
+import { abgeschlossenesQuartal, ZielePage, ZielerreichungPage, type QuartalNr, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -52,6 +52,33 @@ function StrategischeZieleRoute() {
   return <ZielePage search={search} setSearch={setSearch} />;
 }
 
+// Zielerreichung je Quartal (UI-40, BC ZM.03.01, AP-E6-3): /ziele/2026/zielerreichung?quartal=q3; ohne Jahr und Quartal
+// das zuletzt abgeschlossene Quartal
+const zielerreichungStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/zielerreichung',
+  beforeLoad: () => {
+    const q = abgeschlossenesQuartal();
+    throw redirect({ to: '/ziele/$jahr/zielerreichung', params: { jahr: String(q.jahr) }, search: { quartal: `q${q.quartal}` }, replace: true });
+  },
+});
+
+const zielerreichungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/zielerreichung', validateSearch: searchOf.zielerreichung, component: ZielerreichungRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function ZielerreichungRoute() {
+  const { jahr } = zielerreichungRoute.useParams();
+  const search = zielerreichungRoute.useSearch();
+  const navigate = useNavigate({ from: zielerreichungRoute.fullPath });
+  const quartal = Number((search.quartal ?? `q${abgeschlossenesQuartal().quartal}`).slice(1)) as QuartalNr;
+  const setQuartal = useCallback((j: number, q: QuartalNr) => {
+    void navigate({ to: '/ziele/$jahr/zielerreichung', params: { jahr: String(j) }, search: { quartal: `q${q}` } });
+  }, [navigate]);
+  const zuZielen = useCallback(() => { void navigate({ to: '/ziele/strategische-ziele' }); }, [navigate]);
+  return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -60,7 +87,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, zielerreichungStartRoute, zielerreichungRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

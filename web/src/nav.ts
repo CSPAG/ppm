@@ -4,7 +4,7 @@
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
-import { sucheZiele, zieleTexte, zielO } from './features/ziele/index.ts';
+import { sucheZiele, zieleTexte, zielerreichungTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
@@ -14,6 +14,8 @@ export const navigation: NavRegistrierung = {
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
     { raum: 'ziele', pfad: '/ziele/strategische-ziele', label: zieleTexte.bereich, recht: 'ziel:read' },
+    // Zielerreichung je Quartal (BC ZM.03.01, AP-E6-3); führt ins zuletzt abgeschlossene Quartal
+    { raum: 'ziele', pfad: '/ziele/zielerreichung', label: zielerreichungTexte.bereich, recht: 'ziel:read' },
     // Arbeitsraum «Administration»: die Verwalten-Seiten des Baukastens kommen nach Recht aus `useIamNav()` dazu (UC-016)
   ],
   aktionen: [

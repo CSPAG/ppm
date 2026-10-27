@@ -3,3 +3,6 @@ export { ZielePage } from './ZielePage.tsx';
 export { validateZielSearch, zielO, type SetZielSearch, type ZielSearch } from './search.ts';
 export { sucheZiele, zielKeys } from './api.ts';
 export { TZ as zieleTexte } from './texte.ts';
+export { ZielerreichungPage } from './ZielerreichungPage.tsx';
+export { abgeschlossenesQuartal, validateZielerreichungSearch, type QuartalNr, type ZielerreichungSearch } from './ZielerreichungSearch.ts';
+export { TZE as zielerreichungTexte } from './ZielerreichungTexte.ts';

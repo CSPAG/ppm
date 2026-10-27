@@ -3426,6 +3426,270 @@
           }
         }
       },
+      "ZielerreichungEintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "zielTyp",
+          "zielId",
+          "quartal",
+          "stand",
+          "beurteilung",
+          "erfasstAt",
+          "erfasstVon",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "zielTyp": {
+            "description": "Strategisches Ziel oder Jahresziel.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "strategisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "jahresziel"
+                ]
+              }
+            ]
+          },
+          "zielId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "quartal": {
+            "type": "string"
+          },
+          "stand": {
+            "type": "string"
+          },
+          "beurteilung": {
+            "type": "string"
+          },
+          "erfasstAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "erfasstVon": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZielPerson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "ZielerreichungZiel": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "typ",
+          "id",
+          "strategischesZielId",
+          "nummer",
+          "text",
+          "metrik",
+          "zielwert",
+          "eintrag",
+          "letzter"
+        ],
+        "properties": {
+          "typ": {
+            "description": "Strategisches Ziel oder Jahresziel.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "strategisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "jahresziel"
+                ]
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "strategischesZielId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "metrik": {
+            "type": "string"
+          },
+          "zielwert": {
+            "type": "string"
+          },
+          "eintrag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZielerreichungEintrag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "letzter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZielerreichungEintrag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ZielerreichungQuartal": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "quartal",
+          "jahr",
+          "ziele",
+          "fortschritt",
+          "can"
+        ],
+        "properties": {
+          "quartal": {
+            "type": "string"
+          },
+          "jahr": {
+            "type": "integer"
+          },
+          "ziele": {
+            "description": "Nach Nummer: je strategisches Ziel, gefolgt von seinen Jahreszielen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZielerreichungZiel"
+            }
+          },
+          "fortschritt": {
+            "additionalProperties": false,
+            "description": "Kopf «24 von 30 Zielen nachgeführt» (K6 Schritt 10).",
+            "type": "object",
+            "required": [
+              "nachgefuehrt",
+              "gesamt"
+            ],
+            "properties": {
+              "nachgefuehrt": {
+                "minimum": 0,
+                "description": "Ziele mit Stand in diesem Quartal.",
+                "type": "integer"
+              },
+              "gesamt": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Stände erfassen (zielerreichung:write).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ZielerreichungCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zielTyp",
+          "zielId",
+          "stand"
+        ],
+        "properties": {
+          "zielTyp": {
+            "description": "Strategisches Ziel oder Jahresziel.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "strategisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "jahresziel"
+                ]
+              }
+            ]
+          },
+          "zielId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "stand": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Neuer Stand der Metrik, z. B. «−1,4 %».",
+            "type": "string"
+          },
+          "beurteilung": {
+            "maxLength": 2000,
+            "description": "Kommentar und Beurteilung des Stands; leer erlaubt.",
+            "type": "string"
+          }
+        }
+      },
+      "ZielerreichungPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "stand": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S",
+            "description": "Neuer Stand der Metrik, z. B. «−1,4 %».",
+            "type": "string"
+          },
+          "beurteilung": {
+            "maxLength": 2000,
+            "description": "Kommentar und Beurteilung des Stands; leer erlaubt.",
+            "type": "string"
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -21066,6 +21330,528 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/zielerreichung/{quartal}": {
+      "get": {
+        "summary": "Zielerreichung eines Quartals",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Strategische Ziele und die Jahresziele des Jahres mit Metrik, Zielwert, Stand des Quartals und letztem Stand davor; Fortschritt «nachgeführt von gesamt» (UC-012 Schritte 1–2, K6 Schritt 10).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielerreichungQuartal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Stand erfassen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Stand eines Ziels im Quartal mit Kommentar. Unbekanntes Ziel: 404; Jahresziel eines anderen Jahres: 422; schon erfasst: 409 (dann ändern).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZielerreichungCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielerreichungEintrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/zielerreichung/{quartal}/{id}": {
+      "patch": {
+        "summary": "Stand ändern",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Stand oder Kommentar; Datum und Person werden neu gesetzt. Nur mit `If-Match` (412).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZielerreichungPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielerreichungEintrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stand entfernen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Das Ziel gilt im Quartal wieder als nicht nachgeführt. Nur mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Entfernt"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
                 }
               }
             }

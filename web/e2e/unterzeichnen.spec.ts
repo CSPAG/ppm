@@ -35,9 +35,10 @@ async function zurUnterzeichnung(page: Page): Promise<string> {
   }, { 'if-match': 'W/"0"' });
   const e = await a.send<{ version: { id: string } }>('POST', `/v1/projekte/${pj.body.id}/vertrag/entwuerfe`, { anlass: 'initial' });
   const v = e.body.version.id;
-  // Fehlen im Phasenmodell der Organisation Pflichtangaben der Zielphase, sperrt das Einreichen (UC-002 Schritt 8)
-  const pflicht = await a.get<{ vollstaendig: boolean }>(`/v1/vertragsversionen/${v}/pflichtangaben`);
-  test.skip(!pflicht.vollstaendig, 'Phasenmodell der Organisation verlangt Pflichtangaben für die Zielphase');
+  // Die E2E-Datenbank entsteht je Lauf neu (scripts/e2e-db.ts) ohne Phasenmodell in Kraft: keine Pflichtangaben, das
+  // Einreichen sperrt nicht (UC-002 Schritt 8). Setzt eine Spec künftig ein Phasenmodell in Kraft, meldet sich das hier.
+  const pflicht = await a.get<{ vollstaendig: boolean; angaben: { text: string; erfuellt: boolean }[] }>(`/v1/vertragsversionen/${v}/pflichtangaben`);
+  expect(pflicht.angaben.filter(x => !x.erfuellt).map(x => x.text), 'Pflichtangaben ohne Phasenmodell in Kraft').toEqual([]);
   const r = await a.send('POST', `/v1/vertragsversionen/${v}/einreichen`, undefined, { 'if-match': e.etag });
   await a.send('POST', `/v1/vertragsversionen/${v}/quality-check`, { ergebnis: 'bestaetigt' }, { 'if-match': r.etag });
   return pj.body.nummer;

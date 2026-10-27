@@ -36,7 +36,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E4-1 | Projektidee einreichen | 220–229 | umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`; Assistent, Meine Ideen, Ansicht, Rückfragen beantworten); offen: Kopfkarte «Ideen» auf der Startseite (Eintrag über Feature-Grenze), E2E bis CI läuft | #36, #50 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
-| AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | in Arbeit (PR 1: 250, Modul `priorisierung`; PR 2 Oberfläche Bewertung UI-20 und Modell UI-19 folgt) | – | A-01, A-18; Modell «Entwurf»/«in Kraft», gilt das zuletzt in Kraft gesetzte; Entscheid des Gremiums als Text erfasst; Vorgabe = Kriterien aus UC-008 Schritt 2 ohne Zuordnung Nutzen/Risiko (A-39 legt die UE fest); Budgetrahmen je Portfolio; Modell lesen auch mit `priorisierung:read` am Portfolio (Gremium) |
+| AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | umgesetzt (250, Modul `priorisierung`; Portfolio › Priorisierung mit Bewertung UI-20 und Modell UI-19; E2E grün) | #71, #79 | A-01, A-18; Modell «Entwurf»/«in Kraft», gilt das zuletzt in Kraft gesetzte; Entscheid des Gremiums als Text erfasst; Vorgabe = Kriterien aus UC-008 Schritt 2 ohne Zuordnung Nutzen/Risiko (A-39 legt die UE fest); Budgetrahmen je Portfolio; Modell lesen auch mit `priorisierung:read` am Portfolio (Gremium) |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | umgesetzt (270, Modul `ressource`, `get_auslastung`; Portfolio › Ressourcen mit Auslastung UI-23 und Kapazität UI-24; Bedarfsliste UI-25 mit AP-E7-2; E2E offen bis CI läuft) | #35 (über #46), #40 | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
@@ -80,9 +80,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API, Prüfansicht UI-12) | – |
 | DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | – |
 | DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | in Arbeit (API; «Als Dokument herunterladen» im Kopf der Projektakte › Vertrag) | – |
-| PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
-| PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
-| PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
+| PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | umgesetzt | #71, #79 |
+| PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | umgesetzt (Budgetrahmen je Portfolio, A-18) | #71, #79 |
+| PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | umgesetzt (hoch/mittel/tief ohne Score, A-01) | #71, #79 |
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
@@ -184,7 +184,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K4-3 | Ideen mit Rückfrage | ≤ 20 % | Betrieb | AP-E4-2 | offen |
 | K4-4 | Einreichung → bereit für das Gremium | Median ≤ 20 Arbeitstage | Betrieb | AP-E4-2 | offen |
 | K5-1 | Rang verschieben → Wasserlinie | ≤ 200 ms, ≤ 1 s bei 60 Projekten | Test | AP-E5-3 | offen |
-| K5-2 | 15 × 7 Bewertungen nur Tastatur | ≤ 10 Min. | Aufgabentest | AP-E5-1 | offen |
+| K5-2 | 15 × 7 Bewertungen nur Tastatur | ≤ 10 Min. | Aufgabentest | AP-E5-1 | Test: 105 Einschätzungen mit 223 Tastendrücken ohne Maus (`BewertungPage.test.tsx`); Zeit beim Aufgabentest zu messen |
 | K5-3 | Entscheidungsvorlage ohne Dateien | 0 Dateien | Aufgabentest | AP-E5-5 | offen |
 | K5-4 | Projekte unter der Wasserlinie und Engpass nennen | ≥ 90 % | Aufgabentest | AP-E5-3 | offen |
 | K6-1 | Jahresziel mit Metrik und Hauptaktivität | ≤ 3 Min. | Aufgabentest | AP-E6-1 | beim Aufgabentest zu messen (Ablauf im E2E web/e2e/zielzyklus.spec.ts) |
@@ -210,3 +210,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | #48 | AP-E3-1 | Arbeitsfläche (UI-07); Z1, Z2, Z5, Z7, Z8, Z9 (Banner in Prüfung/Baseline), Z10 über den Rahmen | ↑/↓ Kapitel, Alt+N nächste fehlende Angabe, Strg+Z/Strg+Umschalt+Z | ohne Befund (jsdom, Vitest); E2E hell/dunkel offen (ohne Keycloak in der Session) | Layout 360/768/1200 px nach CSS-Brüchen; E2E offen | ja (`features/vertrag/texte.ts`), «Sie» | K2-4 als Vitest (1 Klick je Angabe, Fokus an der Stelle) und API-Test |
 | #44 | AP-E1-2 | Posteingang (UI-15), Bericht (UI-16 Termine), Schublade, Dialog; Z1–Z5, Z7, Z8/Z10, Z9 | vollständig (↑/↓, B, R, E, Leertaste, Enter; Kürzel unter der Liste) | Vitest ohne Befund (Liste, Z9, Termine); E2E hell/dunkel offen bis CI läuft | 360 px im E2E (offen bis CI läuft) | ja (`features/monatsabschluss/texte.ts`), «Sie» | K1-3, K1-4 im Aufgabentest; Start-Bundle 203 kB |
 | #75 | AP-E3-2 | Arbeitsfläche Prüfansicht (UI-12 Quality-Check), Zusammenfassung Unterzeichnen (Telefon); Z1, Z2, Z5, Z7 (412), Z8, Z9 (nicht in Prüfung/zur Unterzeichnung), Z10 | Formulare und Dialog «Nicht unterzeichnen» (Fokus, Pflichtbegründung) | ohne Befund (jsdom, Vitest); E2E hell/dunkel offen bis CI läuft | 360 px im E2E (offen bis CI läuft), Prüfansicht zweispaltig über 900 px | ja (`features/vertrag/PruefenTexte.ts`), «Sie» | K2-1 (Vitest 1 Interaktion, E2E 2 ab Eingang) |
+| #79 | AP-E5-1 | Arbeitsfläche (Bewertung) + Schublade, Liste + Schublade (Modell); Z1, Z2, Z5, Z7–Z10 | ja (Raster mit Pfeilen, 1/2/3, Entf, Eingabetaste, Strg+Z; Editor) | ohne Befund (jsdom; E2E hell, dunkel) | 360 px ohne Überlauf (E2E «schmal», Chromium), 1440 px (Chromium); Bewerten ab 1024 px | ja (Feature-Texte), «Sie» | K5-2 Test: 105 Einschätzungen mit 223 Tastendrücken |

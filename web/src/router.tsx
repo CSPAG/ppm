@@ -13,6 +13,7 @@ import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { priorisierungPfad, type SetBewertungSearch, type SetModellSearch } from './features/priorisierung/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -34,6 +35,8 @@ const IdeePage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeePage
 const AuslastungPage = seite(() => import('./features/ressourcen/AuslastungPage.tsx'), 'AuslastungPage');
 const KapazitaetPage = seite(() => import('./features/ressourcen/KapazitaetPage.tsx'), 'KapazitaetPage');
 const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), 'BedarfPage');
+const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
+const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
@@ -271,6 +274,39 @@ function BedarfRoute() {
   return <BedarfPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Arbeitsraum «Portfolio» › Priorisierung: Bewertung (UI-20) und Modell (UI-19) (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1)
+
+const priorisierungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/priorisierung',
+  beforeLoad: () => { throw redirect({ to: priorisierungPfad.bewertung, replace: true }); },
+});
+
+const bewertungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.bewertung, validateSearch: searchOf.bewertung, component: BewertungRoute,
+});
+
+function BewertungRoute() {
+  const search = bewertungRoute.useSearch();
+  const navigate = useNavigate({ from: bewertungRoute.fullPath });
+  const setSearch = useCallback<SetBewertungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BewertungPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+const modellRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.modell, validateSearch: searchOf.bewertungsmodell, component: ModellRoute,
+});
+
+function ModellRoute() {
+  const search = modellRoute.useSearch();
+  const navigate = useNavigate({ from: modellRoute.fullPath });
+  const setSearch = useCallback<SetModellSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <ModellPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -404,6 +440,9 @@ const routeTree = rootRoute.addChildren([
   auslastungRoute,
   kapazitaetRoute,
   bedarfRoute,
+  priorisierungRoute,
+  bewertungRoute,
+  modellRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

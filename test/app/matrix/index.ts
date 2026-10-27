@@ -11,5 +11,6 @@ export const MATRIX = sammle([
   (await import('./projekt.ts')).matrix,
   (await import('./ziel.ts')).matrix,
   (await import('./sitzung.ts')).matrix,
+  (await import('./sitzung-entscheid.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
 ]);

@@ -214,6 +214,7 @@ export const model = defineModel({
     // sitzung
     list_sitzungen: { title: 'Sitzungen eines Gremiums auflisten', permission: 'sitzung:read', readOnly: true },
     get_sitzung: { title: 'Sitzung mit Traktandenliste lesen', permission: 'sitzung:read', readOnly: true },
+    list_entscheide: { title: 'Entscheide und Auflagen auflisten', permission: 'sitzung:read', readOnly: true },
   },
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)

@@ -25,7 +25,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | in Arbeit (PR 1: 130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; PR 2: Oberfläche Gremien › Sitzungen) | – | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
-| AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
+| AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | in Arbeit (PR 1: 140, Dateien `entscheid*`, `protokoll*` im Modul `sitzung`: Starten, Entscheid mit Folge über die Registry, Auflagen, Korrektur bis Schliessen, SNS-VR nachtragen, Schliessen, Protokoll, Liste Entscheide, `list_entscheide`; PR 2: Sitzungsmodus, Protokoll, Entscheide in der Oberfläche nach AP-E2-1 PR 2) | – | A-02, A-30, A-34, A-44; Ergebnisse je Art aus K3 Schritt 8, solange die Art nicht registriert ist; Stellungnahme «via SNS-VR» mit Ergebnis des Gremiums, Entscheid des SNS-VR nach dem Schliessen; Auflagen-Aufgaben und Mitteilungen erst beim Schliessen; Weiterleitung an den VR als Markierung (K03); Protokoll ohne PDF |
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | offen | – | – |
 | AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | offen | – | – |
@@ -92,7 +92,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.04 | Portfolio in Matrixsicht beurteilen | 008 | E5 | AP-E5-2 | offen | – |
 | PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | in Arbeit (API) | – |
-| PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | offen | – |
+| PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | in Arbeit (API) | – |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | in Arbeit | – |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | in Arbeit (API) | – |
@@ -101,7 +101,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | offen | – |
 | PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | offen | – |
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
-| PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
+| PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | in Arbeit (Entscheid im Gremium, API; Folge über die Art `gate` mit AP-E3-3) | – |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |
 | PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | offen | – |
 | PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | offen | – |
@@ -177,7 +177,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K3-1 | Unterlagen ≥ 5 Arbeitstage vorher | 100 % | Betrieb (Versandprotokoll) | AP-E2-1 | offen |
 | K3-2 | Traktandenliste versandbereit | ≤ 30 Min. | Aufgabentest | AP-E2-1 | offen |
 | K3-3 | Entscheid erfassen | ≤ 60 s je Traktandum | Test (Messung im Sitzungsmodus) | AP-E2-2 | offen |
-| K3-4 | Protokoll ≤ 3 Arbeitstage | 100 % | Betrieb | AP-E2-2 | offen |
+| K3-4 | Protokoll ≤ 3 Arbeitstage | 100 % | Betrieb | AP-E2-2 | in Arbeit (Versand mit Arbeitstagen nach der Sitzung protokolliert, Aufgabe mit Frist) |
 | K3-5 | Antrag und Hauptänderungen finden (PPM-5) | ≥ 90 %, ≤ 30 s, Tablet | Aufgabentest | AP-E2-2 | offen |
 | K4-1 | Idee ohne Hilfe einreichen | ≥ 90 % | Aufgabentest | AP-E4-1 | offen |
 | K4-2 | Zeit zum Einreichen | ≤ 10 Min. | Aufgabentest | AP-E4-1 | offen |

@@ -1276,6 +1276,505 @@
           }
         }
       },
+      "Aufgabe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "art",
+          "titel",
+          "kontext",
+          "link",
+          "frist",
+          "fristArt",
+          "bezug",
+          "empfaenger",
+          "vertretung",
+          "createdAt",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "art": {
+            "description": "Art der Aufgabe `<modul>.<verb>` (Fachmodell 4.2), z. B. `statusbericht.erstellen`.",
+            "type": "string"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "kontext": {
+            "anyOf": [
+              {
+                "description": "Projekt und Rolle, z. B. «2026-014 · als PL».",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link": {
+            "description": "Adresse in der Oberfläche, die direkt zur Aktion führt (I-B1).",
+            "type": "string"
+          },
+          "frist": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Kalendertag (YYYY-MM-DD).",
+                "examples": [
+                  "2026-10-25"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fristArt": {
+            "anyOf": [
+              {
+                "description": "UX-E11: Art der Frist steht immer dabei.",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kalendertage"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "arbeitstage"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bezug": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "typ",
+              "id"
+            ],
+            "properties": {
+              "typ": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          },
+          "empfaenger": {
+            "description": "`person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "person"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "recht"
+                ]
+              }
+            ]
+          },
+          "vertretung": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die Sie heute vertreten (UC-016 Schritt 4).",
+                "type": "object",
+                "required": [
+                  "person",
+                  "bis"
+                ],
+                "properties": {
+                  "person": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "name"
+                    ],
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "bis": {
+                    "format": "date",
+                    "description": "Kalendertag (YYYY-MM-DD).",
+                    "examples": [
+                      "2026-10-25"
+                    ],
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "erledigen"
+            ],
+            "properties": {
+              "erledigen": {
+                "description": "Nur Aufgaben ohne fachlichen Übergang sind von Hand erledigbar.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "AufgabeList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Aufgabe"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AufgabeAnzahl": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "offen",
+          "ueberfaellig",
+          "naechsteFrist"
+        ],
+        "properties": {
+          "offen": {
+            "minimum": 0,
+            "description": "Offene Aufgaben der Person (Zähler an «Eingang», I-N3).",
+            "type": "integer"
+          },
+          "ueberfaellig": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "naechsteFrist": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Kalendertag (YYYY-MM-DD).",
+                "examples": [
+                  "2026-10-25"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Mitteilung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "link",
+          "bezug",
+          "gelesenAt",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bezug": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "typ",
+              "id"
+            ],
+            "properties": {
+              "typ": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          },
+          "gelesenAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MitteilungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor",
+          "ungelesen"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Mitteilung"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ungelesen": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      },
+      "Stellvertretung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "vertretene",
+          "vertreter",
+          "von",
+          "bis",
+          "unterschriften",
+          "aktiv",
+          "richtung",
+          "createdAt",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "vertretene": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "vertreter": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "von": {
+            "format": "date",
+            "description": "Kalendertag (YYYY-MM-DD).",
+            "examples": [
+              "2026-10-25"
+            ],
+            "type": "string"
+          },
+          "bis": {
+            "format": "date",
+            "description": "Kalendertag (YYYY-MM-DD).",
+            "examples": [
+              "2026-10-25"
+            ],
+            "type": "string"
+          },
+          "unterschriften": {
+            "description": "Die Vertretung darf in Vertretung unterzeichnen (UX-OF-10, A-31).",
+            "type": "boolean"
+          },
+          "aktiv": {
+            "description": "Heute im Zeitraum.",
+            "type": "boolean"
+          },
+          "richtung": {
+            "description": "`eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "eigene"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "fuer_andere"
+                ]
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "beenden"
+            ],
+            "properties": {
+              "beenden": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "StellvertretungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Stellvertretung"
+            }
+          }
+        }
+      },
+      "StellvertretungCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "vertreter",
+          "von",
+          "bis"
+        ],
+        "properties": {
+          "vertreter": {
+            "format": "uuid",
+            "description": "Person, die vertritt (aus dem Personenverzeichnis).",
+            "type": "string"
+          },
+          "von": {
+            "format": "date",
+            "description": "Kalendertag (YYYY-MM-DD).",
+            "examples": [
+              "2026-10-25"
+            ],
+            "type": "string"
+          },
+          "bis": {
+            "format": "date",
+            "description": "Kalendertag (YYYY-MM-DD).",
+            "examples": [
+              "2026-10-25"
+            ],
+            "type": "string"
+          },
+          "unterschriften": {
+            "default": false,
+            "description": "Unterschriften ausdrücklich erteilen (A-31).",
+            "type": "boolean"
+          }
+        }
+      },
       "OrgEinheit": {
         "additionalProperties": false,
         "type": "object",
@@ -2239,6 +2738,1402 @@
           }
         }
       },
+      "Phasenmodell": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "stand",
+          "beschreibung",
+          "inKraftAb",
+          "inKraftVon",
+          "version",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "phasen",
+          "gates",
+          "kapitelWirkung",
+          "fristen",
+          "toleranzen",
+          "pruefung",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "minimum": 1,
+            "description": "Laufende Nummer der Version.",
+            "type": "integer"
+          },
+          "stand": {
+            "description": "Entwurf (bearbeitbar), in Kraft (gilt), abgelöst.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeloest"
+                ]
+              }
+            ]
+          },
+          "beschreibung": {
+            "description": "Was sich mit dieser Version ändert.",
+            "type": "string"
+          },
+          "inKraftAb": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inKraftVon": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Bearbeitungsstand (ETag).",
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phasen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code",
+                "name",
+                "position",
+                "ergebnisse",
+                "pflichtangaben"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code der Phase (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "PRE_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer"
+                },
+                "ergebnisse": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "art",
+                      "text"
+                    ],
+                    "properties": {
+                      "art": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "lieferergebnis"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "meilenstein"
+                            ]
+                          }
+                        ]
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "gates": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code",
+                "name",
+                "vonPhase",
+                "nachPhase",
+                "position",
+                "leitfragen",
+                "pflichtangaben"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code des Gates (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EINTRITT_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0_P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1_P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2_P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3_P4"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EXIT_P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "vonPhase": {
+                  "description": "Code der Phase (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "PRE_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P4"
+                      ]
+                    }
+                  ]
+                },
+                "nachPhase": {
+                  "anyOf": [
+                    {
+                      "description": "Code der Phase (fest).",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PRE_P0"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P0"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P1"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P2"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P3"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "P4"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "position": {
+                  "type": "integer"
+                },
+                "leitfragen": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "wertestrom",
+                      "text"
+                    ],
+                    "properties": {
+                      "wertestrom": {
+                        "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                        "description": "Schlüssel des Werts in der Codetabelle «Werteströme».",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 1000,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "kapitelWirkung": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "dimension"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                  "type": "integer"
+                },
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "scope"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "budget"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ressourcen"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "fristen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "schluessel",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "schluessel": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_aufgabe"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_stichtag"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "gate_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sitzung_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "versand"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "protokoll"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "minimum": 0,
+                  "maximum": 365,
+                  "type": "integer"
+                },
+                "einheit": {
+                  "description": "Tag im Monat (Monatszyklus), Arbeitstage (Q8, UX-E11) oder Kalendertage.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "tag_im_monat"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "toleranzen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Standard für Projekte; ohne Wert keine Warnung «wesentlich» (A-10).",
+              "type": "object",
+              "required": [
+                "dimension",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "termin"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kosten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "umfang"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "prozent"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "pruefung": {
+            "description": "Prüfbericht (I-P4): Hinweise und Warnungen vor dem In-Kraft-Setzen.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "stufe",
+                "regel",
+                "text",
+                "ort"
+              ],
+              "properties": {
+                "stufe": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "hinweis"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "warnung"
+                      ]
+                    }
+                  ]
+                },
+                "regel": {
+                  "description": "Schlüssel der Regel.",
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "ort": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "art",
+                    "code"
+                  ],
+                  "properties": {
+                    "art": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "phase"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "gate"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "frist"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "toleranz"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "wirkung"
+                          ]
+                        }
+                      ]
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "description": "Was die anfragende Person damit darf (Recht und Stand).",
+            "type": "object",
+            "required": [
+              "write",
+              "activate"
+            ],
+            "properties": {
+              "write": {
+                "description": "Entwurf bearbeiten oder verwerfen.",
+                "type": "boolean"
+              },
+              "activate": {
+                "description": "Entwurf in Kraft setzen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PhasenmodellKurz": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "stand",
+          "beschreibung",
+          "inKraftAb",
+          "inKraftVon",
+          "version",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "minimum": 1,
+            "description": "Laufende Nummer der Version.",
+            "type": "integer"
+          },
+          "stand": {
+            "description": "Entwurf (bearbeitbar), in Kraft (gilt), abgelöst.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeloest"
+                ]
+              }
+            ]
+          },
+          "beschreibung": {
+            "description": "Was sich mit dieser Version ändert.",
+            "type": "string"
+          },
+          "inKraftAb": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inKraftVon": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Bearbeitungsstand (ETag).",
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PhasenmodellList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor",
+          "can"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhasenmodellKurz"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "create"
+            ],
+            "properties": {
+              "create": {
+                "description": "Entwurf anlegen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PhasenmodellCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "quelle": {
+            "description": "`aktuell`: Kopie der Version in Kraft (Standard, sofern vorhanden); `vorgabe`: Vorgabe des PM-Handbuchs.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "aktuell"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "vorgabe"
+                ]
+              }
+            ]
+          },
+          "beschreibung": {
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
+      "PhasenmodellPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "beschreibung": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "phasen": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code der Phase (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "PRE_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Bezeichnung in der Oberfläche.",
+                  "type": "string"
+                },
+                "ergebnisse": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "art",
+                      "text"
+                    ],
+                    "properties": {
+                      "art": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "lieferergebnis"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "meilenstein"
+                            ]
+                          }
+                        ]
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "gates": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "description": "Code des Gates (fest).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EINTRITT_P0"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P0_P1"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P1_P2"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P2_P3"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "P3_P4"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "EXIT_P4"
+                      ]
+                    }
+                  ]
+                },
+                "name": {
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Bezeichnung in der Oberfläche.",
+                  "type": "string"
+                },
+                "leitfragen": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "wertestrom",
+                      "text"
+                    ],
+                    "properties": {
+                      "wertestrom": {
+                        "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                        "description": "Schlüssel des Werts in der Codetabelle «Werteströme».",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 1000,
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pflichtangaben": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "feld",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                        "type": "integer"
+                      },
+                      "feld": {
+                        "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                        "description": "Feld im Schema des Kapitels (Modul vertrag).",
+                        "type": "string"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 500,
+                        "description": "Was verlangt ist, in Worten.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "kapitelWirkung": {
+            "maxItems": 39,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "dimension"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "description": "Kapitel der Vorlage Projektvertrag (Q7).",
+                  "type": "integer"
+                },
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "scope"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "budget"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ressourcen"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "fristen": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "schluessel",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "schluessel": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_aufgabe"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "bericht_stichtag"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "gate_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sitzung_vorbereiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "versand"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "protokoll"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "minimum": 0,
+                  "maximum": 365,
+                  "type": "integer"
+                },
+                "einheit": {
+                  "description": "Tag im Monat (Monatszyklus), Arbeitstage (Q8, UX-E11) oder Kalendertage.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "tag_im_monat"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "toleranzen": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Standard für Projekte; ohne Wert keine Warnung «wesentlich» (A-10).",
+              "type": "object",
+              "required": [
+                "dimension",
+                "wert",
+                "einheit"
+              ],
+              "properties": {
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "termin"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kosten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "umfang"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "prozent"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kalendertage"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "arbeitstage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "Portfolio": {
         "additionalProperties": false,
         "type": "object",
@@ -3021,6 +4916,548 @@
               "2026-11-18"
             ],
             "type": "string"
+          }
+        }
+      },
+      "Projekt": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "name",
+          "portfolioId",
+          "portfolio",
+          "orgEinheitId",
+          "handlungsfeldId",
+          "handlungsfeld",
+          "phase",
+          "phasenmodellId",
+          "lebenszyklus",
+          "vertraulich",
+          "sponsor",
+          "projektleitung",
+          "controlling",
+          "rollen",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "description": "«JJJJ-NNN», fortlaufend je Jahr der Anlage (A-47); Schlüssel in Adressen.",
+            "examples": [
+              "2026-014"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "schluessel",
+                  "name",
+                  "kategorie"
+                ],
+                "properties": {
+                  "schluessel": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "kategorie": {
+                    "type": "string",
+                    "enum": [
+                      "A",
+                      "B",
+                      "C"
+                    ],
+                    "description": "Kategorie des Portfolios."
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "orgEinheitId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handlungsfeldId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handlungsfeld": {
+            "anyOf": [
+              {
+                "description": "Bezeichnung des Handlungsfelds, falls die Person es sehen darf.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ],
+            "description": "Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss)."
+          },
+          "phasenmodellId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lebenszyklus": {
+            "type": "string",
+            "enum": [
+              "aktiv",
+              "sistiert",
+              "abgebrochen",
+              "abgeschlossen",
+              "zurueckgezogen"
+            ],
+            "description": "`aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`)."
+          },
+          "vertraulich": {
+            "description": "Sichtbar nur für Projektrollen, UE und Gremium des Portfolios (A-34).",
+            "type": "boolean"
+          },
+          "sponsor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projektleitung": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "controlling": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rollen": {
+            "description": "Eigene Funktionen der anfragenden Person in der Projektorganisation.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sp",
+                "pl",
+                "ctl",
+                "kt",
+                "koalition"
+              ],
+              "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+            }
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "write",
+              "organisation"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              },
+              "organisation": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ProjektList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Projekt"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ProjektCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "portfolioId"
+        ],
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Name des Projekts.",
+            "examples": [
+              "Digitale Patientenaufnahme"
+            ],
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ],
+            "description": "Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss)."
+          },
+          "orgEinheitId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handlungsfeldId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vertraulich": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProjektPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Name des Projekts.",
+            "examples": [
+              "Digitale Patientenaufnahme"
+            ],
+            "type": "string"
+          },
+          "orgEinheitId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handlungsfeldId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vertraulich": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Mitglied": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "personId",
+          "funktion",
+          "akv"
+        ],
+        "properties": {
+          "personId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "funktion": {
+            "type": "string",
+            "enum": [
+              "sp",
+              "pl",
+              "ctl",
+              "kt",
+              "koalition"
+            ],
+            "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+          },
+          "akv": {
+            "description": "Aufgaben, Kompetenzen, Verantwortung.",
+            "type": "string"
+          }
+        }
+      },
+      "Organisation": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "mitglieder",
+          "can"
+        ],
+        "properties": {
+          "version": {
+            "minimum": 0,
+            "description": "Stand der Projektorganisation (ETag); 0 ohne Mitglieder.",
+            "type": "integer"
+          },
+          "mitglieder": {
+            "description": "In der Reihenfolge Sponsor, Koalition, Projektleitung, CTL, Kernteam.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Mitglied"
+            }
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "OrganisationPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mitglieder"
+        ],
+        "properties": {
+          "mitglieder": {
+            "maxItems": 100,
+            "description": "Sponsor, Projektleitung und CTL höchstens je eine Person.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "personId",
+                "funktion"
+              ],
+              "properties": {
+                "personId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "funktion": {
+                  "type": "string",
+                  "enum": [
+                    "sp",
+                    "pl",
+                    "ctl",
+                    "kt",
+                    "koalition"
+                  ],
+                  "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+                },
+                "akv": {
+                  "maxLength": 2000,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "KopfProjekt": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "name",
+          "phase",
+          "lebenszyklus",
+          "rollen"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ],
+            "description": "Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss)."
+          },
+          "lebenszyklus": {
+            "type": "string",
+            "enum": [
+              "aktiv",
+              "sistiert",
+              "abgebrochen",
+              "abgeschlossen",
+              "zurueckgezogen"
+            ],
+            "description": "`aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`)."
+          },
+          "rollen": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "sp",
+                "pl",
+                "ctl",
+                "kt",
+                "koalition"
+              ],
+              "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+            }
+          }
+        }
+      },
+      "ProjektKopf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projekte",
+          "anzahl"
+        ],
+        "properties": {
+          "projekte": {
+            "description": "Laufende Projekte, in denen die Person eine Funktion hat (höchstens 20).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KopfProjekt"
+            }
+          },
+          "anzahl": {
+            "minimum": 0,
+            "description": "Anzahl dieser Projekte.",
+            "type": "integer"
           }
         }
       },
@@ -15189,6 +17626,835 @@
         }
       }
     },
+    "/v1/eingang": {
+      "get": {
+        "summary": "Offene Aufgaben («Zu tun»)",
+        "tags": [
+          "Eingang"
+        ],
+        "description": "Alle offenen Aufgaben der Person aus allen Rollen, nach Frist (ohne Frist zuletzt), dann nach Eingang; auch Aufgaben von Personen, die sie heute vertritt (mit `vertretung`). Cursor-Paginierung.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "frist"
+              ]
+            },
+            "in": "query",
+            "name": "filter",
+            "required": false,
+            "description": "`frist`: nur Aufgaben mit Frist."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AufgabeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eingang/anzahl": {
+      "get": {
+        "summary": "Anzahl offener Aufgaben",
+        "tags": [
+          "Eingang"
+        ],
+        "description": "Für den Zähler an «Eingang» (I-N3) und den Kopf des Eingangs.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AufgabeAnzahl"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/eingang/aufgaben/{id}/erledigen": {
+      "post": {
+        "summary": "Aufgabe von Hand erledigen",
+        "tags": [
+          "Eingang"
+        ],
+        "description": "Nur Aufgaben ohne fachlichen Übergang (`can.erledigen`); alle anderen schliesst die Handlung selbst (z. B. Einreichen). Sonst 409.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Aufgabe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mitteilungen": {
+      "get": {
+        "summary": "Mitteilungen",
+        "tags": [
+          "Mitteilungen"
+        ],
+        "description": "Mitteilungen an die Person, neueste zuerst, mit Anzahl ungelesener.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "ungelesen",
+            "required": false,
+            "description": "Nur ungelesene."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MitteilungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mitteilungen/{id}/gelesen": {
+      "post": {
+        "summary": "Mitteilung als gelesen markieren",
+        "tags": [
+          "Mitteilungen"
+        ],
+        "description": "Idempotent.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Gelesen"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stellvertretungen": {
+      "get": {
+        "summary": "Stellvertretungen",
+        "tags": [
+          "Stellvertretungen"
+        ],
+        "description": "Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StellvertretungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Stellvertretung erfassen",
+        "tags": [
+          "Stellvertretungen"
+        ],
+        "description": "Für die angemeldete Person. Im Zeitraum sieht die Vertretung deren Aufgaben und erhält befristet deren Rollen an Portfolios und Projekten; Unterschriften nur, wenn ausdrücklich erteilt (A-31). Die Vertretung erhält eine Mitteilung.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StellvertretungCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stellvertretung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stellvertretungen/{id}": {
+      "delete": {
+        "summary": "Stellvertretung beenden",
+        "tags": [
+          "Stellvertretungen"
+        ],
+        "description": "Nur die vertretene Person; die befristeten Rollen der Vertretung entfallen sofort.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Beendet"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/org-einheiten": {
       "get": {
         "summary": "Organisationseinheiten auflisten",
@@ -18395,6 +21661,788 @@
         }
       }
     },
+    "/v1/phasenmodelle": {
+      "get": {
+        "summary": "Versionen des Phasenmodells auflisten",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Neueste zuerst, Cursor-Paginierung.",
+        "parameters": [
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhasenmodellList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Entwurf anlegen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Kopie der Version in Kraft oder Vorgabe des PM-Handbuchs (ohne Version in Kraft immer die Vorgabe). Höchstens ein Entwurf; besteht einer, 409 mit seiner ID.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhasenmodellCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phasenmodelle/aktuell": {
+      "get": {
+        "summary": "Phasenmodell in Kraft lesen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Die Version, die für neue Projekte und das nächste Gate laufender Projekte gilt (A-13).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phasenmodelle/{id}": {
+      "get": {
+        "summary": "Version des Phasenmodells lesen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Mit Phasen, Gates, Leitfragen, Ergebnissen, Pflichtangaben, Kapitelwirkung, Fristen, Toleranzen und Prüfbericht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Entwurf ändern",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Nur mit `If-Match`. Jede angegebene Liste ersetzt die bisherige (je Phase bzw. Gate nur die genannten Teile). Versionen in Kraft oder abgelöst sind unveränderlich (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhasenmodellPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Entwurf verwerfen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "Nur mit `If-Match` und nur als Entwurf; Versionen in Kraft oder abgelöst bleiben (409).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Verworfen"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phasenmodelle/{id}/in-kraft-setzen": {
+      "post": {
+        "summary": "Entwurf in Kraft setzen",
+        "tags": [
+          "Phasenmodell"
+        ],
+        "description": "UC-017 Schritt 5: Der Entwurf gilt ab sofort für neue Projekte und für laufende ab ihrem nächsten Gate (A-13); die bisherige Version ist abgelöst. Nur mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phasenmodell"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/portfolios": {
       "get": {
         "summary": "Portfolios auflisten",
@@ -20173,6 +24221,859 @@
         }
       }
     },
+    "/v1/projekte": {
+      "get": {
+        "summary": "Projekte auflisten",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Alle sichtbaren Projekte (Meine Projekte, UI-05), sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sp",
+                "pl",
+                "ctl",
+                "kt",
+                "koalition"
+              ]
+            },
+            "in": "query",
+            "name": "rolle",
+            "required": false,
+            "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+          },
+          {
+            "schema": {
+              "maxLength": 40,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false,
+            "description": "Schlüssel des Portfolios (z. B. `transformation`)."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "P0",
+                "P1",
+                "P2",
+                "P3",
+                "P4"
+              ]
+            },
+            "in": "query",
+            "name": "phase",
+            "required": false,
+            "description": "Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss)."
+          },
+          {
+            "schema": {
+              "maxItems": 5,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "aktiv",
+                  "sistiert",
+                  "abgebrochen",
+                  "abgeschlossen",
+                  "zurueckgezogen"
+                ],
+                "description": "`aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`)."
+              }
+            },
+            "in": "query",
+            "name": "lebenszyklus",
+            "required": false,
+            "description": "Nur Projekte in diesen Zuständen."
+          },
+          {
+            "schema": {
+              "maxLength": 20,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "nummer",
+            "required": false,
+            "description": "Genau diese Projektnummer."
+          },
+          {
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "description": "Suche in Name und Nummer (Teilstring)."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjektList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Projekt anlegen",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Mit `projekt:create` an der Organisation oder am Portfolio; Nummer «JJJJ-NNN» fortlaufend je Jahr (A-47), Phase ohne Angabe P0.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjektCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Projekt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/kopf": {
+      "get": {
+        "summary": "Kopf: eigene Projekte",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Laufende Projekte, in denen die anfragende Person eine Funktion hat (Kopfkarte im Eingang).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjektKopf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}": {
+      "get": {
+        "summary": "Projekt lesen",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Kopf der Projektakte und Projektübersicht (UI-06).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Projekt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Projekt ändern",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Name, Federführung, Handlungsfeld, «vertraulich»; nur mit `If-Match`, bei abweichender Version 412, im Endzustand 409.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjektPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Projekt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/organisation": {
+      "get": {
+        "summary": "Projektorganisation lesen",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Sponsor, Sponsoren-Koalition, Projektleitung, CTL und Kernteam mit AKV (PP.04.04).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organisation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Projektorganisation festlegen",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Ersetzt die Projektorganisation (UC-002 Schritt 2) und gibt den benannten Personen ihre Rolle am Projekt (Sponsor, Projektleitung, CTL, Kernteam); entfernte verlieren sie. Nur mit `If-Match` (Stand der Projektorganisation).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organisation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/strategische-ziele": {
       "get": {
         "summary": "Strategische Ziele auflisten",
@@ -21188,6 +26089,18 @@
   ],
   "tags": [
     {
+      "name": "Eingang",
+      "description": "Aufgaben der Person aus allen Rollen («Zu tun»), nach Frist, mit Direktaktion."
+    },
+    {
+      "name": "Mitteilungen",
+      "description": "Mitteilungen an die Person: Information ohne Handlung."
+    },
+    {
+      "name": "Stellvertretungen",
+      "description": "Stellvertretung mit Zeitraum: Aufgaben und befristete Rollen für die Vertretung."
+    },
+    {
       "name": "Stammdaten",
       "description": "Organisationseinheiten mit Direktionen, Codetabellen mit ihren Auswahlwerten und Feiertage für Fristen in Arbeitstagen."
     },
@@ -21196,8 +26109,16 @@
       "description": "Strategische Handlungsfelder mit Leitsatz und Stossrichtungen – oberste Ordnung für Ziele und Vorhaben."
     },
     {
+      "name": "Phasenmodell",
+      "description": "Phasen, Gates mit Leitfragen je Wertestrom, Standard-Ergebnisse, Pflichtangaben, Fristen und Toleranzen – versioniert, nach dem PM-Handbuch."
+    },
+    {
       "name": "Portfolios",
       "description": "Portfolios A, B, C mit ihren Pflichten, Gremien mit Sitzungsterminen und Gremienweg je Gate (inkl. SNS-VR)."
+    },
+    {
+      "name": "Projekte",
+      "description": "Projekte mit Nummer, Portfolio, Phase und Lebenszyklus, Projektorganisation mit Sponsor, Projektleitung, CTL und Kernteam."
     },
     {
       "name": "Ziele",

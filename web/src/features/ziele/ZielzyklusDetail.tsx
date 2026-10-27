@@ -158,13 +158,19 @@ function JahreszielFelder({ jz, jahr, onNeuLaden }: { jz: JahreszielKnoten; jahr
   const version = useRef(jz.version);
   useEffect(() => { version.current = Math.max(version.current, jz.version); }, [jz.version]);
   const [fehler, setFehler] = useState<Partial<Record<Feld, string>>>({});
+  // Speichern nacheinander: Verlässt man zwei Felder rasch hintereinander, wartet das zweite auf die Antwort des ersten
+  // und nimmt dessen Version (sonst 412)
+  const kette = useRef<Promise<unknown>>(Promise.resolve());
   const speichern = (f: Feld) => {
     const wert = v[f].trim();
-    if (wert === gespeichert.current[f]) return;
     if (f === 'text' && !wert) { setFehler({ ...fehler, text: TZZ.textMissing }); return; }
-    m.jahreszielAendern.mutate({ id: jz.id, version: version.current, body: { [f]: wert } }, {
-      onSuccess: r => { version.current = r.version; gespeichert.current = { ...gespeichert.current, [f]: wert }; setFehler({}); },
-    });
+    kette.current = kette.current.then(async () => {
+      if (wert === gespeichert.current[f]) return;
+      const r = await m.jahreszielAendern.mutateAsync({ id: jz.id, version: version.current, body: { [f]: wert } });
+      version.current = r.version;
+      gespeichert.current = { ...gespeichert.current, [f]: wert };
+      setFehler({});
+    }).catch(() => undefined);   // Fehler zeigt der Zustand der Mutation (412: Hinweis, Eingabe bleibt)
   };
   const konflikt = isConflict(m.jahreszielAendern.error);
   const anderer = m.jahreszielAendern.error && !konflikt ? describeError(m.jahreszielAendern.error) : null;

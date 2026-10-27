@@ -10,6 +10,7 @@ import { features, paths } from './auth/index.ts';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { StellvertretungPage, type SetKontoSearch } from './features/konto/index.ts';
+import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -72,6 +73,20 @@ function HandlungsfelderRoute() {
   return <HandlungsfeldPage search={search} setSearch={setSearch} />;
 }
 
+// Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
+const strategischeZieleRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/strategische-ziele', validateSearch: searchOf.strategischeZiele, component: StrategischeZieleRoute,
+});
+
+function StrategischeZieleRoute() {
+  const search = strategischeZieleRoute.useSearch();
+  const navigate = useNavigate({ from: strategischeZieleRoute.fullPath });
+  const setSearch = useCallback<SetZielSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <ZielePage search={search} setSearch={setSearch} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -80,7 +95,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, eingangRoute, kontoRoute, stellvertretungRoute, zieleRoute, handlungsfelderRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, eingangRoute, kontoRoute, stellvertretungRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

@@ -12,8 +12,10 @@ const navigation = (page: Page) => page.getByRole('navigation', { name: 'Navigat
 test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) => {
   await login(page, ANNA);
   const nav = navigation(page);
-  await expect(nav.getByRole('link', { name: 'Ziele' })).toBeVisible();
-  await expect(nav.getByRole('link', { name: 'Ziele' })).toHaveAttribute('aria-current', 'page');
+  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
+  // In der Leiste trägt bei mehreren Bereichen der aktive Bereich aria-current, unten auf dem Telefon der Arbeitsraum
+  const aktuell = telefon(page) ? nav.getByRole('link', { name: 'Ziele', exact: true }) : nav.getByRole('link', { name: 'Handlungsfelder', exact: true });
+  await expect(aktuell).toHaveAttribute('aria-current', 'page');
   await expectAccessible(page);
   await expectNoOverflow(page);
 
@@ -34,7 +36,7 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
 test('Leser:in sieht nur die Arbeitsräume mit Recht', async ({ page }) => {
   await login(page, BRUNO);
   const nav = navigation(page);
-  await expect(nav.getByRole('link', { name: 'Ziele' })).toBeVisible();
+  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Administration' })).toHaveCount(0);
   // Eingang hat jede Rolle (UX-E3); Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
   await expect(nav.getByRole('link', { name: /^Eingang/ })).toBeVisible();

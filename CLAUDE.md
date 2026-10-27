@@ -3,7 +3,9 @@
 PPM ist eine mandantenfähige App für Strategieumsetzung und Projektportfoliomanagement. Fachgrundlage (führend):
 [docs/PPM-Master.md](docs/PPM-Master.md) mit `docs/anhang/` (Funktionsbaum, Use Cases, Klärungsliste). Architektur:
 [docs/zielarchitektur.md](docs/zielarchitektur.md). UX-Schicht (Arbeitsräume, Kernabläufe, Regeln der Oberfläche):
-[docs/ux/](docs/ux/README.md).
+[docs/ux/](docs/ux/README.md). **Bauplan** (verbindlich für jede Umsetzung): [docs/fachmodell.md](docs/fachmodell.md)
+mit Modulschnitt, Datenmodell, Rechten, Arbeitspaketen (Besitz, Migrationsbereich, Abhängigkeiten) und Annahmen `A-nn`;
+Stand in [docs/umsetzungsstand.md](docs/umsetzungsstand.md).
 
 ## Befehle
 
@@ -29,9 +31,13 @@ Tests mit Datenbank brauchen `POSTGRES_SUPERUSER_PASSWORD` (und `POSTGRES_PORT`,
 - **Jede neue Tabelle** mit Mandantendaten: `tenant_id` zuerst im Primärschlüssel, RLS `ENABLE` + `FORCE`
   (`SELECT app.secure_tenant_tables()`), Policies der Lesesicht, `GRANT` nur an `ppm_app`/`_sched`, Eintrag in
   der Testmatrix von `test/app/rls.test.ts`.
-- Migrationen nur vorwärts (`db/migrations/NNN_name.sql`); veröffentlichte nie ändern.
+- Migrationen nur vorwärts (`db/migrations/NNN_name.sql`), Nummer nur aus dem Bereich des Arbeitspakets
+  (`docs/fachmodell.md` Abschnitt 7); veröffentlichte nie ändern.
+- **Arbeitspakete:** nur die Dateien im Besitz des Pakets ändern; gemeinsame Dateien (`src/app.ts`, `src/authz/`,
+  Router, Navigation, Testmatrix) nach den Regeln in `docs/fachmodell.md` Abschnitt 7.2; eigene Zeilen in
+  `docs/umsetzungsstand.md` nachführen.
 - **Fachlich** gilt nur die Spezifikation in `docs/`: keine Regel bauen, die dort fehlt; `[OFFEN]` bleibt offen und
-  kommt in die Klärungsliste. IDs aus Funktionsbaum und Use Cases (z. B. `ZM.01.01`, `UC-004`) in Kommentaren nennen.
+  kommt in die Klärungsliste; bis zur Klärung gilt die Annahme `A-nn` aus `docs/fachmodell.md`. IDs aus Funktionsbaum und Use Cases (z. B. `ZM.01.01`, `UC-004`) in Kommentaren nennen.
 - **Oberfläche:** vor einem Feature den Kernablauf in `docs/ux/ablaeufe/` lesen (oder anlegen); Seitentyp, Zustände und
   Regeln aus `docs/ux/rahmen/interaktion.md`; jeder PR mit Oberfläche erfüllt die UX-Definition of Done
   (`docs/ux/rahmen/pruefung.md`). `docs/ux/rahmen/` ist projektneutral: nicht projektbezogen ändern.

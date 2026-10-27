@@ -2,7 +2,8 @@
  * Kompositionswurzel von PPM: Plattform und Module (Reihenfolge = Reihenfolge der Tags in der API-Doku; die
  * Oberfläche hängt das Paket zuletzt ein). Prozesse und Befehle über `src/cli.ts`, Tests und Skripte über `app`.
  *
- * Neues Modul: hier eintragen (Checkliste in docs/zielarchitektur.md).
+ * Neues Modul: hier eintragen (Checkliste in docs/zielarchitektur.md). Eine Zeile je Eintrag (Module in der Reihenfolge
+ * aus fachmodell.md 1.1, Rechte alphabetisch), damit parallele Pakete konfliktarm ergänzen (fachmodell.md 7.2).
  */
 import { join } from 'node:path';
 import { defineApp } from '@vollholz/platform';
@@ -21,8 +22,25 @@ export const MIGRATIONS_DIR = join(import.meta.dirname, '..', 'db', 'migrations'
 
 export const app = defineApp({
   platform,
-  modules: [eingangModule, stammdatenModule, handlungsfeldModule, phasenmodellModule, portfolioModule, projektModule, zielModule, sitzungModule, webhooksModule],
-  people: { permissions: ['handlungsfeld:read', 'stammdaten:read', 'projekt:read'] },
+  modules: [
+    eingangModule,
+    stammdatenModule,
+    handlungsfeldModule,
+    phasenmodellModule,
+    portfolioModule,
+    projektModule,
+    zielModule,
+    sitzungModule,
+    webhooksModule,
+  ],
+  // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4)
+  people: {
+    permissions: [
+      'handlungsfeld:read',
+      'stammdaten:read',
+      'projekt:read',
+    ],
+  },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App
   migrations: { dir: MIGRATIONS_DIR },
 });

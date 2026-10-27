@@ -20,13 +20,12 @@ export const bezugVon = (t: Pick<store.TraktandumRow, 'bezug_typ' | 'bezug_id' |
 async function intern<T>(tx: Tx, fn: () => Promise<T>): Promise<T> {
   const prev = (await tx.query<{ v: string | null }>("SELECT current_setting('app.sitzung_intern', true) AS v")).rows[0]?.v ?? '';
   await tx.query("SELECT set_config('app.sitzung_intern', 'on', true)");
-  let ok = false;
   try {
-    const r = await fn();
-    ok = true;
-    return r;
+    return await fn();
   } finally {
-    if (ok) await tx.query("SELECT set_config('app.sitzung_intern', $1, true)", [prev ?? '']);
+    // immer zurücksetzen, auch nach einem Fehler, den der Aufrufer abfängt (z. B. kein entscheidendes Gremium);
+    // ist die Transaktion nach einem SQL-Fehler abgebrochen, scheitert das Zurücksetzen und der erste Fehler gilt
+    await tx.query("SELECT set_config('app.sitzung_intern', $1, true)", [prev ?? '']).catch(() => undefined);
   }
 }
 

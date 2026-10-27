@@ -61,7 +61,6 @@ kbd{font:500 11px/1 var(--f-mono);padding:3px 5px;border:1px solid var(--line-2)
 .iconbtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid transparent;background:none;border-radius:8px;color:var(--fg-2)}
 .iconbtn:hover{background:var(--hover);color:var(--fg)}
 .avatar{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font:600 10.5px/1 var(--f-body);color:#fff;flex:none;letter-spacing:.02em}
-.menu-btn{display:none}
 
 /* Shell */
 .shell{display:grid;grid-template-columns:248px minmax(0,1fr);gap:12px;min-height:0}
@@ -214,10 +213,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 @media (max-width: 900px){
-  .shell{grid-template-columns:minmax(0,1fr)}
-  .rail{position:fixed;left:0;top:0;bottom:0;width:280px;max-width:85vw;background:var(--bg);z-index:50;padding:16px 12px calc(16px + env(safe-area-inset-bottom,0px)) max(12px, env(safe-area-inset-left,0px));box-shadow:var(--shadow);transform:translateX(-105%);transition:transform .2s}
-  .rail.open{transform:none}
-  .menu-btn{display:grid}
   .brand small{display:none}
   .omni kbd{display:none}
   .mh{padding:14px 14px 0} .toolbar{padding-left:14px;padding-right:14px}

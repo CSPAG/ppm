@@ -1,9 +1,6 @@
-/** Navigation der App für die Shell; die Einträge setzt der Router (die Shell kennt keine Features). */
+/** Registrierung der Navigation für die Shell; die Einträge setzt die App (`src/nav.ts`), die Shell kennt keine Features. */
 import { createContext, useContext } from 'react';
-import type { IconName } from '../ui/index.ts';
+import type { NavRegistrierung } from './nav.ts';
 
-export interface NavItem { to: string; label: string; icon: IconName }
-export interface ShellContext { nav: NavItem[] }
-
-export const ShellCtx = createContext<ShellContext>({ nav: [] });
+export const ShellCtx = createContext<NavRegistrierung>({ bereiche: [], aktionen: [], suchen: [] });
 export const useShell = () => useContext(ShellCtx);

@@ -72,3 +72,9 @@ export function useHandlungsfeldMutations() {
   });
   return { create, update, remove };
 }
+
+/** Suche für die Befehlspalette (I-N4): die ersten Handlungsfelder zum Suchtext, nur die sichtbaren (API). */
+export async function sucheHandlungsfelder(q: string, signal: AbortSignal): Promise<Handlungsfeld[]> {
+  const { data } = await api.GET('/v1/handlungsfelder', { params: { query: { q, limit: 5 } }, signal });
+  return data!.items;
+}

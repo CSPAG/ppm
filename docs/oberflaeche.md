@@ -30,7 +30,11 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | `src/shell/` | AppShell (Topbar, Navigation, Arbeitsfläche), `nav.ts` (Arbeitsräume, Sichtbarkeit nach Recht), Leiste links mit Bereichsleiste, Leiste unten mit «Mehr», Befehlspalette (Strg+K), Hell/Dunkel, NotFound |
 | `src/ui/` | Bausteine (siehe «Bausteine der Darstellung»), Overlay mit Fokusfalle, Toasts, Zustände leer/Fehler/laden, Icons, Texte je Sprache (`texte/de-CH.ts`) |
 | `src/dev/` | Galerie der Bausteine unter `/dev/galerie`, nur im Entwicklungsbuild (`npm --prefix web run dev`), nicht im Produktionsbuild |
+| `src/features/eingang/` | Arbeitsraum «Eingang» (`/eingang`, Startseite jeder Rolle, UI-01): Kopf mit Aufgaben und Vertretung, Kopfkarten der Module (`kopf.ts`, eine Zeile je Modul), «Zu tun» nach Frist mit Direktaktion (`?filter=frist`), Mitteilungen |
+| `src/features/konto/` | Kontomenü › Profil mit Stellvertretung (`/konto/stellvertretung`, UI-43): Liste, Erfassen in der Schublade (`?o=neu`) mit Personensuche, Beenden mit Rückfrage |
 | `src/features/handlungsfeld/` | Arbeitsraum «Ziele» › Handlungsfelder (`/ziele/handlungsfelder`): Liste mit Suche und Cursor, Schublade über `?o=<id>` (`?o=neu` zum Anlegen), Bearbeiten mit 412-Hinweis, Löschen, Verlauf |
+| `src/features/stammdaten/` | Arbeitsraum «Administration» › Organisation (`/administration/organisation`, Ansichten Einheiten und Feiertage über `?ansicht=feiertage`) und Codetabellen (`/administration/codetabellen`, Werte in der Schublade `?o=<tabelle>`), UI-44, UI-45; Bereiche sichtbar mit `stammdaten:write` |
+| `src/features/phasenmodell/` | Arbeitsraum «Administration» › Phasenmodell (`/administration/phasenmodell`, UI-46): Arbeitsfläche mit Version (`?v=`) und Abschnitt (`?e=`), automatischem Speichern, Rückgängig/Wiederholen, Prüfbericht, Entwurf anlegen, verwerfen und in Kraft setzen |
 | `src/styles/`, `src/test/`, `e2e/` | Tokens und Layout; Testhilfen; Playwright-Tests |
 
 ## Regeln

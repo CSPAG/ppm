@@ -71,6 +71,40 @@ Strategische Handlungsfelder mit Leitsatz und Stossrichtungen (BC ZM.01.01), Bei
 | `DELETE /v1/handlungsfelder/{id}` | `handlungsfeld:delete` | `If-Match` Pflicht, Verlauf bleibt |
 | `GET /v1/handlungsfelder/{id}/history` | `handlungsfeld:read` | alle Versionen, neueste zuerst |
 
+## Phasenmodell
+
+Phasen, Gates mit Leitfragen je Wertestrom, Standard-Lieferergebnisse und -Meilensteine, Pflichtangaben des Vertrags,
+Kapitelwirkung, Fristen und Toleranzen (BC AM.02.03, UC-017 Schritte 3 und 5), versioniert: höchstens ein Entwurf und
+eine Version in Kraft; eine Version in Kraft ist unveränderlich und wird durch die nächste abgelöst (gilt für laufende
+Projekte ab ihrem nächsten Gate, A-13). Jede Antwort trägt den Prüfbericht (`pruefung`) und `can: { write, activate }`.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/phasenmodelle?cursor=&limit=` | `phasenmodell:read` | Versionen, neueste zuerst; `can.create` |
+| `POST /v1/phasenmodelle` | `phasenmodell:write` | Entwurf aus der Version in Kraft (`quelle: aktuell`) oder der Vorgabe des PM-Handbuchs (`vorgabe`; ohne Version in Kraft immer); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/phasenmodelle/aktuell` | `phasenmodell:read` | Version in Kraft (404 ohne) |
+| `GET /v1/phasenmodelle/{id}` | `phasenmodell:read` | `ETag` |
+| `PATCH /v1/phasenmodelle/{id}` | `phasenmodell:write` | nur Entwurf (sonst 409), `If-Match` Pflicht; jede angegebene Liste ersetzt die bisherige |
+| `DELETE /v1/phasenmodelle/{id}` | `phasenmodell:write` | Entwurf verwerfen, `If-Match` Pflicht |
+| `POST /v1/phasenmodelle/{id}/in-kraft-setzen` | `phasenmodell:activate` | `If-Match` Pflicht; bisherige Version wird abgelöst |
+
+Andere Module lesen das Phasenmodell und rechnen Fristen nur über `src/modules/phasenmodell/index.ts`:
+`aktuellesPhasenmodell(tx)`, `phasenmodellLesen(tx, id)`, `frist(tx, schluessel)`, `fristDatum(tx, schluessel, bezug)`
+(Arbeitstage ohne Wochenende und Feiertage der Organisation über `stammdaten`, A-43).
+## Projekte
+
+Projekte mit Nummer «JJJJ-NNN» (A-47), Portfolio, Phase und Lebenszyklus, Projektorganisation mit Sponsor,
+Sponsoren-Koalition, Projektleitung, CTL und Kernteam (BC PP.04.04, UC-002 Schritt 2, UC-014 A1). Lesen nach Rolle an der
+Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektrollen, UE und Gremium (A-34). Endzustände
+(`abgebrochen`, `abgeschlossen`, `zurueckgezogen`) sind lesend (409). Fähigkeiten: `can: { write, organisation }`.
+
+| `GET /v1/projekte?rolle=&portfolio=&phase=&lebenszyklus=&nummer=&q=&cursor=&limit=` | `projekt:read` irgendwo | sortiert nach Nummer; `rolle` = eigene Funktion (`sp`, `pl`, `ctl`, `kt`, `koalition`), `portfolio` = Schlüssel |
+| `GET /v1/projekte/kopf` | `projekt:read` irgendwo | laufende Projekte mit eigener Funktion (Kopfkarte im Eingang) |
+| `POST /v1/projekte` | `projekt:create` an org oder am Portfolio | Nummer fortlaufend je Jahr der Anlage, Phase ohne Angabe P0 |
+| `GET /v1/projekte/{id}` | `projekt:read` | `ETag` |
+| `PATCH /v1/projekte/{id}` | `projekt:write` | Name, Federführung, Handlungsfeld, «vertraulich»; `If-Match` Pflicht |
+| `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
+| `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
 ## Projektdaten
 
 Register je Projekt (docs/fachmodell.md 2.6, AP-E0-6): Meilensteine, Lieferergebnisse und Kommunikationsmassnahmen
@@ -91,6 +125,17 @@ Baseline, Ist-Kosten, Abnahme durch das Gremium und «gedeckt» setzen nur obere
 | `ressourcenbedarf?phase=` | `projekt:read` | `projekt:write` | Grösse S/M/L oder FTE mit `vonMonat`–`bisMonat`; je Rolle und Phase ein Eintrag |
 | `meldungen` | `projekt:read` | `projekt:write` | nur `GET` und `POST` (nur anhängen); Stelle `dti` oder `dbi` |
 | `/v1/portfolios/{id}/risiken` | `projekt:read` (org oder Portfolio) | `projekt:write` an der Organisation | Portfoliorisiken (PC.02.01) |
+## Statusberichte
+
+Monatlicher Statusbericht je Projekt und Periode `YYYY-MM` (BC PS.01.01, UC-004, Kernablauf K1; `src/modules/statusbericht/`).
+
+| `GET /v1/projekte/{id}/berichte` | `projekt:read` am Projekt | alle Berichte, neueste Periode zuerst |
+| `GET /v1/projekte/{id}/berichte/{periode}` | `projekt:read` am Projekt | gespeichert oder Vorbelegung aus der Vorperiode (`version` 0, ohne Status und Trend); `fehlend` = Pflichtangaben für das Einreichen |
+| `PUT /v1/projekte/{id}/berichte/{periode}` | `statusbericht:write` am Projekt | Entwurf speichern, `If-Match` Pflicht (`W/"0"` legt an); 409 nach dem Einreichen, in abgeschlossener Periode, in P4, für spätere Perioden |
+| `POST /v1/projekte/{id}/berichte/{periode}/einreichen` | `statusbericht:write` am Projekt | 422 mit allen fehlenden Angaben in `errors` (Status, Trend, Beurteilung je Dimension; bei «kritisch» Begründung und Massnahme) |
+| `POST /v1/projekte/{id}/berichte/{periode}/zurueckziehen` | `statusbericht:write` am Projekt | Rückgängig innert 10 s, nur durch die einreichende Person (409 sonst) |
+
+Ereignisse: `statusbericht.created`, `statusbericht.updated`, `statusbericht.submitted`, `statusbericht.withdrawn`.
 
 ## Ressourcen
 
@@ -118,6 +163,14 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.handlungsfeld.created` | Handlungsfeld angelegt |
 | `ch.ppm.handlungsfeld.updated` | Handlungsfeld geändert |
 | `ch.ppm.handlungsfeld.deleted` | Handlungsfeld gelöscht |
+| `ch.ppm.phasenmodell.created` | Entwurf des Phasenmodells angelegt |
+| `ch.ppm.phasenmodell.updated` | Entwurf geändert |
+| `ch.ppm.phasenmodell.deleted` | Entwurf verworfen |
+| `ch.ppm.phasenmodell.activated` | Version in Kraft gesetzt (mit `abgeloest`) |
+| `ch.ppm.projekt.created`, `ch.ppm.projekt.updated` | Projekt angelegt bzw. geändert |
+| `ch.ppm.projekt.organisation_changed` | Projektorganisation festgelegt |
+| `ch.ppm.projekt.phase_changed` | Phase nachgeführt (Gate-Entscheid) |
+| `ch.ppm.projekt.suspended`, `.resumed`, `.cancelled`, `.completed`, `.withdrawn` | Lebenszyklus: sistiert, wieder aufgenommen, abgebrochen, abgeschlossen, zurückgezogen |
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |

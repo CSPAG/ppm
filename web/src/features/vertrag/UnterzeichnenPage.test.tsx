@@ -24,7 +24,7 @@ const version = { id: V, projektId: P, nummer: '0.1', anlass: 'initial', zielpha
   begruendung: '', eingereichtAt: '2026-10-20T08:00:00Z', version: 4, createdAt: '2026-10-20T08:00:00Z', updatedAt: '2026-10-20T08:00:00Z', can: { write: false, einreichen: false } };
 const unterschrift = (personId: string, o: Record<string, unknown> = {}) => ({ personId, inVertretungVon: null, ergebnis: 'unterzeichnet', begruendung: '', at: '2026-10-21T09:00:00Z', ...o });
 function pruefung(o: { anzahl?: number; offen?: unknown[]; stand?: string; version?: number; sp?: unknown; pl?: unknown; ctl?: unknown } = {}) {
-  const fs = [['sp', SP, o.sp ?? null], ['pl', PL, o.pl ?? unterschrift(PL)], ['ctl', CTL, o.ctl ?? unterschrift(CTL)]] as const;
+  const fs = [['sp', SP, o.sp ?? null], ['pl', PL, 'pl' in o ? o.pl : unterschrift(PL)], ['ctl', CTL, 'ctl' in o ? o.ctl : unterschrift(CTL)]] as const;
   return {
     versionId: V, nummer: '0.1', stand: o.stand ?? 'zur_unterzeichnung', version: o.version ?? 4,
     qualityChecks: [{ id: 'q1', ergebnis: 'bestaetigt', kommentare: [], at: '2026-10-20T10:00:00Z', personId: PL }],

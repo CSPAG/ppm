@@ -337,7 +337,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       await aufgabe.oeffnen(tx, {
         art: 'vertrag.quality_check', bezug: { typ: 'vertrag_version', id }, empfaenger: { recht: 'vertrag:review' },
         titel: `Quality-Check Projektvertrag ${p.name}`, kontext: `${p.nummer} ${p.name} · Version ${v.nummer} für ${v.zielphase}`,
-        link: `/projekte/${p.nummer}/vertrag?version=entwurf`,
+        link: `/projekte/${p.nummer}/vertrag/pruefen`,
       });
       const r = (await store.version(tx, id))!;
       const daten = { id, projektId: p.id, nummer: r.nummer, anlass: r.anlass, zielphase: r.zielphase, stand: r.stand };

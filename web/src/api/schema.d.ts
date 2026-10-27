@@ -469,13 +469,13 @@ export interface paths {
                             /** @description Alle Rechte in fester Reihenfolge */
                             permissions: {
                                 /** @enum {string} */
-                                key: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read";
+                                key: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read";
                                 label: string;
                                 /** @enum {string} */
-                                group: "tenant" | "handlungsfelder" | "ziele" | "webhooks" | "members" | "audit";
+                                group: "tenant" | "handlungsfelder" | "ziele" | "stammdaten" | "phasenmodell" | "portfolios" | "projekte" | "finanzen" | "berichte" | "vertraege" | "gremien" | "ideen" | "priorisierung" | "ressourcen" | "auswertungen" | "vorlagen" | "schnittstellen" | "webhooks" | "members" | "access" | "audit";
                                 description: string;
                                 /** @description Typen, an denen das Recht geprüft wird (immer mit org); bestimmen die Rechte von owner */
-                                resources: "org"[];
+                                resources: ("org" | "portfolio" | "projekt")[];
                                 /** @description Steht bei keiner Rolle ausser org-admin (deren Rolle vergibt nur die Plattform-Administration) */
                                 adminOnly: boolean;
                                 /** @description Nur für Personen: in keinem Scope, also nie für Maschinen-Clients und MCP (fehlt sonst) */
@@ -484,7 +484,7 @@ export interface paths {
                             /** @description Rechtegruppen in Anzeigereihenfolge */
                             groups: {
                                 /** @enum {string} */
-                                key: "tenant" | "handlungsfelder" | "ziele" | "webhooks" | "members" | "audit";
+                                key: "tenant" | "handlungsfelder" | "ziele" | "stammdaten" | "phasenmodell" | "portfolios" | "projekte" | "finanzen" | "berichte" | "vertraege" | "gremien" | "ideen" | "priorisierung" | "ressourcen" | "auswertungen" | "vorlagen" | "schnittstellen" | "webhooks" | "members" | "access" | "audit";
                                 label: string;
                                 /** @description Stichwörter der Gruppe als regulärer Ausdruck (Gross/klein egal) */
                                 match?: string;
@@ -494,7 +494,7 @@ export interface paths {
                                 label: string;
                                 /** @description Nennt alle Rechtegruppen der Rolle */
                                 description: string;
-                                permissions: ("tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read")[];
+                                permissions: ("tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read")[];
                                 /** @description Nur die Plattform-Administration vergibt diese Rolle */
                                 adminOnly: boolean;
                             }[];
@@ -502,14 +502,14 @@ export interface paths {
                             scopes: {
                                 key: string;
                                 text: string;
-                                permissions: ("tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read")[];
+                                permissions: ("tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read")[];
                             }[];
                             /** @description Orte des Modells, org zuerst */
                             types: {
                                 /** @enum {string} */
-                                key: "org";
+                                key: "org" | "portfolio" | "projekt";
                                 label: string;
-                                parent: "org" | null;
+                                parent: ("org" | "portfolio" | "projekt") | null;
                                 /** @enum {boolean} */
                                 self?: true;
                                 /** @description Rollen, die hier hängen dürfen (org: alle) */
@@ -527,9 +527,9 @@ export interface paths {
                                     relation: string;
                                 };
                                 /** @enum {string} */
-                                read?: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read";
+                                read?: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read";
                                 /** @enum {string} */
-                                write?: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read";
+                                write?: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read";
                             }[];
                             classifications: {
                                 level: 0 | 1 | 2;
@@ -540,7 +540,7 @@ export interface paths {
                                 name: string;
                                 title: string;
                                 /** @enum {string} */
-                                permission: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read";
+                                permission: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read";
                                 scope: string | null;
                                 /** @description Werkzeug liest nur (`readOnlyHint`) */
                                 readOnly: boolean;
@@ -1303,7 +1303,7 @@ export interface paths {
                                 key: string;
                                 label: string;
                                 description: string;
-                                permissions: ("tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "webhook:admin" | "members:admin" | "audit:read")[];
+                                permissions: ("tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read")[];
                                 /** @description Nur die Plattform-Administration vergibt diese Rolle */
                                 adminOnly: boolean;
                             }[];
@@ -9280,7 +9280,7 @@ export interface paths {
         put?: never;
         /**
          * Strategisches Ziel anlegen
-         * @description Unter einem Handlungsfeld; Nummer eindeutig in der Organisation (sonst 409).
+         * @description Unter einem Handlungsfeld (unbekannt: 404); Nummer eindeutig in der Organisation (sonst 409).
          */
         post: {
             parameters: {

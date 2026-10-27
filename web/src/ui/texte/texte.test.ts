@@ -3,9 +3,9 @@
  * Texten weder «Mandant» noch «Tenant» (Begriff «Organisation»), Anrede «Sie» statt «du» (UX-E7).
  */
 import { describe, expect, it } from 'vitest';
-import { T } from './texts.ts';
+import { T } from './index.ts';
 
-const sources = import.meta.glob('../**/*.{ts,tsx,css}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const sources = import.meta.glob('../../**/*.{ts,tsx,css}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const ESZETT = String.fromCharCode(223);
 
 function strings(v: unknown): string[] {

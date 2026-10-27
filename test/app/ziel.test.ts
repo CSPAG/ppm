@@ -86,12 +86,12 @@ describe('Strategische Ziele', { skip }, () => {
     assert.equal((await call('POST', '/v1/strategische-ziele', editor, { handlungsfeldId: feld1, nummer: 'A1', text: 'Format' })).statusCode, 422);
   });
 
-  test('Handlungsfeld: unbekanntes abgewiesen; Handlungsfeld mit Zielen nicht löschbar', async () => {
+  test('Handlungsfeld: unbekanntes ergibt 404; Handlungsfeld mit Zielen nicht löschbar', async () => {
     const r = await call('POST', '/v1/strategische-ziele', editor, { handlungsfeldId: randomUUID(), nummer: '9.1', text: 'Ohne Feld' });
-    assert.equal(r.statusCode, 422, r.body);
+    assert.equal(r.statusCode, 404, r.body);
     assert.match(r.headers['content-type'] as string, /application\/problem\+json/);
     const z = (await call('GET', `/v1/strategische-ziele?handlungsfeld=${feld1}`, viewer)).json().items[0];
-    assert.equal((await call('PATCH', `/v1/strategische-ziele/${z.id}`, { ...editor, 'if-match': `W/"${z.version}"` }, { handlungsfeldId: randomUUID() })).statusCode, 422);
+    assert.equal((await call('PATCH', `/v1/strategische-ziele/${z.id}`, { ...editor, 'if-match': `W/"${z.version}"` }, { handlungsfeldId: randomUUID() })).statusCode, 404);
     const hf = (await call('GET', `/v1/handlungsfelder/${feld1}`, editor)).json();
     assert.equal((await call('DELETE', `/v1/handlungsfelder/${feld1}`, { ...editor, 'if-match': `W/"${hf.version}"` })).statusCode, 409);
   });

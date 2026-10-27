@@ -6,7 +6,7 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import {
-  actorOf, decodeCursor, encodeCursor, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed,
+  actorOf, decodeCursor, encodeCursor, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, notFound, preconditionFailed,
   requireIfMatch, type Deps,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
@@ -35,12 +35,15 @@ const snapshot = (r: store.Row) => ({
   id: r.id, handlungsfeldId: r.handlungsfeld_id, nummer: r.nummer, text: r.text, horizont: r.horizont, metrik: r.metrik, zielwert: r.zielwert, version: r.version,
 });
 
-/** Unbekanntes Handlungsfeld (auch eines anderer Organisationen) als Eingabefehler statt als Konflikt. */
+/**
+ * Unbekanntes Handlungsfeld (auch eines anderer Organisationen) wie jede unbekannte ID als 404 statt als Konflikt aus dem
+ * Fremdschlüssel: fremde und nirgends vorhandene IDs ergeben dieselbe Antwort (Mandantentrennung).
+ */
 async function handlungsfeldPruefen<T>(run: () => Promise<T>): Promise<T> {
   try {
     return await run();
   } catch (e) {
-    if ((e as { code?: string }).code === '23503') throw invalid('Das Handlungsfeld gibt es nicht.', [{ path: '/handlungsfeldId', message: 'unbekanntes Handlungsfeld' }]);
+    if ((e as { code?: string }).code === '23503') throw notFound('Handlungsfeld');
     throw e;
   }
 }
@@ -80,7 +83,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   });
 
   app.post('/v1/strategische-ziele', {
-    schema: { tags: [TAG], summary: 'Strategisches Ziel anlegen', description: 'Unter einem Handlungsfeld; Nummer eindeutig in der Organisation (sonst 409).', headers: IdempotencyHeaders, body: Type.Ref('StrategischesZielCreate'), response: { 201: Type.Ref('StrategischesZiel') } },
+    schema: { tags: [TAG], summary: 'Strategisches Ziel anlegen', description: 'Unter einem Handlungsfeld (unbekannt: 404); Nummer eindeutig in der Organisation (sonst 409).', headers: IdempotencyHeaders, body: Type.Ref('StrategischesZielCreate'), response: { 201: Type.Ref('StrategischesZiel') } },
   }, async (req, reply) => {
     await req.need('ziel:write');
     const body = req.body as typeof StrategischesZielCreate.static;

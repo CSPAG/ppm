@@ -4,13 +4,13 @@
  */
 import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
-import { useCallback } from 'react';
+import { lazy, Suspense, useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { IdeenBereich, IdeeNeuPage, IdeePage, nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
+import { ideeSeiten, nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -21,6 +21,7 @@ import { type SetKontoSearch, StellvertretungPage } from './features/konto/index
 import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
+import { Loading } from './ui/index.ts';
 
 const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
 
@@ -116,6 +117,11 @@ function ZielzyklusRoute() {
   );
 }
 
+// Seiten der Ideen als eigener Chunk (Q-L6), geladen beim ersten Aufruf
+const IdeenBereich = lazy(() => ideeSeiten().then(m => ({ default: m.IdeenBereich })));
+const IdeeNeuPage = lazy(() => ideeSeiten().then(m => ({ default: m.IdeeNeuPage })));
+const IdeePage = lazy(() => ideeSeiten().then(m => ({ default: m.IdeePage })));
+
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
 const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', validateSearch: searchOf.ideen, component: IdeenRoute });
 
@@ -127,7 +133,7 @@ function IdeenRoute() {
   const setSearch = useCallback<SetIdeenSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
   }, [navigate]);
-  return <IdeenBereich search={search} setSearch={setSearch} gehe={gehe} />;
+  return <Suspense fallback={<Loading />}><IdeenBereich search={search} setSearch={setSearch} gehe={gehe} /></Suspense>;
 }
 
 const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });
@@ -136,7 +142,7 @@ function IdeeNeuRoute() {
   const search = ideeNeuRoute.useSearch();
   const navigate = useNavigate();
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <IdeeNeuPage search={search} gehe={gehe} />;
+  return <Suspense fallback={<Loading />}><IdeeNeuPage search={search} gehe={gehe} /></Suspense>;
 }
 
 const ideeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/$nummer', validateSearch: searchOf.idee, component: IdeeRoute });
@@ -149,7 +155,7 @@ function IdeeRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
+  return <Suspense fallback={<Loading />}><IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} /></Suspense>;
 }
 
 // Zielerreichung je Quartal (UI-40, BC ZM.03.01, AP-E6-3): /ziele/2026/zielerreichung?quartal=q3; ohne Jahr und Quartal

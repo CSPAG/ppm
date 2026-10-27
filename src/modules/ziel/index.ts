@@ -9,6 +9,7 @@ import { zielTools } from './mcp.ts';
 import { registerRoutes } from './routes.ts';
 import { registerZyklusRoutes } from './zyklus-routes.ts';
 import { registerErreichungRoutes } from './erreichung-routes.ts';
+import { zielerreichungTask } from './erreichung-aufgabe.ts';
 
 /** Zuordnung Projekt ↔ Ziel für obere Module (Vertrag Kap. 2 bei der Baseline, PP.02.05; AP-E6-1). */
 export { projektZuordnen, type ZielAngabe } from './zyklus-zuordnung.ts';
@@ -21,5 +22,6 @@ export const zielModule = defineModule({
     registerZyklusRoutes(app, deps); // Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung der Projekte (AP-E6-1)
     registerErreichungRoutes(app, deps); // Zielerreichung je Quartal (AP-E6-3)
   },
+  tasks: [zielerreichungTask], // Aufgabe «Zielerreichung erfassen» nach Quartalsende (AP-E6-3)
   mcpTools: { ...zielTools },
 });

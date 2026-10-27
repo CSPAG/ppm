@@ -1,5 +1,5 @@
 /** Seite «Handlungsfelder» gegen die nachgebildete API: Liste, Schublade, Bearbeiten mit 412, Rechte aus `can`. */
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
 import type { AuthzCatalog } from '@vollholz/iam-web';
@@ -107,5 +107,22 @@ describe('Handlungsfelder', () => {
     const post = api.calls.find(c => c.method === 'POST')!;
     expect(post.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
     expect(await post.json()).toEqual({ label: 'Medizin der Zukunft', leitsatz: '', stossrichtungen: ['Forschung', 'Digitalisierung'], position: 0 });
+  });
+
+  it('löscht nach Rückfrage, meldet es und schliesst die Schublade', async () => {
+    let gone = false;
+    const api = stub({
+      // Nach dem Löschen antwortet die Liste langsam (wie im Netz): Die Schublade lädt inzwischen neu
+      'GET /v1/handlungsfelder': async () => { if (gone) await new Promise(r => setTimeout(r, 300)); return json({ items: gone ? [] : [item()], nextCursor: null }); },
+      [`GET ${URL_ONE}`]: () => (gone ? json({ title: 'Nicht gefunden', status: 404 }, 404) : json(item(), 200, { ETag: 'W/"3"' })),
+      [`GET ${URL_ONE}/history`]: () => json({ items: [] }),
+      [`DELETE ${URL_ONE}`]: () => { gone = true; return new Response(null, { status: 204 }); },
+    });
+    renderWithIam(<Page initial={{ o: ID }} />);
+    await userEvent.click(await screen.findByRole('button', { name: T.common.delete }));
+    await userEvent.click(within(await screen.findByRole('dialog', { name: T.common.delete })).getByRole('button', { name: T.common.delete }));
+    expect(await screen.findByText(T.handlungsfeld.deleted)).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(api.calls.find(c => c.method === 'DELETE')!.headers.get('If-Match')).toBe('W/"3"');
   });
 });

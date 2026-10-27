@@ -83,10 +83,12 @@ function ViewDrawer({ loaded: { item, etag }, onClose, onEdit }: { loaded: Loade
       {confirm ? (
         <Confirm title={T.common.delete} text={T.handlungsfeld.confirmDelete(item.label)} confirm={T.common.delete} busy={remove.isPending}
           onClose={() => setConfirm(false)}
-          onConfirm={() => remove.mutate({ id: item.id, etag }, {
-            onSuccess: () => { toast.show(T.handlungsfeld.deleted); onClose(); },
-            onError: e => { setConfirm(false); toast.error(e, isConflict(e) ? T.handlungsfeld.conflict : undefined); },
-          })} />
+          // mutateAsync statt mutate mit Rückrufen: Nach dem Löschen entfernt der Hook die Abfrage, die Schublade lädt neu
+          // und diese Ansicht verschwindet; Rückrufe von mutate() kämen dann nicht mehr an (keine Meldung, Schublade offen)
+          onConfirm={() => void remove.mutateAsync({ id: item.id, etag }).then(
+            () => { toast.show(T.handlungsfeld.deleted); onClose(); },
+            (e: unknown) => { setConfirm(false); toast.error(e, isConflict(e) ? T.handlungsfeld.conflict : undefined); },
+          )} />
       ) : null}
     </Drawer>
   );

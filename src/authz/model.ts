@@ -195,10 +195,6 @@ export const model = defineModel({
     projekt: { label: 'Projekt', parent: 'portfolio', roles: ['pl', 'ctl', 'sp', 'kt'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
   },
   mcpTools: {
-    // stammdaten
-    list_org_einheiten: { title: 'Organisationseinheiten auflisten', permission: 'stammdaten:read', readOnly: true },
-    // eingang
-    list_aufgaben: { title: 'Aufgaben auflisten', permission: 'tenant:read', readOnly: true },
     // eingang
     list_aufgaben: { title: 'Aufgaben auflisten', permission: 'tenant:read', readOnly: true },
     // stammdaten
@@ -206,31 +202,22 @@ export const model = defineModel({
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
-    // portfolio
-    list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
-    // ziel
-    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     // phasenmodell
     get_phasenmodell: { title: 'Phasenmodell lesen', permission: 'phasenmodell:read', readOnly: true },
+    // portfolio
+    list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
     // projekt
     list_projekte: { title: 'Projekte auflisten', permission: 'projekt:read', readOnly: true },
     get_projekt: { title: 'Projekt lesen', permission: 'projekt:read', readOnly: true },
+    // ziel
+    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     // sitzung
     list_sitzungen: { title: 'Sitzungen eines Gremiums auflisten', permission: 'sitzung:read', readOnly: true },
     get_sitzung: { title: 'Sitzung mit Traktandenliste lesen', permission: 'sitzung:read', readOnly: true },
-    // projekt
-    list_projekte: { title: 'Projekte auflisten', permission: 'projekt:read', readOnly: true },
-    get_projekt: { title: 'Projekt lesen', permission: 'projekt:read', readOnly: true },
-    // ziel
-    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)
     projekt: { write: 'projekt:write', organisation: 'projekt:organisation' },
-    // phasenmodell
-    get_phasenmodell: { title: 'Phasenmodell lesen', permission: 'phasenmodell:read', readOnly: true },
-    // ziel
-    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },
   features: { audit: true },
 });

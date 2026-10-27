@@ -5,7 +5,7 @@
  */
 import { conflict, invalid, notFound, type Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
-import { arbeitstageBis, fristDatum } from '../phasenmodell/index.ts';
+import { fristDatum } from '../phasenmodell/index.ts';
 import { entscheidendesGremium, gremienwegFuerGate, type GateCode } from '../portfolio/index.ts';
 import { artDauer, artLabel, festeArten, traktandenart, unterlagenVon, type Art, type Bezug, type Unterlage, type UnterlagenStand } from './arten.ts';
 import { heute, kurzDatum, plusMinuten } from './format.ts';
@@ -213,10 +213,10 @@ export interface Versandfrist {
 /** Versandfrist aus dem Phasenmodell (`versand`, A-27); ohne Phasenmodell in Kraft keine Frist. */
 export async function versandfrist(tx: Tx, s: store.SitzungRow, jetzt = heute()): Promise<Versandfrist> {
   const f = await fristDatum(tx, 'versand', s.datum);
-  const vorlauf = s.versand_vorlauf ?? (jetzt < s.datum ? await arbeitstageBis(tx, jetzt, s.datum) : 0);
+  const vorlauf = s.versand_vorlauf ?? (jetzt < s.datum ? await store.arbeitstageBis(tx, jetzt, s.datum) : 0);
   if (!f) return { bis: null, arbeitstage: null, restArbeitstage: null, vorlauf, eingehalten: true };
-  const rest = jetzt <= f.datum ? await arbeitstageBis(tx, jetzt, f.datum) : -(await arbeitstageBis(tx, f.datum, jetzt));
-  const soll = f.frist.einheit === 'arbeitstage' ? f.frist.wert : await arbeitstageBis(tx, f.datum, s.datum);
+  const rest = await store.arbeitstageBis(tx, jetzt, f.datum);
+  const soll = f.frist.einheit === 'arbeitstage' ? f.frist.wert : await store.arbeitstageBis(tx, f.datum, s.datum);
   return { bis: f.datum, arbeitstage: soll, restArbeitstage: rest, vorlauf, eingehalten: vorlauf >= soll };
 }
 

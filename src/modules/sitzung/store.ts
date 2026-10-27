@@ -59,6 +59,18 @@ export async function projektleitung(tx: Tx, projektId: string): Promise<{ perso
       ORDER BY array_position(ARRAY['pl', 'ctl', 'sp'], funktion)`, [projektId])).rows;
 }
 
+/**
+ * Arbeitstage von `von` (ausschliesslich) bis `bis` (einschliesslich), negativ wenn `bis` davor liegt: Montag bis
+ * Freitag ohne die Feiertage der Organisation (A-43). Das Phasenmodell exportiert nur das Datum einer Frist
+ * (`fristDatum`); die Zahl der Arbeitstage («Versand in 4 Arbeitstagen», Vorlauf K3-1) rechnet die Datenbank hier.
+ */
+export async function arbeitstageBis(tx: Tx, von: string, bis: string): Promise<number> {
+  const [a, b, vz] = von <= bis ? [von, bis, 1] : [bis, von, -1];
+  return vz * (await tx.query<{ n: number }>(
+    `SELECT count(*)::int AS n FROM generate_series($1::date + 1, $2::date, interval '1 day') AS d(t)
+      WHERE extract(isodow FROM d.t) < 6 AND NOT EXISTS (SELECT 1 FROM ${SCHEMA}.feiertag f WHERE f.datum = d.t::date)`, [a, b])).rows[0]!.n;
+}
+
 /** Person der Organisation (nicht entfernt)? */
 export async function personBekannt(tx: Tx, id: string): Promise<boolean> {
   return (await tx.query(`SELECT 1 FROM ${SCHEMA}.principal WHERE id = $1 AND kind = 'user' AND removed_at IS NULL`, [id])).rowCount === 1;

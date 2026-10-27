@@ -19,7 +19,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | in Arbeit (PR 1: 050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»; PR 2: Oberfläche UI-47) | – | A-02, A-07, A-08, A-23, A-45 |
 | AP-E0-6 | Register Projektdaten | 060–069 | offen | – | – |
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | in Arbeit (PR 1 Backend) | – | A-31, A-44 |
-| AP-E0-9 | Strategische Ziele | 080–089 | PR 1 umgesetzt (080, Modul `ziel`, `list_ziele`); PR 2 Oberfläche in Arbeit | #13 | A-15 |
+| AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | offen | – | – |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |

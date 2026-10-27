@@ -177,6 +177,26 @@ Versand nur ihr Traktandum. Bearbeiten mit `sitzung:write` bis zum Versand. Fäh
 
 Andere Module registrieren ihre Traktandenart und schlagen Geschäfte vor, nur über `src/modules/sitzung/index.ts`
 (`registriereTraktandenart`, `traktandum.vorschlagen`); siehe [README des Moduls](../src/modules/sitzung/README.md).
+## Projektvertrag
+
+Versionen des Projektvertrags mit den Kapiteln 1–13 der Vorlage (Q7) als Daten (docs/fachmodell.md 2.10, AP-E3-1;
+DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5, A-29), genau eine Baseline. Lesen mit
+`projekt:read`, bearbeiten und einreichen mit `vertrag:write` am Projekt; Kapitel 9 (Kosten) nur mit `finanzen:read`
+(ohne: Beträge `null`, Speichern 403; A-33). Endzustände des Projekts sind lesend (409).
+
+| `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
+| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `gate`, `aenderung` folgen mit AP-E3-3, AP-E3-4 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
+| `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
+| `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |
+| `GET /v1/vertragsversionen/{id}/pflichtangaben` | `projekt:read` | Angaben des Gates in die Zielphase und der Zielphase (Phasenmodell, K13, A-12) mit `erfuellt`, `grund` und Sprungziel `kapitel`/`feld` (K2-4) |
+| `POST /v1/vertragsversionen/{id}/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung», `If-Match` Pflicht; fehlen Pflichtangaben: 422 mit `/kapitel/<nr>/<feld>` je Angabe; Aufgabe `vertrag.quality_check` an `vertrag:review` |
+
+Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategisches_ziel_id`), die Kapitel camelCase
+(`strategischesZielId`). Ab dem Gate P1–P2 verlangen `personal` FTE mit Monaten (nicht Grösse S/M/L) und `kosten` einen
+Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
+`baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
+über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
 
 ## Webhooks und Ereignisse
 
@@ -203,6 +223,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
+| `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
+| `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.vertrag.drafted`, `.chapter_updated`, `.submitted`, `.baselined` | Projektvertrag: Entwurf angelegt, Kapitel gespeichert, zur Prüfung eingereicht, Version Baseline |
 | `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
 | `ch.ppm.sitzung.created`, `ch.ppm.sitzung.updated` | Sitzung angelegt bzw. Beginn, Dauer, Ort geändert |
 | `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |

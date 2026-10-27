@@ -18,6 +18,7 @@ import { ressourceModule } from './modules/ressource/index.ts';
 import { sitzungModule } from './modules/sitzung/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { statusberichtModule } from './modules/statusbericht/index.ts';
+import { vertragModule } from './modules/vertrag/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
@@ -37,6 +38,7 @@ export const app = defineApp({
     zielModule,
     sitzungModule,
     statusberichtModule,
+    vertragModule,
     ideeModule,
     ressourceModule,
     webhooksModule,

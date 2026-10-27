@@ -10,6 +10,7 @@ import { defineApp } from '@vollholz/platform';
 import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
+import { projektModule } from './modules/projekt/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
@@ -24,13 +25,16 @@ export const app = defineApp({
     stammdatenModule,
     handlungsfeldModule,
     phasenmodellModule,
+    projektModule,
     zielModule,
     webhooksModule,
   ],
-  // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4)
+  // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4);
+  // mit `projekt:read` auch für Clients mit Lese-Scope (Namen der Projektorganisation, PP.04.04)
   people: {
     permissions: [
       'handlungsfeld:read',
+      'projekt:read',
       'stammdaten:read',
     ],
   },

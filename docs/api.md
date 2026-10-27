@@ -91,6 +91,20 @@ Projekte ab ihrem nächsten Gate, A-13). Jede Antwort trägt den Prüfbericht (`
 Andere Module lesen das Phasenmodell und rechnen Fristen nur über `src/modules/phasenmodell/index.ts`:
 `aktuellesPhasenmodell(tx)`, `phasenmodellLesen(tx, id)`, `frist(tx, schluessel)`, `fristDatum(tx, schluessel, bezug)`
 (Arbeitstage ohne Wochenende und Feiertage der Organisation über `stammdaten`, A-43).
+## Projekte
+
+Projekte mit Nummer «JJJJ-NNN» (A-47), Portfolio, Phase und Lebenszyklus, Projektorganisation mit Sponsor,
+Sponsoren-Koalition, Projektleitung, CTL und Kernteam (BC PP.04.04, UC-002 Schritt 2, UC-014 A1). Lesen nach Rolle an der
+Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektrollen, UE und Gremium (A-34). Endzustände
+(`abgebrochen`, `abgeschlossen`, `zurueckgezogen`) sind lesend (409). Fähigkeiten: `can: { write, organisation }`.
+
+| `GET /v1/projekte?rolle=&portfolio=&phase=&lebenszyklus=&nummer=&q=&cursor=&limit=` | `projekt:read` irgendwo | sortiert nach Nummer; `rolle` = eigene Funktion (`sp`, `pl`, `ctl`, `kt`, `koalition`), `portfolio` = Schlüssel |
+| `GET /v1/projekte/kopf` | `projekt:read` irgendwo | laufende Projekte mit eigener Funktion (Kopfkarte im Eingang) |
+| `POST /v1/projekte` | `projekt:create` an org oder am Portfolio | Nummer fortlaufend je Jahr der Anlage, Phase ohne Angabe P0 |
+| `GET /v1/projekte/{id}` | `projekt:read` | `ETag` |
+| `PATCH /v1/projekte/{id}` | `projekt:write` | Name, Federführung, Handlungsfeld, «vertraulich»; `If-Match` Pflicht |
+| `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
+| `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
 
 ## Webhooks und Ereignisse
 
@@ -110,6 +124,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.phasenmodell.updated` | Entwurf geändert |
 | `ch.ppm.phasenmodell.deleted` | Entwurf verworfen |
 | `ch.ppm.phasenmodell.activated` | Version in Kraft gesetzt (mit `abgeloest`) |
+| `ch.ppm.projekt.created`, `ch.ppm.projekt.updated` | Projekt angelegt bzw. geändert |
+| `ch.ppm.projekt.organisation_changed` | Projektorganisation festgelegt |
+| `ch.ppm.projekt.phase_changed` | Phase nachgeführt (Gate-Entscheid) |
+| `ch.ppm.projekt.suspended`, `.resumed`, `.cancelled`, `.completed`, `.withdrawn` | Lebenszyklus: sistiert, wieder aufgenommen, abgebrochen, abgeschlossen, zurückgezogen |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

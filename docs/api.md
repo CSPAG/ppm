@@ -105,6 +105,7 @@ Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektroll
 | `PATCH /v1/projekte/{id}` | `projekt:write` | Name, Federführung, Handlungsfeld, «vertraulich»; `If-Match` Pflicht |
 | `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
 | `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
+| `POST /v1/projekte/uebernahme` | `projekt:create`, `projekt:write`, `projekt:organisation`, `statusbericht:write` an der Organisation | einmalige Übernahme aus dem Excel-Dashboard (K16, A-14): Prüflauf (`speichern: false`) mit Fehlern je Zeile, Speichern nur fehlerfrei; Spalten in `scripts/uebernahme/README.md` |
 ## Projektdaten
 
 Register je Projekt (docs/fachmodell.md 2.6, AP-E0-6): Meilensteine, Lieferergebnisse und Kommunikationsmassnahmen
@@ -159,6 +160,14 @@ Ereignisse: `statusbericht.reviewed`, `statusbericht.review_withdrawn`, `statusb
 `periode.closed`. Aufgaben im Eingang: `statusbericht.pruefen` (Sammelaufgabe ab dem ersten Einreichen), `periode.abschliessen`
 (Job `statusbericht.periode_faellig` am Stichtag), `statusbericht.rueckfrage`, `statusbericht.erstellen` (eingefordert).
 
+## Dashboard
+
+Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/modules/auswertung/`, AP-E1-3). Nur lesend.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
+
 ## Ressourcen
 
 Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =
@@ -170,6 +179,24 @@ elf folgenden, höchstens 60 Monate.
 | `GET /v1/kapazitaet?von=&bis=` | `ressource:read` | Angebot je Rolle und Monat mit `version` je Zelle, `can.write` |
 | `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
 | `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
+
+Bedarfsliste, Zuteilung und Konflikte (AP-E7-2; RK.02.02, RK.02.03; UC-009 Schritte 3–4, A1, A2). Zugeteilt wird je
+Bedarf, Person und Monat ein Anteil in FTE (höchstens eine Stelle je Person, Beschäftigungsgrad aus dem HR-System offen);
+nur Bedarf in FTE × Monate (A-20). Zuteilungen einzelner Personen sehen RM, UE, die Person selbst und die Projektleitung
+des Projekts (darstellung.md), auch in der Lesesicht. Jede Änderung führt «gedeckt» im Register nach, informiert Person
+und Projektleitung (Mitteilung) und führt die Sammelaufgaben `bedarf.decken` und `konflikt.aufloesen` nach (zusätzlich
+stündlich). Priorität kommt aus der Priorisierung (`prioritaetQuelleSetzen`), sonst `null`.
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/bedarfe?stand=&rolle=&projekt=&von=&bis=` | `ressource:read` | mit Deckung (`benoetigt`, `zugeteilt` in FTE-Monaten), `stand` (`offen`, `teilweise`, `gedeckt`, `ungedeckt`), Lücke, Priorität; `anzahl` je Stand; nach Priorität und Beginn |
+| `GET /v1/bedarfe/{id}` | `ressource:read` | Deckung je Monat und Zuteilungen |
+| `GET /v1/bedarfe/{id}/personen?q=` | `ressource:write` | Personen mit Zuteilung und freier Kapazität je Monat des Bedarfs |
+| `POST /v1/bedarfe/{id}/zuteilungen` | `ressource:write` | Person mit Anteil für den ganzen Bedarf oder `vonMonat`–`bisMonat` (ausserhalb 422, doppelt 409); Antwort mit berührten Überbuchungen (Warnung) |
+| `PATCH`, `DELETE /v1/zuteilungen/{id}` | `ressource:write` | Anteil ändern bzw. entfernen, `If-Match` Pflicht |
+| `PUT`, `DELETE /v1/bedarfe/{id}/luecke` | `ressource:write` | Lücke melden (Stand `ungedeckt`) bzw. zurücknehmen; bei gedecktem Bedarf 409 |
+| `GET /v1/zuteilungen/konflikte?von=&bis=` | `ressource:read` | Personen über einer Stelle, Rollen über dem erfassten Angebot; Beteiligte nach Priorität |
+| `GET /v1/zuteilungen?person=ich\|{id}&projekt=&von=&bis=` | eigene: jede Person; Projekt: `projekt:read` (Zeilen nur für Projektleitung, RM, UE); Person: `ressource:read` | Zuteilungen lesen |
 
 ## Sitzungen
 
@@ -208,6 +235,7 @@ DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5,
 
 | `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
 | `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `gate`, `aenderung` folgen mit AP-E3-3, AP-E3-4 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/projekte/{id}/vertrag/ziele` | `projekt:write` | Ziele zur Wahl in Kap. 2: strategische Ziele mit Handlungsfeld, Jahresziele ab dem laufenden Jahr (in voller Sicht gelesen, auch ohne `ziel:read` an der Organisation) |
 | `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
 | `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
 | `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |
@@ -219,6 +247,21 @@ Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategis
 Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
 `baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
 über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
+
+## Priorisierung
+
+Bewertungsmodell mit Kriterien und Budgetrahmen, Bewertung der Projekte (docs/fachmodell.md 2.12, AP-E5-1; PP.01.02,
+PP.01.03, PP.02.01; UC-008 Schritte 1–2, A1). Bewertung je Kriterium hoch/mittel/tief ohne Score (A-01); Budgetrahmen je
+Portfolio optional (A-18).
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/bewertungsmodelle`, `GET /v1/bewertungsmodelle/{id}`, `GET /v1/bewertungsmodelle/aktuell` | `priorisierung:read` | Versionen, neueste zuerst; `aktuell` = zuletzt in Kraft gesetzt (404 ohne); mit Kriterien, Budgetrahmen, Prüfbericht |
+| `POST /v1/bewertungsmodelle` | `priorisierung:write` | Entwurf als Kopie des Modells in Kraft, beim ersten Mal mit den Kriterien aus UC-008 Schritt 2; höchstens ein Entwurf (409) |
+| `PATCH /v1/bewertungsmodelle/{id}`, `DELETE …` | `priorisierung:write` | nur Entwurf (409), `If-Match`; Kriterien und Budgetrahmen als ganze Listen |
+| `POST /v1/bewertungsmodelle/{id}/in-kraft-setzen` | `priorisierung:write` | mit Entscheid des Gremiums (`beschluss`), `If-Match`; Sperren des Prüfberichts → 422; danach unveränderlich |
+| `GET /v1/portfolios/{id}/bewertungen?modell=` | `priorisierung:read` (Organisation oder Portfolio) | Raster aktive Projekte × Kriterien, Fortschritt; frühere Modellversion mit `modell` (G11) |
+| `PUT /v1/portfolios/{id}/bewertungen` | `priorisierung:write` | mehrere Zellen, alles oder nichts, nach dem Modell in Kraft (409 ohne); bewertete Zelle nur mit `version` (412); `einschaetzung: null` entfernt |
 
 ## Webhooks und Ereignisse
 
@@ -245,6 +288,8 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.zuteilung.created`, `.updated`, `.deleted` | Zuteilung einer Person zum Ressourcenbedarf (je Monat) |
+| `ch.ppm.ressourcenbedarf.gap_reported`, `.gap_withdrawn` | Lücke gemeldet bzw. zurückgenommen (UC-009 A2) |
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
@@ -254,6 +299,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |
 | `ch.ppm.sitzung.reordered` | Traktanden geordnet |
 | `ch.ppm.sitzung.dispatched` | Unterlagen versendet (mit Vorlauf in Arbeitstagen und Frist eingehalten) |
+| `ch.ppm.sitzung.started`, `ch.ppm.sitzung.closed` | Sitzung gestartet (Sitzungsmodus) bzw. geschlossen (mit Zahl der Folgevorschläge und Auflagen) |
+| `ch.ppm.entscheid.recorded`, `.corrected`, `.sns_recorded` | Entscheid erfasst, bis zum Schliessen korrigiert, Entscheid des SNS-VR nachgetragen |
+| `ch.ppm.auflage.fulfilled` | Auflage erledigt gemeldet |
+| `ch.ppm.protokoll.updated`, `ch.ppm.protokoll.dispatched` | Protokoll bereinigt bzw. versendet (mit Arbeitstagen nach der Sitzung und Frist eingehalten) |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

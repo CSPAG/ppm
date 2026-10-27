@@ -50,6 +50,7 @@ export const StrategischesZielList = Type.Object({ items: Type.Array(Type.Ref('S
 export const ListQuery = Type.Object({
   handlungsfeld: Type.Optional(Type.String({ format: 'uuid', description: 'Nur Ziele dieses Handlungsfelds.' })),
   q: Type.Optional(Type.String({ maxLength: 200, description: 'Suche in Nummer und Text (Teilstring).' })),
+  nummer: Type.Optional(Type.String({ pattern: '^[0-9]{1,3}(\\.[0-9]{1,3}){0,3}$', description: 'Genau diese Nummer (Schlüssel in der Oberfläche, I-N5).' })),
   cursor: Type.Optional(Cursor),
   limit: Type.Optional(Limit),
 }, { additionalProperties: false });

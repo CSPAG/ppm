@@ -9192,7 +9192,7 @@ export interface paths {
         };
         /**
          * Strategische Ziele auflisten
-         * @description Sortiert nach Nummer (2.9 vor 2.10), Cursor-Paginierung, Filter nach Handlungsfeld, Suche in Nummer und Text.
+         * @description Sortiert nach Nummer (2.9 vor 2.10), Cursor-Paginierung, Filter nach Handlungsfeld und Nummer, Suche in Nummer und Text.
          */
         get: {
             parameters: {
@@ -9201,6 +9201,8 @@ export interface paths {
                     handlungsfeld?: string;
                     /** @description Suche in Nummer und Text (Teilstring). */
                     q?: string;
+                    /** @description Genau diese Nummer (Schlüssel in der Oberfläche, I-N5). */
+                    nummer?: string;
                     /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
                     cursor?: string;
                     /** @description Seitengrösse (höchstens 200). */

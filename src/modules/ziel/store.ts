@@ -18,10 +18,11 @@ const COLS = 'id, handlungsfeld_id, nummer, nummer_sort, text, horizont, metrik,
 /** Sortierung nach den Zahlen der Nummer («2.10» nach «2.9»), dann ID. */
 export interface After { sort: number[]; id: string }
 
-export async function list(tx: Tx, o: { handlungsfeld?: string; q?: string; after?: After | null; limit: number }): Promise<Row[]> {
+export async function list(tx: Tx, o: { handlungsfeld?: string; nummer?: string; q?: string; after?: After | null; limit: number }): Promise<Row[]> {
   const where: string[] = [];
   const args: unknown[] = [];
   if (o.handlungsfeld) { args.push(o.handlungsfeld); where.push(`handlungsfeld_id = $${args.length}::uuid`); }
+  if (o.nummer) { args.push(o.nummer); where.push(`nummer = $${args.length}`); }
   if (o.q) { args.push(`%${o.q.replace(/[\\%_]/g, m => `\\${m}`)}%`); where.push(`(nummer ILIKE $${args.length} OR text ILIKE $${args.length})`); }
   if (o.after) { args.push(o.after.sort, o.after.id); where.push(`(nummer_sort, id) > ($${args.length - 1}::int[], $${args.length}::uuid)`); }
   args.push(o.limit + 1);

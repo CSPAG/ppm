@@ -14414,7 +14414,7 @@
         "tags": [
           "Ziele"
         ],
-        "description": "Sortiert nach Nummer (2.9 vor 2.10), Cursor-Paginierung, Filter nach Handlungsfeld, Suche in Nummer und Text.",
+        "description": "Sortiert nach Nummer (2.9 vor 2.10), Cursor-Paginierung, Filter nach Handlungsfeld und Nummer, Suche in Nummer und Text.",
         "parameters": [
           {
             "schema": {
@@ -14435,6 +14435,16 @@
             "name": "q",
             "required": false,
             "description": "Suche in Nummer und Text (Teilstring)."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{1,3}(\\.[0-9]{1,3}){0,3}$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "nummer",
+            "required": false,
+            "description": "Genau diese Nummer (Schlüssel in der Oberfläche, I-N5)."
           },
           {
             "schema": {

@@ -81,6 +81,7 @@ describe('Strategische Ziele', { skip }, () => {
     assert.equal(second.nextCursor, null);
     assert.equal((await call('GET', `/v1/strategische-ziele?cursor=${first.nextCursor}`, viewer)).statusCode, 422, 'Cursor eines anderen Filters');
     assert.deepEqual((await call('GET', '/v1/strategische-ziele?q=ziel%201', viewer)).json().items.map((x: { nummer: string }) => x.nummer), ['1.2']);
+    assert.deepEqual((await call('GET', '/v1/strategische-ziele?nummer=2.1', viewer)).json().items.map((x: { nummer: string }) => x.nummer), ['2.1'], 'genau diese Nummer');
     // Nummer eindeutig, Format geprüft
     assert.equal((await call('POST', '/v1/strategische-ziele', editor, { handlungsfeldId: feld1, nummer: '2.9', text: 'Doppelt' })).statusCode, 409);
     assert.equal((await call('POST', '/v1/strategische-ziele', editor, { handlungsfeldId: feld1, nummer: 'A1', text: 'Format' })).statusCode, 422);

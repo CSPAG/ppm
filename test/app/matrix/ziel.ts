@@ -21,9 +21,10 @@ export const matrix: Matrix = {
   ],
   tags: ['Ziele'],
   seed: async (api, a, mark) => {
-    const f = await api.app.inject({ method: 'POST', url: '/v1/handlungsfelder', headers: a, payload: { label: `${mark} Ziele` } });
-    assert.equal(f.statusCode, 201, f.body);
-    const z = await api.app.inject({ method: 'POST', url: '/v1/strategische-ziele', headers: a, payload: { handlungsfeldId: f.json().id, nummer: '1.1', text: mark } });
+    // Handlungsfeld von A aus matrix/handlungsfeld.ts (läuft vorher), damit dessen Prüfung «unverändert» stimmt
+    const felder = (await api.app.inject({ method: 'GET', url: `/v1/handlungsfelder?q=${encodeURIComponent(mark)}`, headers: a })).json().items as { id: string }[];
+    assert.equal(felder.length, 1);
+    const z = await api.app.inject({ method: 'POST', url: '/v1/strategische-ziele', headers: a, payload: { handlungsfeldId: felder[0]!.id, nummer: '1.1', text: mark } });
     assert.equal(z.statusCode, 201, z.body);
     return { strategischesZiel: z.json().id };
   },

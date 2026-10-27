@@ -52,15 +52,15 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   for (const s of [StrategischesZiel, StrategischesZielList, StrategischesZielVersion, StrategischesZielHistory, StrategischesZielCreate, StrategischesZielPatch]) app.addSchema(s);
 
   app.get('/v1/strategische-ziele', {
-    schema: { tags: [TAG], summary: 'Strategische Ziele auflisten', description: 'Sortiert nach Nummer (2.9 vor 2.10), Cursor-Paginierung, Filter nach Handlungsfeld, Suche in Nummer und Text.', querystring: ListQuery, response: { 200: Type.Ref('StrategischesZielList') } },
+    schema: { tags: [TAG], summary: 'Strategische Ziele auflisten', description: 'Sortiert nach Nummer (2.9 vor 2.10), Cursor-Paginierung, Filter nach Handlungsfeld und Nummer, Suche in Nummer und Text.', querystring: ListQuery, response: { 200: Type.Ref('StrategischesZielList') } },
   }, async req => {
     await req.need('ziel:read');
-    const q = req.query as { handlungsfeld?: string; q?: string; cursor?: string; limit?: number };
+    const q = req.query as { handlungsfeld?: string; nummer?: string; q?: string; cursor?: string; limit?: number };
     const limit = q.limit ?? 50;
-    const filter = `${q.handlungsfeld ?? ''}|${q.q ?? ''}`;
+    const filter = `${q.handlungsfeld ?? ''}|${q.nummer ?? ''}|${q.q ?? ''}`;
     const after = decodeCursor<{ s: number[]; i: string; f: string }>(q.cursor,
       v => Array.isArray(v.s) && v.s.every(n => Number.isInteger(n)) && typeof v.i === 'string' && v.f === filter);
-    const rows = await req.tx(tx => store.list(tx, { handlungsfeld: q.handlungsfeld, q: q.q, after: after && { sort: after.s, id: after.i }, limit }));
+    const rows = await req.tx(tx => store.list(tx, { handlungsfeld: q.handlungsfeld, nummer: q.nummer, q: q.q, after: after && { sort: after.s, id: after.i }, limit }));
     const page = rows.slice(0, limit);
     const can = await capabilities(req);
     const last = page[page.length - 1];

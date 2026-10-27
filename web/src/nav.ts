@@ -38,8 +38,9 @@ export const navigation: NavRegistrierung = {
     // Arbeitsraum «Portfolio»: Ressourcen mit Auslastung und Kapazität (BC RK.01.01, RK.02.04, AP-E5-4)
     { raum: 'portfolio', pfad: '/portfolio/ressourcen', label: ressourcenTexte.bereich, recht: 'ressource:read' },
     // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
-    // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): publizierte Roadmap lesen alle angemeldeten Personen (A-35)
-    { raum: 'portfolio', pfad: '/portfolio/roadmap', label: roadmapTexte.bereich, recht: 'tenant:read' },
+    // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): in der Navigation mit ziel:read (alle Rollen ausser Antragstellenden,
+    // IA «Sichtbarkeit je Rolle», fachmodell.md 3.3); die API liest mit tenant:read (A-35)
+    { raum: 'portfolio', pfad: '/portfolio/roadmap', label: roadmapTexte.bereich, recht: 'ziel:read' },
     { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussTexte.bereich, recht: 'statusbericht:review' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
     // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach

@@ -10,11 +10,14 @@ import { ANNA, expectAccessible, expectNoOverflow, login } from './support.ts';
 /** Schreibende Aufrufe der API mit CSRF-Token und Organisation der Sitzung (wie die Oberfläche). */
 async function apiAls(page: Page) {
   const me = await (await page.request.get('/auth/me')).json() as { csrfToken: string; tenant: { alias: string }; person: { email: string | null } };
-  const headers = { 'x-csrf-token': me.csrfToken, 'x-tenant': me.tenant.alias, 'content-type': 'application/json' };
+  const headers = { 'x-csrf-token': me.csrfToken, 'x-tenant': me.tenant.alias };
   return {
     me,
     async send<T>(method: 'POST' | 'PUT', url: string, data: unknown, extra: Record<string, string> = {}): Promise<{ body: T; etag: string }> {
-      const r = await page.request.fetch(url, { method, headers: { ...headers, ...extra }, ...(data === undefined ? {} : { data: JSON.stringify(data) }) });
+      // ohne Body auch kein Content-Type (sonst 400 «Body cannot be empty»), z. B. beim Einreichen
+      const r = await page.request.fetch(url, data === undefined
+        ? { method, headers: { ...headers, ...extra } }
+        : { method, headers: { ...headers, 'content-type': 'application/json', ...extra }, data: JSON.stringify(data) });
       expect(r.status(), `${method} ${url}: ${await r.text()}`).toBeLessThan(300);
       return { body: await r.json() as T, etag: r.headers()['etag'] ?? '' };
     },

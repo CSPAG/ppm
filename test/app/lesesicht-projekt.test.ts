@@ -115,6 +115,19 @@ describe('Lesesicht = can: Projekte', { skip }, () => {
     }
   });
 
+  test('Verschieben in ein anderes Portfolio wirkt sofort auf can und Lesesicht (Version der Kette)', async () => {
+    const p = await wer(FAELLE.find(f => f.sub === 'gremium-a')!);
+    const ref = { type: 'projekt', id: projekt['2026-001'] };
+    assert.equal(await api.iam.access.can(p, 'projekt:read', ref), true);
+    await full(api.t.runtime, T, tx => tx.query('UPDATE ppm.projekt SET portfolio_id = $2 WHERE id = $1', [projekt['2026-001'], portfolio.c]));
+    try {
+      assert.equal(await api.iam.access.can(p, 'projekt:read', ref), false);
+      assert.deepEqual(await api.iam.tx(p, async tx => (await tx.query('SELECT nummer FROM ppm.projekt ORDER BY nummer')).rows.map(r => r.nummer)), ['2026-002']);
+    } finally {
+      await full(api.t.runtime, T, tx => tx.query('UPDATE ppm.projekt SET portfolio_id = $2 WHERE id = $1', [projekt['2026-001'], portfolio.a]));
+    }
+  });
+
   test('Hilfsfunktionen der Lesesicht folgen der Policy von ppm.projekt', async () => {
     const p = await wer(FAELLE.find(f => f.sub === 'gremium-a')!);
     await api.iam.tx(p, async tx => {

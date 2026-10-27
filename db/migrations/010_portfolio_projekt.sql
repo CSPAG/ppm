@@ -45,8 +45,7 @@ CREATE TABLE ppm.projekt (
 CREATE UNIQUE INDEX projekt_nummer ON ppm.projekt (tenant_id, nummer);
 CREATE INDEX projekt_portfolio ON ppm.projekt (tenant_id, portfolio_id);
 
--- Version und Änderungszeit setzt die Datenbank (ETag/If-Match über version; updated_at trägt die Version der Kette
--- in src/authz/resources.ts)
+-- Version und Änderungszeit setzt die Datenbank (ETag/If-Match über version)
 CREATE FUNCTION ppm.portfolio_touch() RETURNS trigger LANGUAGE plpgsql SET search_path = ppm, pg_temp AS $$
 BEGIN
   NEW.version := OLD.version + 1;

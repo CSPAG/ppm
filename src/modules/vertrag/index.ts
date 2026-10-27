@@ -12,6 +12,7 @@ import type { FastifyInstance } from 'fastify';
 import { baselineSetzen } from './baseline.ts';
 import { entwurfsanlass } from './entwurf.ts';
 import { vertragTools } from './mcp.ts';
+import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 import * as store from './store.ts';
 import { registerZielauswahl } from './zielauswahl.ts';
@@ -22,6 +23,7 @@ export const vertragModule = defineModule({
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
     registerZielauswahl(app, deps, TAG); // Ziele zur Wahl in Kap. 2 (PP.02.05)
+    registerPruefungRoutes(app, deps);
   },
   mcpTools: { ...vertragTools },
 });
@@ -34,5 +36,6 @@ export const vertrag = {
   version: store.version,
   kapitel: store.kapitel,
 };
+export { unterzeichnung } from './pruefung.ts';
 export { KAPITEL, titel as kapitelTitel, type Inhalt as KapitelInhalt } from './kapitel.ts';
 export type { Anlass, Stand, VersionRow } from './store.ts';

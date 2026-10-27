@@ -25,7 +25,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | in Arbeit (PR 1: 130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; PR 2: Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten) | #32 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
-| AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
+| AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | in Arbeit (PR 1: 140, Dateien `entscheid*`, `protokoll*` im Modul `sitzung`: Starten, Entscheid mit Folge über die Registry, Auflagen, Korrektur bis Schliessen, SNS-VR nachtragen, Schliessen, Protokoll, Liste Entscheide, `list_entscheide`; PR 2: Sitzungsmodus, Protokoll, Entscheide in der Oberfläche nach AP-E2-1 PR 2) | – | A-02, A-30, A-34, A-44; Ergebnisse je Art aus K3 Schritt 8, solange die Art nicht registriert ist; Stellungnahme «via SNS-VR» mit Ergebnis des Gremiums, Entscheid des SNS-VR nach dem Schliessen; Auflagen-Aufgaben und Mitteilungen erst beim Schliessen; Weiterleitung an den VR als Markierung (K03); Protokoll ohne PDF |
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | offen | – | – |
 | AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | offen | – | – |

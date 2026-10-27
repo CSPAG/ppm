@@ -60,7 +60,9 @@ export function ZielerreichungPage({ jahr, quartal, setQuartal, zuZielen }: Ziel
           <span>{TZE.fortschritt(d.fortschritt.nachgefuehrt, d.fortschritt.gesamt)}</span>
         </div>
       ) : null}
-      <div className="body">
+      {/* scrollbar auch ohne Eingabefelder (nur lesen) mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body" tabIndex={0} role="region" aria-label={TZE.tabelle(titel)}>
         {q.isPending ? (
           <div aria-busy="true"><span className="sr" role="status">{TZE.title(titel)}</span>{skelett ? <Skelett /> : null}</div>
         ) : q.error ? (

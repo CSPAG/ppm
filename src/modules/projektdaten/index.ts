@@ -13,6 +13,7 @@ import type { FastifyInstance } from 'fastify';
 import { abhaengigkeiten, baselineSetzen, bedarfGedeckt, bedarfImZeitraum, istSetzen, lesen, meilensteinAbnehmen } from './aktionen.ts';
 import { projektdatenTools } from './mcp.ts';
 import { registerProjektdatenRoutes, TAG } from './routes.ts';
+import { uebernehmen } from './uebernahme.ts';
 
 export const projektdatenModule = defineModule({
   name: 'projektdaten',
@@ -24,5 +25,5 @@ export const projektdatenModule = defineModule({
 });
 
 /** Lesen und Nachführen der Register für obere Module (in deren Transaktion; Rechte prüft der Aufrufer). */
-export const projektdaten = { lesen, abhaengigkeiten, bedarfImZeitraum, baselineSetzen, meilensteinAbnehmen, istSetzen, bedarfGedeckt };
+export const projektdaten = { lesen, abhaengigkeiten, bedarfImZeitraum, baselineSetzen, meilensteinAbnehmen, istSetzen, bedarfGedeckt, uebernehmen };
 export type { Eintrag, RegisterName } from './store.ts';

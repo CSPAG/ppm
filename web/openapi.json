@@ -6488,6 +6488,1635 @@
           }
         }
       },
+      "KpiPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "art",
+          "text",
+          "einheit",
+          "zielwert"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "art": {
+            "description": "Klinischer, nicht-klinischer oder Projekt-KPI.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "klinisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "nicht_klinisch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "projekt"
+                ]
+              }
+            ]
+          },
+          "text": {
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Bezeichnung des KPI.",
+            "type": "string"
+          },
+          "einheit": {
+            "maxLength": 50,
+            "description": "Einheit.",
+            "type": "string"
+          },
+          "zielwert": {
+            "maxLength": 200,
+            "description": "Zielwert.",
+            "type": "string"
+          }
+        }
+      },
+      "AbhaengigkeitPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "zuProjektId",
+          "text",
+          "ansprechperson"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zuProjektId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "Anderes Projekt (muss sichtbar sein)."
+          },
+          "text": {
+            "minLength": 1,
+            "maxLength": 1000,
+            "description": "Abhängigkeit.",
+            "type": "string"
+          },
+          "ansprechperson": {
+            "maxLength": 200,
+            "description": "Ansprechperson bzw. Projektleitung.",
+            "type": "string"
+          }
+        }
+      },
+      "MeilensteinPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "phase",
+          "art",
+          "text",
+          "termin"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "description": "Phase (P0 Initialisierung bis P4 Abschluss).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P4"
+                ]
+              }
+            ]
+          },
+          "art": {
+            "description": "Meilenstein oder Lieferergebnis.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "meilenstein"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "lieferergebnis"
+                ]
+              }
+            ]
+          },
+          "text": {
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Tätigkeit, Lieferergebnis bzw. Meilenstein.",
+            "type": "string"
+          },
+          "termin": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Datum (JJJJ-MM-TT).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "MitgliedPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "personId",
+          "funktion",
+          "akv"
+        ],
+        "properties": {
+          "personId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "Person aus dem Verzeichnis."
+          },
+          "funktion": {
+            "description": "Sponsor, Sponsoren-Koalition, Projektleitung, CTL oder Kernteam.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "sp"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "koalition"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "pl"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ctl"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "kt"
+                ]
+              }
+            ]
+          },
+          "akv": {
+            "maxLength": 2000,
+            "description": "Aufgaben, Kompetenzen, Verantwortung und Verpflichtung.",
+            "type": "string"
+          }
+        }
+      },
+      "KostenPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "phase",
+          "art",
+          "text",
+          "lieferant",
+          "offerte",
+          "betrag"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "description": "Phase (P0 Initialisierung bis P4 Abschluss).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P4"
+                ]
+              }
+            ]
+          },
+          "art": {
+            "description": "CAPEX oder OPEX.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "capex"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "opex"
+                ]
+              }
+            ]
+          },
+          "text": {
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Position.",
+            "type": "string"
+          },
+          "lieferant": {
+            "maxLength": 200,
+            "description": "Lieferant.",
+            "type": "string"
+          },
+          "offerte": {
+            "maxLength": 200,
+            "description": "Verweis auf Offerte bzw. Kostenkalkulation.",
+            "type": "string"
+          },
+          "betrag": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "maximum": 999999999999.99,
+                "description": "Betrag in CHF inkl. MwSt.; nur mit Recht auf Beträge sichtbar (A-33).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "PersonalPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "phase",
+          "rolle",
+          "groesse",
+          "fte",
+          "vonMonat",
+          "bisMonat",
+          "bemerkung"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "description": "Phase (P0 Initialisierung bis P4 Abschluss).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P4"
+                ]
+              }
+            ]
+          },
+          "rolle": {
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "description": "Rolle (Codetabelle «Rollen des Ressourcenbedarfs»).",
+            "type": "string"
+          },
+          "groesse": {
+            "anyOf": [
+              {
+                "description": "Grösse statt FTE, bis zum Gate P1–P2 (UC-002 A1).",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "S"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "M"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "L"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fte": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 1000,
+                "description": "FTE (auf zwei Stellen gerundet).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vonMonat": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                "description": "Monat «JJJJ-MM».",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bisMonat": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                "description": "Monat «JJJJ-MM».",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bemerkung": {
+            "maxLength": 500,
+            "description": "Benötigte Ressourcen inkl. Zeitraum.",
+            "type": "string"
+          }
+        }
+      },
+      "RisikoPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "text",
+          "wahrscheinlichkeit",
+          "auswirkung",
+          "massnahme",
+          "verantwortlich"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "minLength": 1,
+            "maxLength": 1000,
+            "description": "Risiko.",
+            "type": "string"
+          },
+          "wahrscheinlichkeit": {
+            "description": "Eintrittswahrscheinlichkeit (EW).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "hoch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "mittel"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "tief"
+                ]
+              }
+            ]
+          },
+          "auswirkung": {
+            "description": "Auswirkung (AW).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "hoch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "mittel"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "tief"
+                ]
+              }
+            ]
+          },
+          "massnahme": {
+            "maxLength": 1000,
+            "description": "Massnahme.",
+            "type": "string"
+          },
+          "verantwortlich": {
+            "maxLength": 200,
+            "description": "Verantwortlich für die Massnahme.",
+            "type": "string"
+          }
+        }
+      },
+      "StakeholderPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "gruppe",
+          "interesse",
+          "einfluss",
+          "massnahmen"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gruppe": {
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Stakeholder.",
+            "type": "string"
+          },
+          "interesse": {
+            "maxLength": 1000,
+            "description": "Interesse.",
+            "type": "string"
+          },
+          "einfluss": {
+            "maxLength": 1000,
+            "description": "Einfluss auf den Projekterfolg.",
+            "type": "string"
+          },
+          "massnahmen": {
+            "maxLength": 2000,
+            "description": "Geplante Massnahmen.",
+            "type": "string"
+          }
+        }
+      },
+      "KommunikationPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registerId",
+          "phase",
+          "text",
+          "adressat",
+          "ziel",
+          "termin"
+        ],
+        "properties": {
+          "registerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phase": {
+            "description": "Phase (P0 Initialisierung bis P4 Abschluss).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "P0"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P1"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P2"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P3"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "P4"
+                ]
+              }
+            ]
+          },
+          "text": {
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Massnahme.",
+            "type": "string"
+          },
+          "adressat": {
+            "maxLength": 200,
+            "description": "Adressat.",
+            "type": "string"
+          },
+          "ziel": {
+            "maxLength": 500,
+            "description": "Ziel.",
+            "type": "string"
+          },
+          "termin": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Datum (JJJJ-MM-TT).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "BeilagePlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bezeichnung",
+          "version",
+          "inhalt"
+        ],
+        "properties": {
+          "bezeichnung": {
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Bezeichnung.",
+            "type": "string"
+          },
+          "version": {
+            "maxLength": 100,
+            "description": "Version bzw. Datum.",
+            "type": "string"
+          },
+          "inhalt": {
+            "maxLength": 1000,
+            "description": "Inhalt.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel1": {
+        "title": "Ausgangslage / Problembeschreibung",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ausgangslage",
+          "problemstellung",
+          "ohneProjekt",
+          "vorprojekte",
+          "rahmenbedingungen"
+        ],
+        "properties": {
+          "ausgangslage": {
+            "maxLength": 20000,
+            "description": "Beschreibung der Ausgangslage.",
+            "type": "string"
+          },
+          "problemstellung": {
+            "maxLength": 20000,
+            "description": "Welche Problemstellung das Projekt adressiert.",
+            "type": "string"
+          },
+          "ohneProjekt": {
+            "maxLength": 20000,
+            "description": "Was geschieht, wenn das Projekt nicht durchgeführt wird.",
+            "type": "string"
+          },
+          "vorprojekte": {
+            "maxLength": 20000,
+            "description": "Vorprojekte und Initiativen in derselben Thematik.",
+            "type": "string"
+          },
+          "rahmenbedingungen": {
+            "maxLength": 20000,
+            "description": "Einzuhaltende Vorgaben und Rahmenbedingungen.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel2": {
+        "title": "Strategiebezug",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "handlungsfeldId",
+          "strategischesZielId",
+          "jahreszielId",
+          "beitrag"
+        ],
+        "properties": {
+          "handlungsfeldId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Strategisches Handlungsfeld."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "strategischesZielId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Strategisches Ziel, zu dessen Erfüllung das Projekt beiträgt (nur Ziele in Kraft)."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "jahreszielId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Jahresziel (optional, ab Zielzyklus E6)."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "beitrag": {
+            "maxLength": 20000,
+            "description": "Wie das Projekt zum Ziel beiträgt.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel3": {
+        "title": "Ziele und Nutzenbeitrag",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ziele",
+          "nutzen",
+          "businessCase",
+          "kpis"
+        ],
+        "properties": {
+          "ziele": {
+            "maxLength": 20000,
+            "description": "Ziele des Projekts.",
+            "type": "string"
+          },
+          "nutzen": {
+            "maxLength": 20000,
+            "description": "Nutzenbeitrag, qualitativ und quantitativ.",
+            "type": "string"
+          },
+          "businessCase": {
+            "maxLength": 20000,
+            "description": "Business Case: Nutzen als Text mit Verweis auf Beilagen; Kosten je Phase aus Kapitel 9 (A-19, K21 offen).",
+            "type": "string"
+          },
+          "kpis": {
+            "maxItems": 200,
+            "description": "Projekt-KPIs mit Zielwert (PC.03.01).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KpiPlan"
+            }
+          }
+        }
+      },
+      "Kapitel4": {
+        "title": "Lösungsansatz",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "loesungsansatz",
+          "annahmen"
+        ],
+        "properties": {
+          "loesungsansatz": {
+            "maxLength": 20000,
+            "description": "Wie der Lösungsansatz aussieht.",
+            "type": "string"
+          },
+          "annahmen": {
+            "maxLength": 20000,
+            "description": "Annahmen, die dem Lösungsansatz zugrunde liegen.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel5": {
+        "title": "Abgrenzung",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bearbeitet",
+          "nichtBearbeitet"
+        ],
+        "properties": {
+          "bearbeitet": {
+            "maxLength": 20000,
+            "description": "Im Projekt bearbeitete Themen.",
+            "type": "string"
+          },
+          "nichtBearbeitet": {
+            "maxLength": 20000,
+            "description": "Nicht bearbeitete Themen.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel6": {
+        "title": "Abhängigkeiten von anderen Projekten / Schnittstellen",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "abhaengigkeiten",
+          "schnittstellen"
+        ],
+        "properties": {
+          "abhaengigkeiten": {
+            "maxItems": 200,
+            "description": "Abhängigkeiten mit Ansprechperson; erscheinen auch beim anderen Projekt.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbhaengigkeitPlan"
+            }
+          },
+          "schnittstellen": {
+            "maxLength": 20000,
+            "description": "Weitere Schnittstellen und mit wem sie zu koordinieren sind.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel7": {
+        "title": "Projektplanung und Lieferergebnisse",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "vorgehen",
+          "meilensteine",
+          "termine"
+        ],
+        "properties": {
+          "vorgehen": {
+            "maxLength": 20000,
+            "description": "Tätigkeiten je Phase (7.1).",
+            "type": "string"
+          },
+          "meilensteine": {
+            "maxItems": 500,
+            "description": "Lieferergebnisse und Meilensteine je Phase mit Termin (7.1).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeilensteinPlan"
+            }
+          },
+          "termine": {
+            "additionalProperties": false,
+            "description": "Zusammenfassung Projektplanung (7.2).",
+            "type": "object",
+            "required": [
+              "projektStart",
+              "phasenStart",
+              "phasenExit",
+              "projektabschluss"
+            ],
+            "properties": {
+              "projektStart": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "description": "Datum (JJJJ-MM-TT).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "phasenStart": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "description": "Datum (JJJJ-MM-TT).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "phasenExit": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "description": "Datum (JJJJ-MM-TT).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "projektabschluss": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "description": "Datum (JJJJ-MM-TT).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Erwarteter Projektabschluss (ab Phase 2)."
+              }
+            }
+          }
+        }
+      },
+      "Kapitel8": {
+        "title": "Projektstruktur und Organisation",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mitglieder"
+        ],
+        "properties": {
+          "mitglieder": {
+            "maxItems": 200,
+            "description": "Wer welche Rolle im Projekt übernimmt.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MitgliedPlan"
+            }
+          }
+        }
+      },
+      "Kapitel9": {
+        "title": "Ressourcen",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kosten",
+          "personal"
+        ],
+        "properties": {
+          "kosten": {
+            "maxItems": 200,
+            "description": "Kosten je Phase (9.1).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KostenPlan"
+            }
+          },
+          "personal": {
+            "maxItems": 200,
+            "description": "Personal je Phase und Rolle (9.2).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonalPlan"
+            }
+          }
+        }
+      },
+      "Kapitel10": {
+        "title": "Risiko-Management",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "risiken"
+        ],
+        "properties": {
+          "risiken": {
+            "maxItems": 200,
+            "description": "Risiken mit Massnahme.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RisikoPlan"
+            }
+          }
+        }
+      },
+      "Kapitel11": {
+        "title": "Change Management",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "stakeholder",
+          "kommunikation"
+        ],
+        "properties": {
+          "stakeholder": {
+            "maxItems": 200,
+            "description": "Stakeholder-Management (11.1).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StakeholderPlan"
+            }
+          },
+          "kommunikation": {
+            "maxItems": 200,
+            "description": "Kommunikationsmassnahmen mit Adressat und Ziel (11.2).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KommunikationPlan"
+            }
+          }
+        }
+      },
+      "Kapitel12": {
+        "title": "Freigabe",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bemerkung"
+        ],
+        "properties": {
+          "bemerkung": {
+            "maxLength": 20000,
+            "description": "Bemerkungen zur Freigabe.",
+            "type": "string"
+          }
+        }
+      },
+      "Kapitel13": {
+        "title": "Beilagen",
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "beilagen"
+        ],
+        "properties": {
+          "beilagen": {
+            "maxItems": 200,
+            "description": "Beilagen zum Vertrag.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BeilagePlan"
+            }
+          }
+        }
+      },
+      "VertragVersion": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "projektId",
+          "nummer",
+          "anlass",
+          "zielphase",
+          "stand",
+          "baseline",
+          "baselineAt",
+          "basisVersionId",
+          "begruendung",
+          "eingereichtAt",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "description": "Versionsnummer («0.1», «1.0», «1.1»).",
+            "type": "string"
+          },
+          "anlass": {
+            "type": "string",
+            "enum": [
+              "initial",
+              "gate",
+              "aenderung"
+            ],
+            "description": "Anlass: erster Vertrag (UC-002), Gate (UC-003) oder Änderung (UC-007)."
+          },
+          "zielphase": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ],
+            "description": "Phase, für die der Vertrag gilt."
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "in_arbeit",
+              "in_pruefung",
+              "zur_unterzeichnung",
+              "unterzeichnet",
+              "traktandiert",
+              "abgenommen",
+              "abgelehnt",
+              "verworfen",
+              "zurueckgezogen"
+            ],
+            "description": "Bearbeitungsstand (fachmodell.md 2.10)."
+          },
+          "baseline": {
+            "description": "Verbindliche, abgenommene Version.",
+            "type": "boolean"
+          },
+          "baselineAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "basisVersionId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Version, aus der der Entwurf entstand (Baseline)."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "begruendung": {
+            "description": "Begründung einer Änderung (UC-007 Schritt 2).",
+            "type": "string"
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write",
+              "einreichen"
+            ],
+            "properties": {
+              "write": {
+                "description": "Kapitel bearbeiten (Entwurf in Arbeit, vertrag:write).",
+                "type": "boolean"
+              },
+              "einreichen": {
+                "description": "Zur Prüfung einreichen (Entwurf in Arbeit, vertrag:write); Pflichtangaben prüft die Route.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "VertragKapitelKopf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kapitel",
+          "titel",
+          "geaendert",
+          "fehlend",
+          "version",
+          "updatedAt"
+        ],
+        "properties": {
+          "kapitel": {
+            "minimum": 1,
+            "maximum": 13,
+            "type": "integer"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "geaendert": {
+            "description": "Geändert gegenüber der Basisversion (Punkt in der Kapitelnavigation, K2 Schritt 2).",
+            "type": "boolean"
+          },
+          "fehlend": {
+            "minimum": 0,
+            "description": "Fehlende Pflichtangaben der Zielphase in diesem Kapitel (Symbol «Angaben fehlen»).",
+            "type": "integer"
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VertragVersionDetail": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "kapitel"
+        ],
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/VertragVersion"
+          },
+          "kapitel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VertragKapitelKopf"
+            }
+          }
+        }
+      },
+      "Vertrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "versionen",
+          "entwurf",
+          "baseline",
+          "can"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "versionen": {
+            "description": "Alle Versionen, neueste zuerst.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VertragVersion"
+            }
+          },
+          "entwurf": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Entwurf (höchstens einer, UX-E5)."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "baseline": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string",
+                "description": "Baseline (verbindliche Version)."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "entwerfen"
+            ],
+            "properties": {
+              "entwerfen": {
+                "description": "Anlässe, für die die Person jetzt einen Entwurf anlegen kann.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "initial",
+                    "gate",
+                    "aenderung"
+                  ],
+                  "description": "Anlass: erster Vertrag (UC-002), Gate (UC-003) oder Änderung (UC-007)."
+                }
+              }
+            }
+          }
+        }
+      },
+      "VertragEntwurfCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "anlass"
+        ],
+        "properties": {
+          "anlass": {
+            "type": "string",
+            "enum": [
+              "initial",
+              "gate",
+              "aenderung"
+            ],
+            "description": "Anlass: erster Vertrag (UC-002), Gate (UC-003) oder Änderung (UC-007)."
+          },
+          "begruendung": {
+            "maxLength": 5000,
+            "description": "Begründung (Pflicht bei einer Änderung, UC-007 Schritt 2).",
+            "type": "string"
+          }
+        }
+      },
+      "VertragKapitel": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "versionId",
+          "kapitel",
+          "titel",
+          "inhalt",
+          "basis",
+          "geaendert",
+          "version",
+          "updatedAt",
+          "can"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kapitel": {
+            "minimum": 1,
+            "maximum": 13,
+            "type": "integer"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "inhalt": {
+            "additionalProperties": true,
+            "description": "Inhalt nach dem Schema des Kapitels (Komponenten Kapitel1 … Kapitel13). Beträge ohne Recht auf Beträge als null (A-33).",
+            "type": "object",
+            "properties": {}
+          },
+          "basis": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "description": "Inhalt desselben Kapitels in der Basisversion (Abweichung zur Baseline am Feld, K2 Schritt 3).",
+                "type": "object",
+                "properties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "geaendert": {
+            "type": "boolean"
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "VertragKapitelPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "inhalt"
+        ],
+        "properties": {
+          "inhalt": {
+            "additionalProperties": true,
+            "description": "Ganzer Inhalt nach dem Schema des Kapitels (Kapitel1 … Kapitel13).",
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "VertragPflichtangaben": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "versionId",
+          "zielphase",
+          "vollstaendig",
+          "angaben"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "zielphase": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ],
+            "description": "Phase."
+          },
+          "vollstaendig": {
+            "description": "Alle verlangten Angaben sind erfasst; Einreichen ist möglich.",
+            "type": "boolean"
+          },
+          "angaben": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "feld",
+                "text",
+                "quelle",
+                "erfuellt",
+                "grund"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "type": "integer"
+                },
+                "feld": {
+                  "description": "Feld im Kapitel (Sprungziel der Oberfläche).",
+                  "type": "string"
+                },
+                "text": {
+                  "description": "Was verlangt ist (aus dem Phasenmodell).",
+                  "type": "string"
+                },
+                "quelle": {
+                  "type": "object",
+                  "required": [
+                    "art",
+                    "code"
+                  ],
+                  "properties": {
+                    "art": {
+                      "type": "string",
+                      "enum": [
+                        "gate",
+                        "phase"
+                      ],
+                      "description": "Gate in die Zielphase oder die Zielphase."
+                    },
+                    "code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "erfuellt": {
+                  "type": "boolean"
+                },
+                "grund": {
+                  "anyOf": [
+                    {
+                      "description": "Warum die Angabe fehlt.",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -28927,6 +30556,839 @@
         }
       }
     },
+    "/v1/projekte/{id}/vertrag": {
+      "get": {
+        "summary": "Projektvertrag: Versionen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Alle Versionen des Projektvertrags (neueste zuerst) mit Entwurf und Baseline (UI-07). `can.entwerfen` nennt die Anlässe, für die jetzt ein Entwurf möglich ist.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vertrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/vertrag/entwuerfe": {
+      "post": {
+        "summary": "Projektvertrag: Entwurf anlegen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Legt den Entwurf einer neuen Version mit allen 13 Kapiteln an (höchstens einer je Projekt, UX-E5; sonst 409 mit `entwurf`). Erster Vertrag (`initial`, UC-002 Schritt 1): Version 0.1, Ausgangslage, Zielsetzung und Strategiebezug aus der Projektidee, Lieferergebnisse und Meilensteine aus dem Phasenmodell.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragEntwurfCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragVersionDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}": {
+      "get": {
+        "summary": "Vertragsversion lesen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Kopf der Version und Kapitelnavigation mit «geändert gegenüber Baseline» und fehlenden Pflichtangaben je Kapitel (K2 Schritt 2). `ETag` der Version.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragVersionDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/kapitel/{nr}": {
+      "get": {
+        "summary": "Kapitel lesen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Inhalt eines Kapitels mit dem Inhalt der Basisversion (Abweichung zur Baseline am Feld). Beträge (Kap. 9) ohne `finanzen:read` als null (A-33). `ETag` des Kapitels.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 13,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "nr",
+            "required": true,
+            "description": "Kapitel 1–13 (Q7)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragKapitel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Kapitel speichern",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Ersetzt den Inhalt eines Kapitels im Entwurf «in Arbeit» (automatisches Speichern, I-R3); `If-Match` Pflicht, bei fremder Änderung 412 (K2 Z7). Der Inhalt wird gegen das Schema des Kapitels geprüft (422 mit Pfad). Kapitel 9 nur mit `finanzen:read`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragKapitelPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 13,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "nr",
+            "required": true,
+            "description": "Kapitel 1–13 (Q7)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragKapitel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/pflichtangaben": {
+      "get": {
+        "summary": "Pflichtangaben der Zielphase",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Verlangte Angaben aus dem Phasenmodell (Gate in die Zielphase und Zielphase, K13, A-12) mit Stand und Sprungziel (Kapitel, Feld) für das Seitenpanel (K2-4).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragPflichtangaben"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/einreichen": {
+      "post": {
+        "summary": "Zur Prüfung einreichen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Entwurf «in Arbeit» → «in Prüfung» (DM.02.02, UC-002 Schritt 8); die UE erhält die Aufgabe «Quality-Check». Fehlen Pflichtangaben der Zielphase: 422 mit je einem Fehler `/kapitel/<nr>/<feld>` (UC-002 A3). Eine Änderung reicht die PL beim Sponsor ein (UC-007, nicht hier). `If-Match` Pflicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragVersionDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -29261,6 +31723,10 @@
     {
       "name": "Ziele",
       "description": "Strategische Ziele je Handlungsfeld mit Metrik, Zielwert und Verlauf; ab Etappe E6 Zielzyklus, Jahresziele und Zielerreichung."
+    },
+    {
+      "name": "Projektvertrag",
+      "description": "Projektvertrag: Versionen mit Kapiteln 1–13, Entwurf, Pflichtangaben je Phase, Einreichen zur Prüfung, Baseline."
     },
     {
       "name": "Webhooks",

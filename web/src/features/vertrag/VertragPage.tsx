@@ -17,6 +17,7 @@ import {
   kapitelLaden, useKapitel, usePflichtangaben, useProjekt, useVersion, useVertrag, useVertragMutations, type Angabe, type Inhalt, type KapitelLoaded,
   type Version, type VersionLoaded,
 } from './api.ts';
+import { DokumentAusgabe } from './DokumentAusgabe.tsx';
 import { feldId, KAPITEL, pruefeLokal } from './felder.ts';
 import { KapitelEditor } from './KapitelEditor.tsx';
 import type { SetVertragSearch, VertragSearch } from './search.ts';
@@ -142,6 +143,8 @@ function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
       <div className="vt-kopf">
         <h2 className="vt-h">{TV.titel} · {TV.versionFuer(v.nummer, phase)}</h2>
         <Stand familie={FAMILIE[v.stand]} label={v.baseline ? TV.baseline : TV.stand[v.stand]} />
+        {/* Als Dokument herunterladen (K2 Schritt 11, AP-E3-5) */}
+        <DokumentAusgabe versionId={v.id} nummer={v.nummer} />
       </div>
       {banner ? <div className="vt-banner"><Hinweis stufe="hinweis">{banner}</Hinweis></div> : null}
       <div className="vt-flaeche">

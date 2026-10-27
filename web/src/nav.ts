@@ -11,10 +11,11 @@ import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
+import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
-import { sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
+import { roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
@@ -29,7 +30,7 @@ export const navigation: NavRegistrierung = {
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
     { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
-    { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: 'idee:create' },
+    { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: ['idee:create', 'idee:read'] },
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite
     { raum: 'ziele', pfad: `/ziele/${new Date().getFullYear() + 1}`, label: zielzyklusTexte.bereich, recht: 'ziel:read', muster: /^\/ziele\/\d{4}\/?$/ },
     // Arbeitsraum «Ziele»: Handlungsfelder (BC ZM.01.01)
@@ -39,8 +40,13 @@ export const navigation: NavRegistrierung = {
     // Zielerreichung je Quartal (BC ZM.03.01, AP-E6-3); führt ins zuletzt abgeschlossene Quartal
     { raum: 'ziele', pfad: '/ziele/zielerreichung', label: zielerreichungTexte.bereich, recht: 'ziel:read', muster: /^\/ziele\/\d{4}\/zielerreichung\/?$/ },
     // Arbeitsraum «Portfolio»: Ressourcen mit Auslastung und Kapazität (BC RK.01.01, RK.02.04, AP-E5-4)
+    // Priorisierung mit Bewertung und Modell (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1); Gremium mit Recht am Portfolio
+    { raum: 'portfolio', pfad: '/portfolio/priorisierung', label: priorisierungTexte.bereich, recht: 'priorisierung:read' },
     { raum: 'portfolio', pfad: '/portfolio/ressourcen', label: ressourcenTexte.bereich, recht: 'ressource:read' },
     // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
+    // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): sichtbar wie die Auswertungen (auswertung:read; IA «Sichtbarkeit je
+    // Rolle»: Portfolio nicht für Antragstellende und Leser:innen); lesen über die API dürfen alle Angemeldeten (A-35)
+    { raum: 'portfolio', pfad: '/portfolio/roadmap', label: roadmapTexte.bereich, recht: 'auswertung:read' },
     { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussTexte.bereich, recht: 'statusbericht:review' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
     // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach
@@ -64,6 +70,8 @@ export const navigation: NavRegistrierung = {
     { id: 'portfolio-anlegen', label: portfoliosTexte.aktionAnlegen, icon: 'plus', pfad: '/administration/portfolios?o=neu', recht: 'portfolio:admin' },
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
     { id: 'ziel-anlegen', label: zieleTexte.aktionAnlegen, icon: 'plus', pfad: '/ziele/strategische-ziele?o=neu', recht: 'ziel:write' },
+    { id: 'projekte-bewerten', label: priorisierungTexte.aktionBewerten, icon: 'layers', pfad: priorisierungPfad.bewertung, recht: 'priorisierung:write' },
+    { id: 'bewertungsmodell', label: priorisierungTexte.aktionModell, icon: 'rules', pfad: priorisierungPfad.modell, recht: 'priorisierung:write' },
     { id: 'auslastung-analysieren', label: ressourcenTexte.aktionAuslastung, icon: 'grid', pfad: ressourcenPfad.auslastung, recht: 'ressource:read' },
     { id: 'kapazitaet-planen', label: ressourcenTexte.aktionKapazitaet, icon: 'calendar', pfad: ressourcenPfad.kapazitaet, recht: 'ressource:write' },
   ],

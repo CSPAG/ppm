@@ -7,3 +7,7 @@ export { validateZielzyklusSearch, ZIELJAHR, type SetZielzyklusSearch, type Ziel
 export { TZZ as zielzyklusTexte } from './ZielzyklusTexte.ts';
 export { abgeschlossenesQuartal, validateZielerreichungSearch, type QuartalNr, type ZielerreichungSearch } from './ZielerreichungSearch.ts';
 export { TZE as zielerreichungTexte } from './ZielerreichungTexte.ts';
+export type { FreigabePageProps } from './FreigabePage.tsx';
+export type { RoadmapPageProps } from './RoadmapPage.tsx';
+export { validateRoadmapSearch, type RoadmapSearch, type SetRoadmapSearch } from './RoadmapSearch.ts';
+export { TR as roadmapTexte } from './RoadmapTexte.ts';

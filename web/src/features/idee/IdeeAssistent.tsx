@@ -9,7 +9,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNod
 import { ApiError, isConflict, newIdempotencyKey } from '../../api/index.ts';
 import { Confirm, Hinweis, Icon, useToast } from '../../ui/index.ts';
 import { useAuswahl, useIdeeMutations, type IdeeAuswahl, type Loaded, type Rueckfrage } from './api.ts';
-import { ideePfad, Verweis, type Gehe } from './stand.tsx';
+import { ideePfad, MEINE_IDEEN, Verweis, type Gehe } from './stand.tsx';
 import { ideeNeuPfad } from './search.ts';
 import { PFLICHT, TI } from './texte.ts';
 import './idee.css';
@@ -177,7 +177,7 @@ export function IdeeAssistent({ start, vorbelegung, schritt: schrittStart, onSch
     try {
       await m.verwerfen.mutateAsync({ id: l.item.id, etag: l.etag });
       toast.show(TI.verworfen);
-      gehe('/portfolio/ideen');
+      gehe(MEINE_IDEEN);
     } catch (e) {
       setFrageVerwerfen(false);
       toast.error(e, isConflict(e) ? TI.konflikt : undefined);
@@ -490,7 +490,7 @@ function Bestaetigung({ nummer, gehe, ueberschrift }: { nummer: number; gehe: Ge
           <h1 id="idee-fertig" ref={ueberschrift} tabIndex={-1}>{TI.eingereicht}</h1>
           <p>{TI.bestaetigung}</p>
           <div className="idee-fertig-acts">
-            <Verweis pfad="/portfolio/ideen" gehe={gehe} className="btn primary">{TI.zuMeinenIdeen}</Verweis>
+            <Verweis pfad={MEINE_IDEEN} gehe={gehe} className="btn primary">{TI.zuMeinenIdeen}</Verweis>
             <Verweis pfad={ideePfad(nummer)} gehe={gehe} className="btn">{TI.idee(nummer)}</Verweis>
             <Verweis pfad={ideeNeuPfad()} gehe={p => { gehe(p); }} className="btn ghost">{TI.weitereIdee}</Verweis>
           </div>

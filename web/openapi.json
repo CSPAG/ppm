@@ -7979,6 +7979,7 @@
           "jahr",
           "stand",
           "vorlageBis",
+          "vorgelegtAt",
           "freigabeAt",
           "freigabeText",
           "version",
@@ -8019,6 +8020,17 @@
                 "format": "date",
                 "description": "Geplante Vorlage an den VR.",
                 "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vorgelegtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
@@ -9125,6 +9137,531 @@
             "maxLength": 2000,
             "description": "Kommentar und Beurteilung des Stands; leer erlaubt.",
             "type": "string"
+          }
+        }
+      },
+      "ZielVorlage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "stand",
+          "version",
+          "anzahl",
+          "anzahlVorjahr",
+          "jeHandlungsfeld",
+          "ohneMetrik",
+          "ohneUmsetzung",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "in_arbeit"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zur_freigabe"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              }
+            ]
+          },
+          "version": {
+            "description": "Version des Zieljahrs für `If-Match` beim Vorlegen bzw. bei der Freigabe.",
+            "type": "integer"
+          },
+          "anzahl": {
+            "description": "Jahresziele des Jahres.",
+            "type": "integer"
+          },
+          "anzahlVorjahr": {
+            "anyOf": [
+              {
+                "description": "Jahresziele des Vorjahres; null ohne Zielzyklus im Vorjahr.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "jeHandlungsfeld": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "handlungsfeldId",
+                "label",
+                "anzahl",
+                "anzahlVorjahr"
+              ],
+              "properties": {
+                "handlungsfeldId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "label": {
+                  "anyOf": [
+                    {
+                      "description": "Bezeichnung, falls die Person das Handlungsfeld sehen darf.",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "anzahl": {
+                  "type": "integer"
+                },
+                "anzahlVorjahr": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "ohneMetrik": {
+            "description": "Jahresziele ohne Metrik oder Zielwert: sperren die Vorlage (UC-011 Schritt 5).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "ohneUmsetzung": {
+            "description": "Jahresziele ohne Hauptaktivität und ohne Projekt (Hinweis).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "vorlegen",
+              "freigabe"
+            ],
+            "properties": {
+              "vorlegen": {
+                "description": "«Zur Freigabe vorlegen» (ziel:write, Stand «in Arbeit»; Sperren siehe ohneMetrik).",
+                "type": "boolean"
+              },
+              "freigabe": {
+                "description": "«Freigabe erfassen» (ziel:freigabe, Stand «zur Freigabe»).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "FreigabeErfassen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "entscheid",
+          "datum"
+        ],
+        "properties": {
+          "entscheid": {
+            "description": "«freigegeben» setzt die Jahresziele in Kraft; «anpassungen» (UC-011 A2) setzt sie auf «in Arbeit» zurück.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "freigegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "anpassungen"
+                ]
+              }
+            ]
+          },
+          "datum": {
+            "format": "date",
+            "description": "Datum des Entscheids des VR.",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 4000,
+            "description": "Rückmeldungen des VR; bei «anpassungen» Pflicht.",
+            "type": "string"
+          }
+        }
+      },
+      "RoadmapInhalt": {
+        "additionalProperties": false,
+        "description": "Vertrauliche Projekte (A-34) erscheinen nicht.",
+        "type": "object",
+        "required": [
+          "jahr",
+          "handlungsfelder"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "handlungsfelder": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "label",
+                "ziele"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "ziele": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "nummer",
+                      "text",
+                      "metrik",
+                      "zielwert",
+                      "projekte",
+                      "jahresziele"
+                    ],
+                    "properties": {
+                      "nummer": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "metrik": {
+                        "type": "string"
+                      },
+                      "zielwert": {
+                        "type": "string"
+                      },
+                      "projekte": {
+                        "description": "Projekte am strategischen Ziel ohne Jahresziel.",
+                        "type": "array",
+                        "items": {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "nummer",
+                            "name",
+                            "phase",
+                            "lebenszyklus"
+                          ],
+                          "properties": {
+                            "nummer": {
+                              "description": "Projektnummer (Adresse der Projektakte).",
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "phase": {
+                              "type": "string"
+                            },
+                            "lebenszyklus": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "jahresziele": {
+                        "type": "array",
+                        "items": {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "nummer",
+                            "text",
+                            "metrik",
+                            "zielwert",
+                            "hauptaktivitaeten",
+                            "projekte"
+                          ],
+                          "properties": {
+                            "nummer": {
+                              "type": "string"
+                            },
+                            "text": {
+                              "type": "string"
+                            },
+                            "metrik": {
+                              "type": "string"
+                            },
+                            "zielwert": {
+                              "type": "string"
+                            },
+                            "hauptaktivitaeten": {
+                              "type": "array",
+                              "items": {
+                                "additionalProperties": false,
+                                "type": "object",
+                                "required": [
+                                  "text",
+                                  "verantwortlich"
+                                ],
+                                "properties": {
+                                  "text": {
+                                    "type": "string"
+                                  },
+                                  "verantwortlich": {
+                                    "anyOf": [
+                                      {
+                                        "description": "Name der verantwortlichen Person.",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "projekte": {
+                              "type": "array",
+                              "items": {
+                                "additionalProperties": false,
+                                "type": "object",
+                                "required": [
+                                  "nummer",
+                                  "name",
+                                  "phase",
+                                  "lebenszyklus"
+                                ],
+                                "properties": {
+                                  "nummer": {
+                                    "description": "Projektnummer (Adresse der Projektakte).",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "phase": {
+                                    "type": "string"
+                                  },
+                                  "lebenszyklus": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Roadmap": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "publiziertAt",
+          "publiziertBy",
+          "version",
+          "inhalt",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "publiziertAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publiziertBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "inhalt": {
+            "$ref": "#/components/schemas/RoadmapInhalt"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "publizieren"
+            ],
+            "properties": {
+              "publizieren": {
+                "description": "Neu publizieren (ziel:freigabe, Jahresziele in Kraft).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "RoadmapList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "jahr",
+                "publiziertAt",
+                "version"
+              ],
+              "properties": {
+                "jahr": {
+                  "type": "integer"
+                },
+                "publiziertAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "version": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RoadmapVorschau": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "stand",
+          "publiziertAt",
+          "inhalt",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_arbeit"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zur_freigabe"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_kraft"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "publiziertAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inhalt": {
+            "$ref": "#/components/schemas/RoadmapInhalt"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "publizieren"
+            ],
+            "properties": {
+              "publizieren": {
+                "description": "Publizieren möglich (Jahresziele in Kraft).",
+                "type": "boolean"
+              }
+            }
           }
         }
       },
@@ -13676,6 +14213,78 @@
           }
         }
       },
+      "Vorlage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "art",
+          "version",
+          "name",
+          "quelle",
+          "kopfzeile",
+          "gliederung",
+          "grundbestand"
+        ],
+        "properties": {
+          "art": {
+            "description": "Art der Vorlage, z. B. `projektvertrag`.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Fassung; erscheint im erzeugten Dokument.",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quelle": {
+            "description": "Herkunft der Gliederung.",
+            "type": "string"
+          },
+          "kopfzeile": {
+            "description": "Kopfzeile jeder Seite (G12).",
+            "type": "string"
+          },
+          "gliederung": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "nr",
+                "titel"
+              ],
+              "properties": {
+                "nr": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "grundbestand": {
+            "description": "Mitgelieferte Vorlage (eigene Fassungen ab AP-E7-7).",
+            "type": "boolean"
+          }
+        }
+      },
+      "VorlageList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vorlage"
+            }
+          }
+        }
+      },
       "KpiPlan": {
         "additionalProperties": false,
         "type": "object",
@@ -16829,6 +17438,897 @@
                 "type": "null"
               }
             ]
+          }
+        }
+      },
+      "IdeePoolZeile": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "titel",
+          "stand",
+          "standAt",
+          "eingereichtAt",
+          "erfasstVon",
+          "handlungsfeldId",
+          "bereiche",
+          "herkunft",
+          "kategorie",
+          "rueckfragenOffen"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "eingereicht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_pruefung"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_ergaenzung"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "traktandiert"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "freigegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgestellt"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zurueckgewiesen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zusammengefuehrt"
+                ]
+              }
+            ]
+          },
+          "standAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "erfasstVon": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "handlungsfeldId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bereiche": {
+            "type": "array",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          "herkunft": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorie": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "A"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "B"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "C"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rueckfragenOffen": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      },
+      "IdeePoolList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IdeePoolZeile"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "IdeeFunnel": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "stufen",
+          "letzteEinreichung"
+        ],
+        "properties": {
+          "stufen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "stand",
+                "anzahl"
+              ],
+              "properties": {
+                "stand": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "entwurf"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "eingereicht"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "in_pruefung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "in_ergaenzung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "traktandiert"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "freigegeben"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zurueckgestellt"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zurueckgewiesen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zusammengefuehrt"
+                      ]
+                    }
+                  ]
+                },
+                "anzahl": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "letzteEinreichung": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "IdeeAehnliche": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "idee",
+                "gleichesHandlungsfeld",
+                "gemeinsameBereiche"
+              ],
+              "properties": {
+                "idee": {
+                  "$ref": "#/components/schemas/IdeePoolZeile"
+                },
+                "gleichesHandlungsfeld": {
+                  "type": "boolean"
+                },
+                "gemeinsameBereiche": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdeePruefung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "leitfragen",
+          "vorgesehenerSponsor",
+          "raster",
+          "vorschlag",
+          "kategorie",
+          "kategorieBegruendung",
+          "portfolioId",
+          "zustaendig",
+          "can"
+        ],
+        "properties": {
+          "leitfragen": {
+            "description": "Leitfragen zum Eintritt P0 aus dem Phasenmodell in Kraft mit den Antworten (UC-001 Schritt 4).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "position",
+                "wertestrom",
+                "frage",
+                "antwort"
+              ],
+              "properties": {
+                "position": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "wertestrom": {
+                  "type": "string"
+                },
+                "frage": {
+                  "type": "string"
+                },
+                "antwort": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "vorgesehenerSponsor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "raster": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kriterium",
+                "einschaetzung"
+              ],
+              "properties": {
+                "kriterium": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "relevanz"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "direktionen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abhaengigkeiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "priorisierung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "change"
+                      ]
+                    }
+                  ]
+                },
+                "einschaetzung": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "vorschlag": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Naheliegende Kategorie mit Herleitung (G11); die UE entscheidet (Q8 Kap. 6).",
+                "type": "object",
+                "required": [
+                  "kategorie",
+                  "hoch",
+                  "mittel",
+                  "tief"
+                ],
+                "properties": {
+                  "kategorie": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "A"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "B"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "C"
+                        ]
+                      }
+                    ]
+                  },
+                  "hoch": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "mittel": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "tief": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorie": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "A"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "B"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "C"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorieBegruendung": {
+            "type": "string"
+          },
+          "portfolioId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zustaendig": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Entscheidendes Gremium des Portfolios (A-45).",
+                "type": "object",
+                "required": [
+                  "kuerzel",
+                  "name"
+                ],
+                "properties": {
+                  "kuerzel": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "pruefen",
+              "abschliessen"
+            ],
+            "properties": {
+              "pruefen": {
+                "description": "Leitfragen, Raster, Kategorie und Rückfragen (`idee:write`, Idee eingereicht oder in Prüfung).",
+                "type": "boolean"
+              },
+              "abschliessen": {
+                "description": "Zurückweisen und Zusammenführen (`idee:write`, Idee offen im Pool).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "IdeeLeitfragenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "antworten"
+        ],
+        "properties": {
+          "antworten": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "position",
+                "antwort"
+              ],
+              "properties": {
+                "position": {
+                  "minimum": 0,
+                  "maximum": 999,
+                  "type": "integer"
+                },
+                "antwort": {
+                  "maxLength": 4000,
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "vorgesehenerSponsor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "IdeeRasterIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "raster"
+        ],
+        "properties": {
+          "raster": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kriterium",
+                "einschaetzung"
+              ],
+              "properties": {
+                "kriterium": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "relevanz"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "direktionen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abhaengigkeiten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "priorisierung"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "change"
+                      ]
+                    }
+                  ]
+                },
+                "einschaetzung": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdeeKategorieIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kategorie"
+        ],
+        "properties": {
+          "kategorie": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "A"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "B"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "C"
+                ]
+              }
+            ]
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "begruendung": {
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
+      "IdeeRueckfragenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fragen"
+        ],
+        "properties": {
+          "fragen": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "feld": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "titel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ausgangslage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "zielsetzung"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "handlungsfeld"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "strategischesZiel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "bereiche"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "nutzen"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "aufwand"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "relevanz"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "herkunft"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "text": {
+                  "minLength": 1,
+                  "maxLength": 2000,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdeeZurueckweisenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "begruendung"
+        ],
+        "properties": {
+          "begruendung": {
+            "minLength": 1,
+            "maxLength": 4000,
+            "type": "string"
+          }
+        }
+      },
+      "IdeeZusammenfuehrenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fuehrendeIdeeId"
+        ],
+        "properties": {
+          "fuehrendeIdeeId": {
+            "format": "uuid",
+            "type": "string"
           }
         }
       },
@@ -46431,6 +47931,788 @@
         }
       }
     },
+    "/v1/ziele/{jahr}/vorlage": {
+      "get": {
+        "summary": "Vorlage an den VR vorbereiten",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Zusammenfassung (Jahresziele je Handlungsfeld, Vergleich zum Vorjahr) und Prüfung vor dem Vorlegen (K6 Schritt 6). Ohne Zielzyklus 404.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZielVorlage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ziele/{jahr}/vorlegen": {
+      "post": {
+        "summary": "Jahresziele zur Freigabe vorlegen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Setzt die Jahresziele auf «zur Freigabe» (UC-011 Schritt 6); danach gesperrt bis zum Entscheid des VR. 409 ausserhalb von «in Arbeit», ohne Jahresziele oder solange ein Jahresziel keine Metrik bzw. keinen Zielwert hat (`reason: metrik_fehlt`, `ohneMetrik`). Erledigt die Aufgabe «Jahresziele vervollständigen».",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Zieljahr"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ziele/{jahr}/freigabe": {
+      "post": {
+        "summary": "Freigabe des VR erfassen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Entscheid des VR (UC-011 Schritt 7, UE): «freigegeben» setzt die Jahresziele in Kraft; «anpassungen» (A2) setzt sie mit den Rückmeldungen auf «in Arbeit» zurück und legt allen mit `ziel:write` (GL) die Aufgabe zum Anpassen in den Eingang. 409 ausserhalb von «zur Freigabe».",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreigabeErfassen"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Zieljahr"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/roadmap": {
+      "get": {
+        "summary": "Publizierte Roadmaps",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Alle publizierten Jahre, neueste zuerst; lesbar für alle angemeldeten Personen (A-35).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/roadmap/{jahr}": {
+      "get": {
+        "summary": "Roadmap eines Jahres",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Stand bei Publikation; nicht publiziert: 404.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roadmap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Roadmap publizieren",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie allen angemeldeten Personen lesend bereit (UC-011 Schritt 8, A-35). Erneutes Publizieren ersetzt den Stand. 409, solange die Jahresziele nicht in Kraft sind.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roadmap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/roadmap/{jahr}/vorschau": {
+      "get": {
+        "summary": "Vorschau der Roadmap",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Inhalt, wie er beim Publizieren gespeichert würde (K6 Schritt 8); nur mit ziel:freigabe.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapVorschau"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/gremien/{kuerzel}/sitzungen": {
       "get": {
         "summary": "Sitzungen eines Gremiums",
@@ -51990,6 +54272,77 @@
         }
       }
     },
+    "/v1/vorlagen": {
+      "get": {
+        "summary": "Vorlagen auflisten",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Gültige Vorlage je Art mit Fassung und Gliederung; heute der Grundbestand (Projektvertrag nach Q7).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/projekte/{id}/vertrag": {
       "get": {
         "summary": "Projektvertrag: Versionen",
@@ -53309,6 +55662,139 @@
         }
       }
     },
+    "/v1/vertragsversionen/{id}/dokument": {
+      "get": {
+        "summary": "Version als Dokument herunterladen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Version des Projektvertrags im Layout der Vorlage (Grundbestand: Projektvertrag nach Q7) mit Versionsnummer, Stand und Freigabe; Kopfzeile «Intern · enthält Personendaten» (G12). Beträge ohne `finanzen:read` als «nicht verfügbar» (A-33).",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pdf"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "docx"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Dateiformat: `pdf` (Standard) oder `docx` (Word)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dokument als Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "description": "PDF",
+                  "type": "string"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "format": "binary",
+                  "description": "Word",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/ideen": {
       "get": {
         "summary": "Projektideen auflisten",
@@ -53690,7 +56176,7 @@
         "tags": [
           "Ideen"
         ],
-        "description": "Handlungsfelder mit Leitsatz und ihren strategischen Zielen, aktive Bereiche und Herkunft (K4 Schritt 2) – mit `idee:create`, auch ohne Leserecht auf Ziele.",
+        "description": "Handlungsfelder mit Leitsatz und ihren strategischen Zielen, aktive Bereiche und Herkunft (K4 Schritt 2) – mit `idee:create` oder `idee:read` (Pool und Prüfung), auch ohne Leserecht auf Ziele.",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -54354,6 +56840,1383 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/pool": {
+      "get": {
+        "summary": "Ideenpool",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Alle eingereichten Ideen (ohne Entwürfe) mit `idee:read`; Standard «wartet am längsten zuerst» (K4 Prüfen 5), Filter Stand, Handlungsfeld, Herkunft, Cursor.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "entwurf"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "eingereicht"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_pruefung"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_ergaenzung"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "traktandiert"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "freigegeben"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zurueckgestellt"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zurueckgewiesen"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zusammengefuehrt"
+                    ]
+                  }
+                ]
+              }
+            },
+            "in": "query",
+            "name": "stand",
+            "required": false,
+            "description": "Nur diese Stände (mehrfach); ohne Angabe alle ausser Entwurf."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "handlungsfeld",
+            "required": false
+          },
+          {
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "herkunft",
+            "required": false
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "wartet"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "neu"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "description": "`wartet` (Standard): am längsten im aktuellen Stand zuerst; `neu`: zuletzt eingereicht zuerst."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePoolList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/pool/funnel": {
+      "get": {
+        "summary": "Funnel «Pre-P0»",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Anzahl Ideen je Stand (ohne Entwürfe) und Zeitpunkt der letzten Einreichung (K4 Prüfen 5, UC-001 UI).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeeFunnel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/aehnliche": {
+      "get": {
+        "summary": "Ähnliche Ideen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Ideen mit gleichem Handlungsfeld oder gemeinsamen betroffenen Bereichen (UC-001 Schritt 3, A1); nur mit `idee:write` (A-32).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeeAehnliche"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/pruefung": {
+      "get": {
+        "summary": "Prüfung einer Idee",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Leitfragen zum Eintritt P0 mit Antworten, Kriterienraster mit Vorschlag, Kategorie und zuständiges Gremium; nur mit `idee:read` (Antragstellende sehen sie nicht, K4 Z8).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/leitfragen": {
+      "put": {
+        "summary": "Leitfragen zum Eintritt P0 beantworten",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Antworten je Position der Leitfragen des Phasenmodells in Kraft (Frage als Abschrift), vorgesehener Sponsor (UC-001 Schritt 4). Nur mit `If-Match` der Idee.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeLeitfragenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/raster": {
+      "put": {
+        "summary": "Kriterienraster einschätzen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Je Kriterium «hoch / mittel / tief» (null = offen); die Antwort zeigt die naheliegende Kategorie mit Herleitung (PP.02.04, G11). Nur mit `If-Match` der Idee.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeRasterIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/kategorie": {
+      "post": {
+        "summary": "Kategorie zuordnen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Kategorie A, B oder C als Gesamtbeurteilung der UE und damit Portfolio und zuständiges Gremium (UC-001 Schritt 5). Bei mehreren Portfolios der Kategorie (C: je Direktion) ist `portfolioId` nötig (sonst 422). Nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeKategorieIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/rueckfragen": {
+      "post": {
+        "summary": "Rückfrage stellen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu Ihrer Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeRueckfragenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/zurueckweisen": {
+      "post": {
+        "summary": "Idee zurückweisen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Mit Begründung (Pflicht, UC-001 A3): Stand «zurückgewiesen», Antragstellende und – bei zugeordnetem Portfolio – die Mitglieder des Gremiums werden informiert (A-06). Nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeZurueckweisenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/zusammenfuehren": {
+      "post": {
+        "summary": "Ideen zusammenführen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Schliesst diese Idee als «zusammengeführt» mit Verweis auf die führende Idee; Bereiche und Texte gehen in die führende über, beide Antragstellenden werden informiert (UC-001 A1, DM.01.03). Nur mit `If-Match` dieser Idee; die führende muss offen sein (sonst 409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeeZusammenfuehrenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeePruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
                 }
               }
             }
@@ -57310,6 +61173,10 @@
     {
       "name": "Dashboard",
       "description": "Dashboard der Periode: Projekte der sichtbaren Portfolios mit Status, Trend, Phase und Meldung, Funnel nach Phase."
+    },
+    {
+      "name": "Vorlagen",
+      "description": "Vorlagen je Art mit Fassung (Grundbestand: Projektvertrag nach Q7); Dokumentausgabe in Word und PDF."
     },
     {
       "name": "Projektvertrag",

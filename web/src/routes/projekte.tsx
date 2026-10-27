@@ -4,11 +4,11 @@
  * (Vertrag, Bericht, Versionen, Abschluss) tragen ihre Pakete hier ein: je ein Eintrag in `REITER` und eine Route unter
  * `akteRoute`; der Rahmen erhält den Inhalt als Kind und kennt die Features nicht.
  */
-import { createRoute, Outlet, redirect, useNavigate, type AnyRoute } from '@tanstack/react-router';
+import { type AnyRoute, createRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { Suspense, useCallback } from 'react';
-import { PROJEKTNUMMER, projektTexte, type ProjekteSearch, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
+import { type ProjekteSearch, PROJEKTNUMMER, projektTexte, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
 import { berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
-import { vertragTexte, type SetVertragSearch, type VertragSearch } from '../features/vertrag/index.ts';
+import { type SetVertragSearch, type VertragSearch, vertragTexte } from '../features/vertrag/index.ts';
 import { Loading } from '../ui/index.ts';
 import { seite } from './seite.ts';
 import { searchOf } from '../search.ts';

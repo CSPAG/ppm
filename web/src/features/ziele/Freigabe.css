@@ -1,0 +1,23 @@
+/* Assistent Freigabe (UI-39) und Bericht Roadmap (UI-31): Farben nur aus den Tokens, hell und dunkel; schmal untereinander. */
+.fg-assistent,.fg-form{max-width:760px;display:flex;flex-direction:column;gap:14px}
+.fg-schritte{list-style:none;display:flex;gap:8px;flex-wrap:wrap;margin:0;padding:0;counter-reset:s}
+.fg-schritte li{counter-increment:s;padding:4px 12px;border:1px solid var(--line-2);border-radius:999px;color:var(--fg-2);font-size:13px}
+.fg-schritte li::before{content:counter(s) ". "}
+.fg-schritte li.on{border-color:var(--accent);background:var(--accent-soft);color:var(--fg);font-weight:600}
+.fg-schritte li.fertig{color:var(--fg)}
+.fg-tabelle,.rm-tabelle{width:100%;border-collapse:collapse;font-size:14px}
+.fg-tabelle th,.fg-tabelle td,.rm-tabelle th,.rm-tabelle td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.fg-tabelle .num{text-align:right;font-variant-numeric:tabular-nums}
+.fg-tabelle tfoot th,.fg-tabelle tfoot td{font-weight:600}
+.fg-sprung{display:inline-flex;gap:8px;flex-wrap:wrap}
+.fg-entscheid{border:0;padding:0;margin:0;display:flex;gap:16px;flex-wrap:wrap}
+.fg-entscheid legend{padding:0;margin-bottom:6px;font-size:13px;color:var(--fg-2)}
+.fg-nav{justify-content:flex-end}
+.fg-form textarea{width:100%;min-width:0;border:1px solid var(--line-2);border-radius:7px;padding:8px 10px;background:var(--surface);color:var(--fg);font:inherit}
+.rm-feld{margin-bottom:24px}
+.rm-feld h2{font-size:18px;margin:0 0 8px}
+.rm-ziel h3{font-size:15px;margin:12px 0 6px}
+.rm-liste{margin:0;padding-left:16px}
+.rm-tabelle-wrap{overflow-x:auto}
+@media (max-width:640px){.rm-tabelle thead{display:none}.rm-tabelle tr{display:block;border-bottom:1px solid var(--line);padding:6px 0}.rm-tabelle td{display:block;border:0;padding:2px 0}}
+@media print{.rail,.bnav,.top,.fg-schritte,.fg-nav,.acts{display:none !important}}

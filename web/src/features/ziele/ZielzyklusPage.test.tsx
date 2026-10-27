@@ -204,6 +204,20 @@ describe('Zielzyklus', () => {
     expect(screen.queryByRole('button', { name: TZZ.hauptaktivitaetHinzufuegen })).not.toBeInTheDocument();
   });
 
+  it('Einstieg in die Freigabe (UI-39): «Zur Freigabe vorlegen» in Arbeit, «Freigabe erfassen» zur Freigabe mit Recht', async () => {
+    stub({ 'GET /v1/ziele/2027': () => json(zyklus()) });
+    const freigabe = vi.fn();
+    const { unmount } = renderWithIam(<ZielzyklusPage jahr={2027} search={{}} setSearch={() => undefined} jahrWechseln={() => undefined} projektOeffnen={() => undefined} strategischeZiele={() => undefined} freigabe={freigabe} />);
+    await userEvent.click(await screen.findByRole('button', { name: TZZ.zurFreigabeVorlegen }));
+    expect(freigabe).toHaveBeenCalled();
+    unmount();
+    stub({ 'GET /v1/ziele/2027': () => json(zyklus({ zieljahr: zieljahr({ stand: 'zur_freigabe', vorgelegtAt: '2026-11-10T08:00:00Z', can: { write: false } }) as Zielzyklus['zieljahr'], can: { start: false, write: false, zuordnen: true } })) });
+    renderWithIam(<ZielzyklusPage jahr={2027} search={{}} setSearch={() => undefined} jahrWechseln={() => undefined} projektOeffnen={() => undefined} strategischeZiele={() => undefined} freigabe={freigabe} />,
+      { roles: ['ue'], permissions: ['tenant:read', 'ziel:read', 'ziel:freigabe', 'handlungsfeld:read'] });
+    expect(await screen.findByRole('button', { name: TZZ.freigabeErfassen })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: TZZ.zurFreigabeVorlegen })).not.toBeInTheDocument();
+  });
+
   it('unbekanntes Ziel in der Adresse: Hinweis (Z10); Adresse prüft die Nummer (I-N5)', async () => {
     stub({ 'GET /v1/ziele/2027': () => json(zyklus()) });
     renderWithIam(<Page initial={{ o: 'ziel:9.9' }} />);

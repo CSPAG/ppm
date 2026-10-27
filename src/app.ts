@@ -12,6 +12,7 @@ import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
+import { projektdatenModule } from './modules/projektdaten/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
@@ -28,6 +29,7 @@ export const app = defineApp({
     phasenmodellModule,
     portfolioModule,
     projektModule,
+    projektdatenModule,
     zielModule,
     webhooksModule,
   ],

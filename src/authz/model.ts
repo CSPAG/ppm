@@ -209,6 +209,8 @@ export const model = defineModel({
     get_projekt: { title: 'Projekt lesen', permission: 'projekt:read', readOnly: true },
     // portfolio
     list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
+    // projektdaten
+    get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },

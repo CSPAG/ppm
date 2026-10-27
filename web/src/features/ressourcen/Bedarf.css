@@ -1,0 +1,23 @@
+/* Seite «Bedarf» (UI-25, AP-E7-2): Filter, Schublade mit Zuteilung, Überbuchungen; Farben aus den Variablen der Werkbank */
+.res-bedarf-filter{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.res-filter{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-2)}
+.res-filter select{height:34px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface);color:var(--fg);padding:0 8px}
+.res-zuteilung,.res-deckung,.res-beteiligte{margin:6px 0 12px}
+.res-zuteilung caption{text-align:left;font-weight:600;padding:4px 0}
+.res-zuteilung th,.res-zuteilung td,.res-deckung th,.res-deckung td,.res-beteiligte th,.res-beteiligte td{padding:6px 8px 6px 0;border-bottom:1px solid var(--line);text-align:left}
+.res-zuteilung .num,.res-deckung .num,.res-beteiligte .num{text-align:right;font-variant-numeric:tabular-nums}
+.res-luecke-zeile td{color:var(--bad)}
+.res-anteil{display:inline-flex;gap:6px;align-items:center;justify-content:flex-end}
+.res-anteil input,.res-zuteilen input,.res-luecke textarea{border:1px solid var(--line-2);border-radius:7px;background:var(--surface);color:var(--fg);padding:4px 8px}
+.res-anteil input[aria-invalid="true"],.res-zuteilen input[aria-invalid="true"]{border-color:var(--bad)}
+.res-zuteilen,.res-luecke{display:grid;gap:8px;margin-top:6px}
+.res-zuteilen fieldset{border:0;margin:0;padding:0}
+.res-zuteilen legend{font-size:13px;color:var(--fg-2);margin-bottom:4px}
+.res-personen{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:220px;overflow:auto}
+.res-personen label{display:flex;gap:8px;align-items:center;min-height:32px}
+.res-personen .muted{margin-left:auto}
+.res-voll{color:var(--bad)}
+.res-zuteilen-felder{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center}
+.res-konflikte{display:grid;gap:14px}
+.res-konflikt{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.res-warnungen{display:grid;gap:8px;margin-bottom:10px}

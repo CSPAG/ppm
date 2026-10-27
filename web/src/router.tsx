@@ -11,7 +11,7 @@ import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
-import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { AuslastungPage, BedarfPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -206,6 +206,20 @@ function KapazitaetRoute() {
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Portfolio › Ressourcen › Bedarf (UI-25; BC RK.02.02, RK.02.03; AP-E7-2)
+const bedarfRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.bedarf, validateSearch: searchOf.bedarf, component: BedarfRoute,
+});
+
+function BedarfRoute() {
+  const search = bedarfRoute.useSearch();
+  const navigate = useNavigate({ from: bedarfRoute.fullPath });
+  const setSearch = useCallback<SetBedarfSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BedarfPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -336,6 +350,7 @@ const routeTree = rootRoute.addChildren([
   ressourcenRoute,
   auslastungRoute,
   kapazitaetRoute,
+  bedarfRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

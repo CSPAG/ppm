@@ -29,10 +29,10 @@ test('Stellvertretung erfassen und beenden; die Vertretung erhält eine Mitteilu
   await expectNoOverflow(page);
   await page.getByRole('button', { name: 'Stellvertretung erfassen' }).first().click();
   const dlg = page.getByRole('dialog', { name: 'Stellvertretung erfassen' });
-  await dlg.getByLabel('Vertretung').fill('Bruno');
+  await dlg.getByRole('searchbox', { name: 'Vertretung' }).fill('Bruno');
   await dlg.getByRole('button', { name: /Bruno/ }).first().click();
   const bis = new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10);
-  await dlg.getByLabel('Bis').fill(bis);
+  await dlg.getByLabel('Bis', { exact: true }).fill(bis);
   await expect(dlg.getByText(/Wirkung:/)).toBeVisible();
   await expectAccessible(page);
   await dlg.getByRole('button', { name: 'Stellvertretung erfassen' }).click();

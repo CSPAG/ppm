@@ -17,6 +17,7 @@ import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/si
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { StellvertretungPage, type SetKontoSearch } from './features/konto/index.ts';
 import { ZIELJAHR, ZielePage, ZielzyklusPage, type SetZielSearch, type SetZielzyklusSearch } from './features/ziele/index.ts';
+import { abgeschlossenesQuartal, ZielePage, ZielerreichungPage, type QuartalNr, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -143,6 +144,31 @@ function IdeeRoute() {
   }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
   return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
+// Zielerreichung je Quartal (UI-40, BC ZM.03.01, AP-E6-3): /ziele/2026/zielerreichung?quartal=q3; ohne Jahr und Quartal
+// das zuletzt abgeschlossene Quartal
+const zielerreichungStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/zielerreichung',
+  beforeLoad: () => {
+    const q = abgeschlossenesQuartal();
+    throw redirect({ to: '/ziele/$jahr/zielerreichung', params: { jahr: String(q.jahr) }, search: { quartal: `q${q.quartal}` }, replace: true });
+  },
+});
+
+const zielerreichungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/zielerreichung', validateSearch: searchOf.zielerreichung, component: ZielerreichungRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function ZielerreichungRoute() {
+  const { jahr } = zielerreichungRoute.useParams();
+  const search = zielerreichungRoute.useSearch();
+  const navigate = useNavigate({ from: zielerreichungRoute.fullPath });
+  const quartal = Number((search.quartal ?? `q${abgeschlossenesQuartal().quartal}`).slice(1)) as QuartalNr;
+  const setQuartal = useCallback((j: number, q: QuartalNr) => {
+    void navigate({ to: '/ziele/$jahr/zielerreichung', params: { jahr: String(j) }, search: { quartal: `q${q}` } });
+  }, [navigate]);
+  const zuZielen = useCallback(() => { void navigate({ to: '/ziele/strategische-ziele' }); }, [navigate]);
+  return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
 }
 
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
@@ -251,6 +277,8 @@ const routeTree = rootRoute.addChildren([
   ideenRoute,
   ideeNeuRoute,
   ideeRoute,
+  zielerreichungStartRoute,
+  zielerreichungRoute,
   organisationRoute,
   codetabellenRoute,
   phasenmodellRoute,

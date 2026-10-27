@@ -43,7 +43,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
 | AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API umgesetzt: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Aufgabe «Jahresziele vervollständigen» über den Eingang umgesetzt; `projektZuordnen` für den Vertrag mit 301; PR 3 Oberfläche UI-38 Zielzyklus in Review) | #28, #34, #38 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
-| AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
+| AP-E6-3 | Zielerreichung | 320–329 | teilweise (PR 1: 320, `/v1/zielerreichung/:quartal`, Seite Ziele › Zielerreichung UI-40; PR 2 Aufgabe im Eingang folgt) | #37 | Zielerreichung je strategischem Ziel und Jahresziel des Jahres (`ziel_typ`); `beurteilung` als Kommentar ohne Skala (keine festgelegt); ein Stand je Ziel und Quartal, Änderungen im Audit; Jahresziele nur im Quartal ihres Jahres; Aufgabe `zielerreichung.erfassen` (Job nach Quartalsende) folgt in PR 2, sobald es ein Muster für zeitgesteuerte Aufgaben je Organisation gibt (wie AP-E1-1, Job am 18.) |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
 | AP-E7-1 | Abschluss, Sistierung, Abbruch, Lessons Learned | 340–349 | offen | – | – |
 | AP-E7-2 | Ressourcen zuteilen, Konflikte | 350–359 | offen | – | – |
@@ -66,7 +66,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
 | ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
 | ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API umgesetzt, Oberfläche UI-38 in Review | #28 |
-| ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
+| ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | teilweise (UC-012 Schritte 1–2; Aufgabe im Eingang folgt in PR 2) | #37 |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
 | DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | API umgesetzt, Oberfläche in Arbeit | #36 |

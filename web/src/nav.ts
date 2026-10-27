@@ -12,6 +12,7 @@ import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
 import { sucheZiele, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
+import { sucheZiele, zieleTexte, zielerreichungTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
@@ -31,6 +32,8 @@ export const navigation: NavRegistrierung = {
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
     { raum: 'ziele', pfad: '/ziele/strategische-ziele', label: zieleTexte.bereich, recht: 'ziel:read' },
+    // Zielerreichung je Quartal (BC ZM.03.01, AP-E6-3); führt ins zuletzt abgeschlossene Quartal
+    { raum: 'ziele', pfad: '/ziele/zielerreichung', label: zielerreichungTexte.bereich, recht: 'ziel:read' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
     // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach
     // Recht aus `useIamNav()` dazu (UC-016)

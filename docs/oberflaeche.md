@@ -32,6 +32,7 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | `src/dev/` | Galerie der Bausteine unter `/dev/galerie`, nur im Entwicklungsbuild (`npm --prefix web run dev`), nicht im Produktionsbuild |
 | `src/features/handlungsfeld/` | Arbeitsraum «Ziele» › Handlungsfelder (`/ziele/handlungsfelder`): Liste mit Suche und Cursor, Schublade über `?o=<id>` (`?o=neu` zum Anlegen), Bearbeiten mit 412-Hinweis, Löschen, Verlauf |
 | `src/features/phasenmodell/` | Arbeitsraum «Administration» › Phasenmodell (`/administration/phasenmodell`, UI-46): Arbeitsfläche mit Version (`?v=`) und Abschnitt (`?e=`), automatischem Speichern, Rückgängig/Wiederholen, Prüfbericht, Entwurf anlegen, verwerfen und in Kraft setzen |
+| `src/features/stammdaten/` | Arbeitsraum «Administration» › Organisation (`/administration/organisation`, Ansichten Einheiten und Feiertage über `?ansicht=feiertage`) und Codetabellen (`/administration/codetabellen`, Werte in der Schublade `?o=<tabelle>`), UI-44, UI-45; Bereiche sichtbar mit `stammdaten:write` |
 | `src/styles/`, `src/test/`, `e2e/` | Tokens und Layout; Testhilfen; Playwright-Tests |
 
 ## Regeln

@@ -114,3 +114,8 @@ export async function personenVorhanden(tx: Tx, ids: string[]): Promise<Set<stri
 export async function strategischesZiel(tx: Tx, id: string): Promise<{ id: string; handlungsfeld_id: string } | null> {
   return (await tx.query<{ id: string; handlungsfeld_id: string }>(`SELECT id, handlungsfeld_id FROM ${SCHEMA}.strategisches_ziel WHERE id = $1`, [id])).rows[0] ?? null;
 }
+
+/** Jahresziel mit seinem strategischen Ziel (Kap. 2; Tabelle von AP-E6-1, 300); null = unbekannt. Nur lesend wie oben. */
+export async function jahresziel(tx: Tx, id: string): Promise<{ id: string; strategisches_ziel_id: string } | null> {
+  return (await tx.query<{ id: string; strategisches_ziel_id: string }>(`SELECT id, strategisches_ziel_id FROM ${SCHEMA}.jahresziel WHERE id = $1`, [id])).rows[0] ?? null;
+}

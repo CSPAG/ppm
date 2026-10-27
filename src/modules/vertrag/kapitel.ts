@@ -45,7 +45,7 @@ export const Kapitel1 = objekt('Kapitel1', 'Ausgangslage / Problembeschreibung',
 export const Kapitel2 = objekt('Kapitel2', 'Strategiebezug', {
   handlungsfeldId: Nullable({ ...Uuid, description: 'Strategisches Handlungsfeld.' }),
   strategischesZielId: Nullable({ ...Uuid, description: 'Strategisches Ziel, zu dessen Erfüllung das Projekt beiträgt (nur Ziele in Kraft).' }),
-  jahreszielId: Nullable({ ...Uuid, description: 'Jahresziel (optional, ab Zielzyklus E6).' }),
+  jahreszielId: Nullable({ ...Uuid, description: 'Jahresziel (optional) zum gewählten strategischen Ziel.' }),
   beitrag: Lang('Wie das Projekt zum Ziel beiträgt.'),
 });
 

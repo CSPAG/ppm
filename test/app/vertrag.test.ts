@@ -139,6 +139,7 @@ describe('Projektvertrag', { skip }, () => {
     const k2ok = await speichern('pl', entwurf, 2, i => { i.strategischesZielId = ziel; });
     assert.equal(k2ok.statusCode, 200, k2ok.body);
     assert.equal(k2ok.json().inhalt.handlungsfeldId, handlungsfeld);
+    assert.equal((await speichern('pl', entwurf, 2, i => { i.jahreszielId = ziel; })).statusCode, 422, 'kein Jahresziel');
     // Abhängigkeit nur zu sichtbaren Projekten
     assert.equal((await speichern('pl', entwurf, 6, i => { i.abhaengigkeiten = [{ registerId: null, zuProjektId: projekt.andere, text: 'Schnittstelle', ansprechperson: '' }]; })).statusCode, 200);
     assert.equal((await speichern('kt', entwurf, 6, () => {})).statusCode, 403);

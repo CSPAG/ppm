@@ -92,7 +92,10 @@ function runden(nr: number, inhalt: Record<string, unknown>): Record<string, unk
 type Fehler = { path: string; message: string };
 
 /** Schema des Kapitels (Q7) und fachliche Regeln der Listen; Fehler mit Pfad im Inhalt. */
-type ZielLesen = (id: string) => Promise<{ id: string; handlungsfeld_id: string } | null>;
+interface ZielLesen {
+  ziel: (id: string) => Promise<{ id: string; handlungsfeld_id: string } | null>;
+  jahresziel: (id: string) => Promise<{ id: string; strategisches_ziel_id: string } | null>;
+}
 
 async function pruefeInhalt(tx: Tx, nr: number, inhalt: unknown, zielLesen: ZielLesen): Promise<Record<string, unknown>> {
   const schema = KAPITEL[nr - 1]!;
@@ -105,12 +108,16 @@ async function pruefeInhalt(tx: Tx, nr: number, inhalt: unknown, zielLesen: Ziel
   if (nr === 2) {
     const k = i as { handlungsfeldId: string | null; strategischesZielId: string | null; jahreszielId: string | null };
     if (k.strategischesZielId) {
-      const z = await zielLesen(k.strategischesZielId);
+      const z = await zielLesen.ziel(k.strategischesZielId);
       if (!z) fehler.push({ path: '/inhalt/strategischesZielId', message: 'Dieses strategische Ziel gibt es nicht.' });
       else if (k.handlungsfeldId && z.handlungsfeld_id !== k.handlungsfeldId) fehler.push({ path: '/inhalt/handlungsfeldId', message: 'Das Ziel gehört zu einem anderen Handlungsfeld.' });
       else k.handlungsfeldId = z.handlungsfeld_id;
     }
-    if (k.jahreszielId && !k.strategischesZielId) fehler.push({ path: '/inhalt/jahreszielId', message: 'Ein Jahresziel nur zusammen mit seinem strategischen Ziel.' });
+    if (k.jahreszielId) {
+      const j = await zielLesen.jahresziel(k.jahreszielId);
+      if (!j) fehler.push({ path: '/inhalt/jahreszielId', message: 'Dieses Jahresziel gibt es nicht.' });
+      else if (j.strategisches_ziel_id !== k.strategischesZielId) fehler.push({ path: '/inhalt/jahreszielId', message: 'Das Jahresziel gehört nicht zum gewählten strategischen Ziel.' });
+    }
   }
   if (nr === 6) {
     const liste = i.abhaengigkeiten as { zuProjektId: string }[];
@@ -265,7 +272,8 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     const who = actorOf(req);
     // Strategische Ziele sind Stammdaten der Organisation (AP-E0-9, Lesen an der Organisation): Prüfung in voller Sicht,
     // damit die Projektleitung mit Rollen nur am Projekt sie wählen kann
-    const zielLesen: ZielLesen = zid => fullTx(deps.db, req.requirePrincipal().tenantId, tx => store.strategischesZiel(tx, zid));
+    const voll = <T>(fn: (tx: Tx) => Promise<T>) => fullTx(deps.db, req.requirePrincipal().tenantId, fn);
+    const zielLesen: ZielLesen = { ziel: zid => voll(tx => store.strategischesZiel(tx, zid)), jahresziel: jid => voll(tx => store.jahresziel(tx, jid)) };
     const out = await req.tx(async tx => {
       if (!bearbeitbar(v, p)) throw conflict(`Version ${v.nummer} ist ${STAND_TEXT[v.stand]} und kann nicht bearbeitet werden.`, { reason: 'stand', stand: v.stand });
       const vorher = await store.einKapitel(tx, id, nr);

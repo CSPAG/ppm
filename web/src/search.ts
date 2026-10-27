@@ -3,11 +3,14 @@
  * Feature; hier werden sie den Routen zugeordnet.
  */
 import { validateHandlungsfeldSearch, type HandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { validateIdeeNeuSearch, validateIdeeSearch } from './features/idee/index.ts';
 import { validateZielSearch, type ZielSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
   handlungsfelder: validateHandlungsfeldSearch,
   strategischeZiele: validateZielSearch,
+  ideeNeu: validateIdeeNeuSearch,
+  idee: validateIdeeSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
 export type { HandlungsfeldSearch, ZielSearch };

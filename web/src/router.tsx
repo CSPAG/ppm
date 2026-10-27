@@ -8,6 +8,7 @@ import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
@@ -52,6 +53,37 @@ function StrategischeZieleRoute() {
   return <ZielePage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
+const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
+
+function IdeenRoute() {
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeenPage gehe={gehe} />;
+}
+
+const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });
+
+function IdeeNeuRoute() {
+  const search = ideeNeuRoute.useSearch();
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeeNeuPage search={search} gehe={gehe} />;
+}
+
+const ideeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/$nummer', validateSearch: searchOf.idee, component: IdeeRoute });
+
+function IdeeRoute() {
+  const { nummer } = ideeRoute.useParams();
+  const search = ideeRoute.useSearch();
+  const navigate = useNavigate({ from: ideeRoute.fullPath });
+  const setSearch = useCallback<SetIdeeSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -60,7 +92,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, ideenRoute, ideeNeuRoute, ideeRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

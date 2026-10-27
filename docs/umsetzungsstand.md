@@ -200,4 +200,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, «Sie» | Zielgrössen |
 |---|---|---|---|---|---|---|---|
-| – | – | – | – | – | – | – | – |
+| PR 2 AP-E0-5 (`feat/portfolios-administration`) | AP-E0-5 | UI-47 Liste + Schublade (Portfolio › Gremium); Z1, Z2, Z5, Z7 (412), Z8, Z10 im Test | Formulare, Schubladen, Auswahl je Gate; E2E nur mit Tastatur in die Administration | Vitest-axe Liste und Schubladen; E2E hell, dunkel | 360 px im E2E (Projekt «schmal»), 768/1440 hell/dunkel | `features/portfolios/texte.ts`, «Sie» (check-address) | – (kein Kernablauf; UC-017) |

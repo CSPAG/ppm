@@ -10,6 +10,7 @@ import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
+import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
@@ -52,6 +53,33 @@ function StrategischeZieleRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <ZielePage search={search} setSearch={setSearch} />;
+}
+
+// Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
+const organisationRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/organisation', validateSearch: searchOf.organisation, component: OrganisationRoute,
+});
+
+function OrganisationRoute() {
+  const search = organisationRoute.useSearch();
+  const navigate = useNavigate({ from: organisationRoute.fullPath });
+  const setSearch = useCallback<SetOrganisationSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <OrganisationPage search={search} setSearch={setSearch} />;
+}
+
+const codetabellenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/codetabellen', validateSearch: searchOf.codetabellen, component: CodetabellenRoute,
+});
+
+function CodetabellenRoute() {
+  const search = codetabellenRoute.useSearch();
+  const navigate = useNavigate({ from: codetabellenRoute.fullPath });
+  const setSearch = useCallback<SetCodetabellenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <CodetabellenPage search={search} setSearch={setSearch} />;
 }
 
 // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03)
@@ -103,7 +131,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, gremienRoute, sitzungenRoute, sitzungRoute, phasenmodellRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, gremienRoute, sitzungenRoute, sitzungRoute, organisationRoute, codetabellenRoute, phasenmodellRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

@@ -134,8 +134,7 @@ Unten nur Schlüssel- und Steuerspalten; fachliche Felder ergeben sich aus Use C
 | Tabelle | Schlüssel und Steuerspalten | Bemerkung |
 |---|---|---|
 | `org_einheit` | `id`, `parent_id`, `kuerzel` (eindeutig), `name`, `art` (`direktion`/`bereich`/…), `aktiv` | Direktionen mit Kürzeln (A-23); Hierarchie |
-| `codetabelle` | `schluessel` (`projektstatus`, `trend`, `groesse`, `kategorie`, `abweichung`, `wertestrom`, `risikostufe`, `idee_herkunft`, …) | Liste fest im Code, Werte pflegbar |
-| `codewert` | `id`, `codetabelle`, `schluessel`, `label`, `position`, `aktiv` (deaktivieren statt löschen, UC-017 Schritt 2) | Vorgabewerte je Organisation beim Anlegen |
+| `codewert` | `id`, `codetabelle` (`CHECK`: `projektstatus`, `trend`, `groesse`, `kategorie`, `abweichung`, `wertestrom`, `risikostufe`, `ressourcenrolle`, `idee_herkunft`; die Liste der Codetabellen ist fest im Code, keine eigene Tabelle), `schluessel`, `label`, `position`, `aktiv` (deaktivieren statt löschen, UC-017 Schritt 2) | Vorgabewerte je Organisation beim Anlegen |
 | `feiertag` | `datum`, `label` | für Arbeitstage (A-43) |
 
 ### 2.3 phasenmodell
@@ -239,7 +238,7 @@ UX-Rückfluss UC-006 7–8).
 | `portfoliobericht` | `auswertung` | Kenntnisnahme |
 | `gate` | `vertrag` | Baseline, Phase, Phasenmodell nachführen (UC-003 Schritt 10) |
 | `aenderung` | `vertrag` | Baseline nachführen oder Entwurf verwerfen (UC-007 A1) |
-| `meilenstein` | `projektdaten` | Meilenstein abgenommen (PS.02.03) |
+| `meilenstein` | `statusbericht` | Meilenstein abgenommen über `projektdaten` (PS.02.03); `projektdaten` liegt unter `sitzung` und registriert selbst nichts |
 | `eskalation` | `statusbericht` | Eskalation erledigt; ggf. Sistieren/Abbrechen über `projekt` |
 | `idee` | `idee` | Initialisierung: Projekt in P0 anlegen (UC-001 Schritt 7) |
 | `priorisierung` | `priorisierung` | Rangfolge und Szenario als Ist-Stand (UC-008 Schritt 8) |
@@ -411,20 +410,21 @@ Rollen nach den Akteuren (Master §5), Rechte aus der Sichtbarkeitstabelle in
 
 ### 3.4 Policies der Lesesicht
 
-Restriktiv, zusätzlich zu `tenant_isolation`. Hilfsfunktionen legt AP-E0-1 an (SQL, `STABLE`, Rechte der aufrufenden Rolle,
+Restriktiv, zusätzlich zu `tenant_isolation`; **jede** Tabelle aus Abschnitt 2 hat genau ein Muster (die Liste ist vollständig; neue Tabellen zuerst hier eintragen). Hilfsfunktionen legt AP-E0-1 an (SQL, `STABLE`, Rechte der aufrufenden Rolle,
 **nicht** `SECURITY DEFINER`): `ppm.projekt_sichtbar(projekt_id uuid)` = `EXISTS (SELECT 1 FROM ppm.projekt …)` unter RLS,
 `ppm.portfolio_von(projekt_id uuid)`.
 
 | Muster | Lesen (`USING`) | Schreiben (`WITH CHECK`) | Tabellen |
 |---|---|---|---|
-| **ORG** | `app.has_permission('<bereich>:read')` | `app.has_permission('<bereich>:write')` | `org_einheit`, `codewert`, `feiertag`, `phasenmodell` + Kinder, `strategisches_ziel`, `zieljahr`, `jahresziel`, `hauptaktivitaet`, `zielerreichung`, `quartalsbericht`, `bewertungsmodell`, `kriterium`, `kapazitaet`, `vorlage`, `schnittstelle*`, `periode`, `budgetuebergabe`, `jahresrueckblick` |
+| **ORG** | `app.has_permission('<bereich>:read')` | `app.has_permission('<bereich>:write')` | `org_einheit`, `codewert`, `feiertag`, `phasenmodell` + Kinder, `strategisches_ziel`, `zieljahr`, `jahresziel`, `hauptaktivitaet`, `zielerreichung`, `quartalsbericht`, `bewertungsmodell`, `kriterium`, `kapazitaet`, `vorlage`, `schnittstelle*`, `periode`, `budgetuebergabe`, `jahresrueckblick`, `roadmap` (Lesen nach Publikation mit `tenant:read`, A-35) |
 | **PORTFOLIO** | `app.has_permission('<r>') OR app.has_permission('<r>', 'portfolio', portfolio_id)` | dasselbe mit dem Schreibrecht | `portfolio` (Lesen mit `portfolio:read`), `gremium`, `gremienweg`, `sitzungstermin`, `sitzung`, `traktandum` (über Sitzung), `rangfolge`, `szenario*`, `budgetrahmen`, `risiko` (Portfoliorisiko) |
 | **PROJEKT** (Blatt) | `(app.read_all() OR portfolio_id = ANY (app.read_types()) OR app.has_tuple('projekt', id, app.read_relations())) AND (NOT vertraulich OR app.has_tuple('projekt', id, app.read_relations()) OR app.has_permission('projekt:vertraulich') OR app.has_permission('projekt:vertraulich', 'portfolio', portfolio_id))` | `app.write_all() OR portfolio_id = ANY (app.write_types()) OR app.has_tuple('projekt', id, app.write_relations())`; Anlegen: `app.has_permission('projekt:create') OR app.has_permission('projekt:create', 'portfolio', portfolio_id)` | `projekt` |
 | **KIND** | `ppm.projekt_sichtbar(projekt_id)` | `app.has_permission('<recht>', 'projekt', projekt_id)` | `projekt_person`, `meilenstein`, `risiko` (Projektrisiko), `kpi`, `kpi_wert` (`kpi:write`), `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`, `meldung`, `statusbericht` (`statusbericht:write`; Prüfung: `statusbericht:review`), `rueckfrage`, `eskalation`, `vertrag_*`, `quality_check` (`vertrag:review`), `unterschrift` (`vertrag:sign`), `ziel_projekt`, `abschlussbericht`, `lessons_learned`, `bewertung` (`priorisierung:write`) |
 | **BETRAG** | `ppm.projekt_sichtbar(projekt_id) AND (app.has_permission('finanzen:read', 'projekt', projekt_id) OR app.has_permission('finanzen:read', 'portfolio', ppm.portfolio_von(projekt_id)))` | KIND mit `projekt:write` bzw. `finanzen:write` | `kosten`, `ist_kosten`, `abweichung_begruendung` |
 | **EIGEN** | `<person> = app.principal_id() OR <Recht wie oben>` | `<person> = app.principal_id()` | `idee` (`erfasst_von`, `vorgesehener_sponsor`; sonst `idee:read` an org/portfolio), `idee_rueckfrage`, `stellvertretung`, `mitteilung` |
 | **AUFGABE** | `empfaenger_person = app.principal_id() OR (empfaenger_recht IS NOT NULL AND (CASE ort_typ WHEN 'org' THEN app.has_permission(empfaenger_recht) ELSE app.has_permission(empfaenger_recht, ort_typ, ort_id) END)) OR <Stellvertretung>` | nur das schreibende Modul über `eingang` | `aufgabe` |
-| **STAND** | wie KIND bzw. PORTFOLIO | nur anhängen (kein UPDATE/DELETE für `ppm_app`) | alle `*_version`, `entscheid_version`, `dashboard_zeile` |
+| **STAND** | wie KIND bzw. PORTFOLIO | nur anhängen (kein UPDATE/DELETE für `ppm_app`) | alle `*_version` (auch `projekt_version`, `strategisches_ziel_version`), `entscheid_version`, `dashboard_zeile` |
+| **ÜBER ELTERN** | `EXISTS` auf die Elternzeile (deren Policy wirkt mit) | Schreibrecht des Elternobjekts | Sitzung: `einladung`, `unterlage`, `entscheid`, `auflage`, `protokoll` (Eltern `traktandum`/`sitzung`, Schreiben `sitzung:write`); Vertrag: `vertrag_version`, `vertrag_kapitel`, `gate_antrag`, `leitfrage_antwort`, `nutzenpruefung`, `beilage` (Eltern Projekt, Schreiben `vertrag:write`); Idee: `idee_leitfrage`, `idee_raster` (Schreiben `idee:write`); Ressourcen: `zuteilung` (`ressource:write`) |
 
 Sichtbarkeit innerhalb von Gremien: Unterlagen und Protokollentwurf vor dem Versand nur mit `sitzung:write`; Mitglieder
 (`sitzung:read`) ab `versendet`; Eingeladene nur ihr Traktandum (Policy über `einladung.person_id = app.principal_id()`).
@@ -580,6 +580,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | `test/app/rls.test.ts`, `test/app/tenant-isolation.test.ts` | AP-E0-1 teilt Matrix und Fälle in Dateien je Modul (`test/app/matrix/<modul>.ts`) mit einer Import-Zeile je Modul; danach ändert jedes Paket nur seine Datei und eine Zeile |
 | Erzeugte Dateien (`web/openapi.json`, `web/src/api/schema.d.ts`, `infra/keycloak/platform.json`, `.env.example`, `docs/konfiguration.md`) | nie von Hand auflösen: nach dem Merge von `main` neu erzeugen |
 | `docs/umsetzungsstand.md` | nur die eigenen Zeilen; Konflikt = beide Änderungen behalten |
+| `src/modules/<x>/index.ts`, `web/src/features/<x>/index.ts` bei Erweiterungspaketen | Ein Paket, das Dateien in einem Modul oder Feature eines anderen Pakets besitzt (z. B. AP-E2-2 in `sitzung`, AP-E3-2–E3-5 in `vertrag`), legt eigene Dateien an (`routes-<teil>.ts`, `schemas-<teil>.ts`, `mcp-<teil>.ts`, Seiten) und ändert in `index.ts` des Moduls bzw. Features je Datei **eine** Zeile (Import und Aufruf in `register`, Werkzeuge, Export); `routes.ts`, `store.ts` und `schemas.ts` des Grundpakets bleiben unberührt, gemeinsame Abfragen kommen in eine eigene `store-<teil>.ts`. Das Grundpaket legt `register` so an, dass weitere Routendateien je eine Zeile brauchen |
 
 ### 7.3 Pakete
 
@@ -591,7 +592,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | **AP-E0-1** | Rechte Stufe «mittel» vollständig (Abschnitt 3), Orte Portfolio und Projekt (Tabellen `portfolio` und `projekt` als Kern; übrige Spalten und Tabellen ergänzen AP-E0-4 und AP-E0-5), Hilfsfunktionen der Lesesicht, Aufteilung der RLS-/Isolationsmatrix je Modul. PR 1 ohne Routen, **zuerst und schnell** | `portfolio`, `projekt` (nur Migration, keine Routen) | `src/authz/`, `web/src/auth/permissions.ts`, `infra/keycloak/platform.json` (erzeugt), `db/migrations/010–019`, `test/app/matrix/`, `test/app/rls.test.ts`, `test/app/tenant-isolation.test.ts` | 010–019 | sofort · – | `npm run check`; Konformitätstest; Test «Lesesicht = `can`» für Projekt (Rolle an Portfolio, an Projekt, vertraulich) |
 | **AP-E0-2** | Organisationseinheiten, Codetabellen mit Vorgabewerten, Feiertage (AM.02.01, AM.02.02; UC-017 Schritte 1–2) | `stammdaten` · `stammdaten` | `src/modules/stammdaten/`, `web/src/features/stammdaten/` | 020–029 | sofort · AP-E0-1 | UI-44, UI-45 Liste + Schublade; UX-DoD |
 | **AP-E0-3** | Phasenmodell versioniert mit Gates, Leitfragen je Wertestrom, Standard-Ergebnissen, Pflichtangaben, Kapitelwirkung, Fristen, Toleranzen; Vorgabe PM-Handbuch; in Kraft setzen (AM.02.03; UC-017 Schritte 3, 5) | `phasenmodell` · `phasenmodell` | `src/modules/phasenmodell/`, `web/src/features/phasenmodell/` | 030–039 | sofort · AP-E0-1 | UI-46 Arbeitsfläche; Arbeitstage-Rechnung mit Feiertagen getestet; UX-DoD |
-| **AP-E0-4** | Projekt: Routen, Nummer, Lebenszyklus, Projektorganisation mit Tupeln, Meine Projekte, Projektübersicht, Rahmen der Projektakte (PP.04.04; UC-002 Schritt 2, UC-014 A1, UC-016 Schritt 2) | `projekt` · `projekt` | `src/modules/projekt/`, `web/src/features/projekt/` | 040–049 | nach AP-E0-1 PR 1 · AP-E0-1, AP-E0-2 | UI-05, UI-06; Projektrolle wirkt nur im eigenen Projekt (Test); UX-DoD |
+| **AP-E0-4** | Projekt: Routen, Nummer, Lebenszyklus, Projektorganisation mit Tupeln, Meine Projekte, Projektübersicht, Rahmen der Projektakte (PP.04.04; UC-002 Schritt 2, UC-014 A1, UC-016 Schritt 2) | `projekt` · `projekt` | `src/modules/projekt/`, `web/src/features/projekt/` | 040–049 | nach AP-E0-1 PR 1 · AP-E0-1, AP-E0-2, AP-E0-3 | UI-05, UI-06; Projektrolle wirkt nur im eigenen Projekt (Test); UX-DoD |
 | **AP-E0-5** | Portfolios und Gremien: Pflichten je Kategorie, Gremienweg je Gate, Sitzungstermine, Administration (AM.02.04; UC-017 Schritt 4, A1) | `portfolio` · `portfolios` | `src/modules/portfolio/`, `web/src/features/portfolios/` | 050–059 | nach AP-E0-1 PR 1 · AP-E0-3 | UI-47; «via SNS-VR» aus dem Gremienweg ableitbar (Test); UX-DoD |
 | **AP-E0-6** | Register Projektdaten: Meilensteine, Kosten, Risiken, KPIs, Stakeholder, Kommunikation, Abhängigkeiten, Ressourcenbedarf, Meldung ICT/Infrastruktur; API ohne eigene Seiten (Lesend in der Projektübersicht) | `projektdaten` | `src/modules/projektdaten/` | 060–069 | nach AP-E0-1 PR 1 · AP-E0-4 | Beträge nur für Rollen mit `finanzen:read` (RLS-Test, A-33); Abhängigkeit beidseitig sichtbar |
 | **AP-E0-8** | Eingang: Aufgaben, Mitteilungen, Stellvertretung mit befristeten Tupeln; Startseite mit «Zu tun» und Kopfkarten; Profil mit Stellvertretung (AM.01.03; UC-016 Schritt 4; UX-E3) | `eingang` · `eingang`, `konto` | `src/modules/eingang/`, `web/src/features/eingang/`, `web/src/features/konto/` | 070–079 | sofort · AP-E0-1, AP-E0-0 | G1-Prüfung je Rolle; Aufgabe einer Person sieht die Vertretung (Test); UX-DoD |
@@ -613,7 +614,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | **AP-E2-1** | Sitzung, Traktandenvorschläge, Arten-Registry, Einladungen, Unterlagen-Stand, Versand 5 Arbeitstage vorher, Aufgaben «Sitzung vorbereiten» (PP.04.01, PP.04.05; UC-006 Schritte 1–5, A1, A2) | `sitzung` · `sitzung` | `src/modules/sitzung/` (ausser `entscheid*`, `protokoll*`), `web/src/features/sitzung/` (ausser `Sitzungsmodus*`, `Protokoll*`, `Entscheide*`) | 130–139 | nach AP-E0-5 · AP-E0-4, AP-E0-5, AP-E0-8 | K3-1, K3-2; UX-DoD |
 | **AP-E2-2** | Sitzungsmodus, Entscheid je Traktandum mit Folgen über die Registry, Auflagen als Aufgaben, Korrektur bis Schliessen, Protokoll erzeugen und versenden, Entscheide und Auflagen (PP.04.02, PS.02.02; UC-006 Schritte 6–9, A3, A4) | `sitzung` (Dateien `entscheid*`, `protokoll*`) · `sitzung` (Dateien `Sitzungsmodus*`, `Protokoll*`, `Entscheide*`) | diese Dateien | 140–149 | nach AP-E2-1 PR 1 · AP-E2-1 | K3-3 (≤ 60 s, Messung im E2E), K3-4, K3-5 auf Tablet-Breite; UX-DoD |
 | **AP-E2-3** | Portfoliobericht aus dem Dashboard (PDF), Risikolage aus Projekt- und Portfoliorisiken, Art `portfoliobericht` (PC.04.02, PC.02.02; UC-014 Schritte 2–3) | `auswertung` (Dateien `bericht*`, `risiko*`) · `dashboard` (Dateien `Risiken*`, `Portfoliobericht*`) | diese Dateien | 150–159 | nach AP-E1-3 · AP-E1-3, AP-E2-1 | PPM-4 (0 Dateien von Hand); UX-DoD |
-| **AP-E2-4** | Eskalation aus «kritisch» mit Entscheidbedarf und Meilensteinabnahme als Traktanden (PS.03.03, PS.02.03; UC-004 A2, UC-006 Schritt 7) | `statusbericht` (`eskalation*`), `projektdaten` (`abnahme*`) | diese Dateien | 160–169 | nach AP-E2-1 PR 1 · AP-E1-1, AP-E2-2 | Folge des Entscheids sichtbar vor Schliessen der Sitzung (Test) |
+| **AP-E2-4** | Eskalation aus «kritisch» mit Entscheidbedarf und Meilensteinabnahme als Traktanden (PS.03.03, PS.02.03; UC-004 A2, UC-006 Schritt 7) | `statusbericht` (`eskalation*`, `abnahme*`) | diese Dateien | 160–169 | nach AP-E2-1 PR 1 · AP-E1-1, AP-E2-2 | Folge des Entscheids sichtbar vor Schliessen der Sitzung (Test) |
 
 **E3 Projektvertrag und Gate** ([K2](ux/ablaeufe/K2-projektvertrag.md); Abnahme K2-1 bis K2-5, PPM-2, PPM-4)
 

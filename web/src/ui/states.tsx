@@ -5,7 +5,7 @@
 import { describeError } from '@vollholz/iam-web';
 import type { ReactNode } from 'react';
 import { Icon } from './Icon.tsx';
-import { T } from './texts.ts';
+import { T } from './texte/index.ts';
 
 export function Loading({ label = T.common.loading }: { label?: string }) {
   return <div className="loading" role="status" aria-live="polite"><span className="spin" aria-hidden="true" /><span>{label}</span></div>;

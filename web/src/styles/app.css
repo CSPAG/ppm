@@ -54,12 +54,52 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
 .modal-crumbs{margin-bottom:6px}
 .modal-b p{margin:0}
 
-/* Navigation */
-.nav.d-1{padding-left:24px} .nav.d-2{padding-left:40px} .nav.d-3{padding-left:56px} .nav.d-4{padding-left:72px} .nav.d-5{padding-left:88px}
+/* Navigation nach Arbeitsräumen (src/shell/nav.ts; IA «Navigation», I-N3): links ab 1024 px mit Namen, 768–1023 px
+   schmal mit Symbol und Name, darunter unten mit «Mehr» als Blatt von unten (I-M3); Ziele unten ≥ 44 px (Q-B4) */
+.nav.d-1{padding-left:32px} .nav.d-2{padding-left:40px} .nav.d-3{padding-left:56px} .nav.d-4{padding-left:72px} .nav.d-5{padding-left:88px}
 .nav.muted{color:var(--fg-3)}
-.rail-note{font-size:12.5px;padding:4px 8px 4px 24px}
-.rail-scrim{z-index:49}
-@media (min-width:901px){ .rail-scrim{display:none} }
+.rail ul,.bnav ul,.blatt-l{list-style:none;margin:0;padding:0}
+.rail-sub{display:flex;flex-direction:column;gap:1px;margin-top:1px}
+.bereiche{display:none;gap:2px;padding:6px 14px 0;border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
+.bereiche .tab{text-decoration:none;white-space:nowrap}
+.bnav{display:none}
+.top-konto{display:flex;align-items:center;gap:12px}
+/* Kopf der Seite: Aktionen brechen unter den Titel, statt ihn zu quetschen (360 px) */
+.mh-title{flex:1 1 220px}
+@media (max-width:1023px){
+  .shell{grid-template-columns:88px minmax(0,1fr)}
+  .rail{padding-right:0}
+  .rail .nav.raum{flex-direction:column;gap:4px;padding:8px 2px;min-height:56px;text-align:center;font-size:11.5px;line-height:1.2}
+  .rail .nav.raum .ico{width:20px;height:20px}
+  .rail .nav.raum .lbl{flex:none;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+  .rail-sub{display:none}
+  .bereiche{display:flex}
+}
+@media (max-width:767px){
+  .app{grid-template-rows:auto 1fr auto;padding-bottom:0}
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .rail,.top-konto{display:none}
+  .omni{margin-right:0}
+  .bnav{display:block;margin:0 calc(-1 * max(16px, env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px, env(safe-area-inset-left,0px)));background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .bnav ul{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+  .bn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;min-width:44px;width:100%;padding:6px 2px;border:0;background:none;color:var(--fg-2);font-size:11.5px;font-weight:500;text-decoration:none}
+  .bn .ico{width:22px;height:22px}
+  .bn.on{color:var(--accent)}
+  .bn:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:8px}
+  .toasts{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+}
+/* Blatt «Mehr» von unten */
+.overlay.blatt-wrap{align-items:flex-end;padding:0}
+.blatt{width:100%;max-height:85vh;background:var(--surface);border:1px solid var(--line-2);border-bottom:0;border-radius:14px 14px 0 0;box-shadow:var(--shadow);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);animation:up .2s ease-out}
+.blatt-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 6px}
+.blatt-h h2{margin:0;font:700 18px var(--f-display)}
+.blatt-b{overflow:auto;padding:0 12px 16px;display:flex;flex-direction:column;gap:12px}
+.blatt-i{min-height:44px;font-size:14.5px;text-decoration:none}
+.blatt-konto{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.blatt-konto h3{margin:0 8px;font:600 12px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+.blatt-person{margin:0 8px;display:flex;flex-direction:column;gap:2px}
+.blatt-konto .seg{margin:0 8px;align-self:flex-start}
+.blatt-konto .seg button{min-height:36px}
 
 select.inp{padding-right:28px}
 .chip .chip-b{border:0;background:none;padding:0;display:flex;gap:4px;min-width:0;align-items:center}
@@ -115,3 +155,53 @@ tbody td.wrap{white-space:normal;max-width:none}
 .type-ico.neutral{background:var(--surface-2)}
 .grp-h{margin:0 0 8px;font:600 12px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);display:flex;gap:8px;align-items:center}
 .tl-dot{width:9px;height:9px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 2px var(--line-2);margin:5px 0 0 7px;position:relative}
+
+/* Bausteine aus docs/ux/darstellung.md (src/ui/): nie nur Farbe, immer Symbol und Text (Q-B5) */
+.pst{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;vertical-align:middle}
+.pst-k{width:14px;height:14px;flex:none}
+.pst-voll{fill:currentColor}
+.pst-strich{fill:none;stroke:currentColor;stroke-width:1.6;stroke-dasharray:2.6 1.8}
+.pst-sym{fill:none;stroke:var(--surface);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pst-im-plan{color:var(--ok)} .pst-kritisch{color:var(--bad)} .pst-nicht-gemeldet{color:var(--fg-2)}
+.trend{display:inline-flex;color:var(--fg-2)}
+.trend .ico{width:15px;height:15px}
+.stand{display:inline-flex;align-items:center;gap:5px;min-height:22px;padding:1px 8px;border-radius:5px;border:1px solid;font-size:12px;font-weight:500;white-space:nowrap;vertical-align:middle}
+.stand .ico{width:13px;height:13px}
+.stand-d{font-weight:400}
+.stand-neutral{color:var(--fg-2);border-color:var(--line-2);background:var(--surface)}
+.stand-info{color:var(--info);border-color:color-mix(in srgb, var(--info) 45%, transparent);background:var(--info-soft)}
+.stand-ok{color:var(--ok);border-color:color-mix(in srgb, var(--ok) 45%, transparent);background:var(--ok-soft)}
+.stand-bad{color:var(--bad);border-color:color-mix(in srgb, var(--bad) 45%, transparent);background:var(--bad-soft)}
+.merkmal{display:inline-flex;align-items:center;min-height:20px;padding:0 6px;border-radius:4px;font-size:11.5px;font-weight:500;background:var(--tag-bg);color:var(--tag-fg);border:1px solid var(--tag-line);white-space:nowrap;vertical-align:middle}
+.merkmal + .merkmal{margin-left:4px}
+.pk{display:inline-flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.pk-n{font-weight:500}
+.phase{font:500 12.5px var(--f-mono)}
+.hinweis{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;border:1px solid;border-radius:8px;padding:10px 12px;font-size:13px;margin:8px 0;color:var(--fg)}
+.hinweis > .ico{margin-top:2px}
+.hinweis p{margin:0}
+.hinweis-b{flex:1 1 240px;min-width:0}
+.hinweis-q{margin-top:4px;font-size:12.5px;color:var(--fg-2)}
+.hinweis-q summary{cursor:pointer;width:max-content}
+.hinweis-hinweis{background:var(--info-soft);border-color:color-mix(in srgb, var(--info) 40%, transparent)} .hinweis-hinweis > .ico{color:var(--info)}
+.hinweis-warnung{background:var(--warn-soft);border-color:color-mix(in srgb, var(--warn) 40%, transparent)} .hinweis-warnung > .ico{color:var(--warn)}
+.hinweis-sperre{background:var(--bad-soft);border-color:color-mix(in srgb, var(--bad) 40%, transparent)} .hinweis-sperre > .ico{color:var(--bad)}
+/* Datenliste: auf dem Telefon Karten mit den markierten Spalten (I-L6) */
+.dl-teil{margin:0;padding:8px 22px;font-size:12.5px;color:var(--fg-2);border-bottom:1px solid var(--line)}
+th.num{text-align:right}
+@media (max-width:767px){
+  table.dl thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  table.dl,table.dl tbody,table.dl tr,table.dl td{display:block;width:100%}
+  table.dl tr{padding:10px 14px;border-bottom:1px solid var(--line)}
+  table.dl td{height:auto;border:0;padding:2px 0;max-width:none;white-space:normal;text-align:left}
+  table.dl td:not(.karte){display:none}
+  table.dl td.karte:not(.nm)::before{content:attr(data-label) ": ";color:var(--fg-3);font-size:12px}
+  table.dl .rowlink{white-space:normal;min-height:24px}
+  tbody tr:hover td{background:none}
+  .dl-teil{padding:8px 14px}
+}
+/* Galerie (nur Entwicklungsbuild) */
+.galerie h2{font:600 15px var(--f-display);margin:24px 0 10px}
+.galerie-reihe{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.galerie-liste{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.galerie-paar{display:contents}

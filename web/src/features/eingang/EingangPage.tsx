@@ -4,13 +4,13 @@
  * der Person aus allen Rollen nach Frist, je mit Direktaktion (I-B1), dann Mitteilungen. Zustände Z1 (Skelett nach
  * 300 ms), Z2, Z3 (Filter «Nur mit Frist»), Z5.
  */
-import { useId, type MouseEvent, type ReactNode } from 'react';
+import { Suspense, useId, type MouseEvent, type ReactNode } from 'react';
 import { useSession } from '../../auth/index.ts';
 import {
   Empty, ErrorState, fmtDatum, fmtFrist, fmtFristArbeitstage, fmtZeitpunkt, Hinweis, Icon, Skelett, T, tageBis, useToast, useVerzoegert,
 } from '../../ui/index.ts';
 import { useAnzahl, useAufgaben, useEingangMutations, useMitteilungen, useVertretungen, type Aufgabe, type Mitteilung } from './api.ts';
-import { KOPFKARTEN } from './kopf.ts';
+import type { KopfKarte } from './kopf.ts';
 import type { EingangSearch, SetEingangSearch } from './search.ts';
 import { E } from './texte.ts';
 import './eingang.css';
@@ -31,7 +31,11 @@ function Ziel({ pfad, gehe, className, label, children, onGo }: { pfad: string; 
   return <a href={pfad} className={className} aria-label={label} onClick={klick}>{children}</a>;
 }
 
-export function EingangPage({ search, setSearch, gehe }: { search: EingangSearch; setSearch: SetEingangSearch; gehe: Gehe }) {
+export function EingangPage({ search, setSearch, gehe, kopfkarten = [] }: {
+  search: EingangSearch; setSearch: SetEingangSearch; gehe: Gehe;
+  /** Kopfkarten der Module (src/kopfkarten.ts), je nach Recht sichtbar. */
+  kopfkarten?: readonly KopfKarte[];
+}) {
   const titleId = useId();
   return (
     <section aria-labelledby={titleId} className="eingang">
@@ -47,7 +51,7 @@ export function EingangPage({ search, setSearch, gehe }: { search: EingangSearch
         </div>
       </header>
       <div className="body eg-body">
-        <Kopf gehe={gehe} />
+        <Kopf gehe={gehe} kopfkarten={kopfkarten} />
         <ZuTun filter={search.filter} setSearch={setSearch} gehe={gehe} />
         <Mitteilungen gehe={gehe} />
       </div>
@@ -55,11 +59,11 @@ export function EingangPage({ search, setSearch, gehe }: { search: EingangSearch
   );
 }
 
-function Kopf({ gehe }: { gehe: Gehe }) {
+function Kopf({ gehe, kopfkarten }: { gehe: Gehe; kopfkarten: readonly KopfKarte[] }) {
   const { canSomewhere } = useSession();
   const anzahl = useAnzahl();
   const vertretungen = useVertretungen();
-  const karten = KOPFKARTEN.filter(k => canSomewhere(k.recht));
+  const karten = kopfkarten.filter(k => canSomewhere(k.recht));
   const n = anzahl.data;
   const aktiv = (vertretungen.data ?? []).filter(v => v.aktiv);
   return (
@@ -75,7 +79,11 @@ function Kopf({ gehe }: { gehe: Gehe }) {
             </p>
           ) : anzahl.error ? <ErrorState error={anzahl.error} onRetry={() => void anzahl.refetch()} /> : <span className="sk" aria-hidden="true" />}
         </article>
-        {karten.map(k => <k.Karte key={k.id} />)}
+        {karten.map(k => (
+          <article key={k.id} className="eg-karte">
+            <Suspense fallback={<span className="sk" aria-hidden="true" />}><k.Karte /></Suspense>
+          </article>
+        ))}
       </div>
       {aktiv.map(v => (
         <Hinweis key={v.id} stufe="hinweis" aktion={<Ziel pfad="/konto/stellvertretung" gehe={gehe} className="btn sm">{E.vertretung.verwalten}</Ziel>}>

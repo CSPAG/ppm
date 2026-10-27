@@ -14,6 +14,7 @@ import { T } from '../../ui/index.ts';
 import { EingangPage } from './EingangPage.tsx';
 import type { EingangSearch, SetEingangSearch } from './search.ts';
 import { E } from './texte.ts';
+import type { KopfKarte } from './kopf.ts';
 
 const tag = (n: number) => { const d = new Date(Date.now() + n * 86_400_000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const ANNA = { id: '00000000-0000-4000-8000-0000000000aa', name: 'Anna Muster' };
@@ -25,13 +26,13 @@ const aufgabe = (o: Record<string, unknown> = {}) => ({
 });
 const leer = { 'GET /v1/mitteilungen': () => json({ items: [], nextCursor: null, ungelesen: 0 }), 'GET /v1/stellvertretungen': () => json({ items: [] }) };
 
-function Page({ initial = {}, gehe = () => {} }: { initial?: EingangSearch; gehe?(p: string): void }) {
+function Page({ initial = {}, gehe = () => {}, kopfkarten }: { initial?: EingangSearch; gehe?(p: string): void; kopfkarten?: readonly KopfKarte[] }) {
   const [search, set] = useState<EingangSearch>(initial);
   const setSearch = useCallback<SetEingangSearch>(next => set(s => {
     const m: Record<string, unknown> = { ...s, ...next };
     return Object.fromEntries(Object.entries(m).filter(([, v]) => v !== undefined)) as EingangSearch;
   }), []);
-  return <EingangPage search={search} setSearch={setSearch} gehe={gehe} />;
+  return <EingangPage search={search} setSearch={setSearch} gehe={gehe} kopfkarten={kopfkarten} />;
 }
 
 function stub(routes: Parameters<typeof mockIamApi>[0]) {
@@ -63,6 +64,17 @@ describe('Eingang', () => {
     await userEvent.click(within(zeilen[1]!).getByRole('link', { name: E.zuTun.oeffnenAria('Statusbericht Oktober erstellen') }));
     expect(gehe).toHaveBeenCalledWith('/projekte/2026-014/bericht');
     await expectNoAxe(container);
+  });
+
+  it('Kopfkarten der Module erscheinen nach Recht (src/kopfkarten.ts)', async () => {
+    stub({ 'GET /v1/eingang/anzahl': () => json({ offen: 0, ueberfaellig: 0, naechsteFrist: null }), 'GET /v1/eingang': () => json({ items: [], nextCursor: null }) });
+    const karten: KopfKarte[] = [
+      { id: 'mit', recht: 'handlungsfeld:read', Karte: () => <p>Karte mit Recht</p> },
+      { id: 'ohne', recht: 'webhook:admin', Karte: () => <p>Karte ohne Recht</p> },
+    ];
+    renderWithIam(<Page kopfkarten={karten} />);
+    expect(await screen.findByText('Karte mit Recht')).toBeInTheDocument();
+    expect(screen.queryByText('Karte ohne Recht')).not.toBeInTheDocument();
   });
 
   it('leer beim ersten Mal und leer durch Filter mit «Filter zurücksetzen»', async () => {

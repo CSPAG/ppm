@@ -5,6 +5,7 @@
 export const E = {
   titel: 'Eingang',
   sub: 'Was jetzt gilt und zu tun ist – aus allen Ihren Rollen.',
+  zaehler: (n: number) => (n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),
   kopf: {
     titel: 'Ihre Aufgaben',
     offen: (n: number) => (n === 0 ? 'Keine offenen Aufgaben' : n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),

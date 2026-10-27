@@ -20,6 +20,7 @@ import type { SetSitzungSearch } from './features/sitzung/index.ts';
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
+import { kopfkarten } from './kopfkarten.ts';
 import { seite } from './routes/seite.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
@@ -62,7 +63,7 @@ function EingangRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <EingangPage search={search} setSearch={setSearch} gehe={gehe} />;
+  return <EingangPage search={search} setSearch={setSearch} gehe={gehe} kopfkarten={kopfkarten} />;
 }
 
 // Kontomenü › Profil mit Stellvertretung (UI-43, UC-016 Schritt 4)

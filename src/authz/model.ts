@@ -208,6 +208,7 @@ export const model = defineModel({
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     // statusbericht
     list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
+    get_periode: { title: 'Monatsabschluss einer Periode lesen', permission: 'statusbericht:review', readOnly: true },
   },
   features: { audit: true },
 });

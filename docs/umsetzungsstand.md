@@ -22,7 +22,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | in Arbeit (PR 1 #30: 090, Periode und Statusbericht, API mit Vorbelegung aus der Vorperiode, Einreichen mit Rückgängig; PR 2: Berichtsaufgabe am 18., Register, Oberfläche UI-13) | – | A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
-| AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
+| AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | in Arbeit (PR 1: 100, Prüfung, Rückfrage, Einfordern, Abschluss mit «nicht gemeldet», Terminabweichungen, Aufgaben, MCP `get_periode`; PR 2: Oberfläche UI-15, UI-16) | – | A-11, A-28, A-37; Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der Vorperiode, jede Prognose über Budget (K1-4); berichtspflichtig = aktiv, P0–P3, Portfolio mit Pflichten (A-07, A-08); «Periode abschliessen» per Job am Stichtag, eingereiht beim ersten Einreichen (ohne Phasenmodell sofort; Fristen aus dem Phasenmodell nach dem Merge von AP-E0-3); Tabelle `einforderung` (fachmodell.md 2.8) |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | offen | – | – |
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
@@ -97,9 +97,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | offen | – |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | offen | – |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | in Arbeit (API) | – |
-| PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |
-| PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | offen | – |
-| PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | offen | – |
+| PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
+| PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
+| PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
 | PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |

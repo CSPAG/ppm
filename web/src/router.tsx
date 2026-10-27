@@ -15,7 +15,7 @@ import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearc
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
-import { type SetSitzungSearch, SitzungenPage, SitzungPage } from './features/sitzung/index.ts';
+import { EntscheidePage, ProtokollPage, type SetEntscheideSearch, type SetSitzungSearch, SitzungenPage, SitzungPage, SitzungsmodusPage } from './features/sitzung/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { type SetKontoSearch, StellvertretungPage } from './features/konto/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
@@ -299,7 +299,41 @@ function SitzungRoute() {
   const setSearch = useCallback<SetSitzungSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
-  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} />;
+  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+// Sitzungsmodus (UI-34), Protokoll (UI-35) und Entscheide (UI-36), AP-E2-2
+const sitzungsmodusRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum/modus', validateSearch: searchOf.sitzung, component: SitzungsmodusRoute,
+});
+
+function SitzungsmodusRoute() {
+  const { kuerzel, datum } = sitzungsmodusRoute.useParams();
+  const search = sitzungsmodusRoute.useSearch();
+  const navigate = useNavigate({ from: sitzungsmodusRoute.fullPath });
+  const setSearch = useCallback<SetSitzungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SitzungsmodusPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const protokollRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum/protokoll', component: ProtokollRoute });
+
+function ProtokollRoute() {
+  const { kuerzel, datum } = protokollRoute.useParams();
+  const navigate = useNavigate();
+  return <ProtokollPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const entscheideRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/entscheide', validateSearch: searchOf.entscheide, component: EntscheideRoute });
+
+function EntscheideRoute() {
+  const search = entscheideRoute.useSearch();
+  const navigate = useNavigate({ from: entscheideRoute.fullPath });
+  const setSearch = useCallback<SetEntscheideSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <EntscheidePage search={search} setSearch={setSearch} />;
 }
 
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
@@ -322,6 +356,9 @@ const routeTree = rootRoute.addChildren([
   gremienRoute,
   sitzungenRoute,
   sitzungRoute,
+  sitzungsmodusRoute,
+  protokollRoute,
+  entscheideRoute,
   zielzyklusRoute,
   ideenRoute,
   ideeNeuRoute,

@@ -8,7 +8,7 @@ import { eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
-import { sitzungTexte } from './features/sitzung/index.ts';
+import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
@@ -24,8 +24,10 @@ export const navigation: NavRegistrierung = {
     { raum: 'eingang', pfad: '/eingang', label: eingangTexte.titel, recht: 'tenant:read' },
     // Arbeitsraum «Projekte»: Meine Projekte mit der Projektakte (UI-05, UI-06; Projektrollen sehen nur ihre Projekte)
     { raum: 'projekte', pfad: '/projekte', label: projektTexte.bereich, recht: 'projekt:read' },
-    // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1); Entscheide und Jahresrückblick folgen
+    // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1); Jahresrückblick folgt
     { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read' },
+    // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
+    { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
     { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: 'idee:create' },
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite

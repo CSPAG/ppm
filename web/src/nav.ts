@@ -13,8 +13,7 @@ import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts'
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
-import { sucheZiele, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
-import { sucheZiele, zieleTexte, zielerreichungTexte, zielO } from './features/ziele/index.ts';
+import { sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 

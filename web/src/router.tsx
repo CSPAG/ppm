@@ -10,16 +10,15 @@ import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
+import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
-import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
+import { type SetSitzungSearch, SitzungenPage, SitzungPage } from './features/sitzung/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
-import { StellvertretungPage, type SetKontoSearch } from './features/konto/index.ts';
-import { ZIELJAHR, ZielePage, ZielzyklusPage, type SetZielSearch, type SetZielzyklusSearch } from './features/ziele/index.ts';
-import { abgeschlossenesQuartal, ZielePage, ZielerreichungPage, type QuartalNr, type SetZielSearch } from './features/ziele/index.ts';
+import { type SetKontoSearch, StellvertretungPage } from './features/konto/index.ts';
+import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -146,6 +145,8 @@ function IdeeRoute() {
   }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
   return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
+}
+
 // Zielerreichung je Quartal (UI-40, BC ZM.03.01, AP-E6-3): /ziele/2026/zielerreichung?quartal=q3; ohne Jahr und Quartal
 // das zuletzt abgeschlossene Quartal
 const zielerreichungStartRoute = createRoute({
@@ -171,6 +172,8 @@ function ZielerreichungRoute() {
   }, [navigate]);
   const zuZielen = useCallback(() => { void navigate({ to: '/ziele/strategische-ziele' }); }, [navigate]);
   return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
+}
+
 // Arbeitsraum «Portfolio» › Ressourcen: Auslastung (UI-23) und Kapazität (UI-24) (BC RK.01.01, RK.02.04, AP-E5-4)
 const ressourcenRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/ressourcen',
@@ -201,6 +204,8 @@ function KapazitaetRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,

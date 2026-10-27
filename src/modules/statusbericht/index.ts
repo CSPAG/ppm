@@ -23,18 +23,14 @@ export const statusberichtModule = defineModule({
     registerPruefungRoutes(app, deps);
     registerAbschlussRoutes(app, deps);
   },
-  jobs: [oeffnenJob],
+  jobs: [oeffnenJob, periodeFaelligJob],
   tasks: [berichtsaufgabenTask],
-  mcpTools: { ...statusberichtTools },
+  mcpTools: { ...statusberichtTools, ...pruefungTools },
 });
 
 // Berichtsaufgabe und Mitteilung «kritisch» (AP-E1-1, fachmodell.md 4.2)
 folgen.beimEinreichen(beimEinreichen);
 folgen.beimZurueckziehen(beimZurueckziehen);
-  jobs: [periodeFaelligJob],
-  mcpTools: { ...statusberichtTools, ...pruefungTools },
-});
-
 // Prüfung und Monatsabschluss (AP-E1-2): Folgen des Einreichens
 registriereFolgen();
 

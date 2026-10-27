@@ -218,6 +218,10 @@ export const model = defineModel({
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)
     projekt: { write: 'projekt:write', organisation: 'projekt:organisation' },
+    // phasenmodell
+    get_phasenmodell: { title: 'Phasenmodell lesen', permission: 'phasenmodell:read', readOnly: true },
+    // ziel
+    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },
   features: { audit: true },
 });

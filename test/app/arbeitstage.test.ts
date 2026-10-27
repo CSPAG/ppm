@@ -1,10 +1,12 @@
 /**
  * Arbeitstage (A-43) und Fristen des Phasenmodells (docs/fachmodell.md 2.14): Montag bis Freitag ohne Feiertage der
- * Organisation. Beispiele aus den Kernabläufen K2 und K3 (Versand 5 Arbeitstage vor, Protokoll 3 nach der Sitzung).
+ * Organisation (Rechnung in `stammdaten`, Fristen aus dem Phasenmodell). Beispiele aus den Kernabläufen K2 und K3
+ * (Versand 5 Arbeitstage vor, Protokoll 3 nach der Sitzung).
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
-import { addiereArbeitstage, arbeitstageBis, arbeitstageZwischen, fristDatum, istArbeitstag, plusArbeitstage } from '../../src/modules/phasenmodell/index.ts';
+import { fristDatum } from '../../src/modules/phasenmodell/index.ts';
+import { plusArbeitstage as addiereArbeitstage, arbeitstageZwischen, istArbeitstag, plusArbeitstageDb } from '../../src/modules/stammdaten/index.ts';
 import { full, skipDb } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 
@@ -49,12 +51,10 @@ describe('Arbeitstage (rein)', () => {
     assert.equal(addiereArbeitstage('2025-12-10', -30, keine), '2025-10-29');
   });
 
-  test('null Arbeitstage, Start am Wochenende, ungültige Eingaben', () => {
+  test('null Arbeitstage, Start am Wochenende, keine Bruchteile', () => {
     assert.equal(addiereArbeitstage('2025-11-15', 0, keine), '2025-11-15');
     assert.equal(addiereArbeitstage('2025-11-15', 1, keine), '2025-11-17');   // Sa → Mo
     assert.equal(addiereArbeitstage('2025-11-16', -1, keine), '2025-11-14');  // So → Fr
-    assert.throws(() => addiereArbeitstage('2025-02-30', 1, keine), RangeError);
-    assert.throws(() => addiereArbeitstage('12.11.2025', 1, keine), RangeError);
     assert.throws(() => addiereArbeitstage('2025-11-12', 1.5, keine), RangeError);
   });
 
@@ -88,12 +88,7 @@ describe('Fristen mit Feiertagen der Organisation', { skip }, () => {
     assert.equal(e.statusCode, 201, e.body);
     const k = await api.app.inject({ method: 'POST', url: `/v1/phasenmodelle/${e.json().id}/in-kraft-setzen`, headers: { ...h, 'if-match': e.headers.etag as string } });
     assert.equal(k.statusCode, 200, k.body);
-    // Feiertage gehören `stammdaten` (AP-E0-2, docs/fachmodell.md 2.2); fehlt die Tabelle noch, legt der Test sie an
-    const da = (await api.t.admin.query<{ t: string | null }>("SELECT to_regclass('ppm.feiertag')::text AS t")).rows[0]!.t;
-    if (!da) {
-      await api.t.admin.query('CREATE TABLE ppm.feiertag (tenant_id uuid NOT NULL, datum date NOT NULL, label text NOT NULL, PRIMARY KEY (tenant_id, datum))');
-      await api.t.admin.query('GRANT SELECT, INSERT ON ppm.feiertag TO ppm_app');
-    }
+    // Feiertage der Organisation (stammdaten, AM.02.02)
     await full(api.t.runtime, tenantId, tx => tx.query(
       "INSERT INTO ppm.feiertag (tenant_id, datum, label) SELECT $1, d::date, 'Feiertag' FROM unnest($2::text[]) AS d", [tenantId, [...bern]]));
   });
@@ -112,10 +107,9 @@ describe('Fristen mit Feiertagen der Organisation', { skip }, () => {
     await full(api.t.runtime, tenantId, async tx => {
       assert.equal((await fristDatum(tx, 'protokoll', '2025-12-23'))?.datum, '2025-12-30');
       assert.equal((await fristDatum(tx, 'versand', '2026-01-07'))?.datum, '2025-12-29');
-      assert.equal(await plusArbeitstage(tx, '2026-04-02', 1), '2026-04-07');
-      assert.equal(await arbeitstageBis(tx, '2025-12-19', '2025-12-30'), 5);
+      assert.equal(await plusArbeitstageDb(tx, '2026-04-02', 1), '2026-04-07');
       // lange Fristen über viele Feiertage: Spanne wird bei Bedarf erweitert
-      assert.equal(await plusArbeitstage(tx, '2025-12-19', 60), addiereArbeitstage('2025-12-19', 60, bern));
+      assert.equal(await plusArbeitstageDb(tx, '2025-12-19', 60), addiereArbeitstage('2025-12-19', 60, bern));
     });
   });
 

@@ -10,6 +10,7 @@ import { defineApp } from '@vollholz/platform';
 import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
+import { statusberichtModule } from './modules/statusbericht/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
@@ -23,6 +24,7 @@ export const app = defineApp({
     stammdatenModule,
     handlungsfeldModule,
     zielModule,
+    statusberichtModule,
     webhooksModule,
   ],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4)

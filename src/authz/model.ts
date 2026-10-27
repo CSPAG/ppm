@@ -195,6 +195,8 @@ export const model = defineModel({
     projekt: { label: 'Projekt', parent: 'portfolio', roles: ['pl', 'ctl', 'sp', 'kt'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
   },
   mcpTools: {
+    // stammdaten
+    list_org_einheiten: { title: 'Organisationseinheiten auflisten', permission: 'stammdaten:read', readOnly: true },
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },

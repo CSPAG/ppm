@@ -9,12 +9,17 @@
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
 import { vorschlagen, vorschlagZuruecknehmen } from './aktionen.ts';
+import { registerEntscheidRoutes } from './entscheid-routes.ts';
+import { entscheidTools } from './entscheid-mcp.ts';
 import { fristenTask } from './fristen.ts';
 import { sitzungTools } from './mcp.ts';
+import { registerProtokollRoutes } from './protokoll-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
 const ROUTEN: ((app: FastifyInstance, deps: Deps) => void)[] = [
   registerRoutes,
+  registerEntscheidRoutes,
+  registerProtokollRoutes,
 ];
 
 export const sitzungModule = defineModule({
@@ -24,6 +29,7 @@ export const sitzungModule = defineModule({
   tasks: [fristenTask],
   mcpTools: {
     ...sitzungTools,
+    ...entscheidTools,
   },
 });
 

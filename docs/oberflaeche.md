@@ -51,6 +51,11 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 - **Barrierefreiheit:** alles per Tastatur, Fokus in Dialogen gefangen und zurückgegeben, hell und dunkel, ab 360 px
   Breite; axe in jedem E2E-Test.
 
+- **Start-Bundle (Q-L6, ≤ 250 kB gzip, `npm run web:size`):** Der Router lädt die Seiten der Features als eigene Chunks
+  nach (`src/routes/seite.ts`: `seite(() => import('./features/<x>/<Seite>.tsx'), '<Seite>')`). Die `index.ts` eines
+  Features exportiert deshalb **keine Seiten**, nur Suchparameter, Texte, Pfade und Suchen für Navigation und Router;
+  sonst zieht der statische Import aus `nav.ts` oder `search.ts` die Seite ins Start-Bundle.
+
 ## Navigation
 
 Nach Arbeitsräumen ([ux/informationsarchitektur.md](ux/informationsarchitektur.md#navigation), UX-E2): Eingang, Projekte,

@@ -15,6 +15,7 @@ import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
 import { ressourceModule } from './modules/ressource/index.ts';
+import { sitzungModule } from './modules/sitzung/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { statusberichtModule } from './modules/statusbericht/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
@@ -34,6 +35,7 @@ export const app = defineApp({
     projektModule,
     projektdatenModule,
     zielModule,
+    sitzungModule,
     statusberichtModule,
     ideeModule,
     ressourceModule,

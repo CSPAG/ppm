@@ -19,14 +19,15 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
   await expectAccessible(page);
   await expectNoOverflow(page);
 
-  // Nur mit der Tastatur in die Administration (erster Bereich: Portfolios und Gremien bzw. Verwalten des Baukastens)
+  // Nur mit der Tastatur in die Administration (Verwalten des Baukastens)
   if (telefon(page)) {
     await expect(nav.getByRole('button', { name: 'Mehr' })).toBeVisible();
   } else {
     const admin = nav.getByRole('link', { name: 'Administration' });
     await tabTo(page, admin);
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/(administration|verwalten)\//);
+    // erster Bereich der Administration: Organisation (UI-44), danach die Verwalten-Seiten des Baukastens
+    await expect(page).toHaveURL(/\/administration\/organisation/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expectAccessible(page);
     await expectNoOverflow(page);

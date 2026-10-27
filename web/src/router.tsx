@@ -9,6 +9,7 @@ import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
+import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
@@ -53,6 +54,33 @@ function StrategischeZieleRoute() {
   return <ZielePage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
+const organisationRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/organisation', validateSearch: searchOf.organisation, component: OrganisationRoute,
+});
+
+function OrganisationRoute() {
+  const search = organisationRoute.useSearch();
+  const navigate = useNavigate({ from: organisationRoute.fullPath });
+  const setSearch = useCallback<SetOrganisationSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <OrganisationPage search={search} setSearch={setSearch} />;
+}
+
+const codetabellenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/codetabellen', validateSearch: searchOf.codetabellen, component: CodetabellenRoute,
+});
+
+function CodetabellenRoute() {
+  const search = codetabellenRoute.useSearch();
+  const navigate = useNavigate({ from: codetabellenRoute.fullPath });
+  const setSearch = useCallback<SetCodetabellenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <CodetabellenPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Administration» › Portfolios und Gremien (UI-47, BC AM.02.04)
 const portfoliosRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/administration/portfolios', validateSearch: searchOf.portfolios, component: PortfoliosRoute,
@@ -75,7 +103,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, portfoliosRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, organisationRoute, codetabellenRoute, portfoliosRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

@@ -13,7 +13,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | S1 | Bauplan: fachmodell.md und umsetzungsstand.md | – | umgesetzt | #11 | A-01–A-47 festgelegt |
 | AP-E0-0 | Webapp-Fundament und Navigation (Session S2) | – | in Arbeit (S2) | – | – |
 | AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
-| AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | in Arbeit (PR 1 Tabellen und API; PR 2 Oberfläche UI-44, UI-45 folgt) | – | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
+| AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | umgesetzt (PR 1 Tabellen und API, PR 2 Oberfläche UI-44, UI-45) | #20, #26 | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | offen | – | – |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | teilweise: PR 1 umgesetzt (050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»); PR 2 Oberfläche UI-47 in Arbeit | #19 | A-02, A-07, A-08, A-23, A-45 |
@@ -142,8 +142,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
 | AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit | – |
-| AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
-| AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
+| AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
+| AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | offen | – |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | teilweise (API, Gremienweg; Oberfläche folgt) | #19 |
 | AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | offen | – |
@@ -201,4 +201,5 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, «Sie» | Zielgrössen |
 |---|---|---|---|---|---|---|---|
 | #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | ohne Befund (E2E hell, dunkel; jsdom) | 360 px ohne Überlauf (E2E «schmal»); 768/1440 nicht eigens geprüft | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
+| #26 | AP-E0-2 | Liste + Schublade (UI-44, UI-45); Z1–Z3, Z5, Z7, Z8, Z10 | ja (Vitest, E2E) | ja (Vitest, E2E) | 360 px im E2E | ja (`features/stammdaten/texte.ts`) | keine im Ablauf |
 | PR 2 AP-E0-5 (`feat/portfolios-administration`) | AP-E0-5 | UI-47 Liste + Schublade (Portfolio › Gremium); Z1, Z2, Z5, Z7 (412), Z8, Z10 im Test | Formulare, Schubladen, Auswahl je Gate; E2E nur mit Tastatur in die Administration | Vitest-axe Liste und Schubladen; E2E hell, dunkel | 360 px im E2E (Projekt «schmal»), 768/1440 hell/dunkel | `features/portfolios/texte.ts`, «Sie» (check-address) | – (kein Kernablauf; UC-017) |

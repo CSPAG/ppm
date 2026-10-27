@@ -5,6 +5,7 @@
  */
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
+import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { sucheZiele, zieleTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
@@ -15,16 +16,28 @@ export const navigation: NavRegistrierung = {
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
     { raum: 'ziele', pfad: '/ziele/strategische-ziele', label: zieleTexte.bereich, recht: 'ziel:read' },
-    // Arbeitsraum «Administration»: die Verwalten-Seiten des Baukastens kommen nach Recht aus `useIamNav()` dazu (UC-016)
+    // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
+    // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach
+    // Recht aus `useIamNav()` dazu (UC-016)
+    { raum: 'administration', pfad: '/administration/organisation', label: TS.bereich.organisation, recht: 'stammdaten:write' },
+    { raum: 'administration', pfad: '/administration/codetabellen', label: TS.bereich.codetabellen, recht: 'stammdaten:write' },
     // Portfolios und Gremien (UI-47): sichtbar für UE, PMO und ADM (IA «Sichtbarkeit je Rolle»: Recht portfolio:admin)
     { raum: 'administration', pfad: '/administration/portfolios', label: portfoliosTexte.bereich, recht: 'portfolio:admin' },
   ],
   aktionen: [
-    { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
+    { id: 'einheit-anlegen', label: TS.aktion.einheitAnlegen, icon: 'plus', pfad: '/administration/organisation?o=neu', recht: 'stammdaten:write' },
+    { id: 'feiertag-erfassen', label: TS.aktion.feiertagErfassen, icon: 'plus', pfad: '/administration/organisation?ansicht=feiertage&o=neu', recht: 'stammdaten:write' },
     { id: 'portfolio-anlegen', label: portfoliosTexte.aktionAnlegen, icon: 'plus', pfad: '/administration/portfolios?o=neu', recht: 'portfolio:admin' },
+    { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
     { id: 'ziel-anlegen', label: zieleTexte.aktionAnlegen, icon: 'plus', pfad: '/ziele/strategische-ziele?o=neu', recht: 'ziel:write' },
   ],
   suchen: [
+    {
+      id: 'org-einheiten', recht: 'stammdaten:write',
+      suchen: async (q, signal) => (await sucheOrgEinheiten(q, signal)).map(o => ({
+        id: `org-einheit:${o.id}`, label: `${o.kuerzel} · ${o.name}`, detail: TS.bereich.organisation, icon: 'building', pfad: `/administration/organisation?o=${o.id}`,
+      })),
+    },
     {
       id: 'handlungsfelder', recht: 'handlungsfeld:read',
       suchen: async (q, signal) => (await sucheHandlungsfelder(q, signal)).map(h => ({

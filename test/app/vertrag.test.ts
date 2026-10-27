@@ -207,7 +207,7 @@ describe('Projektvertrag', { skip }, () => {
     // Die UE erhält den Quality-Check (Sammelaufgabe über das Recht vertrag:review)
     const aufgaben = await full(api.t.runtime, T, async tx => (await tx.query<{ titel: string; empfaenger_recht: string; link: string }>(
       "SELECT titel, empfaenger_recht, link FROM ppm.aufgabe WHERE art = 'vertrag.quality_check' AND stand = 'offen' AND bezug_id = $1", [entwurf])).rows);
-    assert.deepEqual(aufgaben, [{ titel: 'Quality-Check Projektvertrag 2026-001', empfaenger_recht: 'vertrag:review', link: '/projekte/2026-001/vertrag?version=entwurf' }]);
+    assert.deepEqual(aufgaben, [{ titel: 'Quality-Check Projektvertrag 2026-001', empfaenger_recht: 'vertrag:review', link: '/projekte/2026-001/vertrag/pruefen' }]);
   });
 
   test('Gate P1–P2: nicht mit Grösse S/M/L, Kosten bis P4 (UC-003 A1, Vorgabe A-12)', async () => {

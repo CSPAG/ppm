@@ -1,0 +1,36 @@
+/*
+ * Prüfen und Unterzeichnen (UI-12): Prüfansicht mit Kapiteln und Seitenpanel; Zusammenfassung zum Unterzeichnen ab
+ * 360 px ohne horizontales Scrollen, «Unterzeichnen» in der Daumenzone (I-M1). Nur Tokens aus styles/base.css.
+ */
+.qc{display:flex;flex-direction:column;gap:10px}
+.qc-kopf{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.qc-flaeche{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start;border-top:1px solid var(--line);padding-top:12px}
+.qc-kapitel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.qc-k{border-bottom:1px solid var(--line);padding-bottom:10px}
+.qc-k-kopf{display:flex;align-items:center;gap:8px}
+.qc-k-t{flex:1;font-weight:600}
+.qc-feld{margin-top:6px}
+.qc-panel{display:flex;flex-direction:column;gap:10px;position:sticky;top:0}
+.qc-check,.qc-frueher{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.qc-check li{display:flex;gap:6px;align-items:flex-start}
+.qc-frueher ul{list-style:none;margin:4px 0 0;padding:0}
+.qc-aktion{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:900px){ .qc-flaeche{grid-template-columns:minmax(0,1fr)} .qc-panel{position:static} }
+
+.uz{display:flex;flex-direction:column;gap:12px;max-width:640px;padding-bottom:140px}
+.uz-kopf{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.uz-h{margin:0;font:700 18px/1.2 var(--f-display)}
+.uz-projekt{margin:0;font-weight:600;overflow-wrap:anywhere}
+.uz-kopf .small{margin:0}
+.uz-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.uz-u{display:grid;grid-template-columns:20px minmax(0,1fr);column-gap:8px;row-gap:2px;align-items:start}
+.uz-u > .ico{grid-row:span 3}
+.uz-u.unterzeichnet > .ico{color:var(--ok)}
+.uz-u.verweigert > .ico{color:var(--bad)}
+.uz-u.offen > .ico{color:var(--fg-3)}
+.uz-f{font-weight:600}
+.uz-wer,.uz-s,.uz-b{font-size:13px;overflow-wrap:anywhere}
+.uz-s{color:var(--fg-3)}
+.uz-aktion{display:flex;flex-direction:column;gap:8px;position:sticky;bottom:0;background:var(--bg);padding:12px 0;border-top:1px solid var(--line)}
+.uz-wirkung{margin:0;font-size:13px}
+.uz-gross{min-height:48px;justify-content:center}

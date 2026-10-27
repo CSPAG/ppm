@@ -29,7 +29,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | umgesetzt (160, `statusbericht/eskalation*`, `abnahme*`: Arten `eskalation` und `meilenstein` in der Registry, Folge des Entscheids in dessen Transaktion; Entscheid über die Route mit AP-E2-2) | #65 | A-30, A-46; Vorschlag ohne entscheidendes Gremium entfällt, die Aufgabe «Eskalation behandeln» bleibt; «Nicht abgenommen» ändert das Register nicht, eine erteilte Abnahme bleibt bei Korrektur (Zurücknehmen bietet `projektdaten` nicht); Abnahme als System, solange `EntscheidFolge` keinen Akteur trägt; Frist der Aufgabe offen |
 | AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | in Arbeit (PR 1: 170, Modul `vertrag` mit Versionen, Kapiteln 1–13, Pflichtangaben, Einreichen, Baseline mit Register-Übernahme und Zuordnung zum Ziel, MCP `get_vertrag`; PR 2 Oberfläche Reiter «Vertrag» der Projektakte) | #43, #48 | A-04 (Koalition als Liste in Kap. 8), A-12 (Pflichtangaben aus dem Phasenmodell; ab Gate P1–P2 Personal in FTE und Kosten bis P4), A-19 (Business Case als Text, Kosten aus Kap. 9), A-29; erster Vertrag eines übernommenen Projekts gilt für die laufende Phase; Register-Übernahme erst bei der Baseline; Beilagen ohne Datei |
-| AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | in Arbeit (PR 1: 180, `pruefung*` im Modul `vertrag`: Quality-Check mit Kommentar je Kapitel, Unterschriften SP/PL/CTL mit Stellvertretung, Verweigern mit Begründung, Aufgaben; PR 2: Oberfläche UI-12) | – | A-04, A-31 |
+| AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | in Arbeit (PR 1: 180, `pruefung*` im Modul `vertrag`: Quality-Check mit Kommentar je Kapitel, Unterschriften SP/PL/CTL mit Stellvertretung, Verweigern mit Begründung, Aufgaben; PR 2: Oberfläche UI-12 `/projekte/<nr>/vertrag/pruefen` und `…/unterzeichnen`, Aufgabe «Quality-Check» verweist auf die Prüfansicht) | #64, #75 | A-04, A-31 |
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | offen | – | – |
@@ -77,8 +77,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
 | DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | in Arbeit (Kapitel bearbeiten, API) | – |
 | DM.02.04 | Projektvertrag zurückziehen | 002 | E3 | AP-E3-1 | offen | – |
-| DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API) | – |
-| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API; Entscheid im Gremium AP-E3-3) | – |
+| DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API, Prüfansicht UI-12) | – |
+| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | – |
 | DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | offen | – |
 | PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | in Arbeit (API) | – |
@@ -169,7 +169,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K1-3 | Prüfung unauffälliger Bericht | ≤ 1 Min. ohne Detail | Aufgabentest | AP-E1-2 | offen |
 | K1-4 | Auffälligkeiten erkannt | 5 von 5 in 30 Berichten | Aufgabentest (Testdaten im Paket) | AP-E1-2 | Test: 5 von 5 zuoberst (`test/app/monatsabschluss.test.ts`, Testdaten `monatsabschluss-testdaten.ts`); Aufgabentest offen |
 | K1-5 | Periode bis Monatsende ohne Excel (PPM-3) | 100 %, 0 Dateien | Betrieb | AP-E1-2 | offen |
-| K2-1 | Unterzeichnen auf dem Telefon (PPM-2) | ≤ 60 s, ≤ 3 Interaktionen | Test bei 360 px, Aufgabentest | AP-E3-2 | offen |
+| K2-1 | Unterzeichnen auf dem Telefon (PPM-2) | ≤ 60 s, ≤ 3 Interaktionen | Test bei 360 px, Aufgabentest | AP-E3-2 | Interaktionen gezählt: Vitest 1 ab der Aufgabe, E2E 2 ab dem Eingang bei 360 px mit Zeitmessung (E2E offen bis CI läuft); 60 s beim Aufgabentest zu bestätigen |
 | K2-2 | Quality-Checks ohne Rückmeldung | ≥ 70 % | Betrieb | AP-E3-2 | offen |
 | K2-3 | Eingereicht → unterzeichnet | Median ≤ 5 Arbeitstage | Betrieb | AP-E3-2 | offen |
 | K2-4 | Fehlende Pflichtangaben auffinden | 1 Klick, 100 % | Test | AP-E3-1 | API mit Sprungziel je Angabe getestet (`vertrag.test.ts`); Oberfläche in PR 2 |
@@ -209,3 +209,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | #40 | AP-E5-4 | Bericht (Auslastung) + Schublade, Arbeitsfläche (Kapazität); Z1, Z2, Z4, Z5, Z7, Z8, Z10, ungültiger Zeitraum | ja (Reiter, Zellen, Raster mit Pfeilen, Eingabetaste, Strg+Z) | ohne Befund (jsdom; E2E hell, dunkel) | 360 und 1440 px ohne Überlauf (Chromium), 768 nicht eigens | ja (Feature-Texte), «Sie» | Q-L5 50 × 31 virtualisiert (Test mit Messung) |
 | #48 | AP-E3-1 | Arbeitsfläche (UI-07); Z1, Z2, Z5, Z7, Z8, Z9 (Banner in Prüfung/Baseline), Z10 über den Rahmen | ↑/↓ Kapitel, Alt+N nächste fehlende Angabe, Strg+Z/Strg+Umschalt+Z | ohne Befund (jsdom, Vitest); E2E hell/dunkel offen (ohne Keycloak in der Session) | Layout 360/768/1200 px nach CSS-Brüchen; E2E offen | ja (`features/vertrag/texte.ts`), «Sie» | K2-4 als Vitest (1 Klick je Angabe, Fokus an der Stelle) und API-Test |
 | #44 | AP-E1-2 | Posteingang (UI-15), Bericht (UI-16 Termine), Schublade, Dialog; Z1–Z5, Z7, Z8/Z10, Z9 | vollständig (↑/↓, B, R, E, Leertaste, Enter; Kürzel unter der Liste) | Vitest ohne Befund (Liste, Z9, Termine); E2E hell/dunkel offen bis CI läuft | 360 px im E2E (offen bis CI läuft) | ja (`features/monatsabschluss/texte.ts`), «Sie» | K1-3, K1-4 im Aufgabentest; Start-Bundle 203 kB |
+| #75 | AP-E3-2 | Arbeitsfläche Prüfansicht (UI-12 Quality-Check), Zusammenfassung Unterzeichnen (Telefon); Z1, Z2, Z5, Z7 (412), Z8, Z9 (nicht in Prüfung/zur Unterzeichnung), Z10 | Formulare und Dialog «Nicht unterzeichnen» (Fokus, Pflichtbegründung) | ohne Befund (jsdom, Vitest); E2E hell/dunkel offen bis CI läuft | 360 px im E2E (offen bis CI läuft), Prüfansicht zweispaltig über 900 px | ja (`features/vertrag/PruefenTexte.ts`), «Sie» | K2-1 (Vitest 1 Interaktion, E2E 2 ab Eingang) |

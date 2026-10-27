@@ -19,6 +19,8 @@ const ProjektAkte = seite(() => import('../features/projekt/ProjektAkte.tsx'), '
 const ProjektUebersicht = seite(() => import('../features/projekt/ProjektUebersicht.tsx'), 'ProjektUebersicht');
 const BerichtPage = seite(() => import('../features/bericht/BerichtPage.tsx'), 'BerichtPage');
 const VertragPage = seite(() => import('../features/vertrag/VertragPage.tsx'), 'VertragPage');
+const PruefenPage = seite(() => import('../features/vertrag/PruefenPage.tsx'), 'PruefenPage');
+const UnterzeichnenPage = seite(() => import('../features/vertrag/UnterzeichnenPage.tsx'), 'UnterzeichnenPage');
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
@@ -83,5 +85,17 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><VertragPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, berichtRoute])] as const;
+  // Quality-Check und Unterzeichnen (UI-12, K2 Schritte 7–8): Ziele der Aufgaben im Eingang (I-B1)
+  const pruefenRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag/pruefen', component: PruefenRoute });
+  function PruefenRoute() {
+    const { nr } = akteRoute.useParams();
+    return <Suspense fallback={<Loading />}><PruefenPage nummer={nr} /></Suspense>;
+  }
+  const unterzeichnenRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag/unterzeichnen', component: UnterzeichnenRoute });
+  function UnterzeichnenRoute() {
+    const { nr } = akteRoute.useParams();
+    return <Suspense fallback={<Loading />}><UnterzeichnenPage nummer={nr} /></Suspense>;
+  }
+
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, berichtRoute])] as const;
 }

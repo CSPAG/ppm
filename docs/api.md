@@ -125,6 +125,17 @@ Baseline, Ist-Kosten, Abnahme durch das Gremium und «gedeckt» setzen nur obere
 | `ressourcenbedarf?phase=` | `projekt:read` | `projekt:write` | Grösse S/M/L oder FTE mit `vonMonat`–`bisMonat`; je Rolle und Phase ein Eintrag |
 | `meldungen` | `projekt:read` | `projekt:write` | nur `GET` und `POST` (nur anhängen); Stelle `dti` oder `dbi` |
 | `/v1/portfolios/{id}/risiken` | `projekt:read` (org oder Portfolio) | `projekt:write` an der Organisation | Portfoliorisiken (PC.02.01) |
+## Statusberichte
+
+Monatlicher Statusbericht je Projekt und Periode `YYYY-MM` (BC PS.01.01, UC-004, Kernablauf K1; `src/modules/statusbericht/`).
+
+| `GET /v1/projekte/{id}/berichte` | `projekt:read` am Projekt | alle Berichte, neueste Periode zuerst |
+| `GET /v1/projekte/{id}/berichte/{periode}` | `projekt:read` am Projekt | gespeichert oder Vorbelegung aus der Vorperiode (`version` 0, ohne Status und Trend); `fehlend` = Pflichtangaben für das Einreichen |
+| `PUT /v1/projekte/{id}/berichte/{periode}` | `statusbericht:write` am Projekt | Entwurf speichern, `If-Match` Pflicht (`W/"0"` legt an); 409 nach dem Einreichen, in abgeschlossener Periode, in P4, für spätere Perioden |
+| `POST /v1/projekte/{id}/berichte/{periode}/einreichen` | `statusbericht:write` am Projekt | 422 mit allen fehlenden Angaben in `errors` (Status, Trend, Beurteilung je Dimension; bei «kritisch» Begründung und Massnahme) |
+| `POST /v1/projekte/{id}/berichte/{periode}/zurueckziehen` | `statusbericht:write` am Projekt | Rückgängig innert 10 s, nur durch die einreichende Person (409 sonst) |
+
+Ereignisse: `statusbericht.created`, `statusbericht.updated`, `statusbericht.submitted`, `statusbericht.withdrawn`.
 
 ## Webhooks und Ereignisse
 

@@ -213,6 +213,8 @@ export const model = defineModel({
     get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
+    // statusbericht
+    list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
   },
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)

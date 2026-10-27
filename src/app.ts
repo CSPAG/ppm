@@ -14,6 +14,7 @@ import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
+import { statusberichtModule } from './modules/statusbericht/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
@@ -31,6 +32,7 @@ export const app = defineApp({
     projektModule,
     projektdatenModule,
     zielModule,
+    statusberichtModule,
     webhooksModule,
   ],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4);

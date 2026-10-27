@@ -197,6 +197,8 @@ export const model = defineModel({
   mcpTools: {
     // eingang
     list_aufgaben: { title: 'Aufgaben auflisten', permission: 'tenant:read', readOnly: true },
+    // stammdaten
+    list_org_einheiten: { title: 'Organisationseinheiten auflisten', permission: 'stammdaten:read', readOnly: true },
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },

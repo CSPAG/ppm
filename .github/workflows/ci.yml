@@ -306,8 +306,11 @@ jobs:
           provenance: mode=max
           sbom: true
           cache-from: type=gha
+      # GitHub-Attestationen gibt es für private Repositories nur mit passendem Plan (CSPAG: «Feature not available»).
+      # Provenienz kommt sonst aus dem Build (provenance: mode=max) und die Signatur von cosign keyless; einschalten mit
+      # der Variable GITHUB_ATTESTATIONS=true (Repository öffentlich oder Plan mit Attestationen).
       - name: Provenienz (GitHub Attestation)
-        if: env.PUBLISH == 'true'
+        if: env.PUBLISH == 'true' && vars.GITHUB_ATTESTATIONS == 'true'
         uses: actions/attest-build-provenance@v4.2.2
         with:
           subject-name: ${{ env.IMAGE_NAME }}

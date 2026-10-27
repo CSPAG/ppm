@@ -100,7 +100,7 @@ Jede Aufgabe läuft über alle Instanzen höchstens einmal gleichzeitig. Fachjob
 | web | Typen, ESLint, Vitest, Build, Client-Typen passen zu `web/openapi.json` |
 | dependencies | `npm audit --omit=dev --audit-level=high`, `npm audit signatures`, OSV-Scanner – für beide Lockfiles |
 | manifests | `kustomize build \| kubeconform`, `docker compose config`, `caddy validate`, shellcheck |
-| image | Build, Rauchtest (ohne Konfiguration Exit 78, UID 1000), Trivy, SBOM (CycloneDX, SPDX); auf `main`/Tags Push nach GHCR (amd64, arm64) mit Digest, Provenienz und cosign keyless |
+| image | Build, Rauchtest (ohne Konfiguration Exit 78, UID 1000), Trivy, SBOM (CycloneDX, SPDX); auf `main`/Tags Push nach GHCR (amd64, arm64) mit Digest, Provenienz aus dem Build (`provenance: mode=max`), Signatur und SBOM über cosign keyless; GitHub-Attestation nur mit Variable `GITHUB_ATTESTATIONS=true` (für private Repositories von CSPAG nicht verfügbar) |
 
 Weitere Workflows: `deploy.yml`, `infra.yml` (OpenTofu Hetzner: Plan im PR, Apply nur manuell; danach DNS bei Infomaniak über `infra/dns/`),
 `keycloak.yml` und `identity-conformity.yml` (verwaltet von identity-kit). Renovate (`renovate.json`): wöchentlich,

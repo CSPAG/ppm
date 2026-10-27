@@ -13,6 +13,8 @@ import { statusberichtTools } from './mcp.ts';
 import { pruefungTools } from './pruefung-mcp.ts';
 import { registerPruefungRoutes, TAG_MONATSABSCHLUSS } from './pruefung-routes.ts';
 import { registerRoutes } from './routes.ts';
+// Übernahme aus dem Excel-Dashboard (AP-E0-7): Bericht der Vorperiode je übernommenem Projekt (registriert sich selbst)
+import './uebernahme.ts';
 
 export const statusberichtModule = defineModule({
   name: 'statusbericht',

@@ -105,6 +105,7 @@ Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektroll
 | `PATCH /v1/projekte/{id}` | `projekt:write` | Name, Federführung, Handlungsfeld, «vertraulich»; `If-Match` Pflicht |
 | `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
 | `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
+| `POST /v1/projekte/uebernahme` | `projekt:create`, `projekt:write`, `projekt:organisation`, `statusbericht:write` an der Organisation | einmalige Übernahme aus dem Excel-Dashboard (K16, A-14): Prüflauf (`speichern: false`) mit Fehlern je Zeile, Speichern nur fehlerfrei; Spalten in `scripts/uebernahme/README.md` |
 ## Projektdaten
 
 Register je Projekt (docs/fachmodell.md 2.6, AP-E0-6): Meilensteine, Lieferergebnisse und Kommunikationsmassnahmen

@@ -153,8 +153,9 @@ nur mit TODO, Begründung und Eintrag hier.
 5. Tabellen in einer neuen Migration `db/migrations/NNN_<x>.sql`: `tenant_id` zuerst im Primärschlüssel und in
    Indizes, `SELECT app.secure_tenant_tables()`, Policies der Lesesicht (ohne Typ im Modell mit
    `app.has_permission('<recht>')` wie `001_handlungsfeld.sql`, mit Typ über `app.read_all()`, `app.has_tuple(…)`), `GRANT` nur an `ppm_app` bzw.
-   `_sched`; jede Tabelle mit Testdaten in die Matrix von `test/app/rls.test.ts` (`TENANT_TABLES`, `POLICIES`).
-6. Jede Route mit Fall in `test/app/tenant-isolation.test.ts` (`CASES`); Tag des Moduls in `APP_TAGS` dort.
+   `_sched`; jede Tabelle mit Testdaten und jede Policy in die Matrix des Moduls `test/app/matrix/<x>.ts` (`tables`,
+   `policies`), die Datei mit einer Zeile in `test/app/matrix/index.ts`; `rls.test.ts` prüft sie.
+6. Jede Route mit Fall in derselben Matrix (`cases`, `seed`, `tags`); `tenant-isolation.test.ts` prüft sie.
 7. Genau ein Tag je Route, Tag in `tags` des Moduls (`defineModule`).
 8. Rechte, Rollen, Scopes und ggf. Typ im Modell `src/authz/model.ts`, danach
    `npm run identity:platform-json`; neuer Typ: Kette und `exists` in `src/authz/resources.ts`.

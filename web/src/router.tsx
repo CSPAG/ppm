@@ -138,8 +138,20 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, organisationRoute, codetabellenRoute, phasenmodellRoute, ...iamRoutes, ...devRoutes]);
-const routeTree = rootRoute.addChildren([indexRoute, eingangRoute, kontoRoute, stellvertretungRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  eingangRoute,
+  kontoRoute,
+  stellvertretungRoute,
+  zieleRoute,
+  handlungsfelderRoute,
+  strategischeZieleRoute,
+  organisationRoute,
+  codetabellenRoute,
+  phasenmodellRoute,
+  ...iamRoutes,
+  ...devRoutes,
+]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

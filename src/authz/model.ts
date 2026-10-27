@@ -215,15 +215,15 @@ export const model = defineModel({
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     // statusbericht
     list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
-  },
-  capabilities: {
-    // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)
-    projekt: { write: 'projekt:write', organisation: 'projekt:organisation' },
     // ressource
     get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
     // idee
     list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },
     get_idee: { title: 'Projektidee lesen', permission: 'idee:read', readOnly: true },
+  },
+  capabilities: {
+    // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)
+    projekt: { write: 'projekt:write', organisation: 'projekt:organisation' },
   },
   features: { audit: true },
 });

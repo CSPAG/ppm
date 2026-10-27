@@ -1,0 +1,73 @@
+/*
+ * Sitzungsmodus, Protokoll, Entscheide (UI-34–UI-36, K3): grosse Schrift für die Projektion, Traktandenliste links und
+ * Geschäft rechts, auf dem Tablet untereinander mit dem Antrag zuoberst (K3-5). Nur Tokens aus styles/base.css.
+ */
+.smo-body{display:flex;flex-direction:column}
+.smo-flaeche{display:grid;grid-template-columns:300px minmax(0,1fr);align-items:start}
+.smo-nav{border-right:1px solid var(--line);padding:16px;position:sticky;top:0;display:flex;flex-direction:column;gap:10px}
+.smo-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.smo-tr{display:flex;gap:10px;align-items:flex-start;width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);text-align:left;cursor:pointer;font:inherit}
+.smo-tr:hover{background:var(--hover)}
+.smo-tr.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.smo-tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.smo-tr-b{display:flex;flex-direction:column;gap:4px}
+.smo-tr-t{font-weight:500}
+.smo-tasten{font-size:12px}
+.smo-detail{padding:18px 26px 40px;display:flex;flex-direction:column;gap:14px;font-size:16px;min-width:0}
+.smo-schritt{display:flex;align-items:center;gap:10px}
+.smo-schritt .iconbtn:first-child svg{transform:rotate(180deg)}
+.smo-schritt .iconbtn[disabled]{opacity:.35;cursor:default}
+.smo-titel{margin:0;font:600 22px/1.3 var(--f-display);color:var(--fg)}
+.smo-antrag{margin:0;font-size:19px;line-height:1.4}
+.smo-h{margin:0;font:600 15px var(--f-display);color:var(--fg)}
+.smo-h3{margin:8px 0 4px;font:600 13px var(--f-body);color:var(--fg)}
+.smo-leise{color:var(--fg-3);font-size:13px;margin:0}
+.smo-unterlagen ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.smo-unterlagen li{display:flex;align-items:center;gap:6px}
+.smo-maske{display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--surface)}
+.smo-maske fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.smo-maske legend{font-size:13px;color:var(--fg-2);margin-bottom:6px;padding:0}
+.smo-optionen{flex-direction:row!important;flex-wrap:wrap}
+.smo-option{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 14px;border:1px solid var(--line-2);border-radius:8px;cursor:pointer}
+.smo-option.on{border-color:var(--accent);background:var(--accent-soft)}
+.smo-option input{accent-color:var(--accent)}
+.smo-maske select,.smo-select{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background:var(--surface);color:var(--fg);min-width:0;width:100%}
+.smo-select{width:auto}
+.smo-auflage{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) 44px;gap:8px;align-items:end;padding:8px;border:1px dashed var(--line-2);border-radius:8px}
+.smo-auflage .field{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.smo-auflage .field label{padding-top:0}
+.smo-check{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.smo-wirkung{padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-size:14px}
+.smo-acts{display:flex;justify-content:flex-end;gap:8px}
+.smo-entscheid{display:flex;flex-direction:column;gap:8px}
+.smo-entscheid p{margin:0}
+.smo-ergebnis{font-weight:600;font-size:17px}
+.smo-al{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.smo-al-gross{list-style:none;padding:0}
+.smo-al-gross li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.smo-al-gross li.on{border-color:var(--accent)}
+.smo-filter{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:0 0 12px}
+.smo-liste-body{padding:0 22px 24px}
+.smo-prot{padding:16px 22px 40px;display:flex;flex-direction:column;gap:14px;max-width:900px}
+.smo-prot-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.smo-prot-tr{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.smo-prot-tr p{margin:0}
+.smo-feld{grid-template-columns:150px minmax(0,1fr)}
+.smo-feld-l{font-size:14px}
+@media (max-width:1023px){
+  .smo-flaeche{grid-template-columns:minmax(0,1fr)}
+  /* Tablet: Geschäft mit Antrag zuerst, Liste darunter (K3-5: Antrag ohne Scrollen) */
+  .smo-detail{order:1;padding:14px 16px 24px}
+  .smo-nav{order:2;border-right:0;border-top:1px solid var(--line);position:static}
+}
+@media (max-width:767px){
+  .smo-auflage{grid-template-columns:minmax(0,1fr)}
+  .smo-feld{grid-template-columns:minmax(0,1fr)}
+  .smo-prot,.smo-liste-body{padding:14px}
+  .smo-titel{font-size:19px}
+  .smo-antrag{font-size:17px}
+}
+@media print{
+  .mh .acts,.shell-nav,.smo-filter{display:none}
+  .smo-prot-tr{break-inside:avoid}
+}

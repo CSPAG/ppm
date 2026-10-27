@@ -2,3 +2,5 @@
 export { sitzungPfad, validateSitzungSearch, type SetSitzungSearch, type SitzungSearch } from './search.ts';
 export { sitzungKeys } from './api.ts';
 export { TS as sitzungTexte } from './texte.ts';
+export { validateEntscheideSearch, type EntscheideSearch, type SetEntscheideSearch } from './Entscheide.search.ts';
+export { TM as sitzungsmodusTexte } from './Sitzungsmodus.texte.ts';

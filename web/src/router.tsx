@@ -16,7 +16,7 @@ import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type Se
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
-import type { SetSitzungSearch } from './features/sitzung/index.ts';
+import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/index.ts';
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
@@ -39,6 +39,9 @@ const PhasenmodellPage = seite(() => import('./features/phasenmodell/Phasenmodel
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
 const SitzungenPage = seite(() => import('./features/sitzung/SitzungenPage.tsx'), 'SitzungenPage');
 const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'SitzungPage');
+const SitzungsmodusPage = seite(() => import('./features/sitzung/SitzungsmodusPage.tsx'), 'SitzungsmodusPage');
+const ProtokollPage = seite(() => import('./features/sitzung/ProtokollPage.tsx'), 'ProtokollPage');
+const EntscheidePage = seite(() => import('./features/sitzung/EntscheidePage.tsx'), 'EntscheidePage');
 const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
 const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
 const StellvertretungPage = seite(() => import('./features/konto/StellvertretungPage.tsx'), 'StellvertretungPage');
@@ -337,7 +340,41 @@ function SitzungRoute() {
   const setSearch = useCallback<SetSitzungSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
-  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} />;
+  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+// Sitzungsmodus (UI-34), Protokoll (UI-35) und Entscheide (UI-36), AP-E2-2
+const sitzungsmodusRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum/modus', validateSearch: searchOf.sitzung, component: SitzungsmodusRoute,
+});
+
+function SitzungsmodusRoute() {
+  const { kuerzel, datum } = sitzungsmodusRoute.useParams();
+  const search = sitzungsmodusRoute.useSearch();
+  const navigate = useNavigate({ from: sitzungsmodusRoute.fullPath });
+  const setSearch = useCallback<SetSitzungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SitzungsmodusPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const protokollRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum/protokoll', component: ProtokollRoute });
+
+function ProtokollRoute() {
+  const { kuerzel, datum } = protokollRoute.useParams();
+  const navigate = useNavigate();
+  return <ProtokollPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const entscheideRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/entscheide', validateSearch: searchOf.entscheide, component: EntscheideRoute });
+
+function EntscheideRoute() {
+  const search = entscheideRoute.useSearch();
+  const navigate = useNavigate({ from: entscheideRoute.fullPath });
+  const setSearch = useCallback<SetEntscheideSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <EntscheidePage search={search} setSearch={setSearch} />;
 }
 
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
@@ -360,6 +397,9 @@ const routeTree = rootRoute.addChildren([
   gremienRoute,
   sitzungenRoute,
   sitzungRoute,
+  sitzungsmodusRoute,
+  protokollRoute,
+  entscheideRoute,
   zielzyklusRoute,
   ideenRoute,
   ideeNeuRoute,

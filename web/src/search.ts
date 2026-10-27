@@ -8,6 +8,7 @@ import { type HandlungsfeldSearch, validateHandlungsfeldSearch } from './feature
 import { type ProjekteSearch, validateProjekteSearch } from './features/projekt/index.ts';
 import { validateIdeeNeuSearch, validateIdeeSearch } from './features/idee/index.ts';
 import { type AuslastungSearch, type KapazitaetSearch, validateAuslastungSearch, validateKapazitaetSearch } from './features/ressourcen/index.ts';
+import { validateDashboardSearch } from './features/dashboard/index.ts';
 import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { type PortfoliosSearch, validatePortfoliosSearch } from './features/portfolios/index.ts';
@@ -29,6 +30,7 @@ export const searchOf = {
   zielerreichung: validateZielerreichungSearch,
   auslastung: validateAuslastungSearch,
   kapazitaet: validateKapazitaetSearch,
+  dashboard: validateDashboardSearch,
   monatsabschluss: validateMonatsabschlussSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,

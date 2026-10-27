@@ -12,6 +12,7 @@ import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts'
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { DashboardPage, type SetDashboardSearch } from './features/dashboard/index.ts';
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -206,6 +207,20 @@ function KapazitaetRoute() {
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Arbeitsraum «Portfolio» › Dashboard (UI-17; PC.04.01, UC-014 Schritt 1; AP-E1-3)
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/dashboard', validateSearch: searchOf.dashboard, component: DashboardRoute,
+});
+
+function DashboardRoute() {
+  const search = dashboardRoute.useSearch();
+  const navigate = useNavigate({ from: dashboardRoute.fullPath });
+  const setSearch = useCallback<SetDashboardSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <DashboardPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -328,6 +343,7 @@ const routeTree = rootRoute.addChildren([
   ideeRoute,
   zielerreichungStartRoute,
   zielerreichungRoute,
+  dashboardRoute,
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,

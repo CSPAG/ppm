@@ -68,7 +68,7 @@ die Schritte mit SSH für die lokale Session in [lokale-session.md](lokale-sessi
    |---|---|---|
    | `github` | `HCLOUD_TOKEN`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `TF_STATE_PASSPHRASE`, `INFOMANIAK_API_TOKEN`, `SOPS_AGE_KEY`, `DEPLOY_SSH_KEY`, `KEYCLOAK_IAC_PRIVATE_KEY` | Secrets im Environment `production` ([lokale-session.md › Schritt 8](lokale-session.md#schritt-8-github-environment-production)) |
    | `variablen` | `HETZNER_BACKEND_HCL`, `HETZNER_TFVARS`, `APP_HOST`, `ACME_EMAIL` | Variablen im Environment `production` (keine Geheimnisse, der Einfachheit halber mit abgelegt) |
-   | `lokal` | `ssh_betrieb_private_key`, `keycloak_tofu_private_key`, `keycloak_tofu_public_jwks` | nur lokal: SSH als `betrieb`, Bootstrap des Realms |
+   | `lokal` | `ssh_betrieb_private_key`, `ssh_betrieb_public_key`, `ssh_deploy_public_key`, `keycloak_tofu_private_key`, `keycloak_tofu_public_jwks` | nur lokal: SSH als `betrieb`, Bootstrap des Realms |
 6. **DB-VM einrichten** (über die App-VM als Sprungserver, die DB-VM hat kein öffentliches SSH):
 
    ```sh

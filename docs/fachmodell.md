@@ -560,6 +560,9 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
   Migration darf nur Tabellen aus Bereichen mit **kleinerer** Nummer voraussetzen (frische Datenbanken laufen nach Nummer).
 - **Start und Merge:** «Start» = ab wann das Paket beginnen kann; «Merge nach» = was vorher in `main` sein muss. Wer
   früher startet, programmiert gegen die Schnittstellen in diesem Dokument.
+  «Merge nach» ist erfüllt, sobald der PR **gegen das aktuelle `main` grün** ist und keine Schnittstelle eines noch nicht
+  gemergten Pakets nachbildet (Platzhalter, eigene Kopie): Dann sofort mergen, nicht auf die Reihenfolge warten; jeder
+  wartende grüne PR kostet bei den anderen einen Konflikt.
 - **Grösse:** ein PR, höchstens zwei (PR 1 Tabellen und API, PR 2 Oberfläche); jeder PR für sich grün und mergebar.
 - **Abnahme:** UX-Definition of Done ([pruefung.md](ux/rahmen/pruefung.md)) als Checkliste im PR; Zielgrössen des Kernablaufs
   als automatischer Test, wo die Spalte «Abnahme» «Test» nennt, sonst im Schlussbericht als «beim Aufgabentest zu messen».
@@ -570,7 +573,8 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 
 | Datei | Regel |
 |---|---|
-| `src/app.ts` | je Modul genau eine Import-Zeile und ein Eintrag in `modules`, an der Stelle der Reihenfolge aus 1.1; Konflikt = beide Zeilen behalten |
+| `src/app.ts` | je Modul genau eine Import-Zeile (alphabetisch) und **eine Zeile** in `modules` an der Stelle der Reihenfolge aus 1.1; eine Zeile je Recht in `people.permissions` (alphabetisch); Konflikt = beide Zeilen behalten |
+| `test/app/mcp.test.ts` | eine Zeile je Werkzeug in der erwarteten Liste, alphabetisch |
 | `src/authz/model.ts`, `src/authz/resources.ts` | **AP-E0-1 setzt das vollständige Modell aus Abschnitt 3** (alle Rechte, Rollen, Typen, Scopes). Spätere Pakete ändern daran nur `mcpTools` (eine Zeile je Werkzeug, Block je Modul mit Kommentar `// <modul>`) und `capabilities`; fehlt ein Recht, zuerst dieses Dokument ändern. Danach immer `npm run identity:platform-json` |
 | `web/src/auth/permissions.ts` | AP-E0-1 trägt alle Rechte aus 3.2 ein; sonst unverändert |
 | `web/src/router.tsx`, `web/src/search.ts` | AP-E0-0 teilt die Routen nach Arbeitsraum auf (`web/src/routes/<arbeitsraum>.tsx`, Vorschlag); ein Paket fügt je Seite eine Route in der Datei seines Arbeitsraums und einen Eintrag in `search.ts` hinzu |

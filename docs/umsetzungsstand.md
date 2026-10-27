@@ -22,7 +22,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | teilweise: PR 1 umgesetzt (090, Periode und Statusbericht, API mit Vorbelegung aus Vorperiode und Meilensteinplan, Einreichen mit Rückgängig); PR 2 in Arbeit (Berichtsaufgabe ab dem 18. über den Eingang, erledigt beim Einreichen, Mitteilung an den Sponsor bei «kritisch»); PR 3 Oberfläche UI-13 nach AP-E0-4 PR 2 | #30 (via #46) | A-07, A-08 (Aufgabe nur in Portfolios mit Pflichten), A-26, A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
-| AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | in Arbeit (PR 1: 100, Prüfung, Rückfrage, Einfordern, Abschluss mit «nicht gemeldet», Terminabweichungen, Aufgaben, MCP `get_periode`; PR 2: Oberfläche UI-15, UI-16 in Arbeit) | #41 | A-11, A-28, A-37; Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der Vorperiode, jede Prognose über Budget (K1-4); berichtspflichtig = aktiv, P0–P3, Portfolio mit Pflichten (A-07, A-08); «Periode abschliessen» per Job am Stichtag, eingereiht beim ersten Einreichen (Stichtag aus dem Phasenmodell; ohne Phasenmodell in Kraft sofort); Tabelle `einforderung` (fachmodell.md 2.8) |
+| AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | umgesetzt (100; Prüfung, Rückfrage, Einfordern, Abschluss mit «nicht gemeldet», Terminabweichungen, Aufgaben, MCP `get_periode`; Oberfläche Portfolio › Monatsabschluss UI-15, UI-16) | #41, #44 | A-11, A-28, A-37; Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der Vorperiode, jede Prognose über Budget (K1-4); berichtspflichtig = aktiv, P0–P3, Portfolio mit Pflichten (A-07, A-08); «Periode abschliessen» per Job am Stichtag, eingereiht beim ersten Einreichen (Stichtag aus dem Phasenmodell; ohne Phasenmodell in Kraft sofort); Tabelle `einforderung` (fachmodell.md 2.8) |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
@@ -97,9 +97,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | API umgesetzt, Berichtsaufgabe in Arbeit, Oberfläche offen | #30 |
-| PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
-| PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
-| PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
+| PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
+| PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
+| PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
 | PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |
@@ -167,7 +167,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K1-1 | Statusbericht ohne wesentliche Änderung (PPM-1) | ≤ 5 Min., ≤ 15 Interaktionen | Test (Interaktionen), Aufgabentest | AP-E1-1 | offen |
 | K1-2 | Berichte bis zum 25. eingereicht | ≥ 90 % | Betrieb | AP-E1-1 | offen |
 | K1-3 | Prüfung unauffälliger Bericht | ≤ 1 Min. ohne Detail | Aufgabentest | AP-E1-2 | offen |
-| K1-4 | Auffälligkeiten erkannt | 5 von 5 in 30 Berichten | Aufgabentest (Testdaten im Paket) | AP-E1-2 | offen |
+| K1-4 | Auffälligkeiten erkannt | 5 von 5 in 30 Berichten | Aufgabentest (Testdaten im Paket) | AP-E1-2 | Test: 5 von 5 zuoberst (`test/app/monatsabschluss.test.ts`, Testdaten `monatsabschluss-testdaten.ts`); Aufgabentest offen |
 | K1-5 | Periode bis Monatsende ohne Excel (PPM-3) | 100 %, 0 Dateien | Betrieb | AP-E1-2 | offen |
 | K2-1 | Unterzeichnen auf dem Telefon (PPM-2) | ≤ 60 s, ≤ 3 Interaktionen | Test bei 360 px, Aufgabentest | AP-E3-2 | offen |
 | K2-2 | Quality-Checks ohne Rückmeldung | ≥ 70 % | Betrieb | AP-E3-2 | offen |
@@ -207,3 +207,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | #17 | AP-E0-3 | Arbeitsfläche; Z1, Z2, Z5, Z7–Z10 | vollständig, Strg+Z/Strg+Umschalt+Z | ohne Befund | geprüft (360/1024/1280/1440) | ja | keine Zielgrössen (kein Kernablauf für UC-017) |
 | #24 | AP-E0-5 | UI-47 Liste + Schublade (Portfolio › Gremium); Z1, Z2, Z5, Z7 (412), Z8, Z10 im Test | Formulare, Schubladen, Auswahl je Gate; E2E nur mit Tastatur in die Administration | Vitest-axe Liste und Schubladen; E2E hell, dunkel (E2E offen bis CI läuft) | 360 px im E2E (Projekt «schmal»), 768/1440 hell/dunkel | `features/portfolios/texte.ts`, «Sie» (check-address) | – (kein Kernablauf; UC-017) |
 | #40 | AP-E5-4 | Bericht (Auslastung) + Schublade, Arbeitsfläche (Kapazität); Z1, Z2, Z4, Z5, Z7, Z8, Z10, ungültiger Zeitraum | ja (Reiter, Zellen, Raster mit Pfeilen, Eingabetaste, Strg+Z) | ohne Befund (jsdom; E2E hell, dunkel) | 360 und 1440 px ohne Überlauf (Chromium), 768 nicht eigens | ja (Feature-Texte), «Sie» | Q-L5 50 × 31 virtualisiert (Test mit Messung) |
+| #44 | AP-E1-2 | Posteingang (UI-15), Bericht (UI-16 Termine), Schublade, Dialog; Z1–Z5, Z7, Z8/Z10, Z9 | vollständig (↑/↓, B, R, E, Leertaste, Enter; Kürzel unter der Liste) | Vitest ohne Befund (Liste, Z9, Termine); E2E hell/dunkel offen bis CI läuft | 360 px im E2E (offen bis CI läuft) | ja (`features/monatsabschluss/texte.ts`), «Sie» | K1-3, K1-4 im Aufgabentest; Start-Bundle 203 kB |

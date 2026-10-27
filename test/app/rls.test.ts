@@ -28,6 +28,9 @@ const TENANT_TABLES: Record<string, (tx: Tx, tenantId: string) => Promise<string
     return "key = 'probe'";
   },
   outbox_event: async (tx, t) => { await tx.query("INSERT INTO ppm.outbox_event (tenant_id, type) VALUES ($1, 'probe.created')", [t]); return "type = 'probe.created'"; },
+  org_einheit: async (tx, t) => { await tx.query("INSERT INTO ppm.org_einheit (tenant_id, kuerzel, name) VALUES ($1, 'PROBE', 'Probe')", [t]); return "kuerzel = 'PROBE'"; },
+  codewert: async (tx, t) => { await tx.query("INSERT INTO ppm.codewert (tenant_id, codetabelle, schluessel, label) VALUES ($1, 'trend', 'probe', 'Probe')", [t]); return "schluessel = 'probe'"; },
+  feiertag: async (tx, t) => { await tx.query("INSERT INTO ppm.feiertag (tenant_id, datum, label) VALUES ($1, '2026-08-01', 'Probe')", [t]); return "label = 'Probe'"; },
   handlungsfeld: async (tx, t) => { await tx.query("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Probe')", [t]); return "label = 'Probe'"; },
   handlungsfeld_version: async () => "label = 'Probe'",   // entsteht per Trigger mit dem Handlungsfeld
   webhook_subscription: async (tx, t) => {
@@ -68,6 +71,18 @@ const POLICIES = [
   'ppm.outbox_event.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',
   'ppm.idempotency_key.sched_cleanup PERMISSIVE DELETE ppm_sched USING (expires_at < now()) CHECK -',
   'ppm.idempotency_key.sched_read PERMISSIVE SELECT ppm_sched USING (expires_at < now()) CHECK -',
+  // Lesesicht der Stammdaten (020_stammdaten, Muster ORG): Recht an der Organisation; Codewerte ohne Löschen
+  "ppm.org_einheit.org_einheit_read RESTRICTIVE SELECT ppm_app USING app.has_permission('stammdaten:read'::text) CHECK -",
+  "ppm.org_einheit.org_einheit_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('stammdaten:write'::text)",
+  "ppm.org_einheit.org_einheit_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('stammdaten:write'::text) CHECK app.has_permission('stammdaten:write'::text)",
+  "ppm.org_einheit.org_einheit_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('stammdaten:write'::text) CHECK -",
+  "ppm.codewert.codewert_read RESTRICTIVE SELECT ppm_app USING app.has_permission('stammdaten:read'::text) CHECK -",
+  "ppm.codewert.codewert_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('stammdaten:write'::text)",
+  "ppm.codewert.codewert_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('stammdaten:write'::text) CHECK app.has_permission('stammdaten:write'::text)",
+  "ppm.feiertag.feiertag_read RESTRICTIVE SELECT ppm_app USING app.has_permission('stammdaten:read'::text) CHECK -",
+  "ppm.feiertag.feiertag_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('stammdaten:write'::text)",
+  "ppm.feiertag.feiertag_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('stammdaten:write'::text) CHECK app.has_permission('stammdaten:write'::text)",
+  "ppm.feiertag.feiertag_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('stammdaten:write'::text) CHECK -",
   // Lesesicht der Handlungsfelder (001_handlungsfeld): Recht an der Organisation
   "ppm.handlungsfeld.handlungsfeld_read RESTRICTIVE SELECT ppm_app USING app.has_permission('handlungsfeld:read'::text) CHECK -",
   "ppm.handlungsfeld.handlungsfeld_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('handlungsfeld:write'::text)",
@@ -197,6 +212,22 @@ describe('PostgreSQL RLS', { skip }, () => {
       await tx.query('ROLLBACK TO SAVEPOINT s');
       assert.equal((await tx.query(`UPDATE ${S}.handlungsfeld SET position = 1`)).rowCount, 0);
     });
+  });
+
+  test('Lesesicht Stammdaten: lesen mit stammdaten:read, Codewerte weder löschen noch Schlüssel ändern (UC-017 Schritt 2)', async () => {
+    await withTenant(t.runtime, { tenantId: A, settings: {} }, async tx => {
+      for (const name of ['org_einheit', 'codewert', 'feiertag']) assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.${name}`)).rows[0].n, 0, name);
+    });
+    await withTenant(t.runtime, { tenantId: A, settings: { 'app.org_permissions': '{stammdaten:read}' } }, async tx => {
+      for (const name of ['org_einheit', 'codewert', 'feiertag']) assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.${name}`)).rows[0].n, 1, name);
+      assert.equal((await tx.query(`UPDATE ${S}.feiertag SET label = 'x'`)).rowCount, 0);
+      await tx.query('SAVEPOINT s');
+      await assert.rejects(tx.query(`INSERT INTO ${S}.org_einheit (tenant_id, kuerzel, name) VALUES ($1, 'NEU', 'Nur lesend')`, [A]), /row-level security/);
+      await tx.query('ROLLBACK TO SAVEPOINT s');
+    });
+    await assert.rejects(full(t.runtime, A, tx => tx.query(`DELETE FROM ${S}.codewert`)), /permission denied/);
+    await assert.rejects(full(t.runtime, A, tx => tx.query(`UPDATE ${S}.codewert SET schluessel = 'anders'`)), /permission denied/);
+    assert.equal(await full(t.runtime, A, async tx => (await tx.query(`UPDATE ${S}.codewert SET aktiv = false`)).rowCount), 1);
   });
 
   test('Verlauf ist nur anhängbar; Worker sieht Warteschlange über alle Mandanten, aber keine Handlungsfelder ohne Kontext', async () => {

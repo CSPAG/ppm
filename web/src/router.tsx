@@ -18,7 +18,7 @@ import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/
 import { type SetSitzungSearch, SitzungenPage, SitzungPage } from './features/sitzung/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { type SetKontoSearch, StellvertretungPage } from './features/konto/index.ts';
-import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
+import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage, FreigabePage, RoadmapPage, type SetRoadmapSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -112,8 +112,33 @@ function ZielzyklusRoute() {
     <ZielzyklusPage jahr={Number(jahr)} search={search} setSearch={setSearch}
       jahrWechseln={j => void navigate({ to: '/ziele/$jahr', params: { jahr: String(j) }, search: {} })}
       projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })}
-      strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })} />
+      strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })}
+      freigabe={() => void navigate({ to: '/ziele/$jahr/freigabe', params: { jahr } })} />
   );
+}
+
+// Freigabe der Jahresziele (UI-39, K6 Schritte 6–7; AP-E6-2): Assistent `/ziele/2027/freigabe`
+const freigabeRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/freigabe', component: FreigabeRoute,
+  beforeLoad: ({ params }) => { if (!ZIELJAHR.test(params.jahr)) throw notFound(); },
+});
+
+function FreigabeRoute() {
+  const { jahr } = freigabeRoute.useParams();
+  const navigate = useNavigate({ from: freigabeRoute.fullPath });
+  return <FreigabePage jahr={Number(jahr)} zumZyklus={nr => void navigate({ to: '/ziele/$jahr', params: { jahr }, search: nr ? { o: `ziel:${nr}` } : {} })} />;
+}
+
+// Portfolio › Auswertungen › Roadmap (UI-31, K6 Schritt 8; AP-E6-2): `/portfolio/roadmap?jahr=2027`
+const roadmapRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/roadmap', validateSearch: searchOf.roadmap, component: RoadmapRoute });
+
+function RoadmapRoute() {
+  const search = roadmapRoute.useSearch();
+  const navigate = useNavigate({ from: roadmapRoute.fullPath });
+  const setSearch = useCallback<SetRoadmapSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <RoadmapPage search={search} setSearch={setSearch} projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })} />;
 }
 
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
@@ -323,6 +348,8 @@ const routeTree = rootRoute.addChildren([
   sitzungenRoute,
   sitzungRoute,
   zielzyklusRoute,
+  freigabeRoute,
+  roadmapRoute,
   ideenRoute,
   ideeNeuRoute,
   ideeRoute,

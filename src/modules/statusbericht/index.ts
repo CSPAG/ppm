@@ -6,6 +6,8 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { beimEinreichen, beimZurueckziehen, berichtsaufgabenTask, oeffnenJob } from './aufgabe.ts';
+import { folgen } from './folgen.ts';
 import { statusberichtTools } from './mcp.ts';
 import { registerRoutes } from './routes.ts';
 
@@ -15,8 +17,14 @@ export const statusberichtModule = defineModule({
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
   },
+  jobs: [oeffnenJob],
+  tasks: [berichtsaufgabenTask],
   mcpTools: { ...statusberichtTools },
 });
+
+// Berichtsaufgabe und Mitteilung «kritisch» (AP-E1-1, fachmodell.md 4.2)
+folgen.beimEinreichen(beimEinreichen);
+folgen.beimZurueckziehen(beimZurueckziehen);
 
 export { folgen, type Folge } from './folgen.ts';
 export { PERIODE_MUSTER, type Stand } from './schemas.ts';

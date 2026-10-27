@@ -21,7 +21,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | umgesetzt (070, Modul `eingang` mit Schnittstelle `aufgabe`/`mitteilung`/`stellvertretung`, `list_aufgaben`; Seiten `/eingang`, `/konto/stellvertretung`); offen: Zähler an «Eingang» und Eintrag im Kontomenü (Shell) | #22, #31 | A-31 (Unterschrift in Vertretung prüft AP-E3-2 mit `stellvertretung.aktiv`), A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
-| AP-E1-1 | Statusbericht erfassen | 090–099 | in Arbeit (PR 1 #30: 090, Periode und Statusbericht, API mit Vorbelegung aus der Vorperiode, Einreichen mit Rückgängig; PR 2: Berichtsaufgabe am 18., Register, Oberfläche UI-13) | – | A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
+| AP-E1-1 | Statusbericht erfassen | 090–099 | teilweise: PR 1 umgesetzt (090, Periode und Statusbericht, API mit Vorbelegung aus Vorperiode und Meilensteinplan, Einreichen mit Rückgängig); PR 2 in Arbeit (Berichtsaufgabe ab dem 18. über den Eingang, erledigt beim Einreichen, Mitteilung an den Sponsor bei «kritisch»); PR 3 Oberfläche UI-13 nach AP-E0-4 PR 2 | #30 (via #46) | A-07, A-08 (Aufgabe nur in Portfolios mit Pflichten), A-26, A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | in Arbeit (PR 1: 130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; PR 2: Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
@@ -96,7 +96,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
 | PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | in Arbeit (API, Oberfläche) | #32, #39 |
-| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | in Arbeit (API) | – |
+| PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | API umgesetzt, Berichtsaufgabe in Arbeit, Oberfläche offen | #30 |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |
 | PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | offen | – |
 | PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | offen | – |

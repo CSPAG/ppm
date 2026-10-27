@@ -38,7 +38,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
-| AP-E5-4 | Kapazität und Auslastung | 270–279 | in Arbeit (PR 1: 270, Modul `ressource`, `get_auslastung`; PR 2 Oberfläche UI-23, UI-24 folgt) | – | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
+| AP-E5-4 | Kapazität und Auslastung | 270–279 | umgesetzt (270, Modul `ressource`, `get_auslastung`; Portfolio › Ressourcen mit Auslastung UI-23 und Kapazität UI-24; Bedarfsliste UI-25 mit AP-E7-2; E2E offen bis CI läuft) | #35 (über #46), #40 | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
 | AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API umgesetzt: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Aufgabe «Jahresziele vervollständigen» über den Eingang umgesetzt; `projektZuordnen` für den Vertrag mit 301; PR 3 Oberfläche UI-38 Zielzyklus in Review) | #28, #34, #38 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
@@ -131,12 +131,12 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | offen | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
-| RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | in Arbeit (API) | – |
+| RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | offen | – |
-| RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | in Arbeit (API) | – |
+| RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | umgesetzt (auch je Szenario über die Schnittstelle für AP-E5-3) | #35, #40 |
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
@@ -206,3 +206,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | PR 2 AP-E4-1 | AP-E4-1 | Assistent (4 Schritte), Liste, Ansicht; Z1, Z2, Z5, Z7, Z8, Z10, Entwurf, in Ergänzung | ja (Fokus auf Schrittüberschrift, Radiogruppen, Vitest) | ohne Befund (jsdom; E2E hell, dunkel) | 360 px im E2E «schmal» | ja (`features/idee/texte.ts`), «Sie» | K4-1, K4-2 Aufgabentest |
 | #17 | AP-E0-3 | Arbeitsfläche; Z1, Z2, Z5, Z7–Z10 | vollständig, Strg+Z/Strg+Umschalt+Z | ohne Befund | geprüft (360/1024/1280/1440) | ja | keine Zielgrössen (kein Kernablauf für UC-017) |
 | #24 | AP-E0-5 | UI-47 Liste + Schublade (Portfolio › Gremium); Z1, Z2, Z5, Z7 (412), Z8, Z10 im Test | Formulare, Schubladen, Auswahl je Gate; E2E nur mit Tastatur in die Administration | Vitest-axe Liste und Schubladen; E2E hell, dunkel (E2E offen bis CI läuft) | 360 px im E2E (Projekt «schmal»), 768/1440 hell/dunkel | `features/portfolios/texte.ts`, «Sie» (check-address) | – (kein Kernablauf; UC-017) |
+| #40 | AP-E5-4 | Bericht (Auslastung) + Schublade, Arbeitsfläche (Kapazität); Z1, Z2, Z4, Z5, Z7, Z8, Z10, ungültiger Zeitraum | ja (Reiter, Zellen, Raster mit Pfeilen, Eingabetaste, Strg+Z) | ohne Befund (jsdom; E2E hell, dunkel) | 360 und 1440 px ohne Überlauf (Chromium), 768 nicht eigens | ja (Feature-Texte), «Sie» | Q-L5 50 × 31 virtualisiert (Test mit Messung) |

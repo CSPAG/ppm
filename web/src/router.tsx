@@ -11,6 +11,7 @@ import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
+import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
 import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
@@ -169,6 +170,36 @@ function ZielerreichungRoute() {
   }, [navigate]);
   const zuZielen = useCallback(() => { void navigate({ to: '/ziele/strategische-ziele' }); }, [navigate]);
   return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
+// Arbeitsraum «Portfolio» › Ressourcen: Auslastung (UI-23) und Kapazität (UI-24) (BC RK.01.01, RK.02.04, AP-E5-4)
+const ressourcenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/ressourcen',
+  beforeLoad: () => { throw redirect({ to: ressourcenPfad.auslastung, replace: true }); },
+});
+
+const auslastungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.auslastung, validateSearch: searchOf.auslastung, component: AuslastungRoute,
+});
+
+function AuslastungRoute() {
+  const search = auslastungRoute.useSearch();
+  const navigate = useNavigate({ from: auslastungRoute.fullPath });
+  const setSearch = useCallback<SetAuslastungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <AuslastungPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+const kapazitaetRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.kapazitaet, validateSearch: searchOf.kapazitaet, component: KapazitaetRoute,
+});
+
+function KapazitaetRoute() {
+  const search = kapazitaetRoute.useSearch();
+  const navigate = useNavigate({ from: kapazitaetRoute.fullPath });
+  const setSearch = useCallback<SetKapazitaetSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
@@ -283,6 +314,9 @@ const routeTree = rootRoute.addChildren([
   codetabellenRoute,
   phasenmodellRoute,
   portfoliosRoute,
+  ressourcenRoute,
+  auslastungRoute,
+  kapazitaetRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

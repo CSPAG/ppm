@@ -1,0 +1,61 @@
+/*
+ * Sitzungen (UI-33, K3): Übersicht je Gremium; Arbeitsfläche mit Traktandenliste links und Vorschlägen rechts, mobil
+ * untereinander (reduzierte Ansicht). Nur Tokens aus styles/base.css, keine Inline-Stile (CSP).
+ */
+.sz-uebersicht{padding:16px 22px 32px;display:flex;flex-direction:column;gap:22px}
+.sz-h{margin:0;font:600 15px var(--f-display);color:var(--fg)}
+.sz-h3{margin:14px 0 6px;font:600 13px var(--f-body);color:var(--fg)}
+.sz-sub{color:var(--fg-3);font-size:12.5px;font-weight:400}
+.sz-termine{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sz-termin{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);text-align:left;cursor:pointer}
+.sz-termin:hover{background:var(--hover)}
+.sz-termin-d{font-weight:600;min-width:110px}
+.sz-kopf{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.sz-kopf > span{display:inline-flex;align-items:center;gap:4px}
+.sz-frist strong{font-weight:600}
+.sz-body{display:flex;flex-direction:column}
+.sz-banner{padding:12px 22px 0}
+.sz-flaeche{display:grid;grid-template-columns:minmax(0,1fr) 340px;align-items:start}
+.sz-flaeche.sz-lesen{grid-template-columns:minmax(0,1fr)}
+.sz-haupt{padding:16px 22px 32px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.sz-summe{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sz-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.sz-tr{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);display:flex;flex-direction:column;gap:10px;outline:0}
+.sz-tr:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sz-tr.on{border-color:var(--accent)}
+.sz-tr-k{display:flex;gap:12px;align-items:flex-start}
+.sz-nr{flex:0 0 28px;height:28px;border:0;color:var(--fg);font:inherit;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);font-weight:600;font-variant-numeric:tabular-nums}
+.sz-tr-b{flex:1;display:flex;flex-direction:column;gap:6px}
+.sz-tr-t{margin:0;font:600 14.5px/1.3 var(--f-body)}
+.sz-pnr{font:500 13px var(--f-mono);color:var(--fg-3);margin-right:8px}
+.sz-antrag{margin:0}
+.sz-merk{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12.5px}
+.sz-zeit{display:inline-flex;align-items:center;gap:4px;color:var(--fg-2);font-variant-numeric:tabular-nums}
+.sz-art{color:var(--fg-3)}
+.sz-einl{margin:0;font-size:12.5px;color:var(--fg-2)}
+.sz-sns{display:flex;align-items:center;gap:6px;margin:0}
+.sz-tr-a{display:flex;gap:2px}
+.sz-tr-a .iconbtn[disabled]{opacity:.35;cursor:default}
+.sz-panel{border-left:1px solid var(--line);padding:16px;position:sticky;top:0;display:flex;flex-direction:column}
+.sz-vl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sz-v{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.sz-v-t{font-weight:500;margin-bottom:4px}
+.sz-einplanen{margin-top:18px;display:flex;flex-direction:column;gap:6px}
+.sz-einplanen-r{display:flex;gap:6px}
+.sz-in{flex:1;min-width:0;height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 10px;background:var(--surface);color:var(--fg)}
+.sz-in:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sz-wirkung{display:flex;flex-direction:column;gap:10px}
+.sz-wirkung p{margin:0}
+@media (max-width:1023px){
+  .sz-flaeche{grid-template-columns:minmax(0,1fr)}
+  .sz-panel{border-left:0;border-top:1px solid var(--line);position:static}
+}
+@media (max-width:767px){
+  .sz-haupt,.sz-uebersicht{padding:14px}
+  .sz-banner{padding:10px 14px 0}
+  .sz-tr-k{flex-wrap:wrap}
+  .sz-tr-a .iconbtn{width:44px;height:44px}
+  .sz-termin-d{min-width:0}
+}
+.sz-griff{cursor:grab}
+.sz-griff:focus-visible{outline:2px solid var(--accent);outline-offset:2px}

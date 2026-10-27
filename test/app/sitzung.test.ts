@@ -1,0 +1,270 @@
+/**
+ * Sitzungen vorbereiten (BC PP.04.01, PP.04.05; UC-006 Schritte 1–5, A1, A2; Abnahme K3): Vorschläge aus der Registry,
+ * Aufnehmen mit Zeitbedarf und Einladungen, «via SNS-VR» aus dem Gremienweg, Unterlagenstand mit Verschieben, Versand mit
+ * Vorschau und Protokoll, Lesesicht vor und nach dem Versand, Aufgabe «Sitzung vorbereiten» aus dem Lauf der Fristen.
+ */
+import assert from 'node:assert/strict';
+import { after, before, describe, test } from 'node:test';
+import { full, skipDb } from './harness.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
+import { registriereTraktandenart, traktandum } from '../../src/modules/sitzung/index.ts';
+import { _abmelden } from '../../src/modules/sitzung/arten.ts';
+import { fristenPruefen } from '../../src/modules/sitzung/fristen.ts';
+import { heute, kurzDatum as kurz } from '../../src/modules/sitzung/format.ts';
+
+const skip = await skipDb();
+
+/** Datum n Kalendertage nach heute, auf den nächsten Mittwoch gelegt (Sitzungstag). */
+function mittwochIn(n: number): string {
+  const d = new Date(Date.parse(`${heute()}T00:00:00Z`) + n * 86_400_000);
+  while (d.getUTCDay() !== 3) d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Unterlagen der Probe-Art «gate» je Projekt: Quality-Check bestanden oder offen. */
+const qc = new Map<string, 'bestanden' | 'offen'>();
+
+describe('Sitzungen vorbereiten', { skip }, () => {
+  let api: TestApi;
+  let tenantId: string;
+  let ue: Record<string, string>, gl: Record<string, string>, mitglied: Record<string, string>, plH: Record<string, string>, nobody: Record<string, string>;
+  let pl: string, ctl: string, sp: string;
+  let portfolio: string, prat: string;
+  let p1: { id: string; nummer: string }, p2: { id: string; nummer: string };
+  const termin1 = mittwochIn(28), termin2 = mittwochIn(56);
+
+  const call = (method: string, url: string, headers: Record<string, string>, payload?: unknown) =>
+    api.app.inject({ method: method as 'GET', url, headers: { ...headers, ...(payload !== undefined ? { 'content-type': 'application/json' } : {}) }, ...(payload !== undefined ? { payload: JSON.stringify(payload) } : {}) });
+  const ok = async (method: string, url: string, headers: Record<string, string>, payload?: unknown, status = 200) => {
+    const r = await call(method, url, headers, payload);
+    assert.equal(r.statusCode, status, `${method} ${url}: ${r.body}`);
+    return r.json();
+  };
+  const sys = <T>(fn: Parameters<typeof full<T>>[2]) => full(api.t.runtime, tenantId, fn);
+
+  before(async () => {
+    api = await testApi();
+    const u = await login(api, 'demo', 'u-ue', 'ue');
+    tenantId = u.tenantId;
+    ue = { authorization: u.authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
+    nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
+    const adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
+
+    // Phasenmodell in Kraft (Fristen sitzung_vorbereiten 15, versand 5 Arbeitstage, A-27)
+    const pm = await call('POST', '/v1/phasenmodelle', ue, { quelle: 'vorgabe' });
+    assert.equal(pm.statusCode, 201, pm.body);
+    await ok('POST', `/v1/phasenmodelle/${pm.json().id}/in-kraft-setzen`, { ...adm, 'if-match': pm.headers.etag as string });
+
+    // Portfolio A mit PRAT und SNS-VR; Gremienweg P0–P1 und P1–P2 zusätzlich über den SNS-VR (Q8 Kap. 5.1)
+    portfolio = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'transformation', name: 'Transformation' }, 201)).id;
+    prat = (await ok('POST', '/v1/gremien', ue, { portfolioId: portfolio, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).id;
+    const sns = (await ok('POST', '/v1/gremien', ue, { portfolioId: portfolio, kuerzel: 'sns-vr', name: 'SNS-VR', art: 'extern' }, 201)).id;
+    await ok('PUT', `/v1/portfolios/${portfolio}/gremienweg`, { ...ue, 'if-match': 'W/"1"' }, { schritte: [
+      { gate: 'P0_P1', gremiumId: prat, zusaetzlichGremiumId: sns }, { gate: 'P1_P2', gremiumId: prat, zusaetzlichGremiumId: sns }, { gate: 'P2_P3', gremiumId: prat },
+    ] });
+    for (const datum of [termin1, termin2]) await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum }, 201);
+
+    // Projekte in P1 und P2 mit Projektorganisation
+    [pl, ctl, sp] = [await person(api, tenantId, 'u-pl'), await person(api, tenantId, 'u-ctl'), await person(api, tenantId, 'u-sp')];
+    // alle Mitglieder sind Antragstellende an der Organisation (A-46), Projektrollen setzt die Projektorganisation
+    plH = { authorization: (await login(api, 'demo', 'u-pl', 'antragsteller')).authorization };
+    for (const [phase, set] of [['P1', (x: typeof p1) => { p1 = x; }], ['P2', (x: typeof p1) => { p2 = x; }]] as const) {
+      const p = await ok('POST', '/v1/projekte', ue, { name: `Projekt ${phase}`, portfolioId: portfolio, phase }, 201);
+      await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [
+        { personId: pl, funktion: 'pl', akv: '' }, { personId: ctl, funktion: 'ctl', akv: '' }, { personId: sp, funktion: 'sp', akv: '' },
+      ] });
+      set({ id: p.id, nummer: p.nummer });
+    }
+
+    // Mitglied des PRAT: Rolle «gremium» am Portfolio (A-45)
+    const m = await login(api, 'demo', 'u-mitglied', null);
+    await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolio });
+    mitglied = { authorization: m.authorization };
+
+    // Arten, wie sie vertrag (gate, AP-E3-3) und statusbericht (eskalation, AP-E2-4) registrieren werden
+    registriereTraktandenart({
+      art: 'gate', ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }],
+      zusammenfassung: async (_tx, b) => ({ antrag: `Freigabe Gate für ${b.projektId === p1.id ? p1.nummer : p2.nummer}` }),
+      unterlagen: async (_tx, b) => {
+        const q = qc.get(b.projektId ?? '') ?? 'bestanden';
+        return [{ art: 'packet', titel: 'Gate Review Packet', bereit: q === 'bestanden', qualityCheck: q, hinweis: q === 'bestanden' ? 'Quality-Check bestanden' : 'Quality-Check offen' }];
+      },
+    });
+    registriereTraktandenart({ art: 'eskalation', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }] });
+  });
+  after(async () => { _abmelden('gate'); _abmelden('eskalation'); await api?.close(); });
+
+  let sitzung: { id: string; version: number };
+
+  test('Vorschläge aufnehmen: Gate-Review 35 Min. mit PL, CTL, SP; «via SNS-VR» aus dem Gremienweg (K3 Abnahme 1–3)', async () => {
+    // Module schlagen vor (in ihrer Transaktion, ohne sitzung:write), idempotent je Geschäft
+    const g1 = await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p1' }, projektId: p1.id, titel: `Gate P1–P2 ${p1.nummer}` }));
+    assert.equal(await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p1' }, projektId: p1.id, titel: `Gate P1–P2 ${p1.nummer}`, antrag: 'Freigabe Phase P2' })), g1);
+    await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p2' }, projektId: p2.id, titel: `Gate P2–P3 ${p2.nummer}` }));
+    await sys(tx => traktandum.vorschlagen(tx, { art: 'eskalation', bezug: { typ: 'eskalation', id: 'e-1' }, projektId: p2.id, titel: 'Eskalation Lieferverzug' }));
+
+    const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin1 }, 201);
+    assert.deepEqual([s.stand, s.traktanden.length, s.can.write, s.frist.arbeitstage], ['geplant', 0, true, 5]);
+    assert.equal((await call('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin1 })).statusCode, 409);
+    assert.equal((await call('POST', '/v1/gremien/prat/sitzungen', ue, { datum: mittwochIn(200) })).statusCode, 422, 'nur zu einem Termin');
+
+    const v = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
+    assert.deepEqual(v.gruppen.map((x: { art: string; traktanden: unknown[] }) => [x.art, x.traktanden.length]), [['gate', 2], ['eskalation', 1]]);
+    assert.equal(v.gruppen[0].traktanden[0].antrag, 'Freigabe Phase P2');
+
+    let r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: g1 });
+    const t1 = r.traktanden[0];
+    assert.deepEqual([t1.dauerMin, t1.viaSns, t1.position, t1.zeit, r.stand], [35, true, 1, null, 'in_vorbereitung']);
+    assert.deepEqual(t1.einladungen.map((e: { funktion: string; personId: string }) => [e.funktion, e.personId]), [['pl', pl], ['ctl', ctl], ['sp', sp]]);
+    assert.deepEqual([t1.unterlagen.stand, t1.unterlagen.liste[0].titel], ['bereit', 'Gate Review Packet']);
+
+    const g2 = v.gruppen[0].traktanden[1].id;
+    const esk = v.gruppen[1].traktanden[0].id;
+    r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: g2 });
+    r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: esk });
+    assert.deepEqual(r.traktanden.map((t: { viaSns: boolean; dauerMin: number | null; unterlagen: { stand: string } }) => [t.viaSns, t.dauerMin, t.unterlagen.stand]),
+      [[true, 35, 'bereit'], [false, 35, 'bereit'], [false, null, 'keine']], 'P2 nicht über den SNS-VR; Eskalation ohne Unterlagen');
+    assert.equal(r.zeitbedarfMin, 70);
+    assert.deepEqual((await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue)).gruppen, []);
+
+    // Zeitfenster ab Beginn, Dauer gegen die Sitzungsdauer
+    r = await ok('PATCH', `/v1/sitzungen/${s.id}`, { ...ue, 'if-match': `W/"${r.version}"` }, { beginn: '14:00', dauerMin: 180, ort: 'Sitzungszimmer 1' });
+    assert.deepEqual(r.traktanden.map((t: { zeit: string }) => t.zeit), ['14:00', '14:35', '15:10']);
+
+    // Ordnen nur mit If-Match und vollständig
+    const ids = r.traktanden.map((t: { id: string }) => t.id);
+    assert.equal((await call('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': 'W/"1"' }, { reihenfolge: ids })).statusCode, 412);
+    assert.equal((await call('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': `W/"${r.version}"` }, { reihenfolge: ids.slice(1) })).statusCode, 422);
+    r = await ok('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': `W/"${r.version}"` }, { reihenfolge: [ids[2], ids[0], ids[1]] });
+    assert.deepEqual(r.traktanden.map((t: { id: string; position: number }) => [t.id, t.position]), [[ids[2], 1], [ids[0], 2], [ids[1], 3]]);
+
+    // Einplanen (PP.04.05) und wieder entfernen
+    r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'gate', projektId: p2.id, titel: 'Gate eingeplant' });
+    const geplant = r.traktanden.find((t: { titel: string }) => t.titel === 'Gate eingeplant');
+    assert.deepEqual([geplant.bezug.typ, geplant.position, geplant.antrag], ['projekt', 4, `Freigabe Gate für ${p2.nummer}`]);
+    assert.equal((await call('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'gate', projektId: p2.id })).statusCode, 409, 'Geschäft schon traktandiert');
+    r = await ok('POST', `/v1/traktanden/${geplant.id}/entfernen`, ue);
+    assert.equal(r.traktanden.length, 3);
+    sitzung = { id: s.id, version: r.version };
+  });
+
+  test('Unterlagen fehlen: Warnung, mit einem Klick auf die nächste Sitzung, rückgängig (UC-006 A2, K3 Abnahme 4)', async () => {
+    qc.set(p2.id, 'offen');
+    const s = await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue);
+    const t = s.traktanden.find((x: { projekt: { id: string } | null; art: string }) => x.art === 'gate' && x.projekt?.id === p2.id);
+    assert.equal(t.unterlagen.stand, 'quality_check_offen');
+    const vor = await ok('GET', `/v1/sitzungen/${sitzung.id}/versand`, ue);
+    assert.deepEqual(vor.warnungen.map((w: { traktandumId: string; stand: string }) => [w.traktandumId, w.stand]), [[t.id, 'quality_check_offen']]);
+
+    const v = await ok('POST', `/v1/traktanden/${t.id}/verschieben`, ue);
+    assert.deepEqual([v.nach.datum, v.traktandum.stand, v.traktandum.verschobenVon, v.traktandum.einladungen], [termin2, 'verschoben', termin1, []]);
+    assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).traktanden.length, 2);
+    const naechste = await ok('GET', `/v1/gremien/prat/sitzungen/${termin2}`, ue);
+    const vs = await ok('GET', `/v1/sitzungen/${naechste.id}/vorschlaege`, ue);
+    // verschobene zuerst in ihrer Art; danach der vorhin entfernte Vorschlag ohne Sitzung
+    assert.deepEqual(vs.gruppen[0].traktanden.map((x: { id: string; verschobenVon: string | null }) => [x.id === t.id, x.verschobenVon]), [[true, termin1], [false, null]]);
+
+    // Rückgängig: in der ursprünglichen Sitzung wieder aufnehmen, dann endgültig verschieben
+    let r = await ok('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { vorschlagId: t.id });
+    assert.equal(r.traktanden.length, 3);
+    await ok('POST', `/v1/traktanden/${t.id}/verschieben`, ue);
+    r = await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue);
+    assert.deepEqual(r.traktanden.map((x: { position: number }) => x.position), [1, 2]);
+    sitzung.version = r.version;
+    qc.delete(p2.id);
+  });
+
+  test('Lesesicht vor dem Versand: Mitglieder und GL sehen keine Traktanden, Eingeladene nichts', async () => {
+    const m = await ok('GET', `/v1/sitzungen/${sitzung.id}`, mitglied);
+    assert.deepEqual([m.traktanden, m.can.write], [[], false]);
+    assert.deepEqual((await ok('GET', `/v1/sitzungen/${sitzung.id}`, gl)).traktanden, []);
+    assert.equal((await call('GET', `/v1/sitzungen/${sitzung.id}`, plH)).statusCode, 404);
+    assert.equal((await call('GET', `/v1/sitzungen/${sitzung.id}/vorschlaege`, mitglied)).statusCode, 403);
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, gl, { art: 'eskalation' })).statusCode, 403);
+    assert.equal((await call('GET', '/v1/gremien/prat/sitzungen', nobody)).statusCode, 403);
+  });
+
+  test('Versand: Vorschau, Protokoll mit Arbeitstagen, Einladungen gebündelt, Mitglieder lesen ab Versand (K3 Abnahme 5, K3-1)', async () => {
+    // Zur Eskalation nur den Sponsor einladen (Eingeladene festlegen, UC-006 Schritt 2)
+    const esk = (await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).traktanden.find((t: { art: string }) => t.art === 'eskalation');
+    assert.equal((await call('PUT', `/v1/traktanden/${esk.id}/einladungen`, { ...ue, 'if-match': 'W/"99"' }, { einladungen: [] })).statusCode, 412);
+    assert.equal((await call('PUT', `/v1/traktanden/${esk.id}/einladungen`, { ...ue, 'if-match': `W/"${esk.version}"` }, { einladungen: [{ personId: '00000000-0000-4000-8000-000000000009', funktion: 'weitere' }] })).statusCode, 422);
+    const e = await ok('PUT', `/v1/traktanden/${esk.id}/einladungen`, { ...ue, 'if-match': `W/"${esk.version}"` }, { einladungen: [{ personId: sp, funktion: 'sp' }] });
+    assert.deepEqual(e.einladungen.map((x: { personId: string }) => x.personId), [sp]);
+    sitzung.version = (await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).version;
+
+    const vor = await ok('GET', `/v1/sitzungen/${sitzung.id}/versand`, ue);
+    assert.deepEqual([vor.traktanden, vor.unterlagen, vor.eingeladene, vor.warnungen, vor.verschoben, vor.frist.eingehalten],
+      [2, { packet: 1, bericht: 0, beilage: 0 }, 3, [], 1, true]);
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, ue)).statusCode, 428);
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': 'W/"1"' })).statusCode, 412);
+    const s = await ok('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${sitzung.version}"` });
+    assert.equal(s.stand, 'versendet');
+    assert.ok(s.versendetAt);
+    assert.equal(s.versandVorlauf, s.frist.vorlauf);
+    assert.ok(s.versandVorlauf >= 5);
+    assert.equal(s.can.write, false);
+    assert.equal(s.traktanden.find((t: { art: string }) => t.art === 'gate').unterlagen.liste[0].hinweis, 'Quality-Check bestanden', 'Stand festgehalten');
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { art: 'eskalation' })).statusCode, 409, 'nach dem Versand fest');
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${s.version}"` })).statusCode, 409);
+
+    // Protokoll: Audit sitzung.dispatched mit Vorlauf; Mitteilungen; Aufgabe «Unterlagen lesen» für die Mitglieder
+    const [audit, mitteilungen] = await sys(async tx => [
+      (await tx.query<{ data: { vorlauf: number; fristEingehalten: boolean } }>("SELECT data FROM ppm.audit_log WHERE action = 'sitzung.dispatched'")).rows,
+      (await tx.query<{ empfaenger_person: string; text: string }>("SELECT empfaenger_person, text FROM ppm.mitteilung ORDER BY text")).rows,
+    ] as const);
+    assert.deepEqual([audit.length, audit[0]!.data.vorlauf, audit[0]!.data.fristEingehalten], [1, s.versandVorlauf, true]);
+    const an = (p: string) => mitteilungen.filter(x => x.empfaenger_person === p).map(x => x.text);
+    assert.equal(an(ctl).length, 1, 'je Person gebündelt');
+    assert.equal(an(ctl)[0], `Sie stellen am ${kurz(termin1)} im PRAT vor: ${p1.nummer} Projekt P1 · ca. 14:00.`);
+    // SP ist zu beiden Geschäften eingeladen: eine Mitteilung (Eskalation ohne Zeitbedarf zuerst)
+    assert.ok(an(sp).includes(`Sie stellen am ${kurz(termin1)} im PRAT vor: ${p2.nummer} Projekt P2 · ca. 14:00; ${p1.nummer} Projekt P1 · ca. 14:00.`), JSON.stringify(an(sp)));
+    assert.equal(an(pl).length, 2, 'Einladung und Verschiebung');
+    assert.ok(an(sp).some(t => t.includes('verschoben auf')), 'SP über die Verschiebung informiert');
+    assert.ok(!an(ctl).some(t => t.includes('verschoben')), 'CTL nicht');
+
+    const eingang = (await ok('GET', '/v1/eingang', mitglied)).items.map((a: { titel: string }) => a.titel);
+    assert.ok(eingang.some((t: string) => t.startsWith('Unterlagen PRAT') && t.endsWith('lesen')), JSON.stringify(eingang));
+
+    // Mitglieder lesen ab Versand; Eingeladene nur ihr Traktandum
+    assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, mitglied)).traktanden.length, 2);
+    const fuerPl = await ok('GET', `/v1/sitzungen/${sitzung.id}`, plH);
+    assert.deepEqual(fuerPl.traktanden.map((t: { projekt: { id: string } }) => t.projekt.id), [p1.id]);
+  });
+
+  test('Lauf der Fristen: Sitzung und Aufgabe «Sitzung vorbereiten» 15 Arbeitstage vorher, idempotent (A-27)', async () => {
+    const datum = mittwochIn(120);
+    await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum }, 201);
+    const vorher = new Date(Date.parse(`${datum}T00:00:00Z`) - 30 * 86_400_000).toISOString().slice(0, 10);
+    const ab = new Date(Date.parse(`${datum}T00:00:00Z`) - 21 * 86_400_000).toISOString().slice(0, 10);
+    assert.equal(await sys(tx => fristenPruefen(tx, vorher)), 0, 'noch nicht fällig');
+    assert.ok(await sys(tx => fristenPruefen(tx, ab)) >= 1);
+    await sys(tx => fristenPruefen(tx, ab));
+    const s = await ok('GET', `/v1/gremien/prat/sitzungen/${datum}`, ue);
+    const aufgaben = await sys(async tx => (await tx.query<{ titel: string; frist: string; frist_art: string; stand: string }>(
+      "SELECT titel, to_char(frist, 'YYYY-MM-DD') AS frist, frist_art, stand FROM ppm.aufgabe WHERE art = 'sitzung.vorbereiten' AND bezug_id = $1", [s.id])).rows);
+    assert.equal(aufgaben.length, 1);
+    assert.match(aufgaben[0]!.titel, /^PRAT-Sitzung \w\w \d+\.\d+\. vorbereiten$/);
+    assert.deepEqual([aufgaben[0]!.frist, aufgaben[0]!.frist_art, aufgaben[0]!.stand], [s.frist.bis, 'arbeitstage', 'offen']);
+    const eingang = (await ok('GET', '/v1/eingang', ue)).items.map((a: { titel: string }) => a.titel);
+    assert.ok(eingang.includes(aufgaben[0]!.titel));
+
+    // Versand erledigt die Aufgabe
+    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'eskalation', titel: 'Eskalation ohne Projekt' });
+    await ok('POST', `/v1/sitzungen/${s.id}/versenden`, { ...ue, 'if-match': `W/"${r.version}"` });
+    const stand = await sys(async tx => (await tx.query<{ stand: string }>("SELECT stand FROM ppm.aufgabe WHERE art = 'sitzung.vorbereiten' AND bezug_id = $1", [s.id])).rows[0]!.stand);
+    assert.equal(stand, 'erledigt');
+  });
+
+  test('Liste der Sitzungen und Kopf: Termine ohne Sitzung mit id null', async () => {
+    const l = await ok('GET', '/v1/gremien/prat/sitzungen?limit=2', ue);
+    assert.deepEqual(l.items.map((x: { datum: string; stand: string }) => [x.datum, x.stand]), [[termin1, 'versendet'], [termin2, 'geplant']]);
+    assert.ok(l.nextCursor);
+    const l2 = await ok('GET', `/v1/gremien/prat/sitzungen?cursor=${l.nextCursor}`, ue);
+    assert.equal(l2.items.length, 1);
+    const k = await ok('GET', '/v1/sitzungen/kopf', ue);
+    assert.equal(k.sitzungen[0].datum, termin1);
+    assert.equal((await call('GET', '/v1/gremien/unbekannt/sitzungen', ue)).statusCode, 404);
+  });
+});

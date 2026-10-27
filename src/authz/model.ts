@@ -204,6 +204,8 @@ export const model = defineModel({
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
     // phasenmodell
     get_phasenmodell: { title: 'Phasenmodell lesen', permission: 'phasenmodell:read', readOnly: true },
+    // projektdaten
+    get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },

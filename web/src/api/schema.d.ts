@@ -26275,6 +26275,368 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/vertragsversionen/{id}/pruefung": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Quality-Check und Unterschriften
+         * @description Quality-Checks mit Kommentar je Kapitel und der Stand der Unterschriften («2 von 3», K2 Schritt 8); `can.unterzeichnen` nennt die Funktionen, die die Person jetzt unterzeichnen kann (eigene oder in Vertretung mit Recht auf Unterschriften, A-31).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragPruefung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/quality-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Quality-Check erfassen
+         * @description Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Sponsor, Projektleitung und CTL erhalten je eine Aufgabe (UC-002 Schritt 9); fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). `If-Match` = Version der Vertragsversion.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragQualityCheckIn"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragPruefung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/unterschriften": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unterzeichnen oder verweigern
+         * @description Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (SP, PL, CTL), die sie innehat oder in Vertretung mit Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragUnterschriftIn"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragPruefung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ideen": {
         parameters: {
             query?: never;
@@ -30851,6 +31213,103 @@ export interface components {
                 /** Format: uuid */
                 strategischesZielId: string;
             }[];
+        };
+        VertragPruefung: {
+            /** Format: uuid */
+            versionId: string;
+            nummer: string;
+            /**
+             * @description Bearbeitungsstand der Version.
+             * @enum {string}
+             */
+            stand: "in_arbeit" | "in_pruefung" | "zur_unterzeichnung" | "unterzeichnet" | "traktandiert" | "abgenommen" | "abgelehnt" | "verworfen" | "zurueckgezogen";
+            /** @description Version der Vertragsversion (ETag für die Übergänge). */
+            version: number;
+            /** @description Quality-Checks, neueste zuerst. */
+            qualityChecks: {
+                /** Format: uuid */
+                id: string;
+                /**
+                 * @description Ergebnis.
+                 * @enum {string}
+                 */
+                ergebnis: "bestaetigt" | "rueckmeldung";
+                kommentare: {
+                    /** @description Kapitel des Projektvertrags (Q7). */
+                    kapitel: number;
+                    /** @description Rückmeldung zum Kapitel. */
+                    text: string;
+                }[];
+                /** Format: date-time */
+                at: string;
+                /** Format: uuid */
+                personId: string;
+            }[];
+            unterzeichnung: {
+                /** Format: uuid */
+                qualityCheckId: string;
+                /** @description Unterzeichnete Funktionen («2 von 3»). */
+                anzahl: number;
+                vollstaendig: boolean;
+                funktionen: {
+                    /**
+                     * @description Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10).
+                     * @enum {string}
+                     */
+                    funktion: "sp" | "pl" | "ctl";
+                    /** @description Inhaber der Funktion in der Projektorganisation. */
+                    personen: string[];
+                    unterschrift: {
+                        /** Format: uuid */
+                        personId: string;
+                        inVertretungVon: string | null;
+                        /**
+                         * @description Ergebnis.
+                         * @enum {string}
+                         */
+                        ergebnis: "unterzeichnet" | "verweigert";
+                        begruendung: string;
+                        /** Format: date-time */
+                        at: string;
+                    } | null;
+                }[];
+            } | null;
+            can: {
+                /** @description Quality-Check erfassen (in Prüfung, vertrag:review). */
+                qualityCheck: boolean;
+                /** @description Funktionen, die die Person jetzt unterzeichnen kann (eigene oder in Vertretung, A-31). */
+                unterzeichnen: {
+                    /**
+                     * @description Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10).
+                     * @enum {string}
+                     */
+                    funktion: "sp" | "pl" | "ctl";
+                    inVertretungVon: string | null;
+                }[];
+            };
+        };
+        VertragQualityCheckIn: {
+            /**
+             * @description `bestaetigt`: weiter zur Unterzeichnung (UC-002 Schritt 9). `rueckmeldung`: zurück an die Projektleitung (UC-002 A5), mindestens ein Kommentar.
+             * @enum {string}
+             */
+            ergebnis: "bestaetigt" | "rueckmeldung";
+            /** @description Höchstens ein Kommentar je Kapitel. */
+            kommentare?: {
+                /** @description Kapitel des Projektvertrags (Q7). */
+                kapitel: number;
+                /** @description Rückmeldung zum Kapitel. */
+                text: string;
+            }[];
+        };
+        VertragUnterschriftIn: {
+            /**
+             * @description `unterzeichnet` (protokollierter Klick, A-31) oder `verweigert` mit Begründung (UC-003 A5).
+             * @enum {string}
+             */
+            ergebnis: "unterzeichnet" | "verweigert";
+            /** @description Pflicht beim Verweigern: Die Projektleitung erfährt sonst nicht, was zu ändern ist. */
+            begruendung?: string;
         };
         IdeeRueckfrage: {
             /** Format: uuid */

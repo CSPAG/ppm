@@ -255,6 +255,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |
 | `ch.ppm.sitzung.reordered` | Traktanden geordnet |
 | `ch.ppm.sitzung.dispatched` | Unterlagen versendet (mit Vorlauf in Arbeitstagen und Frist eingehalten) |
+| `ch.ppm.sitzung.started`, `ch.ppm.sitzung.closed` | Sitzung gestartet (Sitzungsmodus) bzw. geschlossen (mit Zahl der Folgevorschläge und Auflagen) |
+| `ch.ppm.entscheid.recorded`, `.corrected`, `.sns_recorded` | Entscheid erfasst, bis zum Schliessen korrigiert, Entscheid des SNS-VR nachgetragen |
+| `ch.ppm.auflage.fulfilled` | Auflage erledigt gemeldet |
+| `ch.ppm.protokoll.updated`, `ch.ppm.protokoll.dispatched` | Protokoll bereinigt bzw. versendet (mit Arbeitstagen nach der Sitzung und Frist eingehalten) |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

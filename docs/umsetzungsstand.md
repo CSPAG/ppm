@@ -38,7 +38,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
-| AP-E5-4 | Kapazität und Auslastung | 270–279 | offen | – | – |
+| AP-E5-4 | Kapazität und Auslastung | 270–279 | in Arbeit (PR 1: 270, Modul `ressource`, `get_auslastung`; PR 2 Oberfläche UI-23, UI-24 folgt) | – | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
 | AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | offen | – | – |
@@ -131,12 +131,12 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | offen | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
-| RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | offen | – |
+| RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | in Arbeit (API) | – |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
 | RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | offen | – |
-| RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | offen | – |
+| RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | in Arbeit (API) | – |
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |

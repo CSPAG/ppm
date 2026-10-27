@@ -204,6 +204,8 @@ export const model = defineModel({
     get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
+    // ressource
+    get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
   },
   features: { audit: true },
 });

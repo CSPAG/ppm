@@ -92,6 +92,18 @@ Baseline, Ist-Kosten, Abnahme durch das Gremium und «gedeckt» setzen nur obere
 | `meldungen` | `projekt:read` | `projekt:write` | nur `GET` und `POST` (nur anhängen); Stelle `dti` oder `dbi` |
 | `/v1/portfolios/{id}/risiken` | `projekt:read` (org oder Portfolio) | `projekt:write` an der Organisation | Portfoliorisiken (PC.02.01) |
 
+## Ressourcen
+
+Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =
+Rolle (Codetabelle `ressourcenrolle`, A-20); Zeitraum `von`/`bis` als `JJJJ-MM`, ohne Angabe der laufende Monat und die
+elf folgenden, höchstens 60 Monate.
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/kapazitaet?von=&bis=` | `ressource:read` | Angebot je Rolle und Monat mit `version` je Zelle, `can.write` |
+| `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
+| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur

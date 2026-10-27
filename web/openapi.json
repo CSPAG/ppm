@@ -4593,6 +4593,400 @@
           }
         }
       },
+      "KapazitaetZelle": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rolle",
+          "monat",
+          "fte",
+          "version"
+        ],
+        "properties": {
+          "rolle": {
+            "type": "string"
+          },
+          "monat": {
+            "type": "string"
+          },
+          "fte": {
+            "anyOf": [
+              {
+                "description": "Angebot in FTE; null = kein Angebot erfasst (bzw. eben entfernt).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "description": "Version der Zelle für `version` beim Ändern; null ohne Angebot.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Kapazitaet": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "von",
+          "bis",
+          "zellen",
+          "can"
+        ],
+        "properties": {
+          "von": {
+            "type": "string"
+          },
+          "bis": {
+            "type": "string"
+          },
+          "zellen": {
+            "description": "Erfasstes Angebot im Zeitraum, nach Rolle und Monat; Zellen ohne Angebot fehlen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KapazitaetZelle"
+            }
+          },
+          "can": {
+            "description": "Was die anfragende Person darf (Angebot pflegen).",
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "KapazitaetPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zellen"
+        ],
+        "properties": {
+          "zellen": {
+            "minItems": 1,
+            "maxItems": 2000,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rolle",
+                "monat",
+                "fte"
+              ],
+              "properties": {
+                "rolle": {
+                  "pattern": "^[A-Za-z0-9_]{1,40}$",
+                  "description": "Rolle = Pool (A-20): Schlüssel eines Codewerts der Codetabelle `ressourcenrolle`.",
+                  "examples": [
+                    "projektleitung"
+                  ],
+                  "type": "string"
+                },
+                "monat": {
+                  "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                  "description": "Monat «JJJJ-MM».",
+                  "examples": [
+                    "2027-04"
+                  ],
+                  "type": "string"
+                },
+                "fte": {
+                  "description": "null entfernt das Angebot der Zelle.",
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "minimum": 0,
+                      "maximum": 1000,
+                      "description": "Neues Angebot in FTE (gespeichert mit zwei Nachkommastellen).",
+                      "type": "number"
+                    }
+                  ]
+                },
+                "version": {
+                  "minimum": 1,
+                  "description": "Gelesene Version der Zelle; Pflicht, wenn die Zelle schon ein Angebot hat (sonst 412).",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "KapazitaetGespeichert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zellen"
+        ],
+        "properties": {
+          "zellen": {
+            "description": "Die geänderten Zellen mit neuer Version (entfernte mit fte und version null).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KapazitaetZelle"
+            }
+          }
+        }
+      },
+      "AuslastungZelle": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "monat",
+          "angebot",
+          "bedarf",
+          "frei",
+          "lage",
+          "beitraege"
+        ],
+        "properties": {
+          "monat": {
+            "type": "string"
+          },
+          "angebot": {
+            "anyOf": [
+              {
+                "description": "Angebot in FTE; null ohne Erfassung.",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bedarf": {
+            "description": "Summe des Bedarfs in FTE der sichtbaren Projekte.",
+            "type": "number"
+          },
+          "frei": {
+            "description": "Angebot minus Bedarf (negativ = überbucht).",
+            "type": "number"
+          },
+          "lage": {
+            "description": "`ueberbucht`: Bedarf über dem Angebot (Warnung, UC-009 A1); `ohne_angebot`: Bedarf ohne erfasstes Angebot; `ausgelastet`: Bedarf = Angebot; `frei`: Angebot über dem Bedarf (Unterauslastung); `leer`: weder Angebot noch Bedarf.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ueberbucht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ohne_angebot"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausgelastet"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "frei"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "leer"
+                ]
+              }
+            ]
+          },
+          "beitraege": {
+            "description": "Einzelwerte der Summe je Projekt und Phase (Bericht: jede Zahl führt zu ihren Einzelwerten).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "phase",
+                "fte",
+                "gedeckt"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "phase": {
+                  "type": "string"
+                },
+                "fte": {
+                  "type": "number"
+                },
+                "gedeckt": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Auslastung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "von",
+          "bis",
+          "monate",
+          "szenario",
+          "rollen",
+          "projekte",
+          "engpaesse"
+        ],
+        "properties": {
+          "von": {
+            "type": "string"
+          },
+          "bis": {
+            "type": "string"
+          },
+          "monate": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "szenario": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rollen": {
+            "description": "Rollen mit Angebot oder Bedarf im Zeitraum, nach Schlüssel.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rolle",
+                "zellen"
+              ],
+              "properties": {
+                "rolle": {
+                  "type": "string"
+                },
+                "zellen": {
+                  "description": "Je Monat des Zeitraums eine Zelle, in der Reihenfolge von `monate`.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuslastungZelle"
+                  }
+                }
+              }
+            }
+          },
+          "projekte": {
+            "description": "Projekte der Beiträge (Nummer und Name für die Anzeige).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "engpaesse": {
+            "description": "Engpässe je Rolle und Quartal (darstellung.md: «Kapazität Q2 2027: 7,5 FTE Projektleitung statt höchstens 5,0»), nach Quartal und Rolle.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rolle",
+                "quartal",
+                "monat",
+                "bedarf",
+                "angebot",
+                "projekte"
+              ],
+              "properties": {
+                "rolle": {
+                  "type": "string"
+                },
+                "quartal": {
+                  "description": "«JJJJ-Qn».",
+                  "type": "string"
+                },
+                "monat": {
+                  "description": "Monat mit der grössten Überbuchung im Quartal.",
+                  "type": "string"
+                },
+                "bedarf": {
+                  "type": "number"
+                },
+                "angebot": {
+                  "description": "0 ohne erfasstes Angebot.",
+                  "type": "number"
+                },
+                "projekte": {
+                  "description": "Anzahl betroffener Projekte in diesem Monat.",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -25421,6 +25815,325 @@
         }
       }
     },
+    "/v1/kapazitaet": {
+      "get": {
+        "summary": "Kapazitätsangebot lesen",
+        "tags": [
+          "Ressourcen"
+        ],
+        "description": "Angebot je Rolle (Pool, A-20) und Monat im Zeitraum (UC-009 Schritt 1); ohne Zeitraum der laufende Monat und die elf folgenden, höchstens 60 Monate.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2027-04",
+            "in": "query",
+            "name": "von",
+            "required": false,
+            "description": "Monat «JJJJ-MM»."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2027-04",
+            "in": "query",
+            "name": "bis",
+            "required": false,
+            "description": "Monat «JJJJ-MM»."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Kapazitaet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Kapazitätsangebot festlegen",
+        "tags": [
+          "Ressourcen"
+        ],
+        "description": "Mehrere Zellen auf einmal (Raster mit automatischem Speichern, UC-009 Schritt 2). Hat eine Zelle schon ein Angebot, ist ihre gelesene `version` Pflicht (sonst 412 mit der aktuellen Version); `fte: null` entfernt das Angebot. Die Rolle muss ein aktiver Codewert der Codetabelle `ressourcenrolle` sein (422). Alles oder nichts.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KapazitaetPut"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KapazitaetGespeichert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auslastung": {
+      "get": {
+        "summary": "Auslastung analysieren",
+        "tags": [
+          "Ressourcen"
+        ],
+        "description": "Angebot gegen den Bedarf in FTE je Rolle und Monat (UC-009 Schritt 5): Engpässe (überbucht, ohne Angebot) und freie Kapazität, mit den Beiträgen je Projekt. Gezählt wird der Bedarf in FTE × Monate der Projekte, die die Person sieht; Bedarf nur als Grösse S/M/L zählt nicht (A-20). Mit `szenario` die Auslastung eines Portfolioszenarios (UC-008 Schritt 5; unbekannt: 404).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2027-04",
+            "in": "query",
+            "name": "von",
+            "required": false,
+            "description": "Monat «JJJJ-MM»."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2027-04",
+            "in": "query",
+            "name": "bis",
+            "required": false,
+            "description": "Monat «JJJJ-MM»."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "szenario",
+            "required": false,
+            "description": "Auslastung für ein Portfolioszenario (UC-008 Schritt 5): Projekte ausserhalb des Szenarios bzw. inaktive fallen weg, der Start verschiebt den Bedarf."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Auslastung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -25739,6 +26452,10 @@
     {
       "name": "Ziele",
       "description": "Strategische Ziele je Handlungsfeld mit Metrik, Zielwert und Verlauf; ab Etappe E6 Zielzyklus, Jahresziele und Zielerreichung."
+    },
+    {
+      "name": "Ressourcen",
+      "description": "Kapazitätsangebot je Rolle (Pool) und Monat und Auslastung aus dem Ressourcenbedarf der Projekte, auch je Szenario."
     },
     {
       "name": "Webhooks",

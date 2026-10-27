@@ -15899,6 +15899,306 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/kapazitaet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kapazitätsangebot lesen
+         * @description Angebot je Rolle (Pool, A-20) und Monat im Zeitraum (UC-009 Schritt 1); ohne Zeitraum der laufende Monat und die elf folgenden, höchstens 60 Monate.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    von?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    bis?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Kapazitaet"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        /**
+         * Kapazitätsangebot festlegen
+         * @description Mehrere Zellen auf einmal (Raster mit automatischem Speichern, UC-009 Schritt 2). Hat eine Zelle schon ein Angebot, ist ihre gelesene `version` Pflicht (sonst 412 mit der aktuellen Version); `fte: null` entfernt das Angebot. Die Rolle muss ein aktiver Codewert der Codetabelle `ressourcenrolle` sein (422). Alles oder nichts.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["KapazitaetPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["KapazitaetGespeichert"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auslastung": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Auslastung analysieren
+         * @description Angebot gegen den Bedarf in FTE je Rolle und Monat (UC-009 Schritt 5): Engpässe (überbucht, ohne Angebot) und freie Kapazität, mit den Beiträgen je Projekt. Gezählt wird der Bedarf in FTE × Monate der Projekte, die die Person sieht; Bedarf nur als Grösse S/M/L zählt nicht (A-20). Mit `szenario` die Auslastung eines Portfolioszenarios (UC-008 Schritt 5; unbekannt: 404).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    von?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    bis?: string;
+                    /** @description Auslastung für ein Portfolioszenario (UC-008 Schritt 5): Projekte ausserhalb des Szenarios bzw. inaktive fallen weg, der Start verschiebt den Bedarf. */
+                    szenario?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Auslastung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks": {
         parameters: {
             query?: never;
@@ -17404,6 +17704,98 @@ export interface components {
             metrik?: string;
             /** @description Angestrebter Wert der Metrik. */
             zielwert?: string;
+        };
+        KapazitaetZelle: {
+            rolle: string;
+            monat: string;
+            fte: number | null;
+            version: number | null;
+        };
+        Kapazitaet: {
+            von: string;
+            bis: string;
+            /** @description Erfasstes Angebot im Zeitraum, nach Rolle und Monat; Zellen ohne Angebot fehlen. */
+            zellen: components["schemas"]["KapazitaetZelle"][];
+            /** @description Was die anfragende Person darf (Angebot pflegen). */
+            can: {
+                write: boolean;
+            };
+        };
+        KapazitaetPut: {
+            zellen: {
+                /**
+                 * @description Rolle = Pool (A-20): Schlüssel eines Codewerts der Codetabelle `ressourcenrolle`.
+                 * @example projektleitung
+                 */
+                rolle: string;
+                /**
+                 * @description Monat «JJJJ-MM».
+                 * @example 2027-04
+                 */
+                monat: string;
+                /** @description null entfernt das Angebot der Zelle. */
+                fte: null | number;
+                /** @description Gelesene Version der Zelle; Pflicht, wenn die Zelle schon ein Angebot hat (sonst 412). */
+                version?: number;
+            }[];
+        };
+        KapazitaetGespeichert: {
+            /** @description Die geänderten Zellen mit neuer Version (entfernte mit fte und version null). */
+            zellen: components["schemas"]["KapazitaetZelle"][];
+        };
+        AuslastungZelle: {
+            monat: string;
+            angebot: number | null;
+            /** @description Summe des Bedarfs in FTE der sichtbaren Projekte. */
+            bedarf: number;
+            /** @description Angebot minus Bedarf (negativ = überbucht). */
+            frei: number;
+            /** @description `ueberbucht`: Bedarf über dem Angebot (Warnung, UC-009 A1); `ohne_angebot`: Bedarf ohne erfasstes Angebot; `ausgelastet`: Bedarf = Angebot; `frei`: Angebot über dem Bedarf (Unterauslastung); `leer`: weder Angebot noch Bedarf. */
+            lage: "ueberbucht" | "ohne_angebot" | "ausgelastet" | "frei" | "leer";
+            /** @description Einzelwerte der Summe je Projekt und Phase (Bericht: jede Zahl führt zu ihren Einzelwerten). */
+            beitraege: {
+                /** Format: uuid */
+                projektId: string;
+                phase: string;
+                fte: number;
+                gedeckt: boolean;
+            }[];
+        };
+        Auslastung: {
+            von: string;
+            bis: string;
+            monate: string[];
+            szenario: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            /** @description Rollen mit Angebot oder Bedarf im Zeitraum, nach Schlüssel. */
+            rollen: {
+                rolle: string;
+                /** @description Je Monat des Zeitraums eine Zelle, in der Reihenfolge von `monate`. */
+                zellen: components["schemas"]["AuslastungZelle"][];
+            }[];
+            /** @description Projekte der Beiträge (Nummer und Name für die Anzeige). */
+            projekte: {
+                /** Format: uuid */
+                id: string;
+                nummer: string;
+                name: string;
+            }[];
+            /** @description Engpässe je Rolle und Quartal (darstellung.md: «Kapazität Q2 2027: 7,5 FTE Projektleitung statt höchstens 5,0»), nach Quartal und Rolle. */
+            engpaesse: {
+                rolle: string;
+                /** @description «JJJJ-Qn». */
+                quartal: string;
+                /** @description Monat mit der grössten Überbuchung im Quartal. */
+                monat: string;
+                bedarf: number;
+                /** @description 0 ohne erfasstes Angebot. */
+                angebot: number;
+                /** @description Anzahl betroffener Projekte in diesem Monat. */
+                projekte: number;
+            }[];
         };
         WebhookSubscription: {
             /** Format: uuid */

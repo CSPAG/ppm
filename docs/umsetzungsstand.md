@@ -114,19 +114,19 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.04.03 | Lessons Learned erfassen | 013, 015 | E7 | AP-E7-1, AP-E7-5 | offen | – |
 | PS.05.01 | Stakeholder erfassen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
-| PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | offen | – |
+| PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
 | PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PC.01.02 | Ist-Kosten übernehmen | 010 | E7 | AP-E7-4 | offen | – |
-| PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | offen | – |
+| PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
 | PC.01.04 | Budgetabweichungen analysieren | 010 | E7 | AP-E7-4 | offen | – |
 | PC.01.05 | Budgetbedarf in den Budgetprozess übergeben | 010, 011 | E7 | AP-E7-4 | offen | – |
 | PC.02.01 | Portfoliorisiko erfassen | 008 | E5 | AP-E5-2 | offen | – |
 | PC.02.02 | Risikolage des Portfolios beurteilen | 006, 014 | E2 | AP-E2-3 | offen | – |
-| PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | offen | – |
+| PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
 | PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
-| PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | offen | – |
+| PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht ab P2 (UI-13, Register AP-E0-6) in Arbeit | – |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | offen | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
@@ -164,7 +164,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 
 | Ablauf | Zielgrösse | Soll | Messung | Paket | Ergebnis |
 |---|---|---|---|---|---|
-| K1-1 | Statusbericht ohne wesentliche Änderung (PPM-1) | ≤ 5 Min., ≤ 15 Interaktionen | Test (Interaktionen), Aufgabentest | AP-E1-1 | offen |
+| K1-1 | Statusbericht ohne wesentliche Änderung (PPM-1) | ≤ 5 Min., ≤ 15 Interaktionen | Test (Interaktionen), Aufgabentest | AP-E1-1 | Interaktionen gezählt: Vitest 3, E2E 8 (E2E offen bis CI läuft); 5 Min. beim Aufgabentest zu messen |
 | K1-2 | Berichte bis zum 25. eingereicht | ≥ 90 % | Betrieb | AP-E1-1 | offen |
 | K1-3 | Prüfung unauffälliger Bericht | ≤ 1 Min. ohne Detail | Aufgabentest | AP-E1-2 | offen |
 | K1-4 | Auffälligkeiten erkannt | 5 von 5 in 30 Berichten | Aufgabentest (Testdaten im Paket) | AP-E1-2 | offen |

@@ -2,18 +2,21 @@
  * Routen (TanStack Router, code-basiert): Seiten der App mit typisierten Suchparametern (`search.ts`) und die
  * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen).
  */
-import { createRootRoute, createRoute, createRouter, lazyRouteComponent, redirect, useNavigate } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
 import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
-import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
+import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
+import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
+import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { StellvertretungPage, type SetKontoSearch } from './features/konto/index.ts';
-import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
+import { ZIELJAHR, ZielePage, ZielzyklusPage, type SetZielSearch, type SetZielzyklusSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -90,6 +93,58 @@ function StrategischeZieleRoute() {
   return <ZielePage search={search} setSearch={setSearch} />;
 }
 
+// Zielzyklus eines Jahres (UI-38, K6; AP-E6-1): `/ziele/2027?o=ziel:2.1`
+const zielzyklusRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr', validateSearch: searchOf.zielzyklus, component: ZielzyklusRoute,
+  beforeLoad: ({ params }) => { if (!ZIELJAHR.test(params.jahr)) throw notFound(); },
+});
+
+function ZielzyklusRoute() {
+  const { jahr } = zielzyklusRoute.useParams();
+  const search = zielzyklusRoute.useSearch();
+  const navigate = useNavigate({ from: zielzyklusRoute.fullPath });
+  const setSearch = useCallback<SetZielzyklusSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return (
+    <ZielzyklusPage jahr={Number(jahr)} search={search} setSearch={setSearch}
+      jahrWechseln={j => void navigate({ to: '/ziele/$jahr', params: { jahr: String(j) }, search: {} })}
+      projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })}
+      strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })} />
+  );
+}
+
+// Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
+const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
+
+function IdeenRoute() {
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeenPage gehe={gehe} />;
+}
+
+const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });
+
+function IdeeNeuRoute() {
+  const search = ideeNeuRoute.useSearch();
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeeNeuPage search={search} gehe={gehe} />;
+}
+
+const ideeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/$nummer', validateSearch: searchOf.idee, component: IdeeRoute });
+
+function IdeeRoute() {
+  const { nummer } = ideeRoute.useParams();
+  const search = ideeRoute.useSearch();
+  const navigate = useNavigate({ from: ideeRoute.fullPath });
+  const setSearch = useCallback<SetIdeeSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
+}
+
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
 const organisationRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/administration/organisation', validateSearch: searchOf.organisation, component: OrganisationRoute,
@@ -131,6 +186,47 @@ function PhasenmodellRoute() {
   return <PhasenmodellPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Administration» › Portfolios und Gremien (UI-47, BC AM.02.04)
+const portfoliosRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/portfolios', validateSearch: searchOf.portfolios, component: PortfoliosRoute,
+});
+
+function PortfoliosRoute() {
+  const search = portfoliosRoute.useSearch();
+  const navigate = useNavigate({ from: portfoliosRoute.fullPath });
+  const setSearch = useCallback<SetPortfoliosSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <PortfoliosPage search={search} setSearch={setSearch} />;
+}
+
+// Arbeitsraum «Gremien»: Sitzungen (UI-33, UC-006, K3); Adresse der Sitzung `/gremien/<kuerzel>/sitzungen/<datum>` (I-N5)
+const gremienRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien',
+  beforeLoad: () => { throw redirect({ to: '/gremien/sitzungen', replace: true }); },
+});
+
+const sitzungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/sitzungen', component: SitzungenRoute });
+
+function SitzungenRoute() {
+  const navigate = useNavigate();
+  return <SitzungenPage gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const sitzungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum', validateSearch: searchOf.sitzung, component: SitzungRoute,
+});
+
+function SitzungRoute() {
+  const { kuerzel, datum } = sitzungRoute.useParams();
+  const search = sitzungRoute.useSearch();
+  const navigate = useNavigate({ from: sitzungRoute.fullPath });
+  const setSearch = useCallback<SetSitzungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -141,16 +237,24 @@ const devRoutes = import.meta.env.DEV
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  ...projekteRoutes(rootRoute),
   eingangRoute,
   kontoRoute,
   stellvertretungRoute,
+  ...projekteRoutes(rootRoute),
   zieleRoute,
   handlungsfelderRoute,
   strategischeZieleRoute,
+  gremienRoute,
+  sitzungenRoute,
+  sitzungRoute,
+  zielzyklusRoute,
+  ideenRoute,
+  ideeNeuRoute,
+  ideeRoute,
   organisationRoute,
   codetabellenRoute,
   phasenmodellRoute,
+  portfoliosRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

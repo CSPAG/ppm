@@ -1,27 +1,48 @@
 /**
  * Routen (TanStack Router, code-basiert): Seiten der App mit typisierten Suchparametern (`search.ts`) und die
- * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen).
+ * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen). Die Seiten der Features lädt
+ * der Router als eigene Chunks nach (`seite`, Q-L6); die `index.ts` der Features exportieren deshalb keine Seiten.
  */
 import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
-import { lazy, Suspense, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
-import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
-import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { ideeSeiten, nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
-import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
-import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
-import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
-import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
-import { type SetSitzungSearch, SitzungenPage, SitzungPage } from './features/sitzung/index.ts';
-import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
-import { type SetKontoSearch, StellvertretungPage } from './features/konto/index.ts';
-import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
+import type { SetEingangSearch } from './features/eingang/index.ts';
+import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
+import { ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
+import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
+import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
+import type { SetSitzungSearch } from './features/sitzung/index.ts';
+import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
+import type { SetKontoSearch } from './features/konto/index.ts';
+import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
+import { seite } from './routes/seite.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
-import { Loading } from './ui/index.ts';
+
+// Seiten der Features als eigene Chunks (Q-L6)
+const EingangPage = seite(() => import('./features/eingang/EingangPage.tsx'), 'EingangPage');
+const HandlungsfeldPage = seite(() => import('./features/handlungsfeld/HandlungsfeldPage.tsx'), 'HandlungsfeldPage');
+const IdeenBereich = seite(() => import('./features/idee/PoolSeite.tsx'), 'IdeenBereich');
+const IdeeNeuPage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeeNeuPage');
+const IdeePage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeePage');
+const AuslastungPage = seite(() => import('./features/ressourcen/AuslastungPage.tsx'), 'AuslastungPage');
+const KapazitaetPage = seite(() => import('./features/ressourcen/KapazitaetPage.tsx'), 'KapazitaetPage');
+const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
+const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
+const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
+const SitzungenPage = seite(() => import('./features/sitzung/SitzungenPage.tsx'), 'SitzungenPage');
+const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'SitzungPage');
+const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
+const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
+const StellvertretungPage = seite(() => import('./features/konto/StellvertretungPage.tsx'), 'StellvertretungPage');
+const ZielePage = seite(() => import('./features/ziele/ZielePage.tsx'), 'ZielePage');
+const ZielzyklusPage = seite(() => import('./features/ziele/ZielzyklusPage.tsx'), 'ZielzyklusPage');
+const ZielerreichungPage = seite(() => import('./features/ziele/ZielerreichungPage.tsx'), 'ZielerreichungPage');
 
 const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
 
@@ -117,11 +138,6 @@ function ZielzyklusRoute() {
   );
 }
 
-// Seiten der Ideen als eigener Chunk (Q-L6), geladen beim ersten Aufruf
-const IdeenBereich = lazy(() => ideeSeiten().then(m => ({ default: m.IdeenBereich })));
-const IdeeNeuPage = lazy(() => ideeSeiten().then(m => ({ default: m.IdeeNeuPage })));
-const IdeePage = lazy(() => ideeSeiten().then(m => ({ default: m.IdeePage })));
-
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
 const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', validateSearch: searchOf.ideen, component: IdeenRoute });
 
@@ -133,7 +149,7 @@ function IdeenRoute() {
   const setSearch = useCallback<SetIdeenSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
   }, [navigate]);
-  return <Suspense fallback={<Loading />}><IdeenBereich search={search} setSearch={setSearch} gehe={gehe} /></Suspense>;
+  return <IdeenBereich search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
 const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });
@@ -142,7 +158,7 @@ function IdeeNeuRoute() {
   const search = ideeNeuRoute.useSearch();
   const navigate = useNavigate();
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <Suspense fallback={<Loading />}><IdeeNeuPage search={search} gehe={gehe} /></Suspense>;
+  return <IdeeNeuPage search={search} gehe={gehe} />;
 }
 
 const ideeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/$nummer', validateSearch: searchOf.idee, component: IdeeRoute });
@@ -155,7 +171,7 @@ function IdeeRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <Suspense fallback={<Loading />}><IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} /></Suspense>;
+  return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
 // Zielerreichung je Quartal (UI-40, BC ZM.03.01, AP-E6-3): /ziele/2026/zielerreichung?quartal=q3; ohne Jahr und Quartal

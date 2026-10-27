@@ -61,3 +61,26 @@ await traktandum.zuruecknehmen(tx, { art: 'aenderung', bezug: { typ: 'vertrag_ve
 
 Lesesicht: Traktanden, Einladungen und Unterlagen vor dem Versand nur mit `sitzung:write`; danach Mitglieder
 (`sitzung:read` am Portfolio, vertrauliche Geschäfte nur mit `projekt:vertraulich`) und Eingeladene (nur ihr Traktandum).
+
+## Sitzung durchführen (AP-E2-2)
+
+Dateien `entscheid*` und `protokoll*` (Migration 140). Ablauf nach UC-006 Schritte 6–9 und K3 Schritte 7–10:
+
+| Schritt | Route | Wirkung |
+|---|---|---|
+| Starten | `POST /v1/sitzungen/{id}/starten` | nach dem Versand: Sitzungsmodus (`laufend`); `GET /v1/sitzungen/{id}/entscheide` liefert je Traktandum Optionen und Entscheid |
+| Entscheid | `PUT /v1/traktanden/{id}/entscheid` | Ergebnis aus `ergebnisse` der Art, Begründung Pflicht, Auflagen (bei `mit_auflagen` mindestens eine), Weiterleitung an den VR (A4); `beiEntscheid` sofort in derselben Transaktion |
+| Korrektur | dieselbe Route mit `If-Match` | bis zum Schliessen, Verlauf in `entscheid_version` (A-30); `beiEntscheid` läuft erneut mit dem neuen Ergebnis |
+| Schliessen | `POST /v1/sitzungen/{id}/schliessen` | Protokollentwurf; Traktanden ohne Entscheid und zurückgestellte Geschäfte (`zurueckgestellt`) werden Vorschläge der nächsten Sitzung; Auflagen werden Aufgaben `auflage.erfuellen`; Aufgabe `protokoll.versenden` (Frist `protokoll`); PL, SP und Verantwortliche erhalten je Person eine Mitteilung (I-B3) |
+| SNS-VR | `PUT /v1/traktanden/{id}/entscheid/sns` | nur «via SNS-VR», nach dem Schliessen, einmal: jetzt läuft `beiEntscheid` mit `viaSns: true` |
+| Protokoll | `GET/PUT /v1/sitzungen/{id}/protokoll`, `…/protokoll/versand`, `POST …/protokoll/versenden` | bereinigen (Anwesende, Notizen, Bemerkungen), Vorschau der Empfänger, Versand mit Arbeitstagen nach der Sitzung (K3-4) |
+| Auflage | `POST /v1/auflagen/{id}/erfuellen` | verantwortliche Person, Vertretung oder `sitzung:write`; erledigt die Aufgabe |
+| Liste | `GET /v1/entscheide` | Filter Projekt, Gremium, `anVr`, `auflagen=offen` (UI-36; MCP `list_entscheide`) |
+
+Für die Art heisst das:
+
+- **Ergebnisse:** `ergebnisse` der Registry gilt; eine noch nicht registrierte Art erhält die Optionen aus K3 Schritt 8.
+  Leere Liste = Kenntnisnahme ohne Entscheid (Portfoliobericht); solche Traktanden werden nicht weitergeschoben.
+- **`beiEntscheid`** muss idempotent sein und die Wirkung dem **zuletzt** übergebenen Ergebnis angleichen (Korrektur in
+  der Sitzung, A-30). Bei «via SNS-VR» kommt der Aufruf erst mit dem Entscheid des SNS-VR (`viaSns: true`, A1).
+- Die Folge ist sofort im Datenbestand; Benachrichtigungen an Betroffene schickt `sitzung` beim Schliessen.

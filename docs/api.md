@@ -50,12 +50,13 @@ App (`<subjekt> <rolle> <ort>`), nie im Token. Modell: `src/authz/model.ts`, aus
 
 | Scope | Rechte |
 |---|---|
-| `ppm:read` | `tenant:read`, `handlungsfeld:read` |
+| `ppm:read` | `tenant:read` und alle `*:read` der Fachbereiche ausser `finanzen:read` (Beträge) |
 | `handlungsfeld:write` | `handlungsfeld:write`, `handlungsfeld:delete` |
 
-`members:admin`, `access:admin` und `webhook:admin` stehen in keinem Scope. Das Modell hat Stufe «einfach» (nur Rollen
-an der Organisation); Rollen der Projekte, Portfolios und Gremien und die Typen dazu kommen mit den Modulen, die sie
-brauchen. Antworten tragen die Fähigkeiten der anfragenden Person (`can: { write, delete }`).
+`members:admin`, `access:admin`, `schnittstelle:admin` und `webhook:admin` stehen in keinem Scope. Das Modell hat
+Stufe «mittel» mit der Kette `org → portfolio → projekt`: Rollen an der Organisation, am Portfolio (`gremium`,
+`direktion`) und am Projekt (`sp`, `pl`, `ctl`, `kt`); Rechte, Rollen und Lesesicht in
+[fachmodell.md, Abschnitt 3](fachmodell.md#3-rechte-und-orte). Antworten tragen die Fähigkeiten der anfragenden Person (`can: { write, delete }`).
 
 ## Handlungsfelder
 

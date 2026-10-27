@@ -12,7 +12,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 |---|---|---|---|---|---|
 | S1 | Bauplan: fachmodell.md und umsetzungsstand.md | – | umgesetzt | #11 | A-01–A-47 festgelegt |
 | AP-E0-0 | Webapp-Fundament und Navigation (Session S2) | – | in Arbeit (S2) | – | – |
-| AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | offen | – | – |
+| AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
 | AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | offen | – | – |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | offen | – | – |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |

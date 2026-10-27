@@ -15,17 +15,19 @@ export const CATALOG_PPM = {
   groups: [{ key: 'handlungsfelder', label: 'Handlungsfelder', match: 'handlungsfeld' }],
   roles: [
     { key: 'org-admin', label: 'Admin', description: '', permissions: ['tenant:read', 'handlungsfeld:read', 'handlungsfeld:write', 'handlungsfeld:delete'], adminOnly: true },
-    { key: 'gl', label: 'Geschäftsleitung', description: '', permissions: ['tenant:read', 'handlungsfeld:read', 'handlungsfeld:write', 'handlungsfeld:delete'], adminOnly: false },
-    { key: 'leser', label: 'Leser:in', description: '', permissions: ['tenant:read', 'handlungsfeld:read'], adminOnly: false },
+    { key: 'gl', label: 'Geschäftsleitung', description: '', permissions: ['tenant:read', 'stammdaten:read', 'phasenmodell:read', 'portfolio:read', 'ziel:read', 'ziel:write', 'zielerreichung:write', 'handlungsfeld:read', 'handlungsfeld:write', 'handlungsfeld:delete', 'projekt:read', 'auswertung:read', 'finanzen:read', 'sitzung:read'], adminOnly: false },
+    { key: 'leser', label: 'Leser:in', description: '', permissions: ['tenant:read', 'stammdaten:read', 'phasenmodell:read', 'portfolio:read', 'handlungsfeld:read', 'ziel:read'], adminOnly: false },
   ],
   scopes: [],
   types: [
     { key: 'org', label: 'Organisation', parent: null, roles: ['org-admin', 'gl', 'leser'], relations: ['org-admin', 'gl', 'leser'] },
+    { key: 'portfolio', label: 'Portfolio', parent: 'org', roles: [], relations: [], read: 'projekt:read' },
+    { key: 'projekt', label: 'Projekt', parent: 'portfolio', roles: [], relations: [], leaf: true, read: 'projekt:read', write: 'projekt:write' },
   ],
   classifications: [{ level: 0, label: 'intern' }, { level: 1, label: 'vertraulich' }, { level: 2, label: 'streng vertraulich' }],
   mcpTools: [],
 };
 
 export function renderWithIam(ui: ReactNode, me: Partial<Me> = {}) {
-  return render(<StaticIam me={{ roles: ['gl'], permissions: ['tenant:read', 'handlungsfeld:read', 'handlungsfeld:write', 'handlungsfeld:delete'], ...me }}>{ui}</StaticIam>);
+  return render(<StaticIam me={{ roles: ['gl'], permissions: ['tenant:read', 'stammdaten:read', 'phasenmodell:read', 'portfolio:read', 'ziel:read', 'ziel:write', 'zielerreichung:write', 'handlungsfeld:read', 'handlungsfeld:write', 'handlungsfeld:delete', 'projekt:read', 'auswertung:read', 'finanzen:read', 'sitzung:read'], ...me }}>{ui}</StaticIam>);
 }

@@ -4,10 +4,12 @@
  */
 import { validateHandlungsfeldSearch, type HandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { validateProjekteSearch, type ProjekteSearch } from './features/projekt/index.ts';
+import { validateZielSearch, type ZielSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
   handlungsfelder: validateHandlungsfeldSearch,
   projekte: validateProjekteSearch,
+  strategischeZiele: validateZielSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { HandlungsfeldSearch, ProjekteSearch };
+export type { HandlungsfeldSearch, ProjekteSearch, ZielSearch };

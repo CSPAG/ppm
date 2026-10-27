@@ -7,6 +7,7 @@ ALTER TABLE ppm.projekt
   ADD COLUMN org_einheit_id   uuid,
   ADD COLUMN handlungsfeld_id uuid,
   ADD COLUMN phasenmodell_id  uuid,
+  ADD FOREIGN KEY (tenant_id, org_einheit_id) REFERENCES ppm.org_einheit (tenant_id, id) ON DELETE SET NULL (org_einheit_id),
   ADD FOREIGN KEY (tenant_id, handlungsfeld_id) REFERENCES ppm.handlungsfeld (tenant_id, id) ON DELETE SET NULL (handlungsfeld_id);
 CREATE INDEX projekt_handlungsfeld ON ppm.projekt (tenant_id, handlungsfeld_id) WHERE handlungsfeld_id IS NOT NULL;
 

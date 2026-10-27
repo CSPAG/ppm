@@ -13,13 +13,13 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | S1 | Bauplan: fachmodell.md und umsetzungsstand.md | – | umgesetzt | #11 | A-01–A-47 festgelegt |
 | AP-E0-0 | Webapp-Fundament und Navigation (Session S2) | – | in Arbeit (S2) | – | – |
 | AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
-| AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | offen | – | – |
-| AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | umgesetzt (Modul, 030, Arbeitstage mit Feiertagen, UI-46; Feiertage bis AP-E0-2 direkt aus `feiertag`) | #17 | A-10, A-12, A-13, A-27, A-43 |
+| AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | in Arbeit (PR 1 Tabellen und API; PR 2 Oberfläche UI-44, UI-45 folgt) | – | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
+| AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | umgesetzt (Modul, 030, Fristen in Arbeitstagen über `stammdaten`, UI-46) | #17 | A-10, A-12, A-13, A-27, A-43 |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | offen | – | – |
 | AP-E0-6 | Register Projektdaten | 060–069 | offen | – | – |
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | offen | – | – |
-| AP-E0-9 | Strategische Ziele | 080–089 | offen | – | – |
+| AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | offen | – | – |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | offen | – | – |
@@ -61,7 +61,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | BC | Business Case | UC | Etappe | Arbeitspaket | Stand | PR |
 |---|---|---|---|---|---|---|
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
-| ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | offen | – |
+| ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
 | ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | offen | – |
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
 | ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | offen | – |
@@ -142,8 +142,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
 | AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | offen | – |
-| AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | offen | – |
-| AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | offen | – |
+| AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
+| AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | offen | – |
 | AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | offen | – |
@@ -200,4 +200,5 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, «Sie» | Zielgrössen |
 |---|---|---|---|---|---|---|---|
+| #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | jsdom ohne Befund; Browser offen | offen (nicht im Browser geprüft) | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
 | #17 | AP-E0-3 | Arbeitsfläche; Z1, Z2, Z5, Z7–Z10 | vollständig, Strg+Z/Strg+Umschalt+Z | ohne Befund | geprüft (360/1024/1280/1440) | ja | keine Zielgrössen (kein Kernablauf für UC-017) |

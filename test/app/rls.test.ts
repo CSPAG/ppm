@@ -165,6 +165,21 @@ describe('PostgreSQL RLS', { skip }, () => {
     });
   });
 
+  test('Lesesicht: strategische Ziele mit ziel:read lesen, nur mit ziel:write schreiben; Verlauf nur anhängbar (AP-E0-9)', async () => {
+    await withTenant(t.runtime, { tenantId: A, settings: { 'app.org_permissions': '{handlungsfeld:read}' } }, async tx => {
+      assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.strategisches_ziel`)).rows[0].n, 0);
+      assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.strategisches_ziel_version`)).rows[0].n, 0);
+    });
+    await withTenant(t.runtime, { tenantId: A, settings: { 'app.org_permissions': '{ziel:read}' } }, async tx => {
+      assert.deepEqual((await tx.query<{ text: string }>(`SELECT text FROM ${S}.strategisches_ziel`)).rows.map(r => r.text), ['Probe']);
+      assert.equal((await tx.query(`SELECT count(*)::int AS n FROM ${S}.strategisches_ziel_version`)).rows[0].n, 1);
+      assert.equal((await tx.query(`UPDATE ${S}.strategisches_ziel SET metrik = 'x'`)).rowCount, 0);
+      assert.equal((await tx.query(`DELETE FROM ${S}.strategisches_ziel`)).rowCount, 0);
+    });
+    await assert.rejects(full(t.runtime, A, tx => tx.query(`UPDATE ${S}.strategisches_ziel_version SET text = 'x'`)), /permission denied/);
+    await assert.rejects(full(t.runtime, A, tx => tx.query(`DELETE FROM ${S}.strategisches_ziel_version`)), /permission denied/);
+  });
+
   test('Verlauf ist nur anhängbar; Worker sieht Warteschlange über alle Mandanten, aber keine Handlungsfelder ohne Kontext', async () => {
     await assert.rejects(full(t.runtime, A, tx => tx.query(`UPDATE ${S}.handlungsfeld_version SET label = 'x'`)), /permission denied/);
     await assert.rejects(full(t.runtime, A, tx => tx.query(`DELETE FROM ${S}.handlungsfeld_version`)), /permission denied/);

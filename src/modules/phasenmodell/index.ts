@@ -1,6 +1,6 @@
 /**
  * Modul Phasenmodell (BC AM.02.03, UC-017 Schritte 3 und 5): öffentliche Schnittstelle. Andere Module lesen die Version
- * in Kraft und rechnen Fristen in Arbeitstagen nur über diese Exporte (docs/fachmodell.md 1.1, 2.14).
+ * in Kraft und rechnen Fristen (Arbeitstage über `stammdaten`) nur über diese Exporte (docs/fachmodell.md 1.1, 2.14).
  */
 import { defineModule } from '@vollholz/platform';
 import { phasenmodellTools } from './mcp.ts';
@@ -13,7 +13,6 @@ export const phasenmodellModule = defineModule({
   mcpTools: phasenmodellTools,
 });
 
-export { addiereArbeitstage, arbeitstageZwischen, istArbeitstag, type Datum } from './arbeitstage.ts';
-export { arbeitstageBis, frist, fristDatum, plusArbeitstage, type Frist } from './fristen.ts';
+export { frist, fristDatum, type Datum, type Frist } from './fristen.ts';
 export { aktuellesPhasenmodell, phasenmodellLesen } from './lesen.ts';
 export { GATES, PHASEN, type Dokument, type FristSchluessel, type GateCode, type PhaseCode } from './schemas.ts';

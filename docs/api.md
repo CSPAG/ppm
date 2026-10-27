@@ -90,7 +90,7 @@ Projekte ab ihrem nächsten Gate, A-13). Jede Antwort trägt den Prüfbericht (`
 
 Andere Module lesen das Phasenmodell und rechnen Fristen nur über `src/modules/phasenmodell/index.ts`:
 `aktuellesPhasenmodell(tx)`, `phasenmodellLesen(tx, id)`, `frist(tx, schluessel)`, `fristDatum(tx, schluessel, bezug)`
-(Arbeitstage ohne Wochenende und Feiertage der Organisation, A-43), `plusArbeitstage`, `arbeitstageBis`.
+(Arbeitstage ohne Wochenende und Feiertage der Organisation über `stammdaten`, A-43).
 
 ## Webhooks und Ereignisse
 

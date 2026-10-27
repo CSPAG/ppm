@@ -57,7 +57,7 @@ describe('MCP-Dienst', { skip }, () => {
     const list = await rpc(token, 'tools/list');
     assert.equal(list.statusCode, 200, list.body);
     const tools = list.json().result.tools as { name: string; annotations?: { readOnlyHint?: boolean } }[];
-    assert.deepEqual(tools.map(t => t.name).sort(), ['get_handlungsfeld', 'get_phasenmodell', 'list_handlungsfelder']);
+    assert.deepEqual(tools.map(t => t.name).sort(), ['get_handlungsfeld', 'get_phasenmodell', 'list_handlungsfelder', 'list_org_einheiten', 'list_ziele']);
     assert.ok(tools.every(t => t.annotations?.readOnlyHint === true));
     const call = await rpc(token, 'tools/call', { name: 'list_handlungsfelder', arguments: {} });
     assert.equal(call.statusCode, 200, call.body);

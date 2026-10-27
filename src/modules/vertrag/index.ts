@@ -10,6 +10,7 @@
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
 import { baselineSetzen } from './baseline.ts';
+import { registerDokumentRoutes } from './dokument-routes.ts';
 import { entwurfsanlass } from './entwurf.ts';
 import { vertragTools } from './mcp.ts';
 import { registerRoutes, TAG } from './routes.ts';
@@ -20,6 +21,7 @@ export const vertragModule = defineModule({
   tags: [{ name: TAG, description: 'Projektvertrag: Versionen mit Kapiteln 1–13, Entwurf, Pflichtangaben je Phase, Einreichen zur Prüfung, Baseline.' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerDokumentRoutes(app, deps); // Dokumentausgabe Word/PDF (AP-E3-5)
   },
   mcpTools: { ...vertragTools },
 });

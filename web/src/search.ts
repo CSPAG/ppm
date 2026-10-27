@@ -3,9 +3,12 @@
  * Feature; hier werden sie den Routen zugeordnet.
  */
 import { validateHandlungsfeldSearch, type HandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 
 export const searchOf = {
   handlungsfelder: validateHandlungsfeldSearch,
+  organisation: validateOrganisationSearch,
+  codetabellen: validateCodetabellenSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
 export type { HandlungsfeldSearch };

@@ -195,12 +195,16 @@ export const model = defineModel({
     projekt: { label: 'Projekt', parent: 'portfolio', roles: ['pl', 'ctl', 'sp', 'kt'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
   },
   mcpTools: {
+    // stammdaten
+    list_org_einheiten: { title: 'Organisationseinheiten auflisten', permission: 'stammdaten:read', readOnly: true },
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
     // projekt
     list_projekte: { title: 'Projekte auflisten', permission: 'projekt:read', readOnly: true },
     get_projekt: { title: 'Projekt lesen', permission: 'projekt:read', readOnly: true },
+    // ziel
+    list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
   },
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)

@@ -1,0 +1,6 @@
+/*
+ * Auswahl im Formular wie die Eingabefelder (base.css `.field input`): Hintergrund und Schrift aus den Farbtokens, damit
+ * der Kontrast hell und dunkel stimmt. `.field select` fehlt in den gemeinsamen Stilen; Folgearbeit für web/src/styles/.
+ */
+.ziel-form select{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 28px 0 10px;background-color:var(--surface);color:var(--fg);width:100%;min-width:0;outline:0}
+.ziel-form select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}

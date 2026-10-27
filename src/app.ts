@@ -8,14 +8,16 @@ import { join } from 'node:path';
 import { defineApp } from '@vollholz/platform';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
+import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
+import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
 
 export const MIGRATIONS_DIR = join(import.meta.dirname, '..', 'db', 'migrations');
 
 export const app = defineApp({
   platform,
-  modules: [handlungsfeldModule, projektModule, webhooksModule],
+  modules: [stammdatenModule, handlungsfeldModule, projektModule, zielModule, webhooksModule],
   // Namen auflösen und Personen auswählen: wer Handlungsfelder oder Projekte liest (Projektorganisation, PP.04.04)
   people: { permissions: ['handlungsfeld:read', 'projekt:read'] },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App

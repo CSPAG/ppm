@@ -8,6 +8,7 @@ import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
+import { projekteRoutes } from './routes/projekte.tsx';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
@@ -140,6 +141,7 @@ const devRoutes = import.meta.env.DEV
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  ...projekteRoutes(rootRoute),
   eingangRoute,
   kontoRoute,
   stellvertretungRoute,

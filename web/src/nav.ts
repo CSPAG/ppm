@@ -7,6 +7,7 @@ import { eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
+import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { sucheZiele, zieleTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
@@ -15,6 +16,8 @@ export const navigation: NavRegistrierung = {
   bereiche: [
     // Arbeitsraum «Eingang»: Startseite jeder Rolle (UI-01, UX-E3); jede Rolle enthält tenant:read (fachmodell.md 3.3)
     { raum: 'eingang', pfad: '/eingang', label: eingangTexte.titel, recht: 'tenant:read' },
+    // Arbeitsraum «Projekte»: Meine Projekte mit der Projektakte (UI-05, UI-06; Projektrollen sehen nur ihre Projekte)
+    { raum: 'projekte', pfad: '/projekte', label: projektTexte.bereich, recht: 'projekt:read' },
     // Arbeitsraum «Ziele»: bis zum Zielzyklus (Etappe E6) nur die Handlungsfelder (BC ZM.01.01)
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Strategische Ziele je Handlungsfeld (BC ZM.01.02, AP-E0-9)
@@ -42,6 +45,12 @@ export const navigation: NavRegistrierung = {
       id: 'org-einheiten', recht: 'stammdaten:write',
       suchen: async (q, signal) => (await sucheOrgEinheiten(q, signal)).map(o => ({
         id: `org-einheit:${o.id}`, label: `${o.kuerzel} · ${o.name}`, detail: TS.bereich.organisation, icon: 'building', pfad: `/administration/organisation?o=${o.id}`,
+      })),
+    },
+    {
+      id: 'projekte', recht: 'projekt:read',
+      suchen: async (q, signal) => (await sucheProjekte(q, signal)).map(p => ({
+        id: `projekt:${p.id}`, label: `${p.nummer} ${p.name}`, detail: projektTexte.palette.detail, icon: 'folder', pfad: `/projekte/${p.nummer}`,
       })),
     },
     {

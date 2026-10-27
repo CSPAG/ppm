@@ -102,6 +102,10 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
 .blatt-konto .seg button{min-height:36px}
 
 select.inp{padding-right:28px}
+/* Auswahlfelder wie Eingabefelder (.field input): eigener Hintergrund, sonst im Dunkelmodus heller Text auf hellem Grund */
+select:not(.inp){height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background-color:var(--surface);color:var(--fg)}
+select:not(.inp):focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.field select{width:100%;min-width:0}
 .chip .chip-b{border:0;background:none;padding:0;display:flex;gap:4px;min-width:0;align-items:center}
 .chip .v .pill{height:18px}
 th .th{display:block;padding:10px 12px}
@@ -133,6 +137,8 @@ tbody td.wrap{white-space:normal;max-width:none}
 .field .hint,.field .ferr{grid-column:2;margin:0}
 .field .hint{font-size:12.5px;color:var(--fg-3)}
 .field [aria-invalid="true"]{border-color:var(--bad)}
+.field select{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 28px 0 10px;background:var(--surface);color:var(--fg);width:100%;min-width:0;outline:0}
+.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 @media (max-width:900px){ .field .hint,.field .ferr{grid-column:1} .field label{padding-top:0} }
 
 /* Schublade: Fuss mit den Knöpfen, Liste in einem Wert */

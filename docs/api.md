@@ -91,7 +91,6 @@ Projekte ab ihrem nächsten Gate, A-13). Jede Antwort trägt den Prüfbericht (`
 Andere Module lesen das Phasenmodell und rechnen Fristen nur über `src/modules/phasenmodell/index.ts`:
 `aktuellesPhasenmodell(tx)`, `phasenmodellLesen(tx, id)`, `frist(tx, schluessel)`, `fristDatum(tx, schluessel, bezug)`
 (Arbeitstage ohne Wochenende und Feiertage der Organisation über `stammdaten`, A-43).
-
 ## Projekte
 
 Projekte mit Nummer «JJJJ-NNN» (A-47), Portfolio, Phase und Lebenszyklus, Projektorganisation mit Sponsor,
@@ -99,8 +98,6 @@ Sponsoren-Koalition, Projektleitung, CTL und Kernteam (BC PP.04.04, UC-002 Schri
 Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektrollen, UE und Gremium (A-34). Endzustände
 (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`) sind lesend (409). Fähigkeiten: `can: { write, organisation }`.
 
-| Methode und Pfad | Recht | Hinweis |
-|---|---|---|
 | `GET /v1/projekte?rolle=&portfolio=&phase=&lebenszyklus=&nummer=&q=&cursor=&limit=` | `projekt:read` irgendwo | sortiert nach Nummer; `rolle` = eigene Funktion (`sp`, `pl`, `ctl`, `kt`, `koalition`), `portfolio` = Schlüssel |
 | `GET /v1/projekte/kopf` | `projekt:read` irgendwo | laufende Projekte mit eigener Funktion (Kopfkarte im Eingang) |
 | `POST /v1/projekte` | `projekt:create` an org oder am Portfolio | Nummer fortlaufend je Jahr der Anlage, Phase ohne Angabe P0 |
@@ -108,6 +105,49 @@ Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektroll
 | `PATCH /v1/projekte/{id}` | `projekt:write` | Name, Federführung, Handlungsfeld, «vertraulich»; `If-Match` Pflicht |
 | `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
 | `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
+## Projektdaten
+
+Register je Projekt (docs/fachmodell.md 2.6, AP-E0-6): Meilensteine, Lieferergebnisse und Kommunikationsmassnahmen
+(PS.02.04, PS.05.02, PS.05.03), Kosten (PC.01.01, PC.01.03), Risiken (PC.02.04, PC.02.03; Portfoliorisiken PC.02.01),
+KPIs mit Werten (PC.03.01, PC.03.03), Stakeholder (PS.05.01), Abhängigkeiten (PP.02.03), Ressourcenbedarf (RK.02.01,
+RK.02.05, A-20) und Meldungen an ICT bzw. Infrastruktur (RK.02.06, A-22). Je Register `GET` (Cursor), `POST`, `PATCH`
+und `DELETE /v1/projekte/{id}/<register>/{eintragId}` mit `If-Match`; Endzustände des Projekts sind lesend (409).
+Baseline, Ist-Kosten, Abnahme durch das Gremium und «gedeckt» setzen nur obere Module (`projektdaten` in `index.ts`).
+
+| Register (Pfad unter `/v1/projekte/{id}/`) | Lesen | Pflegen | Hinweis |
+|---|---|---|---|
+| `meilensteine?phase=&art=` | `projekt:read` | `projekt:write` | `art`: `meilenstein`, `lieferergebnis`, `kommunikation` |
+| `kosten?phase=` | `projekt:read` und `finanzen:read` | `projekt:write` und `finanzen:read` | Beträge nur mit `finanzen:read` (A-33), auch in der Lesesicht; Beträge gehen nicht ins Ereignis |
+| `risiken` | `projekt:read` | `projekt:write` | höchste Auswirkung zuerst |
+| `kpis`, `kpis/{kpiId}/werte` | `projekt:read` | `projekt:write`; Werte `kpi:write` | `PUT …/werte/{JJJJ-MM}` ab Phase P2, `If-Match: W/"0"` für einen neuen Wert |
+| `stakeholder` | `projekt:read` | `projekt:write` | |
+| `abhaengigkeiten` | `projekt:read` | `projekt:write` | beide Richtungen (`ausgehend`, `eingehend`); das andere Projekt nur, wenn sichtbar |
+| `ressourcenbedarf?phase=` | `projekt:read` | `projekt:write` | Grösse S/M/L oder FTE mit `vonMonat`–`bisMonat`; je Rolle und Phase ein Eintrag |
+| `meldungen` | `projekt:read` | `projekt:write` | nur `GET` und `POST` (nur anhängen); Stelle `dti` oder `dbi` |
+| `/v1/portfolios/{id}/risiken` | `projekt:read` (org oder Portfolio) | `projekt:write` an der Organisation | Portfoliorisiken (PC.02.01) |
+## Statusberichte
+
+Monatlicher Statusbericht je Projekt und Periode `YYYY-MM` (BC PS.01.01, UC-004, Kernablauf K1; `src/modules/statusbericht/`).
+
+| `GET /v1/projekte/{id}/berichte` | `projekt:read` am Projekt | alle Berichte, neueste Periode zuerst |
+| `GET /v1/projekte/{id}/berichte/{periode}` | `projekt:read` am Projekt | gespeichert oder Vorbelegung aus der Vorperiode (`version` 0, ohne Status und Trend); `fehlend` = Pflichtangaben für das Einreichen |
+| `PUT /v1/projekte/{id}/berichte/{periode}` | `statusbericht:write` am Projekt | Entwurf speichern, `If-Match` Pflicht (`W/"0"` legt an); 409 nach dem Einreichen, in abgeschlossener Periode, in P4, für spätere Perioden |
+| `POST /v1/projekte/{id}/berichte/{periode}/einreichen` | `statusbericht:write` am Projekt | 422 mit allen fehlenden Angaben in `errors` (Status, Trend, Beurteilung je Dimension; bei «kritisch» Begründung und Massnahme) |
+| `POST /v1/projekte/{id}/berichte/{periode}/zurueckziehen` | `statusbericht:write` am Projekt | Rückgängig innert 10 s, nur durch die einreichende Person (409 sonst) |
+
+Ereignisse: `statusbericht.created`, `statusbericht.updated`, `statusbericht.submitted`, `statusbericht.withdrawn`.
+
+## Ressourcen
+
+Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =
+Rolle (Codetabelle `ressourcenrolle`, A-20); Zeitraum `von`/`bis` als `JJJJ-MM`, ohne Angabe der laufende Monat und die
+elf folgenden, höchstens 60 Monate.
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/kapazitaet?von=&bis=` | `ressource:read` | Angebot je Rolle und Monat mit `version` je Zelle, `can.write` |
+| `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
+| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
 
 ## Sitzungen
 
@@ -137,6 +177,26 @@ Versand nur ihr Traktandum. Bearbeiten mit `sitzung:write` bis zum Versand. Fäh
 
 Andere Module registrieren ihre Traktandenart und schlagen Geschäfte vor, nur über `src/modules/sitzung/index.ts`
 (`registriereTraktandenart`, `traktandum.vorschlagen`); siehe [README des Moduls](../src/modules/sitzung/README.md).
+## Projektvertrag
+
+Versionen des Projektvertrags mit den Kapiteln 1–13 der Vorlage (Q7) als Daten (docs/fachmodell.md 2.10, AP-E3-1;
+DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5, A-29), genau eine Baseline. Lesen mit
+`projekt:read`, bearbeiten und einreichen mit `vertrag:write` am Projekt; Kapitel 9 (Kosten) nur mit `finanzen:read`
+(ohne: Beträge `null`, Speichern 403; A-33). Endzustände des Projekts sind lesend (409).
+
+| `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
+| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `gate`, `aenderung` folgen mit AP-E3-3, AP-E3-4 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
+| `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
+| `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |
+| `GET /v1/vertragsversionen/{id}/pflichtangaben` | `projekt:read` | Angaben des Gates in die Zielphase und der Zielphase (Phasenmodell, K13, A-12) mit `erfuellt`, `grund` und Sprungziel `kapitel`/`feld` (K2-4) |
+| `POST /v1/vertragsversionen/{id}/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung», `If-Match` Pflicht; fehlen Pflichtangaben: 422 mit `/kapitel/<nr>/<feld>` je Angabe; Aufgabe `vertrag.quality_check` an `vertrag:review` |
+
+Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategisches_ziel_id`), die Kapitel camelCase
+(`strategischesZielId`). Ab dem Gate P1–P2 verlangen `personal` FTE mit Monaten (nicht Grösse S/M/L) und `kosten` einen
+Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
+`baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
+über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
 
 ## Webhooks und Ereignisse
 
@@ -160,6 +220,14 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.projekt.organisation_changed` | Projektorganisation festgelegt |
 | `ch.ppm.projekt.phase_changed` | Phase nachgeführt (Gate-Entscheid) |
 | `ch.ppm.projekt.suspended`, `.resumed`, `.cancelled`, `.completed`, `.withdrawn` | Lebenszyklus: sistiert, wieder aufgenommen, abgebrochen, abgeschlossen, zurückgezogen |
+| `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
+| `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
+| `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
+| `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
+| `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
+| `ch.ppm.vertrag.drafted`, `.chapter_updated`, `.submitted`, `.baselined` | Projektvertrag: Entwurf angelegt, Kapitel gespeichert, zur Prüfung eingereicht, Version Baseline |
+| `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
 | `ch.ppm.sitzung.created`, `ch.ppm.sitzung.updated` | Sitzung angelegt bzw. Beginn, Dauer, Ort geändert |
 | `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |
 | `ch.ppm.sitzung.reordered` | Traktanden geordnet |

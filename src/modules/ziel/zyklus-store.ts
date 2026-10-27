@@ -196,6 +196,13 @@ export async function getProjektZiel(tx: Tx, projektId: string, id: string): Pro
   return (await tx.query<ProjektZielRow>(`${PZ_SELECT} WHERE z.projekt_id = $1 AND z.id = $2`, [projektId, id])).rows[0] ?? null;
 }
 
+/** Bestehende Zuordnung (gleiches Projekt, strategisches Ziel und Jahresziel), sonst null. */
+export async function zuordnungSuchen(tx: Tx, projektId: string, strategischesZielId: string, jahreszielId: string | null): Promise<string | null> {
+  return (await tx.query<{ id: string }>(
+    `SELECT id FROM ${ZP} WHERE projekt_id = $1 AND strategisches_ziel_id = $2 AND jahresziel_id IS NOT DISTINCT FROM $3::uuid`,
+    [projektId, strategischesZielId, jahreszielId])).rows[0]?.id ?? null;
+}
+
 export async function zuordnen(tx: Tx, projektId: string, strategischesZielId: string, jahreszielId: string | null): Promise<string> {
   return (await tx.query<{ id: string }>(
     `INSERT INTO ${ZP} (tenant_id, projekt_id, strategisches_ziel_id, jahresziel_id) VALUES (app.tenant_id(), $1, $2, $3) RETURNING id`,

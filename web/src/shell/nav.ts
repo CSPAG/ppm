@@ -55,9 +55,8 @@ export function sichtbareRaeume(
   verwalten: readonly { path: string; title: string }[] = [],
 ): SichtbarerRaum[] {
   const alle = [
-    // Administration: «Benutzer und Rollen» (Verwalten des Baukastens) zuerst, wie in der IA, danach die Bereiche der App
-    ...verwalten.map(v => ({ raum: 'administration' as const, pfad: v.path, label: v.title })),
     ...reg.bereiche.filter(b => darf(b.recht)),
+    ...verwalten.map(v => ({ raum: 'administration' as const, pfad: v.path, label: v.title })),
   ];
   return ARBEITSRAEUME.flatMap(r => {
     const bereiche = alle.filter(b => b.raum === r.id).map(b => ({ pfad: b.pfad, label: b.label, aktiv: liegtIn(path, b.pfad) }));

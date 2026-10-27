@@ -13,6 +13,7 @@ import {
   requireIfMatch, type Deps, type Tx,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
+import { aufgabe } from '../eingang/index.ts';
 import {
   Hauptaktivitaet, HauptaktivitaetCreate, HauptaktivitaetList, HauptaktivitaetPatch, HauptaktivitaetQuery, JahrParams, Jahresziel,
   JahreszielCreate, JahreszielList, JahreszielPatch, JahreszielQuery, Person, ProjektZiel, ProjektZielCreate, ProjektZielList,
@@ -36,6 +37,24 @@ async function jahrBearbeitbar(tx: Tx, jahr: number): Promise<store.ZieljahrRow>
     throw conflict(`Die Jahresziele ${jahr} ${STAND_TEXT[zj.stand]} und können nicht geändert werden.`, { reason: 'gesperrt', stand: zj.stand });
   }
   return zj;
+}
+
+/** Aufgabe «Jahresziele vervollständigen» (Fachmodell 4.2; K6 Einstieg). Schliesst die Vorlage an den VR (AP-E6-2). */
+export const VERVOLLSTAENDIGEN = 'jahresziele.vervollstaendigen';
+export const zieljahrBezug = (zj: { id: string }) => ({ typ: 'zieljahr', id: zj.id });
+
+/**
+ * Aufgabe an alle mit `ziel:write` öffnen bzw. nachführen (idempotent): «Jahresziele 2027 vervollständigen · Vorlage an
+ * den VR bis 15.11.2026», Frist = geplante Vorlage.
+ */
+async function aufgabeVervollstaendigen(tx: Tx, zj: store.ZieljahrRow): Promise<void> {
+  await aufgabe.oeffnen(tx, {
+    art: VERVOLLSTAENDIGEN, bezug: zieljahrBezug(zj), empfaenger: { recht: 'ziel:write' },
+    titel: `Jahresziele ${zj.jahr} vervollständigen`,
+    kontext: zj.vorlage_bis ? `Vorlage an den VR bis ${zj.vorlage_bis.split('-').reverse().join('.')}` : null,
+    link: `/ziele/${zj.jahr}`,
+    frist: zj.vorlage_bis ? { datum: zj.vorlage_bis, art: 'kalendertage' } : null,
+  });
 }
 
 const zieljahrOut = (r: store.ZieljahrRow, write: boolean): ZieljahrOut => ({
@@ -146,7 +165,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
   app.post('/v1/ziele/:jahr', {
     schema: {
       tags: [TAG], summary: 'Zielzyklus starten', params: JahrParams, headers: IdempotencyHeaders, body: Type.Ref('ZieljahrCreate'), response: { 201: Type.Ref('Zieljahr') },
-      description: 'Legt das Zieljahr «in Arbeit» an (UC-011 Schritt 1); schon gestartet: 409.',
+      description: 'Legt das Zieljahr «in Arbeit» an (UC-011 Schritt 1) und öffnet allen mit `ziel:write` die Aufgabe «Jahresziele vervollständigen» mit der geplanten Vorlage als Frist; schon gestartet: 409.',
     },
   }, async (req, reply) => {
     const { jahr } = req.params as { jahr: number };
@@ -156,6 +175,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
     const row = await req.tx(async tx => {
       if (await store.getJahr(tx, jahr)) throw conflict(`Der Zielzyklus ${jahr} ist schon gestartet.`, { reason: 'gestartet' });
       const r = await store.createJahr(tx, jahr, body.vorlageBis ?? null);
+      await aufgabeVervollstaendigen(tx, r);
       const snap = { id: r.id, jahr: r.jahr, stand: r.stand, vorlageBis: r.vorlage_bis, version: r.version };
       await record(tx, who, { action: 'zieljahr.created', resourceType: 'zieljahr', resourceId: r.id, data: snap, event: snap });
       return r;
@@ -179,6 +199,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
       if (before.version !== version) throw preconditionFailed(before.version);
       const r = await store.updateJahr(tx, jahr, version, body.vorlageBis);
       if (!r) throw preconditionFailed(before.version);
+      await aufgabeVervollstaendigen(tx, r);
       await record(tx, who, { action: 'zieljahr.updated', resourceType: 'zieljahr', resourceId: r.id, data: { before: { vorlageBis: before.vorlage_bis }, after: { vorlageBis: r.vorlage_bis } }, event: { id: r.id, jahr, vorlageBis: r.vorlage_bis, version: r.version } });
       return r;
     });

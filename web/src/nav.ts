@@ -4,7 +4,7 @@
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
-import { sucheZiele, zieleTexte } from './features/ziele/index.ts';
+import { sucheZiele, zieleTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
@@ -30,7 +30,7 @@ export const navigation: NavRegistrierung = {
     {
       id: 'strategische-ziele', recht: 'ziel:read',
       suchen: async (q, signal) => (await sucheZiele(q, signal)).map(z => ({
-        id: `ziel:${z.nummer}`, label: `${z.nummer} ${z.text}`, detail: zieleTexte.bereich, icon: 'target', pfad: `/ziele/strategische-ziele?o=${z.nummer}`,
+        id: `ziel:${z.nummer}`, label: `${z.nummer} ${z.text}`, detail: zieleTexte.bereich, icon: 'target', pfad: `/ziele/strategische-ziele?o=${zielO(z.nummer)}`,
       })),
     },
   ],

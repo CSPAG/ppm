@@ -1,6 +1,6 @@
 /**
  * Abnahme AP-E0-9 (BC ZM.01.02, UC-011 Schritt 2): strategisches Ziel unter einem Handlungsfeld anlegen, ändern, Verlauf
- * mit früherem Stand, löschen; Adresse mit der Nummer (I-N5); axe hell, dunkel und 360 px; Leser:in ändert nicht.
+ * mit früherem Stand, löschen; Adresse mit der Nummer (`?o=ziel:2.1`, I-N5); axe hell, dunkel und 360 px; Leser:in ändert nicht.
  */
 import { expect, test } from '@playwright/test';
 import { ANNA, BRUNO, expectAccessible, expectNoOverflow, login } from './support.ts';
@@ -32,7 +32,7 @@ test('Ziel anlegen, ändern, Verlauf mit früherem Stand, löschen; barrierefrei
   await page.getByRole('button', { name: 'Speichern' }).click();
 
   // Schublade über die Nummer, ohne Metrik ein Hinweis
-  await expect(page).toHaveURL(new RegExp(`[?&]o=${nr.replace('.', '\\.')}`));
+  await expect.poll(() => new URL(page.url()).searchParams.get('o')).toBe(`ziel:${nr}`);
   const drawer = page.getByRole('dialog', { name: `${nr} Strategisches Ziel` });
   await expect(drawer).toBeVisible();
   await expect(drawer.getByText(/noch keine Metrik/)).toBeVisible();

@@ -13,7 +13,9 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
   await login(page, ANNA);
   const nav = navigation(page);
   await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
-  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toHaveAttribute('aria-current', 'page');
+  // In der Leiste trägt bei mehreren Bereichen der aktive Bereich aria-current, unten auf dem Telefon der Arbeitsraum
+  const aktuell = telefon(page) ? nav.getByRole('link', { name: 'Ziele', exact: true }) : nav.getByRole('link', { name: 'Handlungsfelder', exact: true });
+  await expect(aktuell).toHaveAttribute('aria-current', 'page');
   await expectAccessible(page);
   await expectNoOverflow(page);
 

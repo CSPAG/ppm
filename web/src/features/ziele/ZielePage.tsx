@@ -1,13 +1,13 @@
 /**
  * Seite «Strategische Ziele» im Arbeitsraum «Ziele» (BC ZM.01.02, UC-011 Schritt 2; Kernablauf K6 als Kontext, der
  * Zielzyklus folgt in Etappe E6): Liste nach Nummer mit Handlungsfeld, Metrik und Zielwert, Suche und «Mehr laden»,
- * Schublade über `?o=<nummer>`. Ohne Metrik ein Hinweis in der Zeile (K6 G4). Bearbeiten nach `can` der Antwort.
+ * Schublade über `?o=ziel:<nummer>`. Ohne Metrik ein Hinweis in der Zeile (K6 G4). Bearbeiten nach `can` der Antwort.
  */
 import { useEffect, useId, useState } from 'react';
 import { useSession } from '../../auth/index.ts';
 import { Datenliste, Icon, type Spalte } from '../../ui/index.ts';
 import { useHandlungsfelder, useZielList, type HandlungsfeldKurz, type StrategischesZiel } from './api.ts';
-import type { SetZielSearch, ZielSearch } from './search.ts';
+import { nummerAusO, zielO, type SetZielSearch, type ZielSearch } from './search.ts';
 import { TZ } from './texte.ts';
 import { ZielDrawer } from './ZielDrawer.tsx';
 
@@ -61,11 +61,11 @@ export function ZielePage({ search, setSearch }: { search: ZielSearch; setSearch
       <div className="body">
         <Datenliste<StrategischesZiel> titel={TZ.title} spalten={spalten(canFelder ? felder.data ?? [] : undefined)} zeilen={items} schluessel={z => z.nummer}
           name={z => `${z.nummer} ${z.text}`}
-          oeffnen={z => setSearch({ o: z.nummer })} aktuell={search.o} laedt={list.isPending} fehler={list.error} erneut={() => void list.refetch()}
+          oeffnen={z => setSearch({ o: zielO(z.nummer) })} aktuell={search.o && search.o !== 'neu' ? nummerAusO(search.o) : undefined} laedt={list.isPending} fehler={list.error} erneut={() => void list.refetch()}
           leer={TZ.empty} gefiltert={!!q} leerGefiltert={TZ.emptySearch} zuruecksetzen={() => setText('')}
           mehr={{ vorhanden: list.hasNextPage, laedt: list.isFetchingNextPage, laden: () => void list.fetchNextPage() }} />
       </div>
-      {search.o ? <ZielDrawer nummer={search.o} canRead={canFelder} onClose={() => setSearch({ o: undefined })} onOpen={n => setSearch({ o: n }, { replace: true })} /> : null}
+      {search.o ? <ZielDrawer nummer={search.o === 'neu' ? 'neu' : nummerAusO(search.o)} canRead={canFelder} onClose={() => setSearch({ o: undefined })} onOpen={n => setSearch({ o: zielO(n) }, { replace: true })} /> : null}
     </section>
   );
 }

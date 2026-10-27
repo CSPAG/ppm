@@ -2,6 +2,7 @@
 import { useId, useState, type FormEvent } from 'react';
 import type { HandlungsfeldKurz, StrategischesZiel, StrategischesZielInput } from './api.ts';
 import { TZ } from './texte.ts';
+import './ziele.css';
 
 export interface FormValues { handlungsfeldId: string; nummer: string; text: string; horizont: string; metrik: string; zielwert: string }
 
@@ -46,7 +47,7 @@ export function ZielForm({ formId, initial, handlungsfelder, onSubmit, busy, ser
   const error = (k: keyof FormValues) => errors[k] ? <p id={`${id}-${k}-e`} className="ferr">{errors[k]}</p> : null;
   const set = (k: keyof FormValues) => (e: { target: { value: string } }) => setV({ ...v, [k]: e.target.value });
   return (
-    <form id={formId} className="form" onSubmit={submit} noValidate aria-busy={busy}>
+    <form id={formId} className="form ziel-form" onSubmit={submit} noValidate aria-busy={busy}>
       <div className="field">
         <label htmlFor={`${id}-handlungsfeldId`}>{TZ.handlungsfeld}</label>
         <select id={`${id}-handlungsfeldId`} name="handlungsfeldId" value={v.handlungsfeldId} onChange={set('handlungsfeldId')} required data-autofocus

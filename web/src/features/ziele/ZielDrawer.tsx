@@ -1,5 +1,5 @@
 /**
- * Schublade eines strategischen Ziels (`?o=<nummer>`) bzw. zum Anlegen (`?o=neu`), BC ZM.01.02, UC-011 Schritt 2:
+ * Schublade eines strategischen Ziels (`?o=ziel:<nummer>`) bzw. zum Anlegen (`?o=neu`), BC ZM.01.02, UC-011 Schritt 2:
  * Angaben, Hinweis ohne Metrik (K6 G4), Verlauf mit den geänderten Angaben je Fassung (G11), Bearbeiten mit `If-Match`
  * (412: Hinweis und neu laden), vergebene Nummer (409) am Feld, Löschen mit Rückfrage.
  */

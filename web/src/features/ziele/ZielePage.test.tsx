@@ -75,7 +75,7 @@ describe('Strategische Ziele', () => {
         { version: 1, action: 'created', handlungsfeldId: HF, nummer: '1.1', text: 'Zugang zur Versorgung verbessern', horizont: 2030, metrik: '', zielwert: '', changedAt: '2026-10-01T08:00:00Z', changedBy: null },
       ] }),
     });
-    renderWithIam(<Page initial={{ o: '1.1' }} />);
+    renderWithIam(<Page initial={{ o: 'ziel:1.1' }} />);
     expect(await screen.findByText(TZ.version(2))).toBeInTheDocument();
     expect(screen.getByText(/Metrik: Wartezeit in Tagen/)).toBeInTheDocument();
     expect(screen.getAllByText(`(${TZ.vorher}: –)`)).toHaveLength(2);   // Metrik und Zielwert neu
@@ -83,7 +83,7 @@ describe('Strategische Ziele', () => {
 
   it('unbekannte Nummer: Hinweis statt Fehler', async () => {
     stub({ 'GET /v1/strategische-ziele': () => json({ items: [], nextCursor: null }) });
-    renderWithIam(<Page initial={{ o: '9.9' }} />);
+    renderWithIam(<Page initial={{ o: 'ziel:9.9' }} />);
     expect(await screen.findByText(TZ.gone)).toBeInTheDocument();
   });
 
@@ -103,7 +103,7 @@ describe('Strategische Ziele', () => {
     const post = api.calls.find(c => c.method === 'POST')!;
     expect(post.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
     expect(await post.json()).toEqual({ handlungsfeldId: HF, nummer: '1.2', text: 'Zugang verbessern', horizont: 2030, metrik: '', zielwert: '' });
-    await waitFor(() => expect(screen.getByTestId('o')).toHaveTextContent('1.2'));
+    await waitFor(() => expect(screen.getByTestId('o')).toHaveTextContent('ziel:1.2'));
   });
 
   it('prüft Eingaben vor dem Senden', async () => {
@@ -138,7 +138,7 @@ describe('Strategische Ziele', () => {
       [`GET ${URL_ONE}/history`]: () => json({ items: [] }),
       [`PATCH ${URL_ONE}`]: () => { version = 4; return json({ title: 'Inzwischen geändert', status: 412 }, 412); },
     });
-    renderWithIam(<Page initial={{ o: '1.1' }} />);
+    renderWithIam(<Page initial={{ o: 'ziel:1.1' }} />);
     await userEvent.click(await screen.findByRole('button', { name: T.common.edit }));
     const metrik = await screen.findByLabelText(TZ.metrik);
     await userEvent.clear(metrik);
@@ -152,15 +152,15 @@ describe('Strategische Ziele', () => {
 
   it('ohne Schreibrecht weder Anlegen noch Bearbeiten', async () => {
     stub({ ...lesen(() => ziel({ can: { write: false } })), [`GET ${URL_ONE}/history`]: () => json({ items: [] }) });
-    renderWithIam(<Page initial={{ o: '1.1' }} />, { roles: ['leser'], permissions: ['tenant:read', 'handlungsfeld:read', 'ziel:read'] });
+    renderWithIam(<Page initial={{ o: 'ziel:1.1' }} />, { roles: ['leser'], permissions: ['tenant:read', 'handlungsfeld:read', 'ziel:read'] });
     expect(await screen.findByText(TZ.noRight)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: T.common.edit })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: new RegExp(TZ.create) })).not.toBeInTheDocument();
   });
 
   it('Adresse: Nummer als Schlüssel, Unbekanntes fällt weg (I-N5)', () => {
-    expect(validateZielSearch({ o: '2.1', q: 'x' })).toEqual({ o: '2.1', q: 'x' });
-    expect(validateZielSearch({ o: 2 })).toEqual({ o: '2' });
+    expect(validateZielSearch({ o: 'ziel:2.1', q: 'x' })).toEqual({ o: 'ziel:2.1', q: 'x' });
+    expect(validateZielSearch({ o: '2.1' })).toEqual({});
     expect(validateZielSearch({ o: '00000000-0000-4000-8000-0000000000a1', x: 1 })).toEqual({});
   });
 });

@@ -9,6 +9,8 @@ import type { FastifyInstance } from 'fastify';
 import { beimEinreichen, beimZurueckziehen, berichtsaufgabenTask, oeffnenJob } from './aufgabe.ts';
 import { folgen } from './folgen.ts';
 import { periodeFaelligJob, registerAbschlussRoutes, registriereFolgen } from './abschluss.ts';
+import * as abnahme from './abnahme.ts';
+import * as eskalation from './eskalation.ts';
 import { statusberichtTools } from './mcp.ts';
 import { pruefungTools } from './pruefung-mcp.ts';
 import { registerPruefungRoutes, TAG_MONATSABSCHLUSS } from './pruefung-routes.ts';
@@ -33,6 +35,13 @@ folgen.beimEinreichen(beimEinreichen);
 folgen.beimZurueckziehen(beimZurueckziehen);
 // Prüfung und Monatsabschluss (AP-E1-2): Folgen des Einreichens
 registriereFolgen();
+// Eskalation aus «kritisch» mit Entscheidbedarf (AP-E2-4): Folgen des Einreichens, Traktandenart `eskalation`
+folgen.beimEinreichen(eskalation.beimEinreichen);
+folgen.beimZurueckziehen(eskalation.beimZurueckziehen);
+eskalation.registriereEskalation();
+// Meilensteinabnahme durch das Gremium (AP-E2-4): Vorschlag beim Einreichen, Traktandenart `meilenstein`
+folgen.beimEinreichen(abnahme.beimEinreichen);
+abnahme.registriereAbnahme();
 
 export { folgen, type Folge } from './folgen.ts';
 export { PERIODE_MUSTER, type Stand } from './schemas.ts';

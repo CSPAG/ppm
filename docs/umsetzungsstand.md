@@ -24,10 +24,10 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E1-1 | Statusbericht erfassen | 090–099 | teilweise: PR 1 umgesetzt (090, Periode und Statusbericht, API mit Vorbelegung aus Vorperiode und Meilensteinplan, Einreichen mit Rückgängig); PR 2 in Arbeit (Berichtsaufgabe ab dem 18. über den Eingang, erledigt beim Einreichen, Mitteilung an den Sponsor bei «kritisch»); PR 3 Oberfläche UI-13 nach AP-E0-4 PR 2 | #30 (via #46) | A-07, A-08 (Aufgabe nur in Portfolios mit Pflichten), A-26, A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
 | AP-E1-2 | Monatsabschluss und Terminabweichungen | 100–109 | in Arbeit (PR 1: 100, Prüfung, Rückfrage, Einfordern, Abschluss mit «nicht gemeldet», Terminabweichungen, Aufgaben, MCP `get_periode`; PR 2: Oberfläche UI-15, UI-16 in Arbeit) | #41 | A-11, A-28, A-37; Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der Vorperiode, jede Prognose über Budget (K1-4); berichtspflichtig = aktiv, P0–P3, Portfolio mit Pflichten (A-07, A-08); «Periode abschliessen» per Job am Stichtag, eingereiht beim ersten Einreichen (Stichtag aus dem Phasenmodell; ohne Phasenmodell in Kraft sofort); Tabelle `einforderung` (fachmodell.md 2.8) |
 | AP-E1-3 | Dashboard der Periode | 110–119 | offen | – | – |
-| AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
+| AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, 131, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39, #PR | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | offen | – | – |
 | AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
-| AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | offen | – | – |
+| AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | umgesetzt (160, `statusbericht/eskalation*`, `abnahme*`: Arten `eskalation` und `meilenstein` in der Registry, Folge des Entscheids in dessen Transaktion; Entscheid über die Route mit AP-E2-2) | #PR | A-30, A-46; Vorschlag ohne entscheidendes Gremium entfällt, die Aufgabe «Eskalation behandeln» bleibt; «Nicht abgenommen» ändert das Register nicht, eine erteilte Abnahme bleibt bei Korrektur (Zurücknehmen bietet `projektdaten` nicht); Abnahme als System, solange `EntscheidFolge` keinen Akteur trägt; Frist der Aufgabe offen |
 | AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | in Arbeit (PR 1: 170, Modul `vertrag` mit Versionen, Kapiteln 1–13, Pflichtangaben, Einreichen, Baseline mit Register-Übernahme und Zuordnung zum Ziel, MCP `get_vertrag`; PR 2 Oberfläche folgt) | #43 | A-04 (Koalition als Liste in Kap. 8), A-12 (Pflichtangaben aus dem Phasenmodell; ab Gate P1–P2 Personal in FTE und Kosten bis P4), A-19 (Business Case als Text, Kosten aus Kap. 9), A-29; erster Vertrag eines übernommenen Projekts gilt für die laufende Phase; Register-Übernahme erst bei der Baseline; Beilagen ohne Datei |
 | AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | offen | – | – |
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
@@ -102,12 +102,12 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | in Arbeit (API) | – |
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
 | PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
-| PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |
+| PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | umgesetzt (UC-006 Schritt 7) | #PR |
 | PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | offen | – |
 | PS.03.01 | Änderung am Projektvertrag beantragen | 007 | E3 | AP-E3-4 | offen | – |
 | PS.03.02 | Änderung am Projektvertrag entscheiden | 007 | E3 | AP-E3-4 | offen | – |
-| PS.03.03 | Eskalation behandeln | 004, 006 | E2 | AP-E2-4 | offen | – |
+| PS.03.03 | Eskalation behandeln | 004, 006 | E2 | AP-E2-4 | umgesetzt (UC-004 A2.2, UC-006 Schritt 7) | #PR |
 | PS.03.04 | Vertragsversionen vergleichen | 003, 007 | E3 | AP-E3-4 | offen | – |
 | PS.04.01 | Vorhaben abschliessen | 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.02 | Vorhaben sistieren oder abbrechen | 006, 015 | E7 | AP-E7-1 | offen | – |

@@ -26,7 +26,8 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
     const admin = nav.getByRole('link', { name: 'Administration' });
     await tabTo(page, admin);
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/verwalten\//);
+    // erster Bereich der Administration: Organisation (UI-44), danach die Verwalten-Seiten des Baukastens
+    await expect(page).toHaveURL(/\/administration\/organisation/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expectAccessible(page);
     await expectNoOverflow(page);
@@ -38,8 +39,9 @@ test('Leser:in sieht nur die Arbeitsräume mit Recht', async ({ page }) => {
   const nav = navigation(page);
   await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Administration' })).toHaveCount(0);
-  // Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
-  for (const name of ['Eingang', 'Projekte', 'Portfolio', 'Gremien']) await expect(nav.getByRole('link', { name })).toHaveCount(0);
+  // Eingang hat jede Rolle (UX-E3); Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
+  await expect(nav.getByRole('link', { name: /^Eingang/ })).toBeVisible();
+  for (const name of ['Projekte', 'Portfolio', 'Gremien']) await expect(nav.getByRole('link', { name })).toHaveCount(0);
 });
 
 test('Telefon: Leiste unten mit «Mehr» als Blatt mit Konto', async ({ page }) => {

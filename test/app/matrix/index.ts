@@ -3,10 +3,17 @@ import { sammle } from './typ.ts';
 
 export const MATRIX = sammle([
   (await import('./plattform.ts')).matrix,
+  (await import('./eingang.ts')).matrix,
   (await import('./stammdaten.ts')).matrix,
   (await import('./handlungsfeld.ts')).matrix,
+  (await import('./phasenmodell.ts')).matrix,
   (await import('./portfolio.ts')).matrix,
   (await import('./projekt.ts')).matrix,
+  (await import('./projektdaten.ts')).matrix,
   (await import('./ziel.ts')).matrix,
+  (await import('./ziel-zyklus.ts')).matrix,
+  (await import('./statusbericht.ts')).matrix,
+  (await import('./ressource.ts')).matrix,
+  (await import('./idee.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
 ]);

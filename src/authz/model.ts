@@ -195,16 +195,31 @@ export const model = defineModel({
     projekt: { label: 'Projekt', parent: 'portfolio', roles: ['pl', 'ctl', 'sp', 'kt'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
   },
   mcpTools: {
+    // eingang
+    list_aufgaben: { title: 'Aufgaben auflisten', permission: 'tenant:read', readOnly: true },
     // stammdaten
     list_org_einheiten: { title: 'Organisationseinheiten auflisten', permission: 'stammdaten:read', readOnly: true },
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
+    // phasenmodell
+    get_phasenmodell: { title: 'Phasenmodell lesen', permission: 'phasenmodell:read', readOnly: true },
     // projekt
     list_projekte: { title: 'Projekte auflisten', permission: 'projekt:read', readOnly: true },
     get_projekt: { title: 'Projekt lesen', permission: 'projekt:read', readOnly: true },
+    // portfolio
+    list_portfolios: { title: 'Portfolios mit Gremien und Gremienweg auflisten', permission: 'portfolio:read', readOnly: true },
+    // projektdaten
+    get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
+    // statusbericht
+    list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
+    // ressource
+    get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
+    // idee
+    list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },
+    get_idee: { title: 'Projektidee lesen', permission: 'idee:read', readOnly: true },
   },
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)

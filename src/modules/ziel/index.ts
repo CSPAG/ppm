@@ -7,12 +7,17 @@ import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
 import { zielTools } from './mcp.ts';
 import { registerRoutes } from './routes.ts';
+import { registerZyklusRoutes } from './zyklus-routes.ts';
+
+/** Zuordnung Projekt ↔ Ziel für obere Module (Vertrag Kap. 2 bei der Baseline, PP.02.05; AP-E6-1). */
+export { projektZuordnen, type ZielAngabe } from './zyklus-zuordnung.ts';
 
 export const zielModule = defineModule({
   name: 'ziel',
   tags: [{ name: 'Ziele', description: 'Strategische Ziele je Handlungsfeld mit Metrik, Zielwert und Verlauf; ab Etappe E6 Zielzyklus, Jahresziele und Zielerreichung.' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerZyklusRoutes(app, deps); // Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung der Projekte (AP-E6-1)
   },
   mcpTools: { ...zielTools },
 });

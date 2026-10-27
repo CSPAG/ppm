@@ -5,6 +5,8 @@ import type { Matrix } from './typ.ts';
 
 /** Portfolio von B für den Fall «Anlegen» (nicht unter den IDs von A, sonst gälte es als fremde ID in Listen). */
 let portfolioB = '';
+/** Projekt von A aus dem Seed (andere Module legen in A eigene Projekte an, z. B. matrix/ziel-zyklus.ts). */
+let projektA = '';
 
 export const matrix: Matrix = {
   tables: {
@@ -47,6 +49,7 @@ export const matrix: Matrix = {
     const s = await api.app.inject({ method: 'POST', url: '/v1/projekte', headers: a, payload: { name: mark, portfolioId: pa } });
     assert.equal(s.statusCode, 201, s.body);
     const id = s.json().id as string;
+    projektA = id;
     const t = await tenant(api.t.runtime, 'acme');
     const ich = await full(api.t.runtime, t, async tx => (await tx.query<{ id: string }>("SELECT id FROM ppm.principal WHERE subject = 'u-a'")).rows[0]!.id);
     const o = await api.app.inject({ method: 'PUT', url: `/v1/projekte/${id}/organisation`, headers: { ...a, 'if-match': 'W/"0"' }, payload: { mitglieder: [{ personId: ich, funktion: 'pl', akv: mark }] } });
@@ -63,9 +66,9 @@ export const matrix: Matrix = {
     'PUT /v1/projekte/:id/organisation': i => ({ method: 'PUT', url: `/v1/projekte/${i.projekt}/organisation`, body: { mitglieder: [] }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
   },
   unchanged: async (api, a, mark) => {
-    const mine = (await api.app.inject({ method: 'GET', url: '/v1/projekte', headers: a })).json().items;
-    assert.deepEqual(mine.map((x: { name: string; version: number }) => [x.name, x.version]), [[mark, 1]]);
-    const o = (await api.app.inject({ method: 'GET', url: `/v1/projekte/${mine[0].id}/organisation`, headers: a })).json();
+    const p = (await api.app.inject({ method: 'GET', url: `/v1/projekte/${projektA}`, headers: a })).json();
+    assert.deepEqual([p.name, p.version], [mark, 1]);
+    const o = (await api.app.inject({ method: 'GET', url: `/v1/projekte/${projektA}/organisation`, headers: a })).json();
     assert.deepEqual([o.version, o.mitglieder.map((m: { akv: string }) => m.akv)], [1, [mark]]);
   },
 };

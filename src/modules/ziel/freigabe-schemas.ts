@@ -26,7 +26,7 @@ export const Vorlage = Type.Object({
     vorlegen: Type.Boolean({ description: '«Zur Freigabe vorlegen» (ziel:write, Stand «in Arbeit»; Sperren siehe ohneMetrik).' }),
     freigabe: Type.Boolean({ description: '«Freigabe erfassen» (ziel:freigabe, Stand «zur Freigabe»).' }),
   }),
-}, { $id: 'Vorlage', additionalProperties: false });
+}, { $id: 'ZielVorlage', additionalProperties: false });
 export type VorlageOut = Static<typeof Vorlage>;
 
 export const FreigabeErfassen = Type.Object({

@@ -21984,7 +21984,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Vorlage"];
+                        "application/json": components["schemas"]["ZielVorlage"];
                     };
                 };
                 /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
@@ -27625,90 +27625,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/vorlagen": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Vorlagen auflisten
-         * @description Gültige Vorlage je Art mit Fassung und Gliederung; heute der Grundbestand (Projektvertrag nach Q7).
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Default Response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["VorlageList"];
-                    };
-                };
-                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["OrganizationChoice"];
-                    };
-                };
-                /** @description Nicht angemeldet oder Token ungültig */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["Problem"];
-                    };
-                };
-                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["Problem"];
-                    };
-                };
-                /** @description Zu viele Anfragen (Retry-After) */
-                429: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["Problem"];
-                    };
-                };
-                /** @description Interner Fehler (Referenz im detail) */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["Problem"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/dashboard": {
         parameters: {
             query?: never;
@@ -27779,6 +27695,90 @@ export interface paths {
                     };
                     content: {
                         "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vorlagen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vorlagen auflisten
+         * @description Gültige Vorlage je Art mit Fassung und Gliederung; heute der Grundbestand (Projektvertrag nach Q7).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VorlageList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
                     };
                 };
                 /** @description Zu viele Anfragen (Retry-After) */
@@ -36027,7 +36027,7 @@ export interface components {
             /** @description Kommentar und Beurteilung des Stands; leer erlaubt. */
             beurteilung?: string;
         };
-        Vorlage: {
+        ZielVorlage: {
             jahr: number;
             stand: "in_arbeit" | "zur_freigabe" | "in_kraft";
             /** @description Version des Zieljahrs für `If-Match` beim Vorlegen bzw. bei der Freigabe. */
@@ -37059,26 +37059,6 @@ export interface components {
                 abschlussBis: string;
             } | null;
         };
-        Vorlage: {
-            /** @description Art der Vorlage, z. B. `projektvertrag`. */
-            art: string;
-            /** @description Fassung; erscheint im erzeugten Dokument. */
-            version: string;
-            name: string;
-            /** @description Herkunft der Gliederung. */
-            quelle: string;
-            /** @description Kopfzeile jeder Seite (G12). */
-            kopfzeile: string;
-            gliederung: {
-                nr: string;
-                titel: string;
-            }[];
-            /** @description Mitgelieferte Vorlage (eigene Fassungen ab AP-E7-7). */
-            grundbestand: boolean;
-        };
-        VorlageList: {
-            items: components["schemas"]["Vorlage"][];
-        };
         DashboardZeile: {
             /** Format: uuid */
             projektId: string;
@@ -37135,6 +37115,26 @@ export interface components {
             /** @description Kritische zuerst, dann nicht gemeldete, sonst nach Nummer. */
             items: components["schemas"]["DashboardZeile"][];
             funnel: components["schemas"]["FunnelStufe"][];
+        };
+        Vorlage: {
+            /** @description Art der Vorlage, z. B. `projektvertrag`. */
+            art: string;
+            /** @description Fassung; erscheint im erzeugten Dokument. */
+            version: string;
+            name: string;
+            /** @description Herkunft der Gliederung. */
+            quelle: string;
+            /** @description Kopfzeile jeder Seite (G12). */
+            kopfzeile: string;
+            gliederung: {
+                nr: string;
+                titel: string;
+            }[];
+            /** @description Mitgelieferte Vorlage (eigene Fassungen ab AP-E7-7). */
+            grundbestand: boolean;
+        };
+        VorlageList: {
+            items: components["schemas"]["Vorlage"][];
         };
         KpiPlan: {
             registerId: string | null;

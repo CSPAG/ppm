@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ifMatch, type Schemas } from '../../api/index.ts';
 
-export type Vorlage = Schemas['Vorlage'];
+export type Vorlage = Schemas['ZielVorlage'];
 export type FreigabeErfassen = Schemas['FreigabeErfassen'];
 
 export const freigabeKeys = { vorlage: (jahr: number) => ['zielzyklus', 'vorlage', jahr] as const };

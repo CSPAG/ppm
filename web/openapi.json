@@ -9140,7 +9140,7 @@
           }
         }
       },
-      "Vorlage": {
+      "ZielVorlage": {
         "additionalProperties": false,
         "type": "object",
         "required": [
@@ -13771,78 +13771,6 @@
           }
         }
       },
-      "Vorlage": {
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "art",
-          "version",
-          "name",
-          "quelle",
-          "kopfzeile",
-          "gliederung",
-          "grundbestand"
-        ],
-        "properties": {
-          "art": {
-            "description": "Art der Vorlage, z. B. `projektvertrag`.",
-            "type": "string"
-          },
-          "version": {
-            "description": "Fassung; erscheint im erzeugten Dokument.",
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "quelle": {
-            "description": "Herkunft der Gliederung.",
-            "type": "string"
-          },
-          "kopfzeile": {
-            "description": "Kopfzeile jeder Seite (G12).",
-            "type": "string"
-          },
-          "gliederung": {
-            "type": "array",
-            "items": {
-              "additionalProperties": false,
-              "type": "object",
-              "required": [
-                "nr",
-                "titel"
-              ],
-              "properties": {
-                "nr": {
-                  "type": "string"
-                },
-                "titel": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "grundbestand": {
-            "description": "Mitgelieferte Vorlage (eigene Fassungen ab AP-E7-7).",
-            "type": "boolean"
-          }
-        }
-      },
-      "VorlageList": {
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "items"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Vorlage"
-            }
-          }
-        }
-      },
       "DashboardZeile": {
         "additionalProperties": false,
         "type": "object",
@@ -14281,6 +14209,78 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FunnelStufe"
+            }
+          }
+        }
+      },
+      "Vorlage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "art",
+          "version",
+          "name",
+          "quelle",
+          "kopfzeile",
+          "gliederung",
+          "grundbestand"
+        ],
+        "properties": {
+          "art": {
+            "description": "Art der Vorlage, z. B. `projektvertrag`.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Fassung; erscheint im erzeugten Dokument.",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quelle": {
+            "description": "Herkunft der Gliederung.",
+            "type": "string"
+          },
+          "kopfzeile": {
+            "description": "Kopfzeile jeder Seite (G12).",
+            "type": "string"
+          },
+          "gliederung": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "nr",
+                "titel"
+              ],
+              "properties": {
+                "nr": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "grundbestand": {
+            "description": "Mitgelieferte Vorlage (eigene Fassungen ab AP-E7-7).",
+            "type": "boolean"
+          }
+        }
+      },
+      "VorlageList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vorlage"
             }
           }
         }
@@ -47957,7 +47957,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Vorlage"
+                  "$ref": "#/components/schemas/ZielVorlage"
                 }
               }
             }
@@ -54147,77 +54147,6 @@
         }
       }
     },
-    "/v1/vorlagen": {
-      "get": {
-        "summary": "Vorlagen auflisten",
-        "tags": [
-          "Vorlagen"
-        ],
-        "description": "Gültige Vorlage je Art mit Fassung und Gliederung; heute der Grundbestand (Projektvertrag nach Q7).",
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VorlageList"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationChoice"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Nicht angemeldet oder Token ungültig",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Zu viele Anfragen (Retry-After)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Interner Fehler (Referenz im detail)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/dashboard": {
       "get": {
         "summary": "Dashboard der Periode",
@@ -54316,6 +54245,77 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vorlagen": {
+      "get": {
+        "summary": "Vorlagen auflisten",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Gültige Vorlage je Art mit Fassung und Gliederung; heute der Grundbestand (Projektvertrag nach Q7).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -61171,12 +61171,12 @@
       "description": "Prüfung und Abschluss der Periode durch die Unternehmensentwicklung: Posteingang mit Auffälligkeiten, Bestätigen, Rückfrage, Einfordern, Terminabweichungen, «nicht gemeldet» (AP-E1-2)."
     },
     {
-      "name": "Vorlagen",
-      "description": "Vorlagen je Art mit Fassung (Grundbestand: Projektvertrag nach Q7); Dokumentausgabe in Word und PDF."
-    },
-    {
       "name": "Dashboard",
       "description": "Dashboard der Periode: Projekte der sichtbaren Portfolios mit Status, Trend, Phase und Meldung, Funnel nach Phase."
+    },
+    {
+      "name": "Vorlagen",
+      "description": "Vorlagen je Art mit Fassung (Grundbestand: Projektvertrag nach Q7); Dokumentausgabe in Word und PDF."
     },
     {
       "name": "Projektvertrag",

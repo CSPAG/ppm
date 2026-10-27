@@ -55,7 +55,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, _deps: Deps): void 
 
   app.get('/v1/ziele/:jahr/vorlage', {
     schema: {
-      tags: [TAG], summary: 'Vorlage an den VR vorbereiten', params: JahrParams, response: { 200: Type.Ref('Vorlage') },
+      tags: [TAG], summary: 'Vorlage an den VR vorbereiten', params: JahrParams, response: { 200: Type.Ref('ZielVorlage') },
       description: 'Zusammenfassung (Jahresziele je Handlungsfeld, Vergleich zum Vorjahr) und Prüfung vor dem Vorlegen (K6 Schritt 6). Ohne Zielzyklus 404.',
     },
   }, async req => {

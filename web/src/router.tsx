@@ -12,6 +12,7 @@ import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts'
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
 import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
@@ -200,6 +201,18 @@ function KapazitaetRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+// Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
+const monatsabschlussRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
+});
+
+function MonatsabschlussRoute() {
+  const search = monatsabschlussRoute.useSearch();
+  const navigate = useNavigate({ from: monatsabschlussRoute.fullPath });
+  const setSearch = useCallback<SetMonatsabschlussSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <MonatsabschlussPage search={search} setSearch={setSearch} />;
 }
 
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
@@ -310,6 +323,7 @@ const routeTree = rootRoute.addChildren([
   ideeRoute,
   zielerreichungStartRoute,
   zielerreichungRoute,
+  monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,
   phasenmodellRoute,

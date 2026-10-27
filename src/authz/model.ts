@@ -220,6 +220,7 @@ export const model = defineModel({
     get_sitzung: { title: 'Sitzung mit Traktandenliste lesen', permission: 'sitzung:read', readOnly: true },
     // statusbericht
     list_statusberichte: { title: 'Statusberichte auflisten', permission: 'projekt:read', readOnly: true },
+    get_periode: { title: 'Monatsabschluss einer Periode lesen', permission: 'statusbericht:review', readOnly: true },
     // ressource
     get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
     // idee

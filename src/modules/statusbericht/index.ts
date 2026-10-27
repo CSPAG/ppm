@@ -8,14 +8,20 @@ import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
 import { beimEinreichen, beimZurueckziehen, berichtsaufgabenTask, oeffnenJob } from './aufgabe.ts';
 import { folgen } from './folgen.ts';
+import { periodeFaelligJob, registerAbschlussRoutes, registriereFolgen } from './abschluss.ts';
 import { statusberichtTools } from './mcp.ts';
+import { pruefungTools } from './pruefung-mcp.ts';
+import { registerPruefungRoutes, TAG_MONATSABSCHLUSS } from './pruefung-routes.ts';
 import { registerRoutes } from './routes.ts';
 
 export const statusberichtModule = defineModule({
   name: 'statusbericht',
-  tags: [{ name: 'Statusberichte', description: 'Monatlicher Statusbericht je Projekt und Periode: Vorbelegung aus der Vorperiode, Entwurf, Einreichen mit Rückgängig.' }],
+  tags: [{ name: 'Statusberichte', description: 'Monatlicher Statusbericht je Projekt und Periode: Vorbelegung aus der Vorperiode, Entwurf, Einreichen mit Rückgängig.' },
+    { name: TAG_MONATSABSCHLUSS, description: 'Prüfung und Abschluss der Periode durch die Unternehmensentwicklung: Posteingang mit Auffälligkeiten, Bestätigen, Rückfrage, Einfordern, Terminabweichungen, «nicht gemeldet» (AP-E1-2).' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerPruefungRoutes(app, deps);
+    registerAbschlussRoutes(app, deps);
   },
   jobs: [oeffnenJob],
   tasks: [berichtsaufgabenTask],
@@ -25,6 +31,12 @@ export const statusberichtModule = defineModule({
 // Berichtsaufgabe und Mitteilung «kritisch» (AP-E1-1, fachmodell.md 4.2)
 folgen.beimEinreichen(beimEinreichen);
 folgen.beimZurueckziehen(beimZurueckziehen);
+  jobs: [periodeFaelligJob],
+  mcpTools: { ...statusberichtTools, ...pruefungTools },
+});
+
+// Prüfung und Monatsabschluss (AP-E1-2): Folgen des Einreichens
+registriereFolgen();
 
 export { folgen, type Folge } from './folgen.ts';
 export { PERIODE_MUSTER, type Stand } from './schemas.ts';

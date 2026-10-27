@@ -12,7 +12,7 @@ import { projekteRoutes } from './routes/projekte.tsx';
 import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
-import { ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -33,6 +33,7 @@ const IdeeNeuPage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeeN
 const IdeePage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeePage');
 const AuslastungPage = seite(() => import('./features/ressourcen/AuslastungPage.tsx'), 'AuslastungPage');
 const KapazitaetPage = seite(() => import('./features/ressourcen/KapazitaetPage.tsx'), 'KapazitaetPage');
+const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), 'BedarfPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
@@ -229,6 +230,20 @@ function KapazitaetRoute() {
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Portfolio › Ressourcen › Bedarf (UI-25; BC RK.02.02, RK.02.03; AP-E7-2)
+const bedarfRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.bedarf, validateSearch: searchOf.bedarf, component: BedarfRoute,
+});
+
+function BedarfRoute() {
+  const search = bedarfRoute.useSearch();
+  const navigate = useNavigate({ from: bedarfRoute.fullPath });
+  const setSearch = useCallback<SetBedarfSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BedarfPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -359,6 +374,7 @@ const routeTree = rootRoute.addChildren([
   ressourcenRoute,
   auslastungRoute,
   kapazitaetRoute,
+  bedarfRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

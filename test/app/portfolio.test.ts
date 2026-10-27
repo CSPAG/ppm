@@ -64,7 +64,9 @@ describe('Portfolios und Gremien', { skip }, () => {
     assert.equal((await call('PATCH', `/v1/portfolios/${a.id}`, { ...ue, 'if-match': 'W/"1"' }, { name: 'Alt' })).statusCode, 412);
 
     // Direktion nur bei Kategorie C (A-23)
-    const dir = '00000000-0000-4000-8000-000000000001';
+    const dir = await full(api.t.runtime, tenantId, async tx => (await tx.query<{ id: string }>(
+      "INSERT INTO ppm.org_einheit (tenant_id, kuerzel, name, art) VALUES ($1, 'DTI-P', 'Direktion DTI', 'direktion') RETURNING id", [tenantId])).rows[0]!.id);
+    assert.equal((await call('PATCH', `/v1/portfolios/${c.id}`, { ...ue, 'if-match': 'W/"1"' }, { orgEinheitId: '00000000-0000-4000-8000-000000000001' })).statusCode, 409, 'unbekannte Organisationseinheit');
     assert.equal((await call('POST', '/v1/portfolios', ue, { kategorie: 'B', schluessel: 'b-dir', name: 'B', orgEinheitId: dir })).statusCode, 422);
     const pc = await call('PATCH', `/v1/portfolios/${c.id}`, { ...ue, 'if-match': 'W/"1"' }, { orgEinheitId: dir });
     assert.equal(pc.json().orgEinheitId, dir);

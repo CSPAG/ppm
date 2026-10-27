@@ -4,8 +4,9 @@
 -- Pflichten folgen der Kategorie: A und B mit Vertrag, Quality-Check und Monatsbericht (A-07), C freiwillig ohne
 -- Pflicht-Gates und Pflicht-Reporting (A-08, UC-017 A1)
 ALTER TABLE ppm.portfolio ADD CONSTRAINT portfolio_pflichten CHECK (pflichten = (kategorie <> 'C'));
--- Direktion des Portfolios der Kategorie C (A-23); Verweis auf stammdaten.org_einheit folgt, sobald AP-E0-2 auf main ist
+-- Direktion des Portfolios der Kategorie C (A-23): Organisationseinheit aus stammdaten (020)
 ALTER TABLE ppm.portfolio ADD COLUMN org_einheit_id uuid;
+ALTER TABLE ppm.portfolio ADD CONSTRAINT portfolio_org_einheit_fk FOREIGN KEY (tenant_id, org_einheit_id) REFERENCES ppm.org_einheit (tenant_id, id);
 ALTER TABLE ppm.portfolio ADD CONSTRAINT portfolio_org_einheit CHECK (kategorie = 'C' OR org_einheit_id IS NULL);
 
 CREATE TABLE ppm.gremium (

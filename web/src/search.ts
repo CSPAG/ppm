@@ -7,16 +7,17 @@ import { validateHandlungsfeldSearch, type HandlungsfeldSearch } from './feature
 import { validatePhasenmodellSearch, type PhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
-import { validateZielSearch, type ZielSearch } from './features/ziele/index.ts';
+import { validateZielSearch, validateZielzyklusSearch, type ZielSearch, type ZielzyklusSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
   eingang: validateEingangSearch,
   stellvertretung: validateKontoSearch,
   handlungsfelder: validateHandlungsfeldSearch,
   strategischeZiele: validateZielSearch,
+  zielzyklus: validateZielzyklusSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,
   phasenmodell: validatePhasenmodellSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { HandlungsfeldSearch, PhasenmodellSearch, ZielSearch };
+export type { HandlungsfeldSearch, PhasenmodellSearch, ZielSearch, ZielzyklusSearch };

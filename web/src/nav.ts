@@ -25,7 +25,6 @@ export const navigation: NavRegistrierung = {
     { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
     { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: 'idee:create' },
-    // Arbeitsraum «Ziele»: bis zum Zielzyklus (Etappe E6) nur die Handlungsfelder (BC ZM.01.01)
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite
     { raum: 'ziele', pfad: `/ziele/${new Date().getFullYear() + 1}`, label: zielzyklusTexte.bereich, recht: 'ziel:read' },
     // Arbeitsraum «Ziele»: Handlungsfelder (BC ZM.01.01)

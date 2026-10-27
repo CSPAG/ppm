@@ -26,11 +26,7 @@ export const searchOf = {
   codetabellen: validateCodetabellenSearch,
   phasenmodell: validatePhasenmodellSearch,
   portfolios: validatePortfoliosSearch,
+  sitzung: validateSitzungSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { HandlungsfeldSearch, PhasenmodellSearch, PortfoliosSearch, ZielSearch };
-export type { HandlungsfeldSearch, PhasenmodellSearch, ProjekteSearch, ZielSearch };
-  sitzung: validateSitzungSearch,
-
-export type { HandlungsfeldSearch, PhasenmodellSearch, SitzungSearch, ZielSearch };
-export type { HandlungsfeldSearch, PhasenmodellSearch, ZielSearch, ZielzyklusSearch };
+export type { HandlungsfeldSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, SitzungSearch, ZielSearch, ZielzyklusSearch };

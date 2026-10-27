@@ -112,6 +112,8 @@ function ZielzyklusRoute() {
       projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })}
       strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })} />
   );
+}
+
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
 const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
 
@@ -137,6 +139,8 @@ function IdeeRoute() {
   const search = ideeRoute.useSearch();
   const navigate = useNavigate({ from: ideeRoute.fullPath });
   const setSearch = useCallback<SetIdeeSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
   return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
 }
@@ -194,6 +198,8 @@ function PortfoliosRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <PortfoliosPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Gremien»: Sitzungen (UI-33, UC-006, K3); Adresse der Sitzung `/gremien/<kuerzel>/sitzungen/<datum>` (I-N5)
 const gremienRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/gremien',
@@ -216,6 +222,8 @@ function SitzungRoute() {
   const search = sitzungRoute.useSearch();
   const navigate = useNavigate({ from: sitzungRoute.fullPath });
   const setSearch = useCallback<SetSitzungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
   return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} />;
 }
 

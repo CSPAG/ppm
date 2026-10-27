@@ -28,8 +28,12 @@ test('Jahresziele vorlegen, Freigabe erfassen, Roadmap publizieren; barrierefrei
 
   // Zielzyklus mit einem Jahresziel mit Metrik und Zielwert
   await page.goto(`/ziele/${j}?o=ziel:${nr}`);
+  // erst nach dem Laden entscheiden: leerer Zyklus (Z2, «Zielzyklus starten») oder schon gestartet (Baum)
   const starten = page.getByRole('button', { name: 'Zielzyklus starten' });
+  const baum = page.getByRole('tree', { name: 'Zielhierarchie' });
+  await expect(starten.or(baum)).toBeVisible();
   if (await starten.isVisible()) await starten.click();
+  await expect(baum).toBeVisible();
   await page.getByRole('button', { name: 'Jahresziel hinzufügen' }).click();
   await page.getByLabel('Ziel', { exact: true }).fill('Einkauf bündeln');
   await page.getByLabel('Metrik').fill('Anteil gebündelter Einkauf');

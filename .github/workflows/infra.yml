@@ -1,14 +1,15 @@
-# Infrastruktur auf Hetzner (infra/hetzner) mit OpenTofu. DNS liegt bei Hostpoint (ohne API, von Hand: deploy/hetzner/README.md).
-#   pull_request: nur fmt und validate (ohne Geheimnisse)
-#   «Run workflow»: plan oder apply; apply nur mit Freigabe im Environment «production», genau den Plan
+# Infrastruktur auf Hetzner (infra/hetzner) mit OpenTofu und DNS bei Infomaniak (infra/dns, nur der Name «ppm»).
+#   pull_request: nur fmt und validate (ohne Geheimnisse); die DNS-Logik prüft «CI» (test/infra/dns.test.ts)
+#   «Run workflow»: plan (mit DNS-Probelauf) oder apply; apply nur mit Freigabe im Environment «production», genau den
+#   Plan, danach DNS abgleichen
 #
-# Environment «production»: Secrets HCLOUD_TOKEN, S3_ACCESS_KEY, S3_SECRET_KEY, TF_STATE_PASSPHRASE;
+# Environment «production»: Secrets HCLOUD_TOKEN, S3_ACCESS_KEY, S3_SECRET_KEY, TF_STATE_PASSPHRASE, INFOMANIAK_API_TOKEN;
 # Variablen HETZNER_BACKEND_HCL, HETZNER_TFVARS (Inhalt von backend.hcl bzw. terraform.tfvars, ohne Geheimnisse).
 name: Infrastruktur
 
 on:
   pull_request:
-    paths: ["infra/hetzner/**", ".github/workflows/infra.yml"]
+    paths: ["infra/hetzner/**", "infra/dns/**", ".github/workflows/infra.yml"]
   workflow_dispatch:
     inputs:
       action:
@@ -65,6 +66,7 @@ jobs:
       TF_VAR_state_passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
       BACKEND_HCL: ${{ vars.HETZNER_BACKEND_HCL }}
       TFVARS: ${{ vars.HETZNER_TFVARS }}
+      INFOMANIAK_API_TOKEN: ${{ secrets.INFOMANIAK_API_TOKEN }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -80,12 +82,26 @@ jobs:
           tofu plan -input=false -lock-timeout=5m -out=tfplan
           tofu show -no-color tfplan > plan.txt
           { echo '### Plan'; echo '```'; tail -c 60000 plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-      # Plan ist mit TF_STATE_PASSPHRASE verschlüsselt (encryption › plan)
+      # Plan ist mit TF_STATE_PASSPHRASE verschlüsselt (encryption › plan); «Apply» wendet genau diesen Plan an
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: tfplan-hetzner
           path: infra/hetzner/tfplan
           retention-days: 1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+      # Stand des States vor diesem Plan (nach einem apply zeigt der nächste Plan, ob DNS nachgeführt ist)
+      - name: DNS-Probelauf (Infomaniak, nur lesend)
+        run: |
+          if ! tofu output -json dns > dns-soll.json 2>/dev/null; then
+            echo "Noch keine Ausgabe «dns» im State (vor dem ersten apply): DNS-Probelauf entfällt" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          set +e; DNS_INPUT=dns-soll.json ../dns/dns.sh --dry-run > dns.txt 2>&1; rc=$?; set -e
+          cat dns.txt
+          { echo '### DNS (Probelauf)'; echo '```'; cat dns.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          [ "$rc" != 1 ]
 
   apply:
     name: Apply
@@ -103,6 +119,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
       TF_VAR_state_passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
       BACKEND_HCL: ${{ vars.HETZNER_BACKEND_HCL }}
+      INFOMANIAK_API_TOKEN: ${{ secrets.INFOMANIAK_API_TOKEN }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -111,6 +128,9 @@ jobs:
         with:
           tofu_version: ${{ env.TOFU_VERSION }}
           tofu_wrapper: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
       - uses: actions/download-artifact@v8.0.1
         with:
           name: tfplan-hetzner
@@ -119,3 +139,5 @@ jobs:
           printf '%s\n' "$BACKEND_HCL" > backend.hcl
           tofu init -input=false -backend-config=backend.hcl
           tofu apply -input=false -lock-timeout=5m tfplan
+      - name: DNS abgleichen (nur Einträge aus `tofu output dns`, nur Name ppm)
+        run: ../dns/dns.sh apply

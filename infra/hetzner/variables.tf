@@ -19,13 +19,13 @@ variable "network_zone" {
 variable "app_server_type" {
   description = "Servertyp der App-VM (Caddy, api, worker, mcp)."
   type        = string
-  default     = "cx32"
+  default     = "cx33"
 }
 
 variable "db_server_type" {
   description = "Servertyp der DB-VM (PostgreSQL 17, pgBackRest)."
   type        = string
-  default     = "cx32"
+  default     = "cx33"
 }
 
 variable "image" {
@@ -47,6 +47,12 @@ variable "ssh_keys" {
     condition     = length(var.ssh_keys) > 0
     error_message = "Mindestens ein SSH-Schlüssel nötig."
   }
+}
+
+variable "deploy_ssh_public_key" {
+  description = "Öffentlicher Schlüssel des Workflows «Deploy» (Benutzer deploy, nur erzwungener Befehl ppm-ssh-gate). Leer = kein Deploy-Zugang."
+  type        = string
+  default     = ""
 }
 
 variable "admin_cidrs" {
@@ -77,4 +83,28 @@ variable "delete_protection" {
   description = "Löschschutz für Server, Volume und Netz (Produktion: true)."
   type        = bool
   default     = true
+}
+
+# ---------- Domain (Zone bei Infomaniak; Einträge setzt infra/dns aus der Ausgabe «dns»)
+
+variable "dns_zone" {
+  description = "DNS-Zone bei Infomaniak. infra/dns verwaltet darin nur die Einträge aus der Ausgabe «dns»."
+  type        = string
+  default     = "project-suite.ch"
+}
+
+variable "domain" {
+  description = "Öffentlicher Host von PPM (PUBLIC_BASE_URL, MCP unter /mcp). Muss in dns_zone liegen."
+  type        = string
+  default     = "ppm.project-suite.ch"
+  validation {
+    condition     = endswith(var.domain, ".${var.dns_zone}")
+    error_message = "domain muss ein Name unterhalb von dns_zone sein (nicht die Zone selbst)."
+  }
+}
+
+variable "dns_ttl" {
+  description = "TTL der DNS-Einträge in Sekunden (60–86400)."
+  type        = number
+  default     = 300
 }

@@ -5,6 +5,14 @@
 
 locals {
   labels = { app = "ppm", managed_by = "opentofu" }
+
+  # Soll-Einträge für infra/dns (Infomaniak): A/AAAA der App-VM, CAA nur Let's Encrypt (Caddy holt das Zertifikat)
+  dns_name = trimsuffix(var.domain, ".${var.dns_zone}")
+  dns_records = [
+    { name = local.dns_name, type = "A", value = hcloud_server.app.ipv4_address, ttl = var.dns_ttl },
+    { name = local.dns_name, type = "AAAA", value = hcloud_server.app.ipv6_address, ttl = var.dns_ttl },
+    { name = local.dns_name, type = "CAA", value = "0 issue \"letsencrypt.org\"", ttl = var.dns_ttl },
+  ]
 }
 
 resource "hcloud_ssh_key" "ops" {
@@ -81,7 +89,11 @@ resource "hcloud_server" "app" {
   delete_protection  = var.delete_protection
   rebuild_protection = var.delete_protection
   labels             = merge(local.labels, { role = "app" })
-  user_data          = file("${path.module}/cloud-init/app.yaml")
+  user_data = templatefile("${path.module}/cloud-init/app.yaml.tftpl", {
+    admin_ssh_keys        = values(var.ssh_keys)
+    deploy_ssh_public_key = trimspace(var.deploy_ssh_public_key)
+    gate_script           = file("${path.module}/../../deploy/hetzner/ppm-ssh-gate.sh")
+  })
 
   public_net {
     ipv4_enabled = true
@@ -107,7 +119,7 @@ resource "hcloud_server" "db" {
   delete_protection  = var.delete_protection
   rebuild_protection = var.delete_protection
   labels             = merge(local.labels, { role = "db" })
-  user_data          = file("${path.module}/cloud-init/db.yaml")
+  user_data          = templatefile("${path.module}/cloud-init/db.yaml.tftpl", { volume_id = hcloud_volume.pgdata.id })
 
   # Ausgehend braucht die DB-VM IPv4 (Pakete, Object Storage für pgBackRest); eingehend sperrt die Firewall alles
   public_net {
@@ -136,5 +148,5 @@ resource "hcloud_volume" "pgdata" {
 resource "hcloud_volume_attachment" "pgdata" {
   volume_id = hcloud_volume.pgdata.id
   server_id = hcloud_server.db.id
-  automount = true
+  automount = false # cloud-init hängt das Volume unter /srv/pgdata ein
 }

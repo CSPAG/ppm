@@ -1,0 +1,63 @@
+#cloud-config
+# App-VM: Docker mit Compose, Caddy und Container von PPM (deploy/hetzner/rollout.sh legt die Dateien ab).
+package_update: true
+package_upgrade: true
+packages: [ca-certificates, curl, gnupg, unattended-upgrades, age, jq]
+users:
+  # Betriebspersonen: Sprungserver zur DB-VM, Fehlersuche (root meldet sich nicht über SSH an)
+  - name: betrieb
+    shell: /bin/bash
+    groups: [sudo, docker, adm]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys: ${jsonencode(admin_ssh_keys)}
+  # Workflow «Deploy»: nur erzwungener Befehl ppm-ssh-gate, keine Shell, keine Weiterleitungen, nicht in docker
+%{ if deploy_ssh_public_key != "" ~}
+  - name: deploy
+    shell: /bin/sh
+    lock_passwd: true
+    ssh_authorized_keys:
+      - restrict ${deploy_ssh_public_key}
+%{ endif ~}
+ssh_pwauth: false
+write_files:
+  - path: /usr/local/sbin/ppm-ssh-gate
+    permissions: "0755"
+    encoding: b64
+    content: ${base64encode(gate_script)}
+  - path: /etc/ssh/sshd_config.d/10-haerten.conf
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+      AuthenticationMethods publickey
+      AllowUsers betrieb%{ if deploy_ssh_public_key != "" } deploy%{ endif }
+      X11Forwarding no
+      AllowAgentForwarding no
+      PermitUserEnvironment no
+      MaxAuthTries 3
+      LoginGraceTime 20
+      Match User deploy
+        AllowTcpForwarding no
+        AllowStreamLocalForwarding no
+        PermitTunnel no
+        PermitTTY no
+        ForceCommand sudo -n /usr/local/sbin/ppm-ssh-gate
+      # Match-Block beenden, damit nachfolgende Konfigurationsdateien wieder global gelten
+      Match all
+  - path: /etc/sudoers.d/10-deploy
+    permissions: "0440"
+    content: |
+      Defaults!/usr/local/sbin/ppm-ssh-gate env_keep += "SSH_ORIGINAL_COMMAND"
+      deploy ALL=(root) NOPASSWD: /usr/local/sbin/ppm-ssh-gate
+  - path: /etc/docker/daemon.json
+    content: |
+      { "log-driver": "json-file", "log-opts": { "max-size": "20m", "max-file": "5" }, "live-restore": true, "no-new-privileges": true }
+runcmd:
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list
+  - apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  - install -d -m 0750 -o root -g docker /opt/ppm /opt/ppm/state/maintenance
+  - install -d -m 0700 -o 1000 -g 1000 /opt/ppm/secrets
+  - systemctl enable --now docker unattended-upgrades

@@ -193,7 +193,8 @@ jobs:
             "$CADDY_IMAGE" caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
       - name: Shell-Skripte
         run: |
-          shellcheck -s sh scripts/e2e.sh deploy/docker-entrypoint.sh deploy/dev/postgres-init.sh deploy/hetzner/rollout.sh deploy/hetzner/db/setup.sh
+          shellcheck -s sh scripts/e2e.sh deploy/docker-entrypoint.sh deploy/dev/postgres-init.sh deploy/hetzner/rollout.sh deploy/hetzner/db/setup.sh infra/dns/dns.sh
+          shellcheck deploy/hetzner/ppm-ssh-gate.sh
 
   image:
     name: Image (Build, Rauchtest, Scan, SBOM, Signatur)

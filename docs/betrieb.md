@@ -102,6 +102,6 @@ Jede Aufgabe läuft über alle Instanzen höchstens einmal gleichzeitig. Fachjob
 | manifests | `kustomize build \| kubeconform`, `docker compose config`, `caddy validate`, shellcheck |
 | image | Build, Rauchtest (ohne Konfiguration Exit 78, UID 1000), Trivy, SBOM (CycloneDX, SPDX); auf `main`/Tags Push nach GHCR (amd64, arm64) mit Digest, Provenienz und cosign keyless |
 
-Weitere Workflows: `deploy.yml`, `infra.yml` (OpenTofu Hetzner: Plan im PR, Apply nur manuell; DNS bei Hostpoint von Hand),
+Weitere Workflows: `deploy.yml`, `infra.yml` (OpenTofu Hetzner: Plan im PR, Apply nur manuell; danach DNS bei Infomaniak über `infra/dns/`),
 `keycloak.yml` und `identity-conformity.yml` (verwaltet von identity-kit). Renovate (`renovate.json`): wöchentlich,
 14 Tage Mindestalter, Sicherheitsupdates sofort, Gruppe «identity-kit» ohne Automerge, Digests gepinnt.

@@ -18,5 +18,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "scripts", "test", "infra/keycloak/platform.ts"]
+  "include": ["src", "scripts", "test", "infra/keycloak/platform.ts", "infra/dns"]
 }

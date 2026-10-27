@@ -42,8 +42,10 @@ SECRETS
 chown postgres:postgres /etc/pgbackrest/conf.d/secrets.conf
 
 systemctl restart postgresql@17-main
+# über stdin, gewollt von root gelesen (SC2024): postgres darf /root nicht lesen
+# shellcheck disable=SC2024
 sudo -u postgres psql -v ON_ERROR_STOP=1 -v p=ppm -v db=ppm \
-  -v owner_pw="$OWNER_PW" -v runtime_pw="$RUNTIME_PW" -v worker_pw="$WORKER_PW" -f "$here/../bootstrap.sql"
+  -v owner_pw="$OWNER_PW" -v runtime_pw="$RUNTIME_PW" -v worker_pw="$WORKER_PW" < "$here/../bootstrap.sql"
 sudo -u postgres psql -d ppm -c 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements'
 
 sudo -u postgres pgbackrest --stanza=ppm stanza-create

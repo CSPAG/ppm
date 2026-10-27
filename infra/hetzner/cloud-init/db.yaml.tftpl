@@ -17,7 +17,12 @@ runcmd:
   - curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/pgdg.asc
   - echo "deb [signed-by=/etc/apt/keyrings/pgdg.asc] https://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo $VERSION_CODENAME)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
   - apt-get update
-  # Volume (automount unter /mnt/HC_Volume_<id>) als Datenverzeichnis vor der Installation verlinken
-  - mkdir -p /var/lib/postgresql && ln -sfn "$(ls -d /mnt/HC_Volume_* | head -1)" /var/lib/postgresql/17
+  # Volume als Datenverzeichnis vor der Installation einhängen; OpenTofu hängt es erst nach dem Anlegen des Servers an,
+  # darum bis zu 5 Minuten warten und selbst einhängen (ohne Volume bricht cloud-init hier ab, statt auf die Systemplatte
+  # zu installieren)
+  - [sh, -c, "for i in $(seq 1 150); do [ -e /dev/disk/by-id/scsi-0HC_Volume_${volume_id} ] && break; sleep 2; done"]
+  - [sh, -c, "grep -q HC_Volume_${volume_id} /etc/fstab || echo '/dev/disk/by-id/scsi-0HC_Volume_${volume_id} /srv/pgdata ext4 discard,nofail,noatime,defaults 0 2' >> /etc/fstab"]
+  - [sh, -c, "mkdir -p /srv/pgdata && mount -a && mountpoint -q /srv/pgdata"]
+  - mkdir -p /var/lib/postgresql && ln -sfn /srv/pgdata /var/lib/postgresql/17
   - apt-get install -y postgresql-17 pgbackrest
   - systemctl enable --now unattended-upgrades

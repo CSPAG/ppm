@@ -201,3 +201,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, «Sie» | Zielgrössen |
 |---|---|---|---|---|---|---|---|
 | #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | ohne Befund (E2E hell, dunkel; jsdom) | 360 px ohne Überlauf (E2E «schmal»); 768/1440 nicht eigens geprüft | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
+| #40 | AP-E5-4 | Bericht (Auslastung) + Schublade, Arbeitsfläche (Kapazität); Z1, Z2, Z4, Z5, Z7, Z8, Z10, ungültiger Zeitraum | ja (Reiter, Zellen, Raster mit Pfeilen, Eingabetaste, Strg+Z) | ohne Befund (jsdom; E2E hell, dunkel) | 360 und 1440 px ohne Überlauf (Chromium), 768 nicht eigens | ja (Feature-Texte), «Sie» | Q-L5 50 × 31 virtualisiert (Test mit Messung) |

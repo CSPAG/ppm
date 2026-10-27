@@ -5756,6 +5756,1103 @@
           }
         }
       },
+      "Versandfrist": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bis",
+          "arbeitstage",
+          "restArbeitstage",
+          "vorlauf",
+          "eingehalten"
+        ],
+        "properties": {
+          "bis": {
+            "description": "Versand spätestens (Q8 Kap. 8.1); ohne Phasenmodell in Kraft null.",
+            "anyOf": [
+              {
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Datum (JJJJ-MM-TT).",
+                "examples": [
+                  "2026-11-12"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "arbeitstage": {
+            "description": "Verlangte Arbeitstage zwischen Versand und Sitzung.",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "restArbeitstage": {
+            "description": "Arbeitstage bis zur Frist, negativ wenn überschritten.",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vorlauf": {
+            "description": "Arbeitstage zwischen heute bzw. dem Versand und der Sitzung (K3-1).",
+            "type": "integer"
+          },
+          "eingehalten": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Unterlage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "art",
+          "titel",
+          "bereit"
+        ],
+        "properties": {
+          "art": {
+            "type": "string",
+            "enum": [
+              "packet",
+              "bericht",
+              "beilage"
+            ],
+            "description": "Gate Review Packet, Bericht oder Beilage."
+          },
+          "titel": {
+            "type": "string"
+          },
+          "bereit": {
+            "type": "boolean"
+          },
+          "hinweis": {
+            "type": "string"
+          },
+          "qualityCheck": {
+            "type": "string",
+            "enum": [
+              "bestanden",
+              "offen"
+            ],
+            "description": "Quality-Check der Unterlage."
+          }
+        }
+      },
+      "Einladung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "personId",
+          "name",
+          "funktion"
+        ],
+        "properties": {
+          "personId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "funktion": {
+            "type": "string",
+            "enum": [
+              "sp",
+              "pl",
+              "ctl",
+              "weitere"
+            ],
+            "description": "Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person."
+          }
+        }
+      },
+      "Traktandum": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "sitzungId",
+          "art",
+          "artLabel",
+          "bezug",
+          "projekt",
+          "titel",
+          "antrag",
+          "position",
+          "dauerMin",
+          "zeit",
+          "stand",
+          "viaSns",
+          "vertraulich",
+          "verschobenVon",
+          "unterlagen",
+          "einladungen",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "sitzungId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "portfoliobericht",
+              "gate",
+              "aenderung",
+              "meilenstein",
+              "eskalation",
+              "idee",
+              "priorisierung",
+              "quartalsreporting",
+              "abschluss",
+              "jahresrueckblick"
+            ],
+            "description": "Art des Traktandums (fachmodell.md 2.9)."
+          },
+          "artLabel": {
+            "description": "Bezeichnung der Art, z. B. «Gate-Review».",
+            "type": "string"
+          },
+          "bezug": {
+            "additionalProperties": false,
+            "description": "Fachlicher Bezug des Geschäfts.",
+            "type": "object",
+            "required": [
+              "typ",
+              "id"
+            ],
+            "properties": {
+              "typ": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          },
+          "projekt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "nummer",
+                  "name",
+                  "phase"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nummer": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "phase": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "titel": {
+            "type": "string"
+          },
+          "antrag": {
+            "description": "Antrag in einem Satz (K3 Schritt 6).",
+            "type": "string"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dauerMin": {
+            "anyOf": [
+              {
+                "description": "Zeitbedarf in Minuten.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zeit": {
+            "description": "Beginn des Traktandums, gerechnet ab Beginn der Sitzung.",
+            "anyOf": [
+              {
+                "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+                "description": "Uhrzeit (HH:MM).",
+                "examples": [
+                  "14:00"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "vorgeschlagen",
+              "traktandiert",
+              "verschoben",
+              "entschieden"
+            ],
+            "description": "Stand des Traktandums."
+          },
+          "viaSns": {
+            "description": "«via SNS-VR»: Der Entscheid des Gremiums ist eine Stellungnahme (UC-006 A1).",
+            "type": "boolean"
+          },
+          "vertraulich": {
+            "type": "boolean"
+          },
+          "verschobenVon": {
+            "description": "Datum der Sitzung, von der das Traktandum verschoben wurde (UC-006 A2).",
+            "anyOf": [
+              {
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Datum (JJJJ-MM-TT).",
+                "examples": [
+                  "2026-11-12"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unterlagen": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "stand",
+              "liste"
+            ],
+            "properties": {
+              "stand": {
+                "type": "string",
+                "enum": [
+                  "bereit",
+                  "quality_check_offen",
+                  "fehlt",
+                  "keine"
+                ],
+                "description": "Stand der Unterlagen (UC-006 Schritt 3): bereit, Quality-Check offen, Unterlagen fehlen, keine Unterlagen nötig."
+              },
+              "liste": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Unterlage"
+                }
+              }
+            }
+          },
+          "einladungen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Einladung"
+            }
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        }
+      },
+      "Sitzung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "gremium",
+          "portfolioId",
+          "datum",
+          "beginn",
+          "dauerMin",
+          "ort",
+          "stand",
+          "versendetAt",
+          "versandVorlauf",
+          "frist",
+          "zeitbedarfMin",
+          "traktanden",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "gremium": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "kuerzel",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kuerzel": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "datum": {
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "Datum (JJJJ-MM-TT).",
+            "examples": [
+              "2026-11-12"
+            ],
+            "type": "string"
+          },
+          "beginn": {
+            "anyOf": [
+              {
+                "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+                "description": "Uhrzeit (HH:MM).",
+                "examples": [
+                  "14:00"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dauerMin": {
+            "anyOf": [
+              {
+                "description": "Sitzungsdauer in Minuten.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ort": {
+            "type": "string"
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "geplant",
+              "in_vorbereitung",
+              "versendet",
+              "laufend",
+              "geschlossen",
+              "protokoll_versendet"
+            ],
+            "description": "Bearbeitungsstand: geplant, in Vorbereitung, Unterlagen versendet, laufend, geschlossen, Protokoll versendet."
+          },
+          "versendetAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "versandVorlauf": {
+            "anyOf": [
+              {
+                "description": "Arbeitstage zwischen Versand und Sitzung (Versandprotokoll, K3-1).",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "frist": {
+            "$ref": "#/components/schemas/Versandfrist"
+          },
+          "zeitbedarfMin": {
+            "description": "Summe des Zeitbedarfs der Traktanden.",
+            "type": "integer"
+          },
+          "traktanden": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Traktandum"
+            }
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Traktandenliste bearbeiten und versenden (sitzung:write, nur bis zum Versand).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SitzungPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "beginn": {
+            "anyOf": [
+              {
+                "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+                "description": "Uhrzeit (HH:MM).",
+                "examples": [
+                  "14:00"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dauerMin": {
+            "anyOf": [
+              {
+                "minimum": 15,
+                "maximum": 720,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ort": {
+            "maxLength": 200,
+            "type": "string"
+          }
+        }
+      },
+      "SitzungEintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "datum",
+          "id",
+          "stand",
+          "traktanden",
+          "versendetAt"
+        ],
+        "properties": {
+          "datum": {
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "Datum (JJJJ-MM-TT).",
+            "examples": [
+              "2026-11-12"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Sitzung; null, solange zum Termin noch keine Sitzung besteht.",
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "geplant",
+              "in_vorbereitung",
+              "versendet",
+              "laufend",
+              "geschlossen",
+              "protokoll_versendet"
+            ],
+            "description": "Bearbeitungsstand: geplant, in Vorbereitung, Unterlagen versendet, laufend, geschlossen, Protokoll versendet."
+          },
+          "traktanden": {
+            "type": "integer"
+          },
+          "versendetAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "SitzungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gremium",
+          "items",
+          "nextCursor",
+          "can"
+        ],
+        "properties": {
+          "gremium": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "kuerzel",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kuerzel": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitzungEintrag"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "description": "Was die anfragende Person damit darf.",
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Traktandenliste bearbeiten und versenden (sitzung:write, nur bis zum Versand).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SitzungCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "datum"
+        ],
+        "properties": {
+          "datum": {
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "Datum (JJJJ-MM-TT).",
+            "examples": [
+              "2026-11-12"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "Vorschlaege": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gruppen"
+        ],
+        "properties": {
+          "gruppen": {
+            "description": "Vorschläge je Art in der Reihenfolge von K3 Schritt 1; verschobene Traktanden der letzten Sitzung zuerst in ihrer Art.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "art",
+                "label",
+                "traktanden"
+              ],
+              "properties": {
+                "art": {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht",
+                    "gate",
+                    "aenderung",
+                    "meilenstein",
+                    "eskalation",
+                    "idee",
+                    "priorisierung",
+                    "quartalsreporting",
+                    "abschluss",
+                    "jahresrueckblick"
+                  ],
+                  "description": "Art des Traktandums (fachmodell.md 2.9)."
+                },
+                "label": {
+                  "type": "string"
+                },
+                "traktanden": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Traktandum"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TraktandumCreate": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "description": "Vorschlag aufnehmen (UC-006 Schritt 2).",
+            "type": "object",
+            "required": [
+              "vorschlagId"
+            ],
+            "properties": {
+              "vorschlagId": {
+                "format": "uuid",
+                "type": "string"
+              }
+            }
+          },
+          {
+            "additionalProperties": false,
+            "description": "Geschäft einplanen (PP.04.05), z. B. das Gate-Review eines Projekts.",
+            "type": "object",
+            "required": [
+              "art"
+            ],
+            "properties": {
+              "art": {
+                "type": "string",
+                "enum": [
+                  "portfoliobericht",
+                  "gate",
+                  "aenderung",
+                  "meilenstein",
+                  "eskalation",
+                  "idee",
+                  "priorisierung",
+                  "quartalsreporting",
+                  "abschluss",
+                  "jahresrueckblick"
+                ],
+                "description": "Art des Traktandums (fachmodell.md 2.9)."
+              },
+              "projektId": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "titel": {
+                "minLength": 1,
+                "maxLength": 300,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              "antrag": {
+                "maxLength": 1000,
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "Reihenfolge": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reihenfolge"
+        ],
+        "properties": {
+          "reihenfolge": {
+            "minItems": 1,
+            "maxItems": 999,
+            "description": "Alle Traktanden der Sitzung in der neuen Reihenfolge.",
+            "type": "array",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TraktandumPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "titel": {
+            "minLength": 1,
+            "maxLength": 300,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "antrag": {
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "dauerMin": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "maximum": 480,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "EinladungenPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "einladungen"
+        ],
+        "properties": {
+          "einladungen": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "personId",
+                "funktion"
+              ],
+              "properties": {
+                "personId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "funktion": {
+                  "type": "string",
+                  "enum": [
+                    "sp",
+                    "pl",
+                    "ctl",
+                    "weitere"
+                  ],
+                  "description": "Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person."
+                }
+              }
+            }
+          }
+        }
+      },
+      "Verschoben": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "traktandum",
+          "nach"
+        ],
+        "properties": {
+          "traktandum": {
+            "$ref": "#/components/schemas/Traktandum"
+          },
+          "nach": {
+            "additionalProperties": false,
+            "description": "Sitzung, auf die das Traktandum verschoben wurde.",
+            "type": "object",
+            "required": [
+              "id",
+              "datum"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "datum": {
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Datum (JJJJ-MM-TT).",
+                "examples": [
+                  "2026-11-12"
+                ],
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Versandvorschau": {
+        "additionalProperties": false,
+        "description": "Wirkung des Versands (I-R1 Stufe 3): Empfänger sind die Mitglieder des Gremiums (Recht sitzung:read am Portfolio) und die Eingeladenen.",
+        "type": "object",
+        "required": [
+          "frist",
+          "traktanden",
+          "unterlagen",
+          "eingeladene",
+          "warnungen",
+          "verschoben"
+        ],
+        "properties": {
+          "frist": {
+            "$ref": "#/components/schemas/Versandfrist"
+          },
+          "traktanden": {
+            "type": "integer"
+          },
+          "unterlagen": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "packet",
+              "bericht",
+              "beilage"
+            ],
+            "properties": {
+              "packet": {
+                "type": "integer"
+              },
+              "bericht": {
+                "type": "integer"
+              },
+              "beilage": {
+                "type": "integer"
+              }
+            }
+          },
+          "eingeladene": {
+            "description": "Eingeladene Personen (je Person einmal).",
+            "type": "integer"
+          },
+          "warnungen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "traktandumId",
+                "titel",
+                "stand"
+              ],
+              "properties": {
+                "traktandumId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "stand": {
+                  "type": "string",
+                  "enum": [
+                    "bereit",
+                    "quality_check_offen",
+                    "fehlt",
+                    "keine"
+                  ],
+                  "description": "Stand der Unterlagen (UC-006 Schritt 3): bereit, Quality-Check offen, Unterlagen fehlen, keine Unterlagen nötig."
+                }
+              }
+            }
+          },
+          "verschoben": {
+            "description": "Verschobene Traktanden, deren PL und SP informiert werden.",
+            "type": "integer"
+          }
+        }
+      },
+      "SitzungKopf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sitzungen"
+        ],
+        "properties": {
+          "sitzungen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "gremium",
+                "datum",
+                "stand",
+                "traktanden",
+                "versandBis"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "gremium": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "kuerzel",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kuerzel": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "datum": {
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                  "description": "Datum (JJJJ-MM-TT).",
+                  "examples": [
+                    "2026-11-12"
+                  ],
+                  "type": "string"
+                },
+                "stand": {
+                  "type": "string",
+                  "enum": [
+                    "geplant",
+                    "in_vorbereitung",
+                    "versendet",
+                    "laufend",
+                    "geschlossen",
+                    "protokoll_versendet"
+                  ],
+                  "description": "Bearbeitungsstand: geplant, in Vorbereitung, Unterlagen versendet, laufend, geschlossen, Protokoll versendet."
+                },
+                "traktanden": {
+                  "type": "integer"
+                },
+                "versandBis": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                      "description": "Datum (JJJJ-MM-TT).",
+                      "examples": [
+                        "2026-11-12"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -25785,6 +26882,1943 @@
         }
       }
     },
+    "/v1/gremien/{kuerzel}/sitzungen": {
+      "get": {
+        "summary": "Sitzungen eines Gremiums",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Geplante Termine und Sitzungen aufsteigend (ohne `von`: ab heute); zu einem Termin ohne Sitzung `id: null`. Cursor-Paginierung.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "example": "2026-11-12",
+            "in": "query",
+            "name": "von",
+            "required": false,
+            "description": "Datum (JJJJ-MM-TT)."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "example": "2026-11-12",
+            "in": "query",
+            "name": "bis",
+            "required": false,
+            "description": "Datum (JJJJ-MM-TT)."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          },
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "kuerzel",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitzungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Sitzung zum Termin anlegen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Aus einem geplanten Sitzungstermin des Gremiums (sonst 400); besteht sie schon, 409. Feste Traktanden (Portfoliobericht, UC-006 Schritt 4) stehen sofort darauf.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SitzungCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "kuerzel",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/gremien/{kuerzel}/sitzungen/{datum}": {
+      "get": {
+        "summary": "Sitzung am Datum lesen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Adresse der Oberfläche (I-N5); wie `GET /v1/sitzungen/{id}`. 404, solange zum Termin keine Sitzung besteht.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "kuerzel",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "example": "2026-11-12",
+            "in": "path",
+            "name": "datum",
+            "required": true,
+            "description": "Datum (JJJJ-MM-TT)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/kopf": {
+      "get": {
+        "summary": "Kopf im Eingang",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitzungKopf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/{id}": {
+      "get": {
+        "summary": "Sitzung mit Traktandenliste",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Kopf mit Versandfrist und Zeitbedarf, Traktanden mit Unterlagenstand und Einladungen (K3 Schritte 1–3). Mitglieder und Eingeladene ab Versand.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Sitzung ändern",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Beginn, Dauer und Ort; nur mit `If-Match`, nicht nach dem Schliessen (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SitzungPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/{id}/vorschlaege": {
+      "get": {
+        "summary": "Traktandenvorschläge",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Vorschläge für die Sitzung, gruppiert nach Art (K3 Schritt 1): Geschäfte der Module für das Gremium und von der letzten Sitzung verschobene Traktanden (UC-006 A2).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vorschlaege"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/{id}/traktanden": {
+      "post": {
+        "summary": "Traktandum aufnehmen oder einplanen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an PL, CTL, SP werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TraktandumCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Traktanden ordnen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Neue Reihenfolge aller Traktanden der Sitzung (Ziehen oder Alt+↑/↓, I-M2). Nur mit `If-Match` (Version der Sitzung).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reihenfolge"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/{id}/versand": {
+      "get": {
+        "summary": "Vorschau des Versands",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Wirkung von «Unterlagen versenden» (I-R1 Stufe 3): Traktanden, Unterlagen, Eingeladene, Frist (5 Arbeitstage, Q8 Kap. 8.1) und Warnungen (UC-006 A2).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wirkung des Versands (I-R1 Stufe 3): Empfänger sind die Mitglieder des Gremiums (Recht sitzung:read am Portfolio) und die Eingeladenen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Versandvorschau"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/{id}/versenden": {
+      "post": {
+        "summary": "Unterlagen versenden",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Stellt Traktandenliste und Unterlagen den Mitgliedern bereit, lädt die Eingeladenen gebündelt ein, informiert PL und SP verschobener Traktanden und protokolliert den Versand mit Zeitpunkt und Arbeitstagen vor der Sitzung (UC-006 Schritt 5, K3-1). Warnungen sperren nicht. Nur mit `If-Match`; leere Liste oder schon versendet 409.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traktanden/{id}": {
+      "get": {
+        "summary": "Traktandum lesen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Antrag, Unterlagen und Einladungen (K3 Schritt 6). Mitglieder ab Versand, Eingeladene nur ihr Traktandum.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Traktandum"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Traktandum ändern",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Titel, Antrag, Zeitbedarf; nur mit `If-Match` und bis zum Versand.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TraktandumPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Traktandum"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traktanden/{id}/entfernen": {
+      "post": {
+        "summary": "Aus der Traktandenliste nehmen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Das Traktandum wird wieder Vorschlag; Einladungen entfallen. Bis zum Versand.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sitzung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traktanden/{id}/verschieben": {
+      "post": {
+        "summary": "Auf die nächste Sitzung verschieben",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "UC-006 A2 (Unterlagen fehlen): auf den nächsten Termin des Gremiums, dort als Vorschlag; PL und SP werden mit dem Versand dieser Sitzung informiert. Rückgängig: in dieser Sitzung wieder aufnehmen. Ohne weiteren Termin 409.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Verschoben"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traktanden/{id}/einladungen": {
+      "put": {
+        "summary": "Eingeladene festlegen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Ersetzt die Eingeladenen des Traktandums (vorgesetzt PL, CTL, SP, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EinladungenPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Traktandum"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -26123,6 +29157,10 @@
     {
       "name": "Ziele",
       "description": "Strategische Ziele je Handlungsfeld mit Metrik, Zielwert und Verlauf; ab Etappe E6 Zielzyklus, Jahresziele und Zielerreichung."
+    },
+    {
+      "name": "Sitzungen",
+      "description": "Sitzungen der Gremien: Traktandenliste aus Vorschlägen, Unterlagen, Einladungen und Versand 5 Arbeitstage vorher (UC-006)."
     },
     {
       "name": "Webhooks",

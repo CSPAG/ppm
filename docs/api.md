@@ -109,6 +109,35 @@ Organisation, am Portfolio oder am Projekt; «vertraulich» nur für Projektroll
 | `GET /v1/projekte/{id}/organisation` | `projekt:read` | `ETag` = Stand der Projektorganisation |
 | `PUT /v1/projekte/{id}/organisation` | `projekt:organisation` | ersetzt die Liste; setzt bzw. entzieht die Rollen `sp`, `pl`, `ctl`, `kt` als Tupel am Projekt; `If-Match` Pflicht |
 
+## Sitzungen
+
+Sitzungen der Gremien vorbereiten (BC PP.04.01, PP.04.05; UC-006 Schritte 1–5, A1, A2; Kernablauf K3). Die Sitzung
+entsteht aus einem Sitzungstermin des Gremiums (von Hand oder 15 Arbeitstage vorher durch den Lauf der Fristen, A-27).
+Lesen mit `sitzung:read` am Portfolio des Gremiums, Traktanden und Unterlagen erst ab Versand; Eingeladene sehen ab
+Versand nur ihr Traktandum. Bearbeiten mit `sitzung:write` bis zum Versand. Fähigkeiten: `can: { write }`.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/gremien/{kuerzel}/sitzungen?von=&bis=&cursor=&limit=` | `sitzung:read` | Termine und Sitzungen ab heute; Termin ohne Sitzung mit `id: null` |
+| `POST /v1/gremien/{kuerzel}/sitzungen` | `sitzung:write` | `{ datum }` eines Termins (sonst 422), feste Traktanden der Registry |
+| `GET /v1/gremien/{kuerzel}/sitzungen/{datum}` | `sitzung:read` | Adresse der Oberfläche; `ETag` |
+| `GET /v1/sitzungen/kopf` | `sitzung:read` irgendwo | nächste Sitzungen mit Versandfrist (Eingang) |
+| `GET /v1/sitzungen/{id}` | `sitzung:read` | Traktandenliste mit Zeitbedarf, Zeitfenster, Unterlagenstand, Eingeladenen, Versandfrist; `ETag` |
+| `PATCH /v1/sitzungen/{id}` | `sitzung:write` | Beginn, Dauer, Ort; `If-Match` Pflicht |
+| `GET /v1/sitzungen/{id}/vorschlaege` | `sitzung:write` | Vorschläge je Art; verschobene der letzten Sitzung zuerst |
+| `POST /v1/sitzungen/{id}/traktanden` | `sitzung:write` | `{ vorschlagId }` aufnehmen oder `{ art, projektId, titel, antrag }` einplanen (PP.04.05); liefert die Sitzung |
+| `PUT /v1/sitzungen/{id}/traktanden` | `sitzung:write` | `{ reihenfolge }` aller Traktanden; `If-Match` (Sitzung) |
+| `GET /v1/sitzungen/{id}/versand` | `sitzung:write` | Vorschau der Wirkung (I-R1): Traktanden, Unterlagen, Eingeladene, Frist, Warnungen |
+| `POST /v1/sitzungen/{id}/versenden` | `sitzung:write` | `If-Match`; protokolliert Zeitpunkt und Arbeitstage vor der Sitzung (K3-1) |
+| `GET /v1/traktanden/{id}` | `sitzung:read` | Antrag, Unterlagen, Eingeladene |
+| `PATCH /v1/traktanden/{id}` | `sitzung:write` | Titel, Antrag, Zeitbedarf; `If-Match` |
+| `POST /v1/traktanden/{id}/entfernen` | `sitzung:write` | zurück zu den Vorschlägen |
+| `POST /v1/traktanden/{id}/verschieben` | `sitzung:write` | auf den nächsten Termin (UC-006 A2); ohne Termin 409 |
+| `PUT /v1/traktanden/{id}/einladungen` | `sitzung:write` | Eingeladene ersetzen; `If-Match` (Traktandum) |
+
+Andere Module registrieren ihre Traktandenart und schlagen Geschäfte vor, nur über `src/modules/sitzung/index.ts`
+(`registriereTraktandenart`, `traktandum.vorschlagen`); siehe [README des Moduls](../src/modules/sitzung/README.md).
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur
@@ -131,6 +160,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.projekt.organisation_changed` | Projektorganisation festgelegt |
 | `ch.ppm.projekt.phase_changed` | Phase nachgeführt (Gate-Entscheid) |
 | `ch.ppm.projekt.suspended`, `.resumed`, `.cancelled`, `.completed`, `.withdrawn` | Lebenszyklus: sistiert, wieder aufgenommen, abgebrochen, abgeschlossen, zurückgezogen |
+| `ch.ppm.sitzung.created`, `ch.ppm.sitzung.updated` | Sitzung angelegt bzw. Beginn, Dauer, Ort geändert |
+| `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |
+| `ch.ppm.sitzung.reordered` | Traktanden geordnet |
+| `ch.ppm.sitzung.dispatched` | Unterlagen versendet (mit Vorlauf in Arbeitstagen und Frist eingehalten) |
 
 Abonniert wird mit dem Typ ohne Präfix (`handlungsfeld.created`) oder `*`. Zustellung mit Backoff bis
 `WEBHOOK_MAX_ATTEMPTS`; Erfolg ist jede 2xx-Antwort.

@@ -12,6 +12,7 @@ import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
+import { sitzungModule } from './modules/sitzung/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
@@ -20,7 +21,7 @@ export const MIGRATIONS_DIR = join(import.meta.dirname, '..', 'db', 'migrations'
 
 export const app = defineApp({
   platform,
-  modules: [eingangModule, stammdatenModule, handlungsfeldModule, phasenmodellModule, portfolioModule, projektModule, zielModule, webhooksModule],
+  modules: [eingangModule, stammdatenModule, handlungsfeldModule, phasenmodellModule, portfolioModule, projektModule, zielModule, sitzungModule, webhooksModule],
   people: { permissions: ['handlungsfeld:read', 'stammdaten:read', 'projekt:read'] },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App
   migrations: { dir: MIGRATIONS_DIR },

@@ -33,6 +33,8 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 | `get_phasenmodell` | `GET /v1/phasenmodelle/aktuell` bzw. `/{id}` | `phasenmodell:read` | `readOnlyHint` |
 | `list_projekte` | `GET /v1/projekte` | `projekt:read` | `readOnlyHint` |
 | `get_projekt` | `GET /v1/projekte/{id}` und `…/organisation` | `projekt:read` | `readOnlyHint` |
+| `list_sitzungen` | `GET /v1/gremien/{kuerzel}/sitzungen` | `sitzung:read` | `readOnlyHint` |
+| `get_sitzung` | `GET /v1/sitzungen/{id}` | `sitzung:read` | `readOnlyHint` |
 
 Neues Werkzeug: im Modell unter `mcpTools` eintragen (Titel, Recht, `readOnly`), in `mcp/tools.ts` als Aufruf der
 REST-API umsetzen; nie direkt auf Module oder die Datenbank zugreifen.

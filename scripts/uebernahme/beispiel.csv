@@ -1,0 +1,4 @@
+Index;Strategisches Handlungsfeld;Priorität;Projektname;Thema / Inhalt;ProjektleiterIn;Projektphase;Abschluss per;Meilenstein Termin;Nächster Meilenstein;Status;Trend;Begründung;Massnahme
+01;Beispielfeld Nord;;Beispielprojekt Alpha;Erfundenes Thema A;pl.alpha@beispiel.test;P1;31.12.2026;30.11.2026;P1 Update: Konzept abnehmen;im Plan;→;;
+02;Beispielfeld Nord;hoch;Beispielprojekt Beta;"Erfundenes Thema B; mit Semikolon";pl.beta@beispiel.test;P2;28.02.2027;;Rollout Pilot;kritisch;↗;Lieferverzug beim Partner (erfunden);Ersatzlieferant prüfen (erfunden)
+03;;;Beispielprojekt Gamma;;;P0;;;;;;;

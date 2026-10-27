@@ -37,6 +37,7 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | `src/features/monatsabschluss/` | Arbeitsraum «Portfolio» › Monatsabschluss (`/portfolio/monatsabschluss?periode=2026-10`), UI-15, UI-16, K1: Posteingang der Periode (auffällige zuerst, Auswahl mit Sammelbestätigung und Einfordern, Tastatur ↑/↓ B R E Leertaste Enter, Rückfrage in der Zeile), Bericht im Vergleich zur Vorperiode in der Schublade (`?o=bericht:<nummer>`), Ansicht «Termine» (`?ansicht=termine`), «Periode abschliessen» mit Wirkungsvorschau; Bereich sichtbar mit `statusbericht:review` |
 | `src/features/phasenmodell/` | Arbeitsraum «Administration» › Phasenmodell (`/administration/phasenmodell`, UI-46): Arbeitsfläche mit Version (`?v=`) und Abschnitt (`?e=`), automatischem Speichern, Rückgängig/Wiederholen, Prüfbericht, Entwurf anlegen, verwerfen und in Kraft setzen |
 | `src/features/bericht/` | Projekte › Projekt › Bericht (`/projekte/<nr>/bericht?periode=2026-10`, UI-13, K1): Arbeitsfläche mit Vorbelegung aus Vorperiode und Registern, Meilensteine, Kosten, Risiken, Kommunikation, KPIs (ab P2) und Beurteilung, automatischem Speichern, Seitenpanel «Bereit zum Einreichen», Einreichen mit Rückgängig (10 s); Befehlspalette «Statusbericht erstellen» mit Projektwahl |
+| `src/features/vertrag/` | Projektakte › Vertrag (`/projekte/<nr>/vertrag?kapitel=&version=&feld=`, UI-07, K2): Arbeitsfläche mit den Kapiteln 1–13, automatischem Speichern je Kapitel, Rückgängig/Wiederholen, Konflikt (412), Seitenpanel mit Pflichtangaben (Sprung mit einem Klick, Alt+N) und «Zur Prüfung einreichen»; erster Entwurf ohne Rückfrage |
 | `src/styles/`, `src/test/`, `e2e/` | Tokens und Layout; Testhilfen; Playwright-Tests |
 
 ## Regeln
@@ -49,6 +50,11 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
   (`src/ui/texte/texte.test.ts`, `scripts/check-address.ts`); Begriffe aus dem Glossar der UX-Schicht ([ux/README.md](ux/README.md#glossar-der-oberfläche)).
 - **Barrierefreiheit:** alles per Tastatur, Fokus in Dialogen gefangen und zurückgegeben, hell und dunkel, ab 360 px
   Breite; axe in jedem E2E-Test.
+
+- **Start-Bundle (Q-L6, ≤ 250 kB gzip, `npm run web:size`):** Der Router lädt die Seiten der Features als eigene Chunks
+  nach (`src/routes/seite.ts`: `seite(() => import('./features/<x>/<Seite>.tsx'), '<Seite>')`). Die `index.ts` eines
+  Features exportiert deshalb **keine Seiten**, nur Suchparameter, Texte, Pfade und Suchen für Navigation und Router;
+  sonst zieht der statische Import aus `nav.ts` oder `search.ts` die Seite ins Start-Bundle.
 
 ## Navigation
 

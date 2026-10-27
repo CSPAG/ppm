@@ -5,16 +5,25 @@
  * `akteRoute`; der Rahmen erhält den Inhalt als Kind und kennt die Features nicht.
  */
 import { createRoute, Outlet, redirect, useNavigate, type AnyRoute } from '@tanstack/react-router';
-import { useCallback } from 'react';
-import {
-  MeineProjektePage, PROJEKTNUMMER, ProjektAkte, projektTexte, ProjektUebersicht, type ProjekteSearch, type Reiter, type SetProjekteSearch,
-} from '../features/projekt/index.ts';
-import { BerichtPage, berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
+import { Suspense, useCallback } from 'react';
+import { PROJEKTNUMMER, projektTexte, type ProjekteSearch, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
+import { berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
+import { vertragTexte, type SetVertragSearch, type VertragSearch } from '../features/vertrag/index.ts';
+import { Loading } from '../ui/index.ts';
+import { seite } from './seite.ts';
 import { searchOf } from '../search.ts';
+
+// Seiten als eigene Chunks (Q-L6)
+const MeineProjektePage = seite(() => import('../features/projekt/MeineProjektePage.tsx'), 'MeineProjektePage');
+const ProjektAkte = seite(() => import('../features/projekt/ProjektAkte.tsx'), 'ProjektAkte');
+const ProjektUebersicht = seite(() => import('../features/projekt/ProjektUebersicht.tsx'), 'ProjektUebersicht');
+const BerichtPage = seite(() => import('../features/bericht/BerichtPage.tsx'), 'BerichtPage');
+const VertragPage = seite(() => import('../features/vertrag/VertragPage.tsx'), 'VertragPage');
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektTexte.akte.uebersicht },
+  { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
   { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
 ];
 
@@ -61,5 +70,18 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <BerichtPage nummer={nr} periode={periode ?? laufendePeriode()} />;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, berichtRoute])] as const;
+  // Vertrag (UI-07, K2): `?kapitel=7&version=entwurf&feld=…` (informationsarchitektur.md, Adressen)
+  const vertragRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag', validateSearch: searchOf.vertrag, component: VertragRoute });
+
+  function VertragRoute() {
+    const { nr } = akteRoute.useParams();
+    const search = vertragRoute.useSearch();
+    const navigate = useNavigate({ from: vertragRoute.fullPath });
+    const setSearch = useCallback<SetVertragSearch>((next, o) => {
+      void navigate({ search: (prev: VertragSearch) => ({ ...prev, ...next }), replace: o?.replace ?? false });
+    }, [navigate]);
+    return <Suspense fallback={<Loading />}><VertragPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
+  }
+
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, berichtRoute])] as const;
 }

@@ -57,7 +57,9 @@ export function ProjektAkte({ nummer, reiter, children }: { nummer: string; reit
       </header>
       {beendet ? <div className="pj-banner"><Hinweis stufe="hinweis">{TP.akte.beendet(TP.lebenszyklus[p.lebenszyklus])}</Hinweis></div> : null}
       {p.lebenszyklus === 'sistiert' ? <div className="pj-banner"><Hinweis stufe="hinweis">{TP.akte.sistiert}</Hinweis></div> : null}
-      <div className="body pj-inhalt">{children}</div>
+      {/* scrollbarer Bereich mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body pj-inhalt" tabIndex={0} role="region" aria-label={TP.akte.inhalt}>{children}</div>
     </section>
   );
 }

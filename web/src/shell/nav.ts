@@ -29,7 +29,11 @@ export const UNTEN_VORRANG: readonly ArbeitsraumId[] = ['eingang', 'projekte', '
 export const UNTEN_ANZAHL = 3;
 
 /** Bereich eines Arbeitsraums (I-N5: `/<arbeitsraum>/<bereich>`), sichtbar mit dem Recht irgendwo. */
-export interface BereichEintrag { raum: ArbeitsraumId; pfad: string; label: string; recht: AppPermission }
+export interface BereichEintrag {
+  raum: ArbeitsraumId; pfad: string; label: string; recht: AppPermission;
+  /** Adressen mit Parametern, unter denen der Bereich aktiv ist (z. B. `/ziele/2026` für den Zielzyklus); ersetzt `pfad` als Prüfung. */
+  muster?: RegExp;
+}
 
 /** Häufige Aktion für die Befehlspalette (I-N4), sichtbar mit dem Recht an der Organisation. */
 export interface AktionEintrag { id: string; label: string; icon: IconName; pfad: string; recht: AppPermission }
@@ -73,12 +77,12 @@ export function sichtbareRaeume(
   reg: Pick<NavRegistrierung, 'bereiche'>, darf: (p: AppPermission) => boolean, path: string,
   verwalten: readonly { path: string; title: string }[] = [],
 ): SichtbarerRaum[] {
-  const alle = [
+  const alle: { raum: ArbeitsraumId; pfad: string; label: string; muster?: RegExp }[] = [
     ...verwalten.map(v => ({ raum: 'administration' as const, pfad: v.path, label: v.title })),
     ...reg.bereiche.filter(b => darf(b.recht)),
   ];
   return ARBEITSRAEUME.flatMap(r => {
-    const bereiche = alle.filter(b => b.raum === r.id).map(b => ({ pfad: b.pfad, label: b.label, aktiv: liegtIn(path, b.pfad) }));
+    const bereiche = alle.filter(b => b.raum === r.id).map(b => ({ pfad: b.pfad, label: b.label, aktiv: b.muster ? b.muster.test(path) : liegtIn(path, b.pfad) }));
     if (!bereiche.length) return [];
     return [{ ...r, pfad: bereiche[0]!.pfad, bereiche, aktiv: bereiche.some(b => b.aktiv) }];
   });

@@ -63,6 +63,18 @@ describe('sichtbare Arbeitsräume', () => {
     expect(sichtbareRaeume(reg, darf(['webhook:admin']), '/')[0]!.pfad).toBe('/administration/organisation');
   });
 
+  it('Bereiche mit Parametern in der Adresse: aktiv nach Muster (Zielzyklus /ziele/2026, Zielerreichung)', () => {
+    const reg = { bereiche: [
+      { raum: 'ziele' as const, pfad: '/ziele/2027', label: 'Zielzyklus', recht: 'handlungsfeld:read' as const, muster: /^\/ziele\/\d{4}\/?$/ },
+      { raum: 'ziele' as const, pfad: '/ziele/zielerreichung', label: 'Zielerreichung', recht: 'handlungsfeld:read' as const, muster: /^\/ziele\/\d{4}\/zielerreichung\/?$/ },
+    ] };
+    const aktiv = (p: string) => sichtbareRaeume(reg, darf(['handlungsfeld:read']), p)[0]!.bereiche.filter(b => b.aktiv).map(b => b.label);
+    expect(aktiv('/ziele/2026')).toEqual(['Zielzyklus']);
+    expect(aktiv('/ziele/2026/zielerreichung')).toEqual(['Zielerreichung']);
+    expect(aktiv('/ziele/2027/zielerreichung')).toEqual(['Zielerreichung']);
+    expect(aktiv('/ziele/handlungsfelder')).toEqual([]);
+  });
+
   it('Telefon: die ersten drei nach Vorrang unten, die übrigen unter «Mehr»', () => {
     const alle = sichtbareRaeume(REG, darf(['handlungsfeld:read', 'handlungsfeld:write', 'webhook:admin']), '/', VERWALTEN);
     const { unten, mehr } = aufteilenUnten(alle);

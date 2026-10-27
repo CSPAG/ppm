@@ -65,6 +65,10 @@ die Verwalten-Seiten des Baukastens («Benutzer und Rollen») zuerst, dann die B
 - **Zähler (I-N3):** `zaehler` in `src/nav.ts` setzt einen Zähler an einen Arbeitsraum (heute: offene Aufgaben an
   «Eingang» aus `GET /v1/eingang/anzahl`); sichtbar als Zahl, für Bildschirmleser im Namen des Links; neu geladen jede
   Minute und nach jeder Änderung im Eingang.
+- **Bereiche mit Parametern:** `muster` an einem Bereich (z. B. `/ziele/2026`, `/ziele/2026/zielerreichung`) bestimmt, wann
+  er aktiv ist; ohne `muster` gilt der Pfad und alles darunter.
+- **Kopfkarten des Eingangs:** `src/kopfkarten.ts` meldet je Modul Recht und Karte an (Karte als eigener Chunk); der Router
+  gibt die Liste an die Startseite, kein Feature importiert aus `features/eingang`.
 - **Konto:** `konto` in `src/nav.ts` setzt persönliche Seiten ins Kontomenü und unter «Mehr» (heute: Profil und
   Stellvertretung, UI-43).
 

@@ -3,6 +3,8 @@
  * Hauptaktivitäten, Zuordnung Projekt ↔ Ziel.
  */
 import assert from 'node:assert/strict';
+import { aufgabe } from '../../../src/modules/eingang/index.ts';
+import { VERVOLLSTAENDIGEN } from '../../../src/modules/ziel/zyklus-routes.ts';
 import { full, tenant } from '../harness.ts';
 import type { Matrix } from './typ.ts';
 
@@ -60,10 +62,15 @@ export const matrix: Matrix = {
     const ziele = (await call('GET', `/v1/strategische-ziele?q=${encodeURIComponent(mark)}`)).items as { id: string }[];
     assert.equal(ziele.length, 1);
     await call('POST', '/v1/ziele/2026', {});
+    // Die Aufgabe «Jahresziele vervollständigen» entfällt hier wieder: matrix/eingang.ts prüft den Eingang von A genau
+    const t = await tenant(api.t.runtime, 'acme');
+    await full(api.t.runtime, t, async tx => {
+      const id = (await tx.query<{ id: string }>('SELECT id FROM ppm.zieljahr WHERE jahr = 2026')).rows[0]!.id;
+      assert.equal(await aufgabe.entfallen(tx, { art: VERVOLLSTAENDIGEN, bezug: { typ: 'zieljahr', id } }), 1);
+    });
     const jz = await call('POST', '/v1/jahresziele', { jahr: 2026, strategischesZielId: ziele[0]!.id, text: mark, metrik: 'Anzahl' });
     const ha = await call('POST', '/v1/hauptaktivitaeten', { jahreszielId: jz.id, text: mark });
     // Projekt von A ohne Routen des Moduls projekt (Tabelle aus 010)
-    const t = await tenant(api.t.runtime, 'acme');
     const projekt = await full(api.t.runtime, t, async tx => {
       const pf = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'ziel-probe', $2, true) RETURNING id", [t, mark])).rows[0]!.id;
       return (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-901', $2, $3) RETURNING id", [t, mark, pf])).rows[0]!.id;

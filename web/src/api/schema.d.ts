@@ -15633,7 +15633,7 @@ export interface paths {
         put?: never;
         /**
          * Zielzyklus starten
-         * @description Legt das Zieljahr «in Arbeit» an (UC-011 Schritt 1); schon gestartet: 409.
+         * @description Legt das Zieljahr «in Arbeit» an (UC-011 Schritt 1) und öffnet allen mit `ziel:write` die Aufgabe «Jahresziele vervollständigen» mit der geplanten Vorlage als Frist; schon gestartet: 409.
          */
         post: {
             parameters: {

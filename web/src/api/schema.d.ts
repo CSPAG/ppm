@@ -25393,6 +25393,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dashboard der Periode
+         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Schlüssel des Portfolios (I-N5), z. B. `transformation`. */
+                    portfolio?: string;
+                    /** @description Ohne Angabe die letzte abgeschlossene Periode, sonst die laufende. */
+                    periode?: string;
+                    /** @description Darstellung der Oberfläche; die Antwort enthält Liste und Funnel. */
+                    ansicht?: "liste" | "funnel";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Dashboard"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/vertrag": {
         parameters: {
             query?: never;
@@ -30377,6 +30477,63 @@ export interface components {
                 /** Format: date */
                 abschlussBis: string;
             } | null;
+        };
+        DashboardZeile: {
+            /** Format: uuid */
+            projektId: string;
+            nummer: string;
+            name: string;
+            /** Format: uuid */
+            portfolioId: string;
+            /** @description Name des Portfolios. */
+            portfolio: string;
+            handlungsfeld: string | null;
+            projektleitung: string | null;
+            phase: "P0" | "P1" | "P2" | "P3" | "P4";
+            abschlussPer: string | null;
+            naechsterMeilenstein: {
+                termin: string | null;
+                text: string;
+            } | null;
+            status: ("im_plan" | "kritisch") | null;
+            statusVorperiode: ("im_plan" | "kritisch") | null;
+            trend: string | null;
+            meldung: "gemeldet" | "ausstehend" | "nicht_gemeldet" | "ohne_pflicht";
+            werteAus: string | null;
+            /** @description «Eskalation»: Bericht der Periode mit «Entscheid des PRAT nötig» (UC-004 A2.2). */
+            merkmale: "eskalation"[];
+        };
+        FunnelStufe: {
+            phase: "P0" | "P1" | "P2" | "P3" | "P4";
+            anzahl: number;
+            imPlan: number;
+            kritisch: number;
+            /** @description Ohne Status (nicht gemeldet ohne frühere Werte, ohne Pflicht). */
+            ohneStatus: number;
+            /** @description «nicht gemeldet» bzw. «ausstehend». */
+            nichtGemeldet: number;
+        };
+        Dashboard: {
+            periode: string;
+            periodeStand: "offen" | "abgeschlossen";
+            abgeschlossenAt: string | null;
+            /** @description Perioden zur Auswahl, neueste zuerst. */
+            perioden: {
+                periode: string;
+                stand: "offen" | "abgeschlossen";
+            }[];
+            /** @description Portfolios, deren Dashboard die Person sieht (`auswertung:read`). */
+            portfolios: {
+                /** Format: uuid */
+                id: string;
+                schluessel: string;
+                name: string;
+                kategorie: string;
+            }[];
+            portfolio: string | null;
+            /** @description Kritische zuerst, dann nicht gemeldete, sonst nach Nummer. */
+            items: components["schemas"]["DashboardZeile"][];
+            funnel: components["schemas"]["FunnelStufe"][];
         };
         KpiPlan: {
             registerId: string | null;

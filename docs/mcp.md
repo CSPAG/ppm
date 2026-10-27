@@ -36,6 +36,7 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 | `get_projektdaten` | `GET /v1/projekte/{id}/<register>` je Register | `projekt:read` | `readOnlyHint`; Kosten `null` ohne `finanzen:read` |
 | `list_statusberichte` | `GET /v1/projekte/{id}/berichte[/{periode}]` | `projekt:read` | `readOnlyHint`; mit Periode der ganze Bericht |
 | `get_periode` | `GET /v1/perioden/{periode}[/terminabweichungen]` | `statusbericht:review` | `readOnlyHint`; Monatsabschluss bzw. Terminabweichungen |
+| `get_dashboard` | `GET /v1/dashboard` | `auswertung:read` | `readOnlyHint`; optional `portfolio` (Schlüssel), `periode` |
 | `get_auslastung` | `GET /v1/auslastung` | `ressource:read` | `readOnlyHint`; Zeitraum `von`/`bis`, optional `szenario` |
 | `list_sitzungen` | `GET /v1/gremien/{kuerzel}/sitzungen` | `sitzung:read` | `readOnlyHint` |
 | `get_sitzung` | `GET /v1/sitzungen/{id}` | `sitzung:read` | `readOnlyHint` |

@@ -13407,6 +13407,339 @@
           }
         }
       },
+      "VertragPruefung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "versionId",
+          "nummer",
+          "stand",
+          "version",
+          "qualityChecks",
+          "unterzeichnung",
+          "can"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "in_arbeit",
+              "in_pruefung",
+              "zur_unterzeichnung",
+              "unterzeichnet",
+              "traktandiert",
+              "abgenommen",
+              "abgelehnt",
+              "verworfen",
+              "zurueckgezogen"
+            ],
+            "description": "Bearbeitungsstand der Version."
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Version der Vertragsversion (ETag für die Übergänge).",
+            "type": "integer"
+          },
+          "qualityChecks": {
+            "description": "Quality-Checks, neueste zuerst.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "ergebnis",
+                "kommentare",
+                "at",
+                "personId"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "ergebnis": {
+                  "type": "string",
+                  "enum": [
+                    "bestaetigt",
+                    "rueckmeldung"
+                  ],
+                  "description": "Ergebnis."
+                },
+                "kommentare": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "kapitel",
+                      "text"
+                    ],
+                    "properties": {
+                      "kapitel": {
+                        "minimum": 1,
+                        "maximum": 13,
+                        "description": "Kapitel des Projektvertrags (Q7).",
+                        "type": "integer"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "maxLength": 2000,
+                        "pattern": "\\S",
+                        "description": "Rückmeldung zum Kapitel.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "personId": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "unterzeichnung": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Laufender bzw. letzter Durchgang der Unterschriften nach einem bestätigten Quality-Check; null ohne Durchgang.",
+                "type": "object",
+                "required": [
+                  "qualityCheckId",
+                  "anzahl",
+                  "vollstaendig",
+                  "funktionen"
+                ],
+                "properties": {
+                  "qualityCheckId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "anzahl": {
+                    "minimum": 0,
+                    "description": "Unterzeichnete Funktionen («2 von 3»).",
+                    "type": "integer"
+                  },
+                  "vollstaendig": {
+                    "type": "boolean"
+                  },
+                  "funktionen": {
+                    "type": "array",
+                    "items": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "funktion",
+                        "personen",
+                        "unterschrift"
+                      ],
+                      "properties": {
+                        "funktion": {
+                          "type": "string",
+                          "enum": [
+                            "sp",
+                            "pl",
+                            "ctl"
+                          ],
+                          "description": "Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10)."
+                        },
+                        "personen": {
+                          "description": "Inhaber der Funktion in der Projektorganisation.",
+                          "type": "array",
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "unterschrift": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "type": "object",
+                              "required": [
+                                "personId",
+                                "inVertretungVon",
+                                "ergebnis",
+                                "begruendung",
+                                "at"
+                              ],
+                              "properties": {
+                                "personId": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "inVertretungVon": {
+                                  "anyOf": [
+                                    {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "ergebnis": {
+                                  "type": "string",
+                                  "enum": [
+                                    "unterzeichnet",
+                                    "verweigert"
+                                  ],
+                                  "description": "Ergebnis."
+                                },
+                                "begruendung": {
+                                  "type": "string"
+                                },
+                                "at": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              }
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "qualityCheck",
+              "unterzeichnen"
+            ],
+            "properties": {
+              "qualityCheck": {
+                "description": "Quality-Check erfassen (in Prüfung, vertrag:review).",
+                "type": "boolean"
+              },
+              "unterzeichnen": {
+                "description": "Funktionen, die die Person jetzt unterzeichnen kann (eigene oder in Vertretung, A-31).",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "funktion",
+                    "inVertretungVon"
+                  ],
+                  "properties": {
+                    "funktion": {
+                      "type": "string",
+                      "enum": [
+                        "sp",
+                        "pl",
+                        "ctl"
+                      ],
+                      "description": "Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10)."
+                    },
+                    "inVertretungVon": {
+                      "anyOf": [
+                        {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "VertragQualityCheckIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ergebnis"
+        ],
+        "properties": {
+          "ergebnis": {
+            "type": "string",
+            "enum": [
+              "bestaetigt",
+              "rueckmeldung"
+            ],
+            "description": "`bestaetigt`: weiter zur Unterzeichnung (UC-002 Schritt 9). `rueckmeldung`: zurück an die Projektleitung (UC-002 A5), mindestens ein Kommentar."
+          },
+          "kommentare": {
+            "maxItems": 13,
+            "description": "Höchstens ein Kommentar je Kapitel.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "text"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "description": "Kapitel des Projektvertrags (Q7).",
+                  "type": "integer"
+                },
+                "text": {
+                  "minLength": 1,
+                  "maxLength": 2000,
+                  "pattern": "\\S",
+                  "description": "Rückmeldung zum Kapitel.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "VertragUnterschriftIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ergebnis"
+        ],
+        "properties": {
+          "ergebnis": {
+            "type": "string",
+            "enum": [
+              "unterzeichnet",
+              "verweigert"
+            ],
+            "description": "`unterzeichnet` (protokollierter Klick, A-31) oder `verweigert` mit Begründung (UC-003 A5)."
+          },
+          "begruendung": {
+            "maxLength": 2000,
+            "description": "Pflicht beim Verweigern: Die Projektleitung erfährt sonst nicht, was zu ändern ist.",
+            "type": "string"
+          }
+        }
+      },
       "IdeeRueckfrage": {
         "additionalProperties": false,
         "type": "object",
@@ -47081,6 +47414,390 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VertragVersionDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/pruefung": {
+      "get": {
+        "summary": "Quality-Check und Unterschriften",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Quality-Checks mit Kommentar je Kapitel und der Stand der Unterschriften («2 von 3», K2 Schritt 8); `can.unterzeichnen` nennt die Funktionen, die die Person jetzt unterzeichnen kann (eigene oder in Vertretung mit Recht auf Unterschriften, A-31).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragPruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/quality-check": {
+      "post": {
+        "summary": "Quality-Check erfassen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Sponsor, Projektleitung und CTL erhalten je eine Aufgabe (UC-002 Schritt 9); fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). `If-Match` = Version der Vertragsversion.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragQualityCheckIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragPruefung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/unterschriften": {
+      "post": {
+        "summary": "Unterzeichnen oder verweigern",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (SP, PL, CTL), die sie innehat oder in Vertretung mit Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragUnterschriftIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragPruefung"
                 }
               }
             }

@@ -52,9 +52,9 @@ test('Sitzung durchführen: Entscheid in ≤ 60 s, schliessen, Protokoll versend
   await page.getByRole('radio', { name: 'Mit Auflagen freigegeben' }).check();
   await page.getByLabel('Begründung').fill('Business Case überzeugt, Termin knapp');
   await page.getByRole('button', { name: 'Auflage hinzufügen' }).click();
-  await page.getByLabel('Auflage 1').fill('Risikoplan nachreichen');
-  await page.getByLabel('Termin').fill(mittwochIn(70));
-  const wer = page.getByLabel('Verantwortlich');
+  await page.getByLabel('Auflage 1', { exact: true }).fill('Risikoplan nachreichen');
+  await page.getByLabel('Termin', { exact: true }).fill(mittwochIn(70));
+  const wer = page.getByLabel('Verantwortlich', { exact: true });
   if (!(await wer.inputValue())) await wer.selectOption({ index: 1 });
   await expect(page.getByText(/Die Folge wird sofort nachgeführt\./)).toBeVisible();
   await page.getByRole('button', { name: 'Entscheid erfassen' }).click();

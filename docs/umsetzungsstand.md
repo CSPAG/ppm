@@ -66,7 +66,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
 | ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
 | ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | umgesetzt (API und Oberfläche UI-38) | #28, #49 |
-| ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | teilweise (UC-012 Schritte 1–2; Aufgabe im Eingang folgt in PR 2) | #37 |
+| ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | teilweise (UC-012 Schritte 1–2; Aufgabe «Zielerreichung erfassen» im Eingang in Arbeit, PR 2) | #37 |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
 | DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | umgesetzt | #36, #50 |

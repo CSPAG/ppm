@@ -15,6 +15,7 @@ export const MATRIX = sammle([
   (await import('./ziel-zyklus.ts')).matrix,
   (await import('./sitzung.ts')).matrix,
   (await import('./ziel-erreichung.ts')).matrix,
+  (await import('./sitzung-entscheid.ts')).matrix,
   (await import('./statusbericht.ts')).matrix,
   (await import('./monatsabschluss.ts')).matrix,
   (await import('./ressource.ts')).matrix,

@@ -23623,6 +23623,1373 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sitzungen/{id}/entscheide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sitzungsmodus: Traktanden mit Entscheiden
+         * @description Je Traktandum Antrag, Optionen der Art (K3 Schritt 8) und erfasster Entscheid mit Auflagen und Verlauf; Zahl der Traktanden ohne Entscheid für «Sitzung schliessen». Mitglieder ab Versand.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Sitzungsmodus"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sitzungen/{id}/starten": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sitzung starten
+         * @description Schaltet in den Sitzungsmodus (K3 Schritt 7); erst danach lassen sich Entscheide erfassen. Nur nach dem Versand der Unterlagen und mit `If-Match`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Sitzungsmodus"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sitzungen/{id}/schliessen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sitzung schliessen
+         * @description UC-006 Schritt 8: erzeugt den Protokollentwurf, schlägt Traktanden ohne Entscheid und zurückgestellte Geschäfte für die nächste Sitzung vor, legt Auflagen als Aufgaben in den Eingang der Verantwortlichen, öffnet «Protokoll versenden» (3 Arbeitstage) und benachrichtigt PL, SP und Verantwortliche gebündelt je Person (I-B3). Danach sind die Entscheide fest (A-30). Nur mit `If-Match`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SitzungGeschlossen"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/traktanden/{id}/entscheid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Entscheid lesen
+         * @description Entscheid mit Auflagen und Verlauf (A-30); 404, solange keiner erfasst ist.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Entscheid"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        /**
+         * Entscheid erfassen oder korrigieren
+         * @description UC-006 Schritt 7, A3, A4 in der laufenden Sitzung: Ergebnis aus den Optionen der Art, Begründung (Pflicht), Auflagen mit Text, Termin und Verantwortlichen (bei «Mit Auflagen» mindestens eine), Weiterleitung an den VR. Die Folge der Art läuft sofort in derselben Transaktion; bei «via SNS-VR» ist der Entscheid eine Stellungnahme und die Folge kommt mit dem SNS-VR (A1). Korrektur mit `If-Match` (Version des Entscheids) bis zum Schliessen (A-30).
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EntscheidPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Entscheid"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/traktanden/{id}/entscheid/sns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Entscheid des SNS-VR nachtragen
+         * @description UC-006 A1 (K02 Vorschlag, A-02): Die UE erfasst den Entscheid des SNS-VR zur Stellungnahme des Gremiums, nach dem Schliessen der Sitzung und einmal. Jetzt läuft die Folge der Art; PL und SP werden informiert. Nur mit `If-Match` (Version des Entscheids).
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SnsEntscheidPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Entscheid"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/entscheide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Entscheide und Auflagen
+         * @description Entscheide der Gremien, die die Person sieht, neueste Sitzung zuerst; Filter Projekt, Gremium, Weiterleitung an den VR (UC-006 A4) und offene Auflagen. Cursor-Paginierung.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    projektId?: string;
+                    /** @description Kürzel des Gremiums. */
+                    gremium?: string;
+                    /** @description Nur an den VR weitergeleitete (UC-006 A4) bzw. nicht weitergeleitete. */
+                    anVr?: boolean;
+                    /** @description Nur Entscheide mit offenen Auflagen. */
+                    auflagen?: "offen";
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EntscheidList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auflagen/{id}/erfuellen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Auflage erledigt melden
+         * @description Die verantwortliche Person (oder ihre Vertretung, sonst sitzung:write) meldet die Auflage erfüllt (UC-006 A3); die Aufgabe im Eingang ist erledigt. Wiederholt ohne Wirkung.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Auflage"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sitzungen/{id}/protokoll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Protokoll lesen
+         * @description Protokoll mit Traktanden, Entscheiden, Begründungen und Auflagen (UC-006 Schritt 8) und Frist (3 Arbeitstage, Q8 Kap. 8.1). Entwurf nur mit sitzung:write, Mitglieder ab Versand; 404, solange die Sitzung nicht geschlossen ist.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Protokoll"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        /**
+         * Protokoll bereinigen
+         * @description K3 Schritt 10: Anwesende, Notizen je Traktandum und Bemerkungen (automatisches Speichern); Entscheide bleiben unverändert (A-30). Nur im Entwurf und mit `If-Match`.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProtokollPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Protokoll"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sitzungen/{id}/protokoll/versand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vorschau des Protokollversands
+         * @description Empfänger (K3 Schritt 10) und Frist: Beteiligte erhalten eine Mitteilung, Mitglieder sehen das Protokoll ab Versand.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Vorschau der Empfänger (K3 Schritt 10): Mitglieder des Gremiums (sitzung:read am Portfolio) sehen das Protokoll ab Versand, Beteiligte erhalten eine Mitteilung. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Protokollversand"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sitzungen/{id}/protokoll/versenden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Protokoll versenden
+         * @description UC-006 Schritt 9: Mitglieder sehen das Protokoll, Beteiligte erhalten eine Mitteilung, «Protokoll versenden» ist erledigt; protokolliert mit Arbeitstagen nach der Sitzung (K3-4). Nur mit `If-Match` (Version des Protokolls).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Protokoll"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/berichte": {
         parameters: {
             query?: never;
@@ -30183,6 +31550,349 @@ export interface components {
                 stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
                 traktanden: number;
                 versandBis: string | null;
+            }[];
+        };
+        EntscheidErgebnis: {
+            schluessel: string;
+            label: string;
+        };
+        Auflage: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            entscheidId: string;
+            text: string;
+            verantwortlich: {
+                /** Format: uuid */
+                id: string;
+                name: string | null;
+            };
+            /**
+             * @description Datum (JJJJ-MM-TT).
+             * @example 2026-11-12
+             */
+            termin: string;
+            /**
+             * @description Offen oder erfüllt (von der verantwortlichen Person gemeldet).
+             * @enum {string}
+             */
+            stand: "offen" | "erfuellt";
+            erfuelltAt: string | null;
+            can: {
+                /** @description Erledigt melden (verantwortliche Person, Vertretung oder sitzung:write). */
+                erfuellen: boolean;
+            };
+        };
+        Entscheid: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            traktandumId: string;
+            /** Format: uuid */
+            sitzungId: string;
+            ergebnis: string;
+            /** @description Bezeichnung des Ergebnisses, z. B. «Mit Auflagen freigegeben». */
+            label: string;
+            begruendung: string;
+            /** @description «via SNS-VR»: Der Entscheid des Gremiums ist eine Stellungnahme; er gilt erst mit dem SNS-VR (UC-006 A1). */
+            stellungnahme: boolean;
+            /** @description An den VR weitergeleitet: im nächsten Quartalsreporting (UC-006 A4). */
+            anVr: boolean;
+            /** @description Entscheid des SNS-VR; null, solange ausstehend oder nicht nötig. */
+            sns: {
+                ergebnis: string;
+                label: string;
+                begruendung: string;
+                /** Format: date-time */
+                erfasstAt: string;
+            } | null;
+            /** Format: date-time */
+            erfasstAt: string;
+            erfasstVon: string | null;
+            auflagen: components["schemas"]["Auflage"][];
+            version: number;
+            /** @description Erfassung und Korrekturen (A-30). */
+            verlauf: {
+                version: number;
+                ergebnis: string;
+                label: string;
+                begruendung: string;
+                anVr: boolean;
+                snsErgebnis: string | null;
+                /** Format: date-time */
+                at: string;
+                von: string | null;
+            }[];
+            can: {
+                /** @description Korrektur bis zum Schliessen der Sitzung (A-30). */
+                korrigieren: boolean;
+                /** @description Entscheid des SNS-VR nachtragen (nach dem Schliessen, A-02). */
+                snsErfassen: boolean;
+            };
+        };
+        EntscheidPut: {
+            /**
+             * @description Schlüssel des Ergebnisses aus den Optionen der Art (K3 Schritt 8).
+             * @example freigegeben
+             */
+            ergebnis: string;
+            /** @description Begründung (Pflicht, UC-006 Schritt 7); erscheint im Protokoll und beim Projekt. */
+            begruendung: string;
+            /** @description An den VR weiterleiten (UC-006 A4). */
+            anVr?: boolean;
+            /** @description Auflagen mit Text, Termin und Verantwortlichen (A3); ersetzt die bisherigen. */
+            auflagen?: {
+                text: string;
+                /** Format: uuid */
+                verantwortlich: string;
+                /**
+                 * @description Datum (JJJJ-MM-TT).
+                 * @example 2026-11-12
+                 */
+                termin: string;
+            }[];
+        };
+        SnsEntscheidPut: {
+            /**
+             * @description Schlüssel des Ergebnisses aus den Optionen der Art (K3 Schritt 8).
+             * @example freigegeben
+             */
+            ergebnis: string;
+            /** @description Begründung (Pflicht, UC-006 Schritt 7); erscheint im Protokoll und beim Projekt. */
+            begruendung: string;
+        };
+        Sitzungsmodus: {
+            /** Format: uuid */
+            sitzungId: string;
+            gremium: {
+                kuerzel: string;
+                name: string;
+            };
+            /**
+             * @description Datum (JJJJ-MM-TT).
+             * @example 2026-11-12
+             */
+            datum: string;
+            /**
+             * @description Bearbeitungsstand der Sitzung.
+             * @enum {string}
+             */
+            stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
+            geschlossenAt: string | null;
+            /** @description Version der Sitzung (If-Match für Starten und Schliessen). */
+            version: number;
+            traktanden: {
+                /** Format: uuid */
+                traktandumId: string;
+                position: number | null;
+                /**
+                 * @description Art des Traktandums (fachmodell.md 2.9).
+                 * @enum {string}
+                 */
+                art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
+                artLabel: string;
+                titel: string;
+                antrag: string;
+                projekt: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    name: string;
+                } | null;
+                viaSns: boolean;
+                vertraulich: boolean;
+                /** @description Ergebnisse der Art; leer = Kenntnisnahme ohne Entscheid. */
+                optionen: components["schemas"]["EntscheidErgebnis"][];
+                entscheid: components["schemas"]["Entscheid"] | null;
+            }[];
+            /** @description Traktanden ohne Entscheid: werden beim Schliessen für die nächste Sitzung vorgeschlagen (K3 Schritt 9). */
+            ohneEntscheid: number;
+            /** @description Was die Person jetzt darf (sitzung:write und Stand). */
+            can: {
+                starten: boolean;
+                erfassen: boolean;
+                schliessen: boolean;
+            };
+        };
+        SitzungGeschlossen: {
+            /** @description Traktanden ohne Entscheid, für die nächste Sitzung vorgeschlagen. */
+            nichtBehandelt: number;
+            /** @description Zurückgestellte Geschäfte, für eine Folgesitzung vorgeschlagen (A3). */
+            zurueckgestellt: number;
+            /** @description Auflagen, die Aufgaben im Eingang wurden. */
+            auflagen: number;
+            /** @description Personen mit gebündelter Mitteilung (I-B3). */
+            benachrichtigt: number;
+            sitzung: components["schemas"]["Sitzungsmodus"];
+        };
+        EntscheidEintrag: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            traktandumId: string;
+            /** Format: uuid */
+            sitzungId: string;
+            ergebnis: string;
+            /** @description Bezeichnung des Ergebnisses, z. B. «Mit Auflagen freigegeben». */
+            label: string;
+            begruendung: string;
+            /** @description «via SNS-VR»: Der Entscheid des Gremiums ist eine Stellungnahme; er gilt erst mit dem SNS-VR (UC-006 A1). */
+            stellungnahme: boolean;
+            /** @description An den VR weitergeleitet: im nächsten Quartalsreporting (UC-006 A4). */
+            anVr: boolean;
+            /** @description Entscheid des SNS-VR; null, solange ausstehend oder nicht nötig. */
+            sns: {
+                ergebnis: string;
+                label: string;
+                begruendung: string;
+                /** Format: date-time */
+                erfasstAt: string;
+            } | null;
+            /** Format: date-time */
+            erfasstAt: string;
+            erfasstVon: string | null;
+            auflagen: components["schemas"]["Auflage"][];
+            version: number;
+            traktandum: {
+                /** Format: uuid */
+                id: string;
+                /**
+                 * @description Art des Traktandums (fachmodell.md 2.9).
+                 * @enum {string}
+                 */
+                art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
+                artLabel: string;
+                titel: string;
+                antrag: string;
+                viaSns: boolean;
+            };
+            projekt: {
+                /** Format: uuid */
+                id: string;
+                nummer: string;
+                name: string;
+            } | null;
+            sitzung: {
+                /** Format: uuid */
+                id: string;
+                /**
+                 * @description Datum (JJJJ-MM-TT).
+                 * @example 2026-11-12
+                 */
+                datum: string;
+                gremium: {
+                    kuerzel: string;
+                    name: string;
+                };
+            };
+        };
+        EntscheidList: {
+            items: components["schemas"]["EntscheidEintrag"][];
+            nextCursor: string | null;
+        };
+        Protokollfrist: {
+            /** @description Versand spätestens (Q8 Kap. 8.1, A-27); ohne Phasenmodell in Kraft null. */
+            bis: string | null;
+            /** @description Arbeitstage bis zur Frist, negativ wenn überschritten. */
+            restArbeitstage: number | null;
+            /** @description Arbeitstage zwischen Sitzung und Versand bzw. heute (K3-4). */
+            nachSitzung: number;
+            eingehalten: boolean;
+        };
+        Protokoll: {
+            /** Format: uuid */
+            sitzungId: string;
+            /**
+             * @description Entwurf oder versendet.
+             * @enum {string}
+             */
+            stand: "entwurf" | "versendet";
+            inhalt: {
+                kopf: {
+                    gremium: {
+                        kuerzel: string;
+                        name: string;
+                    };
+                    /**
+                     * @description Datum (JJJJ-MM-TT).
+                     * @example 2026-11-12
+                     */
+                    datum: string;
+                    beginn: string | null;
+                    ort: string;
+                };
+                anwesende: string;
+                traktanden: {
+                    /** Format: uuid */
+                    traktandumId: string;
+                    position: number | null;
+                    /**
+                     * @description Art des Traktandums (fachmodell.md 2.9).
+                     * @enum {string}
+                     */
+                    art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
+                    artLabel: string;
+                    titel: string;
+                    antrag: string;
+                    projekt: {
+                        nummer: string;
+                        name: string;
+                    } | null;
+                    vertraulich: boolean;
+                    viaSns: boolean;
+                    /**
+                     * @description Entschieden, zur Kenntnis genommen oder nicht behandelt (für die nächste Sitzung vorgeschlagen).
+                     * @enum {string}
+                     */
+                    behandlung: "entschieden" | "kenntnisnahme" | "nicht_behandelt";
+                    entscheid: {
+                        ergebnis: string;
+                        label: string;
+                        begruendung: string;
+                        stellungnahme: boolean;
+                        anVr: boolean;
+                        auflagen: {
+                            text: string;
+                            verantwortlich: string | null;
+                            /**
+                             * @description Datum (JJJJ-MM-TT).
+                             * @example 2026-11-12
+                             */
+                            termin: string;
+                        }[];
+                    } | null;
+                    /** @description Diskussion in Kürze, von der UE ergänzt. */
+                    notiz: string;
+                }[];
+                bemerkungen: string;
+            };
+            frist: components["schemas"]["Protokollfrist"];
+            versendetAt: string | null;
+            version: number;
+            /** Format: date-time */
+            updatedAt: string;
+            can: {
+                /** @description Bereinigen und versenden (sitzung:write, solange Entwurf). */
+                write: boolean;
+            };
+        };
+        ProtokollPut: {
+            anwesende?: string;
+            bemerkungen?: string;
+            notizen?: {
+                /** Format: uuid */
+                traktandumId: string;
+                notiz: string;
+            }[];
+        };
+        /** @description Vorschau der Empfänger (K3 Schritt 10): Mitglieder des Gremiums (sitzung:read am Portfolio) sehen das Protokoll ab Versand, Beteiligte erhalten eine Mitteilung. */
+        Protokollversand: {
+            frist: components["schemas"]["Protokollfrist"];
+            /** @description Erhalten eine Mitteilung: Eingeladene, PL und SP der entschiedenen Geschäfte, Verantwortliche von Auflagen. */
+            beteiligte: {
+                /** Format: uuid */
+                personId: string;
+                name: string | null;
             }[];
         };
         /** @description Beurteilung der Abweichung je Dimension. */

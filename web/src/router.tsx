@@ -4,7 +4,7 @@
  */
 import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
-import { useCallback } from 'react';
+import { lazy, Suspense, useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
@@ -12,6 +12,7 @@ import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts'
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { priorisierungPfad, type SetBewertungSearch, type SetModellSearch } from './features/priorisierung/index.ts';
 import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -21,6 +22,7 @@ import { type SetKontoSearch, StellvertretungPage } from './features/konto/index
 import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
+import { Loading } from './ui/index.ts';
 
 const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
 
@@ -206,6 +208,43 @@ function KapazitaetRoute() {
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Arbeitsraum «Portfolio» › Priorisierung: Bewertung (UI-20) und Modell (UI-19) (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1);
+// Arbeitsflächen bei Bedarf nachgeladen (Q-L6)
+const priorisierungSeiten = () => import('./features/priorisierung/seiten.ts');
+const BewertungPage = lazy(() => priorisierungSeiten().then(m => ({ default: m.BewertungPage })));
+const ModellPage = lazy(() => priorisierungSeiten().then(m => ({ default: m.ModellPage })));
+
+const priorisierungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/priorisierung',
+  beforeLoad: () => { throw redirect({ to: priorisierungPfad.bewertung, replace: true }); },
+});
+
+const bewertungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.bewertung, validateSearch: searchOf.bewertung, component: BewertungRoute,
+});
+
+function BewertungRoute() {
+  const search = bewertungRoute.useSearch();
+  const navigate = useNavigate({ from: bewertungRoute.fullPath });
+  const setSearch = useCallback<SetBewertungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <Suspense fallback={<Loading />}><BewertungPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} /></Suspense>;
+}
+
+const modellRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.modell, validateSearch: searchOf.bewertungsmodell, component: ModellRoute,
+});
+
+function ModellRoute() {
+  const search = modellRoute.useSearch();
+  const navigate = useNavigate({ from: modellRoute.fullPath });
+  const setSearch = useCallback<SetModellSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <Suspense fallback={<Loading />}><ModellPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} /></Suspense>;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -336,6 +375,9 @@ const routeTree = rootRoute.addChildren([
   ressourcenRoute,
   auslastungRoute,
   kapazitaetRoute,
+  priorisierungRoute,
+  bewertungRoute,
+  modellRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

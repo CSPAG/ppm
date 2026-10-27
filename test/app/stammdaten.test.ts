@@ -187,6 +187,13 @@ describe('Stammdaten', { skip }, () => {
     assert.equal((await call('POST', '/v1/feiertage', leser, { datum: '2026-08-01', label: 'Bundesfeier' })).statusCode, 403);
   });
 
+  test('Datenbank: Codewerte weder löschen noch Schlüssel ändern (UC-017 Schritt 2), auch mit voller Sicht', async () => {
+    await assert.rejects(full(api.t.runtime, tenantId, tx => tx.query('DELETE FROM ppm.codewert')), /permission denied/);
+    await assert.rejects(full(api.t.runtime, tenantId, tx => tx.query("UPDATE ppm.codewert SET schluessel = 'anders'")), /permission denied/);
+    await assert.rejects(full(api.t.runtime, tenantId, tx => tx.query("UPDATE ppm.codewert SET codetabelle = 'trend'")), /permission denied/);
+    assert.ok(await full(api.t.runtime, tenantId, async tx => (await tx.query("UPDATE ppm.codewert SET label = label WHERE codetabelle = 'trend'")).rowCount ?? 0) >= 1);
+  });
+
   test('Audit und Ereignis in derselben Transaktion', async () => {
     const c = await call('POST', '/v1/feiertage', { ...adm, 'x-request-id': 'req-ft' }, { datum: '2026-08-01', label: 'Bundesfeier' });
     assert.equal(c.statusCode, 201);

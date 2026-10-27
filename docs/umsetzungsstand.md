@@ -12,8 +12,8 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 |---|---|---|---|---|---|
 | S1 | Bauplan: fachmodell.md und umsetzungsstand.md | – | umgesetzt | #11 | A-01–A-47 festgelegt |
 | AP-E0-0 | Webapp-Fundament und Navigation (Session S2) | – | in Arbeit (S2) | – | – |
-| AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | offen | – | – |
-| AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | offen | – | – |
+| AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
+| AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | in Arbeit (PR 1 Tabellen und API; PR 2 Oberfläche UI-44, UI-45 folgt) | – | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | offen | – | – |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | offen | – | – |
@@ -142,8 +142,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
 | AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | offen | – |
-| AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | offen | – |
-| AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | offen | – |
+| AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
+| AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | offen | – |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | offen | – |
 | AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | offen | – |

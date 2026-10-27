@@ -6,6 +6,7 @@
  */
 import { join } from 'node:path';
 import { defineApp } from '@vollholz/platform';
+import { eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
@@ -19,7 +20,8 @@ export const MIGRATIONS_DIR = join(import.meta.dirname, '..', 'db', 'migrations'
 
 export const app = defineApp({
   platform,
-  modules: [stammdatenModule, handlungsfeldModule, phasenmodellModule, portfolioModule, projektModule, zielModule, webhooksModule],
+  modules: [eingangModule, stammdatenModule, handlungsfeldModule, phasenmodellModule, portfolioModule, projektModule, zielModule, webhooksModule],
+  people: { permissions: ['handlungsfeld:read', 'projekt:read'] },
   // Warteschlange, Idempotenz und Outbox: platform_001_core.sql des Pakets, vor den Migrationen der App
   migrations: { dir: MIGRATIONS_DIR },
 });

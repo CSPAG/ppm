@@ -18,7 +18,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | in Arbeit | – | A-04, A-34, A-47 |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | in Arbeit (PR 1: 050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»; PR 2: Oberfläche UI-47) | – | A-02, A-07, A-08, A-23, A-45 |
 | AP-E0-6 | Register Projektdaten | 060–069 | offen | – | – |
-| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | offen | – | – |
+| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | in Arbeit (PR 1 Backend) | – | A-31, A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | PR 1 umgesetzt (080, Modul `ziel`, `list_ziele`); PR 2 Oberfläche in Arbeit | #13 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | offen | – | – |
@@ -141,7 +141,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | offen | – |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
-| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | offen | – |
+| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit | – |
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |

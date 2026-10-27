@@ -33,7 +33,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | offen | – | – |
-| AP-E4-1 | Projektidee einreichen | 220–229 | offen | – | – |
+| AP-E4-1 | Projektidee einreichen | 220–229 | in Arbeit (PR 1 Tabellen und API: 220, Modul `idee`, `list_ideen`, `get_idee`; PR 2 Oberfläche Assistent und Meine Ideen folgt) | – | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | offen | – | – |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | offen | – | – |
@@ -41,7 +41,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | offen | – | – |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
-| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | offen | – | – |
+| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Oberfläche UI-38 und Aufgabe «Jahresziele vervollständigen» folgt) | – | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1 |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
 | AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
@@ -62,14 +62,14 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 |---|---|---|---|---|---|---|
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
 | ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
-| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | offen | – |
+| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
-| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | offen | – |
-| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | offen | – |
+| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
+| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
-| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | offen | – |
+| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | API in Arbeit, Oberfläche folgt | – |
 | DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | offen | – |
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | offen | – |
@@ -86,7 +86,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | offen | – |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | offen | – |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus in Arbeit (AP-E6-1); aus Vertrag Kap. 2 offen (AP-E3-1) | – |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |

@@ -9,6 +9,7 @@ export const MATRIX = sammle([
   (await import('./portfolio.ts')).matrix,
   (await import('./projekt.ts')).matrix,
   (await import('./ziel.ts')).matrix,
+  (await import('./ziel-zyklus.ts')).matrix,
   (await import('./idee.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
 ]);

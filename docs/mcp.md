@@ -30,6 +30,8 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 |---|---|---|---|
 | `list_handlungsfelder` | `GET /v1/handlungsfelder` | `handlungsfeld:read` | `readOnlyHint` |
 | `get_handlungsfeld` | `GET /v1/handlungsfelder/{id}` | `handlungsfeld:read` | `readOnlyHint` |
+| `list_projekte` | `GET /v1/projekte` | `projekt:read` | `readOnlyHint` |
+| `get_projekt` | `GET /v1/projekte/{id}` und `…/organisation` | `projekt:read` | `readOnlyHint` |
 
 Neues Werkzeug: im Modell unter `mcpTools` eintragen (Titel, Recht, `readOnly`), in `mcp/tools.ts` als Aufruf der
 REST-API umsetzen; nie direkt auf Module oder die Datenbank zugreifen.

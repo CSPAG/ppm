@@ -198,6 +198,13 @@ export const model = defineModel({
     // handlungsfeld
     list_handlungsfelder: { title: 'Handlungsfelder auflisten', permission: 'handlungsfeld:read', readOnly: true },
     get_handlungsfeld: { title: 'Handlungsfeld lesen', permission: 'handlungsfeld:read', readOnly: true },
+    // projekt
+    list_projekte: { title: 'Projekte auflisten', permission: 'projekt:read', readOnly: true },
+    get_projekt: { title: 'Projekt lesen', permission: 'projekt:read', readOnly: true },
+  },
+  capabilities: {
+    // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)
+    projekt: { write: 'projekt:write', organisation: 'projekt:organisation' },
   },
   features: { audit: true },
 });

@@ -71,7 +71,7 @@ export const matrix: Matrix = {
   },
   unchanged: async (api, a, mark) => {
     const get = async (url: string) => (await api.app.inject({ method: 'GET', url, headers: a })).json();
-    // nur das Portfolio dieser Matrix (andere Module legen eigene Portfolios an, z. B. projekt)
+    // nur das eigene Portfolio (andere Module legen für ihre Daten ebenfalls Portfolios an)
     const p = (await get('/v1/portfolios')).items.filter((x: { schluessel: string }) => x.schluessel === 'geheim-a');
     assert.deepEqual(p.map((x: { name: string; version: number }) => [x.name, x.version]), [[mark, 2]]);
     const g = (await get(`/v1/gremien?portfolio=${p[0].id}`)).items;

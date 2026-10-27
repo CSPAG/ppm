@@ -3,15 +3,17 @@
  * Feature; hier werden sie den Routen zugeordnet.
  */
 import { validateEingangSearch } from './features/eingang/index.ts';
-import { validateHandlungsfeldSearch, type HandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { validateProjekteSearch, type ProjekteSearch } from './features/projekt/index.ts';
+import { type HandlungsfeldSearch, validateHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { type ProjekteSearch, validateProjekteSearch } from './features/projekt/index.ts';
 import { validateIdeeNeuSearch, validateIdeeSearch } from './features/idee/index.ts';
-import { validatePhasenmodellSearch, type PhasenmodellSearch } from './features/phasenmodell/index.ts';
-import { validatePortfoliosSearch, type PortfoliosSearch } from './features/portfolios/index.ts';
-import { validateSitzungSearch, type SitzungSearch } from './features/sitzung/index.ts';
+import { type AuslastungSearch, type KapazitaetSearch, validateAuslastungSearch, validateKapazitaetSearch } from './features/ressourcen/index.ts';
+import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
+import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
+import { type PortfoliosSearch, validatePortfoliosSearch } from './features/portfolios/index.ts';
+import { type SitzungSearch, validateSitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
-import { validateZielSearch, validateZielzyklusSearch, type ZielSearch, type ZielzyklusSearch } from './features/ziele/index.ts';
+import { validateZielerreichungSearch, validateZielSearch, validateZielzyklusSearch, type ZielerreichungSearch, type ZielSearch, type ZielzyklusSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
   eingang: validateEingangSearch,
@@ -22,6 +24,10 @@ export const searchOf = {
   zielzyklus: validateZielzyklusSearch,
   ideeNeu: validateIdeeNeuSearch,
   idee: validateIdeeSearch,
+  zielerreichung: validateZielerreichungSearch,
+  auslastung: validateAuslastungSearch,
+  kapazitaet: validateKapazitaetSearch,
+  monatsabschluss: validateMonatsabschlussSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,
   phasenmodell: validatePhasenmodellSearch,
@@ -29,4 +35,4 @@ export const searchOf = {
   sitzung: validateSitzungSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { HandlungsfeldSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, SitzungSearch, ZielSearch, ZielzyklusSearch };
+export type { AuslastungSearch, HandlungsfeldSearch, KapazitaetSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, SitzungSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };

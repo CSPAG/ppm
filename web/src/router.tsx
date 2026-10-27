@@ -10,13 +10,15 @@ import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
+import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
+import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
-import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
+import { type SetSitzungSearch, SitzungenPage, SitzungPage } from './features/sitzung/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
-import { StellvertretungPage, type SetKontoSearch } from './features/konto/index.ts';
-import { ZIELJAHR, ZielePage, ZielzyklusPage, type SetZielSearch, type SetZielzyklusSearch } from './features/ziele/index.ts';
+import { type SetKontoSearch, StellvertretungPage } from './features/konto/index.ts';
+import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -145,6 +147,79 @@ function IdeeRoute() {
   return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
+// Zielerreichung je Quartal (UI-40, BC ZM.03.01, AP-E6-3): /ziele/2026/zielerreichung?quartal=q3; ohne Jahr und Quartal
+// das zuletzt abgeschlossene Quartal
+const zielerreichungStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/zielerreichung',
+  beforeLoad: () => {
+    const q = abgeschlossenesQuartal();
+    throw redirect({ to: '/ziele/$jahr/zielerreichung', params: { jahr: String(q.jahr) }, search: { quartal: `q${q.quartal}` }, replace: true });
+  },
+});
+
+const zielerreichungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/zielerreichung', validateSearch: searchOf.zielerreichung, component: ZielerreichungRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function ZielerreichungRoute() {
+  const { jahr } = zielerreichungRoute.useParams();
+  const search = zielerreichungRoute.useSearch();
+  const navigate = useNavigate({ from: zielerreichungRoute.fullPath });
+  const quartal = Number((search.quartal ?? `q${abgeschlossenesQuartal().quartal}`).slice(1)) as QuartalNr;
+  const setQuartal = useCallback((j: number, q: QuartalNr) => {
+    void navigate({ to: '/ziele/$jahr/zielerreichung', params: { jahr: String(j) }, search: { quartal: `q${q}` } });
+  }, [navigate]);
+  const zuZielen = useCallback(() => { void navigate({ to: '/ziele/strategische-ziele' }); }, [navigate]);
+  return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
+}
+
+// Arbeitsraum «Portfolio» › Ressourcen: Auslastung (UI-23) und Kapazität (UI-24) (BC RK.01.01, RK.02.04, AP-E5-4)
+const ressourcenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/ressourcen',
+  beforeLoad: () => { throw redirect({ to: ressourcenPfad.auslastung, replace: true }); },
+});
+
+const auslastungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.auslastung, validateSearch: searchOf.auslastung, component: AuslastungRoute,
+});
+
+function AuslastungRoute() {
+  const search = auslastungRoute.useSearch();
+  const navigate = useNavigate({ from: auslastungRoute.fullPath });
+  const setSearch = useCallback<SetAuslastungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <AuslastungPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+const kapazitaetRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.kapazitaet, validateSearch: searchOf.kapazitaet, component: KapazitaetRoute,
+});
+
+function KapazitaetRoute() {
+  const search = kapazitaetRoute.useSearch();
+  const navigate = useNavigate({ from: kapazitaetRoute.fullPath });
+  const setSearch = useCallback<SetKapazitaetSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+// Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
+const monatsabschlussRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
+});
+
+function MonatsabschlussRoute() {
+  const search = monatsabschlussRoute.useSearch();
+  const navigate = useNavigate({ from: monatsabschlussRoute.fullPath });
+  const setSearch = useCallback<SetMonatsabschlussSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <MonatsabschlussPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
 const organisationRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/administration/organisation', validateSearch: searchOf.organisation, component: OrganisationRoute,
@@ -251,10 +326,16 @@ const routeTree = rootRoute.addChildren([
   ideenRoute,
   ideeNeuRoute,
   ideeRoute,
+  zielerreichungStartRoute,
+  zielerreichungRoute,
+  monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,
   phasenmodellRoute,
   portfoliosRoute,
+  ressourcenRoute,
+  auslastungRoute,
+  kapazitaetRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

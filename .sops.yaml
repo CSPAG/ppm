@@ -11,7 +11,7 @@ creation_rules:
   - path_regex: ^deploy/hetzner/secrets\.sops\.yaml$
     age: >-
       age1tapagx9rj38nslwgmzqzsjkdjffnfq2kmvucw59yfcwf743pp9dq0u8drh,
-      age1mqee8y8a2s6sscvn5nkemdyudulnhgt9x22g3z5fznvuhw7uaeaqlhgksf
+      age1pr47t2aw2g6d5gwh06y80jvjfew7zlcwesrpw2q0h5muvz9gr5psklrx9f
   - path_regex: ^infra/.*\.sops\.(yaml|json)$
     age: >-
       age1tapagx9rj38nslwgmzqzsjkdjffnfq2kmvucw59yfcwf743pp9dq0u8drh

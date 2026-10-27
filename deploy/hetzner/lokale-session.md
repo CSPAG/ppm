@@ -34,7 +34,7 @@ gh api -X PUT repos/CSPAG/ppm/environments/production > $null   # legt das Envir
 foreach ($n in "HCLOUD_TOKEN","S3_ACCESS_KEY","S3_SECRET_KEY","TF_STATE_PASSPHRASE","INFOMANIAK_API_TOKEN","SOPS_AGE_KEY","DEPLOY_SSH_KEY","KEYCLOAK_IAC_PRIVATE_KEY") {
   sops -d --extract "[`"github`"][`"$n`"]" infra/hetzner/betrieb.sops.yaml | gh secret set $n @r
 }
-foreach ($n in "HETZNER_BACKEND_HCL","HETZNER_TFVARS","APP_HOST","ACME_EMAIL") {
+foreach ($n in "HETZNER_BACKEND_HCL","HETZNER_TFVARS","APP_HOST","ACME_EMAIL") {   # HETZNER_TFVARS = infra/hetzner/production.tfvars
   sops -d --extract "[`"variablen`"][`"$n`"]" infra/hetzner/betrieb.sops.yaml | gh variable set $n @r
 }
 ```

@@ -14,6 +14,8 @@ import { abhaengigkeiten, baselineSetzen, bedarfGedeckt, bedarfImZeitraum, istSe
 import { projektdatenTools } from './mcp.ts';
 import { registerProjektdatenRoutes, TAG } from './routes.ts';
 import { uebernehmen } from './uebernahme.ts';
+// Übernahme aus dem Excel-Dashboard (AP-E0-7): nächster Meilenstein mit Termin (registriert sich selbst)
+import './uebernahme-dashboard.ts';
 
 export const projektdatenModule = defineModule({
   name: 'projektdaten',

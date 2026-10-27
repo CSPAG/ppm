@@ -1,0 +1,63 @@
+/*
+ * Arbeitsfläche «Projektvertrag» (UI-07): Kapitel links, Kapitel in der Mitte, Seitenpanel mit Pflichtangaben rechts;
+ * mobil Kapitel als Auswahl und Seitenpanel unten (reduzierte Ansicht). Nur Tokens aus styles/base.css, keine
+ * Inline-Stile (CSP).
+ */
+.vt-wrap{display:flex;flex-direction:column}
+.vt-kopf{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 0 10px}
+.vt-h{margin:0;font:600 15px var(--f-body)}
+.vt-banner{padding:0 0 10px}
+.vt-flaeche{display:grid;grid-template-columns:250px minmax(0,1fr) 300px;align-items:start;border-top:1px solid var(--line)}
+.vt-nav{border-right:1px solid var(--line);padding:12px 8px;position:sticky;top:0;max-height:calc(100vh - 200px);overflow:auto}
+.vt-nav-sel{display:none}
+.vt-nav-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+.vt-nr{font:500 12px var(--f-mono);color:var(--fg-3);min-width:18px}
+.vt-punkt{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:0 0 auto}
+.vt-fehlt{color:var(--warn);display:inline-flex}
+.vt-haupt{padding:12px 22px 32px;min-width:0}
+.vt-titel{margin:0 0 10px;font:700 18px/1.2 var(--f-display)}
+.vt-tools{gap:6px;padding:0 0 8px}
+.vt-status{min-width:0}
+.vt-fehler .emptystate{padding:12px 0}
+.vt-panel{border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:10px}
+.vt-pflicht{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.vt-pflicht .hint{margin:2px 0 0;font-size:12.5px;color:var(--fg-3)}
+.vt-sprung{text-align:left;height:auto;min-height:32px;white-space:normal}
+.vt-einreichen{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.vt-ed{display:flex;flex-direction:column;gap:16px;max-width:980px}
+.vt-feld{scroll-margin-top:80px}
+.vt-text{display:grid;grid-template-columns:1fr;gap:4px}
+.vt-text .hint,.vt-text .ferr{grid-column:1}
+.vt-text label{padding-top:0}
+.vt-ro{margin:0;white-space:pre-wrap}
+.vt-label{font-weight:500}
+.vt-basis{font-style:italic}
+.vt-termine,.vt-liste{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.vt-legend{font:600 13px var(--f-body);padding:0;margin:0 0 4px}
+.vt-zeilen{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.vt-zeile{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:8px;border:1px solid var(--line);border-radius:8px}
+.vt-zelle{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 120px}
+.vt-zelle.vt-kurz{flex:2 1 200px}
+.vt-zelle.vt-person,.vt-zelle.vt-projekt{flex:2 1 220px}
+.vt-zelle.vt-zahl,.vt-zelle.vt-betrag,.vt-zelle.vt-monat{flex:0 1 120px}
+.vt-zl{font-size:12px;color:var(--fg-3)}
+.vt-zelle input,.vt-zelle select{height:32px;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background:var(--surface);color:var(--fg);min-width:0;width:100%}
+.vt-zelle input:focus,.vt-zelle select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.vt-zelle [aria-invalid="true"]{border-color:var(--bad)}
+.vt-zahl{text-align:right;font-variant-numeric:tabular-nums}
+.vt-wert{min-height:32px;display:flex;align-items:center}
+.vt-weg{width:32px;height:32px}
+@media (max-width:1199px){
+  .vt-flaeche{grid-template-columns:220px minmax(0,1fr)}
+  .vt-panel{grid-column:1 / -1;border-left:0;border-top:1px solid var(--line)}
+}
+@media (max-width:767px){
+  .vt-flaeche{display:flex;flex-direction:column}
+  .vt-nav{border-right:0;border-bottom:1px solid var(--line);padding:10px 0;position:static;max-height:none;overflow:visible}
+  .vt-nav-sel{display:block}
+  .vt-nav-sel select{width:100%;height:40px}
+  .vt-nav-l{display:none}
+  .vt-haupt{padding:14px 0}
+  .vt-panel{padding:14px 0}
+  .vt-weg{width:40px;height:40px}
+}

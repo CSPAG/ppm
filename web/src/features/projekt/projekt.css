@@ -1,0 +1,28 @@
+/* Projekte (UI-05, UI-06): Filter, Projektakte, Phasenleiste, Projektorganisation; Farben aus den Variablen der Werkbank */
+.pj-toolbar{flex-wrap:wrap;gap:8px}
+.pj-filter{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-2)}
+.pj-filter select{height:34px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface);color:var(--fg);padding:0 8px}
+.merkmal-vertraulich{display:inline-flex;align-items:center;gap:4px}
+.pj-nr{color:var(--fg-2);font-weight:500}
+.pj-akte .mh .tabs{margin-top:10px}
+.pj-banner{padding:0 22px}
+.pj-inhalt{padding:12px 22px 24px}
+.pj-uebersicht{display:grid;gap:18px;max-width:960px}
+.pj-grp-kopf{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.pj-phasen{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.pj-phase{border:1px solid var(--line-2);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0;background:var(--surface)}
+.pj-phase-k{display:inline-flex;align-items:center;gap:4px;font:600 13px/1.2 var(--f-mono)}
+.pj-phase-n{font-size:12px;color:var(--fg-2);overflow:hidden;text-overflow:ellipsis}
+.pj-erledigt{background:var(--ok-soft);border-color:transparent}
+.pj-aktuell{border:2px solid var(--fg)}
+.pj-offen{border-style:dashed;color:var(--fg-2)}
+.pj-org ul{margin:0;padding:0;list-style:none}
+.pj-org-g{display:contents}
+.pj-zeile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0 0 10px;display:grid;gap:8px;position:relative}
+.pj-entfernen{justify-self:end}
+.pj-wirkung{border-top:1px solid var(--line);margin-top:12px;padding-top:8px;font-size:13px}
+.pj-wirkung p{margin:4px 0}
+@media (max-width: 700px){
+  .pj-phasen{grid-template-columns:1fr}
+  .pj-banner,.pj-inhalt{padding-left:16px;padding-right:16px}
+}

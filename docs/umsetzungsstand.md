@@ -18,7 +18,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | in Arbeit | – | A-04, A-34, A-47 |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | teilweise: PR 1 umgesetzt (050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»); PR 2 Oberfläche UI-47 in Arbeit | #19 | A-02, A-07, A-08, A-23, A-45 |
 | AP-E0-6 | Register Projektdaten | 060–069 | PR 1 umgesetzt (Tabellen 060, API, MCP `get_projektdaten`); PR 2 Einhängen in die Projektübersicht folgt | #29 | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
-| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche in Arbeit | #22 | A-31, A-44 |
+| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche (`/eingang`, `/konto/stellvertretung`) in Prüfung | #22 | A-31, A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | in Arbeit (PR 1 #30: 090, Periode und Statusbericht, API mit Vorbelegung aus der Vorperiode, Einreichen mit Rückgängig; PR 2: Berichtsaufgabe am 18., Register, Oberfläche UI-13) | – | A-37 (Periode nach Abschluss gesperrt), A-38; Periode lesbar für alle der Organisation (enthält keine Projektdaten) |
@@ -141,7 +141,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
-| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit | – |
+| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit (API umgesetzt) | #22 |
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |

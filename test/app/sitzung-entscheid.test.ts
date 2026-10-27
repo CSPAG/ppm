@@ -9,7 +9,8 @@ import { after, before, describe, test } from 'node:test';
 import { full, skipDb } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../../src/modules/sitzung/index.ts';
-import { _abmelden } from '../../src/modules/sitzung/arten.ts';
+import { _abmelden, traktandenart, type Traktandenart } from '../../src/modules/sitzung/arten.ts';
+import { optionen } from '../../src/modules/sitzung/entscheid.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 
 const skip = await skipDb();
@@ -22,6 +23,18 @@ function mittwochIn(n: number): string {
 
 /** Folgen, die die Probe-Art «gate» erhält (wie vertrag in AP-E3-3: Baseline und Phase). */
 const folgen: EntscheidFolge[] = [];
+
+/**
+ * Art für den Test ersetzen: Registriert ein Modul die Art schon beim Laden (statusbericht: eskalation, meilenstein,
+ * AP-E2-4; vertrag: gate, AP-E3-3), wird sie für diesen Test durch die Probe ersetzt und danach wiederhergestellt.
+ */
+const wiederherstellen: (() => void)[] = [];
+function probeArt(a: Traktandenart): void {
+  const vorher = traktandenart(a.art);
+  if (vorher) _abmelden(a.art);
+  registriereTraktandenart(a);
+  wiederherstellen.push(() => { _abmelden(a.art); if (vorher) registriereTraktandenart(vorher); });
+}
 
 describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () => {
   let api: TestApi;
@@ -79,9 +92,9 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolio });
     mitglied = { authorization: m.authorization };
 
-    // gate mit Folge (wie vertrag, AP-E3-3), eskalation ohne Folge (wie statusbericht, AP-E2-4); meilenstein bleibt
-    // unregistriert und erhält die Ergebnisse aus K3 Schritt 8
-    registriereTraktandenart({
+    // Probe-Arten: gate mit Folge (wie vertrag, AP-E3-3), eskalation und meilenstein ohne Folge (wie statusbericht,
+    // AP-E2-4); die Ergebnisse von meilenstein entsprechen K3 Schritt 8
+    probeArt({
       art: 'gate',
       ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }, { schluessel: 'mit_auflagen', label: 'Mit Auflagen freigegeben' },
         { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }, { schluessel: 'abgelehnt', label: 'Gestoppt' }],
@@ -92,7 +105,8 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
         folgen.push(e);
       },
     });
-    registriereTraktandenart({ art: 'eskalation', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }, { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }] });
+    probeArt({ art: 'eskalation', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }, { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }] });
+    probeArt({ art: 'meilenstein', ergebnisse: [{ schluessel: 'abgenommen', label: 'Abgenommen' }, { schluessel: 'nicht_abgenommen', label: 'Nicht abgenommen' }] });
 
     // Traktanden: Gate P2 (PRAT entscheidet), Gate P1 (via SNS-VR), zwei Eskalationen, Meilenstein
     const v = [
@@ -112,7 +126,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     r = await ok('POST', `/v1/sitzungen/${s.id}/versenden`, { ...ue, 'if-match': `W/"${r.version}"` });
     sitzung = { id: s.id, version: r.version };
   });
-  after(async () => { _abmelden('gate'); _abmelden('eskalation'); await api?.close(); });
+  after(async () => { for (const w of wiederherstellen.reverse()) w(); await api?.close(); });
 
   const entscheid = (k: string, body: unknown, headers: Record<string, string> = {}) => call('PUT', `/v1/traktanden/${tid[k]}/entscheid`, { ...ue, ...headers }, body);
 
@@ -125,7 +139,9 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     const s = await ok('POST', `/v1/sitzungen/${sitzung.id}/starten`, { ...ue, 'if-match': `W/"${sitzung.version}"` });
     assert.deepEqual([s.stand, s.can.erfassen, s.can.schliessen], ['laufend', true, true]);
     const opt = Object.fromEntries(s.traktanden.map((t: { traktandumId: string; optionen: { schluessel: string }[] }) => [t.traktandumId, t.optionen.map(o => o.schluessel)]));
-    assert.deepEqual(opt[tid.ms!], ['abgenommen', 'nicht_abgenommen'], 'unregistrierte Art: Ergebnisse aus K3');
+    assert.deepEqual(opt[tid.ms!], ['abgenommen', 'nicht_abgenommen']);
+    assert.deepEqual(optionen('jahresrueckblick').map(o => o.schluessel), ['verabschiedet', 'anpassungen'], 'unregistrierte Art: Ergebnisse aus K3');
+    assert.deepEqual(optionen('portfoliobericht'), [], 'Kenntnisnahme');
     assert.deepEqual(opt[tid.esk1!], ['erledigt', 'zurueckgestellt'], 'Registry geht vor');
     sitzung.version = s.version;
   });

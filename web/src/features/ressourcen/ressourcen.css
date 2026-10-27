@@ -1,0 +1,51 @@
+/*
+ * Ressourcen (UI-23, UI-24): Kennzahlen, Tabelle Rolle × Monat mit fester erster Spalte; Lage immer mit Symbol und Text
+ * (Bedarf / Angebot), Farbe nur zusätzlich (Q-B5). Bildlauf nur im Raster, nie auf der Seite (360 px).
+ */
+.res-body{padding:12px 22px 22px;display:flex;flex-direction:column;gap:12px}
+.res-zeitraum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:0;margin:0;padding:0;min-width:0}
+.res-zeitraum label{color:var(--fg-2);font-size:13px}
+.res-zeitraum input{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background:var(--surface);color:var(--fg);min-width:0}
+.res-zeitraum input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.res-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.res-kpi{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface)}
+.res-kpi.warn{border-color:color-mix(in srgb, var(--warn) 50%, transparent);background:var(--warn-soft)}
+.res-kpi-t{display:flex;align-items:center;gap:6px;color:var(--fg-2);font-size:12.5px;font-weight:500}
+.res-kpi.warn .res-kpi-t .ico{color:var(--warn)}
+.res-kpi-v{font-weight:600;font-size:22px;line-height:1.2;margin-top:4px;font-variant-numeric:tabular-nums}
+.res-kpi-h{color:var(--fg-2);font-size:12px;margin-top:2px}
+.res-engpaesse .hinweis{margin:0 0 6px}
+.res-legende{margin:0;color:var(--fg-2);font-size:12.5px}
+.res-status{color:var(--fg);font-weight:500;margin-left:6px}
+.res-scroll{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:10px}
+.res-raster-scroll{max-height:calc(100vh - 300px)}
+.res-tabelle{width:max-content;min-width:100%}
+.res-tabelle thead th{padding:8px 10px}
+.res-tabelle .res-rolle{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 12px;border-right:1px solid var(--line)}
+.res-tabelle thead .res-rolle{z-index:3}
+.res-tabelle tbody tr{cursor:default}
+.res-tabelle tbody td,.res-tabelle tbody th{height:36px;border-bottom:1px solid var(--line)}
+.res-tabelle abbr{text-decoration:none}
+.res-zelle{padding:0!important;min-width:84px}
+.res-zelle button{display:flex;align-items:center;justify-content:flex-end;gap:3px;width:100%;height:35px;border:0;background:none;padding:0 10px;color:var(--fg);font-variant-numeric:tabular-nums;cursor:pointer}
+.res-zelle button:hover{background:var(--hover)}
+.res-zelle button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.res-zelle .ico{width:14px;height:14px}
+.res-durch{color:var(--fg-3)}
+.res-ueberbucht button,.res-ohne_angebot button{background:var(--warn-soft);color:var(--fg)}
+.res-ueberbucht .ico,.res-ohne_angebot .ico{color:var(--warn)}
+.res-ausgelastet .ico{color:var(--ok)}
+.res-leer button{color:var(--fg-3)}
+.res-zelle.cur button{box-shadow:inset 0 -3px 0 var(--accent)}
+.res-eingabe{padding:0!important;width:76px;border-left:1px solid var(--line)}
+.res-eingabe input{width:76px;height:35px;border:0;background:none;padding:0 10px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg);min-width:0}
+.res-eingabe input:focus{outline:2px solid var(--accent);outline-offset:-2px;background:var(--surface)}
+.res-eingabe input[aria-invalid="true"]{outline:2px solid var(--bad);outline-offset:-2px}
+.res-geaendert{background:var(--accent-soft)}
+.res-aus{color:var(--fg-3);font-weight:400}
+.res-platz td{padding:0;border:0;height:auto}
+.res-beitraege{margin-top:8px}
+.res-beitraege tbody tr{cursor:default}
+.res-beitraege tfoot th,.res-beitraege tfoot td{padding:8px 12px;font-weight:600;text-align:left}
+.res-beitraege tfoot td.num{text-align:right}
+@media (max-width:640px){ .res-body{padding:10px 14px 14px} }

@@ -48,7 +48,7 @@ function stub(o: { versionen?: unknown[]; angaben?: unknown[]; v?: Record<string
     [`GET /v1/projekte/${P}/vertrag`]: () => json({ projektId: P, versionen: o.versionen ?? [version(o.v)], entwurf: V, baseline: null, can: { entwerfen: [] } }),
     [`GET /v1/vertragsversionen/${V}`]: () => mitEtag({ version: version(o.v), kapitel: kopf({ 1: 1, 9: 1, 10: 1 }) }, Number(o.v?.version ?? 1)),
     [`GET /v1/vertragsversionen/${V}/pflichtangaben`]: () => json({ versionId: V, zielphase: 'P1', vollstaendig: !(o.angaben ?? FEHLEND).some((a: unknown) => !(a as { erfuellt: boolean }).erfuellt), angaben: o.angaben ?? FEHLEND }),
-    'GET /v1/strategische-ziele': () => json({ items: [], nextCursor: null }),
+    [`GET /v1/projekte/${P}/vertrag/ziele`]: () => json({ ziele: [], jahresziele: [] }),
     'GET /v1/codetabellen/ressourcenrolle/werte': () => json({ items: [{ id: 'r1', schluessel: 'pl', label: 'Projektleitung', position: 0, aktiv: true }], nextCursor: null }),
     ...o.routes,
   };
@@ -194,6 +194,24 @@ describe('Projektvertrag (UI-07)', () => {
     stub({ v: { stand: 'in_pruefung', eingereichtAt: '2026-10-21T08:00:00Z', can: { write: false, einreichen: false } }, kapitelRo: true });
     renderWithIam(<Page />, PL as never);
     expect(await screen.findByText(/In Prüfung bei der Unternehmensentwicklung seit/)).toBeInTheDocument();
+  });
+
+  it('Kap. 2: Ziele zur Wahl aus dem Modul vertrag, das Handlungsfeld folgt dem Ziel (PP.02.05)', async () => {
+    const Z = '00000000-0000-4000-8000-0000000000d1';
+    const H = '00000000-0000-4000-8000-0000000000d2';
+    const puts: Record<string, unknown>[] = [];
+    stub({ routes: {
+      [`GET /v1/projekte/${P}/vertrag/ziele`]: () => json({ ziele: [{ id: Z, nummer: '2.1', text: 'Digitale Aufnahme', handlungsfeldId: H, handlungsfeld: 'Patientenpfade' }], jahresziele: [] }),
+      [`PUT /v1/vertragsversionen/${V}/kapitel/2`]: async req => { const b = await req.json(); puts.push(b.inhalt); return mitEtag(kapitel(2, b.inhalt, { version: 2 }), 2); },
+    } });
+    renderWithIam(<Page initial={{ kapitel: 2 }} />, PL as never);
+    const wahl = await screen.findByLabelText('Strategisches Ziel');
+    await screen.findByRole('option', { name: '2.1 Digitale Aufnahme' });
+    await userEvent.selectOptions(wahl, Z);
+    expect(await screen.findByText(TV.zielHinweis('2.1'))).toBeInTheDocument();
+    expect(await screen.findByText('Patientenpfade')).toBeInTheDocument();
+    await waitFor(() => expect(puts.length).toBe(1), { timeout: 3000 });
+    expect(puts[0]).toMatchObject({ strategischesZielId: Z, handlungsfeldId: H, jahreszielId: null });
   });
 
   it('Kapitelnavigation mit ↑/↓', async () => {

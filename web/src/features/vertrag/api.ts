@@ -66,12 +66,15 @@ export function usePflichtangaben(id: string | null) {
   });
 }
 
-/** Strategische Ziele für Kapitel 2 (nur mit `ziel:read`; sonst bleibt die Auswahl leer). */
-export function useStrategischeZiele(enabled: boolean) {
+/**
+ * Ziele zur Wahl in Kapitel 2 (Route des Moduls vertrag, `projekt:write` am Projekt): strategische Ziele mit
+ * Handlungsfeld und Jahresziele. Ohne Recht (403) bleibt die Auswahl leer.
+ */
+export function useZielauswahl(projektId: string) {
   return useQuery({
-    queryKey: ['vertrag', 'ziele'] as const,
-    enabled,
-    queryFn: async ({ signal }) => (await api.GET('/v1/strategische-ziele', { params: { query: { limit: 200 } }, signal })).data!.items,
+    queryKey: ['vertrag', 'ziele', projektId] as const,
+    retry: false,
+    queryFn: async ({ signal }) => (await api.GET('/v1/projekte/{id}/vertrag/ziele', { params: { path: { id: projektId } }, signal })).data!,
   });
 }
 

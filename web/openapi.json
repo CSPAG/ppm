@@ -11043,6 +11043,84 @@
           }
         }
       },
+      "VertragZielauswahl": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ziele",
+          "jahresziele"
+        ],
+        "properties": {
+          "ziele": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer",
+                "text",
+                "handlungsfeldId",
+                "handlungsfeld"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "handlungsfeldId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "handlungsfeld": {
+                  "description": "Bezeichnung des Handlungsfelds.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "jahresziele": {
+            "description": "Jahresziele ab dem laufenden Jahr.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "jahr",
+                "nummer",
+                "text",
+                "strategischesZielId"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "jahr": {
+                  "type": "integer"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "strategischesZielId": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
       "IdeeRueckfrage": {
         "additionalProperties": false,
         "type": "object",
@@ -40969,6 +41047,108 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/vertrag/ziele": {
+      "get": {
+        "summary": "Projektvertrag: Ziele zur Wahl (Kap. 2)",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Strategische Ziele mit Handlungsfeld und Jahresziele ab dem laufenden Jahr für den Strategiebezug (PP.02.05). Recht `projekt:write` am Projekt; die Ziele liest das System in voller Sicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragZielauswahl"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

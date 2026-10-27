@@ -4,11 +4,9 @@
  * Lesemodus (Z8, Z9) ohne Bearbeiten-Elemente. Unter Texten steht die Baseline, wenn der Entwurf davon abweicht.
  */
 import { PersonName, PersonPick } from '@vollholz/iam-web';
-import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { api } from '../../api/index.ts';
 import { fmtBetrag, fmtDatum, Icon } from '../../ui/index.ts';
-import { useProjekteAuswahl, useRollen, useStrategischeZiele, type Inhalt } from './api.ts';
+import { useProjekteAuswahl, useRollen, useZielauswahl, type Inhalt } from './api.ts';
 import { feldId, kapitel, TERMINE, type Feld, type Spalte } from './felder.ts';
 import { TV } from './texte.ts';
 
@@ -20,13 +18,13 @@ export interface EditorProps {
   /** Fehler je Feld: `feld` oder `feld/<index>/<spalte>` (lokal und vom Server). */
   fehler: Record<string, string>;
   onChange(inhalt: Inhalt, feld: string): void;
-  /** Ziele lesen (`ziel:read` an der Organisation). */
-  zieleLesbar: boolean;
+  /** Projekt des Vertrags (Zielauswahl für Kap. 2). */
+  projektId: string;
 }
 
 type Zeile = Record<string, unknown>;
 
-export function KapitelEditor({ nr, inhalt, basis, ro, fehler, onChange, zieleLesbar }: EditorProps) {
+export function KapitelEditor({ nr, inhalt, basis, ro, fehler, onChange, projektId }: EditorProps) {
   const k = kapitel(nr);
   const setze = (key: string, v: unknown) => onChange({ ...inhalt, [key]: v }, key);
   return (
@@ -34,16 +32,16 @@ export function KapitelEditor({ nr, inhalt, basis, ro, fehler, onChange, zieleLe
       {k.felder.map(f => (
         <div key={f.key} id={feldId(nr, f.key)} className="vt-feld" data-feld={f.key}>
           <FeldEditor nr={nr} f={f} wert={inhalt[f.key]} basis={basis?.[f.key]} ro={ro} fehler={fehler} setze={v => setze(f.key, v)}
-            inhalt={inhalt} zieleLesbar={zieleLesbar} onZiel={(zielId, hf) => onChange({ ...inhalt, strategischesZielId: zielId, handlungsfeldId: hf, jahreszielId: null }, 'strategischesZielId')} />
+            inhalt={inhalt} projektId={projektId} onZiel={(zielId, hf) => onChange({ ...inhalt, strategischesZielId: zielId, handlungsfeldId: hf, jahreszielId: null }, 'strategischesZielId')} />
         </div>
       ))}
     </div>
   );
 }
 
-function FeldEditor({ nr, f, wert, basis, ro, fehler, setze, inhalt, zieleLesbar, onZiel }: {
+function FeldEditor({ nr, f, wert, basis, ro, fehler, setze, inhalt, projektId, onZiel }: {
   nr: number; f: Feld; wert: unknown; basis: unknown; ro: boolean; fehler: Record<string, string>; setze(v: unknown): void; inhalt: Inhalt;
-  zieleLesbar: boolean; onZiel(zielId: string | null, handlungsfeldId: string | null): void;
+  projektId: string; onZiel(zielId: string | null, handlungsfeldId: string | null): void;
 }) {
   const id = `${feldId(nr, f.key)}-in`;
   const err = fehler[f.key];
@@ -81,20 +79,21 @@ function FeldEditor({ nr, f, wert, basis, ro, fehler, setze, inhalt, zieleLesbar
       </fieldset>
     );
   }
-  if (f.art === 'ziel') return <ZielFeld id={id} label={label} hilfe={f.hilfe} wert={wert as string | null} ro={ro} err={err} lesbar={zieleLesbar} onZiel={onZiel} />;
+  if (f.art === 'ziel') return <ZielFeld id={id} label={label} hilfe={f.hilfe} wert={wert as string | null} ro={ro} err={err} projektId={projektId} onZiel={onZiel} />;
   if (f.art === 'jahresziel') {
-    return <JahreszielFeld id={id} label={label} ziel={inhalt.strategischesZielId as string | null} wert={wert as string | null} ro={ro} err={err} lesbar={zieleLesbar} setze={setze} />;
+    return <JahreszielFeld id={id} label={label} ziel={inhalt.strategischesZielId as string | null} wert={wert as string | null} ro={ro} err={err} projektId={projektId} setze={setze} />;
   }
-  if (f.art === 'handlungsfeld') return <HandlungsfeldFeld id={id} label={label} wert={wert as string | null} lesbar={zieleLesbar} />;
+  if (f.art === 'handlungsfeld') return <HandlungsfeldFeld id={id} label={label} wert={wert as string | null} projektId={projektId} />;
   return <ListeFeld nr={nr} f={f} zeilen={(wert ?? []) as Zeile[]} ro={ro} fehler={fehler} setze={setze} />;
 }
 
-function ZielFeld({ id, label, hilfe, wert, ro, err, lesbar, onZiel }: {
-  id: string; label: ReactNode; hilfe?: string; wert: string | null; ro: boolean; err?: string; lesbar: boolean;
+function ZielFeld({ id, label, hilfe, wert, ro, err, projektId, onZiel }: {
+  id: string; label: ReactNode; hilfe?: string; wert: string | null; ro: boolean; err?: string; projektId: string;
   onZiel(zielId: string | null, handlungsfeldId: string | null): void;
 }) {
-  const ziele = useStrategischeZiele(lesbar);
-  const liste = ziele.data ?? [];
+  const auswahl = useZielauswahl(projektId);
+  const lesbar = !!auswahl.data;
+  const liste = auswahl.data?.ziele ?? [];
   const gewaehlt = liste.find(z => z.id === wert);
   return (
     <div className="field">
@@ -115,20 +114,16 @@ function ZielFeld({ id, label, hilfe, wert, ro, err, lesbar, onZiel }: {
   );
 }
 
-function JahreszielFeld({ id, label, ziel, wert, ro, err, lesbar, setze }: {
-  id: string; label: ReactNode; ziel: string | null; wert: string | null; ro: boolean; err?: string; lesbar: boolean; setze(v: unknown): void;
+function JahreszielFeld({ id, label, ziel, wert, ro, err, projektId, setze }: {
+  id: string; label: ReactNode; ziel: string | null; wert: string | null; ro: boolean; err?: string; projektId: string; setze(v: unknown): void;
 }) {
-  const q = useQuery({
-    queryKey: ['vertrag', 'jahresziele', ziel],
-    enabled: lesbar && !!ziel,
-    queryFn: async ({ signal }) => (await api.GET('/v1/jahresziele', { params: { query: { strategischesZiel: ziel!, limit: 200 } }, signal })).data!.items,
-  });
-  const liste = q.data ?? [];
+  const auswahl = useZielauswahl(projektId);
+  const liste = (auswahl.data?.jahresziele ?? []).filter(j => j.strategischesZielId === ziel);
   const gewaehlt = liste.find(j => j.id === wert);
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      {ro || !lesbar || !ziel ? <p id={id} className="vt-ro" tabIndex={-1}>{gewaehlt ? `${gewaehlt.nummer} ${gewaehlt.text}` : '–'}</p> : (
+      {ro || !auswahl.data || !ziel ? <p id={id} className="vt-ro" tabIndex={-1}>{gewaehlt ? `${gewaehlt.jahr} · ${gewaehlt.nummer} ${gewaehlt.text}` : '–'}</p> : (
         <select id={id} value={wert ?? ''} onChange={e => setze(e.target.value || null)} aria-invalid={err ? true : undefined}>
           <option value="">–</option>
           {liste.map(j => <option key={j.id} value={j.id}>{`${j.jahr} · ${j.nummer} ${j.text}`}</option>)}
@@ -139,17 +134,13 @@ function JahreszielFeld({ id, label, ziel, wert, ro, err, lesbar, setze }: {
   );
 }
 
-function HandlungsfeldFeld({ id, label, wert, lesbar }: { id: string; label: ReactNode; wert: string | null; lesbar: boolean }) {
-  const q = useQuery({
-    queryKey: ['vertrag', 'handlungsfelder'],
-    enabled: lesbar && !!wert,
-    queryFn: async ({ signal }) => (await api.GET('/v1/handlungsfelder', { params: { query: { limit: 200 } }, signal })).data!.items,
-  });
-  const hf = q.data?.find(h => h.id === wert);
+function HandlungsfeldFeld({ id, label, wert, projektId }: { id: string; label: ReactNode; wert: string | null; projektId: string }) {
+  const auswahl = useZielauswahl(projektId);
+  const hf = auswahl.data?.ziele.find(z => z.handlungsfeldId === wert)?.handlungsfeld;
   return (
     <div className="field">
       <span className="vt-label">{label}</span>
-      <p id={id} className="vt-ro" tabIndex={-1}>{hf?.label ?? (wert ? '…' : '–')}</p>
+      <p id={id} className="vt-ro" tabIndex={-1}>{hf ?? (wert ? '…' : '–')}</p>
     </div>
   );
 }

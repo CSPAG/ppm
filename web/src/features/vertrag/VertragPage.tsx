@@ -12,7 +12,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { describeError } from '@vollholz/iam-web';
 import { isConflict, newIdempotencyKey, statusOf } from '../../api/index.ts';
-import { useSession } from '../../auth/index.ts';
 import { Dialog, Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, Stand, T, useToast, useVerzoegert, type Phase, type StandFamilie } from '../../ui/index.ts';
 import {
   kapitelLaden, useKapitel, usePflichtangaben, useProjekt, useVersion, useVertrag, useVertragMutations, type Angabe, type Inhalt, type KapitelLoaded,
@@ -72,7 +71,6 @@ function Akte({ projektId, versionId, search, setSearch }: { projektId: string; 
 function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
   projektId: string; loaded: VersionLoaded; angaben: Angabe[]; search: VertragSearch; setSearch: SetVertragSearch;
 }) {
-  const { can } = useSession();
   const toast = useToast();
   const v = loaded.detail.version;
   const nr = search.kapitel ?? 1;
@@ -176,7 +174,7 @@ function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
         <section className="vt-haupt" aria-labelledby={`${navId}-t`}>
           <h3 id={`${navId}-t`} className="vt-titel"><span className="muted">{nr}</span> {k?.titel ?? KAPITEL[nr - 1]!.titel}</h3>
           <KapitelArbeit key={`${v.id}-${nr}`} versionId={v.id} nr={nr} versionRo={ro} feld={search.feld} speichernRef={speichernRef}
-            zieleLesbar={can('ziel:read')} onFokussiert={() => setSearch({ feld: undefined }, { replace: true })} />
+            projektId={projektId} onFokussiert={() => setSearch({ feld: undefined }, { replace: true })} />
         </section>
         <aside className="vt-panel" aria-labelledby={`${navId}-p`}>
           <h3 id={`${navId}-p`} className="grp-h">{TV.pflicht} {TV.pflichtFuer(phase)}</h3>
@@ -221,21 +219,21 @@ function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
 type Status = 'gespeichert' | 'speichert' | 'ungespeichert' | 'fehler' | 'konflikt' | 'gesperrt';
 
 /** Ein Kapitel mit automatischem Speichern (I-R3), Rückgängig/Wiederholen und Konflikt (Z7). */
-function KapitelArbeit({ versionId, nr, versionRo, feld, speichernRef, zieleLesbar, onFokussiert }: {
+function KapitelArbeit({ versionId, nr, versionRo, feld, speichernRef, projektId, onFokussiert }: {
   versionId: string; nr: number; versionRo: boolean; feld?: string; speichernRef: MutableRefObject<() => Promise<boolean>>;
-  zieleLesbar: boolean; onFokussiert(): void;
+  projektId: string; onFokussiert(): void;
 }) {
   const q = useKapitel(versionId, nr);
   const skelett = useVerzoegert(q.isPending);
   if (q.isPending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={4} /> : null}</div>;
   if (q.error) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   return <KapitelForm geladen={q.data} versionId={versionId} nr={nr} ro={versionRo || !q.data.kapitel.can.write} feld={feld} speichernRef={speichernRef}
-    zieleLesbar={zieleLesbar} onFokussiert={onFokussiert} betraegeVerborgen={nr === 9 && !versionRo && !q.data.kapitel.can.write} />;
+    projektId={projektId} onFokussiert={onFokussiert} betraegeVerborgen={nr === 9 && !versionRo && !q.data.kapitel.can.write} />;
 }
 
-function KapitelForm({ geladen, versionId, nr, ro, feld, speichernRef, zieleLesbar, onFokussiert, betraegeVerborgen }: {
+function KapitelForm({ geladen, versionId, nr, ro, feld, speichernRef, projektId, onFokussiert, betraegeVerborgen }: {
   geladen: KapitelLoaded; versionId: string; nr: number; ro: boolean; feld?: string; speichernRef: MutableRefObject<() => Promise<boolean>>;
-  zieleLesbar: boolean; onFokussiert(): void; betraegeVerborgen: boolean;
+  projektId: string; onFokussiert(): void; betraegeVerborgen: boolean;
 }) {
   const { speichern: speicherMut } = useVertragMutations(undefined);
   const [inhalt, setInhalt] = useState<Inhalt>(geladen.kapitel.inhalt as Inhalt);
@@ -392,7 +390,7 @@ function KapitelForm({ geladen, versionId, nr, ro, feld, speichernRef, zieleLesb
           {status === 'fehler' ? <p className="small">{TV.fehlerSpeichern} <button type="button" className="btn sm" onClick={() => { dirty.current = true; void speichern(); }}>{TV.erneutSpeichern}</button></p> : null}
         </div>
       ) : null}
-      <KapitelEditor nr={nr} inhalt={inhalt} basis={(geladen.kapitel.basis as Inhalt | null) ?? null} ro={ro} fehler={{ ...server, ...lokal }} onChange={aendere} zieleLesbar={zieleLesbar} />
+      <KapitelEditor nr={nr} inhalt={inhalt} basis={(geladen.kapitel.basis as Inhalt | null) ?? null} ro={ro} fehler={{ ...server, ...lokal }} onChange={aendere} projektId={projektId} />
     </div>
   );
 }

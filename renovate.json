@@ -1,0 +1,127 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigestsToSemver",
+    ":semanticCommitsDisabled"
+  ],
+  "timezone": "Europe/Zurich",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "minimumReleaseAge": "14 days",
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on monday"
+    ]
+  },
+  "npm": {
+    "minimumReleaseAge": "14 days"
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "minimumReleaseAge": null,
+    "schedule": [
+      "at any time"
+    ],
+    "labels": [
+      "sicherheit"
+    ]
+  },
+  "osvVulnerabilityAlerts": true,
+  "branchPrefix": "chore/abhaengigkeiten-",
+  "labels": [
+    "abhaengigkeiten"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**"
+  ],
+  "hostRules": [
+    {
+      "matchHost": "npm.pkg.github.com",
+      "hostType": "npm",
+      "encrypted": {}
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Basis-Image im Dockerfile (ARG NODE_IMAGE)",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG NODE_IMAGE=(?<depName>node):(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "identity-kit: Pakete @vollholz/* gemeinsam, nie automatisch. Das Realm-Modul product-realm steht in verwalteten Dateien (infra/keycloak) und kommt mit @vollholz/create-iam-app: nach dem Update `npm run identity:sync` im selben PR.",
+      "groupName": "identity-kit",
+      "matchPackageNames": [
+        "@vollholz/**"
+      ],
+      "automerge": false,
+      "minimumReleaseAge": null,
+      "labels": [
+        "identity-kit"
+      ]
+    },
+    {
+      "description": "Node 24 bleibt (engines, .nvmrc): keine Hauptversion des Basis-Images",
+      "matchPackageNames": [
+        "node",
+        "@types/node"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "PostgreSQL 17 und Keycloak 26: Hauptversionen nur bewusst",
+      "matchPackageNames": [
+        "postgres",
+        "quay.io/keycloak/keycloak"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "OpenTelemetry gemeinsam",
+      "groupName": "opentelemetry",
+      "matchPackageNames": [
+        "@opentelemetry/**"
+      ]
+    },
+    {
+      "description": "GitHub Actions gesammelt",
+      "groupName": "github-actions",
+      "matchManagers": [
+        "github-actions"
+      ]
+    },
+    {
+      "description": "Kleine Entwicklungsabhängigkeiten nach grüner CI automatisch",
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "matchPackageNames": [
+        "!typescript",
+        "!@vollholz/**"
+      ]
+    }
+  ]
+}

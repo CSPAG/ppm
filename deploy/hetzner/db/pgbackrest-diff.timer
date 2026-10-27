@@ -1,0 +1,10 @@
+[Unit]
+Description=Differenzielles Backup PPM, täglich
+
+[Timer]
+OnCalendar=Mon..Sat 02:15
+Persistent=true
+Unit=pgbackrest-backup@diff.service
+
+[Install]
+WantedBy=timers.target

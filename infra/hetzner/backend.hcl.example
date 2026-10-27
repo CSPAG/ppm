@@ -1,0 +1,13 @@
+# Als backend.hcl kopieren (nicht versionieren) und init mit: tofu init -backend-config=backend.hcl
+# Zugang über AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (S3-Schlüssel des Object Storage) aus der Umgebung.
+bucket                      = "ppm-tofu-state"
+key                         = "hetzner/terraform.tfstate"
+region                      = "nbg1"
+endpoints                   = { s3 = "https://nbg1.your-objectstorage.com" }
+skip_credentials_validation = true
+skip_region_validation      = true
+skip_requesting_account_id  = true
+skip_metadata_api_check     = true
+skip_s3_checksum            = true
+use_path_style              = true
+use_lockfile                = true

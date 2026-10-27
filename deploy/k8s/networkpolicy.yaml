@@ -1,0 +1,100 @@
+# Netzwerk: standardmässig alles zu; nur, was jeder Dienst braucht.
+# Adressen von Keycloak und Datenbank liegen ausserhalb des Clusters: das Overlay setzt die CIDRs
+# (Platzhalter 10.0.1.0/24 = Datenbank, 0.0.0.0/0 Port 443 = Keycloak und OTLP).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# DNS für alle Pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector: { matchLabels: { k8s-app: kube-dns } }
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+---
+# API: vom Ingress und vom MCP-Dienst; nach aussen Datenbank und HTTPS (Keycloak, Entra ID, OTLP)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/name: ppm-api } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: ingress-nginx } }
+        - podSelector: { matchLabels: { app.kubernetes.io/name: ppm-mcp } }
+      ports: [{ protocol: TCP, port: 8080 }]
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
+      ports: [{ protocol: TCP, port: 9090 }]
+  egress:
+    - to: [{ ipBlock: { cidr: 10.0.1.0/24 } }]
+      ports: [{ protocol: TCP, port: 5432 }]
+    - to: [{ ipBlock: { cidr: 0.0.0.0/0, except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16] } }]
+      ports: [{ protocol: TCP, port: 443 }]
+---
+# Worker: keine eingehenden Verbindungen ausser Metriken; nach aussen Datenbank, HTTPS (Keycloak, Webhooks, Web Push)
+# und SMTP (465 TLS, 587 STARTTLS) zu öffentlichen Mailservern (MAIL_ADAPTER=smtp)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: worker
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/name: ppm-worker } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
+      ports: [{ protocol: TCP, port: 9090 }]
+  egress:
+    - to: [{ ipBlock: { cidr: 10.0.1.0/24 } }]
+      ports: [{ protocol: TCP, port: 5432 }]
+    - to: [{ ipBlock: { cidr: 0.0.0.0/0, except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16] } }]
+      ports: [{ protocol: TCP, port: 443 }, { protocol: TCP, port: 465 }, { protocol: TCP, port: 587 }]
+---
+# MCP: vom Ingress; nach aussen nur die API (im Cluster) und HTTPS (Keycloak). Keine Datenbank.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mcp
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/name: ppm-mcp } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: ingress-nginx } }
+      ports: [{ protocol: TCP, port: 8081 }]
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
+      ports: [{ protocol: TCP, port: 9090 }]
+  egress:
+    - to: [{ podSelector: { matchLabels: { app.kubernetes.io/name: ppm-api } } }]
+      ports: [{ protocol: TCP, port: 8080 }]
+    - to: [{ ipBlock: { cidr: 0.0.0.0/0, except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16] } }]
+      ports: [{ protocol: TCP, port: 443 }]
+---
+# Migrationen: nur Datenbank
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: migrate
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/name: ppm-migrate } }
+  policyTypes: [Ingress, Egress]
+  egress:
+    - to: [{ ipBlock: { cidr: 10.0.1.0/24 } }]
+      ports: [{ protocol: TCP, port: 5432 }]

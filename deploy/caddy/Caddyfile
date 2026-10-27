@@ -1,0 +1,67 @@
+# Caddy vor PPM: TLS (ACME), genau ein Host, HTTP/3. Routen:
+#   /mcp*           → mcp:8081   (MCP über Streamable HTTP; Metadaten RFC 9728 unter /.well-known/oauth-protected-resource/mcp)
+#   alles andere    → api:8080   (REST-API /v1, BFF /auth, Webapp)
+# Der Betriebs-Endpunkt (OPS_PORT 9090) ist nie öffentlich.
+#
+# Wartung: liegt /srv/state/on (deploy.yml › maintenance-on), antwortet Caddy mit 503 und der Wartungsseite.
+{
+	email {$ACME_EMAIL}
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$DOMAIN:ppm.project-suite.ch} {
+	encode zstd gzip
+
+	# Sicherheits-Header als Rückfall; die App setzt je Antwortart ihre eigene, strengere CSP (Header werden nur
+	# ergänzt, wenn die App keinen setzt: «?»)
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		?Content-Security-Policy "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+		?Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		-Server
+	}
+
+	@maintenance file /srv/state/on
+	handle @maintenance {
+		root * /srv/maintenance
+		rewrite * /index.html
+		header Retry-After "600"
+		header Cache-Control "no-store"
+		header Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'"
+		file_server {
+			status 503
+		}
+	}
+
+	# Betriebs-Endpunkte nie nach aussen
+	@ops path /metrics /metrics/* /healthz /readyz
+	respond @ops 404
+
+	handle /mcp* {
+		reverse_proxy mcp:8081 {
+			flush_interval -1
+			health_uri /healthz
+			health_port 9090
+		}
+	}
+	handle /.well-known/oauth-protected-resource/mcp* {
+		reverse_proxy mcp:8081
+	}
+
+	handle {
+		reverse_proxy api:8080 {
+			health_uri /readyz
+			health_port 9090
+			lb_try_duration 10s
+		}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

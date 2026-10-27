@@ -1,0 +1,115 @@
+# Produktion auf einer VM (z. B. Hetzner App-VM, deploy/hetzner/): Caddy (TLS, ein Host), api, worker, mcp, migrate.
+# PostgreSQL läuft getrennt (DB-VM), erreichbar nur im privaten Netz mit TLS (DATABASE_SSL=verify-full).
+#
+#   IMAGE=ghcr.io/cspag/ppm@sha256:… docker compose -f compose.prod.yaml --env-file prod.env up -d --wait
+#
+# Geheimnisse liegen als Dateien unter ./secrets/ (0400, Besitzer UID 1000 – Compose ohne Swarm bindet sie unverändert ein;
+# aus SOPS entschlüsselt, deploy/hetzner/rollout.sh)
+# und gehen je Dienst nur an den Dienst, der sie liest (docs/betrieb.md › Geheimnisse je Dienst). Variablen ohne
+# Geheimnis stehen in prod.env (Vorlage prod.env.example).
+name: ppm
+
+x-app: &app
+  image: ${IMAGE:?IMAGE fehlt (ghcr.io/cspag/ppm@sha256:…)}
+  env_file: [prod.env]
+  read_only: true
+  tmpfs: [/tmp]
+  restart: unless-stopped
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  user: "1000:1000"
+  stop_grace_period: 40s # > SHUTDOWN_DELAY + SHUTDOWN_TIMEOUT
+  logging:
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
+  networks: [app]
+  # DB-VM im privaten Netz; Name passt zum Zertifikat (verify-full), CA als Secret database_ca
+  extra_hosts: ["db.ppm.internal:${DB_PRIVATE_IP:-10.0.1.20}"]
+
+services:
+  caddy:
+    image: caddy:2.11-alpine@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      DOMAIN: ${DOMAIN:-ppm.project-suite.ch}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL fehlt}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/maintenance:/srv/maintenance:ro
+      - ./state/maintenance:/srv/state:ro # Datei «on» = Wartungsseite (deploy.yml › maintenance-on)
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [app]
+
+  migrate:
+    <<: *app
+    command: ["migrate"]
+    restart: "no"
+    secrets: [database_admin_url, database_ca]
+    environment:
+      DATABASE_ADMIN_URL_FILE: /run/secrets/database_admin_url
+      NODE_EXTRA_CA_CERTS: /run/secrets/database_ca
+    profiles: [migrate]
+
+  api:
+    <<: *app
+    command: ["api"]
+    secrets: [database_url, database_ca, session_secret, encryption_keys, oidc_bff_private_key, keycloak_mgmt_private_key]
+    environment:
+      NODE_EXTRA_CA_CERTS: /run/secrets/database_ca
+      DATABASE_URL_FILE: /run/secrets/database_url
+      SESSION_SECRET_FILE: /run/secrets/session_secret
+      ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+      OIDC_BFF_PRIVATE_KEY_FILE: /run/secrets/oidc_bff_private_key
+      KEYCLOAK_MGMT_PRIVATE_KEY_FILE: /run/secrets/keycloak_mgmt_private_key
+    deploy:
+      replicas: 1
+
+  worker:
+    <<: *app
+    command: ["worker"]
+    secrets: [database_worker_url, database_ca, encryption_keys, keycloak_sync_private_key, keycloak_mgmt_private_key, smtp_url]
+    environment:
+      NODE_EXTRA_CA_CERTS: /run/secrets/database_ca
+      DATABASE_WORKER_URL_FILE: /run/secrets/database_worker_url
+      ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+      KEYCLOAK_SYNC_PRIVATE_KEY_FILE: /run/secrets/keycloak_sync_private_key
+      # Verwaltung im Worker (JobContext.admin, z. B. Zugang nach dem Austritt entfernen)
+      KEYCLOAK_MGMT_PRIVATE_KEY_FILE: /run/secrets/keycloak_mgmt_private_key
+      # E-Mail versendet nur der Worker; bei MAIL_ADAPTER=smtp (prod.env) Pflicht, die Datei bleibt bei «aus» leer
+      SMTP_URL_FILE: /run/secrets/smtp_url
+      MAIL_FROM: PPM <noreply@ppm.project-suite.ch>
+
+  mcp:
+    <<: *app
+    command: ["mcp"]
+    # Kein Datenbank-Login: der MCP-Dienst ist ein Client der REST-API
+    secrets: [mcp_private_key, mcp_dpop_key]
+    environment:
+      MCP_PRIVATE_KEY_FILE: /run/secrets/mcp_private_key
+      MCP_DPOP_KEY_FILE: /run/secrets/mcp_dpop_key
+      MCP_API_URL: http://api:8080
+
+secrets:
+  database_url: { file: ./secrets/database_url }
+  database_worker_url: { file: ./secrets/database_worker_url }
+  database_admin_url: { file: ./secrets/database_admin_url }
+  database_ca: { file: ./secrets/database_ca }
+  session_secret: { file: ./secrets/session_secret }
+  encryption_keys: { file: ./secrets/encryption_keys }
+  oidc_bff_private_key: { file: ./secrets/oidc_bff_private_key }
+  keycloak_mgmt_private_key: { file: ./secrets/keycloak_mgmt_private_key }
+  keycloak_sync_private_key: { file: ./secrets/keycloak_sync_private_key }
+  smtp_url: { file: ./secrets/smtp_url }
+  mcp_private_key: { file: ./secrets/mcp_private_key }
+  mcp_dpop_key: { file: ./secrets/mcp_dpop_key }
+
+volumes:
+  caddy-data:
+  caddy-config:
+
+networks:
+  app:

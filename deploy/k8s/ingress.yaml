@@ -1,0 +1,29 @@
+# Ein Host, TLS über cert-manager (Issuer im Overlay). /mcp an den MCP-Dienst, alles andere an die API.
+# Betriebs-Endpunkte (Port 9090) sind nie über den Ingress erreichbar.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ppm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-body-size: 2m
+    # Streamable HTTP (SSE) des MCP-Dienstes nicht puffern
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [ppm.project-suite.ch]
+      secretName: ppm-tls
+  rules:
+    - host: ppm.project-suite.ch
+      http:
+        paths:
+          - path: /mcp
+            pathType: Prefix
+            backend: { service: { name: ppm-mcp, port: { name: http } } }
+          - path: /.well-known/oauth-protected-resource/mcp
+            pathType: Prefix
+            backend: { service: { name: ppm-mcp, port: { name: http } } }
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: ppm-api, port: { name: http } } }

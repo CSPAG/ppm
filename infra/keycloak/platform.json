@@ -1,0 +1,6 @@
+{
+  "scopes": [
+    "ppm:read",
+    "handlungsfeld:write"
+  ]
+}

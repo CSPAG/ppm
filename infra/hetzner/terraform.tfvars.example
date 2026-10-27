@@ -1,0 +1,11 @@
+# Als terraform.tfvars kopieren (nicht versionieren, keine Geheimnisse hier).
+location        = "nbg1"
+app_server_type = "cx33"
+db_server_type  = "cx33"
+db_volume_size  = 40
+admin_cidrs     = ["0.0.0.0/0", "::/0"] # GitHub-Runner haben keine festen Adressen; SSH nur mit Schlüssel
+ssh_keys = {
+  # "vorname" = "ssh-ed25519 AAAA… vorname@laptop"
+}
+# Workflow «Deploy» (Benutzer deploy, nur ppm-ssh-gate)
+deploy_ssh_public_key = "" # "ssh-ed25519 AAAA… deploy-workflow@ppm"

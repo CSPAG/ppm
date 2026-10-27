@@ -8,6 +8,7 @@ import { validateProjekteSearch, type ProjekteSearch } from './features/projekt/
 import { validatePhasenmodellSearch, type PhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
+import { validateVertragSearch, type VertragSearch } from './features/vertrag/index.ts';
 import { validateZielSearch, type ZielSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
@@ -19,6 +20,7 @@ export const searchOf = {
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,
   phasenmodell: validatePhasenmodellSearch,
+  vertrag: validateVertragSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { HandlungsfeldSearch, PhasenmodellSearch, ProjekteSearch, ZielSearch };
+export type { HandlungsfeldSearch, PhasenmodellSearch, ProjekteSearch, VertragSearch, ZielSearch };

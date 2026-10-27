@@ -9,11 +9,13 @@ import { useCallback } from 'react';
 import {
   MeineProjektePage, PROJEKTNUMMER, ProjektAkte, projektTexte, ProjektUebersicht, type ProjekteSearch, type Reiter, type SetProjekteSearch,
 } from '../features/projekt/index.ts';
+import { VertragPage, vertragTexte, type SetVertragSearch, type VertragSearch } from '../features/vertrag/index.ts';
 import { searchOf } from '../search.ts';
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektTexte.akte.uebersicht },
+  { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -50,5 +52,18 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <ProjektUebersicht nummer={nr} />;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute])] as const;
+  // Vertrag (UI-07, K2): `?kapitel=7&version=entwurf&feld=…` (informationsarchitektur.md, Adressen)
+  const vertragRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag', validateSearch: searchOf.vertrag, component: VertragRoute });
+
+  function VertragRoute() {
+    const { nr } = akteRoute.useParams();
+    const search = vertragRoute.useSearch();
+    const navigate = useNavigate({ from: vertragRoute.fullPath });
+    const setSearch = useCallback<SetVertragSearch>((next, o) => {
+      void navigate({ search: (prev: VertragSearch) => ({ ...prev, ...next }), replace: o?.replace ?? false });
+    }, [navigate]);
+    return <VertragPage nummer={nr} search={search} setSearch={setSearch} />;
+  }
+
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute])] as const;
 }

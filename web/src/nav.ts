@@ -3,17 +3,23 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
+import { eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
+import { kontoTexte } from './features/konto/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
 export const navigation: NavRegistrierung = {
   bereiche: [
+    // Arbeitsraum «Eingang»: Startseite jeder Rolle (UI-01, UX-E3); jede Rolle enthält tenant:read (fachmodell.md 3.3)
+    { raum: 'eingang', pfad: '/eingang', label: eingangTexte.titel, recht: 'tenant:read' },
     // Arbeitsraum «Ziele»: bis zum Zielzyklus (Etappe E6) nur die Handlungsfelder (BC ZM.01.01)
     { raum: 'ziele', pfad: '/ziele/handlungsfelder', label: T.bereich.handlungsfelder, recht: 'handlungsfeld:read' },
     // Arbeitsraum «Administration»: die Verwalten-Seiten des Baukastens kommen nach Recht aus `useIamNav()` dazu (UC-016)
   ],
   aktionen: [
+    // Befehlspalette «Stellvertretung erfassen» (IA «Navigation», UC-016 Schritt 4)
+    { id: 'stellvertretung-erfassen', label: kontoTexte.erfassen, icon: 'users', pfad: '/konto/stellvertretung?o=neu', recht: 'tenant:read' },
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
   ],
   suchen: [

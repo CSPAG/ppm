@@ -36,8 +36,9 @@ test('Leser:in sieht nur die Arbeitsräume mit Recht', async ({ page }) => {
   const nav = navigation(page);
   await expect(nav.getByRole('link', { name: 'Ziele' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Administration' })).toHaveCount(0);
-  // Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
-  for (const name of ['Eingang', 'Projekte', 'Portfolio', 'Gremien']) await expect(nav.getByRole('link', { name })).toHaveCount(0);
+  // Eingang hat jede Rolle (UX-E3); Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
+  await expect(nav.getByRole('link', { name: /^Eingang/ })).toBeVisible();
+  for (const name of ['Projekte', 'Portfolio', 'Gremien']) await expect(nav.getByRole('link', { name })).toHaveCount(0);
 });
 
 test('Telefon: Leiste unten mit «Mehr» als Blatt mit Konto', async ({ page }) => {

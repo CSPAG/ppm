@@ -208,6 +208,7 @@ DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5,
 
 | `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
 | `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `gate`, `aenderung` folgen mit AP-E3-3, AP-E3-4 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/projekte/{id}/vertrag/ziele` | `projekt:write` | Ziele zur Wahl in Kap. 2: strategische Ziele mit Handlungsfeld, Jahresziele ab dem laufenden Jahr (in voller Sicht gelesen, auch ohne `ziel:read` an der Organisation) |
 | `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
 | `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
 | `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |

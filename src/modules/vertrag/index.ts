@@ -14,12 +14,14 @@ import { entwurfsanlass } from './entwurf.ts';
 import { vertragTools } from './mcp.ts';
 import { registerRoutes, TAG } from './routes.ts';
 import * as store from './store.ts';
+import { registerZielauswahl } from './zielauswahl.ts';
 
 export const vertragModule = defineModule({
   name: 'vertrag',
   tags: [{ name: TAG, description: 'Projektvertrag: Versionen mit Kapiteln 1–13, Entwurf, Pflichtangaben je Phase, Einreichen zur Prüfung, Baseline.' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerZielauswahl(app, deps, TAG); // Ziele zur Wahl in Kap. 2 (PP.02.05)
   },
   mcpTools: { ...vertragTools },
 });

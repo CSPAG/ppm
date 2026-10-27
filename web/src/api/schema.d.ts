@@ -14911,6 +14911,115 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/uebernahme": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Projekte aus dem Excel-Dashboard übernehmen
+         * @description Einmalige Übernahme der laufenden Projekte (K16, A-14): je Zeile Projekt mit Nummer, Phase, Handlungsfeld, Projektleitung, dazu die Beiträge der Module (Bericht der Vorperiode mit Status und Trend, nächster Meilenstein). Prüflauf mit `speichern: false` meldet Fehler je Zeile und speichert nichts; mit `speichern: true` wird nur ohne Fehler gespeichert (alles oder nichts). Rechte an der Organisation: `projekt:create`, `projekt:write`, `projekt:organisation` und die der Beiträge (`statusbericht:write`).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UebernahmeIn"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UebernahmeErgebnis"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/meilensteine": {
         parameters: {
             query?: never;
@@ -28874,6 +28983,41 @@ export interface components {
             projekte: components["schemas"]["KopfProjekt"][];
             /** @description Anzahl dieser Projekte. */
             anzahl: number;
+        };
+        UebernahmeIn: {
+            /** @description Dashboard als CSV (Excel «CSV UTF-8», Trennzeichen `;` oder `,`), Spalten nach `scripts/uebernahme/vorlage.csv`. */
+            csv: string;
+            /** @description Schlüssel des Portfolios aller Zeilen, z. B. `transformation`. */
+            portfolio: string;
+            /** @description Periode der übernommenen Werte (Status, Trend): Vorperiode des ersten Berichts. Ohne Angabe der Vormonat. */
+            periode?: string;
+            /** @description `false`: Prüflauf, nichts wird gespeichert. `true`: speichern, nur wenn keine Zeile einen Fehler hat (sonst 422 mit dem Ergebnis). */
+            speichern: boolean;
+        };
+        UebernahmeErgebnis: {
+            gespeichert: boolean;
+            periode: string;
+            /** @description Fehler der ganzen Datei (Kopfzeile, Portfolio). */
+            kopf: {
+                spalte: string | null;
+                text: string;
+            }[];
+            zeilen: {
+                /** @description Zeilennummer in der Datei (Kopf = 1). */
+                zeile: number;
+                index: string;
+                name: string;
+                /** @description Projektnummer beim Speichern bzw. die vorgesehene im Prüflauf. */
+                nummer: string | null;
+                fehler: {
+                    spalte: string | null;
+                    text: string;
+                }[];
+            }[];
+            anzahl: {
+                zeilen: number;
+                fehlerhaft: number;
+            };
         };
         Meilenstein: {
             /** Format: uuid */

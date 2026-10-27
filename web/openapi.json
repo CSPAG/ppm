@@ -5461,6 +5461,163 @@
           }
         }
       },
+      "UebernahmeIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "csv",
+          "portfolio",
+          "speichern"
+        ],
+        "properties": {
+          "csv": {
+            "minLength": 1,
+            "maxLength": 2000000,
+            "description": "Dashboard als CSV (Excel «CSV UTF-8», Trennzeichen `;` oder `,`), Spalten nach `scripts/uebernahme/vorlage.csv`.",
+            "type": "string"
+          },
+          "portfolio": {
+            "minLength": 1,
+            "maxLength": 40,
+            "description": "Schlüssel des Portfolios aller Zeilen, z. B. `transformation`.",
+            "type": "string"
+          },
+          "periode": {
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Periode der übernommenen Werte (Status, Trend): Vorperiode des ersten Berichts. Ohne Angabe der Vormonat.",
+            "type": "string"
+          },
+          "speichern": {
+            "description": "`false`: Prüflauf, nichts wird gespeichert. `true`: speichern, nur wenn keine Zeile einen Fehler hat (sonst 422 mit dem Ergebnis).",
+            "type": "boolean"
+          }
+        }
+      },
+      "UebernahmeErgebnis": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gespeichert",
+          "periode",
+          "kopf",
+          "zeilen",
+          "anzahl"
+        ],
+        "properties": {
+          "gespeichert": {
+            "type": "boolean"
+          },
+          "periode": {
+            "type": "string"
+          },
+          "kopf": {
+            "description": "Fehler der ganzen Datei (Kopfzeile, Portfolio).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "spalte",
+                "text"
+              ],
+              "properties": {
+                "spalte": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "zeilen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "zeile",
+                "index",
+                "name",
+                "nummer",
+                "fehler"
+              ],
+              "properties": {
+                "zeile": {
+                  "description": "Zeilennummer in der Datei (Kopf = 1).",
+                  "type": "integer"
+                },
+                "index": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "nummer": {
+                  "description": "Projektnummer beim Speichern bzw. die vorgesehene im Prüflauf.",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fehler": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "spalte",
+                      "text"
+                    ],
+                    "properties": {
+                      "spalte": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "anzahl": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "zeilen",
+              "fehlerhaft"
+            ],
+            "properties": {
+              "zeilen": {
+                "type": "integer"
+              },
+              "fehlerhaft": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
       "Meilenstein": {
         "additionalProperties": false,
         "type": "object",
@@ -34198,6 +34355,120 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/uebernahme": {
+      "post": {
+        "summary": "Projekte aus dem Excel-Dashboard übernehmen",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Einmalige Übernahme der laufenden Projekte (K16, A-14): je Zeile Projekt mit Nummer, Phase, Handlungsfeld, Projektleitung, dazu die Beiträge der Module (Bericht der Vorperiode mit Status und Trend, nächster Meilenstein). Prüflauf mit `speichern: false` meldet Fehler je Zeile und speichert nichts; mit `speichern: true` wird nur ohne Fehler gespeichert (alles oder nichts). Rechte an der Organisation: `projekt:create`, `projekt:write`, `projekt:organisation` und die der Beiträge (`statusbericht:write`).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UebernahmeIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UebernahmeErgebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

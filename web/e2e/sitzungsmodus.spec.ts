@@ -41,6 +41,7 @@ test('Sitzung durchführen: Entscheid in ≤ 60 s, schliessen, Protokoll versend
   await page.goto(`/gremien/${kuerzel}/sitzungen/${termin}`);
   await page.getByRole('button', { name: 'Sitzungsmodus' }).click();
   await expect(page).toHaveURL(new RegExp(`/gremien/${kuerzel}/sitzungen/${termin}/modus`));
+  await expect(page.getByRole('heading', { level: 1, name: /Sitzungsmodus$/ })).toBeVisible();
   await page.getByRole('button', { name: 'Sitzung starten' }).click();
   await expect(page.getByText('Sitzung gestartet.')).toBeVisible();
   await expectAccessible(page);
@@ -80,6 +81,8 @@ test('Sitzung durchführen: Entscheid in ≤ 60 s, schliessen, Protokoll versend
   await expect(page.getByText(/Sitzung geschlossen am .* Protokoll im Entwurf\./)).toBeVisible();
   await page.getByRole('button', { name: 'Protokoll', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/sitzungen/${termin}/protokoll$`));
+  // die Seite wird nachgeladen (seite()): erst die Überschrift des Protokolls abwarten
+  await expect(page.getByRole('heading', { level: 1, name: /^Protokoll / })).toBeVisible();
   await expect(page.getByText('Mit Auflagen freigegeben')).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);

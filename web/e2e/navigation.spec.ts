@@ -12,8 +12,8 @@ const navigation = (page: Page) => page.getByRole('navigation', { name: 'Navigat
 test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) => {
   await login(page, ANNA);
   const nav = navigation(page);
-  await expect(nav.getByRole('link', { name: 'Ziele' })).toBeVisible();
-  await expect(nav.getByRole('link', { name: 'Ziele' })).toHaveAttribute('aria-current', 'page');
+  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
+  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toHaveAttribute('aria-current', 'page');
   await expectAccessible(page);
   await expectNoOverflow(page);
 
@@ -34,7 +34,7 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
 test('Leser:in sieht nur die Arbeitsräume mit Recht', async ({ page }) => {
   await login(page, BRUNO);
   const nav = navigation(page);
-  await expect(nav.getByRole('link', { name: 'Ziele' })).toBeVisible();
+  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Administration' })).toHaveCount(0);
   // Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
   for (const name of ['Eingang', 'Projekte', 'Portfolio', 'Gremien']) await expect(nav.getByRole('link', { name })).toHaveCount(0);

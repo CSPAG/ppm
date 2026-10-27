@@ -57,8 +57,8 @@ async function aufgabeVervollstaendigen(tx: Tx, zj: store.ZieljahrRow): Promise<
   });
 }
 
-const zieljahrOut = (r: store.ZieljahrRow, write: boolean): ZieljahrOut => ({
-  jahr: r.jahr, stand: r.stand, vorlageBis: r.vorlage_bis, freigabeAt: r.freigabe_at, freigabeText: r.freigabe_text,
+export const zieljahrOut = (r: store.ZieljahrRow, write: boolean): ZieljahrOut => ({
+  jahr: r.jahr, stand: r.stand, vorlageBis: r.vorlage_bis, vorgelegtAt: r.vorgelegt_at, freigabeAt: r.freigabe_at, freigabeText: r.freigabe_text,
   version: r.version, createdAt: r.created_at, updatedAt: r.updated_at, can: { write: write && r.stand === 'in_arbeit' },
 });
 

@@ -7979,6 +7979,7 @@
           "jahr",
           "stand",
           "vorlageBis",
+          "vorgelegtAt",
           "freigabeAt",
           "freigabeText",
           "version",
@@ -8019,6 +8020,17 @@
                 "format": "date",
                 "description": "Geplante Vorlage an den VR.",
                 "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vorgelegtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
@@ -9125,6 +9137,531 @@
             "maxLength": 2000,
             "description": "Kommentar und Beurteilung des Stands; leer erlaubt.",
             "type": "string"
+          }
+        }
+      },
+      "Vorlage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "stand",
+          "version",
+          "anzahl",
+          "anzahlVorjahr",
+          "jeHandlungsfeld",
+          "ohneMetrik",
+          "ohneUmsetzung",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "in_arbeit"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "zur_freigabe"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_kraft"
+                ]
+              }
+            ]
+          },
+          "version": {
+            "description": "Version des Zieljahrs für `If-Match` beim Vorlegen bzw. bei der Freigabe.",
+            "type": "integer"
+          },
+          "anzahl": {
+            "description": "Jahresziele des Jahres.",
+            "type": "integer"
+          },
+          "anzahlVorjahr": {
+            "anyOf": [
+              {
+                "description": "Jahresziele des Vorjahres; null ohne Zielzyklus im Vorjahr.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "jeHandlungsfeld": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "handlungsfeldId",
+                "label",
+                "anzahl",
+                "anzahlVorjahr"
+              ],
+              "properties": {
+                "handlungsfeldId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "label": {
+                  "anyOf": [
+                    {
+                      "description": "Bezeichnung, falls die Person das Handlungsfeld sehen darf.",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "anzahl": {
+                  "type": "integer"
+                },
+                "anzahlVorjahr": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "ohneMetrik": {
+            "description": "Jahresziele ohne Metrik oder Zielwert: sperren die Vorlage (UC-011 Schritt 5).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "ohneUmsetzung": {
+            "description": "Jahresziele ohne Hauptaktivität und ohne Projekt (Hinweis).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "vorlegen",
+              "freigabe"
+            ],
+            "properties": {
+              "vorlegen": {
+                "description": "«Zur Freigabe vorlegen» (ziel:write, Stand «in Arbeit»; Sperren siehe ohneMetrik).",
+                "type": "boolean"
+              },
+              "freigabe": {
+                "description": "«Freigabe erfassen» (ziel:freigabe, Stand «zur Freigabe»).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "FreigabeErfassen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "entscheid",
+          "datum"
+        ],
+        "properties": {
+          "entscheid": {
+            "description": "«freigegeben» setzt die Jahresziele in Kraft; «anpassungen» (UC-011 A2) setzt sie auf «in Arbeit» zurück.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "freigegeben"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "anpassungen"
+                ]
+              }
+            ]
+          },
+          "datum": {
+            "format": "date",
+            "description": "Datum des Entscheids des VR.",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 4000,
+            "description": "Rückmeldungen des VR; bei «anpassungen» Pflicht.",
+            "type": "string"
+          }
+        }
+      },
+      "RoadmapInhalt": {
+        "additionalProperties": false,
+        "description": "Vertrauliche Projekte (A-34) erscheinen nicht.",
+        "type": "object",
+        "required": [
+          "jahr",
+          "handlungsfelder"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "handlungsfelder": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "label",
+                "ziele"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "ziele": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "nummer",
+                      "text",
+                      "metrik",
+                      "zielwert",
+                      "projekte",
+                      "jahresziele"
+                    ],
+                    "properties": {
+                      "nummer": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "metrik": {
+                        "type": "string"
+                      },
+                      "zielwert": {
+                        "type": "string"
+                      },
+                      "projekte": {
+                        "description": "Projekte am strategischen Ziel ohne Jahresziel.",
+                        "type": "array",
+                        "items": {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "nummer",
+                            "name",
+                            "phase",
+                            "lebenszyklus"
+                          ],
+                          "properties": {
+                            "nummer": {
+                              "description": "Projektnummer (Adresse der Projektakte).",
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "phase": {
+                              "type": "string"
+                            },
+                            "lebenszyklus": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "jahresziele": {
+                        "type": "array",
+                        "items": {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "nummer",
+                            "text",
+                            "metrik",
+                            "zielwert",
+                            "hauptaktivitaeten",
+                            "projekte"
+                          ],
+                          "properties": {
+                            "nummer": {
+                              "type": "string"
+                            },
+                            "text": {
+                              "type": "string"
+                            },
+                            "metrik": {
+                              "type": "string"
+                            },
+                            "zielwert": {
+                              "type": "string"
+                            },
+                            "hauptaktivitaeten": {
+                              "type": "array",
+                              "items": {
+                                "additionalProperties": false,
+                                "type": "object",
+                                "required": [
+                                  "text",
+                                  "verantwortlich"
+                                ],
+                                "properties": {
+                                  "text": {
+                                    "type": "string"
+                                  },
+                                  "verantwortlich": {
+                                    "anyOf": [
+                                      {
+                                        "description": "Name der verantwortlichen Person.",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "projekte": {
+                              "type": "array",
+                              "items": {
+                                "additionalProperties": false,
+                                "type": "object",
+                                "required": [
+                                  "nummer",
+                                  "name",
+                                  "phase",
+                                  "lebenszyklus"
+                                ],
+                                "properties": {
+                                  "nummer": {
+                                    "description": "Projektnummer (Adresse der Projektakte).",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "phase": {
+                                    "type": "string"
+                                  },
+                                  "lebenszyklus": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Roadmap": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "publiziertAt",
+          "publiziertBy",
+          "version",
+          "inhalt",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "publiziertAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publiziertBy": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "inhalt": {
+            "$ref": "#/components/schemas/RoadmapInhalt"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "publizieren"
+            ],
+            "properties": {
+              "publizieren": {
+                "description": "Neu publizieren (ziel:freigabe, Jahresziele in Kraft).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "RoadmapList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "jahr",
+                "publiziertAt",
+                "version"
+              ],
+              "properties": {
+                "jahr": {
+                  "type": "integer"
+                },
+                "publiziertAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "version": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RoadmapVorschau": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "stand",
+          "publiziertAt",
+          "inhalt",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_arbeit"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "zur_freigabe"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "in_kraft"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "publiziertAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inhalt": {
+            "$ref": "#/components/schemas/RoadmapInhalt"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "publizieren"
+            ],
+            "properties": {
+              "publizieren": {
+                "description": "Publizieren möglich (Jahresziele in Kraft).",
+                "type": "boolean"
+              }
+            }
           }
         }
       },
@@ -46394,6 +46931,788 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ziele/{jahr}/vorlage": {
+      "get": {
+        "summary": "Vorlage an den VR vorbereiten",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Zusammenfassung (Jahresziele je Handlungsfeld, Vergleich zum Vorjahr) und Prüfung vor dem Vorlegen (K6 Schritt 6). Ohne Zielzyklus 404.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vorlage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ziele/{jahr}/vorlegen": {
+      "post": {
+        "summary": "Jahresziele zur Freigabe vorlegen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Setzt die Jahresziele auf «zur Freigabe» (UC-011 Schritt 6); danach gesperrt bis zum Entscheid des VR. 409 ausserhalb von «in Arbeit», ohne Jahresziele oder solange ein Jahresziel keine Metrik bzw. keinen Zielwert hat (`reason: metrik_fehlt`, `ohneMetrik`). Erledigt die Aufgabe «Jahresziele vervollständigen».",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Zieljahr"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ziele/{jahr}/freigabe": {
+      "post": {
+        "summary": "Freigabe des VR erfassen",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Entscheid des VR (UC-011 Schritt 7, UE): «freigegeben» setzt die Jahresziele in Kraft; «anpassungen» (A2) setzt sie mit den Rückmeldungen auf «in Arbeit» zurück und legt allen mit `ziel:write` (GL) die Aufgabe zum Anpassen in den Eingang. 409 ausserhalb von «zur Freigabe».",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreigabeErfassen"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Zieljahr"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/roadmap": {
+      "get": {
+        "summary": "Publizierte Roadmaps",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Alle publizierten Jahre, neueste zuerst; lesbar für alle angemeldeten Personen (A-35).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/roadmap/{jahr}": {
+      "get": {
+        "summary": "Roadmap eines Jahres",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Stand bei Publikation; nicht publiziert: 404.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roadmap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Roadmap publizieren",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie allen angemeldeten Personen lesend bereit (UC-011 Schritt 8, A-35). Erneutes Publizieren ersetzt den Stand. 409, solange die Jahresziele nicht in Kraft sind.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roadmap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/roadmap/{jahr}/vorschau": {
+      "get": {
+        "summary": "Vorschau der Roadmap",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Inhalt, wie er beim Publizieren gespeichert würde (K6 Schritt 8); nur mit ziel:freigabe.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapVorschau"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

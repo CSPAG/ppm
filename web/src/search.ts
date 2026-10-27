@@ -15,7 +15,7 @@ import { type SitzungSearch, validateSitzungSearch } from './features/sitzung/in
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
 import { validateVertragSearch, type VertragSearch } from './features/vertrag/index.ts';
-import { validateZielerreichungSearch, validateZielSearch, validateZielzyklusSearch, type ZielerreichungSearch, type ZielSearch, type ZielzyklusSearch } from './features/ziele/index.ts';
+import { type RoadmapSearch, validateRoadmapSearch, validateZielerreichungSearch, validateZielSearch, validateZielzyklusSearch, type ZielerreichungSearch, type ZielSearch, type ZielzyklusSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
   eingang: validateEingangSearch,
@@ -25,6 +25,7 @@ export const searchOf = {
   bericht: validateBerichtSearch,
   strategischeZiele: validateZielSearch,
   zielzyklus: validateZielzyklusSearch,
+  roadmap: validateRoadmapSearch,
   ideeNeu: validateIdeeNeuSearch,
   idee: validateIdeeSearch,
   zielerreichung: validateZielerreichungSearch,
@@ -40,4 +41,4 @@ export const searchOf = {
   vertrag: validateVertragSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { AuslastungSearch, HandlungsfeldSearch, KapazitaetSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };
+export type { AuslastungSearch, HandlungsfeldSearch, KapazitaetSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, RoadmapSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };

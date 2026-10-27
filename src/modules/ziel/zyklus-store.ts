@@ -17,10 +17,10 @@ export type Stand = 'in_arbeit' | 'zur_freigabe' | 'in_kraft';
 // ---------------------------------------------------------------- Zieljahr
 
 export interface ZieljahrRow {
-  id: string; jahr: number; stand: Stand; vorlage_bis: string | null; freigabe_at: Date | null; freigabe_text: string;
+  id: string; jahr: number; stand: Stand; vorlage_bis: string | null; vorgelegt_at: Date | null; freigabe_at: Date | null; freigabe_text: string;
   version: number; created_at: Date; updated_at: Date;
 }
-const ZJ_COLS = "id, jahr, stand, to_char(vorlage_bis, 'YYYY-MM-DD') AS vorlage_bis, freigabe_at, freigabe_text, version, created_at, updated_at";
+export const ZJ_COLS = "id, jahr, stand, to_char(vorlage_bis, 'YYYY-MM-DD') AS vorlage_bis, vorgelegt_at, freigabe_at, freigabe_text, version, created_at, updated_at";
 
 export async function getJahr(tx: Tx, jahr: number, sperren = false): Promise<ZieljahrRow | null> {
   // FOR SHARE: Vorlegen (AP-E6-2) wartet, bis laufende Änderungen an Jahreszielen abgeschlossen sind

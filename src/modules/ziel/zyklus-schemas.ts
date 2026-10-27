@@ -17,6 +17,7 @@ export const Zieljahr = Type.Object({
   jahr: Type.Integer(),
   stand: Type.Union([Type.Literal('in_arbeit'), Type.Literal('zur_freigabe'), Type.Literal('in_kraft')], { description: 'Bearbeitungsstand der Jahresziele; ab «zur_freigabe» gesperrt.' }),
   vorlageBis: Nullable(Type.String({ format: 'date', description: 'Geplante Vorlage an den VR.' })),
+  vorgelegtAt: Nullable(DateTime),
   freigabeAt: Nullable(DateTime),
   freigabeText: Type.String(),
   version: Type.Integer({ minimum: 1 }),

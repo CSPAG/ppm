@@ -37,9 +37,7 @@ export const searchOf = {
   portfolios: validatePortfoliosSearch,
   sitzung: validateSitzungSearch,
   vertrag: validateVertragSearch,
-} satisfies Record<string, (raw: Record<string, unknown>) => object>;
-
-export type { AuslastungSearch, EntscheideSearch, HandlungsfeldSearch, KapazitaetSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };
   entscheide: validateEntscheideSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
+export type { AuslastungSearch, EntscheideSearch, HandlungsfeldSearch, KapazitaetSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };

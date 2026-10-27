@@ -17,8 +17,8 @@ import { Loading } from '../ui/index.ts';
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektTexte.akte.uebersicht },
-  { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
   { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
+  { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -64,7 +64,6 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <BerichtPage nummer={nr} periode={periode ?? laufendePeriode()} />;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, berichtRoute])] as const;
   // Vertrag (UI-07, K2): `?kapitel=7&version=entwurf&feld=…` (informationsarchitektur.md, Adressen)
   const vertragRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag', validateSearch: searchOf.vertrag, component: VertragRoute });
 
@@ -78,5 +77,5 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><VertragPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute])] as const;
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, berichtRoute])] as const;
 }

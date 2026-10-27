@@ -247,6 +247,9 @@ describe('Projektvertrag', { skip }, () => {
     // Abhängigkeit erscheint auch beim anderen Projekt (UC-002 Schritt 5)
     const ab = (await call('pl', 'GET', `/v1/projekte/${projekt.andere}/abhaengigkeiten`)).json().items;
     assert.deepEqual(ab.map((a: { richtung: string; text: string }) => [a.richtung, a.text]), [['eingehend', 'Schnittstelle']]);
+    // Strategiebezug aus Kap. 2 im Arbeitsraum Ziele (PP.02.05)
+    const zugeordnet = await full(api.t.runtime, T, async tx => (await tx.query<{ z: string }>('SELECT strategisches_ziel_id AS z FROM ppm.ziel_projekt WHERE projekt_id = $1', [projekt.p0])).rows);
+    assert.deepEqual(zugeordnet, [{ z: ziel }]);
     // Ein zweites Mal geht nicht (nicht eingereicht)
     await assert.rejects(full(api.t.runtime, T, tx => vertrag.baselineSetzen(tx, systemActor('system'), entwurf)), /nicht zum Entscheid/);
   });

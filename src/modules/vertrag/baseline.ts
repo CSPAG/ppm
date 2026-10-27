@@ -3,7 +3,7 @@
  * fachmodell.md 2.6): Die Version wird «abgenommen» und verbindlich, die bisherige Baseline gilt nicht mehr, und die
  * Listen der Kapitel gehen ins Register des Projekts (`projektdaten.uebernehmen`) – Termine und Budget als neue
  * Baseline-Spalten. Die IDs im Register schreibt das System in die Kapitel zurück, damit der nächste Entwurf dieselben
- * Einträge fortschreibt.
+ * Einträge fortschreibt. Das gewählte Ziel aus Kapitel 2 ordnet das Projekt im Modul ziel zu (`projektZuordnen`).
  *
  * Auslöser sind der Gate-Entscheid (Traktandenart `gate`, AP-E3-3) und der Entscheid einer Änderung (AP-E3-4). Läuft in
  * deren Transaktion; die Rechte prüft der Aufrufer. Entscheidet jemand ohne `vertrag:write` und `projekt:write` (UE im
@@ -11,6 +11,7 @@
  */
 import { conflict, notFound, type Actor, type Tx } from '@vollholz/platform';
 import { projektdaten, type RegisterName } from '../projektdaten/index.ts';
+import { projektZuordnen } from '../ziel/index.ts';
 import { record } from '../../platform.ts';
 import type { Inhalt } from './kapitel.ts';
 import * as store from './store.ts';
@@ -62,6 +63,10 @@ export async function baselineSetzen(tx: Tx, who: Actor, versionId: string): Pro
     neu.set(z.kapitel, inhalt);
   }
   for (const [nr, inhalt] of neu) await store.kapitelSetzen(tx, versionId, nr, null, inhalt, kapitel.get(nr)!.geaendert);
+
+  // Strategiebezug (Kap. 2, PP.02.05, UC-002 Schritt 3): das Projekt erscheint im Arbeitsraum Ziele unter dem Ziel
+  const k2 = kapitel.get(2)?.inhalt as { strategischesZielId?: string | null; jahreszielId?: string | null } | undefined;
+  if (k2?.strategischesZielId) await projektZuordnen(tx, who, v.projekt_id, { strategischesZielId: k2.strategischesZielId, jahreszielId: k2.jahreszielId ?? null });
 
   await store.baselineAufheben(tx, v.projekt_id);
   if (!(await store.standSetzen(tx, versionId, null, ENTSCHEIDBAR, 'abgenommen', { baseline: true }))) throw notFound('Vertragsversion');

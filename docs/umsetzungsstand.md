@@ -17,7 +17,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | umgesetzt (Modul, 030, Fristen in Arbeitstagen über `stammdaten`, UI-46) | #17 | A-10, A-12, A-13, A-27, A-43 |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | umgesetzt (040, 041; Modul und Feature `projekt`, Rahmen der Projektakte mit Reitern in `web/src/routes/projekte.tsx`) | #21, #25 | A-04, A-34, A-47; `POST /v1/projekte` mit `projekt:create`; Status, Trend und Meilenstein in der Projektzeile folgen mit AP-E1-1/AP-E0-6 |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | umgesetzt (050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»; Oberfläche UI-47; E2E offen bis CI läuft) | #19 (Merge-Zug #46), #24 | A-02, A-07, A-08, A-23, A-45 |
-| AP-E0-6 | Register Projektdaten | 060–069 | PR 1 umgesetzt (Tabellen 060, API, MCP `get_projektdaten`); PR 2 Register lesend in der Projektübersicht (Meilensteine, Risiken, Kosten nur mit `finanzen:read`, Abhängigkeiten beidseitig, weitere Register als Anzahl; E2E offen bis CI läuft) | #29 | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
+| AP-E0-6 | Register Projektdaten | 060–069 | umgesetzt (Tabellen 060, API, MCP `get_projektdaten`; Register lesend in der Projektübersicht: Meilensteine, Risiken, Kosten nur mit `finanzen:read`, Abhängigkeiten beidseitig, weitere Register als Anzahl; E2E offen bis CI läuft) | #29, #51 | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | umgesetzt (070, Modul `eingang` mit Schnittstelle `aufgabe`/`mitteilung`/`stellvertretung`, `list_aufgaben`; Seiten `/eingang`, `/konto/stellvertretung`); offen: Zähler an «Eingang» und Eintrag im Kontomenü (Shell) | #22, #31 | A-31 (Unterschrift in Vertretung prüft AP-E3-2 mit `stellvertretung.aktiv`), A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
@@ -84,7 +84,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | offen | – |
 | PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | offen | – |
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
-| PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
 | PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus umgesetzt (AP-E6-1, API und Oberfläche); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1, in Arbeit) | #28, #38, #43, #49 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
@@ -103,7 +103,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
 | PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |
-| PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | offen | – |
 | PS.03.01 | Änderung am Projektvertrag beantragen | 007 | E3 | AP-E3-4 | offen | – |
 | PS.03.02 | Änderung am Projektvertrag entscheiden | 007 | E3 | AP-E3-4 | offen | – |
@@ -112,10 +112,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.04.01 | Vorhaben abschliessen | 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.02 | Vorhaben sistieren oder abbrechen | 006, 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.03 | Lessons Learned erfassen | 013, 015 | E7 | AP-E7-1, AP-E7-5 | offen | – |
-| PS.05.01 | Stakeholder erfassen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
-| PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PS.05.01 | Stakeholder erfassen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
+| PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
-| PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PC.01.02 | Ist-Kosten übernehmen | 010 | E7 | AP-E7-4 | offen | – |
 | PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
 | PC.01.04 | Budgetabweichungen analysieren | 010 | E7 | AP-E7-4 | offen | – |
@@ -123,8 +123,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.02.01 | Portfoliorisiko erfassen | 008 | E5 | AP-E5-2 | offen | – |
 | PC.02.02 | Risikolage des Portfolios beurteilen | 006, 014 | E2 | AP-E2-3 | offen | – |
 | PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht (UI-13, Register AP-E0-6) in Arbeit | – |
-| PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
-| PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
+| PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
 | PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | Oberfläche im Bericht ab P2 (UI-13, Register AP-E0-6) in Arbeit | – |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
@@ -133,12 +133,12 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
 | RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
-| RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | umgesetzt (auch je Szenario über die Schnittstelle für AP-E5-3) | #35, #40 |
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
-| RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
 | AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | umgesetzt | #22, #31 |

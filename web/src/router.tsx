@@ -2,7 +2,7 @@
  * Routen (TanStack Router, code-basiert): Seiten der App mit typisierten Suchparametern (`search.ts`) und die
  * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen).
  */
-import { createRootRoute, createRoute, createRouter, lazyRouteComponent, redirect, useNavigate } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
 import { useCallback } from 'react';
 import { Root } from './app.tsx';
@@ -15,7 +15,7 @@ import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/
 import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { StellvertretungPage, type SetKontoSearch } from './features/konto/index.ts';
-import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
+import { ZIELJAHR, ZielePage, ZielzyklusPage, type SetZielSearch, type SetZielzyklusSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
 
@@ -90,6 +90,27 @@ function StrategischeZieleRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <ZielePage search={search} setSearch={setSearch} />;
+}
+
+// Zielzyklus eines Jahres (UI-38, K6; AP-E6-1): `/ziele/2027?o=ziel:2.1`
+const zielzyklusRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr', validateSearch: searchOf.zielzyklus, component: ZielzyklusRoute,
+  beforeLoad: ({ params }) => { if (!ZIELJAHR.test(params.jahr)) throw notFound(); },
+});
+
+function ZielzyklusRoute() {
+  const { jahr } = zielzyklusRoute.useParams();
+  const search = zielzyklusRoute.useSearch();
+  const navigate = useNavigate({ from: zielzyklusRoute.fullPath });
+  const setSearch = useCallback<SetZielzyklusSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return (
+    <ZielzyklusPage jahr={Number(jahr)} search={search} setSearch={setSearch}
+      jahrWechseln={j => void navigate({ to: '/ziele/$jahr', params: { jahr: String(j) }, search: {} })}
+      projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })}
+      strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })} />
+  );
 }
 
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
@@ -190,6 +211,7 @@ const routeTree = rootRoute.addChildren([
   gremienRoute,
   sitzungenRoute,
   sitzungRoute,
+  zielzyklusRoute,
   organisationRoute,
   codetabellenRoute,
   phasenmodellRoute,

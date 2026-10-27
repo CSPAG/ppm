@@ -10,7 +10,7 @@ import { validatePortfoliosSearch, type PortfoliosSearch } from './features/port
 import { validateSitzungSearch, type SitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
-import { validateZielSearch, type ZielSearch } from './features/ziele/index.ts';
+import { validateZielSearch, validateZielzyklusSearch, type ZielSearch, type ZielzyklusSearch } from './features/ziele/index.ts';
 
 export const searchOf = {
   eingang: validateEingangSearch,
@@ -18,6 +18,7 @@ export const searchOf = {
   handlungsfelder: validateHandlungsfeldSearch,
   projekte: validateProjekteSearch,
   strategischeZiele: validateZielSearch,
+  zielzyklus: validateZielzyklusSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,
   phasenmodell: validatePhasenmodellSearch,
@@ -29,3 +30,4 @@ export type { HandlungsfeldSearch, PhasenmodellSearch, ProjekteSearch, ZielSearc
   sitzung: validateSitzungSearch,
 
 export type { HandlungsfeldSearch, PhasenmodellSearch, SitzungSearch, ZielSearch };
+export type { HandlungsfeldSearch, PhasenmodellSearch, ZielSearch, ZielzyklusSearch };

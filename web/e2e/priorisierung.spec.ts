@@ -15,9 +15,12 @@ test('Bewertung und Modell: Reiter, Entwurf, barrierefrei', async ({ page }) => 
   await page.getByRole('link', { name: 'Modell' }).click();
   await expect(page).toHaveURL(/\/portfolio\/priorisierung\/modell/);
   const anlegen = page.getByRole('button', { name: 'Entwurf anlegen' }).first();
-  // Läufe hell, dunkel und schmal teilen die Datenbank: entweder neu anlegen oder den Entwurf öffnen
+  const version = page.getByRole('button', { name: /Modell \d+/ }).first();
+  // Läufe hell, dunkel und schmal teilen die Datenbank: erst warten, bis die Liste geladen ist, dann neu anlegen oder
+  // die vorhandene Version öffnen
+  await expect(anlegen.or(version).first()).toBeVisible();
   if (await anlegen.isVisible()) await anlegen.click();
-  else await page.getByRole('button', { name: /Modell \d+/ }).first().click();
+  else await version.click();
   await expect(page.getByRole('dialog', { name: /Modell \d+/ })).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);

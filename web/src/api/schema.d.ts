@@ -11892,6 +11892,730 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/phasenmodelle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Versionen des Phasenmodells auflisten
+         * @description Neueste zuerst, Cursor-Paginierung.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PhasenmodellList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Entwurf anlegen
+         * @description Kopie der Version in Kraft oder Vorgabe des PM-Handbuchs (ohne Version in Kraft immer die Vorgabe). Höchstens ein Entwurf; besteht einer, 409 mit seiner ID.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PhasenmodellCreate"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Phasenmodell"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/phasenmodelle/aktuell": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Phasenmodell in Kraft lesen
+         * @description Die Version, die für neue Projekte und das nächste Gate laufender Projekte gilt (A-13).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Phasenmodell"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/phasenmodelle/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Version des Phasenmodells lesen
+         * @description Mit Phasen, Gates, Leitfragen, Ergebnissen, Pflichtangaben, Kapitelwirkung, Fristen, Toleranzen und Prüfbericht.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Phasenmodell"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Entwurf verwerfen
+         * @description Nur mit `If-Match` und nur als Entwurf; Versionen in Kraft oder abgelöst bleiben (409).
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Verworfen */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Entwurf ändern
+         * @description Nur mit `If-Match`. Jede angegebene Liste ersetzt die bisherige (je Phase bzw. Gate nur die genannten Teile). Versionen in Kraft oder abgelöst sind unveränderlich (409).
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PhasenmodellPatch"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Phasenmodell"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/phasenmodelle/{id}/in-kraft-setzen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Entwurf in Kraft setzen
+         * @description UC-017 Schritt 5: Der Entwurf gilt ab sofort für neue Projekte und für laufende ab ihrem nächsten Gate (A-13); die bisherige Version ist abgelöst. Nur mit `If-Match`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Phasenmodell"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/meilensteine": {
         parameters: {
             query?: never;
@@ -21125,6 +21849,189 @@ export interface components {
             stossrichtungen?: string[];
             /** @description Reihenfolge in Listen (aufsteigend, danach Name). */
             position?: number;
+        };
+        Phasenmodell: {
+            /** Format: uuid */
+            id: string;
+            /** @description Laufende Nummer der Version. */
+            nummer: number;
+            /** @description Entwurf (bearbeitbar), in Kraft (gilt), abgelöst. */
+            stand: "entwurf" | "in_kraft" | "abgeloest";
+            /** @description Was sich mit dieser Version ändert. */
+            beschreibung: string;
+            inKraftAb: string | null;
+            inKraftVon: string | null;
+            /** @description Bearbeitungsstand (ETag). */
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string | null;
+            phasen: {
+                /** @description Code der Phase (fest). */
+                code: "PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4";
+                name: string;
+                position: number;
+                ergebnisse: {
+                    art: "lieferergebnis" | "meilenstein";
+                    text: string;
+                }[];
+                pflichtangaben: {
+                    /** @description Kapitel der Vorlage Projektvertrag (Q7). */
+                    kapitel: number;
+                    /** @description Feld im Schema des Kapitels (Modul vertrag). */
+                    feld: string;
+                    /** @description Was verlangt ist, in Worten. */
+                    text: string;
+                }[];
+            }[];
+            gates: {
+                /** @description Code des Gates (fest). */
+                code: "EINTRITT_P0" | "P0_P1" | "P1_P2" | "P2_P3" | "P3_P4" | "EXIT_P4";
+                name: string;
+                /** @description Code der Phase (fest). */
+                vonPhase: "PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4";
+                nachPhase: ("PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4") | null;
+                position: number;
+                leitfragen: {
+                    /** @description Schlüssel des Werts in der Codetabelle «Werteströme». */
+                    wertestrom: string;
+                    text: string;
+                }[];
+                pflichtangaben: {
+                    /** @description Kapitel der Vorlage Projektvertrag (Q7). */
+                    kapitel: number;
+                    /** @description Feld im Schema des Kapitels (Modul vertrag). */
+                    feld: string;
+                    /** @description Was verlangt ist, in Worten. */
+                    text: string;
+                }[];
+            }[];
+            kapitelWirkung: {
+                /** @description Kapitel der Vorlage Projektvertrag (Q7). */
+                kapitel: number;
+                dimension: "scope" | "budget" | "ressourcen";
+            }[];
+            fristen: {
+                schluessel: "bericht_aufgabe" | "bericht_stichtag" | "gate_vorbereiten" | "sitzung_vorbereiten" | "versand" | "protokoll";
+                wert: number;
+                /** @description Tag im Monat (Monatszyklus), Arbeitstage (Q8, UX-E11) oder Kalendertage. */
+                einheit: "tag_im_monat" | "arbeitstage" | "kalendertage";
+            }[];
+            toleranzen: {
+                dimension: "termin" | "kosten" | "umfang";
+                wert: number | null;
+                einheit: "prozent" | "kalendertage" | "arbeitstage";
+            }[];
+            /** @description Prüfbericht (I-P4): Hinweise und Warnungen vor dem In-Kraft-Setzen. */
+            pruefung: {
+                stufe: "hinweis" | "warnung";
+                /** @description Schlüssel der Regel. */
+                regel: string;
+                text: string;
+                ort: {
+                    art: "phase" | "gate" | "frist" | "toleranz" | "wirkung";
+                    code: string | null;
+                };
+            }[];
+            /** @description Was die anfragende Person damit darf (Recht und Stand). */
+            can: {
+                /** @description Entwurf bearbeiten oder verwerfen. */
+                write: boolean;
+                /** @description Entwurf in Kraft setzen. */
+                activate: boolean;
+            };
+        };
+        PhasenmodellKurz: {
+            /** Format: uuid */
+            id: string;
+            /** @description Laufende Nummer der Version. */
+            nummer: number;
+            /** @description Entwurf (bearbeitbar), in Kraft (gilt), abgelöst. */
+            stand: "entwurf" | "in_kraft" | "abgeloest";
+            /** @description Was sich mit dieser Version ändert. */
+            beschreibung: string;
+            inKraftAb: string | null;
+            inKraftVon: string | null;
+            /** @description Bearbeitungsstand (ETag). */
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string | null;
+        };
+        PhasenmodellList: {
+            items: components["schemas"]["PhasenmodellKurz"][];
+            nextCursor: string | null;
+            can: {
+                /** @description Entwurf anlegen. */
+                create: boolean;
+            };
+        };
+        PhasenmodellCreate: {
+            /** @description `aktuell`: Kopie der Version in Kraft (Standard, sofern vorhanden); `vorgabe`: Vorgabe des PM-Handbuchs. */
+            quelle?: "aktuell" | "vorgabe";
+            beschreibung?: string;
+        };
+        PhasenmodellPatch: {
+            beschreibung?: string;
+            phasen?: {
+                /** @description Code der Phase (fest). */
+                code: "PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4";
+                /** @description Bezeichnung in der Oberfläche. */
+                name?: string;
+                ergebnisse?: {
+                    art: "lieferergebnis" | "meilenstein";
+                    text: string;
+                }[];
+                pflichtangaben?: {
+                    /** @description Kapitel der Vorlage Projektvertrag (Q7). */
+                    kapitel: number;
+                    /** @description Feld im Schema des Kapitels (Modul vertrag). */
+                    feld: string;
+                    /** @description Was verlangt ist, in Worten. */
+                    text: string;
+                }[];
+            }[];
+            gates?: {
+                /** @description Code des Gates (fest). */
+                code: "EINTRITT_P0" | "P0_P1" | "P1_P2" | "P2_P3" | "P3_P4" | "EXIT_P4";
+                /** @description Bezeichnung in der Oberfläche. */
+                name?: string;
+                leitfragen?: {
+                    /** @description Schlüssel des Werts in der Codetabelle «Werteströme». */
+                    wertestrom: string;
+                    text: string;
+                }[];
+                pflichtangaben?: {
+                    /** @description Kapitel der Vorlage Projektvertrag (Q7). */
+                    kapitel: number;
+                    /** @description Feld im Schema des Kapitels (Modul vertrag). */
+                    feld: string;
+                    /** @description Was verlangt ist, in Worten. */
+                    text: string;
+                }[];
+            }[];
+            kapitelWirkung?: {
+                /** @description Kapitel der Vorlage Projektvertrag (Q7). */
+                kapitel: number;
+                dimension: "scope" | "budget" | "ressourcen";
+            }[];
+            fristen?: {
+                schluessel: "bericht_aufgabe" | "bericht_stichtag" | "gate_vorbereiten" | "sitzung_vorbereiten" | "versand" | "protokoll";
+                wert: number;
+                /** @description Tag im Monat (Monatszyklus), Arbeitstage (Q8, UX-E11) oder Kalendertage. */
+                einheit: "tag_im_monat" | "arbeitstage" | "kalendertage";
+            }[];
+            toleranzen?: {
+                dimension: "termin" | "kosten" | "umfang";
+                wert: number | null;
+                einheit: "prozent" | "kalendertage" | "arbeitstage";
+            }[];
         };
         Meilenstein: {
             /** Format: uuid */

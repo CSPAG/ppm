@@ -8,6 +8,7 @@ import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
 import { ZielePage, type SetZielSearch } from './features/ziele/index.ts';
 import { searchOf } from './search.ts';
@@ -80,6 +81,20 @@ function CodetabellenRoute() {
   return <CodetabellenPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03)
+const phasenmodellRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/phasenmodell', validateSearch: searchOf.phasenmodell, component: PhasenmodellRoute,
+});
+
+function PhasenmodellRoute() {
+  const search = phasenmodellRoute.useSearch();
+  const navigate = useNavigate({ from: phasenmodellRoute.fullPath });
+  const setSearch = useCallback<SetPhasenmodellSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <PhasenmodellPage search={search} setSearch={setSearch} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -88,7 +103,7 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
-const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, organisationRoute, codetabellenRoute, ...iamRoutes, ...devRoutes]);
+const routeTree = rootRoute.addChildren([indexRoute, zieleRoute, handlungsfelderRoute, strategischeZieleRoute, organisationRoute, codetabellenRoute, phasenmodellRoute, ...iamRoutes, ...devRoutes]);
 
 export const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true });
 

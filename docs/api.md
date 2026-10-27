@@ -71,6 +71,26 @@ Strategische Handlungsfelder mit Leitsatz und Stossrichtungen (BC ZM.01.01), Bei
 | `DELETE /v1/handlungsfelder/{id}` | `handlungsfeld:delete` | `If-Match` Pflicht, Verlauf bleibt |
 | `GET /v1/handlungsfelder/{id}/history` | `handlungsfeld:read` | alle Versionen, neueste zuerst |
 
+## Phasenmodell
+
+Phasen, Gates mit Leitfragen je Wertestrom, Standard-Lieferergebnisse und -Meilensteine, Pflichtangaben des Vertrags,
+Kapitelwirkung, Fristen und Toleranzen (BC AM.02.03, UC-017 Schritte 3 und 5), versioniert: höchstens ein Entwurf und
+eine Version in Kraft; eine Version in Kraft ist unveränderlich und wird durch die nächste abgelöst (gilt für laufende
+Projekte ab ihrem nächsten Gate, A-13). Jede Antwort trägt den Prüfbericht (`pruefung`) und `can: { write, activate }`.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/phasenmodelle?cursor=&limit=` | `phasenmodell:read` | Versionen, neueste zuerst; `can.create` |
+| `POST /v1/phasenmodelle` | `phasenmodell:write` | Entwurf aus der Version in Kraft (`quelle: aktuell`) oder der Vorgabe des PM-Handbuchs (`vorgabe`; ohne Version in Kraft immer); besteht ein Entwurf: 409 mit `entwurf` |
+| `GET /v1/phasenmodelle/aktuell` | `phasenmodell:read` | Version in Kraft (404 ohne) |
+| `GET /v1/phasenmodelle/{id}` | `phasenmodell:read` | `ETag` |
+| `PATCH /v1/phasenmodelle/{id}` | `phasenmodell:write` | nur Entwurf (sonst 409), `If-Match` Pflicht; jede angegebene Liste ersetzt die bisherige |
+| `DELETE /v1/phasenmodelle/{id}` | `phasenmodell:write` | Entwurf verwerfen, `If-Match` Pflicht |
+| `POST /v1/phasenmodelle/{id}/in-kraft-setzen` | `phasenmodell:activate` | `If-Match` Pflicht; bisherige Version wird abgelöst |
+
+Andere Module lesen das Phasenmodell und rechnen Fristen nur über `src/modules/phasenmodell/index.ts`:
+`aktuellesPhasenmodell(tx)`, `phasenmodellLesen(tx, id)`, `frist(tx, schluessel)`, `fristDatum(tx, schluessel, bezug)`
+(Arbeitstage ohne Wochenende und Feiertage der Organisation über `stammdaten`, A-43).
 ## Statusberichte
 
 Monatlicher Statusbericht je Projekt und Periode `YYYY-MM` (BC PS.01.01, UC-004, Kernablauf K1; `src/modules/statusbericht/`).
@@ -141,6 +161,10 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.handlungsfeld.created` | Handlungsfeld angelegt |
 | `ch.ppm.handlungsfeld.updated` | Handlungsfeld geändert |
 | `ch.ppm.handlungsfeld.deleted` | Handlungsfeld gelöscht |
+| `ch.ppm.phasenmodell.created` | Entwurf des Phasenmodells angelegt |
+| `ch.ppm.phasenmodell.updated` | Entwurf geändert |
+| `ch.ppm.phasenmodell.deleted` | Entwurf verworfen |
+| `ch.ppm.phasenmodell.activated` | Version in Kraft gesetzt (mit `abgeloest`) |
 | `ch.ppm.<register>.created`, `.updated`, `.deleted` | Eintrag eines Registers (`meilenstein`, `kosten`, `risiko`, `kpi`, `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`); Kosten ohne Beträge |
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |

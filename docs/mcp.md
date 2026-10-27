@@ -30,6 +30,7 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 |---|---|---|---|
 | `list_handlungsfelder` | `GET /v1/handlungsfelder` | `handlungsfeld:read` | `readOnlyHint` |
 | `get_handlungsfeld` | `GET /v1/handlungsfelder/{id}` | `handlungsfeld:read` | `readOnlyHint` |
+| `get_phasenmodell` | `GET /v1/phasenmodelle/aktuell` bzw. `/{id}` | `phasenmodell:read` | `readOnlyHint` |
 | `list_statusberichte` | `GET /v1/projekte/{id}/berichte[/{periode}]` | `projekt:read` | `readOnlyHint`; mit Periode der ganze Bericht |
 | `get_periode` | `GET /v1/perioden/{periode}[/terminabweichungen]` | `statusbericht:review` | `readOnlyHint`; Monatsabschluss bzw. Terminabweichungen |
 | `get_projektdaten` | `GET /v1/projekte/{id}/<register>` je Register | `projekt:read` | `readOnlyHint`; Kosten `null` ohne `finanzen:read` |

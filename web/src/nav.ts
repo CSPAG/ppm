@@ -3,15 +3,19 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
+import { eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
+import { kontoTexte } from './features/konto/index.ts';
 import { sucheZiele, zieleTexte, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
 export const navigation: NavRegistrierung = {
   bereiche: [
+    // Arbeitsraum «Eingang»: Startseite jeder Rolle (UI-01, UX-E3); jede Rolle enthält tenant:read (fachmodell.md 3.3)
+    { raum: 'eingang', pfad: '/eingang', label: eingangTexte.titel, recht: 'tenant:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
     { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: 'idee:create' },
     // Arbeitsraum «Ziele»: bis zum Zielzyklus (Etappe E6) nur die Handlungsfelder (BC ZM.01.01)
@@ -23,12 +27,18 @@ export const navigation: NavRegistrierung = {
     // Recht aus `useIamNav()` dazu (UC-016)
     { raum: 'administration', pfad: '/administration/organisation', label: TS.bereich.organisation, recht: 'stammdaten:write' },
     { raum: 'administration', pfad: '/administration/codetabellen', label: TS.bereich.codetabellen, recht: 'stammdaten:write' },
+    // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03) nur für wer es pflegt (IA: UE, PMO, ADM); lesen dürfen
+    // alle Rollen (fachmodell.md 3.3), die Administration erscheint dafür aber nicht. Die Verwalten-Seiten des Baukastens
+    // kommen nach Recht aus `useIamNav()` dazu (UC-016)
+    { raum: 'administration', pfad: '/administration/phasenmodell', label: T.bereich.phasenmodell, recht: 'phasenmodell:write' },
   ],
   aktionen: [
     // Befehlspalette «Projektidee einreichen» für alle, die Ideen erfassen (K4 Einstieg)
     { id: 'idee-einreichen', label: ideeTexte.einreichen, icon: 'plus', pfad: ideeNeuPfad(), recht: 'idee:create' },
     { id: 'einheit-anlegen', label: TS.aktion.einheitAnlegen, icon: 'plus', pfad: '/administration/organisation?o=neu', recht: 'stammdaten:write' },
     { id: 'feiertag-erfassen', label: TS.aktion.feiertagErfassen, icon: 'plus', pfad: '/administration/organisation?ansicht=feiertage&o=neu', recht: 'stammdaten:write' },
+    // Befehlspalette «Stellvertretung erfassen» (IA «Navigation», UC-016 Schritt 4)
+    { id: 'stellvertretung-erfassen', label: kontoTexte.erfassen, icon: 'users', pfad: '/konto/stellvertretung?o=neu', recht: 'tenant:read' },
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
     { id: 'ziel-anlegen', label: zieleTexte.aktionAnlegen, icon: 'plus', pfad: '/ziele/strategische-ziele?o=neu', recht: 'ziel:write' },
   ],

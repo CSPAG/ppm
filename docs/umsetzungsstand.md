@@ -15,7 +15,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
 | AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | in Arbeit (PR 1 Tabellen und API; PR 2 Oberfläche UI-44, UI-45 folgt) | – | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | umgesetzt (Modul, 030, Arbeitstage mit Feiertagen, UI-46; Feiertage bis AP-E0-2 direkt aus `feiertag`) | #17 | A-10, A-12, A-13, A-27, A-43 |
-| AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
+| AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | in Arbeit | – | A-04, A-34, A-47 |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | in Arbeit (PR 1: 050, Modul `portfolio` mit API, MCP, Gremienweg «via SNS-VR»; PR 2: Oberfläche UI-47) | – | A-02, A-07, A-08, A-23, A-45 |
 | AP-E0-6 | Register Projektdaten | 060–069 | offen | – | – |
 | AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | offen | – | – |
@@ -94,7 +94,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | offen | – |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | offen | – |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | offen | – |
-| PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | offen | – |
+| PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | in Arbeit | – |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | offen | – |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | offen | – |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | offen | – |

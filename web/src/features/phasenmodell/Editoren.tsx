@@ -14,7 +14,11 @@ const P = T.phasenmodell;
 type Fehler = Record<string, string>;
 
 /** Liste von Texten mit Hinzufügen, Entfernen und Verschieben. */
-function TextListe({ titel, items, onChange, ro, addLabel, ebene = 3 }: { titel: string; items: string[]; onChange(l: string[]): void; ro: boolean; addLabel: string; ebene?: 3 | 4 }) {
+function TextListe({ titel, items, onChange, ro, addLabel, ebene = 3, max }: {
+  titel: string; items: string[]; onChange(l: string[]): void; ro: boolean; addLabel: string; ebene?: 3 | 4;
+  /** Höchstlänge wie im Schema (Leitfrage 1000, Ergebnis 500). */
+  max: number;
+}) {
   const H = ebene === 3 ? 'h3' : 'h4';
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -42,7 +46,7 @@ function TextListe({ titel, items, onChange, ro, addLabel, ebene = 3 }: { titel:
       <ol className="pm-rows">
         {items.map((t, i) => (
           <li key={i} data-row={i} className="pm-row">
-            <input className="pm-in" value={t} onChange={e => setze(i, e.target.value)} aria-label={`${titel} ${i + 1}`} maxLength={1000} data-act="text" />
+            <input className="pm-in" value={t} onChange={e => setze(i, e.target.value)} aria-label={`${titel} ${i + 1}`} maxLength={max} data-act="text" />
             <button type="button" className="iconbtn" data-act="hoch" aria-label={`${P.hoch}: ${t}`} title={P.hoch} disabled={i === 0}
               onClick={() => { onChange(verschiebe(items, i, -1)); setFokus({ row: i - 1, act: i - 1 === 0 ? 'runter' : 'hoch' }); }}><Icon name="up" /></button>
             <button type="button" className="iconbtn" data-act="runter" aria-label={`${P.runter}: ${t}`} title={P.runter} disabled={i === items.length - 1}
@@ -128,8 +132,8 @@ export function PhaseEditor({ phase, index, onChange, ro, fehler }: { phase: Pha
     <div className="pm-ed">
       <NameFeld value={phase.name} onChange={name => onChange({ ...phase, name })} ro={ro} fehler={fehler[`/phasen/${index}/name`]} />
       {phase.code !== 'PRE_P0' ? <p className="hint">{P.ergebnisseHint}</p> : null}
-      <TextListe titel={P.lieferergebnisse} items={art('lieferergebnis')} onChange={l => setzeArt('lieferergebnis', l)} ro={ro} addLabel={P.hinzufuegen.lieferergebnis} />
-      <TextListe titel={P.meilensteine} items={art('meilenstein')} onChange={l => setzeArt('meilenstein', l)} ro={ro} addLabel={P.hinzufuegen.meilenstein} />
+      <TextListe titel={P.lieferergebnisse} items={art('lieferergebnis')} onChange={l => setzeArt('lieferergebnis', l)} ro={ro} addLabel={P.hinzufuegen.lieferergebnis} max={500} />
+      <TextListe titel={P.meilensteine} items={art('meilenstein')} onChange={l => setzeArt('meilenstein', l)} ro={ro} addLabel={P.hinzufuegen.meilenstein} max={500} />
       <PflichtListe items={phase.pflichtangaben} onChange={pflichtangaben => onChange({ ...phase, pflichtangaben })} ro={ro} fehler={fehler} pfad={`/phasen/${index}/pflichtangaben`} />
     </div>
   );
@@ -148,7 +152,7 @@ export function GateEditor({ gate, index, onChange, ro, fehler }: { gate: Gate; 
       <h3 className="pm-h2">{P.leitfragen}</h3>
       <p className="hint">{P.leitfragenHint}</p>
       {gruppen.map(w => (
-        <TextListe key={w} titel={wertestromLabel(w)} items={gate.leitfragen.filter(l => l.wertestrom === w).map(l => l.text)} onChange={l => setzeGruppe(w, l)} ro={ro} addLabel={P.hinzufuegen.leitfrage} ebene={4} />
+        <TextListe key={w} titel={wertestromLabel(w)} items={gate.leitfragen.filter(l => l.wertestrom === w).map(l => l.text)} onChange={l => setzeGruppe(w, l)} ro={ro} addLabel={P.hinzufuegen.leitfrage} ebene={4} max={1000} />
       ))}
       <PflichtListe items={gate.pflichtangaben} onChange={pflichtangaben => onChange({ ...gate, pflichtangaben })} ro={ro} fehler={fehler} pfad={`/gates/${index}/pflichtangaben`} />
     </div>

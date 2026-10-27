@@ -62,8 +62,12 @@ describe('Arbeitstage (rein)', () => {
     assert.equal(arbeitstageZwischen('2025-11-05', '2025-11-12', keine), 5);
     assert.equal(arbeitstageZwischen('2025-11-12', '2025-11-05', keine), -5);
     assert.equal(arbeitstageZwischen('2025-11-12', '2025-11-12', keine), 0);
+    // rückwärts zählt das Ende der Richtung: Sa → Fr ist ein Arbeitstag zurück, Mo → Sa keiner
+    assert.equal(arbeitstageZwischen('2025-11-15', '2025-11-14', keine), -1);
+    assert.equal(arbeitstageZwischen('2025-11-17', '2025-11-15', keine), 0);
+    assert.equal(arbeitstageZwischen('2025-11-14', '2025-11-15', keine), 0);
     assert.equal(arbeitstageZwischen('2025-12-19', '2025-12-30', bern), 5);
-    for (const [d, n] of [['2025-12-19', 7], ['2026-03-30', 12], ['2026-01-07', -9]] as const) {
+    for (const [d, n] of [['2025-12-19', 7], ['2026-03-30', 12], ['2026-01-07', -9], ['2025-11-15', -1], ['2025-11-16', -6]] as const) {
       assert.equal(arbeitstageZwischen(d, addiereArbeitstage(d, n, bern), bern), n, `${d} ${n}`);
     }
   });

@@ -45,9 +45,9 @@ export function addiereArbeitstage(d: Datum, n: number, feiertage: ReadonlySet<D
 /** Arbeitstage von `von` (ausschliesslich) bis `bis` (einschliesslich); negativ, wenn `bis` vor `von` liegt. */
 export function arbeitstageZwischen(von: Datum, bis: Datum, feiertage: ReadonlySet<Datum>): number {
   const a = tagesZahl(von), b = tagesZahl(bis);
-  const [lo, hi, vz] = a <= b ? [a, b, 1] : [b, a, -1];
+  // vorwärts: (von, bis]; rückwärts: [bis, von) – gezählt wird immer das Ende der Richtung, nie der Start
+  const [lo, hi, vz] = a <= b ? [a + 1, b, 1] : [b, a - 1, -1];
   let n = 0;
-  for (let t = lo + 1; t <= hi; t++) if (istArbeitstag(ausTagesZahl(t), feiertage)) n++;
-  return n * vz;
+  for (let t = lo; t <= hi; t++) if (istArbeitstag(ausTagesZahl(t), feiertage)) n++;
+  return n === 0 ? 0 : n * vz;
 }
-

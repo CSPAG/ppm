@@ -5,14 +5,20 @@
  */
 import { QueryClient } from '@tanstack/react-query';
 import { useRouter, useRouterState } from '@tanstack/react-router';
-import { IamProvider, type IamFeatures, type IamLinkProps, type IamResources, type IamRouter } from '@vollholz/iam-web';
+import { ApiError, IamProvider, type IamFeatures, type IamLinkProps, type IamResources, type IamRouter } from '@vollholz/iam-web';
 import { useMemo, type ReactNode } from 'react';
 import './permissions.ts';
 
 export const features: IamFeatures = { entra: true, platform: true };
 export const paths = { home: '/ziele/handlungsfelder' };
 
-export const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } } });
+/** Wiederholen nur bei Netz- und Serverfehlern; 4xx (z. B. 404 «gibt es nicht mehr») sofort anzeigen statt nach drei Versuchen. */
+export function retryQuery(failureCount: number, error: unknown): boolean {
+  if (error instanceof ApiError && error.status >= 400 && error.status < 500) return false;
+  return failureCount < 3;
+}
+
+export const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: retryQuery } } });
 
 /** Router-Adapter: Pfad mit Suchtext wie die Seiten des Baukastens ihn liefern. */
 export function useIamRouter(): IamRouter {

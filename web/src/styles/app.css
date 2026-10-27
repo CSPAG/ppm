@@ -21,7 +21,8 @@ kbd { border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; margi
 .rail-link { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: var(--radius); color: #e8ebf5; text-decoration: none; }
 .rail-link:hover { background: rgba(255, 255, 255, .08); }
 .rail-link[aria-current='page'] { background: rgba(255, 255, 255, .14); font-weight: 600; }
-.rail-iam { --iam-text: #e8ebf5; --iam-muted: #c3c9dc; }
+/* Gruppe «Zugang» des Baukastens auf der dunklen Leiste: alle Text- und Flächen-Tokens, die IamNav nutzt (Kontrast AA) */
+.rail-iam { --iam-text: #e8ebf5; --iam-text-2: #e8ebf5; --iam-text-3: #c3c9dc; --iam-muted: #c3c9dc; --iam-hover: rgba(255, 255, 255, .08); --iam-accent-soft: rgba(255, 255, 255, .14); }
 .shell-main { display: flex; flex-direction: column; min-width: 0; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 24px; border-bottom: 1px solid var(--border); background: var(--surface); }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }

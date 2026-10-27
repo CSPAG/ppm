@@ -48,6 +48,8 @@ test('zweite Organisation sieht das Handlungsfeld nicht', async ({ page, browser
   await page.getByRole('button', { name: 'Neues Handlungsfeld' }).click();
   await page.getByLabel('Bezeichnung').fill(label);
   await page.getByRole('button', { name: 'Speichern' }).click();
+  // Nach dem Anlegen wechselt die Adresse von ?o=neu auf die ID
+  await expect(page).toHaveURL(/[?&]o=[0-9a-f-]{36}/);
   const id = new URL(page.url()).searchParams.get('o');
   expect(id).toMatch(/^[0-9a-f-]{36}$/);
 

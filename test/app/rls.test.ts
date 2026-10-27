@@ -30,6 +30,40 @@ const TENANT_TABLES: Record<string, (tx: Tx, tenantId: string) => Promise<string
   outbox_event: async (tx, t) => { await tx.query("INSERT INTO ppm.outbox_event (tenant_id, type) VALUES ($1, 'probe.created')", [t]); return "type = 'probe.created'"; },
   handlungsfeld: async (tx, t) => { await tx.query("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Probe')", [t]); return "label = 'Probe'"; },
   handlungsfeld_version: async () => "label = 'Probe'",   // entsteht per Trigger mit dem Handlungsfeld
+  // Phasenmodell (030_phasenmodell): ein Entwurf mit je einem Kind, angelegt mit voller Sicht
+  phasenmodell: async (tx, t) => { await tx.query("INSERT INTO ppm.phasenmodell (tenant_id, nummer, beschreibung) VALUES ($1, 1, 'Probe')", [t]); return "beschreibung = 'Probe'"; },
+  phase: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.phase (tenant_id, phasenmodell_id, code, name, position) SELECT $1, id, c, c, 0 FROM ppm.phasenmodell, unnest(ARRAY['P0', 'P1']) c WHERE tenant_id = $1", [t]);
+    return "code = 'P0'";
+  },
+  gate: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.gate (tenant_id, phasenmodell_id, code, name, von_phase, nach_phase, position) SELECT $1, id, 'P0_P1', 'Probe', 'P0', 'P1', 0 FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "code = 'P0_P1'";
+  },
+  leitfrage: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.leitfrage (tenant_id, phasenmodell_id, gate_code, wertestrom, position, text) SELECT $1, id, 'P0_P1', 'nutzen', 0, 'Probe' FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "text = 'Probe'";
+  },
+  standard_ergebnis: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.standard_ergebnis (tenant_id, phasenmodell_id, phase_code, art, position, text) SELECT $1, id, 'P0', 'meilenstein', 0, 'Probe' FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "text = 'Probe'";
+  },
+  pflichtangabe: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.pflichtangabe (tenant_id, phasenmodell_id, gate_code, kapitel, feld, position, text) SELECT $1, id, 'P0_P1', 9, 'kosten', 0, 'Probe' FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "text = 'Probe'";
+  },
+  kapitel_wirkung: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.kapitel_wirkung (tenant_id, phasenmodell_id, kapitel, dimension) SELECT $1, id, 9, 'budget' FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "dimension = 'budget'";
+  },
+  frist: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.frist (tenant_id, phasenmodell_id, schluessel, wert, einheit) SELECT $1, id, 'versand', 5, 'arbeitstage' FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "schluessel = 'versand'";
+  },
+  toleranz: async (tx, t) => {
+    await tx.query("INSERT INTO ppm.toleranz (tenant_id, phasenmodell_id, dimension, wert, einheit) SELECT $1, id, 'kosten', 10, 'prozent' FROM ppm.phasenmodell WHERE tenant_id = $1", [t]);
+    return "dimension = 'kosten'";
+  },
   webhook_subscription: async (tx, t) => {
     await tx.query("INSERT INTO ppm.webhook_subscription (tenant_id, url, secret_enc, event_types) VALUES ($1, 'https://example.ch/probe', 'x', '{handlungsfeld.created}')", [t]);
     return "url = 'https://example.ch/probe'";
@@ -74,6 +108,20 @@ const POLICIES = [
   "ppm.handlungsfeld.handlungsfeld_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('handlungsfeld:write'::text) CHECK app.has_permission('handlungsfeld:write'::text)",
   "ppm.handlungsfeld.handlungsfeld_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('handlungsfeld:delete'::text) CHECK -",
   "ppm.handlungsfeld_version.handlungsfeld_version_read RESTRICTIVE SELECT ppm_app USING app.has_permission('handlungsfeld:read'::text) CHECK -",
+  // Lesesicht des Phasenmodells (030_phasenmodell): Recht an der Organisation; Kinder nur im Entwurf änderbar
+  "ppm.phasenmodell.phasenmodell_read RESTRICTIVE SELECT ppm_app USING app.has_permission('phasenmodell:read'::text) CHECK -",
+  "ppm.phasenmodell.phasenmodell_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('phasenmodell:write'::text) AND (stand = 'entwurf'::text))",
+  "ppm.phasenmodell.phasenmodell_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('phasenmodell:write'::text) OR app.has_permission('phasenmodell:activate'::text)) CHECK (app.has_permission('phasenmodell:write'::text) OR app.has_permission('phasenmodell:activate'::text))",
+  "ppm.phasenmodell.phasenmodell_delete RESTRICTIVE DELETE ppm_app USING (app.has_permission('phasenmodell:write'::text) AND (stand = 'entwurf'::text)) CHECK -",
+  ...['phase', 'gate', 'leitfrage', 'standard_ergebnis', 'pflichtangabe', 'kapitel_wirkung', 'frist', 'toleranz'].flatMap(t => {
+    const entwurf = `(app.has_permission('phasenmodell:write'::text) AND (EXISTS ( SELECT 1 FROM ppm.phasenmodell m WHERE ((m.tenant_id = ${t}.tenant_id) AND (m.id = ${t}.phasenmodell_id) AND (m.stand = 'entwurf'::text)))))`;
+    return [
+      `ppm.${t}.${t}_read RESTRICTIVE SELECT ppm_app USING app.has_permission('phasenmodell:read'::text) CHECK -`,
+      `ppm.${t}.${t}_insert RESTRICTIVE INSERT ppm_app USING - CHECK ${entwurf}`,
+      `ppm.${t}.${t}_update RESTRICTIVE UPDATE ppm_app USING ${entwurf} CHECK ${entwurf}`,
+      `ppm.${t}.${t}_delete RESTRICTIVE DELETE ppm_app USING ${entwurf} CHECK -`,
+    ];
+  }),
   // Webhooks (002_webhooks): Zustellung über alle Mandanten im Worker
   'ppm.webhook_delivery.sched_read PERMISSIVE SELECT ppm_sched USING true CHECK -',
   'ppm.webhook_delivery.sched_write PERMISSIVE ALL ppm_sched USING ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id())) CHECK ((app.tenant_id() IS NULL) OR (tenant_id = app.tenant_id()))',

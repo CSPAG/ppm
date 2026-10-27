@@ -17,8 +17,8 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | offen | – | – |
 | AP-E0-4 | Projekt, Projektorganisation, Meine Projekte, Übersicht | 040–049 | offen | – | – |
 | AP-E0-5 | Portfolios und Gremien, Gremienweg | 050–059 | offen | – | – |
-| AP-E0-6 | Register Projektdaten | 060–069 | in Arbeit (PR 1 Tabellen 060, API, MCP `get_projektdaten`; PR 2 Einhängen in die Projektübersicht folgt) | – | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
-| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | offen | – | – |
+| AP-E0-6 | Register Projektdaten | 060–069 | PR 1 umgesetzt (Tabellen 060, API, MCP `get_projektdaten`); PR 2 Einhängen in die Projektübersicht folgt | #29 | A-20, A-22 (Meldung im System mit Ereignis `meldung.created`; Mitteilung an die Stelle folgt mit AP-E0-8), A-33 (Beträge auch in der Lesesicht nur mit `finanzen:read`); Massnahme eines Risikos `offen`/`umgesetzt`; KPI-Werte ab P2 |
+| AP-E0-8 | Eingang, Mitteilungen, Stellvertretung | 070–079 | PR 1 umgesetzt (070, Modul `eingang`, `list_aufgaben`); PR 2 Oberfläche in Arbeit | #22 | A-31, A-44 |
 | AP-E0-9 | Strategische Ziele | 080–089 | umgesetzt (080, Modul `ziel`, `list_ziele`; Seite Ziele › Strategische Ziele) | #13, #23 | A-15 |
 | AP-E0-7 | Übernahme aus dem Excel-Dashboard | 120–129 | offen | – | – |
 | AP-E1-1 | Statusbericht erfassen | 090–099 | offen | – | – |
@@ -41,7 +41,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | offen | – | – |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
-| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | offen | – | – |
+| AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | in Arbeit (PR 1 Tabellen und API: 300, Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; PR 2 Oberfläche UI-38 und Aufgabe «Jahresziele vervollständigen» folgt) | – | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1 |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | offen | – | – |
 | AP-E6-3 | Zielerreichung | 320–329 | offen | – | – |
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
@@ -62,10 +62,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 |---|---|---|---|---|---|---|
 | ZM.01.01 | Strategische Handlungsfelder pflegen | 011 | E0 | – (besteht) | umgesetzt (Grundfunktion) | Gerüst (695ab82) |
 | ZM.01.02 | Strategische Ziele festlegen | 011 | E0 | AP-E0-9 | umgesetzt (UC-011 Schritt 2; Ziele je Jahr in E6) | #13, #23 |
-| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | offen | – |
+| ZM.02.01 | Jahresziele ableiten | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
 | ZM.02.02 | Jahresziele freigeben | 011 | E6 | AP-E6-2 | offen | – |
-| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | offen | – |
-| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | offen | – |
+| ZM.02.03 | Hauptaktivitäten festlegen | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
+| ZM.02.04 | Zielmetrik definieren | 011 | E6 | AP-E6-1 | API in Arbeit, Oberfläche folgt | – |
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | offen | – |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | offen | – |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | offen | – |
@@ -84,9 +84,9 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | offen | – |
 | PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | offen | – |
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
-| PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register (API) in Arbeit (AP-E0-6) | – |
+| PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | offen | – |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | offen | – |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus in Arbeit (AP-E6-1); aus Vertrag Kap. 2 offen (AP-E3-1) | – |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
@@ -103,7 +103,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
 | PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | offen | – |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | offen | – |
-| PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) in Arbeit (AP-E0-6) | – |
+| PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | offen | – |
 | PS.03.01 | Änderung am Projektvertrag beantragen | 007 | E3 | AP-E3-4 | offen | – |
 | PS.03.02 | Änderung am Projektvertrag entscheiden | 007 | E3 | AP-E3-4 | offen | – |
@@ -112,10 +112,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.04.01 | Vorhaben abschliessen | 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.02 | Vorhaben sistieren oder abbrechen | 006, 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.03 | Lessons Learned erfassen | 013, 015 | E7 | AP-E7-1, AP-E7-5 | offen | – |
-| PS.05.01 | Stakeholder erfassen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
-| PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
+| PS.05.01 | Stakeholder erfassen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | offen | – |
-| PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
+| PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PC.01.02 | Ist-Kosten übernehmen | 010 | E7 | AP-E7-4 | offen | – |
 | PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | offen | – |
 | PC.01.04 | Budgetabweichungen analysieren | 010 | E7 | AP-E7-4 | offen | – |
@@ -123,8 +123,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.02.01 | Portfoliorisiko erfassen | 008 | E5 | AP-E5-2 | offen | – |
 | PC.02.02 | Risikolage des Portfolios beurteilen | 006, 014 | E2 | AP-E2-3 | offen | – |
 | PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | offen | – |
-| PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) in Arbeit (AP-E0-6) | – |
-| PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
+| PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
+| PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
 | PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | offen | – |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | offen | – |
@@ -133,15 +133,15 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
 | RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | offen | – |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
-| RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
+| RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | offen | – |
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
-| RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) in Arbeit (AP-E0-6) | – |
+| RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register (API) umgesetzt (AP-E0-6 PR 1) | #29 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
-| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | offen | – |
+| AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | in Arbeit | – |
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | in Arbeit (API) | – |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | offen | – |
@@ -200,4 +200,4 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, «Sie» | Zielgrössen |
 |---|---|---|---|---|---|---|---|
-| #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | jsdom ohne Befund; Browser offen | offen (nicht im Browser geprüft) | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |
+| #23 | AP-E0-9 | Liste + Schublade; Z1, Z2, Z3, Z5, unbekannte Nummer | ja (Datenliste, Formular) | ohne Befund (E2E hell, dunkel; jsdom) | 360 px ohne Überlauf (E2E «schmal»); 768/1440 nicht eigens geprüft | ja (Feature-Texte), «Sie» | – (keine Zielgrösse in E0) |

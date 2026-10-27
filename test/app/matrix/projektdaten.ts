@@ -85,7 +85,7 @@ export const matrix: Matrix = {
       const pf = (await tx.query<{ id: string }>(
         "INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'register', 'Register', true) RETURNING id", [t])).rows[0]!.id;
       return (await tx.query<{ id: string }>(
-        "INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-901', $2, $3) RETURNING id", [t, mark, pf])).rows[0]!.id;
+        "INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-902', $2, $3) RETURNING id", [t, mark, pf])).rows[0]!.id;
     });
     const portfolio = await full(api.t.runtime, t, async tx => (await tx.query<{ portfolio_id: string }>('SELECT portfolio_id FROM ppm.projekt WHERE id = $1', [projekt])).rows[0]!.portfolio_id);
     const post = async (pfad: string, payload: Record<string, unknown>) => {

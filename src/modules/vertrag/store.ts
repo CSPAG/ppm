@@ -119,3 +119,21 @@ export async function strategischesZiel(tx: Tx, id: string): Promise<{ id: strin
 export async function jahresziel(tx: Tx, id: string): Promise<{ id: string; strategisches_ziel_id: string } | null> {
   return (await tx.query<{ id: string; strategisches_ziel_id: string }>(`SELECT id, strategisches_ziel_id FROM ${SCHEMA}.jahresziel WHERE id = $1`, [id])).rows[0] ?? null;
 }
+
+/**
+ * Auswahl für Kap. 2 (Zielbaum, PP.02.05): strategische Ziele mit Handlungsfeld und Jahresziele ab dem laufenden Jahr.
+ * Nur lesend aus den Tabellen von AP-E0-9 und AP-E6-1; der Aufrufer liest in voller Sicht (Stammdaten der Organisation),
+ * weil die Projektleitung `ziel:read` an der Organisation nicht hat (Entscheid Master-Session, fachmodell.md 3.3).
+ */
+export async function zielauswahl(tx: Tx, abJahr: number): Promise<{
+  ziele: { id: string; nummer: string; text: string; handlungsfeld_id: string; handlungsfeld: string }[];
+  jahresziele: { id: string; jahr: number; nummer: string; text: string; strategisches_ziel_id: string }[];
+}> {
+  const ziele = (await tx.query<{ id: string; nummer: string; text: string; handlungsfeld_id: string; handlungsfeld: string }>(
+    `SELECT z.id, z.nummer, z.text, z.handlungsfeld_id, h.label AS handlungsfeld
+       FROM ${SCHEMA}.strategisches_ziel z JOIN ${SCHEMA}.handlungsfeld h ON h.tenant_id = z.tenant_id AND h.id = z.handlungsfeld_id
+      ORDER BY z.nummer_sort, z.id`)).rows;
+  const jahresziele = (await tx.query<{ id: string; jahr: number; nummer: string; text: string; strategisches_ziel_id: string }>(
+    `SELECT id, jahr, nummer, text, strategisches_ziel_id FROM ${SCHEMA}.jahresziel WHERE jahr >= $1 ORDER BY jahr, nummer_sort, id`, [abJahr])).rows;
+  return { ziele, jahresziele };
+}

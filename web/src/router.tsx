@@ -10,6 +10,7 @@ import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
 import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
 import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { IdeeNeuPage, IdeePage, IdeenPage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
 import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
 import { SitzungenPage, SitzungPage, type SetSitzungSearch } from './features/sitzung/index.ts';
@@ -111,6 +112,33 @@ function ZielzyklusRoute() {
       projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })}
       strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })} />
   );
+// Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
+const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
+
+function IdeenRoute() {
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeenPage gehe={gehe} />;
+}
+
+const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });
+
+function IdeeNeuRoute() {
+  const search = ideeNeuRoute.useSearch();
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeeNeuPage search={search} gehe={gehe} />;
+}
+
+const ideeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/$nummer', validateSearch: searchOf.idee, component: IdeeRoute });
+
+function IdeeRoute() {
+  const { nummer } = ideeRoute.useParams();
+  const search = ideeRoute.useSearch();
+  const navigate = useNavigate({ from: ideeRoute.fullPath });
+  const setSearch = useCallback<SetIdeeSearch>((next, o) => {
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <IdeePage nummer={nummerAusPfad(nummer)} search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
 // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017 Schritte 1–2)
@@ -212,6 +240,9 @@ const routeTree = rootRoute.addChildren([
   sitzungenRoute,
   sitzungRoute,
   zielzyklusRoute,
+  ideenRoute,
+  ideeNeuRoute,
+  ideeRoute,
   organisationRoute,
   codetabellenRoute,
   phasenmodellRoute,

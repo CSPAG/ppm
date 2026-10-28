@@ -6480,6 +6480,75 @@
           }
         }
       },
+      "ProjektPersonen": {
+        "additionalProperties": false,
+        "description": "Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail.",
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "kontexte"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "kontexte": {
+                  "maxItems": 3,
+                  "description": "Funktionen in sichtbaren laufenden Projekten (höchstens drei, nach Nummer).",
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "projektId",
+                      "nummer",
+                      "name",
+                      "funktion"
+                    ],
+                    "properties": {
+                      "projektId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "nummer": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "funktion": {
+                        "type": "string",
+                        "enum": [
+                          "sp",
+                          "pl",
+                          "ctl",
+                          "kt",
+                          "koalition"
+                        ],
+                        "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "UebernahmeIn": {
         "additionalProperties": false,
         "type": "object",
@@ -53565,6 +53634,111 @@
           },
           "409": {
             "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/personen": {
+      "get": {
+        "summary": "Personen in sichtbaren Projekten suchen",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Befehlspalette (I-N4): Personen nach Name mit ihren Funktionen in laufenden Projekten, die die anfragende Person sieht; ohne E-Mail. Personen ohne Funktion in einem sichtbaren Projekt erscheinen nicht.",
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 2,
+              "maxLength": 100,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "description": "Teil des Namens."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 8,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjektPersonen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
             "content": {
               "application/problem+json": {
                 "schema": {

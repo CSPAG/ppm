@@ -105,6 +105,19 @@ export type OrganisationPutIn = Static<typeof OrganisationPut>;
 export const KopfProjekt = Type.Object({
   id: Uuid, nummer: Type.String(), name: Type.String(), phase: PhaseT, lebenszyklus: LebenszyklusT, rollen: Type.Array(FunktionT),
 }, { $id: 'KopfProjekt', additionalProperties: false });
+/** Personensuche der Befehlspalette (I-N4, IA «Navigation»: «Suche nach … Personen, gefiltert nach Recht»). */
+export const PersonenQuery = Type.Object({
+  q: Type.String({ minLength: 2, maxLength: 100, description: 'Teil des Namens.' }),
+  limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 20, default: 8 })),
+}, { additionalProperties: false });
+export const ProjektPersonen = Type.Object({
+  items: Type.Array(Type.Object({
+    id: Uuid, name: Type.String(),
+    kontexte: Type.Array(Type.Object({ projektId: Uuid, nummer: Type.String(), name: Type.String(), funktion: FunktionT }, { additionalProperties: false }),
+      { maxItems: 3, description: 'Funktionen in sichtbaren laufenden Projekten (höchstens drei, nach Nummer).' }),
+  }, { additionalProperties: false })),
+}, { $id: 'ProjektPersonen', additionalProperties: false, description: 'Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail.' });
+
 export const Kopf = Type.Object({
   projekte: Type.Array(Type.Ref('KopfProjekt'), { description: 'Laufende Projekte, in denen die Person eine Funktion hat (höchstens 20).' }),
   anzahl: Type.Integer({ minimum: 0, description: 'Anzahl dieser Projekte.' }),

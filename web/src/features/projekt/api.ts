@@ -98,6 +98,11 @@ export function useOrganisationSpeichern() {
 }
 
 /** Suche für die Befehlspalette (I-N4): Projekte nach Name oder Nummer, nur die sichtbaren (API). */
+/** Personen in sichtbaren Projekten für die Befehlspalette (I-N4): Name und Funktionen, ohne E-Mail. */
+export async function suchePersonen(q: string, signal: AbortSignal) {
+  return (await api.GET('/v1/projekte/personen', { params: { query: { q, limit: 5 } }, signal })).data!.items;
+}
+
 export async function sucheProjekte(q: string, signal: AbortSignal): Promise<Projekt[]> {
   const { data } = await api.GET('/v1/projekte', { params: { query: { q, limit: 5 } }, signal });
   return data!.items;

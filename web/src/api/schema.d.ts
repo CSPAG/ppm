@@ -15776,6 +15776,103 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/personen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Personen in sichtbaren Projekten suchen
+         * @description Befehlspalette (I-N4): Personen nach Name mit ihren Funktionen in laufenden Projekten, die die anfragende Person sieht; ohne E-Mail. Personen ohne Funktion in einem sichtbaren Projekt erscheinen nicht.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Teil des Namens. */
+                    q: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjektPersonen"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/kopf": {
         parameters: {
             query?: never;
@@ -46898,6 +46995,26 @@ export interface components {
             projekte: components["schemas"]["KopfProjekt"][];
             /** @description Anzahl dieser Projekte. */
             anzahl: number;
+        };
+        /** @description Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail. */
+        ProjektPersonen: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @description Funktionen in sichtbaren laufenden Projekten (höchstens drei, nach Nummer). */
+                kontexte: {
+                    /** Format: uuid */
+                    projektId: string;
+                    nummer: string;
+                    name: string;
+                    /**
+                     * @description `sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition.
+                     * @enum {string}
+                     */
+                    funktion: "sp" | "pl" | "ctl" | "kt" | "koalition";
+                }[];
+            }[];
         };
         UebernahmeIn: {
             /** @description Dashboard als CSV (Excel «CSV UTF-8», Trennzeichen `;` oder `,`), Spalten nach `scripts/uebernahme/vorlage.csv`. */

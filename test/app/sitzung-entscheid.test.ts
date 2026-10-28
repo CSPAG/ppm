@@ -60,6 +60,9 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     "SELECT bezug_id, empfaenger_person, to_char(frist, 'YYYY-MM-DD') AS frist, stand, titel FROM ppm.aufgabe WHERE art = $1 ORDER BY created_at", [art])).rows);
 
   before(async () => {
+    // Traktandum 1 «Bericht der Programmleitung» (Art portfoliobericht, AP-E2-3) gehört nicht zu diesem Test
+    const bericht = traktandenart('portfoliobericht');
+    if (bericht) { _abmelden('portfoliobericht'); wiederherstellen.push(() => registriereTraktandenart(bericht)); }
     api = await testApi();
     const u = await login(api, 'demo', 'u-ue', 'ue');
     tenantId = u.tenantId;

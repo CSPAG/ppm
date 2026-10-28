@@ -82,6 +82,8 @@ export const matrix: Matrix = {
   },
   unchanged: async (api, a, mark) => {
     const s = (await api.app.inject({ method: 'GET', url: '/v1/gremien/gremium-a/sitzungen/2026-12-02', headers: a })).json();
-    assert.deepEqual([s.stand, s.ort, s.traktanden.map((t: { titel: string; stand: string }) => [t.titel, t.stand])], ['in_vorbereitung', '', [[mark, 'traktandiert']]]);
+    // ohne Traktandum 1 «Bericht der Programmleitung» (fest, Art portfoliobericht, AP-E2-3)
+    const eigene = s.traktanden.filter((t: { art: string }) => t.art !== 'portfoliobericht');
+    assert.deepEqual([s.stand, s.ort, eigene.map((t: { titel: string; stand: string }) => [t.titel, t.stand])], ['in_vorbereitung', '', [[mark, 'traktandiert']]]);
   },
 };

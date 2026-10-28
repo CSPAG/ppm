@@ -304,6 +304,24 @@ Portfolio optional (A-18).
 | `GET /v1/portfolios/{id}/rangfolge` | `priorisierung:read` (Organisation oder Portfolio) | Rangfolge entschieden und Entwurf mit Begründung; `ETag` = Version des Entwurfs (PP.02.02) |
 | `PUT /v1/portfolios/{id}/rangfolge` | `priorisierung:write` | ganze Liste als Entwurf, `If-Match` (428/412); nur aktive Projekte des Portfolios, ohne Doppel (422) |
 
+## Finanzen
+
+Ist-Kosten aus dem ERP, Finanzübersicht, Budgetabweichungen mit Begründung, Jahresbedarf und Übergabe an den
+Budgetprozess (docs/fachmodell.md 2.13, AP-E7-4; PC.01.02, PC.01.04, PC.01.05; UC-010). Budget und Prognose aus dem
+Register `kosten`; Ist-Kosten kommen über die Schnittstelle «ERP · Ist-Kosten» je Kostenträger und Monat (A-16), der
+Jahresbedarf geht über «Budgetprozess · Jahresbedarf» hinaus (A-17). Beträge nur mit `finanzen:read` (A-33).
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/finanzen?portfolio=&alle=` | `finanzen:read` (Organisation, Portfolio oder Projekt; nur Projekte mit sichtbaren Beträgen) | je Projekt Budget, Prognose (je Phase, CAPEX/OPEX), Ist (`null` = noch nicht verfügbar), Abweichung mit Toleranz «Kosten» des Phasenmodells (A-10), Verlauf je Monat, letzte Begründung; Summe; mit `finanzen:write` Kostenträger ohne Projekt (UC-010 A1) |
+| `GET /v1/finanzen/abweichungen?portfolio=` | wie oben | nur Projekte mit Abweichung, wesentliche zuerst |
+| `PUT /v1/projekte/{id}/kostentraeger` | `finanzen:write` | Kostenträger im ERP zuordnen (A-16, A1.1), `null` hebt auf; schon vergeben → 409 |
+| `GET /v1/projekte/{id}/abweichungsbegruendungen` | `finanzen:read` am Projekt | Begründungen je Periode, neueste zuerst |
+| `PUT /v1/projekte/{id}/abweichungsbegruendungen/{periode}` | `finanzen:read` und `projekt:write` am Projekt oder `finanzen:write` | festhalten bzw. ändern, `If-Match` (`W/"0"` neu); erledigt die Aufgabe «Abweichung klären» |
+| `GET /v1/budgetuebergaben/{jahr}` | `finanzen:read` an der Organisation | Jahresbedarf CAPEX/OPEX je aktivem Projekt zeitanteilig nach Phasenterminen (A-17) mit Korrekturen; nach der Übergabe der exportierte Inhalt |
+| `PUT /v1/budgetuebergaben/{jahr}` | `finanzen:write` | Korrekturen von FI als ganze Liste; `If-Match` (beim ersten Speichern ohne); öffnet die Aufgabe «Jahresbedarf übergeben» |
+| `POST /v1/budgetuebergaben/{jahr}/export` | `finanzen:write` | übergeben: Inhalt festhalten, Audit `budget.handed_over`, danach unveränderlich (409) |
+
 ## Schnittstellen und Änderungsprotokoll
 
 Schnittstellen zu Umsystemen mit Laufprotokoll (docs/fachmodell.md 2.13, AP-E7-3; AM.03.02; UC-018 Schritte 3–4, A1) und

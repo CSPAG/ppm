@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Verwaltet von identity-kit (create-iam-app 0.2.3) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.2.3 sync
+# Verwaltet von identity-kit (create-iam-app 0.5.0) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.0 sync
 #
 # OpenTofu für den Realm der App (Module product-realm und product-realm-bootstrap aus vollholz/identity-kit).
 # Produkt, Keycloak-Instanz und State-Backend kommen aus identity.app.json.

@@ -274,6 +274,9 @@ Portfolio optional (A-18).
 | `POST /v1/bewertungsmodelle/{id}/in-kraft-setzen` | `priorisierung:write` | mit Entscheid des Gremiums (`beschluss`), `If-Match`; Sperren des Prüfberichts → 422; danach unveränderlich |
 | `GET /v1/portfolios/{id}/bewertungen?modell=` | `priorisierung:read` (Organisation oder Portfolio) | Raster aktive Projekte × Kriterien, Fortschritt; frühere Modellversion mit `modell` (G11) |
 | `PUT /v1/portfolios/{id}/bewertungen` | `priorisierung:write` | mehrere Zellen, alles oder nichts, nach dem Modell in Kraft (409 ohne); bewertete Zelle nur mit `version` (412); `einschaetzung: null` entfernt |
+| `GET /v1/portfolios/{id}/matrix` | `priorisierung:read` (Organisation oder Portfolio) | aktive Projekte mit Nutzen/Risiko je Achse (Durchschnitt hoch=3/mittel=2/tief=1 der zugeordneten Kriterien, A-39, ohne Score A-01), Feld (Q6 F9; Grenze = kein Feld), Ressourcen (FTE-Monate, Grösse), Kosten nur mit `finanzen:read`, Abhängigkeiten im Portfolio, Rang (PP.03.04) |
+| `GET /v1/portfolios/{id}/rangfolge` | `priorisierung:read` (Organisation oder Portfolio) | Rangfolge entschieden und Entwurf mit Begründung; `ETag` = Version des Entwurfs (PP.02.02) |
+| `PUT /v1/portfolios/{id}/rangfolge` | `priorisierung:write` | ganze Liste als Entwurf, `If-Match` (428/412); nur aktive Projekte des Portfolios, ohne Doppel (422) |
 
 ## Webhooks und Ereignisse
 

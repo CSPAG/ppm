@@ -33955,6 +33955,327 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portfolios/{id}/matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Portfolio-Matrix
+         * @description Aktive Projekte mit Nutzen und Risiko aus der Bewertung nach dem Modell in Kraft (Durchschnitt der Einschätzungen der zugeordneten Kriterien, A-39; ohne Score, A-01), Feld der Matrix (Q6 F9), Ressourcenbedarf, Kosten (nur mit finanzen:read), Rang und Abhängigkeiten.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Matrix"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portfolios/{id}/rangfolge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rangfolge des Portfolios
+         * @description Entschiedene Rangfolge (bisherige, UC-008 Schritt 1) und Entwurf der UE mit Begründung je Projekt (PP.02.02); ETag = Fassung des Entwurfs.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Rangfolge"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        /**
+         * Rangfolge entwerfen
+         * @description Ersetzt den Entwurf durch die Liste (Rang = Position, PP.02.02). `If-Match` mit der gelesenen Fassung (`W/"0"` ohne Entwurf, sonst 412). Nur aktive Projekte des Portfolios, jedes einmal (422). Entschieden wird die Rangfolge erst mit dem Entscheid des Gremiums (AP-E5-5).
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RangfolgePut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Rangfolge"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks": {
         parameters: {
             query?: never;
@@ -38813,6 +39134,93 @@ export interface components {
                 einschaetzung: ("hoch" | "mittel" | "tief") | null;
                 kommentar: string;
                 version: number | null;
+            }[];
+        };
+        Matrix: {
+            portfolio: {
+                /** Format: uuid */
+                id: string;
+                schluessel: string;
+                name: string;
+                kategorie: string;
+            };
+            modell: {
+                /** Format: uuid */
+                id: string;
+                nummer: number;
+                inKraftAt: string | null;
+                kriterien: {
+                    schluessel: string;
+                    text: string;
+                    dimension: ("nutzen" | "risiko") | null;
+                }[];
+            } | null;
+            /** @description Beträge nur mit finanzen:read (A-33); sonst ist `kosten` null. */
+            kostenSichtbar: boolean;
+            /** @description Aktive Projekte des Portfolios, die die Person sieht, nach Nummer. */
+            projekte: {
+                /** Format: uuid */
+                id: string;
+                nummer: string;
+                name: string;
+                phase: string;
+                nutzen: {
+                    wert: number | null;
+                    stufe: ("hoch" | "tief" | "grenze") | null;
+                    /** @description Bewertete Kriterien dieser Achse. */
+                    bewertet: number;
+                    /** @description Kriterien, die dieser Achse zugeordnet sind. */
+                    von: number;
+                };
+                risiko: {
+                    wert: number | null;
+                    stufe: ("hoch" | "tief" | "grenze") | null;
+                    /** @description Bewertete Kriterien dieser Achse. */
+                    bewertet: number;
+                    /** @description Kriterien, die dieser Achse zugeordnet sind. */
+                    von: number;
+                };
+                feld: ("priorisieren" | "rasch_umsetzen" | "opportunistisch" | "hinterfragen") | null;
+                ressourcen: {
+                    fteMonate: number | null;
+                    groesse: ("S" | "M" | "L") | null;
+                };
+                kosten: number | null;
+                rang: number | null;
+                rangEntwurf: number | null;
+                /** @description Projekte dieses Portfolios, die das Projekt braucht (PP.02.03, Linien in der Matrix). */
+                abhaengigVon: string[];
+            }[];
+        };
+        Rangfolge: {
+            /** @description Vom Gremium entschiedene Rangfolge (AP-E5-5). */
+            entschieden: {
+                /** Format: uuid */
+                projektId: string;
+                rang: number;
+                begruendung: string;
+            }[];
+            /** @description Entwurf der UE, nach Rang. */
+            entwurf: {
+                /** Format: uuid */
+                projektId: string;
+                rang: number;
+                begruendung: string;
+            }[];
+            /** @description Fassung des Entwurfs für If-Match (0 ohne Entwurf). */
+            version: number;
+            geaendertAt: string | null;
+            can: {
+                write: boolean;
+            };
+        };
+        RangfolgePut: {
+            /** @description Alle Projekte des Entwurfs in der Reihenfolge Rang 1, 2, …; leer entfernt den Entwurf. */
+            projekte: {
+                /** Format: uuid */
+                projektId: string;
+                /** @description Begründung des Rangs (PP.02.02 «begründete Rangfolge»). */
+                begruendung?: string;
             }[];
         };
         WebhookSubscription: {

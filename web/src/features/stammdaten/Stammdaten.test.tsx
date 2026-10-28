@@ -113,6 +113,25 @@ describe('Organisation (UI-44)', () => {
     expect(api.calls.find(c => c.method === 'PATCH')!.headers.get('If-Match')).toBe('W/"1"');
   });
 
+  it('Konflikt (412): «Neu laden» behält die Eingabe und speichert mit dem neuen Stand (Z7)', async () => {
+    let n = 0;
+    const api = stub({
+      'GET /v1/org-einheiten': liste([ict]),
+      [`GET /v1/org-einheiten/${ICT}`]: () => json({ ...ict, version: n ? 2 : 1 }, 200, { ETag: n ? 'W/"2"' : 'W/"1"' }),
+      [`PATCH /v1/org-einheiten/${ICT}`]: () => (n++ ? json({ ...ict, name: `${ict.name} neu`, version: 3 }, 200, { ETag: 'W/"3"' }) : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
+    });
+    renderWithIam(<Org initial={{ o: ICT }} />, ADM);
+    await userEvent.click(await screen.findByRole('button', { name: T.common.edit }));
+    await userEvent.type(await screen.findByLabelText(TS.org.name), ' neu');
+    await userEvent.click(screen.getByRole('button', { name: T.common.save }));
+    await userEvent.click(await screen.findByRole('button', { name: T.common.reload }));
+    await waitFor(() => expect(screen.queryByText(TS.org.conflict)).toBeNull());
+    expect(screen.getByLabelText(TS.org.name)).toHaveValue(`${ict.name} neu`);
+    await userEvent.click(screen.getByRole('button', { name: T.common.save }));
+    expect(await screen.findByText(TS.org.saved)).toBeInTheDocument();
+    expect(api.calls.filter(c => c.method === 'PATCH')[1]!.headers.get('If-Match')).toBe('W/"2"');
+  });
+
   it('nur lesen: keine Bearbeiten-Elemente, Hinweis auf das Recht (Z8)', async () => {
     const lesend = { ...ict, can: { write: false, delete: false } };
     stub({
@@ -185,6 +204,29 @@ describe('Codetabellen (UI-45)', () => {
     expect(api.calls.find(c => c.method === 'POST')!.headers.get('If-Match')).toBe('W/"1"');
     await userEvent.click(within(dialog).getByRole('button', { name: TS.code.bearbeiten('aufwärts') }));
     expect(await screen.findByLabelText(TS.code.schluessel)).toHaveAttribute('readonly');
+  });
+
+  it('Wert ändern mit Konflikt (412): «Neu laden» behält die Eingabe, gespeichert wird mit der neuen Version (Z7)', async () => {
+    let n = 0;
+    const api = stub({
+      'GET /v1/codetabellen': () => json({ items: tabellen(2), can: { write: true } }),
+      'GET /v1/codetabellen/trend/werte': () => json({ items: [wert({ version: n ? 2 : 1 })], nextCursor: null, can: { write: true } }),
+      [`PATCH /v1/codetabellen/trend/werte/${wert({}).id}`]: () => (n++ ? json(wert({ label: 'steigend', version: 3 })) : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
+    });
+    renderWithIam(<Code initial={{ o: 'trend' }} />, ADM);
+    await userEvent.click(await screen.findByRole('button', { name: TS.code.bearbeiten('aufwärts') }));
+    const feld = await screen.findByLabelText(TS.code.label);
+    await userEvent.clear(feld);
+    await userEvent.type(feld, 'steigend');
+    await userEvent.click(screen.getByRole('button', { name: T.common.save }));
+    expect(await screen.findByText(TS.code.conflict)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: T.common.reload }));
+    await waitFor(() => expect(screen.queryByText(TS.code.conflict)).toBeNull());
+    expect(screen.getByLabelText(TS.code.label)).toHaveValue('steigend');
+    await userEvent.click(screen.getByRole('button', { name: T.common.save }));
+    expect(await screen.findByText(TS.code.saved)).toBeInTheDocument();
+    const patches = api.calls.filter(c => c.method === 'PATCH');
+    expect([patches[0]!.headers.get('If-Match'), patches[1]!.headers.get('If-Match')]).toEqual(['W/"1"', 'W/"2"']);
   });
 
   it('nur lesen: keine Aktionen an den Werten (Z8)', async () => {

@@ -105,7 +105,8 @@ function EditDrawer({ loaded, alle, onDone, onReload }: { loaded: Loaded<OrgEinh
           <button type="button" className="btn" onClick={async () => { await onReload(); update.reset(); }}>{T.common.reload}</button>
         </div>
       ) : update.error ? <ErrorState error={update.error} /> : null}
-      <OrgForm key={item.version} formId={formId} initial={toValues(item)} alle={alle} selbst={item.id} busy={update.isPending} serverErrors={describeError(update.error).fields}
+      {/* ohne key: «Neu laden» (Z7) holt den neuen Stand für If-Match, die Eingaben im Formular bleiben */}
+      <OrgForm formId={formId} initial={toValues(item)} alle={alle} selbst={item.id} busy={update.isPending} serverErrors={describeError(update.error).fields}
         onSubmit={v => update.mutate({ id: item.id, etag, body: toInput(v) }, { onSuccess: () => { toast.show(TS.org.saved); onDone(); } })} />
     </Drawer>
   );

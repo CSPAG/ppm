@@ -90,7 +90,8 @@ function EditDrawer({ loaded: { item, etag }, onDone, onReload }: { loaded: Load
           <button type="button" className="btn" onClick={async () => { await onReload(); update.reset(); }}>{T.common.reload}</button>
         </div>
       ) : update.error ? <ErrorState error={update.error} /> : null}
-      <FeiertagForm key={item.version} formId={formId} initial={{ datum: item.datum, label: item.label }} busy={update.isPending} serverErrors={describeError(update.error).fields}
+      {/* ohne key: «Neu laden» (Z7) holt den neuen Stand für If-Match, die Eingaben im Formular bleiben */}
+      <FeiertagForm formId={formId} initial={{ datum: item.datum, label: item.label }} busy={update.isPending} serverErrors={describeError(update.error).fields}
         onSubmit={v => update.mutate({ id: item.id, etag, body: toInput(v) }, { onSuccess: () => { toast.show(TS.feiertag.saved); onDone(); } })} />
     </Drawer>
   );

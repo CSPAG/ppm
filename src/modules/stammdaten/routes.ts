@@ -234,7 +234,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   });
 
   app.post('/v1/codetabellen/:schluessel/werte/:id/deaktivieren', {
-    schema: { tags: [TAG], summary: 'Codewert deaktivieren', description: 'Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Sie erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.', params: WertParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Codewert') } },
+    schema: { tags: [TAG], summary: 'Codewert deaktivieren', description: 'Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Deaktivierte Werte erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.', params: WertParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Codewert') } },
   }, async (req, reply) => {
     const row = await changeWert(req, { aktiv: false }, 'codewert.deactivated');
     reply.header('etag', etag(row.version));

@@ -52,7 +52,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E7-5 | Jahresrückblick | 380–389 | offen | – | – |
 | AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | offen | – | – |
 | AP-E7-7 | Vorlagen mit Feldzuordnung | 400–409 | offen | – | – |
-| AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | offen | – | – |
+| AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | in Arbeit (PR 1: 410, Dateien `neubesetzung*` im Modul `eingang`: Vorschau, Entziehen über den Baukasten, Aufgabe `zugang.neu_besetzen`, Neubesetzungen; PR 2: Oberfläche) | – | A-21; «sperrt den Zugang» = Mitglied im Baukasten entfernen; neu zu besetzen sind nur unbefristete Rollen an Orten; Neubesetzung dort, wo die Rolle vergeben wird; Folgearbeit Baukasten: Haken vor dem Entfernen, Rollen zur Laufzeit (A2), Benachrichtigung bei Rollenänderung (Schritt 3) |
 
 ## Business Cases
 

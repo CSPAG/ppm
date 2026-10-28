@@ -130,15 +130,33 @@ Realms legt anschliessend der Workflow «Keycloak» (`keycloak.yml`) mit `ppm-ia
 
 ## Schritt 14: Erste Organisation, Betrieb, Rauchtest
 
+Erst nach dem Apply des Workflows «Keycloak» mit SMTP (Secret `SMTP_PASSWORD`,
+[OP-05](../../docs/offene-punkte.md#op-05)); vorher die Mail des Realms prüfen.
+
 ```powershell
 $env:KEYCLOAK_IAC_PRIVATE_KEY = sops -d --extract '["github"]["KEYCLOAK_IAC_PRIVATE_KEY"]' infra/hetzner/betrieb.sops.yaml | Out-String
+foreach ($n in "S3_ACCESS_KEY","S3_SECRET_KEY","TF_STATE_PASSPHRASE") {
+  Set-Item "env:$n" (sops -d --extract "[`"github`"][`"$n`"]" infra/hetzner/betrieb.sops.yaml)
+}
 npm ci
+bash infra/keycloak/kc.sh init       # lädt das Modul (smtp-test liegt darin)
+bash infra/keycloak/kc.sh smtp-test platform-admin@project-suite.ch   # Testmail über die SMTP-Einstellungen des Realms
+Remove-Item env:S3_ACCESS_KEY, env:S3_SECRET_KEY, env:TF_STATE_PASSPHRASE
 npm run identity:first-org      # organizations und operators aus identity.app.json; Einladungen per E-Mail
 Remove-Item env:KEYCLOAK_IAC_PRIVATE_KEY
 ```
 
-Rauchtest (`npm run smoke`) braucht einen Maschinen-Client ([OP-13](../../docs/offene-punkte.md#op-13)); bis dahin genügt
-der Rauchtest im Workflow «Deploy».
+Rauchtest mit dem Maschinen-Client `ppm-rauchtest` ([OP-13](../../docs/offene-punkte.md#op-13)): zuerst in PPM als
+Admin der Organisation `solutions` unter «Verwalten › Maschinen-Clients» freigeben. Dann (Git Bash):
+
+```bash
+k=infra/keycloak/keys/ppm-rauchtest.sops.yaml
+SMOKE_CLIENT_ID="$(sops -d --extract '["SMOKE_CLIENT_ID"]' "$k")" \
+SMOKE_CLIENT_KEY="$(sops -d --extract '["SMOKE_CLIENT_KEY"]' "$k")" \
+OIDC_ISSUER_URL=https://identity.project-suite.ch/realms/ppm BASE_URL=https://ppm.project-suite.ch npm run smoke
+```
+
+Bis dahin genügt der Rauchtest im Workflow «Deploy».
 
 ## Schritt 15: PITR üben
 

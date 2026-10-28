@@ -172,8 +172,8 @@ Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/mod
 
 Risikolage (BC PC.02.02, UC-014 Schritt 2) und Portfoliobericht (BC PC.04.02, UC-014 Schritt 3, K3 Schritt 4;
 `src/modules/auswertung/` Dateien `risiko*`, `bericht*`, Tabelle `portfoliobericht` aus 150, AP-E2-3). Art
-`portfoliobericht` in der Registry der Sitzung: Traktandum 1 «Bericht der Programmleitung» steht in jeder Sitzung,
-Unterlage ist der bereitgestellte Bericht der letzten vor dem Sitzungsmonat abgeschlossenen Periode, Ergebnis «Zur
+`portfoliobericht` in der Registry der Sitzung: Beim Bereitstellen schlägt der Bericht dem entscheidenden Gremium das
+Traktandum «Bericht der Programmleitung» vor (K3 Schritte 1 und 4), Unterlage ist der Bericht selbst, Ergebnis «Zur
 Kenntnis genommen».
 
 | Methode und Pfad | Recht | Hinweis |
@@ -183,7 +183,7 @@ Kenntnis genommen».
 | `POST /v1/portfolioberichte` | `auswertung:write` | aus dem abgeschlossenen Dashboard (offene Periode 409); 201 neu, 200 im Entwurf neu erzeugt (Kommentar bleibt), bereitgestellt 409 |
 | `GET /v1/portfolioberichte/:id` | `auswertung:read` (Lesesicht) | Stand bei Erzeugung; ETag |
 | `PATCH /v1/portfolioberichte/:id` | `auswertung:write` | Kommentar im Entwurf; `If-Match` |
-| `POST /v1/portfolioberichte/:id/bereitstellen` | `auswertung:write` | danach fest und für Gremien sichtbar; `If-Match`; Ereignis `portfoliobericht.provided` |
+| `POST /v1/portfolioberichte/:id/bereitstellen` | `auswertung:write` | danach fest und für Gremien sichtbar, Vorschlag an das entscheidende Gremium; `If-Match`; Ereignis `portfoliobericht.provided` |
 | `GET /v1/portfolioberichte/:id/dokument?format=pdf\|docx` | `auswertung:read` (Lesesicht) | über die Ausgabe des Moduls `vorlage`; Export im Audit |
 
 ## Ressourcen

@@ -1,7 +1,7 @@
 /**
  * Risikolage und Portfoliobericht (BC PC.02.02, PC.04.02; UC-014 Schritte 2–3; K3 Schritt 4; AP-E2-3): Risikolage aus
  * Projekt- und Portfoliorisiken mit Abhängigkeiten und Eskalationen, Sichtbarkeit je Rolle; Bericht aus dem
- * abgeschlossenen Dashboard (PPM-4), Kommentar, Bereitstellen, Dokument über `vorlage`; Traktandum 1 «Bericht der
+ * abgeschlossenen Dashboard (PPM-4), Kommentar, Bereitstellen, Dokument über `vorlage`; Vorschlag «Bericht der
  * Programmleitung» mit dem Bericht als Unterlage.
  */
 import assert from 'node:assert/strict';
@@ -100,6 +100,7 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
   });
 
   let id = '';
+  let prat = '';
 
   test('Portfoliobericht aus dem abgeschlossenen Dashboard; Kommentar, neu erzeugen, bereitstellen (UC-014 Schritt 3, PPM-4)', async () => {
     const neu = { portfolio: 'transformation', periode: VORPERIODE };
@@ -131,6 +132,8 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.deepEqual((await ok('GET', '/v1/portfolioberichte', gremium)).items, []);
     assert.equal((await call('GET', `/v1/portfolioberichte/${id}`, gremium)).statusCode, 404);
 
+    // entscheidendes Gremium des Portfolios: erhält beim Bereitstellen den Vorschlag
+    prat = (await ok('POST', '/v1/gremien', ue, { portfolioId: pfA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).id;
     const r = await ok('POST', `/v1/portfolioberichte/${id}/bereitstellen`, { ...ue, 'if-match': 'W/"3"' });
     assert.deepEqual([r.stand, r.bereitgestelltAt !== null, r.can.bearbeiten], ['bereitgestellt', true, false]);
     // fest: weder Kommentar noch neu erzeugen
@@ -163,19 +166,20 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.equal(n, 2);
   });
 
-  test('Traktandum 1 «Bericht der Programmleitung» mit dem bereitgestellten Bericht als Unterlage (K3 Schritt 4)', async () => {
-    const g = (await ok('POST', '/v1/gremien', ue, { portfolioId: pfA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).id;
+  test('Vorschlag «Bericht der Programmleitung» an das Gremium mit dem Bericht als Unterlage (K3 Schritte 1 und 4)', async () => {
     const datum = mittwochIn(35);
-    await ok('POST', `/v1/gremien/${g}/termine`, ue, { datum }, 201);
+    await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum }, 201);
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum }, 201);
-    const t = s.traktanden[0];
-    assert.equal(s.traktanden.length, 1);
-    assert.deepEqual([t.art, t.titel, t.position], ['portfoliobericht', 'Bericht der Programmleitung', 1]);
-    // Antrag ohne Monat; die Periode nennt die Unterlage (ein Stand, auch wenn inzwischen eine Periode abgeschlossen wird)
-    assert.equal(t.antrag, 'Kenntnisnahme des Portfolioberichts');
-    assert.equal(t.unterlagen.liste[0].titel, `Portfoliobericht ${new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${VORPERIODE}-01T00:00:00Z`))}`);
-    assert.deepEqual([t.unterlagen.stand, t.unterlagen.liste[0].hinweis], ['bereit', 'bereitgestellt']);
-    const e = await ok('GET', `/v1/sitzungen/${s.id}/entscheide`, ue);
-    assert.ok(JSON.stringify(e).includes('kenntnis_genommen'), 'Ergebnis «Zur Kenntnis genommen»');
+    assert.equal(s.traktanden.length, 0, 'kein festes Traktandum');
+    const v = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
+    const g = v.gruppen.find((x: { art: string }) => x.art === 'portfoliobericht');
+    assert.equal(g.traktanden.length, 1);
+    const t = g.traktanden[0];
+    const monat = new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${VORPERIODE}-01T00:00:00Z`));
+    assert.deepEqual([t.titel, t.antrag], ['Bericht der Programmleitung', `Kenntnisnahme des Portfolioberichts ${monat}`]);
+    // aufnehmen: Unterlage «Portfoliobericht <Monat>» bereit
+    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: t.id });
+    const a = r.traktanden.find((x: { art: string }) => x.art === 'portfoliobericht');
+    assert.deepEqual([a.unterlagen.stand, a.unterlagen.liste[0].titel], ['bereit', `Portfoliobericht ${monat}`]);
   });
 });

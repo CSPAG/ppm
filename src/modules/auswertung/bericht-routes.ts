@@ -8,7 +8,7 @@ import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, etag, forbidden, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { FORMATE, MIME, vorlage, type Format } from '../vorlage/index.ts';
-import { daten, erzeugen, kurz, lesenOder404, voll } from './bericht.ts';
+import { daten, erzeugen, kurz, lesenOder404, voll, vorschlagen } from './bericht.ts';
 import { berichtDokument, dateiname } from './bericht-dokument.ts';
 import {
   Portfoliobericht, PortfolioberichtCreate, PortfolioberichtKurz, PortfolioberichtListe, PortfolioberichtPatch, PortfolioberichtQuery,
@@ -112,7 +112,7 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
   app.post('/v1/portfolioberichte/:id/bereitstellen', {
     schema: {
       tags: [TAG_BERICHT], summary: 'Portfoliobericht bereitstellen',
-      description: 'Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio und Unterlage des Traktandums «Bericht der Programmleitung»; nur mit `If-Match`.',
+      description: 'Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio, und schlägt dem entscheidenden Gremium das Traktandum «Bericht der Programmleitung» mit dem Bericht als Unterlage vor (K3 Schritte 1 und 4); nur mit `If-Match`.',
       params: IdParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Portfoliobericht') },
     },
   }, async (req, reply): Promise<PortfolioberichtOut> => {
@@ -124,7 +124,8 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
       const vorher = await lesenOder404(tx, id);
       if (vorher.stand !== 'entwurf') throw conflict('Der Portfoliobericht ist bereits bereitgestellt.');
       if (vorher.version !== version || !(await store.bereitstellen(tx, id, version))) throw preconditionFailed(vorher.version);
-      const daten = { id, portfolioId: vorher.portfolio_id, periode: vorher.periode };
+      const traktandumId = await vorschlagen(tx, vorher);
+      const daten = { id, portfolioId: vorher.portfolio_id, periode: vorher.periode, traktandumId };
       await record(tx, who, { action: 'portfoliobericht.provided', resourceType: 'portfoliobericht', resourceId: id, data: daten, event: daten });
       return lesenOder404(tx, id);
     });

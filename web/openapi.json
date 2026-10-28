@@ -20430,6 +20430,558 @@
             }
           }
         }
+      },
+      "SchnittstelleKatalogeintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "umsystem",
+          "umsystemLabel",
+          "daten",
+          "datenLabel",
+          "richtung",
+          "quelle",
+          "verfuegbar"
+        ],
+        "properties": {
+          "umsystem": {
+            "type": "string"
+          },
+          "umsystemLabel": {
+            "type": "string"
+          },
+          "daten": {
+            "type": "string"
+          },
+          "datenLabel": {
+            "type": "string"
+          },
+          "richtung": {
+            "type": "string",
+            "enum": [
+              "eingehend",
+              "ausgehend"
+            ],
+            "description": "`eingehend`: Daten vom Umsystem abholen; `ausgehend`: an das Umsystem liefern."
+          },
+          "quelle": {
+            "description": "Herkunft im Bauplan (Annahme, Klärung, BC).",
+            "type": "string"
+          },
+          "verfuegbar": {
+            "description": "Verarbeitung der Daten vorhanden; sonst schlägt ein Lauf mit «noch nicht verfügbar» fehl (der Testlauf prüft nur die Verbindung).",
+            "type": "boolean"
+          }
+        }
+      },
+      "SchnittstelleLauf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "schnittstelleId",
+          "art",
+          "stand",
+          "start",
+          "ende",
+          "umfang",
+          "fehler",
+          "gestartetVon"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "schnittstelleId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "test",
+              "geplant",
+              "manuell"
+            ],
+            "description": "`test`: beim Einrichten (nur Verbindung); `geplant`: nach Rhythmus; `manuell`: von Hand gestartet."
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "laeuft",
+              "erfolgreich",
+              "fehlgeschlagen"
+            ]
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ende": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "umfang": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "description": "Übertragene Datensätze.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fehler": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gestartetVon": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Person; null bei geplanten Läufen.",
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Schnittstelle": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "umsystem",
+          "daten",
+          "name",
+          "richtung",
+          "rhythmus",
+          "adresse",
+          "aktiv",
+          "verfuegbar",
+          "letzterLauf",
+          "version",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "umsystem": {
+            "type": "string"
+          },
+          "daten": {
+            "type": "string"
+          },
+          "name": {
+            "description": "Umsystem und Daten, z. B. «ERP · Ist-Kosten je Kostenträger und Monat».",
+            "type": "string"
+          },
+          "richtung": {
+            "type": "string",
+            "enum": [
+              "eingehend",
+              "ausgehend"
+            ],
+            "description": "`eingehend`: Daten vom Umsystem abholen; `ausgehend`: an das Umsystem liefern."
+          },
+          "rhythmus": {
+            "type": "string",
+            "enum": [
+              "manuell",
+              "taeglich",
+              "woechentlich",
+              "monatlich"
+            ],
+            "description": "Geplanter Lauf einmal je Tag, Woche bzw. Monat (Europe/Zurich); `manuell`: nur von Hand."
+          },
+          "adresse": {
+            "type": "string"
+          },
+          "aktiv": {
+            "type": "boolean"
+          },
+          "verfuegbar": {
+            "description": "Verarbeitung der Daten vorhanden.",
+            "type": "boolean"
+          },
+          "letzterLauf": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SchnittstelleLauf"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SchnittstelleList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "katalog"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Schnittstelle"
+            }
+          },
+          "katalog": {
+            "description": "Umsysteme und Daten, die sich einrichten lassen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchnittstelleKatalogeintrag"
+            }
+          }
+        }
+      },
+      "SchnittstelleErgebnis": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schnittstelle",
+          "testlauf"
+        ],
+        "properties": {
+          "schnittstelle": {
+            "$ref": "#/components/schemas/Schnittstelle"
+          },
+          "testlauf": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SchnittstelleLauf"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "SchnittstelleCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "umsystem",
+          "daten",
+          "rhythmus",
+          "adresse"
+        ],
+        "properties": {
+          "umsystem": {
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "type": "string"
+          },
+          "daten": {
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "type": "string"
+          },
+          "rhythmus": {
+            "type": "string",
+            "enum": [
+              "manuell",
+              "taeglich",
+              "woechentlich",
+              "monatlich"
+            ],
+            "description": "Geplanter Lauf einmal je Tag, Woche bzw. Monat (Europe/Zurich); `manuell`: nur von Hand."
+          },
+          "adresse": {
+            "format": "uri",
+            "pattern": "^https?://",
+            "maxLength": 2000,
+            "description": "Adresse des Umsystems (HTTPS; Abruf mit SSRF-Schutz).",
+            "type": "string"
+          },
+          "aktiv": {
+            "default": true,
+            "type": "boolean"
+          }
+        }
+      },
+      "SchnittstellePatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "rhythmus": {
+            "type": "string",
+            "enum": [
+              "manuell",
+              "taeglich",
+              "woechentlich",
+              "monatlich"
+            ],
+            "description": "Geplanter Lauf einmal je Tag, Woche bzw. Monat (Europe/Zurich); `manuell`: nur von Hand."
+          },
+          "adresse": {
+            "format": "uri",
+            "pattern": "^https?://",
+            "maxLength": 2000,
+            "description": "Adresse des Umsystems (HTTPS; Abruf mit SSRF-Schutz).",
+            "type": "string"
+          },
+          "aktiv": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SchnittstelleLaufList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchnittstelleLauf"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AenderungsprotokollEintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "zeit",
+          "person",
+          "quelle",
+          "aktion",
+          "art",
+          "objekt",
+          "aenderungen"
+        ],
+        "properties": {
+          "id": {
+            "description": "Folge im Audit (aufsteigend).",
+            "type": "string"
+          },
+          "zeit": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "person": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name",
+                  "art"
+                ],
+                "properties": {
+                  "id": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "art": {
+                    "description": "`user` oder `client` (Maschinen-Client).",
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quelle": {
+            "description": "`ui`, `api`, `mcp`, `worker`, `webhook` oder `system`.",
+            "type": "string"
+          },
+          "aktion": {
+            "description": "Aktion im Audit, z. B. `org_einheit.updated`.",
+            "type": "string"
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "angelegt",
+              "geaendert",
+              "geloescht",
+              "sonstig"
+            ]
+          },
+          "objekt": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "typ",
+              "id"
+            ],
+            "properties": {
+              "typ": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "aenderungen": {
+            "description": "Alter und neuer Wert je Feld (beim Anlegen nur neu, beim Löschen nur alt).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "feld",
+                "vorher",
+                "nachher"
+              ],
+              "properties": {
+                "feld": {
+                  "type": "string"
+                },
+                "vorher": {},
+                "nachher": {}
+              }
+            }
+          }
+        }
+      },
+      "AenderungsprotokollList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AenderungsprotokollEintrag"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AenderungsprotokollObjekte": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   },
@@ -61110,6 +61662,889 @@
           }
         }
       }
+    },
+    "/v1/schnittstellen": {
+      "get": {
+        "summary": "Schnittstellen auflisten",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Eingerichtete Schnittstellen mit letztem Lauf und der Katalog der Umsysteme und Daten (UC-018 Schritte 3–4).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Schnittstelle einrichten",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Umsystem, Daten, Rhythmus und Adresse; die Richtung folgt aus dem Katalog. Speichert und führt bei aktiver Schnittstelle einen Testlauf aus (UC-018 Schritt 3). 409, wenn es für Umsystem und Daten schon eine gibt.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchnittstelleCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleErgebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schnittstellen/{id}": {
+      "get": {
+        "summary": "Schnittstelle lesen",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schnittstelle"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Schnittstelle ändern",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Rhythmus, Adresse, aktiv (deaktivieren statt löschen). Neue Adresse oder Aktivieren führt einen Testlauf aus. `If-Match` erforderlich.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchnittstellePatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleErgebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schnittstellen/{id}/laeufe": {
+      "get": {
+        "summary": "Läufe einer Schnittstelle",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Laufprotokoll: je Lauf Zeitpunkt, Umfang und Fehler, neueste zuerst (UC-018 Schritt 4).",
+        "parameters": [
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleLaufList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schnittstellen/{id}/starten": {
+      "post": {
+        "summary": "Lauf starten",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Lauf von Hand, auch erneut nach einem Fehler (UC-018 A1.1); wartet auf das Ergebnis. 409, wenn die Schnittstelle nicht aktiv ist oder schon ein Lauf läuft.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleLauf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/aenderungsprotokoll": {
+      "get": {
+        "summary": "Änderungsprotokoll",
+        "tags": [
+          "Änderungsprotokoll"
+        ],
+        "description": "Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "objekt",
+            "required": false,
+            "description": "Objekttyp, z. B. `projekt`."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "objektId",
+            "required": false
+          },
+          {
+            "schema": {
+              "format": "date",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "von",
+            "required": false
+          },
+          {
+            "schema": {
+              "format": "date",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "bis",
+            "required": false
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AenderungsprotokollList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/aenderungsprotokoll/objekte": {
+      "get": {
+        "summary": "Objekttypen im Änderungsprotokoll",
+        "tags": [
+          "Änderungsprotokoll"
+        ],
+        "description": "Objekttypen mit Einträgen, für den Filter.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AenderungsprotokollObjekte"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [
@@ -61197,6 +62632,14 @@
     {
       "name": "Webhooks",
       "description": "Ausgehende Ereignisse (CloudEvents, Standard Webhooks) an Systeme der Organisation."
+    },
+    {
+      "name": "Schnittstellen",
+      "description": "Schnittstellen zu Umsystemen (ERP, HR-System, Budgetprozess) mit Testlauf, Rhythmus und Laufprotokoll; Fehler als Aufgabe im Eingang."
+    },
+    {
+      "name": "Änderungsprotokoll",
+      "description": "Wer wann was geändert hat: Einträge des Audits mit altem und neuem Wert, nach Objekt und Zeitraum."
     },
     {
       "name": "Konto",

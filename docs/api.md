@@ -263,6 +263,27 @@ Portfolio optional (A-18).
 | `GET /v1/portfolios/{id}/bewertungen?modell=` | `priorisierung:read` (Organisation oder Portfolio) | Raster aktive Projekte × Kriterien, Fortschritt; frühere Modellversion mit `modell` (G11) |
 | `PUT /v1/portfolios/{id}/bewertungen` | `priorisierung:write` | mehrere Zellen, alles oder nichts, nach dem Modell in Kraft (409 ohne); bewertete Zelle nur mit `version` (412); `einschaetzung: null` entfernt |
 
+## Schnittstellen und Änderungsprotokoll
+
+Schnittstellen zu Umsystemen mit Laufprotokoll (docs/fachmodell.md 2.13, AP-E7-3; AM.03.02; UC-018 Schritte 3–4, A1) und
+Änderungsprotokoll aus dem Audit (AM.03.03; UC-018 Schritt 5). Katalog: ERP › Ist-Kosten (eingehend, A-16), HR-System ›
+Personal- und Abwesenheitsdaten (eingehend, RK.01.02), Budgetprozess › Jahresbedarf (ausgehend, A-17). Austausch über
+HTTP(S) mit JSON an der Adresse der Schnittstelle, nur über `safeRequest` (SSRF-Schutz); die Verarbeitung der Daten
+registriert das Fachmodul (`verarbeitungSetzen`), ohne sie schlägt ein Lauf mit «noch nicht verfügbar» fehl. Ein
+fehlgeschlagener Lauf (ausser Testlauf) öffnet die Aufgabe «Schnittstelle prüfen» (`schnittstelle.fehler`) an alle mit
+`schnittstelle:admin`, ein erfolgreicher schliesst sie. Geplante Läufe stündlich geprüft: einmal je Tag, Woche bzw. Monat
+(Europe/Zurich).
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/schnittstellen` | `schnittstelle:admin` | mit letztem Lauf und Katalog (`verfuegbar` = Verarbeitung vorhanden) |
+| `POST /v1/schnittstellen` | `schnittstelle:admin` | Umsystem, Daten, Rhythmus, Adresse (Richtung aus dem Katalog; unbekannt 422, doppelt 409, Adresse nicht zulässig 422); aktiv: Testlauf (nur Verbindung) in der Antwort |
+| `GET /v1/schnittstellen/{id}`, `PATCH …` | `schnittstelle:admin` | Rhythmus, Adresse, `aktiv` (deaktivieren statt löschen), `If-Match`; neue Adresse oder Aktivieren mit Testlauf |
+| `GET /v1/schnittstellen/{id}/laeufe` | `schnittstelle:admin` | je Lauf Art, Stand, Start, Ende, Umfang, Fehler; neueste zuerst, Cursor |
+| `POST /v1/schnittstellen/{id}/starten` | `schnittstelle:admin` | Lauf von Hand, auch erneut nach Fehler (A1.1), wartet auf das Ergebnis; nicht aktiv oder läuft schon 409 |
+| `GET /v1/aenderungsprotokoll?objekt=&objektId=&von=&bis=` | `audit:read` | Einträge des Audits mit Person, Zeitpunkt, Aktion, `aenderungen` (Feld, `vorher`, `nachher`; aus `before`/`after`); neueste zuerst, Cursor; `von`/`bis` Kalendertage |
+| `GET /v1/aenderungsprotokoll/objekte` | `audit:read` | Objekttypen mit Einträgen (Filter) |
+
 ## Webhooks und Ereignisse
 
 `GET`, `POST /v1/webhooks`, `DELETE /v1/webhooks/{id}` (Recht `webhook:admin`). Das Geheimnis (`whsec_…`) steht nur

@@ -31,7 +31,7 @@ die Oberfläche betrifft.
 
 | Nr. | Frage | Betrifft | Vorschlag bis zur Klärung | Klärt |
 |---|---|---|---|---|
-| UX-OF-1 | Anrede in der Oberfläche: Sie oder Du? | alle Texte, Q-S4, UX-E7 | «Sie» | UE mit Unternehmenskommunikation |
+| UX-OF-1 | Anrede in der Oberfläche: Sie oder Du? | alle Texte, Q-S4, UX-E7 | **Entschieden 28.10.2026: «Du»** | – |
 | UX-OF-2 | Sprachen: nur Deutsch, oder auch Französisch bzw. Englisch? | Q-S1, Q-S3 | nur Deutsch; Texte trotzdem zentral und übersetzbar | UE |
 | UX-OF-3 | Stimmen Gerät, Umgebung und Häufigkeit der Rollen ([nutzungskontexte.md](nutzungskontexte.md))? | UX-E1, alle Abläufe | Annahmen wie beschrieben | Interviews mit PL, CTL, SP, UE, PRAT |
 | UX-OF-4 | Wann erscheint die Aufgabe «Statusbericht erstellen»? | K1 | am 18., 7 Tage vor dem Stichtag | UE |

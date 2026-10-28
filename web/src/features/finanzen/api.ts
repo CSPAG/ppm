@@ -1,6 +1,6 @@
 /** Abfragen und Änderungen der Finanzen (TanStack Query über den typisierten Client); BC PC.01.02, PC.01.04, PC.01.05. */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, isConflict, type Schemas } from '../../api/index.ts';
+import { api, type Schemas } from '../../api/index.ts';
 
 export type Finanzuebersicht = Schemas['Finanzuebersicht'];
 export type FinanzProjekt = Schemas['FinanzProjekt'];
@@ -94,8 +94,6 @@ export function useUebergabeAendern(jahr: number) {
   const uebergeben = useMutation({
     mutationFn: async (version: number) => (await api.POST('/v1/budgetuebergaben/{jahr}/export', { params: { path: { jahr }, header: { 'if-match': `W/"${version}"` } } })).data!,
     onSuccess: fertig,
-    // Konflikt (412): den neuen Stand holen, damit vor dem Übergeben der aktuelle Jahresbedarf zu sehen ist (Z7)
-    onError: e => { if (isConflict(e)) void qc.invalidateQueries({ queryKey: finanzenKeys.uebergabe(jahr) }); },
   });
   return { korrigieren, uebergeben };
 }

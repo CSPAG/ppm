@@ -68,7 +68,7 @@ export function BudgetprozessPage({ search, setSearch, navigieren, heute = new D
         {schritt === 1 ? <Jahr jahr={jahr} heute={heute} u={u} weiter={j => setSearch({ jahr: String(j), schritt: '2' })} /> : null}
         {/* key nur das Jahr: ein neuer Stand (Speichern, «Neu laden» nach 412) behält die Korrekturen (Z7) */}
         {schritt === 2 && u ? <Pruefen key={jahr} u={u} zurueck={() => gehe(1)} weiter={() => gehe(3)} neuLaden={() => q.refetch()} /> : null}
-        {schritt === 3 && u ? <Uebergeben u={u} zurueck={() => gehe(2)} /> : null}
+        {schritt === 3 && u ? <Uebergeben u={u} zurueck={() => gehe(2)} neuLaden={() => q.refetch()} /> : null}
       </div>
     </section>
   );
@@ -103,6 +103,17 @@ function abgleichen(eingabe: Eingabe, alt: Eingabe, neu: Eingabe): Eingabe {
   }));
 }
 
+/** Konflikt (412) mit «Neu laden»: wartet auf den neuen Stand; erst wenn er da ist, verschwindet der Hinweis (Z7). */
+function useKonflikt(neuLaden: () => Promise<{ error: unknown }>) {
+  const [konflikt, setKonflikt] = useState(false);
+  const [laedt, setLaedt] = useState(false);
+  const laden = async () => {
+    setLaedt(true);
+    try { if (!(await neuLaden()).error) setKonflikt(false); } finally { setLaedt(false); }
+  };
+  return { konflikt, laedt, laden, melden: () => setKonflikt(true) };
+}
+
 function Pruefen({ u, zurueck, weiter, neuLaden }: { u: Budgetuebergabe; zurueck(): void; weiter(): void; neuLaden(): Promise<{ error: unknown }> }) {
   const toast = useToast();
   const { korrigieren } = useUebergabeAendern(u.jahr);
@@ -114,12 +125,7 @@ function Pruefen({ u, zurueck, weiter, neuLaden }: { u: Budgetuebergabe; zurueck
     setBasis(stand);
     setEingabe(abgleichen(eingabe, basis, stand));
   }
-  const [konflikt, setKonflikt] = useState(false);
-  const [laedt, setLaedt] = useState(false);
-  const laden = async () => {
-    setLaedt(true);
-    try { if (!(await neuLaden()).error) setKonflikt(false); } finally { setLaedt(false); }
-  };
+  const { konflikt, laedt, laden, melden } = useKonflikt(neuLaden);
   const darf = u.can.write && u.stand !== 'uebergeben';
   const geaendert = JSON.stringify(eingabe) !== JSON.stringify(eingabeAus(u));
   const ungueltig = Object.values(eingabe).some(e => Number.isNaN(zahl(e.capex)) || Number.isNaN(zahl(e.opex)));
@@ -130,12 +136,15 @@ function Pruefen({ u, zurueck, weiter, neuLaden }: { u: Budgetuebergabe; zurueck
     if (ungueltig) return;
     if (!geaendert) { danach?.(); return; }
     const korrekturen = Object.entries(eingabe).map(([projektId, e]) => ({ projektId, capex: zahl(e.capex), opex: zahl(e.opex), bemerkung: e.bemerkung.trim() }));
+    const gesendet = eingabe;
     try {
-      await korrigieren.mutateAsync({ version: u.version, korrekturen });
+      const neu = await korrigieren.mutateAsync({ version: u.version, korrekturen });
+      // gespeicherte Felder in der Form des Servers («8'000» → «8000», Bemerkung ohne Leerraum), ausser seither geändert
+      setEingabe(e => abgleichen(e, gesendet, eingabeAus(neu)));
       toast.show(TF.entwurfGespeichert);
       danach?.();
     } catch (e) {
-      if (isConflict(e)) setKonflikt(true);
+      if (isConflict(e)) melden();
       else toast.error(e);
     }
   };
@@ -205,10 +214,11 @@ function Pruefen({ u, zurueck, weiter, neuLaden }: { u: Budgetuebergabe; zurueck
   );
 }
 
-function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
+function Uebergeben({ u, zurueck, neuLaden }: { u: Budgetuebergabe; zurueck(): void; neuLaden(): Promise<{ error: unknown }> }) {
   const toast = useToast();
   const { uebergeben } = useUebergabeAendern(u.jahr);
   const [frage, setFrage] = useState(false);
+  const { konflikt, laedt, laden, melden } = useKonflikt(neuLaden);
   const fertig = u.stand === 'uebergeben';
   const datei = () => herunterladen(`jahresbedarf-${u.jahr}.csv`, csv(
     [TF.projekt, 'Name', `${TF.capex} CHF`, `${TF.opex} CHF`, `${TF.capex} ${TF.berechnet} CHF`, `${TF.opex} ${TF.berechnet} CHF`, TF.bemerkung],
@@ -217,17 +227,18 @@ function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
   ));
   const los = () => uebergeben.mutate(u.version, {
     onSuccess: () => { setFrage(false); toast.show(TF.uebergebenToast); },
-    onError: e => { setFrage(false); toast.error(e, isConflict(e) ? TF.uebergebenKonflikt : undefined); },
+    onError: e => { setFrage(false); if (isConflict(e)) melden(); else toast.error(e); },
   });
   return (
     <div className="fi-uebergeben">
       <p className="fi-zusammenfassung" role="status">{TF.zusammenfassung(u.jahr, u.positionen.length + (u.vertraulich?.anzahl ?? 0), lang(u.summe.capex), lang(u.summe.opex))}</p>
       {fertig && u.uebergebenAt ? <Hinweis stufe="hinweis">{TF.uebergebenAm(fmtDateTime(u.uebergebenAt))}</Hinweis> : <p>{TF.wirkung}</p>}
       {!fertig && !u.can.write ? <Hinweis stufe="hinweis">{TF.nurLesen}</Hinweis> : null}
+      {konflikt ? <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laedt} onClick={() => void laden()}>{TF.neuLaden}</button>}>{TF.uebergebenKonflikt}</Hinweis> : null}
       <div className="fi-akt">
         <button type="button" className="btn" onClick={zurueck}>{TF.zurueck}</button>
         <button type="button" className="btn" onClick={datei}><Icon name="download" />{TF.herunterladen}</button>
-        {!fertig && u.can.write ? <button type="button" className="btn primary" onClick={() => setFrage(true)}>{TF.uebergeben}</button> : null}
+        {!fertig && u.can.write ? <button type="button" className="btn primary" disabled={konflikt} onClick={() => setFrage(true)}>{TF.uebergeben}</button> : null}
       </div>
       {frage ? <Confirm title={TF.uebergebenDialog(u.jahr)} text={`${TF.zusammenfassung(u.jahr, u.positionen.length + (u.vertraulich?.anzahl ?? 0), lang(u.summe.capex), lang(u.summe.opex))} ${TF.wirkung}`} confirm={TF.uebergeben} onConfirm={los} onClose={() => setFrage(false)} busy={uebergeben.isPending} /> : null}
     </div>

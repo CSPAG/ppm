@@ -168,6 +168,24 @@ Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/mod
 |---|---|---|
 | `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
 
+## Risikolage und Portfoliobericht
+
+Risikolage (BC PC.02.02, UC-014 Schritt 2) und Portfoliobericht (BC PC.04.02, UC-014 Schritt 3, K3 Schritt 4;
+`src/modules/auswertung/` Dateien `risiko*`, `bericht*`, Tabelle `portfoliobericht` aus 150, AP-E2-3). Art
+`portfoliobericht` in der Registry der Sitzung: Beim Bereitstellen schlägt der Bericht dem entscheidenden Gremium das
+Traktandum «Bericht der Programmleitung» vor (K3 Schritte 1 und 4), Unterlage ist der Bericht selbst; Kenntnisnahme
+ohne Entscheid.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/dashboard/risiken?portfolio=` | `auswertung:read` an der Organisation oder am Portfolio | Projektrisiken der aktiven Projekte und Portfoliorisiken, höchste Auswirkung und Wahrscheinlichkeit zuerst; Matrix 3 × 3; Abhängigkeiten; offene Eskalationen |
+| `GET /v1/portfolioberichte?portfolio=` | `auswertung:read` | Entwürfe nur mit `auswertung:write`, sonst bereitgestellte Berichte der sichtbaren Portfolios |
+| `POST /v1/portfolioberichte` | `auswertung:write` | aus dem abgeschlossenen Dashboard (offene Periode 409); 201 neu, 200 im Entwurf neu erzeugt (Kommentar bleibt), bereitgestellt 409 |
+| `GET /v1/portfolioberichte/:id` | `auswertung:read` (Lesesicht) | Stand bei Erzeugung; ETag |
+| `PATCH /v1/portfolioberichte/:id` | `auswertung:write` | Kommentar im Entwurf; `If-Match` |
+| `POST /v1/portfolioberichte/:id/bereitstellen` | `auswertung:write` | danach fest und für Gremien sichtbar, Vorschlag an das entscheidende Gremium; `If-Match`; Ereignis `portfoliobericht.provided` |
+| `GET /v1/portfolioberichte/:id/dokument?format=pdf\|docx` | `auswertung:read` (Lesesicht) | über die Ausgabe des Moduls `vorlage`; Export im Audit |
+
 ## Ressourcen
 
 Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =

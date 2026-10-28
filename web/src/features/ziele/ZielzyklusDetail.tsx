@@ -228,7 +228,16 @@ function Hauptaktivitaeten({ jz, jahr, write }: { jz: JahreszielKnoten; jahr: nu
               <span className="muted small">{TZZ.verantwortlich}: {h.verantwortlich ? <PersonName id={h.verantwortlich.id} /> : TZZ.ohneVerantwortlich}</span>
               {write ? (
                 <button type="button" className="iconbtn" aria-label={TZZ.hauptaktivitaetEntfernen(h.text)}
-                  onClick={() => m.hauptaktivitaetLoeschen.mutate({ id: h.id, version: h.version }, { onSuccess: () => toast.show(TZZ.hauptaktivitaetEntfernt), onError: e => toast.error(e) })}>
+                  onClick={() => m.hauptaktivitaetLoeschen.mutate({ id: h.id, version: h.version }, {
+                    // umkehrbar (I-R1 Stufe 1): «Rückgängig» legt sie mit Text, Verantwortlich und Stelle wieder an
+                    onSuccess: () => toast.show(TZZ.hauptaktivitaetEntfernt, {
+                      action: {
+                        label: TZZ.rueckgaengig,
+                        run: () => m.hauptaktivitaetAnlegen.mutate({ key: newIdempotencyKey(), body: { jahreszielId: jz.id, text: h.text, verantwortlich: h.verantwortlich?.id ?? null, position: h.position } }, { onError: e => toast.error(e) }),
+                      },
+                    }),
+                    onError: e => toast.error(e),
+                  })}>
                   <Icon name="trash" />
                 </button>
               ) : null}
@@ -278,7 +287,13 @@ function Projekte({ projekte, zyklus, ziel, onProjekt }: {
               <PhaseKurz phase={p.phase as Phase} />
               {darf ? (
                 <button type="button" className="iconbtn" aria-label={TZZ.zuordnungLoesen(p.nummer)}
-                  onClick={() => m.loesen.mutate({ projektId: p.projektId, zuordnungId: p.zuordnungId }, { onSuccess: () => toast.show(TZZ.zuordnungGeloest(p.nummer)), onError: e => toast.error(e) })}>
+                  onClick={() => m.loesen.mutate({ projektId: p.projektId, zuordnungId: p.zuordnungId }, {
+                    // umkehrbar (I-R1 Stufe 1): «Rückgängig» ordnet das Projekt demselben Ziel wieder zu
+                    onSuccess: () => toast.show(TZZ.zuordnungGeloest(p.nummer), {
+                      action: { label: TZZ.rueckgaengig, run: () => m.zuordnen.mutate({ projektId: p.projektId, body: ziel, key: newIdempotencyKey() }, { onError: e => toast.error(e) }) },
+                    }),
+                    onError: e => toast.error(e),
+                  })}>
                   <Icon name="x" />
                 </button>
               ) : null}

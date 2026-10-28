@@ -44059,7 +44059,7 @@ export interface paths {
         };
         /**
          * Änderungsprotokoll
-         * @description Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5).
+         * @description Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5). Mit `format=csv` als Export aller Einträge zum Filter (eine Zeile je geändertes Feld, höchstens 10 000 Einträge, sonst 422).
          */
         get: {
             parameters: {
@@ -44073,6 +44073,8 @@ export interface paths {
                     cursor?: string;
                     /** @description Seitengrösse (höchstens 200). */
                     limit?: number;
+                    /** @description Export als CSV: alle Einträge zum Filter, eine Zeile je geändertes Feld. */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;
@@ -46135,7 +46137,7 @@ export interface components {
             }[];
             toleranzen?: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: null | number;
+                wert: number | null;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
         };
@@ -46598,6 +46600,7 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
+            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
             prognose: null | number;
             budgetBaseline: null | number;
             ist: null | number;
@@ -46627,7 +46630,8 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: null | number;
+            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
+            prognose?: number | null;
         };
         KostenPatch: {
             /**
@@ -46646,7 +46650,8 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: null | number;
+            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
+            prognose?: number | null;
         };
         Risiko: {
             /** Format: uuid */

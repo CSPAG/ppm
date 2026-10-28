@@ -210,6 +210,12 @@ th.num{text-align:right}
   tbody tr:hover td{background:none}
   .dl-teil{padding:8px 14px}
 }
+/* Übersicht der Kürzel (interaktion.md Abschnitt 11) */
+.kz-tab{margin:0 0 14px}
+.kz-tab caption{text-align:left;font-weight:600;padding:0 0 6px}
+.kz-tab tbody tr{cursor:default}
+.kz-tab tbody tr:hover td{background:none}
+.kz-tab tbody td{white-space:normal;max-width:none;height:36px}
 /* Ziele unter 768 px mindestens 44 px (Q-B4, I-M1; docs/ux/rahmen/pruefung.md). min-height schlägt die festen Höhen der
    Features; Kontrollkästchen und Optionen treffen über ihre Beschriftung, Links im Fliesstext sind ausgenommen (WCAG 2.5.8). */
 @media (max-width:767px){

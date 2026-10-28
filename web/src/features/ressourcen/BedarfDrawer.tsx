@@ -18,6 +18,7 @@ function ZuteilungZeile({ z, write, label }: { z: Zuteilung; write: boolean; lab
   const toast = useToast();
   const aendern = useAnteilAendern();
   const entfernen = useZuteilungEntfernen();
+  const zuteilen = useZuteilen();
   const [wert, setWert] = useState(zahl(z.fte));
   const fehler = anteil(wert) === null;
   const person = z.personName ?? label;
@@ -37,7 +38,13 @@ function ZuteilungZeile({ z, write, label }: { z: Zuteilung; write: boolean; lab
       {write ? (
         <td>
           <button type="button" className="iconbtn" aria-label={TB.entfernen(person, monat)} disabled={entfernen.isPending}
-            onClick={() => entfernen.mutate({ id: z.id, version: z.version }, { onSuccess: () => toast.show(TB.entfernt), onError: fehlerMelden })}>
+            onClick={() => entfernen.mutate({ id: z.id, version: z.version }, {
+              // umkehrbar (I-R1 Stufe 1): «Rückgängig» teilt dieselbe Person im selben Monat mit demselben Anteil wieder zu
+              onSuccess: () => toast.show(TB.entfernt, {
+                action: { label: TB.rueckgaengig, run: () => zuteilen.mutate({ id: z.bedarfId, personId: z.personId, fte: z.fte, vonMonat: z.monat, bisMonat: z.monat }, { onError: fehlerMelden }) },
+              }),
+              onError: fehlerMelden,
+            })}>
             <Icon name="trash" />
           </button>
         </td>

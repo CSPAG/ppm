@@ -15,7 +15,7 @@ export interface Pruefung extends Pflichtangabe {
   /** Woher die Angabe verlangt ist: Gate in die Zielphase oder die Zielphase selbst. */
   quelle: { art: 'gate' | 'phase'; code: string };
   erfuellt: boolean;
-  /** Warum sie fehlt, in Worten (Sie-Form). */
+  /** Warum sie fehlt, in Worten (Du-Form). */
   grund: string | null;
 }
 

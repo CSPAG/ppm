@@ -305,7 +305,7 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
   app.post('/v1/projekte/:id/berichte/:periode/rueckfragen', {
     schema: {
       tags: [TAG], summary: 'Rückfrage stellen',
-      description: 'Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»). Sie erhält im Eingang «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».',
+      description: 'Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»); im Eingang erhält sie «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».',
       params: BerichtParams, headers: Type.Composite([IfMatchHeaders, IdempotencyHeaders]), body: Type.Ref('RueckfrageCreate'), response: { 200: Type.Ref('PeriodeZeile') },
     },
   }, async (req, reply) => {
@@ -316,7 +316,7 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
       const p = await projektZumPruefen(req, tx, id);
       await offenePeriode(tx, periode);
       const r = pruefeBericht(await store.get(tx, id, periode, { sperren: true }), version, ['eingereicht', 'geprueft'], 'Der Bericht ist bereits zurückgegeben.');
-      if (!text.trim()) throw invalid('Angaben fehlen: Die Rückfrage ist leer. Schreiben Sie, was unklar ist.', [{ path: '/text', message: 'Rückfrage' }]);
+      if (!text.trim()) throw invalid('Angaben fehlen: Die Rückfrage ist leer. Schreibe, was unklar ist.', [{ path: '/text', message: 'Rückfrage' }]);
       const n = await pstore.pruefstand(tx, r.id, r.version, ['eingereicht', 'geprueft'], 'zurueckgegeben');
       if (!n) throw preconditionFailed(r.version);
       const rf = await pstore.rueckfrageStellen(tx, r.id, text);

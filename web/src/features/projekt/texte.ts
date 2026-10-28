@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Projekte» (Namensraum des Features, fachmodell.md 7.2): Anrede «Sie», Schweizer Rechtschreibung,
+ * Texte des Features «Projekte» (Namensraum des Features, fachmodell.md 7.2): Anrede «Du», Schweizer Rechtschreibung,
  * Begriffe nach docs/ux/darstellung.md (Rollen ausgeschrieben, «CTL» als Kurzform der Insel).
  */
 import type { StandFamilie } from '../../ui/index.ts';
@@ -10,11 +10,11 @@ type Lebenszyklus = 'aktiv' | 'sistiert' | 'abgebrochen' | 'abgeschlossen' | 'zu
 export const TP = {
   bereich: 'Meine Projekte',
   titel: 'Projekte',
-  sub: 'Projekte, in denen Sie eine Rolle haben oder die Sie sehen dürfen. Öffnen Sie ein Projekt, um seine Projektakte zu führen.',
+  sub: 'Projekte, in denen du eine Rolle hast oder die du sehen darfst. Öffne ein Projekt, um seine Projektakte zu führen.',
   suche: 'Projekte durchsuchen',
   sucheHinweis: 'Name oder Nummer',
-  leer: 'Sie sind noch in keinem Projekt eingetragen. Projekte entstehen aus freigegebenen Projektideen; Sponsor und Projektleitung legen danach die Projektorganisation fest.',
-  leerGefiltert: 'Kein Projekt passt zu Ihrer Suche oder den Filtern.',
+  leer: 'Du bist noch in keinem Projekt eingetragen. Projekte entstehen aus freigegebenen Projektideen; Sponsor und Projektleitung legen danach die Projektorganisation fest.',
+  leerGefiltert: 'Kein Projekt passt zu deiner Suche oder den Filtern.',
   oeffnen: 'Projektakte öffnen',
   // Filter (I-L1)
   filter: {
@@ -42,7 +42,7 @@ export const TP = {
   // Projektakte (Rahmen)
   akte: {
     reiter: 'Bereiche der Projektakte', inhalt: 'Inhalt der Projektakte', uebersicht: 'Übersicht', zurueck: 'Zu den Projekten',
-    nichtGefunden: 'Dieses Projekt gibt es nicht, oder Sie sehen es nicht.',
+    nichtGefunden: 'Dieses Projekt gibt es nicht, oder du siehst es nicht.',
     beendet: (stand: string) => `Das Projekt ist ${stand}. Die Projektakte kann nur noch gelesen werden.`,
     sistiert: 'Das Projekt ist sistiert. Es wird mit einem Entscheid des Gremiums wieder aufgenommen.',
   },
@@ -58,10 +58,10 @@ export const TP = {
     funktion: 'Funktion', person: 'Person', akv: 'Aufgaben, Kompetenzen, Verantwortung', akvKurz: 'AKV', optional: 'optional',
     hinzufuegen: 'Person hinzufügen', entfernen: (n: number) => `Zeile ${n} entfernen`, zeile: (n: number) => `Zeile ${n}`,
     gespeichert: 'Projektorganisation gespeichert.',
-    personFehlt: 'Wählen Sie eine Person.',
-    einzeln: (f: string) => `${f}: höchstens eine Person. Entfernen Sie eine der Zeilen.`,
+    personFehlt: 'Wähle eine Person.',
+    einzeln: (f: string) => `${f}: höchstens eine Person. Entferne eine der Zeilen.`,
     doppelt: 'Diese Person steht schon mit dieser Funktion in der Liste.',
-    konflikt: 'Die Projektorganisation wurde inzwischen geändert. Laden Sie den neuen Stand; Ihre Eingaben bleiben erhalten, die Wirkung zeigt dann die Unterschiede zum neuen Stand.',
+    konflikt: 'Die Projektorganisation wurde inzwischen geändert. Lade den neuen Stand; deine Eingaben bleiben erhalten, die Wirkung zeigt dann die Unterschiede zum neuen Stand.',
     wirkung: 'Wirkung beim Speichern',
     erhalten: 'erhalten Zugriff auf das Projekt:',
     verlieren: 'verlieren ihre Rolle im Projekt:',

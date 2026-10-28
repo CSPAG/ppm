@@ -74,7 +74,7 @@ const aufzaehlung = (t: string[]) => (t.length > 1 ? `${t.slice(0, -1).join(', '
 export function pruefePflichtangaben(w: Werte): void {
   const f = fehlend(w);
   if (!f.length) return;
-  throw invalid(`Angaben fehlen: ${aufzaehlung(f.map(x => x.text))} ${f.length > 1 ? 'sind' : 'ist'} leer. Ergänzen Sie sie, um den Bericht einzureichen.`,
+  throw invalid(`Angaben fehlen: ${aufzaehlung(f.map(x => x.text))} ${f.length > 1 ? 'sind' : 'ist'} leer. Ergänze sie, um den Bericht einzureichen.`,
     f.map(x => ({ path: `/${x.feld.replace('.', '/')}`, message: x.text })));
 }
 

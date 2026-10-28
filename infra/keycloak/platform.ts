@@ -1,5 +1,5 @@
 /**
- * Verwaltet von identity-kit (create-iam-app 0.5.3) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.3 sync
+ * Verwaltet von identity-kit (create-iam-app 0.5.4) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.4 sync
  *
  * Scopes der App als JSON für das Realm-Modul (platform.json): `model.platformJson()` aus @vollholz/iam. Pfad des
  * Modells aus identity.app.json › paths.model (Standard src/authz/model.ts). iam-conformity-test prüft, dass die Datei

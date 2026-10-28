@@ -1,8 +1,8 @@
-<!-- Verwaltet von identity-kit (create-iam-app 0.5.3) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.3 sync -->
+<!-- Verwaltet von identity-kit (create-iam-app 0.5.4) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.4 sync -->
 
 # Anmeldung und Rechte: was vom Identity-Kit kommt
 
-Diese App nutzt das [Identity-Kit](https://github.com/vollholz/identity-kit) (Gerüst `create-iam-app` 0.5.3) für
+Diese App nutzt das [Identity-Kit](https://github.com/vollholz/identity-kit) (Gerüst `create-iam-app` 0.5.4) für
 Anmeldung, Organisationen, Rechte und Datenbank-Schutz. Jede Vorgabe gehört zu genau einer **Zone**; daran sieht man,
 woher sie kommt und wer sie ändern darf.
 

@@ -210,7 +210,8 @@ describe('Codetabellen (UI-45)', () => {
     let n = 0;
     const api = stub({
       'GET /v1/codetabellen': () => json({ items: tabellen(2), can: { write: true } }),
-      'GET /v1/codetabellen/trend/werte': () => json({ items: [wert({ version: n ? 2 : 1 })], nextCursor: null, can: { write: true } }),
+      // dazwischen ändert jemand anderes die Reihenfolge (10 → 20)
+      'GET /v1/codetabellen/trend/werte': () => json({ items: [wert(n ? { version: 2, position: 20 } : { version: 1 })], nextCursor: null, can: { write: true } }),
       [`PATCH /v1/codetabellen/trend/werte/${wert({}).id}`]: () => (n++ ? json(wert({ label: 'steigend', version: 3 })) : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
     });
     renderWithIam(<Code initial={{ o: 'trend' }} />, ADM);
@@ -223,10 +224,12 @@ describe('Codetabellen (UI-45)', () => {
     await userEvent.click(screen.getByRole('button', { name: T.common.reload }));
     await waitFor(() => expect(screen.queryByText(TS.code.conflict)).toBeNull());
     expect(screen.getByLabelText(TS.code.label)).toHaveValue('steigend');
+    expect(screen.getByLabelText(TS.code.position)).toHaveValue('20'); // nicht geändertes Feld übernimmt den neuen Stand
     await userEvent.click(screen.getByRole('button', { name: T.common.save }));
     expect(await screen.findByText(TS.code.saved)).toBeInTheDocument();
     const patches = api.calls.filter(c => c.method === 'PATCH');
     expect([patches[0]!.headers.get('If-Match'), patches[1]!.headers.get('If-Match')]).toEqual(['W/"1"', 'W/"2"']);
+    expect(await patches[1]!.json()).toEqual({ label: 'steigend' }); // nur das Geänderte
   });
 
   it('nur lesen: keine Aktionen an den Werten (Z8)', async () => {

@@ -10,6 +10,7 @@ import { isConflict, newIdempotencyKey } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Drawer, Empty, ErrorState, Icon, Loading, Stand, T, useToast } from '../../ui/index.ts';
 import { useCodeMutations, useWerte, type Codetabelle, type Codewert, type TabelleKey } from './api.ts';
+import { geaendert, useFormStand } from './formStand.ts';
 import { TS } from './texte.ts';
 
 export function CodetabelleDrawer({ schluessel, tabellen, laedt, onClose }: { schluessel: string; tabellen: Codetabelle[]; laedt: boolean; onClose(): void }) {
@@ -105,7 +106,7 @@ function WertFormular({ tabelle, modus, onDone }: { tabelle: Codetabelle; modus:
   const werte = useWerte(tabelle.schluessel as TabelleKey);
   // aktueller Stand des Werts (nach «Neu laden» mit neuer Version), sonst der beim Öffnen
   const w = modus.art === 'bearbeiten' ? werte.data?.find(x => x.id === modus.wert.id) ?? modus.wert : undefined;
-  const [v, setV] = useState<FormValues>({ schluessel: w?.schluessel ?? '', label: w?.label ?? '', position: String(w?.position ?? 0) });
+  const [v, setV] = useFormStand<FormValues>({ schluessel: w?.schluessel ?? '', label: w?.label ?? '', position: String(w?.position ?? 0) });
   const [touched, setTouched] = useState(false);
   const mutation = neu ? m.create : m.update;
   const errors = {
@@ -119,7 +120,12 @@ function WertFormular({ tabelle, modus, onDone }: { tabelle: Codetabelle; modus:
     if (Object.keys(fehler).length) { document.getElementById(`${id}-${Object.keys(fehler)[0]}`)?.focus(); return; }
     const fertig = { onSuccess: () => { toast.show(neu ? TS.code.created : TS.code.saved); onDone(); } };
     if (neu) m.create.mutate({ body: { schluessel: v.schluessel.trim(), label: v.label.trim(), position: Number(v.position) }, key }, fertig);
-    else m.update.mutate({ wert: w!, body: { label: v.label.trim(), position: Number(v.position) } }, fertig);
+    else {
+      // nur Geändertes senden: die Änderung einer anderen Person am anderen Feld bleibt (Z7)
+      const body = geaendert({ label: v.label.trim(), position: Number(v.position) }, { label: w!.label, position: w!.position });
+      if (!Object.keys(body).length) { onDone(); return; }
+      m.update.mutate({ wert: w!, body }, fertig);
+    }
   };
   const describedBy = (k: keyof FormValues, hint?: boolean) =>
     [hint ? `${id}-${k}-h` : '', errors[k] ? `${id}-${k}-e` : ''].filter(Boolean).join(' ') || undefined;
@@ -132,7 +138,7 @@ function WertFormular({ tabelle, modus, onDone }: { tabelle: Codetabelle; modus:
       {isConflict(mutation.error) ? (
         <div className="notice" role="alert">
           <p>{TS.code.conflict}</p>
-          <button type="button" className="btn" onClick={async () => { await werte.refetch(); mutation.reset(); }}>{T.common.reload}</button>
+          <button type="button" className="btn" onClick={async () => { if (!(await werte.refetch()).error) mutation.reset(); }}>{T.common.reload}</button>
         </div>
       ) : mutation.error && !describeError(mutation.error).fields?.length ? <ErrorState error={mutation.error} /> : null}
       <form id={formId} className="form" onSubmit={submit} noValidate aria-busy={mutation.isPending}>

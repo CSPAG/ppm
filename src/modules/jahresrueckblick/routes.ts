@@ -18,16 +18,26 @@ export const TAG = 'Jahresrückblick';
 const SCHREIBEN = 'quartalsbericht:write';
 
 /**
- * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Mitglieder
- * des PRAT sehen den Rückblick ab «traktandiert», welchen Stand und welches Gremium, entscheidet die Lesesicht (381).
- * Liefert, ob die Person die Ziele der Organisation liest.
+ * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Welche
+ * Gremien den Rückblick ab «traktandiert» sehen, entscheidet die Lesesicht (381) am festgehaltenen Portfolio des
+ * Traktandums. Liefert, ob die Person die Ziele der Organisation liest.
  */
-async function lesend(req: FastifyRequest, tx: Tx, schreiben: boolean): Promise<boolean> {
+async function lesend(req: FastifyRequest, schreiben: boolean): Promise<boolean> {
   if (schreiben || await req.can('ziel:read')) return true;
-  // nur Mitglieder des PRAT; andere Gremien erhalten 403 statt eines Wartezustands
-  const prat = await store.portfolioA(tx);
-  if (!prat || !(await req.can('sitzung:read', { type: 'portfolio', id: prat }))) throw forbidden();
+  await req.needSomewhere('sitzung:read');
   return false;
+}
+
+/**
+ * Rückblick nicht sichtbar für ein Gremium: 404 (noch nicht traktandiert) für Mitglieder des heutigen PRAT, sonst 403.
+ * Entscheidet nur die Antwort, nie den Zugriff; den gibt allein das festgehaltene Portfolio (381).
+ */
+const notFoundRueckblick = (): never => { throw notFound('Jahresrückblick'); };
+
+async function nichtSichtbar(req: FastifyRequest, tx: Tx): Promise<never> {
+  const prat = await store.portfolioA(tx);
+  if (prat && await req.can('sitzung:read', { type: 'portfolio', id: prat })) throw notFound('Jahresrückblick');
+  throw forbidden();
 }
 
 export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
@@ -41,11 +51,11 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   }, async (req, reply): Promise<JahresrueckblickOut> => {
     const { jahr } = req.params as { jahr: number };
     const schreiben = await req.can(SCHREIBEN);
+    const ziele = await lesend(req, schreiben);
     const out = await req.tx(async tx => {
-      const ziele = await lesend(req, tx, schreiben);
       const r = await store.lesen(tx, jahr);
       // Gremium (A-67): nur der traktandierte Stand, keine Auswertung live
-      if (!r && !ziele) throw notFound('Jahresrückblick');
+      if (!r && !ziele) await nichtSichtbar(req, tx);
       return antwort(tx, jahr, r, schreiben);
     });
     reply.header('etag', etag(out.version));
@@ -133,10 +143,10 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
     const schreiben = await req.can(SCHREIBEN);
     const who = actorOf(req);
+    const ziele = await lesend(req, schreiben);
     const out = await req.tx(async tx => {
-      await lesend(req, tx, schreiben);
       const r = await store.lesen(tx, jahr);
-      if (!r) throw notFound('Jahresrückblick');
+      if (!r) return ziele ? notFoundRueckblick() : nichtSichtbar(req, tx);
       // Export eines Dokuments mit Personendaten im Audit (I-Z3); kein Ereignis
       await record(tx, who, { action: 'jahresrueckblick.exported', resourceType: 'jahresrueckblick', resourceId: r.id, data: { jahr, format } });
       return antwort(tx, jahr, r, schreiben);

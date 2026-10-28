@@ -173,10 +173,18 @@ describe('Zuteilung (AP-E7-2)', { skip }, () => {
     await lebenszyklus('aktiv');
     assert.deepEqual([await bedarfJan(), await konflikte(), await annaJan()], [1.5, ['person', 'pool'], 1.25]);
 
-    // Abgebrochen: Zuteilung entfernen bleibt möglich, das Register bleibt, wie es war
-    await lebenszyklus('abgebrochen');
-    const d = await call('rm', 'DELETE', `/v1/zuteilungen/${zy.id}`, undefined, { 'if-match': `W/"${zy.version}"` });
-    assert.equal(d.statusCode, 204, d.body);
-    assert.equal((await call('rm', 'GET', `/v1/bedarfe/${bedarfY}`)).json().zuteilungen.length, 0);
+    // Sistiert: Zuteilung entfernen bleibt möglich und führt «gedeckt» nach, damit es nach der Wiederaufnahme stimmt
+    const gedecktY = () => full(api.t.runtime, T, async tx => (await tx.query('SELECT gedeckt FROM ppm.ressourcenbedarf WHERE id = $1', [bedarfY])).rows[0].gedeckt);
+    const zb = await call('rm', 'POST', `/v1/bedarfe/${bedarfY}/zuteilungen`, { personId: id.ben, fte: 0.5 });
+    assert.equal(zb.statusCode, 201, zb.body);
+    assert.equal(await gedecktY(), true);
+    await lebenszyklus('sistiert');
+    for (const z of [zy, ...zb.json().zuteilungen]) {
+      const d = await call('rm', 'DELETE', `/v1/zuteilungen/${z.id}`, undefined, { 'if-match': `W/"${z.version}"` });
+      assert.equal(d.statusCode, 204, d.body);
+    }
+    assert.equal(await gedecktY(), false);
+    await lebenszyklus('aktiv');
+    assert.equal((await call('rm', 'GET', `/v1/bedarfe/${bedarfY}`)).json().bedarf.stand, 'offen');
   });
 });

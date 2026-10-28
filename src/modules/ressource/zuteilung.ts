@@ -101,11 +101,12 @@ export async function bedarf(tx: Tx, id: string): Promise<BedarfZeile | null> {
 
 /**
  * Nach jeder Änderung: «gedeckt» im Register nachführen (RK.02.04), eine gemeldete Lücke entfällt, sobald der Bedarf
- * gedeckt ist; Sammelaufgaben der RM nachführen. Das Register eines Projekts, das nicht mehr aktiv ist, bleibt, wie es war.
+ * gedeckt ist; Sammelaufgaben der RM nachführen. «gedeckt» auch bei einem Projekt, das nicht mehr aktiv ist (Zuteilung
+ * entfernt), damit es nach einer Wiederaufnahme stimmt.
  */
 export async function nachfuehren(tx: Tx, who: Actor, bedarfId: string): Promise<BedarfZeile> {
   const b = (await bedarf(tx, bedarfId))!;
-  if (b.aktiv && b.gedeckt !== (b.stand === 'gedeckt')) await projektdaten.bedarfGedeckt(tx, who, b.id, b.stand === 'gedeckt');
+  if (b.gedeckt !== (b.stand === 'gedeckt')) await projektdaten.bedarfGedeckt(tx, who, b.id, b.stand === 'gedeckt');
   if (b.aktiv && b.stand === 'gedeckt' && b.luecke) await zs.lueckeEntfernen(tx, b.id);
   await aufgabenNachfuehren(tx);
   return (await bedarf(tx, bedarfId))!;

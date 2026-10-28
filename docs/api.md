@@ -209,7 +209,7 @@ Projekte, die nicht mehr aktiv sind (`sistiert`, `abgebrochen`, `abgeschlossen`,
 frei (UC-015 Schritt 6, A1.2): Ihr Bedarf und ihre Zuteilungen zählen in Auslastung (auch je Szenario), Bedarfsliste,
 Konflikten, Belegung und Sammelaufgaben nicht mehr. Entschieden wird beim Lesen, gelöscht wird nichts; bei einer
 Wiederaufnahme zählen sie wieder. Zuteilen, Anteil ändern und Lücke melden ergeben 409 (`reason: lebenszyklus`),
-Entfernen bleibt möglich. Wer das Projekt nicht sieht, sieht seinen Lebenszyklus nicht; für ihn zählen dessen
+Entfernen bleibt möglich und führt «gedeckt» nach. Wer das Projekt nicht sieht, sieht seinen Lebenszyklus nicht; für ihn zählen dessen
 Zuteilungen weiter.
 
 | Route | Recht | Hinweis |

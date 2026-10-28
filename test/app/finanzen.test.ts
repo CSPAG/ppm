@@ -247,4 +247,20 @@ describe('Finanzen (API)', { skip }, () => {
     assert.equal((await call('gremium', 'GET', '/v1/budgetuebergaben/2027')).statusCode, 403);
     assert.equal((await call('fi', 'GET', '/v1/finanzen?portfolio=00000000-0000-4000-8000-000000000099')).statusCode, 404);
   });
+
+  test('Toleranz aus dem Projektvertrag (A-10): die Baseline übersteuert den Standard; die PL sieht sie ohne phasenmodell:read', async () => {
+    const tol = async (who: string) => (await call(who, 'GET', '/v1/finanzen')).json().projekte
+      .filter((x: { id: string }) => x.id === p.a).map((x: { toleranzProzent: number | null; abweichung: { wesentlich: boolean } }) => [x.toleranzProzent, x.abweichung.wesentlich]);
+    assert.deepEqual(await tol('pl'), [[10, true]], 'Standard des Phasenmodells, auch ohne phasenmodell:read');
+    // Prognose inzwischen 40 % über Budget; Baseline mit Toleranz «Kosten» 50 % in Kap. 7 (wie nach dem Gate-Entscheid)
+    await full(api.t.runtime, T, async tx => {
+      const v = (await tx.query<{ id: string }>(
+        "INSERT INTO ppm.vertrag_version (tenant_id, projekt_id, nummer, anlass, zielphase, begruendung, stand, baseline, baseline_at) VALUES ($1, $2, '1.0', 'initial', 'P1', '', 'abgenommen', true, now()) RETURNING id",
+        [T, p.a])).rows[0]!.id;
+      await tx.query("INSERT INTO ppm.vertrag_kapitel (tenant_id, projekt_id, version_id, kapitel, inhalt) VALUES ($1, $2, $3, 7, $4)",
+        [T, p.a, v, JSON.stringify({ toleranzen: [{ dimension: 'kosten', wert: 50, einheit: 'prozent' }] })]);
+    });
+    assert.deepEqual(await tol('fi'), [[50, false]]);
+    assert.deepEqual(await tol('pl'), [[50, false]]);
+  });
 });

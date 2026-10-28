@@ -52,3 +52,5 @@
   .ma-akt{white-space:normal}
   .ma-tasten{display:none}
 }
+.ma-vorschau{margin:4px 0 12px;padding-left:18px;max-height:200px;overflow:auto}
+.ma-vorschau li{margin:2px 0}

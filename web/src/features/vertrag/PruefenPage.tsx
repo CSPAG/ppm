@@ -7,7 +7,7 @@
 import { describeError } from '@vollholz/iam-web';
 import { useId, useState } from 'react';
 import { isConflict, statusOf } from '../../api/index.ts';
-import { Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
+import { Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, TeilFehler, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
 import { usePflichtangaben, useProjekt, useVertrag, type Version } from './api.ts';
 import { KAPITEL } from './felder.ts';
 import { usePruefung, usePruefungMutations, type PruefungLoaded } from './PruefenApi.ts';
@@ -85,7 +85,8 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
         <aside className="qc-panel" aria-labelledby={`${id}-c`}>
           <h3 id={`${id}-c`} className="grp-h">{TP.checkliste}</h3>
           <ul className="qc-check">
-            <li><Icon name={fehlend ? 'warn' : 'check'} />{pflicht.isPending ? T.common.loading : TP.checkPflicht(fehlend)}</li>
+            {pflicht.error ? <li><TeilFehler was={TP.pflichtangaben} error={pflicht.error} onRetry={() => void pflicht.refetch()} /></li>
+              : <li><Icon name={fehlend ? 'warn' : 'check'} />{pflicht.isPending ? T.common.loading : TP.checkPflicht(fehlend)}</li>}
             <li><Icon name="info" />{TP.checkHandbuch}</li>
           </ul>
           {frueher.length ? (

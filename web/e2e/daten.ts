@@ -37,7 +37,7 @@ const heute = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Z
 /** Datum n Kalendertage nach heute. */
 export const inTagen = (n: number) => new Date(Date.parse(`${heute()}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 /** Datum n Kalendertage nach heute, auf den nächsten Mittwoch gelegt (Sitzungstag). */
-function mittwochIn(n: number): string {
+export function mittwochIn(n: number): string {
   const d = new Date(Date.parse(`${inTagen(n)}T00:00:00Z`));
   while (d.getUTCDay() !== 3) d.setUTCDate(d.getUTCDate() + 1);
   return d.toISOString().slice(0, 10);
@@ -75,6 +75,7 @@ export async function phasenmodellMitToleranzen(a: Api): Promise<void> {
 }
 
 export interface Projekt { id: string; nummer: string; name: string; portfolioId: string }
+export interface Gremium { id: string; kuerzel: string }
 
 /** Projekt in eigenem Portfolio, die angemeldete Person in den angegebenen Funktionen. */
 export async function projekt(a: Api, name: string, phase: string, funktionen: readonly string[] = ['sp', 'pl', 'ctl']): Promise<Projekt> {
@@ -91,21 +92,43 @@ export async function projekt(a: Api, name: string, phase: string, funktionen: r
 }
 
 /**
- * Projekt mit Projektvertrag als Baseline (K2 Schritte 6–11): Phasenmodell mit Toleranzen in Kraft, Gremium mit Termin
- * und Gremienweg P0–P1, Entwurf mit einem Meilenstein (Termin in `meilensteinInTagen`), Einreichen, Quality-Check,
- * drei Unterschriften, Gate-Entscheid «freigegeben» in der laufenden Sitzung. Danach ist das Projekt in P1, der
- * Meilenstein steht mit Baseline-Termin im Register.
+ * Entscheidendes Gremium des Portfolios (Traktandenvorschläge der Module gehen dorthin, A-45) mit Terminen; mit `gates`
+ * zusätzlich der Gremienweg für diese Gates.
  */
-export async function projektMitBaseline(page: Page, name: string, o: { meilenstein: string; meilensteinInTagen: number }): Promise<Projekt> {
+export async function gremium(a: Api, portfolioId: string, termine: string[], gates: string[] = []): Promise<Gremium> {
+  const kuerzel = `g${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+  const g = await a.send<{ id: string }>('POST', '/v1/gremien', { portfolioId, kuerzel, name: `Gremium ${kuerzel}`, art: 'entscheidend' });
+  if (gates.length) {
+    const weg = await a.get(`/v1/portfolios/${portfolioId}/gremienweg`);
+    await a.send('PUT', `/v1/portfolios/${portfolioId}/gremienweg`, { schritte: gates.map(gate => ({ gate, gremiumId: g.body.id })) }, { 'if-match': weg.headers()['etag'] ?? '' });
+  }
+  for (const datum of termine) await a.send('POST', `/v1/gremien/${g.body.id}/termine`, { datum });
+  return { id: g.body.id, kuerzel };
+}
+
+/** Sitzung am Termin mit dem ersten Vorschlag der Art anlegen und versenden (K3 Schritte 1–5); liefert Sitzung und Traktandum. */
+export async function sitzungVersendet(a: Api, g: Gremium, datum: string, art: string): Promise<{ sitzung: string; traktandum: string; version: number }> {
+  const s = await a.send<{ id: string; version: number }>('POST', `/v1/gremien/${g.kuerzel}/sitzungen`, { datum });
+  const vorschlaege = await (await a.get(`/v1/sitzungen/${s.body.id}/vorschlaege`)).json() as { gruppen: { art: string; traktanden: { id: string }[] }[] };
+  const t = vorschlaege.gruppen.find(x => x.art === art)?.traktanden[0];
+  expect(t, `Traktandum der Art ${art} vorgeschlagen`).toBeTruthy();
+  const st = (await a.send<{ version: number }>('POST', `/v1/sitzungen/${s.body.id}/traktanden`, { vorschlagId: t!.id })).body;
+  const v = (await a.send<{ version: number }>('POST', `/v1/sitzungen/${s.body.id}/versenden`, undefined, { 'if-match': `W/"${st.version}"` })).body;
+  return { sitzung: s.body.id, traktandum: t!.id, version: v.version };
+}
+
+/**
+ * Projekt mit Projektvertrag als Baseline (K2 Schritte 6–11): Phasenmodell mit Toleranzen in Kraft, entscheidendes
+ * Gremium mit Termin in einer Woche und Gremienweg P0–P1, Entwurf mit einem Meilenstein (Termin in
+ * `meilensteinInTagen`), Einreichen, Quality-Check, Unterschrift, Gate-Entscheid «freigegeben» in der laufenden Sitzung.
+ * Danach ist das Projekt in P1, der Meilenstein steht mit Baseline-Termin im Register.
+ */
+export async function projektMitBaseline(page: Page, name: string, o: { meilenstein: string; meilensteinInTagen: number }): Promise<Projekt & { gremium: Gremium }> {
   const a = await apiAls(page);
   await phasenmodellMitToleranzen(a);
   const p = await projekt(a, name, 'P0');
-  const kuerzel = `g${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
-  const gremium = await a.send<{ id: string }>('POST', '/v1/gremien', { portfolioId: p.portfolioId, kuerzel, name: `Gremium ${kuerzel}`, art: 'entscheidend' });
-  const weg = await a.get(`/v1/portfolios/${p.portfolioId}/gremienweg`);
-  await a.send('PUT', `/v1/portfolios/${p.portfolioId}/gremienweg`, { schritte: [{ gate: 'P0_P1', gremiumId: gremium.body.id }] }, { 'if-match': weg.headers()['etag'] ?? '' });
   const datum = mittwochIn(7);
-  await a.send('POST', `/v1/gremien/${gremium.body.id}/termine`, { datum });
+  const g = await gremium(a, p.portfolioId, [datum], ['P0_P1']);
 
   const e = await a.send<{ version: { id: string } }>('POST', `/v1/projekte/${p.id}/vertrag/entwuerfe`, { anlass: 'initial' });
   const v = e.body.version.id;
@@ -121,15 +144,10 @@ export async function projektMitBaseline(page: Page, name: string, o: { meilenst
   await a.send('POST', `/v1/vertragsversionen/${v}/unterschriften`, { ergebnis: 'unterzeichnet' }, { 'if-match': pr.headers()['etag'] ?? '' });
 
   // Gate-Traktandum in die Sitzung, versenden, starten, entscheiden (K3)
-  const s = await a.send<{ id: string; version: number }>('POST', `/v1/gremien/${kuerzel}/sitzungen`, { datum });
-  const vorschlaege = await (await a.get(`/v1/sitzungen/${s.body.id}/vorschlaege`)).json() as { gruppen: { art: string; traktanden: { id: string }[] }[] };
-  const t = vorschlaege.gruppen.find(g => g.art === 'gate')?.traktanden[0];
-  expect(t, 'Gate-Traktandum vorgeschlagen').toBeTruthy();
-  let st = (await a.send<{ version: number }>('POST', `/v1/sitzungen/${s.body.id}/traktanden`, { vorschlagId: t!.id })).body;
-  st = (await a.send<{ version: number }>('POST', `/v1/sitzungen/${s.body.id}/versenden`, undefined, { 'if-match': `W/"${st.version}"` })).body;
-  await a.send('POST', `/v1/sitzungen/${s.body.id}/starten`, undefined, { 'if-match': `W/"${st.version}"` });
-  await a.send('PUT', `/v1/traktanden/${t!.id}/entscheid`, { ergebnis: 'freigegeben', begruendung: 'Vertrag vollständig' });
+  const s = await sitzungVersendet(a, g, datum, 'gate');
+  await a.send('POST', `/v1/sitzungen/${s.sitzung}/starten`, undefined, { 'if-match': `W/"${s.version}"` });
+  await a.send('PUT', `/v1/traktanden/${s.traktandum}/entscheid`, { ergebnis: 'freigegeben', begruendung: 'Vertrag vollständig' });
   const vertrag = await (await a.get(`/v1/projekte/${p.id}/vertrag`)).json() as { baseline: string | null };
   expect(vertrag.baseline, 'Baseline nach dem Gate-Entscheid').toBeTruthy();
-  return p;
+  return { ...p, gremium: g };
 }

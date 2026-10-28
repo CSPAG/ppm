@@ -9,5 +9,8 @@ export function validateSitzungSearch(raw: Record<string, unknown>): SitzungSear
 
 export type SetSitzungSearch = (next: Partial<Record<keyof SitzungSearch, string | undefined>>, o?: { replace?: boolean }) => void;
 
+/** Sitzungen eines Gremiums (IA «Kontext im Kopf»: `/gremien/prat/sitzungen`). */
+export const gremiumSitzungenPfad = (kuerzel: string) => `/gremien/${kuerzel}/sitzungen`;
+
 /** Adresse einer Sitzung in der Oberfläche. */
 export const sitzungPfad = (kuerzel: string, datum: string) => `/gremien/${kuerzel}/sitzungen/${datum}`;

@@ -1,6 +1,6 @@
 /** Anmeldung über Keycloak und Prüfungen der UX-Definition of Done (docs/ux/rahmen/pruefung.md) für alle Tests. */
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 export interface Person { user: string; password: string }
 
@@ -35,9 +35,27 @@ export async function expectAccessible(page: Page) {
   expect(result.violations.map(v => `${v.id}: ${v.nodes.map(n => n.target.join(' ')).join(', ')}`)).toEqual([]);
 }
 
-/** Nichts ragt über den Rand der aktuellen Breite (Q-B6, schmalste Breite 360 px). */
+/** Weitere Breiten der UX-DoD: Tablet und breiter Bildschirm (docs/ux/rahmen/pruefung.md, «schmalste Breite der Rolle»). */
+const BREITEN = [768, 1440] as const;
+
+/**
+ * Nichts ragt über den Rand der aktuellen Breite (Q-B6, schmalste Breite 360 px). Im Projekt «hell» zusätzlich bei 768
+ * und 1440 px; danach gilt wieder die Breite des Projekts. «dunkel» und «schmal» messen nur ihre eigene Breite.
+ */
 export async function expectNoOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
+  if (test.info().project.name !== 'hell') return;
+  const vorher = page.viewportSize()!;
+  try {
+    for (const width of BREITEN) {
+      await page.setViewportSize({ width, height: vorher.height });
+      // nach dem Umbruch neu messen, bis das Layout steht
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth), { message: `kein Überlauf bei ${width} px` })
+        .toBeLessThanOrEqual(width);
+    }
+  } finally {
+    await page.setViewportSize(vorher);
+  }
 }
 
 /**

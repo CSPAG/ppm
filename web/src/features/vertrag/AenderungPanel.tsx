@@ -80,7 +80,11 @@ export function AenderungPanel({ projektId, nummer, version: v, speichern }: { p
   const { einreichen } = useAenderungMutations(projektId);
   const [dialog, setDialog] = useState(false);
   const a = antrag.data?.aenderung;
-  const sperre = einreichen.error && (statusOf(einreichen.error) === 422 || statusOf(einreichen.error) === 409) ? describeError(einreichen.error).detail : null;
+  const status = einreichen.error ? statusOf(einreichen.error) : null;
+  const sperre = einreichen.error && (status === 422 || status === 409) ? describeError(einreichen.error).detail : null;
+  // jeder andere Fehler bleibt sichtbar am Panel (Z5, Z7): der Dialog schliesst, die Meldung bleibt
+  const andererFehler = einreichen.error && !sperre ? describeError(einreichen.error) : null;
+  const neuLaden = () => { einreichen.reset(); void antrag.refetch(); };
 
   // erst einreichen, wenn das offene Kapitel gespeichert ist (sonst ginge der alte Stand an den Sponsor)
   const start = async () => { if (await speichern()) setDialog(true); };
@@ -106,6 +110,11 @@ export function AenderungPanel({ projektId, nummer, version: v, speichern }: { p
       {a?.can.einreichen ? (
         <div className="vt-einreichen">
           {sperre ? <Hinweis stufe="sperre" live>{sperre}</Hinweis> : null}
+          {andererFehler ? (
+            status === 412
+              ? <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={neuLaden}>{T.common.reload}</button>}>{TA.einreichenKonflikt}</Hinweis>
+              : <Hinweis stufe="sperre" live>{[andererFehler.title || T.common.error, andererFehler.detail].filter(Boolean).join(' ')}</Hinweis>
+          ) : null}
           <button type="button" className="btn primary" onClick={() => void start()}><Icon name="send" />{TA.einreichen}</button>
         </div>
       ) : null}

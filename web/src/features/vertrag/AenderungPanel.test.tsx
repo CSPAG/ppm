@@ -2,7 +2,7 @@
  * Änderungsantrag in der Projektakte (UI-09, K2 Schritte 1, 5, 6; UC-007 Schritte 1–3): «Änderung beantragen» nur mit
  * Begründung, aus dem Statusbericht gleich offen (`?aenderung=1`, UC-004 A1); Seitenpanel mit Hauptänderungen (umformulieren mit If-Match) und «Änderung einreichen» mit Wirkung davor.
  */
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
 import type { AuthzCatalog } from '@vollholz/iam-web';
@@ -110,6 +110,22 @@ describe('Änderungsantrag der Projektleitung', () => {
     await userEvent.click(screen.getAllByRole('button', { name: TA.einreichen }).at(-1)!);
     expect(await screen.findByText(TA.eingereicht)).toBeInTheDocument();
     expect(api.calls.some(c => c.method === 'POST' && c.url.endsWith('/aenderung/einreichen'))).toBe(true);
+  });
+
+  it('«Änderung einreichen» mit 412 oder 500: Meldung bleibt am Panel sichtbar (Z5, Z7)', async () => {
+    let status = 412;
+    stub({ [`POST /v1/vertragsversionen/${V}/aenderung/einreichen`]: () => json({ type: 'about:blank', title: status === 412 ? 'Vorbedingung fehlgeschlagen' : 'Interner Fehler', status }, status, { 'Content-Type': 'application/problem+json' }) });
+    renderWithIam(<AenderungPanel projektId={P} nummer="2026-014" version={version} speichern={async () => true} />);
+    await userEvent.click(await screen.findByRole('button', { name: TA.einreichen }));
+    await userEvent.click(screen.getAllByRole('button', { name: TA.einreichen }).at(-1)!);
+    expect(await screen.findByText(TA.einreichenKonflikt)).toBeInTheDocument();
+    expect(screen.queryByText(TA.einreichenWirkung)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Neu laden' }));
+    await waitFor(() => expect(screen.queryByText(TA.einreichenKonflikt)).not.toBeInTheDocument());
+    status = 500;
+    await userEvent.click(screen.getByRole('button', { name: TA.einreichen }));
+    await userEvent.click(screen.getAllByRole('button', { name: TA.einreichen }).at(-1)!);
+    expect(await screen.findByText(/Interner Fehler/)).toBeInTheDocument();
   });
 
   it('reicht nicht ein, wenn das offene Kapitel nicht gespeichert werden konnte', async () => {

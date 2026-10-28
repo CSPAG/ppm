@@ -4,7 +4,7 @@
  * führen Phase und Lebenszyklus über `projekt.phaseSetzen` und `projekt.lebenszyklusWechseln` nach.
  */
 import { defineModule } from '@vollholz/platform';
-import { anlegen, lebenszyklusWechseln, phaseSetzen, UEBERGAENGE } from './aktionen.ts';
+import { anlegen, lebenszyklusWechseln, organisationFestlegen, phaseSetzen, UEBERGAENGE } from './aktionen.ts';
 import { projektTools } from './mcp.ts';
 import { registerRoutes } from './routes.ts';
 import { registriere } from './uebernahme.ts';
@@ -21,7 +21,7 @@ export const projektModule = defineModule({
 });
 
 /** Fachaktionen für obere Module (in deren Transaktion; Rechte prüft der Aufrufer). */
-export const projekt = { anlegen, lebenszyklusWechseln, phaseSetzen, UEBERGAENGE };
+export const projekt = { anlegen, lebenszyklusWechseln, organisationFestlegen, phaseSetzen, UEBERGAENGE };
 
 /** Übernahme aus dem Excel-Dashboard (AP-E0-7): obere Module registrieren ihren Beitrag je Zeile. */
 export const uebernahme = { registriere };

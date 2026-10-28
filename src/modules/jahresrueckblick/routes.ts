@@ -5,7 +5,7 @@
  */
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { actorOf, conflict, etag, notFound, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
+import { actorOf, conflict, etag, forbidden, notFound, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { MIME, vorlage, type Format } from '../vorlage/index.ts';
 import { dateiname, rueckblickDokument } from './dokument.ts';
@@ -22,9 +22,11 @@ const SCHREIBEN = 'quartalsbericht:write';
  * des PRAT sehen den Rückblick ab «traktandiert», welchen Stand und welches Gremium, entscheidet die Lesesicht (381).
  * Liefert, ob die Person die Ziele der Organisation liest.
  */
-async function lesend(req: FastifyRequest, schreiben: boolean): Promise<boolean> {
+async function lesend(req: FastifyRequest, tx: Tx, schreiben: boolean): Promise<boolean> {
   if (schreiben || await req.can('ziel:read')) return true;
-  await req.needSomewhere('sitzung:read');
+  // nur Mitglieder des PRAT; andere Gremien erhalten 403 statt eines Wartezustands
+  const prat = await store.portfolioA(tx);
+  if (!prat || !(await req.can('sitzung:read', { type: 'portfolio', id: prat }))) throw forbidden();
   return false;
 }
 
@@ -39,8 +41,8 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   }, async (req, reply): Promise<JahresrueckblickOut> => {
     const { jahr } = req.params as { jahr: number };
     const schreiben = await req.can(SCHREIBEN);
-    const ziele = await lesend(req, schreiben);
     const out = await req.tx(async tx => {
+      const ziele = await lesend(req, tx, schreiben);
       const r = await store.lesen(tx, jahr);
       // Gremium (A-67): nur der traktandierte Stand, keine Auswertung live
       if (!r && !ziele) throw notFound('Jahresrückblick');
@@ -130,9 +132,9 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const { jahr } = req.params as { jahr: number };
     const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
     const schreiben = await req.can(SCHREIBEN);
-    await lesend(req, schreiben);
     const who = actorOf(req);
     const out = await req.tx(async tx => {
+      await lesend(req, tx, schreiben);
       const r = await store.lesen(tx, jahr);
       if (!r) throw notFound('Jahresrückblick');
       // Export eines Dokuments mit Personendaten im Audit (I-Z3); kein Ereignis

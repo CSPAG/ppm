@@ -23,7 +23,7 @@ function mittwochIn(n: number): string {
 describe('Jahresrückblick', { skip }, () => {
   let api: TestApi;
   let tenantId = '';
-  let ue: H, gl: H, ohne: H, prat: H, fremd: H;
+  let ue: H, gl: H, ohne: H, prat: H, fremd: H, zweitesA: H;
   let portfolioA = '';
   const quartal = letztesQuartal(heute());
   const jahr = Number(quartal.slice(0, 4));
@@ -64,6 +64,11 @@ describe('Jahresrückblick', { skip }, () => {
     const f = await login(api, 'demo', 'u-fremd', null);
     await grant(api, tenantId, `user:${f.principalId}`, 'gremium', { type: 'portfolio', id: portfolioB });
     fremd = { authorization: f.authorization };
+    // ein zweites Portfolio der Kategorie A (nach Name später): sein Gremium ist nicht der PRAT
+    const portfolioA2 = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'zentrum', name: 'Zentrum' }, 201)).json().id;
+    const z = await login(api, 'demo', 'u-zweites-a', null);
+    await grant(api, tenantId, `user:${z.principalId}`, 'gremium', { type: 'portfolio', id: portfolioA2 });
+    zweitesA = { authorization: z.authorization };
 
     // Ziel mit Stand im Jahr
     const feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
@@ -139,7 +144,9 @@ describe('Jahresrückblick', { skip }, () => {
     assert.deepEqual([g.json().stand, g.json().erkenntnisse, g.json().can], ['traktandiert', 'Zu viele Vorhaben parallel.', { bearbeiten: false, traktandieren: false }]);
     assert.equal((await call('GET', `${url}/dokument`, prat)).statusCode, 200);
     assert.equal((await call('PUT', url, mit(prat, g.headers.etag as string), { erkenntnisse: 'x', massnahmen: '' })).statusCode, 403);
-    for (const u of [`${url}`, `${url}/dokument`]) assert.equal((await call('GET', u, fremd)).statusCode, 404, u);
+    for (const u of [`${url}`, `${url}/dokument`]) assert.equal((await call('GET', u, fremd)).statusCode, 403, u);
+    // Gremium eines anderen Portfolios der Kategorie A: liest nie, auch wenn es nur sein eigenes Portfolio sieht
+    for (const u of [`${url}`, `${url}/dokument`]) assert.ok([403, 404].includes((await call('GET', u, zweitesA)).statusCode), u);
     assert.equal((await call('GET', url, ohne)).statusCode, 403);
     assert.equal((await call('PUT', url, mit(ue, r.headers.etag as string), { erkenntnisse: 'x', massnahmen: '' })).statusCode, 409);
     // Stand bei Traktandierung: ein später abgeschlossenes Vorhaben ändert die Auswertung nicht mehr

@@ -7,7 +7,7 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import {
-  actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx,
+  actorOf, conflict, etag, forbidden, IdempotencyHeaders, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { aufgabe } from '../eingang/index.ts';
@@ -33,11 +33,13 @@ const kommentareVoll = (k: Partial<KommentareOut>): KommentareOut => Object.from
 
 /**
  * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Mitglieder des
- * PRAT sehen den Bericht ab «traktandiert», welchen Stand und welches Gremium, entscheidet die Lesesicht (331).
+ * PRAT sehen den Bericht ab «traktandiert», welchen Stand, entscheidet die Lesesicht (331).
  */
-async function lesend(req: FastifyRequest): Promise<void> {
+async function lesend(req: FastifyRequest, tx: Tx): Promise<void> {
   if (await req.can('ziel:read') || await req.can(SCHREIBEN)) return;
-  await req.needSomewhere('sitzung:read');
+  // nur Mitglieder des PRAT; andere Gremien erhalten 403
+  const prat = await store.portfolioA(tx);
+  if (!prat || !(await req.can('sitzung:read', { type: 'portfolio', id: prat }))) throw forbidden();
 }
 
 async function berichtOut(req: FastifyRequest, tx: Tx, b: store.BerichtRow): Promise<QuartalsberichtOut> {
@@ -76,8 +78,7 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
   app.get('/v1/quartalsberichte', {
     schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreportings', description: 'Erzeugte Quartalsreportings mit Stand, neuestes zuerst.', response: { 200: Type.Ref('QuartalsberichtListe') } },
   }, async req => {
-    await lesend(req);
-    const rows = await req.tx(tx => store.liste(tx));
+    const rows = await req.tx(async tx => { await lesend(req, tx); return store.liste(tx); });
     return { items: rows.map(r => ({ id: r.id, quartal: r.quartal, stand: r.stand, erzeugtAt: r.erzeugt_at.toISOString(), verabschiedetAt: r.verabschiedet_at?.toISOString() ?? null })) };
   });
 
@@ -85,8 +86,8 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
     schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreporting eines Quartals', description: 'Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404.', params: QuartalsberichtParams, response: { 200: Type.Ref('Quartalsbericht') } },
   }, async (req, reply) => {
     const { quartal } = req.params as { quartal: string };
-    await lesend(req);
     return req.tx(async tx => {
+      await lesend(req, tx);
       if (!(await store.bericht(tx, quartal))) throw notFound('Quartalsreporting');
       return antwort(req, reply, tx, quartal);
     });
@@ -149,7 +150,7 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
         art: 'quartalsreporting', bezug: { typ: 'quartalsbericht', id: b.id }, portfolioId,
         titel: `Quartalsreporting ${quartalLabel(quartal)}`, antrag: 'Verabschiedung des Quartalsreportings zuhanden des VR',
       });
-      if (!(await store.standSetzen(tx, b.id, 'traktandiert', { version }))) throw preconditionFailed(b.version);
+      if (!(await store.standSetzen(tx, b.id, 'traktandiert', { version, gremiumPortfolioId: portfolioId }))) throw preconditionFailed(b.version);
       await aufgabe.erledigen(tx, { art: ART_AUFGABE, bezug: bezugQuartal(quartal) });
       await record(tx, who, { action: 'quartalsbericht.scheduled', resourceType: 'quartalsbericht', resourceId: b.id, data: snap(b), event: { ...snap(b), stand: 'traktandiert' } });
       return antwort(req, reply, tx, quartal);
@@ -165,9 +166,9 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
   }, async (req, reply) => {
     const { quartal } = req.params as { quartal: string };
     const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
-    await lesend(req);
     const who = actorOf(req);
     const b = await req.tx(async tx => {
+      await lesend(req, tx);
       const b = await store.bericht(tx, quartal);
       if (!b) throw notFound('Quartalsreporting');
       // Export eines Dokuments mit Personendaten im Audit (I-Z3); kein Ereignis

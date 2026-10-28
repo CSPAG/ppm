@@ -183,8 +183,8 @@ describe('Quartalsreporting an den VR', { skip }, () => {
     assert.deepEqual([g.stand, g.can], ['traktandiert', { erzeugen: false, bearbeiten: false, traktandieren: false, rueckmeldung: false }]);
     assert.equal((await ok('GET', '/v1/quartalsberichte', mitglied)).json().items.length, 1);
     assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}/dokument`, mitglied)).statusCode, 200);
-    assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}`, fremd)).statusCode, 404);
-    assert.deepEqual((await ok('GET', '/v1/quartalsberichte', fremd)).json().items, []);
+    assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}`, fremd)).statusCode, 403);
+    assert.equal((await call('GET', '/v1/quartalsberichte', fremd)).statusCode, 403);
     assert.equal((await call('PATCH', `/v1/quartalsberichte/${quartal}`, mit(ue, r.headers.etag as string), { kommentare: { risiken: 'x' } })).statusCode, 409);
     assert.equal((await aufgaben('quartalsreporting.erstellen')).find(x => x.bezug_id === quartal)!.stand, 'erledigt');
 

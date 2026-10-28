@@ -21,7 +21,7 @@ registriereTraktandenart({
   zusammenfassung: async (tx, bezug) => ({ titel, antrag: 'Freigabe Phase P2 und Projektvertrag Version 2.0' }),
   unterlagen: async (tx, bezug) => [{ art: 'packet', titel: 'Gate Review Packet', bereit, qualityCheck: 'bestanden', hinweis: 'Quality-Check bestanden 28.10.' }],
   ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }, …],   // AP-E2-2
-  beiEntscheid: async (tx, e) => { … },          // AP-E2-2: in der Transaktion des Entscheids
+  beiEntscheid: async (tx, e, k) => { … },       // AP-E2-2: in der Transaktion des Entscheids; k = FolgeKontext
 });
 ```
 
@@ -83,4 +83,13 @@ Für die Art heisst das:
   Leere Liste = Kenntnisnahme ohne Entscheid (Portfoliobericht); solche Traktanden werden nicht weitergeschoben.
 - **`beiEntscheid`** muss idempotent sein und die Wirkung dem **zuletzt** übergebenen Ergebnis angleichen (Korrektur in
   der Sitzung, A-30). Bei «via SNS-VR» kommt der Aufruf erst mit dem Entscheid des SNS-VR (`viaSns: true`, A1).
+- **Kontext `k` (`FolgeKontext`, dritter Parameter):**
+  - `akteur` und `principalId`: die entscheidende Person (UE, auch beim SNS-VR, A-02). Für Audit, Aufgaben und
+    «erstellt von» statt `systemActor`, wo das Fachmodell eine Person verlangt.
+  - `sitzungId` und `traktandumId`.
+  - `vorher`: das zuvor erfasste Ergebnis bei einer Korrektur (A-30), sonst `null`.
+  - `db` und `tuples`: Zugang wie `deps` beim Registrieren (Nummernkreis, Rollen am Projekt). Ein eigenes Festhalten
+    von `deps` in der Art ist damit unnötig.
+  - Die Sitzung übergibt `k` immer; der Parameter ist optional, damit bestehende Arten und direkte Aufrufe in Tests
+    unverändert gelten.
 - Die Folge ist sofort im Datenbestand; Benachrichtigungen an Betroffene schickt `sitzung` beim Schliessen.

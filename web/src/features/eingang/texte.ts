@@ -30,6 +30,8 @@ export const E = {
     erledigt: 'Erledigt',
     erledigtAria: (titel: string) => `${titel} als erledigt markieren`,
     erledigtToast: (titel: string) => `«${titel}» erledigt.`,
+    wiederOffen: (titel: string) => `«${titel}» ist wieder offen.`,
+    rueckgaengig: 'Rückgängig',
     inVertretung: (name: string) => `in Vertretung von ${name}`,
     anAlle: 'an alle mit dieser Aufgabe',
     ohneFrist: 'ohne Frist',

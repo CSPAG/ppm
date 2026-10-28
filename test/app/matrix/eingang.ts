@@ -64,6 +64,7 @@ export const matrix: Matrix = {
     'GET /v1/eingang': () => ({ method: 'GET', url: '/v1/eingang', kind: 'list' }),
     'GET /v1/eingang/anzahl': () => ({ method: 'GET', url: '/v1/eingang/anzahl', kind: 'list' }),
     'POST /v1/eingang/aufgaben/:id/erledigen': i => ({ method: 'POST', url: `/v1/eingang/aufgaben/${i.aufgabe}/erledigen`, kind: 'foreign' }),
+    'POST /v1/eingang/aufgaben/:id/wieder-oeffnen': i => ({ method: 'POST', url: `/v1/eingang/aufgaben/${i.aufgabe}/wieder-oeffnen`, kind: 'foreign' }),
     'GET /v1/mitteilungen': () => ({ method: 'GET', url: '/v1/mitteilungen', kind: 'list' }),
     'POST /v1/mitteilungen/:id/gelesen': i => ({ method: 'POST', url: `/v1/mitteilungen/${i.mitteilung}/gelesen`, kind: 'foreign' }),
     'GET /v1/stellvertretungen': () => ({ method: 'GET', url: '/v1/stellvertretungen', kind: 'list' }),

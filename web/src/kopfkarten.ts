@@ -7,6 +7,8 @@ import type { KopfKarte } from './features/eingang/index.ts';
 import { seite } from './routes/seite.ts';
 
 export const kopfkarten: readonly KopfKarte[] = [
+  // Organisation einrichten (Z2): ohne Portfolio für alle, die Portfolios pflegen (ADM, UE, PMO)
+  { id: 'einrichten', recht: 'portfolio:admin', Karte: seite(() => import('./features/portfolios/EinrichtenKopfKarte.tsx'), 'EinrichtenKopfKarte') },
   // Monatszyklus der UE und des PMO (K1 «Prüfen», UC-005): Periode in Arbeit, Stichtag, Abschluss
   { id: 'monatszyklus', recht: 'statusbericht:review', Karte: seite(() => import('./features/monatsabschluss/MonatszyklusKopfKarte.tsx'), 'MonatszyklusKopfKarte') },
   // Eigene Projekte für PL, CTL und SP (UC-016 Schritt 2: Projektrollen je Projekt)

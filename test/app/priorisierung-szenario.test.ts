@@ -229,11 +229,20 @@ describe('Szenarien (API)', { skip }, () => {
     const s = (await call('ue', 'POST', `/v1/portfolios/${pfC}/szenarien`, { name: 'Last' })).json();
     assert.equal(s.positionen.length, 60);
     const umgekehrt = [...s.positionen].reverse().map((x: { projektId: string }) => ({ projektId: x.projektId }));
-    const t0 = performance.now();
-    const r = await call('ue', 'PUT', `/v1/szenarien/${s.id}/positionen`, { positionen: umgekehrt }, { 'if-match': 'W/"1"' });
-    const ms = performance.now() - t0;
-    assert.equal(r.statusCode, 200, r.body);
-    assert.equal(r.json().positionen[0].projektId, umgekehrt[0]!.projektId);
-    assert.ok(ms <= 1000, `${ms.toFixed(0)} ms`);
+    const vorwaerts = s.positionen.map((x: { projektId: string }) => ({ projektId: x.projektId }));
+    // ein Aufruf zum Aufwärmen (Pläne, Caches), dann der Median aus drei Umordnungen; die Grenze K5-1 bleibt 1 s
+    let version = 1;
+    const umordnen = async (positionen: { projektId: string }[]) => {
+      const t0 = performance.now();
+      const r = await call('ue', 'PUT', `/v1/szenarien/${s.id}/positionen`, { positionen }, { 'if-match': `W/"${version}"` });
+      const ms = performance.now() - t0;
+      assert.equal(r.statusCode, 200, r.body);
+      assert.equal(r.json().positionen[0].projektId, positionen[0]!.projektId);
+      version = r.json().version;
+      return ms;
+    };
+    await umordnen(umgekehrt);
+    const zeiten = [await umordnen(vorwaerts), await umordnen(umgekehrt), await umordnen(vorwaerts)].sort((a, b) => a - b);
+    assert.ok(zeiten[1]! <= 1000, `Median ${zeiten[1]!.toFixed(0)} ms (${zeiten.map(z => z.toFixed(0)).join(', ')})`);
   });
 });

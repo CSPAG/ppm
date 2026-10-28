@@ -27,6 +27,7 @@ export const TB = {
     erreichtMelden: (t: string) => `${t} als erreicht melden`, terminVon: (t: string) => `Neuer Termin für ${t}`,
   },
   wesentlich: {
+    beantragen: 'Änderung beantragen',
     termin: (text: string, neu: string, alt: string, w: string) => `${text} neu ${neu} statt ${alt} laut Baseline (${w}). Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.`,
     kosten: (phase: string, p: string) => `Prognose ${phase} ${p} über Budget. Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.`,
     regel: 'Termin', regelKosten: 'Kosten',

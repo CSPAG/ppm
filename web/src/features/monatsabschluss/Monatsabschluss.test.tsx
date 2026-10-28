@@ -34,7 +34,7 @@ const kopf = (o: Record<string, unknown> = {}) => ({
   periode: P, stand: 'offen', abgeschlossenAt: null, abgeschlossenBy: null, version: 1,
   anzahl: { projekte: 4, eingereicht: 3, zurueckgegeben: 0, geprueft: 0, ausstehend: 1, nichtGemeldet: 0, auffaellig: 1 },
   fristen: { berichtAufgabe: '2026-10-18', stichtag: '2026-10-25', abschlussBis: '2026-10-31' }, vorperiode: '2026-09',
-  abschluss: { moeglich: false, sperre: 'Abschluss: 3 Berichte sind eingereicht, aber nicht geprüft. Prüfen Sie diese zuerst.', geprueft: 0, nichtGemeldet: 1 },
+  abschluss: { moeglich: false, sperre: 'Abschluss: 3 Berichte sind eingereicht, aber nicht geprüft. Prüfe diese zuerst.', geprueft: 0, nichtGemeldet: 1 },
   can: { pruefen: true, abschliessen: true }, ...o,
 });
 

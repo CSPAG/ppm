@@ -1,6 +1,6 @@
 /**
  * Änderungsantrag in der Projektakte (UI-09, K2 Schritte 1, 5, 6; UC-007 Schritte 1–3): «Änderung beantragen» nur mit
- * Begründung; Seitenpanel mit Hauptänderungen (umformulieren mit If-Match) und «Änderung einreichen» mit Wirkung davor.
+ * Begründung, aus dem Statusbericht gleich offen (`?aenderung=1`, UC-004 A1); Seitenpanel mit Hauptänderungen (umformulieren mit If-Match) und «Änderung einreichen» mit Wirkung davor.
  */
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,6 +11,7 @@ import { expectNoAxe } from '../../test/axe.ts';
 import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
 import { AenderungBeantragen, AenderungPanel } from './AenderungPanel.tsx';
 import { TA } from './AenderungTexte.ts';
+import { validateVertragSearch } from './search.ts';
 import type { Version } from './api.ts';
 
 const P = '00000000-0000-4000-8000-000000000001';
@@ -55,6 +56,18 @@ describe('Änderungsantrag der Projektleitung', () => {
     await userEvent.click(screen.getByRole('button', { name: TA.anlegen }));
     await vi.waitFor(() => expect(onAngelegt).toHaveBeenCalled());
     expect(await api.calls.find(c => c.method === 'POST')!.json()).toEqual({ anlass: 'aenderung', begruendung: 'Lizenzkosten gestiegen' });
+  });
+
+  it('aus der Warnung im Statusbericht: Dialog gleich offen, Schliessen wird gemeldet (UC-004 A1)', async () => {
+    stub();
+    const onGeschlossen = vi.fn();
+    const { container } = renderWithIam(<AenderungBeantragen projektId={P} oeffnen onAngelegt={vi.fn()} onGeschlossen={onGeschlossen} />);
+    expect(await screen.findByRole('dialog', { name: TA.beantragenFrage })).toBeInTheDocument();
+    await expectNoAxe(container);
+    await userEvent.click(screen.getByRole('button', { name: TA.abbrechen }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onGeschlossen).toHaveBeenCalledOnce();
+    expect([validateVertragSearch({ aenderung: 1 }), validateVertragSearch({ aenderung: 'ja' })]).toEqual([{ aenderung: true }, {}]);
   });
 
   it('Seitenpanel: Hauptänderungen umformulieren und «Änderung einreichen» mit Wirkung davor', async () => {

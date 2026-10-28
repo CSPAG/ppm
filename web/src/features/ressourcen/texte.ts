@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Ressourcen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte des Features «Ressourcen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung; Pool = Rolle (A-20), Mengen in FTE.
  */
 export const TR = {
@@ -10,7 +10,7 @@ export const TR = {
   aktionKapazitaet: 'Kapazität planen',
   aktionAuslastung: 'Auslastung analysieren',
   zeitraum: 'Zeitraum', von: 'Von', bis: 'Bis',
-  zeitraumUngueltig: 'Wählen Sie einen Zeitraum von höchstens 60 Monaten, der nicht vor seinem Beginn endet.',
+  zeitraumUngueltig: 'Wähle einen Zeitraum von höchstens 60 Monaten, der nicht vor seinem Beginn endet.',
   rolle: 'Rolle',
   monat: 'Monat',
   // UI-23 Auslastung (Bericht)
@@ -29,18 +29,18 @@ export const TR = {
   } as Record<string, string>,
   zelleLabel: (rolle: string, monat: string, bedarf: string, angebot: string, lage: string) => `${rolle}, ${monat}: Bedarf ${bedarf}, Angebot ${angebot}, ${lage}`,
   keinAngebot: 'kein Angebot',
-  // Mustertext darstellung.md: «Kapazität Q2 2027: 7,5 FTE Projektleitung statt höchstens 5,0. Verschieben Sie …»
+  // Mustertext darstellung.md: «Kapazität Q2 2027: 7,5 FTE Projektleitung statt höchstens 5,0. Verschiebe …»
   engpassRegel: (quartal: string) => `Kapazität ${quartal}`,
   engpassIst: (fte: string, rolle: string) => `${fte} ${rolle}`,
   engpassGrenze: (fte: string) => `höchstens ${fte}`,
   engpassVorschlag: (n: number) => (n === 1
-    ? 'Verschieben Sie den Start des betroffenen Projekts oder erhöhen Sie das Angebot.'
-    : `Verschieben Sie den Start eines der ${n} betroffenen Projekte oder erhöhen Sie das Angebot.`),
-  engpassOhneAngebot: (quartal: string, rolle: string, fte: string) => `Kapazität ${quartal}: ${fte} ${rolle} ohne erfasstes Angebot. Legen Sie das Angebot unter «Kapazität» fest.`,
+    ? 'Verschiebe den Start des betroffenen Projekts oder erhöhe das Angebot.'
+    : `Verschiebe den Start eines der ${n} betroffenen Projekte oder erhöhe das Angebot.`),
+  engpassOhneAngebot: (quartal: string, rolle: string, fte: string) => `Kapazität ${quartal}: ${fte} ${rolle} ohne erfasstes Angebot. Lege das Angebot unter «Kapazität» fest.`,
   engpassZeigen: 'Einzelwerte zeigen',
   szenario: (name: string) => `Auslastung im Szenario «${name}»: Projekte und Startmonate wie im Szenario, übrige Projekte wie geplant.`,
   istStand: 'Ist-Stand anzeigen',
-  nurFte: 'Gezählt wird der Bedarf in FTE × Monate der Projekte, die Sie sehen; Bedarf nur als Grösse S, M oder L ist noch nicht eingerechnet.',
+  nurFte: 'Gezählt wird der Bedarf in FTE × Monate der Projekte, die du siehst; Bedarf nur als Grösse S, M oder L ist noch nicht eingerechnet.',
   leer: 'Im Zeitraum gibt es weder Angebot noch Bedarf. Die Auslastung zeigt, wo der Bedarf der Projekte das Kapazitätsangebot je Rolle übersteigt.',
   leerAktion: 'Kapazität planen',
   export: 'Als CSV exportieren',
@@ -57,8 +57,8 @@ export const TR = {
   rasterLabel: 'Kapazitätsangebot je Rolle und Monat',
   zelleEingabe: (rolle: string, monat: string) => `Angebot ${rolle}, ${monat}, in FTE`,
   ungueltig: 'Zahl von 0 bis 1000, höchstens zwei Nachkommastellen.',
-  nurLesen: 'Sie können das Kapazitätsangebot nur ansehen; es pflegt das Ressourcenmanagement.',
-  keineRollen: 'Es gibt noch keine Rollen des Ressourcenbedarfs. Legen Sie sie in der Administration unter Codetabellen an (Rolle des Ressourcenbedarfs).',
+  nurLesen: 'Du kannst das Kapazitätsangebot nur ansehen; es pflegt das Ressourcenmanagement.',
+  keineRollen: 'Es gibt noch keine Rollen des Ressourcenbedarfs. Lege sie in der Administration unter Codetabellen an (Rolle des Ressourcenbedarfs).',
   deaktiviert: 'deaktiviert',
   speichert: 'Wird gespeichert …',
   gespeichert: 'Gespeichert',
@@ -67,7 +67,7 @@ export const TR = {
   vorMinuten: (m: number) => `vor ${m} Min.`,
   ungespeichert: (n: number) => (n === 1 ? '1 Änderung noch nicht gespeichert' : `${n} Änderungen noch nicht gespeichert`),
   rueckgaengig: 'Rückgängig', wiederholen: 'Wiederholen',
-  konflikt: 'Jemand anderes hat das Angebot inzwischen geändert. Laden Sie neu; Ihre Änderungen bleiben erhalten und werden danach gespeichert.',
+  konflikt: 'Jemand anderes hat das Angebot inzwischen geändert. Lade neu; deine Änderungen bleiben erhalten und werden danach gespeichert.',
   neuLaden: 'Neu laden',
   fehlerSpeichern: 'Das Angebot konnte nicht gespeichert werden.',
   erneut: 'Erneut versuchen',

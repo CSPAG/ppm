@@ -11,6 +11,33 @@ import { artDauer, artLabel, festeArten, traktandenart, unterlagenVon, type Art,
 import { heute, kurzDatum, plusMinuten } from './format.ts';
 import * as store from './store.ts';
 
+/**
+ * Festes Traktandum 1 der Sitzungen eines entscheidenden Gremiums (Portfolio-Gremium, A-45): «Bericht der Programmleitung»
+ * ist immer gesetzt (K3 Schritt 4, UC-006 Schritt 4). Ohne bereitgestellten Portfoliobericht steht ein Platzhalter (Bezug
+ * die Sitzung); der Vorschlag der Art `portfoliobericht` (AP-E2-3) füllt ihn. Es lässt sich weder entfernen noch
+ * verschieben und bleibt an Position 1.
+ */
+export const FEST = { art: 'portfoliobericht' as Art, titel: 'Bericht der Programmleitung' } as const;
+
+export const istFest = (t: Pick<store.TraktandumRow, 'art'>): boolean => t.art === FEST.art;
+
+const istPlatzhalter = (t: Pick<store.TraktandumRow, 'art' | 'bezug_typ'>): boolean => istFest(t) && t.bezug_typ === 'sitzung';
+
+/** 409, wenn das Traktandum das feste Traktandum 1 ist. */
+function pruefeNichtFest(t: store.TraktandumRow, was: string): void {
+  if (istFest(t)) {
+    throw conflict(`«${FEST.titel}» ist in jeder Sitzung Traktandum 1 (K3 Schritt 4) und lässt sich nicht ${was}.`, { reason: 'fest' });
+  }
+}
+
+/** Reihenfolge prüfen: Das feste Traktandum bleibt an Position 1 (409 sonst). */
+export function pruefeReihenfolge(ts: readonly store.TraktandumRow[], reihenfolge: readonly string[]): void {
+  const fest = ts.find(istFest);
+  if (fest && reihenfolge[0] !== fest.id) {
+    throw conflict(`«${FEST.titel}» bleibt Traktandum 1 (K3 Schritt 4); ordnen Sie die übrigen Traktanden dahinter.`, { reason: 'fest' });
+  }
+}
+
 /** Adresse der Sitzung in der Oberfläche (informationsarchitektur.md, Adressen). */
 export const sitzungLink = (kuerzel: string, datum: string) => `/gremien/${kuerzel}/sitzungen/${datum}`;
 
@@ -81,7 +108,21 @@ export async function vorschlagen(tx: Tx, v: Vorschlag): Promise<string> {
       projektId: p?.id ?? null, titel: v.titel, antrag: v.antrag ?? '', dauerMin: null, stand: 'vorgeschlagen', position: null,
       viaSns: false, vertraulich: p?.vertraulich ?? false,
     });
+  }).then(async id => {
+    // Bericht der Programmleitung: füllt den Platzhalter der nächsten Sitzung in Vorbereitung, wenn die Person die
+    // Traktandenliste bearbeiten darf (sonst nimmt die UE den Vorschlag auf, K3 Schritt 4)
+    if (v.art === FEST.art) await platzhalterFuellen(tx, id);
+    return id;
   });
+}
+
+/** Vorschlag `portfoliobericht` in die nächste Sitzung mit Platzhalter aufnehmen (nur mit sitzung:write am Portfolio). */
+async function platzhalterFuellen(tx: Tx, traktandumId: string): Promise<void> {
+  const t = await store.getTraktandum(tx, traktandumId);
+  if (!t || t.stand !== 'vorgeschlagen' || t.sitzung_id) return;
+  if (!(await store.darfTraktandenliste(tx, t.portfolio_id))) return;
+  const s = await store.sitzungMitPlatzhalter(tx, t.gremium_id, FEST.art);
+  if (s) await aufnehmen(tx, s, t.id);
 }
 
 /** Vorschlag zurücknehmen (Geschäft entfällt, z. B. Antrag zurückgezogen), solange er nicht versendet ist. */
@@ -118,9 +159,17 @@ export async function aufnehmen(tx: Tx, s: store.SitzungRow, traktandumId: strin
     const andere = await store.getSitzung(tx, t.sitzung_id);
     if (andere && andere.stand !== 'geplant' && andere.stand !== 'in_vorbereitung') throw conflict('Das Traktandum steht auf einer versendeten Sitzung.');
   }
+  // Bericht der Programmleitung ersetzt den Platzhalter und steht an Position 1 (K3 Schritt 4)
+  const fest = istFest(t) ? (await store.traktanden(tx, s.id)).find(istFest) : undefined;
+  if (fest && !istPlatzhalter(fest)) throw conflict(`«${FEST.titel}» ist bereits traktandiert.`, { reason: 'fest' });
+  if (fest) await store.loeschen(tx, fest.id);
   const p = t.projekt_id ? await store.projekt(tx, t.projekt_id) : null;
   await store.aufnehmen(tx, t.id, s.id, { dauerMin: artDauer(t.art), viaSns: await viaSns(tx, t.art, p) });
   if (t.sitzung_id && t.sitzung_id !== s.id) await store.positionenSchliessen(tx, t.sitzung_id);
+  if (istFest(t)) {
+    const rest = (await store.traktanden(tx, s.id)).filter(x => x.stand === 'traktandiert' && x.id !== t.id).map(x => x.id);
+    await store.ordnen(tx, s.id, [t.id, ...rest]);
+  }
   const neu = (await store.getTraktandum(tx, t.id))!;
   await einladungenVorsetzen(tx, neu, s.id);
   return neu;
@@ -150,6 +199,7 @@ export async function einplanen(tx: Tx, s: store.SitzungRow, e: { art: Art; proj
 /** Aus der Traktandenliste nehmen: zurück zu den Vorschlägen. */
 export async function entfernen(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow): Promise<void> {
   pruefeVorbereitung(s);
+  pruefeNichtFest(t, 'entfernen');
   if (t.sitzung_id !== s.id || t.stand !== 'traktandiert') throw conflict('Das Traktandum steht nicht auf dieser Traktandenliste.');
   await store.entfernen(tx, t.id);
   await store.positionenSchliessen(tx, s.id);
@@ -161,19 +211,33 @@ export async function entfernen(tx: Tx, s: store.SitzungRow, t: store.Traktandum
  */
 export async function verschieben(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow): Promise<store.SitzungRow> {
   pruefeVorbereitung(s);
+  pruefeNichtFest(t, 'verschieben');
   if (t.sitzung_id !== s.id || (t.stand !== 'traktandiert' && t.stand !== 'verschoben')) throw conflict('Das Traktandum steht nicht auf dieser Sitzung.');
   const [naechster] = await store.termine(tx, s.gremium_id, { nach: s.datum });
   if (!naechster) throw conflict('Für das Gremium ist kein weiterer Sitzungstermin geplant. Erfassen Sie zuerst den nächsten Termin.');
   const g = (await store.gremium(tx, s.gremium_id))!;
-  const ziel = (await store.sitzungAm(tx, g.id, naechster)) ?? (await store.getSitzung(tx, await store.createSitzung(tx, g, naechster)))!;
+  const ziel = (await store.sitzungAm(tx, g.id, naechster)) ?? await sitzungAnlegen(tx, g, naechster);
   await store.verschieben(tx, t.id, s.id, ziel.id);
   await store.positionenSchliessen(tx, s.id);
   return ziel;
 }
 
-/** Feste Traktanden (Portfoliobericht als Traktandum 1, UC-006 Schritt 4) beim Anlegen der Sitzung. */
+/**
+ * Feste Traktanden beim Anlegen der Sitzung: in Sitzungen eines entscheidenden Gremiums «Bericht der Programmleitung» als
+ * Traktandum 1 (K3 Schritt 4, UC-006 Schritt 4) – der offene Vorschlag des Portfolioberichts, sonst ein Platzhalter –;
+ * danach weitere feste Arten der Registry.
+ */
 export async function festeTraktanden(tx: Tx, s: store.SitzungRow): Promise<void> {
-  for (const a of festeArten()) {
+  const g = await store.gremium(tx, s.gremium_id);
+  if (g?.art === 'entscheidend') {
+    const vorschlag = (await store.vorschlaege(tx, s)).find(t => istFest(t) && !t.sitzung_id);
+    const id = vorschlag?.id ?? await store.createTraktandum(tx, {
+      portfolioId: s.portfolio_id, gremiumId: s.gremium_id, sitzungId: null, art: FEST.art, bezugTyp: 'sitzung', bezugId: s.id, projektId: null,
+      titel: FEST.titel, antrag: '', dauerMin: null, stand: 'vorgeschlagen', position: null, viaSns: false, vertraulich: false,
+    });
+    await aufnehmen(tx, s, id);
+  }
+  for (const a of festeArten().filter(x => x.art !== FEST.art)) {
     const bezug = { typ: 'sitzung', id: s.id };
     const z = await a.zusammenfassung?.(tx, { ...bezug, projektId: null });
     const id = await store.createTraktandum(tx, {

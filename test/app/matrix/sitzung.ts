@@ -60,7 +60,7 @@ export const matrix: Matrix = {
     for (const datum of ['2026-12-02', '2027-01-13']) await inject('POST', `/v1/gremien/${g.id}/termine`, { datum });
     const s = await inject('POST', '/v1/gremien/gremium-a/sitzungen', { datum: '2026-12-02' });
     const mit = await inject('POST', `/v1/sitzungen/${s.id}/traktanden`, { art: 'eskalation', titel: mark, antrag: mark });
-    return { sitzung: s.id, traktandum: mit.traktanden[0].id };
+    return { sitzung: s.id, traktandum: mit.traktanden.find((t: { art: string }) => t.art === 'eskalation').id };
   },
   cases: {
     'GET /v1/gremien/:kuerzel/sitzungen': () => ({ method: 'GET', url: '/v1/gremien/gremium-a/sitzungen', kind: 'foreign' }),
@@ -82,6 +82,6 @@ export const matrix: Matrix = {
   },
   unchanged: async (api, a, mark) => {
     const s = (await api.app.inject({ method: 'GET', url: '/v1/gremien/gremium-a/sitzungen/2026-12-02', headers: a })).json();
-    assert.deepEqual([s.stand, s.ort, s.traktanden.map((t: { titel: string; stand: string }) => [t.titel, t.stand])], ['in_vorbereitung', '', [[mark, 'traktandiert']]]);
+    assert.deepEqual([s.stand, s.ort, s.traktanden.map((t: { titel: string; stand: string }) => [t.titel, t.stand])], ['in_vorbereitung', '', [['Bericht der Programmleitung', 'traktandiert'], [mark, 'traktandiert']]]);
   },
 };

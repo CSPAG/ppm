@@ -46,7 +46,6 @@ export function ZugaengePage({ search, setSearch, gehe }: { search: ZugaengeSear
         </div>
       </header>
       <div className="body">
-        <Hinweis stufe="hinweis">{Z.hinweisBaukasten}</Hinweis>
         <div className="zg-filter" role="group" aria-label={Z.filter.titel}>
           <button type="button" className="btn sm" aria-pressed={!offen} onClick={() => setSearch({ offen: undefined })}>{Z.filter.alle}</button>
           <button type="button" className="btn sm" aria-pressed={offen} onClick={() => setSearch({ offen: true })}>{Z.filter.offen}</button>

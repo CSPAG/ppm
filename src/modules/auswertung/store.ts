@@ -34,7 +34,8 @@ export interface ZeileRow {
   gemeldet: boolean; abgeschlossen: boolean;
   status: 'im_plan' | 'kritisch' | null; trend: string | null; phase: string | null; abschluss_per: string | null;
   naechster_meilenstein: string | null; werte_aus: string | null; status_vorperiode: 'im_plan' | 'kritisch' | null;
-  entscheid_noetig: boolean;
+  /** Bericht der Zeile (Stand bei Abschluss bzw. eingereicht in der offenen Periode), für den Badge «Eskalation». */
+  statusbericht_id: string | null;
   ms_termin: string | null; ms_text: string | null;
 }
 
@@ -56,10 +57,9 @@ export async function zeilenAbgeschlossen(tx: Tx, periode: string, portfolioIds:
     `SELECT p.id AS projekt_id, p.nummer, p.name, p.portfolio_id, p.lebenszyklus, p.phase AS projekt_phase, ${KOPF},
             true AS pflichtig, d.gemeldet, true AS abgeschlossen, d.status, d.trend, d.phase,
             to_char(d.abschluss_per, 'YYYY-MM-DD') AS abschluss_per, d.naechster_meilenstein, d.werte_aus, d.status_vorperiode,
-            coalesce(b.entscheid_noetig, false) AS entscheid_noetig
+            d.statusbericht_id
        FROM ${S}.dashboard_zeile d
        JOIN ${S}.projekt p ON p.id = d.projekt_id
-       LEFT JOIN ${S}.statusbericht b ON b.id = d.statusbericht_id
        ${MEILENSTEIN}
       WHERE d.periode = $1 AND p.portfolio_id = ANY ($2::uuid[])`, [periode, portfolioIds])).rows;
 }
@@ -77,7 +77,7 @@ export async function zeilenOffen(tx: Tx, periode: string, portfolioIds: string[
             to_char(coalesce(b.abschluss_per, v.abschluss_per), 'YYYY-MM-DD') AS abschluss_per,
             CASE WHEN b.id IS NOT NULL THEN b.naechster_meilenstein ELSE v.naechster_meilenstein END AS naechster_meilenstein,
             CASE WHEN b.id IS NOT NULL THEN $1 ELSE v.periode END AS werte_aus,
-            v.status AS status_vorperiode, coalesce(b.entscheid_noetig, false) AS entscheid_noetig
+            v.status AS status_vorperiode, b.id AS statusbericht_id
        FROM ${S}.projekt p
        JOIN ${S}.portfolio pf ON pf.id = p.portfolio_id
        LEFT JOIN ${S}.statusbericht b ON b.projekt_id = p.id AND b.periode = $1 AND b.stand <> 'entwurf'

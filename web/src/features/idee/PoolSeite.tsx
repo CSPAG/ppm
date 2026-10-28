@@ -7,7 +7,7 @@
 import { PersonName } from '@vollholz/iam-web';
 import { useId } from 'react';
 import { useSession } from '../../auth/index.ts';
-import { Datenliste, fmtDatum, Icon, tageBis, type Spalte } from '../../ui/index.ts';
+import { Datenliste, fmtDatum, Icon, tageBis, TeilFehler, type Spalte } from '../../ui/index.ts';
 import { useAuswahl } from './api.ts';
 import { IdeenPage } from './IdeenPage.tsx';
 import { STAENDE_POOL } from './PoolStaende.ts';
@@ -131,7 +131,7 @@ export function PoolPage({ search, setSearch, gehe }: { search: IdeenSearch; set
 function FunnelAnsicht({ onStand }: { onStand(stand: string): void }) {
   const f = useFunnel();
   if (f.isPending) return <p role="status" className="muted">…</p>;
-  if (!f.data) return null;
+  if (f.error || !f.data) return <TeilFehler was={TP.funnelTitel} error={f.error} onRetry={() => void f.refetch()} />;
   const max = Math.max(1, ...f.data.stufen.map(s => s.anzahl));
   return (
     <section aria-labelledby="idee-funnel" className="idee-funnel">

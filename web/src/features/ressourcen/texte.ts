@@ -73,5 +73,10 @@ export const TR = {
   neuLaden: 'Neu laden',
   fehlerSpeichern: 'Das Angebot konnte nicht gespeichert werden.',
   erneut: 'Erneut versuchen',
+  // RK.01.02: Kapazität laut HR-System (Annahme AP-E7-2: das festgelegte Angebot hat Vorrang, HR füllt Lücken)
+  hrHinweis: (zeitpunkt: string) => `Grau mit «HR»: Kapazität laut HR-System (Pensum minus Abwesenheiten), übernommen ${zeitpunkt}. Der Wert zählt, solange du kein Angebot festlegst.`,
+  hrMarke: 'HR',
+  hrZelle: (fte: string, personen: number, abwesend: string) => `Laut HR-System ${fte} FTE (${personen === 1 ? '1 Person' : `${personen} Personen`}, Abwesenheiten ${abwesend} FTE)`,
+  hrLabel: (fte: string) => `, laut HR-System ${fte} FTE`,
   tastatur: 'Pfeiltasten und Eingabetaste wechseln die Zeile; Strg+Z macht rückgängig.',
 };

@@ -2,13 +2,14 @@
  * Seite «Kapazität» (UI-24, Seitentyp Arbeitsfläche; BC RK.01.01 Grundfunktion, UC-009 Schritte 1–2): Raster Rolle (Pool,
  * A-20) × Monat mit dem für Vorhaben verfügbaren Angebot in FTE. Automatisches Speichern mit Anzeige (I-R3), Rückgängig
  * und Wiederholen (Strg+Z / Strg+Umschalt+Z), Tastatur (Pfeile, Eingabetaste), Konflikt bei 412 (Z7), nur lesen ohne
- * `ressource:write` (Z8). Zeilen virtualisiert (Q-L5: flüssig bei 50 × 31 Zellen).
+ * `ressource:write` (Z8). Zeilen virtualisiert (Q-L5: flüssig bei 50 × 31 Zellen). Kapazität laut HR-System (RK.01.02,
+ * UC-009 Schritt 1): in Zellen ohne festgelegtes Angebot grau mit «HR», Annahme AP-E7-2 (das Festgelegte hat Vorrang).
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { isConflict } from '../../api/index.ts';
-import { Empty, ErrorState, Hinweis, Icon, Skelett, T, useVerzoegert } from '../../ui/index.ts';
-import { ressourcenKeys, useKapazitaet, useKapazitaetSpeichern, useRollen, type Kapazitaet, type KapazitaetAenderung } from './api.ts';
+import { Empty, ErrorState, fmtZeitpunkt, Hinweis, Icon, Skelett, T, useVerzoegert } from '../../ui/index.ts';
+import { ressourcenKeys, useKapazitaet, useKapazitaetHr, useKapazitaetSpeichern, useRollen, type Kapazitaet, type KapazitaetAenderung } from './api.ts';
 import { Kopf } from './Kopf.tsx';
 import { eingabeAusFte, fenster, fteAusEingabe, ZEILE } from './raster.ts';
 import type { KapazitaetSearch, SetKapazitaetSearch } from './search.ts';
@@ -25,6 +26,7 @@ interface Schritt { key: string; vorher: string; nachher: string }
 export function KapazitaetPage({ search, setSearch, navigieren }: { search: KapazitaetSearch; setSearch: SetKapazitaetSearch; navigieren(pfad: string): void }) {
   const z = zeitraum(search);
   const daten = useKapazitaet(z);
+  const hr = useKapazitaetHr(z);
   const rollen = useRollen();
   const speichern = useKapazitaetSpeichern();
   const qc = useQueryClient();
@@ -32,13 +34,15 @@ export function KapazitaetPage({ search, setSearch, navigieren }: { search: Kapa
 
   const ms = useMemo(() => (z ? monate(z.von, z.bis) : []), [z?.von, z?.bis]); // eslint-disable-line react-hooks/exhaustive-deps
   const server = useMemo(() => new Map((daten.data?.zellen ?? []).map(c => [k(c.rolle, c.monat), c])), [daten.data]);
+  // Kapazität laut HR (ohne Laden oder bei Fehler leer: das Raster bleibt bedienbar)
+  const hrZellen = useMemo(() => new Map((hr.data?.zellen ?? []).map(c => [k(c.rolle, c.monat), c])), [hr.data]);
   // Zeilen: aktive Rollen in der Reihenfolge der Codetabelle, deaktivierte nur mit erfasstem Angebot, unbekannte Schlüssel am Ende
   const zeilen = useMemo(() => {
-    const mitAngebot = new Set((daten.data?.zellen ?? []).map(c => c.rolle));
+    const mitAngebot = new Set([...(daten.data?.zellen ?? []), ...(hr.data?.zellen ?? [])].map(c => c.rolle));
     const bekannt = (rollen.data ?? []).filter(r => r.aktiv || mitAngebot.has(r.schluessel));
     const rest = [...mitAngebot].filter(r => !bekannt.some(b => b.schluessel === r)).sort().map(r => ({ schluessel: r, label: r, aktiv: false }));
     return [...bekannt, ...rest];
-  }, [rollen.data, daten.data]);
+  }, [rollen.data, daten.data, hr.data]);
   const darf = daten.data?.can.write ?? false;
 
   // Entwurf: Eingaben, die noch nicht gespeichert sind (Schlüssel Rolle|Monat → Text)
@@ -180,6 +184,7 @@ export function KapazitaetPage({ search, setSearch, navigieren }: { search: Kapa
           <>
             {darf ? <p className="res-legende">{TR.tastatur} <span className="res-status" role="status" aria-live="polite">{status}</span></p>
               : <Hinweis stufe="hinweis">{TR.nurLesen}</Hinweis>}
+            {hr.data?.uebernommenAt ? <p className="res-legende">{TR.hrHinweis(fmtZeitpunkt(hr.data.uebernommenAt))}</p> : null}
             <div className="res-scroll res-raster-scroll" ref={scroller} onScroll={e => setOben(e.currentTarget.scrollTop)}>
               <table className="res-tabelle res-raster" aria-rowcount={zeilen.length + 1} aria-colcount={ms.length + 1}>
                 <caption className="sr">{TR.rasterLabel}</caption>
@@ -199,13 +204,22 @@ export function KapazitaetPage({ search, setSearch, navigieren }: { search: Kapa
                         {ms.map((m, si) => {
                           const key = k(r.schluessel, m);
                           const v = wert(key);
-                          if (!darf) return <td key={m} className="num">{v || '–'}</td>;
+                          const h = hrZellen.get(key);
+                          const hrTitel = h ? TR.hrZelle(eingabeAusFte(h.fte), h.personen, eingabeAusFte(h.abwesend)) : undefined;
+                          if (!darf) {
+                            return (
+                              <td key={m} className="num" title={!v && h ? hrTitel : undefined}>
+                                {v || (h ? <span className="res-hr">{eingabeAusFte(h.fte)}<span className="res-hr-marke" aria-hidden="true">{TR.hrMarke}</span><span className="sr">{TR.hrLabel(eingabeAusFte(h.fte))}</span></span> : '–')}
+                              </td>
+                            );
+                          }
                           const ungueltig = fteAusEingabe(v) === undefined;
                           return (
                             <td key={m} className={`res-eingabe${key in entwurf ? ' res-geaendert' : ''}`}>
                               <input type="text" inputMode="decimal" autoComplete="off" data-zelle={`${zi}:${si}`} value={v}
-                                aria-label={TR.zelleEingabe(r.label, monatLang(m))} aria-invalid={ungueltig || undefined}
-                                title={ungueltig ? TR.ungueltig : undefined}
+                                aria-label={TR.zelleEingabe(r.label, monatLang(m)) + (!v && h ? TR.hrLabel(eingabeAusFte(h.fte)) : '')} aria-invalid={ungueltig || undefined}
+                                className={!v && h ? 'res-hr' : undefined} placeholder={h ? `${eingabeAusFte(h.fte)} ${TR.hrMarke}` : undefined}
+                                title={ungueltig ? TR.ungueltig : !v && h ? hrTitel : undefined}
                                 onFocus={() => { startwert.current = { key, wert: v }; }}
                                 onBlur={schrittMerken}
                                 onChange={e => setzen(key, e.target.value)}

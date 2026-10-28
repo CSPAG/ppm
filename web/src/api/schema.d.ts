@@ -1802,7 +1802,7 @@ export interface paths {
         post?: never;
         /**
          * Mitglied entfernen
-         * @description Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen).
+         * @description Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen). Die App kann das Entfernen in ihrem Haken `member.removing` ablehnen (z. B. 409 mit Begründung in `detail` und eigenem `reason`); dann bleibt alles unverändert.
          */
         delete: {
             parameters: {
@@ -2491,7 +2491,7 @@ export interface paths {
         post?: never;
         /**
          * Mitglied entfernen
-         * @description Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen).
+         * @description Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen). Die App kann das Entfernen in ihrem Haken `member.removing` ablehnen (z. B. 409 mit Begründung in `detail` und eigenem `reason`); dann bleibt alles unverändert.
          */
         delete: {
             parameters: {
@@ -9486,7 +9486,7 @@ export interface paths {
         put?: never;
         /**
          * Zugang entziehen
-         * @description Hält die Rollen der Person an Orten ausser der Organisation fest, entfernt sie dann im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration) und legt der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben. Ein abgebrochener Versuch wird beim nächsten Aufruf fortgesetzt.
+         * @description Entfernt die Person im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration). Die Haken des Moduls halten dabei die Rollen an Orten ausser der Organisation fest und legen der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben – gleich wie beim Entfernen unter «Benutzer und Rollen».
          */
         post: {
             parameters: {

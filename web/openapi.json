@@ -10260,6 +10260,7 @@
           "stand",
           "viaSns",
           "vertraulich",
+          "fest",
           "verschobenVon",
           "unterlagen",
           "einladungen",
@@ -10409,6 +10410,10 @@
             "type": "boolean"
           },
           "vertraulich": {
+            "type": "boolean"
+          },
+          "fest": {
+            "description": "Festes Traktandum 1 «Bericht der Programmleitung» (K3 Schritt 4): weder entfernen noch verschieben, bleibt an Position 1.",
             "type": "boolean"
           },
           "verschobenVon": {

@@ -169,17 +169,16 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
   test('Vorschlag «Bericht der Programmleitung» an das Gremium mit dem Bericht als Unterlage (K3 Schritte 1 und 4)', async () => {
     const datum = mittwochIn(35);
     await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum }, 201);
+    // neue Sitzung: der offene Vorschlag wird festes Traktandum 1 (K3 Schritt 4)
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum }, 201);
-    assert.equal(s.traktanden.length, 0, 'kein festes Traktandum');
-    const v = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
-    const g = v.gruppen.find((x: { art: string }) => x.art === 'portfoliobericht');
-    assert.equal(g.traktanden.length, 1);
-    const t = g.traktanden[0];
+    assert.equal(s.traktanden.length, 1, 'festes Traktandum 1');
+    const t = s.traktanden[0];
     const monat = new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${VORPERIODE}-01T00:00:00Z`));
-    assert.deepEqual([t.titel, t.antrag], ['Bericht der Programmleitung', `Kenntnisnahme des Portfolioberichts ${monat}`]);
-    // aufnehmen: Unterlage «Portfoliobericht <Monat>» bereit
-    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: t.id });
-    const a = r.traktanden.find((x: { art: string }) => x.art === 'portfoliobericht');
+    assert.deepEqual([t.titel, t.antrag, t.position, t.fest, t.bezug.typ], ['Bericht der Programmleitung', `Kenntnisnahme des Portfolioberichts ${monat}`, 1, true, 'portfoliobericht']);
+    const vs = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
+    assert.equal(vs.gruppen.find((x: { art: string }) => x.art === 'portfoliobericht'), undefined, 'kein Vorschlag mehr offen');
+    // Unterlage «Portfoliobericht <Monat>» bereit
+    const a = t;
     assert.deepEqual([a.unterlagen.stand, a.unterlagen.liste[0].titel], ['bereit', `Portfoliobericht ${monat}`]);
   });
 });

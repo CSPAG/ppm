@@ -21,6 +21,8 @@ import { gremienwegFuerGate } from '../portfolio/index.ts';
 import { projekt as projektAktion } from '../projekt/index.ts';
 import { registriereTraktandenart, traktandum, type EntscheidFolge, type Unterlage } from '../sitzung/index.ts';
 import { SCHEMA } from '../../platform.ts';
+// Folge eines Gremiumsentscheids mit `app.vertrag_intern` (Muster aus AP-E3-4, 200_vertrag_aenderung)
+import { intern } from './aenderung.ts';
 import { baselineSetzen } from './baseline.ts';
 import { entwurfsanlass } from './entwurf.ts';
 import * as gs from './gate-store.ts';
@@ -49,17 +51,6 @@ export const ERGEBNISSE = [
 /** Gate einer Version: Anlass erster Vertrag oder Gate, Zielphase P1 bis P4. */
 export function gateVon(v: Pick<store.VersionRow, 'anlass' | 'zielphase'>): gs.GateCode | null {
   return v.anlass === 'aenderung' ? null : GATE_IN[v.zielphase] ?? null;
-}
-
-/** Führt `fn` mit `app.vertrag_intern` aus (Folge des Entscheids, 190_vertrag_gate.sql) und stellt den Wert wieder her. */
-async function intern<T>(tx: Tx, fn: () => Promise<T>): Promise<T> {
-  const prev = (await tx.query<{ v: string | null }>("SELECT current_setting('app.vertrag_intern', true) AS v")).rows[0]?.v ?? '';
-  await tx.query("SELECT set_config('app.vertrag_intern', 'on', true)");
-  try {
-    return await fn();
-  } finally {
-    await tx.query("SELECT set_config('app.vertrag_intern', $1, true)", [prev ?? '']).catch(() => undefined);
-  }
 }
 
 /**

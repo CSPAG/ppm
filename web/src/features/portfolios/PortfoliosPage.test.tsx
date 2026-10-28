@@ -180,6 +180,21 @@ describe('Portfolios und Gremien', () => {
     await expectNoAxe(container.ownerDocument.body);
   });
 
+  it('Gremium: Termin entfernen mit «Rückgängig» plant ihn wieder ein (I-R1 Stufe 1)', async () => {
+    const api = stub({
+      [`GET /v1/gremien/${PRAT}`]: () => json(gremium(), 200, { ETag: 'W/"1"' }),
+      [`GET /v1/gremien/${PRAT}/termine`]: () => json({ items: [{ id: SNS, gremiumId: PRAT, datum: '2026-11-18', ...meta }], can: { admin: true } }),
+      [`DELETE /v1/gremien/${PRAT}/termine/2026-11-18`]: () => new Response(null, { status: 204 }),
+      [`POST /v1/gremien/${PRAT}/termine`]: () => json({ id: PC, gremiumId: PRAT, datum: '2026-11-18', ...meta }, 201),
+    });
+    renderWithIam(<Page initial={{ o: 'transformation', g: 'prat' }} />, UE);
+    const drawer = await screen.findByRole('dialog', { name: 'PRAT' });
+    await userEvent.click(await within(drawer).findByRole('button', { name: /Termin .* entfernen/ }));
+    await userEvent.click(await screen.findByRole('button', { name: TP.rueckgaengig }));
+    await waitFor(() => expect(api.calls.some(c => c.method === 'POST')).toBe(true));
+    expect(await api.calls.find(c => c.method === 'POST')!.json()).toEqual({ datum: '2026-11-18' });
+  });
+
   it('nur lesen: keine Bearbeiten-Elemente, Hinweis wer ändern darf', async () => {
     stub({
       'GET /v1/portfolios': () => json({ items: [portfolio({ can: { admin: false } })], nextCursor: null }),

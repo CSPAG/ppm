@@ -61,6 +61,7 @@ export const TZZ = {
   ohneVerantwortlich: 'noch niemand',
   hauptaktivitaetEntfernen: (text: string) => `Hauptaktivität «${text}» entfernen`,
   hauptaktivitaetEntfernt: 'Hauptaktivität entfernt.',
+  rueckgaengig: 'Rückgängig',
   projekte: 'Projekte',
   keineProjekte: 'Noch kein Projekt zugeordnet.',
   projektZuordnen: 'Projekt zuordnen',

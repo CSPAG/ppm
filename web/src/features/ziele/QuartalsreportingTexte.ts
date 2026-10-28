@@ -2,8 +2,10 @@
  * Texte der Seite «Quartalsreporting» (UI-41; Kernablauf K6 Schritte 11–14, Regeln und Texte): Anrede «Du» (UX-OF-1, #121),
  * Schweizer Rechtschreibung; Aktionen aus K6 «Bericht erstellen», «Als Dokument herunterladen».
  */
+import { NAV } from './nav.ts';
+
 export const TQR = {
-  bereich: 'Quartalsreporting',
+  bereich: NAV.quartalsreporting,
   title: (q: string) => `Quartalsreporting ${q}`,
   sub: 'Bericht an den VR aus Dashboard und Zielerreichung: erstellen, kommentieren, im PRAT traktandieren.',
   vorher: 'Vorheriges Quartal', nachher: 'Nächstes Quartal', quartalWaehlen: 'Quartal',

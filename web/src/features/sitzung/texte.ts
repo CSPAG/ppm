@@ -2,8 +2,10 @@
  * Texte des Features «Sitzungen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung, Begriffe und Schaltflächen aus K3 (docs/ux/ablaeufe/K3-gremiumssitzung.md «Texte»).
  */
+import { NAV } from './nav.ts';
+
 export const TS = {
-  bereich: 'Sitzungen',
+  bereich: NAV.bereich,
   title: 'Sitzungen',
   // Gremium im Kopf des Arbeitsraums (IA «Kontext im Kopf»)
   gremium: 'Gremium', alleGremien: 'Alle Gremien',
@@ -14,7 +16,7 @@ export const TS = {
   spalten: { datum: 'Datum', stand: 'Stand', traktanden: 'Traktanden' },
   oeffnen: (g: string, d: string) => `Sitzung ${g} ${d} öffnen`,
   mehrLaden: 'Weitere Termine',
-  aktionNaechste: 'Nächste Sitzung öffnen',
+  aktionNaechste: NAV.aktionNaechste,
 
   stand: {
     geplant: 'geplant', in_vorbereitung: 'in Vorbereitung', versendet: 'Unterlagen versendet', laufend: 'läuft',

@@ -2,9 +2,11 @@
  * Texte des Features «Stammdaten» (Namensraum = Feature, docs/fachmodell.md 7.2): Administration › Organisation (UI-44)
  * und Codetabellen (UI-45). Anrede «Du», Schweizer Rechtschreibung, «Organisation» statt Mandant.
  */
+import { NAV } from './nav.ts';
+
 export const TS = {
-  bereich: { organisation: 'Organisation', codetabellen: 'Codetabellen' },
-  aktion: { einheitAnlegen: 'Organisationseinheit anlegen', feiertagErfassen: 'Feiertag erfassen' },
+  bereich: NAV.bereich,
+  aktion: NAV.aktion,
   ansicht: { einheiten: 'Einheiten', feiertage: 'Feiertage' },
   org: {
     title: 'Organisation', sub: 'Organisationseinheiten mit Direktionen und Feiertage der Organisation.',

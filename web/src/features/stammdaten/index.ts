@@ -3,5 +3,6 @@ export {
   validateCodetabellenSearch, validateOrganisationSearch, type CodetabellenSearch, type OrganisationSearch, type SetCodetabellenSearch,
   type SetOrganisationSearch,
 } from './search.ts';
-export { stammdatenKeys, sucheOrgEinheiten } from './api.ts';
-export { TS as stammdatenTexte } from './texte.ts';
+export { sucheOrgEinheiten } from './api.ts';
+// Texte für Navigation, Befehlspalette und Reiter ohne die Texte der Seiten (Q-L6)
+export { NAV as stammdatenNav } from './nav.ts';

@@ -1,8 +1,9 @@
 /** Texte der Portfolio-Roadmap (UI-31, K6 Schritt 8; eigene Datei von AP-E6-2): Anrede «Du», Schweizer Rechtschreibung. */
+import { NAV } from './nav.ts';
 import { fmtDatum } from '../../ui/index.ts';
 
 export const TR = {
-  bereich: 'Roadmap',
+  bereich: NAV.roadmap,
   inhalt: (jahr: number | null) => (jahr ? `Inhalt der Roadmap ${jahr}` : 'Inhalt der Roadmap'),
   titel: (jahr: number) => `Roadmap ${jahr}`,
   publiziert: (d: string) => `publiziert ${fmtDatum(d)}`,

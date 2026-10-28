@@ -2,8 +2,10 @@
  * Texte des Features «Vorlagen» (UI-48; UC-018 Schritte 1–2): Anrede «Du» (UX-E7), Schweizer Rechtschreibung,
  * «Organisation» statt «Mandant».
  */
+import { NAV } from './nav.ts';
+
 export const TV = {
-  bereich: 'Vorlagen',
+  bereich: NAV.bereich,
   title: 'Vorlagen',
   sub: 'Word-Vorlagen je Dokumentart mit Versionen. Platzhalter wie «Projektname» werden den Daten zugeordnet; die aktive Version gilt für alle künftigen Word-Ausgaben.',
   art: 'Dokumentart', gilt: 'Gilt heute', versionen: 'Versionen', datenquelle: 'Daten',

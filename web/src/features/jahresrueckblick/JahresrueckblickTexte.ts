@@ -3,10 +3,12 @@
  * Rechtschreibung, in sichtbaren Texten «Organisation»; Wortlaut der Ergebnisse aus K3 («Verabschiedet», «Anpassungen
  * verlangt»).
  */
+import { NAV } from './nav.ts';
+
 const mehr = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
 
 export const TJ = {
-  bereich: 'Jahresrückblick',
+  bereich: NAV.bereich,
   title: (j: number) => `Jahresrückblick ${j}`,
   sub: 'Auswertung des Jahres für den PRAT: Zielerreichung, Vorhaben und Lessons Learned; danach Erkenntnisse und Massnahmen für den nächsten Zielzyklus.',
   inhalt: (j: number) => `Inhalt des Jahresrückblicks ${j}`,

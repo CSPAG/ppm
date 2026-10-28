@@ -9,6 +9,8 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { registriereAenderung } from './aenderung.ts';
+import { registerAenderungRoutes } from './aenderung-routes.ts';
 import { baselineSetzen } from './baseline.ts';
 import { registerDokumentRoutes } from './dokument-routes.ts';
 import { entwurfsanlass } from './entwurf.ts';
@@ -16,6 +18,8 @@ import { vertragTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 import * as store from './store.ts';
+import { vergleichTools } from './vergleich-mcp.ts';
+import { registerVergleichRoutes } from './vergleich-routes.ts';
 import { registerZielauswahl } from './zielauswahl.ts';
 
 export const vertragModule = defineModule({
@@ -26,9 +30,13 @@ export const vertragModule = defineModule({
     registerZielauswahl(app, deps, TAG); // Ziele zur Wahl in Kap. 2 (PP.02.05)
     registerPruefungRoutes(app, deps);
     registerDokumentRoutes(app, deps); // Dokumentausgabe Word/PDF (AP-E3-5)
+    registerVergleichRoutes(app, deps); // Versionsvergleich und Hauptänderungen (AP-E3-4)
+    registerAenderungRoutes(app, deps); // Änderungsantrag (AP-E3-4)
   },
-  mcpTools: { ...vertragTools },
+  mcpTools: { ...vertragTools, ...vergleichTools },
 });
+
+registriereAenderung(); // Traktandenart «Änderung» (AP-E3-4, fachmodell.md 2.9)
 
 /** Für Erweiterungspakete und obere Module (in deren Transaktion; Rechte prüft der Aufrufer). */
 export const vertrag = {

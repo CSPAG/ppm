@@ -117,7 +117,7 @@ export function registerGateRoutes(app: FastifyInstance, _deps: Deps): void {
     const zutreffend = body.zutreffend ?? true;
     const text = body.antwort.trim();
     if (!zutreffend && !text) {
-      throw invalid('Begründung fehlt: Begründe, warum die Leitfrage nicht zutrifft.', [{ path: '/antwort', message: 'Pflicht bei «trifft nicht zu»' }]);
+      throw invalid('Begründung fehlt: Begründen Sie, warum die Leitfrage nicht zutrifft.', [{ path: '/antwort', message: 'Pflicht bei «trifft nicht zu»' }]);
     }
     const { v, p, gate } = await req.tx(tx => sichtbar(tx, id));
     await req.need('vertrag:write', projektOrt(p.id));

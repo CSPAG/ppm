@@ -66,7 +66,8 @@ export const TA = {
     an_prat: (datum: string) => `Am ${datum} an den PRAT unterstützt.`,
   },
   traktandiert: 'Traktandiert für den PRAT. Der Entscheid fällt in der Sitzung.',
-  konflikt: 'Der Stand hat sich inzwischen geändert. Lade neu und entscheide erneut.',
+  konflikt: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und entscheide danach erneut; deine Begründung bleibt erhalten.',
+  neuLaden: 'Neu laden',
   einreichenKonflikt: 'Der Antrag wurde inzwischen geändert. Lade ihn neu und reiche danach erneut ein.',
 
   // Versionen und Vergleich (UI-10, UI-11)

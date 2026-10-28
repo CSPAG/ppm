@@ -3,15 +3,18 @@
  * Schritt 7, A4): Prüfansicht der Unternehmensentwicklung. Kapitel nur lesbar (Sprung in die Projektakte), Kommentar je
  * Kapitel, Checkliste (Pflichtangaben der Phase, Einhaltung PM-Handbuch); «Quality-Check bestätigen» und «Zurück an
  * die Projektleitung» je mit Wirkung davor (I-R1 Stufe 3). Die Oberfläche prüft vorab, der Server entscheidet (I-P6).
+ * Kommentare bleiben als Entwurf im Speicher der Sitzung, bis sie gesendet sind: Der Sprung ins Kapitel und zurück
+ * verliert nichts (Z7 sinngemäss, I-R3).
  */
-import { describeError } from '@vollholz/iam-web';
-import { useId, useState } from 'react';
+import { describeError, useIamConfig } from '@vollholz/iam-web';
+import { useEffect, useId, useState } from 'react';
 import { isConflict, statusOf } from '../../api/index.ts';
 import { Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, TeilFehler, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
 import { usePflichtangaben, useProjekt, useVertrag, type Version } from './api.ts';
 import { KAPITEL } from './felder.ts';
 import { usePruefung, usePruefungMutations, type PruefungLoaded } from './PruefenApi.ts';
 import { TP } from './PruefenTexte.ts';
+import { useNeuLaden } from './neuLaden.ts';
 import { TV } from './texte.ts';
 import './Pruefen.css';
 
@@ -24,19 +27,41 @@ export function PruefenPage({ nummer }: { nummer: string }) {
   if (projekt.isPending || vertrag.isPending || (entwurf && pruefung.isPending)) {
     return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={6} /> : null}</div>;
   }
+  // ein gescheitertes Neuladen behält den geladenen Stand (und die Eingaben); nur ohne Daten der Fehler (Z5)
   const fehler = projekt.error ?? vertrag.error ?? pruefung.error;
-  if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
+  if (fehler && !(projekt.data && vertrag.data && (!entwurf || pruefung.data))) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
   const version = vertrag.data?.versionen.find(v => v.id === entwurf);
   if (!projekt.data || !version || !pruefung.data) return <Empty>{TP.keinEntwurf}</Empty>;
-  return <Pruefansicht nummer={nummer} projektId={projekt.data.id} version={version} geladen={pruefung.data} />;
+  return <Pruefansicht nummer={nummer} projektId={projekt.data.id} version={version} geladen={pruefung.data} neuLaden={() => pruefung.refetch()} />;
 }
 
-function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string; projektId: string; version: Version; geladen: PruefungLoaded }) {
+const entwurfSchluessel = (versionId: string) => `ppm.qc.kommentare.${versionId}`;
+
+/** Kommentar-Entwurf der Prüfung je Version (ohne Speicher: nur im Zustand der Seite). */
+function entwurfLesen(versionId: string): Record<number, string> {
+  try {
+    const roh = sessionStorage.getItem(entwurfSchluessel(versionId));
+    const w: unknown = roh ? JSON.parse(roh) : null;
+    return w && typeof w === 'object' ? w as Record<number, string> : {};
+  } catch { return {}; }
+}
+
+function entwurfSchreiben(versionId: string, k: Record<number, string>): void {
+  try {
+    if (Object.values(k).some(t => t.trim())) sessionStorage.setItem(entwurfSchluessel(versionId), JSON.stringify(k));
+    else sessionStorage.removeItem(entwurfSchluessel(versionId));
+  } catch { /* ohne Speicher bleibt der Entwurf nur auf der Seite */ }
+}
+
+function Pruefansicht({ nummer, projektId, version, geladen, neuLaden }: { nummer: string; projektId: string; version: Version; geladen: PruefungLoaded; neuLaden(): Promise<{ error: unknown }> }) {
   const id = useId();
   const toast = useToast();
   const { qualityCheck } = usePruefungMutations(projektId);
+  const laden = useNeuLaden(neuLaden, () => qualityCheck.reset());
   const pflicht = usePflichtangaben(version.id);
-  const [kommentare, setKommentare] = useState<Record<number, string>>({});
+  const { router: { Link } } = useIamConfig();
+  const [kommentare, setKommentare] = useState<Record<number, string>>(() => entwurfLesen(geladen.pruefung.versionId));
+  useEffect(() => { entwurfSchreiben(geladen.pruefung.versionId, kommentare); }, [geladen.pruefung.versionId, kommentare]);
   const [ohneKommentar, setOhneKommentar] = useState(false);
   const p = geladen.pruefung;
   const phase = fmtPhase(version.zielphase as Phase);
@@ -50,7 +75,7 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
     if (ergebnis === 'rueckmeldung' && !liste.length) { setOhneKommentar(true); return; }
     setOhneKommentar(false);
     qualityCheck.mutate({ id: p.versionId, etag: geladen.etag, body: { ergebnis, ...(liste.length ? { kommentare: liste } : {}) } }, {
-      onSuccess: () => toast.show(ergebnis === 'bestaetigt' ? TP.bestaetigt : TP.zurueckgegeben),
+      onSuccess: () => { setKommentare({}); toast.show(ergebnis === 'bestaetigt' ? TP.bestaetigt : TP.zurueckgegeben); },
     });
   };
 
@@ -58,7 +83,7 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
     <section className="qc" aria-labelledby={`${id}-h`}>
       <header className="qc-kopf">
         <h2 id={`${id}-h`} className="vt-h">{TP.pruefenTitel} · {TP.version(p.nummer, phase)}</h2>
-        <a className="btn sm" href={`/projekte/${nummer}/vertrag?version=entwurf`}><Icon name="doc" />{TP.zurueckZumVertrag}</a>
+        <Link className="btn sm" to={`/projekte/${nummer}/vertrag?version=entwurf`}><Icon name="doc" />{TP.zurueckZumVertrag}</Link>
       </header>
       {p.stand !== 'in_pruefung' ? <Hinweis stufe="hinweis">{TP.nichtInPruefung(TV.stand[p.stand])}</Hinweis>
         : !darf ? <Hinweis stufe="hinweis">{TP.nurUe}</Hinweis> : null}
@@ -69,7 +94,7 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
             <li key={k.nr} className="qc-k">
               <div className="qc-k-kopf">
                 <span className="vt-nr">{k.nr}</span> <span className="qc-k-t">{k.titel}</span>
-                <a className="btn sm" href={`/projekte/${nummer}/vertrag?version=entwurf&kapitel=${k.nr}`} aria-label={TP.kapitelAnsehen(k.nr)}><Icon name="eye" /></a>
+                <Link className="btn sm" to={`/projekte/${nummer}/vertrag?version=entwurf&kapitel=${k.nr}`}><Icon name="eye" /><span className="sr">{TP.kapitelAnsehen(k.nr)}</span></Link>
               </div>
               {darf ? (
                 <div className="field qc-feld">
@@ -105,16 +130,19 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
 
           {darf ? (
             <div className="qc-aktion">
-              {isConflict(qualityCheck.error) ? <Hinweis stufe="warnung" live>{TP.konflikt}</Hinweis> : null}
+              {isConflict(qualityCheck.error) ? (
+                <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laden.laedt} onClick={() => void laden.laden()}>{TP.neuLaden}</button>}>{TP.konflikt}</Hinweis>
+              ) : null}
               {serverFehler ? <Hinweis stufe="sperre" live>{statusOf(qualityCheck.error) === 409 && serverFehler.detail?.includes('Projektorganisation') ? `${serverFehler.detail} ${TP.organisationFehlt}` : serverFehler.detail ?? serverFehler.title}</Hinweis> : null}
               <p className="small" role="status">{TP.kommentareAnzahl(liste.length)}</p>
+              {liste.length ? <p className="muted small">{TP.entwurfBleibt}</p> : null}
               <p className="small" id={`${id}-wb`}>{TP.bestaetigenWirkung}</p>
-              <button type="button" className="btn primary" aria-describedby={`${id}-wb`} disabled={qualityCheck.isPending} onClick={() => senden('bestaetigt')}>
+              <button type="button" className="btn primary" aria-describedby={`${id}-wb`} disabled={qualityCheck.isPending || isConflict(qualityCheck.error)} onClick={() => senden('bestaetigt')}>
                 <Icon name="check" />{TP.bestaetigen}
               </button>
               <p className="small" id={`${id}-wz`}>{TP.zurueckgebenWirkung}</p>
               {ohneKommentar ? <Hinweis stufe="sperre" live>{TP.zurueckgebenFehlt}</Hinweis> : null}
-              <button type="button" className="btn" aria-describedby={`${id}-wz`} disabled={qualityCheck.isPending} onClick={() => senden('rueckmeldung')}>
+              <button type="button" className="btn" aria-describedby={`${id}-wz`} disabled={qualityCheck.isPending || isConflict(qualityCheck.error)} onClick={() => senden('rueckmeldung')}>
                 <Icon name="reply" />{TP.zurueckgeben}
               </button>
             </div>

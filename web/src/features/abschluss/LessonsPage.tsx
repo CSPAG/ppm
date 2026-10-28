@@ -135,7 +135,7 @@ function LessonDrawer({ l, onClose, projektOeffnen }: { l: Lesson; onClose(): vo
         </>
       )}
       {frage ? (
-        <Confirm title={TA.lessons.loeschen(l.text.slice(0, 60))} text={l.text} confirm={T.common.delete} busy={loeschen.isPending} onClose={() => setFrage(false)}
+        <Confirm title={TA.lessons.loeschenFrage(l.text.slice(0, 60))} text={TA.lessons.loeschenWirkung} confirm={TA.lessons.loeschenJa} busy={loeschen.isPending} onClose={() => setFrage(false)}
           onConfirm={() => loeschen.mutate(l, { onSuccess: () => { toast.show(TA.lessons.geloescht); onClose(); }, onError: e => toast.error(e) })} />
       ) : null}
     </Drawer>

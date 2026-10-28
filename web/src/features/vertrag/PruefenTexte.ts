@@ -20,6 +20,7 @@ export const TP = {
   kapitelAnsehen: (nr: number) => `Kapitel ${nr} ansehen`,
   kommentar: (nr: number, titel: string) => `Rückmeldung zu Kapitel ${nr} ${titel}`,
   kommentarHint: 'Leer lassen, wenn das Kapitel in Ordnung ist.',
+  entwurfBleibt: 'Deine Kommentare bleiben erhalten, bis du sie sendest, auch wenn du dazwischen ein Kapitel ansiehst.',
   kommentareAnzahl: (n: number) => (n === 1 ? '1 Kapitel mit Rückmeldung' : `${n} Kapitel mit Rückmeldung`),
   bestaetigen: 'Quality-Check bestätigen',
   bestaetigenWirkung: 'Sponsor, Projektleitung und CTL erhalten je eine Unterzeichnungsaufgabe.',
@@ -34,7 +35,9 @@ export const TP = {
   rueckmeldungVom: (datum: string) => `Rückmeldung vom ${datum}`,
   bestaetigtAm: (datum: string) => `Bestätigt am ${datum}`,
   organisationFehlt: 'Die Projektorganisation ist unvollständig. Sponsor und Projektleitung legen sie in der Projektübersicht fest.',
-  konflikt: 'Der Stand hat sich inzwischen geändert. Lade neu und prüfe erneut.',
+  konflikt: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und sende danach erneut; deine Kommentare bleiben erhalten.',
+  neuLaden: 'Neu laden',
+  konfliktUnterzeichnen: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und prüfe, was du unterzeichnest.',
 
   // Unterzeichnen (K2 Schritt 8, K2-1)
   unterzeichnenTitel: 'Projektvertrag unterzeichnen',

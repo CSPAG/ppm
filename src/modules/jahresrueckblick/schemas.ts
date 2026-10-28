@@ -22,6 +22,13 @@ export const Jahresauswertung = Type.Object({
     abgebrochen: Type.Array(Projekt, { description: 'Im Jahr abgebrochen.' }),
     laufend: Type.Array(Projekt, { description: 'Aktive und sistierte Vorhaben.' }),
   }, { additionalProperties: false }),
+  lessonsLearned: Type.Object({
+    eintraege: Type.Array(Type.Object({
+      id: Uuid, projekt: Type.Object({ id: Uuid, nummer: Type.String(), name: Type.String() }, { additionalProperties: false }),
+      text: Type.String(), kategorie: Type.String(),
+    }, { additionalProperties: false }), { description: 'Im Jahr erfasst (PS.04.03), neueste zuerst.' }),
+    ohne: Type.Array(Projekt, { description: 'Im Jahr abgeschlossene Vorhaben ohne Lessons Learned (UC-013 Schritt 2, A1).' }),
+  }, { additionalProperties: false, description: 'Lessons Learned des Jahres (UC-013 Schritte 1–2).' }),
 }, { $id: 'Jahresauswertung', additionalProperties: false });
 export type JahresauswertungOut = Static<typeof Jahresauswertung>;
 
@@ -50,3 +57,7 @@ export const JahresrueckblickPut = Type.Object({
 export type JahresrueckblickPutIn = Static<typeof JahresrueckblickPut>;
 
 export const JahrParams = Type.Object({ jahr: Type.Integer({ minimum: 2000, maximum: 2100 }) }, { additionalProperties: false });
+
+export const DokumentQuery = Type.Object({
+  format: Type.Optional(Type.Union([Type.Literal('pdf'), Type.Literal('docx')], { description: 'Standard PDF.' })),
+}, { additionalProperties: false });

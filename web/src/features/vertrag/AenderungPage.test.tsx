@@ -3,7 +3,7 @@
  * davor; eine Änderung an den Kosten kann der SP nicht freigeben, nur an den PRAT unterstützen (K2-Abnahme); Ablehnen mit
  * Pflichtbegründung; axe.
  */
-import { screen } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
 import type { AuthzCatalog } from '@vollholz/iam-web';
@@ -89,6 +89,29 @@ describe('Änderung entscheiden', () => {
     await userEvent.click(screen.getByRole('button', { name: TA.freigeben }));
     expect(await screen.findByText(TA.toastFreigegeben('1.1'))).toBeInTheDocument();
     expect(await api.calls.find(c => c.method === 'POST')!.json()).toEqual({ ergebnis: 'freigegeben' });
+  });
+
+  it('Konflikt (412) beim Ablehnen: «Neu laden» im Dialog, die Begründung bleibt, danach mit neuem Stand (Z7)', async () => {
+    let n = 0;
+    const api = stub(aenderung(), {
+      [`GET /v1/vertragsversionen/${V}/aenderung`]: () => json(aenderung({ version: n ? 7 : 6 }), 200, { ETag: n ? 'W/"7"' : 'W/"6"' }),
+      [`POST /v1/vertragsversionen/${V}/aenderung/entscheiden`]: () => (n++
+        ? json(aenderung({ stand: 'abgelehnt', version: 8, entscheid: { ergebnis: 'abgelehnt', begruendung: 'Nicht im Budget', at: '2026-10-28T08:00:00Z', personId: null } }), 200, { ETag: 'W/"8"' })
+        : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
+    });
+    renderWithIam(<AenderungPage nummer="2026-014" />);
+    await userEvent.click(await screen.findByRole('button', { name: TA.ablehnen }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.type(within(dialog).getByLabelText(TA.begruendung), 'Nicht im Budget');
+    await userEvent.click(within(dialog).getByRole('button', { name: TA.ablehnen }));
+    expect(await within(dialog).findByText(TA.konflikt)).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole('button', { name: TA.neuLaden }));
+    await waitFor(() => expect(within(dialog).queryByText(TA.konflikt)).toBeNull());
+    expect(within(dialog).getByLabelText(TA.begruendung)).toHaveValue('Nicht im Budget');
+    await waitFor(() => expect(api.calls.filter(c => c.url.endsWith('/aenderung') && c.method === 'GET').length).toBeGreaterThan(1));
+    await userEvent.click(within(dialog).getByRole('button', { name: TA.ablehnen }));
+    expect(await screen.findByText(TA.toastAbgelehnt)).toBeInTheDocument();
+    expect(api.calls.filter(c => c.method === 'POST')[1]!.headers.get('If-Match')).toBe('W/"7"');
   });
 
   it('Ablehnen nur mit Begründung (UC-007 A2)', async () => {

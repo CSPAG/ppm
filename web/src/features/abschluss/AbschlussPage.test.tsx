@@ -11,6 +11,7 @@ import type { AuthzCatalog, Me } from '@vollholz/iam-web';
 import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxe } from '../../test/axe.ts';
 import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
+import { T } from '../../ui/index.ts';
 import { AbschlussPage } from './AbschlussPage.tsx';
 import { TA } from './texte.ts';
 
@@ -134,6 +135,33 @@ describe('Abschluss (UI-14)', () => {
     await userEvent.click(screen.getByRole('button', { name: TA.lessons.erfassen }));
     await waitFor(() => expect(lesson).toEqual({ text: 'Früh mit dem Betrieb planen', kategorie: 'Übergabe' }));
     expect(api.calls.find(c => c.url.endsWith('/lessons-learned'))!.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('Lesson Learned löschen erst nach der Rückfrage; Download-Fehler sichtbar am Knopf (I-R1, Z5, G12)', async () => {
+    const LL = '00000000-0000-4000-8000-0000000000d1';
+    const ll = { id: LL, projekt: { id: ID, nummer: '2026-014', name: 'Neues Labor' }, text: 'Früh mit dem Betrieb planen', kategorie: '', jahr: 2026, version: 1,
+      createdAt: '2026-10-28T08:00:00Z', von: 'Paula Leiterin', can: { write: true } };
+    const api = stub({
+      [`GET ${URL_A}`]: () => json(abschluss({ lessonsLearned: [ll] }), 200, { etag: 'W/"1"' }),
+      [`DELETE /v1/lessons-learned/${LL}`]: () => new Response(null, { status: 204 }),
+      [`GET ${URL_A}/dokument`]: () => json({ type: 'about:blank', title: 'Vorlage fehlt', status: 409, detail: 'Es gibt keine aktive Vorlage «Abschlussbericht».' }, 409, { 'Content-Type': 'application/problem+json' }),
+    });
+    renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
+    expect(await screen.findByText(TA.dokument.personendaten)).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: TA.lessons.loeschen(ll.text) }));
+    const frage = await screen.findByRole('dialog', { name: TA.lessons.loeschenFrage(ll.text) });
+    expect(frage).toHaveTextContent(TA.lessons.loeschenWirkung);
+    await expectNoAxe(frage);
+    expect(api.calls.some(c => c.method === 'DELETE')).toBe(false);
+    await userEvent.click(screen.getByRole('button', { name: T.common.cancel }));
+    expect(api.calls.some(c => c.method === 'DELETE')).toBe(false);
+    await userEvent.click(screen.getByRole('button', { name: TA.lessons.loeschen(ll.text) }));
+    await userEvent.click(await screen.findByRole('button', { name: TA.lessons.loeschenJa }));
+    await waitFor(() => expect(api.calls.some(c => c.method === 'DELETE')).toBe(true));
+    expect(await screen.findByText(TA.lessons.geloescht)).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: TA.dokument.pdf }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(TA.dokument.fehler('Es gibt keine aktive Vorlage «Abschlussbericht».'));
   });
 
   it('sistiert: Bericht zur Sistierung und Wiederaufnahme mit Begründung (A-09)', async () => {

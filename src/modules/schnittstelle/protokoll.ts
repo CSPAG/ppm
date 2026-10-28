@@ -5,7 +5,7 @@
  * halten `{ before, after }` fest, Anlegen und Löschen den Stand.
  */
 import type { Tx } from '@vollholz/platform';
-import { SCHEMA } from '../../platform.ts';
+import { csv, SCHEMA } from '../../platform.ts';
 
 export interface Filter { objekt?: string; objektId?: string; von?: string; bis?: string; nach?: string; limit: number }
 
@@ -75,4 +75,19 @@ export async function objekte(tx: Tx): Promise<string[]> {
        UNION ALL
        SELECT (SELECT resource_type FROM ${SCHEMA}.audit_log WHERE resource_type > t.t ORDER BY resource_type LIMIT 1) FROM t WHERE t.t IS NOT NULL
      ) SELECT t FROM t WHERE t IS NOT NULL`)).rows.map(r => r.t);
+}
+
+const ART_LABEL: Record<Art, string> = { angelegt: 'angelegt', geaendert: 'geändert', geloescht: 'gelöscht', sonstig: 'Aktion' };
+const QUELLE_LABEL: Record<string, string> = { ui: 'Oberfläche', api: 'API', mcp: 'Assistent (MCP)', worker: 'Hintergrund', webhook: 'Webhook', system: 'System' };
+const zeitpunkt = (d: Date) => d.toLocaleString('sv-SE', { timeZone: 'Europe/Zurich' });
+const wert = (v: unknown): string | null => (v === null || v === undefined ? null : typeof v === 'string' ? v : JSON.stringify(v));
+
+/** Export (UI-50, Seitentyp Bericht): eine Zeile je geändertes Feld, Einträge ohne Felder als eine Zeile. */
+export function alsCsv(eintraege: readonly Eintrag[]): string {
+  const kopf = ['Zeitpunkt', 'Quelle', 'Person', 'Objekt', 'Kennung', 'Art', 'Aktion', 'Feld', 'Vorher', 'Nachher'];
+  const zeilen = eintraege.flatMap(e => {
+    const basis = [zeitpunkt(e.zeit), QUELLE_LABEL[e.quelle] ?? e.quelle, e.person ? (e.person.name ?? e.person.id) : 'System', e.objekt.typ, e.objekt.id, ART_LABEL[e.art], e.aktion];
+    return e.aenderungen.length ? e.aenderungen.map(a => [...basis, a.feld, wert(a.vorher), wert(a.nachher)]) : [[...basis, null, null, null]];
+  });
+  return csv([kopf, ...zeilen]);
 }

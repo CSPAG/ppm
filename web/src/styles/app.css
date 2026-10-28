@@ -28,7 +28,6 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
 .e{color:var(--fg-3);font-style:italic}
 
 /* Lade-, Leer- und Fehlerzustände */
-.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:48px 22px;color:var(--fg-2)}
 .loading-inline{display:inline-flex;align-items:center;gap:8px;color:var(--fg-2);font-size:13px}
 .skeleton{padding:8px 22px}
 .sk-row{display:flex;gap:16px;height:42px;align-items:center;border-bottom:1px solid var(--line)}
@@ -210,6 +209,25 @@ th.num{text-align:right}
   table.dl .rowlink{white-space:normal;min-height:24px}
   tbody tr:hover td{background:none}
   .dl-teil{padding:8px 14px}
+}
+/* Übersicht der Kürzel (interaktion.md Abschnitt 11) */
+.kz-tab{margin:0 0 14px}
+.kz-tab caption{text-align:left;font-weight:600;padding:0 0 6px}
+.kz-tab tbody tr{cursor:default}
+.kz-tab tbody tr:hover td{background:none}
+.kz-tab tbody td{white-space:normal;max-width:none;height:36px}
+/* Ziele unter 768 px mindestens 44 px (Q-B4, I-M1; docs/ux/rahmen/pruefung.md). min-height schlägt die festen Höhen der
+   Features; Kontrollkästchen und Optionen treffen über ihre Beschriftung, Links im Fliesstext sind ausgenommen (WCAG 2.5.8). */
+@media (max-width:767px){
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),select,textarea,
+  .btn,.btn.sm,.search,.omni,.field .pickbtn,.tab,.seg button,.nav,.chip{min-height:44px}
+  .btn,.btn.sm,.chip{height:auto}
+  .iconbtn{width:44px;height:44px;min-width:44px}
+  .chip .x{width:44px;height:44px}
+  /* Die Seite rollt als Ganzes: Mit den grösseren Zielen bliebe unter Kopf und Werkzeugleiste sonst nur ein schmaler Bildlauf im Inhalt. */
+  .main{overflow-y:auto}
+  .main > section{flex:1 0 auto}
+  label:has(> input[type="checkbox"]),label:has(> input[type="radio"]){min-height:44px;display:inline-flex;align-items:center;gap:8px}
 }
 /* Galerie (nur Entwicklungsbuild) */
 .galerie h2{font:600 15px var(--f-display);margin:24px 0 10px}

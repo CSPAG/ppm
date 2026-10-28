@@ -8,14 +8,15 @@ import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
-import { zugangTexte } from './features/zugang/index.ts';
+import { suchePersonen, zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { naechsteSitzungPfad, sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
+import { jahresrueckblickTexte } from './features/jahresrueckblick/index.ts';
 import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
 import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
-import { dashboardTexte, portfolioberichtTexte, risikenTexte } from './features/dashboard/index.ts';
+import { auswertungenTexte, dashboardTexte, portfolioberichtTexte, risikenTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { vorlagenTexte } from './features/vorlagen/index.ts';
@@ -32,10 +33,12 @@ export const navigation: NavRegistrierung = {
     { raum: 'eingang', pfad: '/eingang', label: eingangTexte.titel, recht: 'tenant:read' },
     // Arbeitsraum «Projekte»: Meine Projekte mit der Projektakte (UI-05, UI-06; Projektrollen sehen nur ihre Projekte)
     { raum: 'projekte', pfad: '/projekte', label: projektTexte.bereich, recht: 'projekt:read' },
-    // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1); Jahresrückblick folgt
-    { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read', muster: /^\/gremien\/(sitzungen|(?!entscheide\/?$)[a-z0-9][a-z0-9-]*(\/sitzungen.*)?)\/?$/ },
+    // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1)
+    { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read', muster: /^\/gremien\/(sitzungen|(?!(entscheide|jahresrueckblick)\/?$)[a-z0-9][a-z0-9-]*(\/sitzungen.*)?)\/?$/ },
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
     { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
+    // Jahresrückblick (UI-37, UC-013, AP-E7-5) für Gremium und UE; führt im Q4 ins laufende Jahr, sonst ins Vorjahr
+    { raum: 'gremien', pfad: '/gremien/jahresrueckblick', label: jahresrueckblickTexte.bereich, recht: ['sitzung:read', 'quartalsbericht:write'], muster: /^\/gremien\/jahresrueckblick(\/\d{4})?\/?$/ },
     // Arbeitsraum «Portfolio» › Dashboard (UI-17, PC.04.01; AP-E1-3): erster Bereich des Portfolios (IA)
     { raum: 'portfolio', pfad: '/portfolio/dashboard', label: dashboardTexte.bereich, recht: 'auswertung:read', muster: /^\/portfolio\/dashboard\/?$/ },
     // Risikolage (UI-18) und Portfoliobericht (UI-29), AP-E2-3
@@ -64,6 +67,9 @@ export const navigation: NavRegistrierung = {
     // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
     // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): sichtbar wie die Auswertungen (auswertung:read; IA «Sichtbarkeit je
     // Rolle»: Portfolio nicht für Antragstellende und Leser:innen); lesen über die API dürfen alle Angemeldeten (A-35)
+    // Portfolio › Auswertungen (UI-30; PC.04.03, UC-014 A2; AP-E7-6): Ad-hoc-Auswertungen nur für UE und FI; aktiv nur auf
+    // der eigenen Adresse, nicht unter dem Portfoliobericht (`/portfolio/auswertungen/portfoliobericht`)
+    { raum: 'portfolio', pfad: '/portfolio/auswertungen', label: auswertungenTexte.bereich, recht: 'auswertung:write', muster: /^\/portfolio\/auswertungen\/?$/ },
     { raum: 'portfolio', pfad: '/portfolio/roadmap', label: roadmapTexte.bereich, recht: 'auswertung:read' },
     { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussTexte.bereich, recht: 'statusbericht:review' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
@@ -138,6 +144,13 @@ export const navigation: NavRegistrierung = {
       id: 'ideen', recht: ['idee:create', 'idee:read'],
       suchen: async (q, signal) => (await sucheIdeen(q, signal)).map(i => ({
         id: `idee:${i.id}`, label: `${i.nummer} ${i.titel}`, detail: ideeTexte.bereich, icon: 'doc', pfad: `/portfolio/ideen/${i.nummer}`,
+      })),
+    },
+    // Personen nach Name oder E-Mail (I-N4): nur für die Administration (members:admin), Treffer in Verwalten › Mitglieder
+    {
+      id: 'personen', recht: 'members:admin',
+      suchen: async (q, signal) => (await suchePersonen(q, signal)).map(p => ({
+        id: `person:${p.id}`, label: p.name || p.email || p.id, detail: [p.email, zugangTexte.palette.mitglieder].filter(Boolean).join(' · '), icon: 'user', pfad: '/verwalten/mitglieder',
       })),
     },
     {

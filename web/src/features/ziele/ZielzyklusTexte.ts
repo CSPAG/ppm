@@ -61,6 +61,7 @@ export const TZZ = {
   ohneVerantwortlich: 'noch niemand',
   hauptaktivitaetEntfernen: (text: string) => `Hauptaktivität «${text}» entfernen`,
   hauptaktivitaetEntfernt: 'Hauptaktivität entfernt.',
+  rueckgaengig: 'Rückgängig',
   projekte: 'Projekte',
   keineProjekte: 'Noch kein Projekt zugeordnet.',
   projektZuordnen: 'Projekt zuordnen',
@@ -78,4 +79,12 @@ export const TZZ = {
   abbrechen: 'Abbrechen',
   zurFreigabeVorlegen: 'Zur Freigabe vorlegen',
   freigabeErfassen: 'Freigabe erfassen',
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», GL)
+  kopfkarte: {
+    titel: (jahr: number) => `Jahresziele ${jahr}`,
+    mitMetrik: (m: number, n: number) => `${m} von ${n} mit Metrik`,
+    vorlageBis: (d: string) => `Vorlage an den VR bis ${d}`,
+    nichtGestartet: 'Der Zielzyklus ist noch nicht gestartet.',
+    zielerreichung: (quartal: string, m: number, n: number) => `Zielerreichung ${quartal}: ${m} von ${n} nachgeführt`,
+  },
 };

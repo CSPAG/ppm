@@ -1,7 +1,7 @@
 /**
  * Navigation nach Arbeitsräumen (docs/ux/informationsarchitektur.md «Navigation», I-N2 bis I-N4) in hell, dunkel und
  * 360 px: Arbeitsräume nach Recht, nur mit Tastatur bedienbar, axe ohne Befund, kein Überlauf; auf dem Telefon Leiste
- * unten mit «Mehr»; Befehlspalette mit Aktion nach Recht.
+ * unten mit «Mehr»; Befehlspalette mit Aktion nach Recht; Kürzel «/» und «?» (interaktion.md Abschnitt 11).
  */
 import { expect, test, type Page } from '@playwright/test';
 import { ANNA, BRUNO, expectAccessible, expectNoOverflow, login, tabTo } from './support.ts';
@@ -89,4 +89,21 @@ test('Befehlspalette: Aktion nach Recht mit der Tastatur', async ({ page }) => {
   await expect(palette.getByRole('option', { name: 'Handlungsfeld anlegen' })).toBeVisible();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/[?&]o=neu/);
+});
+
+test('Kürzel: «/» setzt den Fokus in die Suche der Liste, «?» zeigt die Übersicht (interaktion.md §11)', async ({ page }) => {
+  await login(page, ANNA, '/projekte');
+  await expect(page.getByRole('heading', { name: 'Projekte', level: 1 })).toBeVisible();
+  await page.getByRole('heading', { name: 'Projekte', level: 1 }).click();
+  await page.keyboard.press('/');
+  await expect(page.getByRole('searchbox', { name: 'Projekte durchsuchen' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await page.getByRole('heading', { name: 'Projekte', level: 1 }).click();
+  await page.keyboard.press('?');
+  const d = page.getByRole('dialog', { name: 'Tastaturkürzel' });
+  await expect(d.getByRole('table', { name: 'Überall' })).toBeVisible();
+  await expectAccessible(page);
+  await expectNoOverflow(page);
+  await page.keyboard.press('Escape');
+  await expect(d).toHaveCount(0);
 });

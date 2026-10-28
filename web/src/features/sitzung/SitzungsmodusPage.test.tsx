@@ -244,8 +244,35 @@ describe('Entscheide und Auflagen', () => {
     expect(api.calls.find(c => c.url.includes('/v1/entscheide'))!.url).toContain('auflagen=offen');
     await expectNoAxe(container.ownerDocument.body);
     await userEvent.click(within(drawer).getByRole('button', { name: TM.erfuellenName('Risikoplan nachreichen') }));
+    // nicht umkehrbar: erst die Rückfrage mit Wirkung (I-R1 Stufe 2); Abbrechen meldet nichts
+    const frage = await screen.findByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') });
+    expect(within(frage).getByText(TM.erfuellenWirkung)).toBeInTheDocument();
+    await expectNoAxe(container.ownerDocument.body);
+    await userEvent.click(within(frage).getByRole('button', { name: 'Abbrechen' }));
+    expect(api.calls.some(c => c.method === 'POST')).toBe(false);
+    await userEvent.click(within(drawer).getByRole('button', { name: TM.erfuellenName('Risikoplan nachreichen') }));
+    await userEvent.click(within(await screen.findByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') })).getByRole('button', { name: TM.erfuellen }));
     await waitFor(() => expect(api.calls.some(c => c.method === 'POST')).toBe(true));
     expect(api.calls.find(c => c.method === 'POST')!.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('Erledigt melden: solange die Meldung läuft, schliessen weder Abbrechen noch Escape den Dialog', async () => {
+    let fertig: (r: Response) => void = () => {};
+    stub({
+      'GET /v1/gremien': () => json({ items: [], nextCursor: null }),
+      'GET /v1/entscheide': () => json({ items: [eintrag], nextCursor: null }),
+      [`POST /v1/auflagen/${A1}/erfuellen`]: () => new Promise<Response>(r => { fertig = r; }),
+    });
+    renderWithIam(<EntscheidePage search={{ auflage: A1 }} setSearch={() => {}} />, UE);
+    const drawer = await screen.findByRole('dialog', { name: '2026-014 Gate P2–P3 Neues KIS' });
+    await userEvent.click(within(drawer).getByRole('button', { name: TM.erfuellenName('Risikoplan nachreichen') }));
+    const frage = await screen.findByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') });
+    await userEvent.click(within(frage).getByRole('button', { name: TM.erfuellen }));
+    expect(within(frage).getByRole('button', { name: 'Abbrechen' })).toBeDisabled();
+    await userEvent.keyboard('{Escape}');
+    expect(screen.getByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') })).toBeInTheDocument();
+    fertig(json({ ...(eintrag.auflagen as object[])[0], stand: 'erfuellt', can: { erfuellen: false } }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') })).not.toBeInTheDocument());
   });
 
   it('Adresse: Filter und Schublade, Unbekanntes fällt weg (I-N5)', () => {

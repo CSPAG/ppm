@@ -55,4 +55,11 @@ export const Z = {
     offenHint: 'Besetze die Rollen dort neu, wo sie vergeben werden (z. B. in der Projektorganisation). Erledige danach die Aufgabe im Eingang.',
     zumEingang: 'Zum Eingang',
   },
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», ADM): nur mit offenen Neubesetzungen
+  palette: { mitglieder: 'Mitglieder' },
+  kopfkarte: {
+    titel: 'Zugänge',
+    offen: (n: number) => (n === 1 ? '1 Person mit Rollen zum Neubesetzen' : `${n} Personen mit Rollen zum Neubesetzen`),
+    person: (name: string) => `Rollen von ${name} neu besetzen`,
+  },
 } as const;

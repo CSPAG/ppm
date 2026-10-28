@@ -324,7 +324,7 @@ Jahresbedarf geht über «Budgetprozess · Jahresbedarf» hinaus (A-17). Beträg
 
 | Route | Recht | Hinweis |
 |---|---|---|
-| `GET /v1/finanzen?portfolio=&alle=` | `finanzen:read` (Organisation, Portfolio oder Projekt; nur Projekte mit sichtbaren Beträgen) | je Projekt Budget, Prognose (je Phase, CAPEX/OPEX), Ist (`null` = noch nicht verfügbar), Abweichung mit Toleranz «Kosten» des Phasenmodells (A-10), Verlauf je Monat, letzte Begründung; Summe; mit `finanzen:write` Kostenträger ohne Projekt (UC-010 A1) |
+| `GET /v1/finanzen?portfolio=&alle=` | `finanzen:read` (Organisation, Portfolio oder Projekt; nur Projekte mit sichtbaren Beträgen) | je Projekt Budget, Prognose (je Phase, CAPEX/OPEX), Ist (`null` = noch nicht verfügbar), Abweichung mit gültige Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell), Verlauf je Monat, letzte Begründung; Summe; mit `finanzen:write` Kostenträger ohne Projekt (UC-010 A1) |
 | `GET /v1/finanzen/abweichungen?portfolio=` | wie oben | nur Projekte mit Abweichung, wesentliche zuerst |
 | `PUT /v1/projekte/{id}/kostentraeger` | `finanzen:write` | Kostenträger im ERP zuordnen (A-16, A1.1), `null` hebt auf; schon vergeben → 409 |
 | `GET /v1/projekte/{id}/abweichungsbegruendungen` | `finanzen:read` am Projekt | Begründungen je Periode, neueste zuerst |
@@ -351,7 +351,7 @@ fehlgeschlagener Lauf (ausser Testlauf) öffnet die Aufgabe «Schnittstelle prü
 | `GET /v1/schnittstellen/{id}`, `PATCH …` | `schnittstelle:admin` | Rhythmus, Adresse, `aktiv` (deaktivieren statt löschen), `If-Match`; neue Adresse oder Aktivieren mit Testlauf |
 | `GET /v1/schnittstellen/{id}/laeufe` | `schnittstelle:admin` | je Lauf Art, Stand, Start, Ende, Umfang, Fehler; neueste zuerst, Cursor |
 | `POST /v1/schnittstellen/{id}/starten` | `schnittstelle:admin` | Lauf von Hand, auch erneut nach Fehler (A1.1), wartet auf das Ergebnis; nicht aktiv oder läuft schon 409 |
-| `GET /v1/aenderungsprotokoll?objekt=&objektId=&von=&bis=` | `audit:read` | Einträge des Audits mit Person, Zeitpunkt, Aktion, `aenderungen` (Feld, `vorher`, `nachher`; aus `before`/`after`); neueste zuerst, Cursor; `von`/`bis` Kalendertage |
+| `GET /v1/aenderungsprotokoll?objekt=&objektId=&von=&bis=&format=` | `audit:read` | Einträge des Audits mit Person, Zeitpunkt, Aktion, `aenderungen` (Feld, `vorher`, `nachher`; aus `before`/`after`); neueste zuerst, Cursor; `von`/`bis` Kalendertage; `format=csv`: Export aller Einträge zum Filter (eine Zeile je Feld, höchstens 10 000 Einträge, sonst 422) |
 | `GET /v1/aenderungsprotokoll/objekte` | `audit:read` | Objekttypen mit Einträgen (Filter) |
 
 ## Webhooks und Ereignisse

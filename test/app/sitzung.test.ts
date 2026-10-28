@@ -298,6 +298,28 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.equal((await call('GET', '/v1/gremien/unbekannt/sitzungen', ue)).statusCode, 404);
   });
 
+  test('Suche für die Befehlspalette (I-N4): Gremium, Datum, Traktandentitel; nach Recht und Lesesicht', async () => {
+    const suche = async (q: string, h: Record<string, string>) => (await ok('GET', `/v1/sitzungen?q=${encodeURIComponent(q)}`, h)).items as { id: string; datum: string; gremium: { kuerzel: string }; traktandum: string | null }[];
+    const [j, m, d] = termin1.split('-');
+    const s1 = (await ok('GET', `/v1/gremien/prat/sitzungen/${termin1}`, ue)).id as string;
+    // Gremium (Kürzel, Name), kommende zuerst
+    const g = await suche('PRAT', ue);
+    assert.equal(g[0]!.id, s1);
+    assert.ok(g.every(x => x.gremium.kuerzel === 'prat' && x.traktandum === null));
+    assert.ok((await suche('programmaus', ue)).some(x => x.id === s1));
+    // Datum: ISO, Monat, TT.MM. und TT.MM.JJJJ
+    for (const q of [termin1, `${j}-${m}`, `${Number(d)}.${Number(m)}.`, `${d}.${m}.${j}`]) assert.ok((await suche(q, ue)).some(x => x.id === s1), q);
+    assert.deepEqual(await suche('31.02.', ue), []);
+    // Titel eines Traktandums (versendet: auch Mitglieder)
+    const t = await suche('ohne Projekt', ue);
+    assert.deepEqual(t.map(x => x.traktandum), ['Eskalation ohne Projekt']);
+    assert.deepEqual((await suche('ohne Projekt', mitglied)).map(x => x.id), [t[0]!.id]);
+    // Platzhalter sind Text, kein Muster; ohne Recht 403
+    assert.deepEqual(await suche('%_', ue), []);
+    assert.equal((await call('GET', '/v1/sitzungen?q=prat', nobody)).statusCode, 403);
+    assert.equal((await call('GET', '/v1/sitzungen', ue)).statusCode, 422);
+  });
+
   test('Festes Traktandum 1 «Bericht der Programmleitung»: der Vorschlag füllt den Platzhalter, einmal (K3 Schritt 4)', async () => {
     // nächste Sitzung in Vorbereitung mit Platzhalter: die zum zweiten Termin
     let s = await ok('GET', `/v1/gremien/prat/sitzungen/${termin2}`, ue);

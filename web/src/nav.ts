@@ -10,7 +10,7 @@ import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
 import { zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
-import { naechsteSitzungPfad, sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
+import { naechsteSitzungPfad, sitzungPfad, sitzungsmodusTexte, sitzungTexte, sucheSitzungen } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
@@ -24,7 +24,7 @@ import { kontoTexte } from './features/konto/index.ts';
 import { schnittstellenTexte as TX } from './features/schnittstellen/index.ts';
 import { quartalsreportingTexte, roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
-import { T } from './ui/index.ts';
+import { fmtDatum, T } from './ui/index.ts';
 
 export const navigation: NavRegistrierung = {
   bereiche: [
@@ -138,6 +138,14 @@ export const navigation: NavRegistrierung = {
       id: 'ideen', recht: ['idee:create', 'idee:read'],
       suchen: async (q, signal) => (await sucheIdeen(q, signal)).map(i => ({
         id: `idee:${i.id}`, label: `${i.nummer} ${i.titel}`, detail: ideeTexte.bereich, icon: 'doc', pfad: `/portfolio/ideen/${i.nummer}`,
+      })),
+    },
+    // Sitzungen nach Gremium, Datum oder Traktandentitel (I-N4); Sitzungen und Traktanden nach Lesesicht
+    {
+      id: 'sitzungen', recht: 'sitzung:read',
+      suchen: async (q, signal) => (await sucheSitzungen(q, signal)).map(x => ({
+        id: `sitzung:${x.id}`, label: `${x.gremium.kuerzel.toUpperCase()} · ${fmtDatum(x.datum)}`, detail: x.traktandum ?? `${x.gremium.name} · ${sitzungTexte.bereich}`,
+        icon: 'calendar', pfad: sitzungPfad(x.gremium.kuerzel, x.datum),
       })),
     },
     {

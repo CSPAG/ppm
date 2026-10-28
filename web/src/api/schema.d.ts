@@ -28477,6 +28477,104 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sitzungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sitzungen suchen
+         * @description Für die Befehlspalette (I-N4): Sitzungen aller Gremien, die die Person sieht, nach Gremium, Datum oder Titel eines sichtbaren Traktandums; kommende zuerst (aufsteigend), danach vergangene (neueste zuerst).
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Gremium (Kürzel oder Name, Teilstring), Datum (JJJJ-MM-TT, JJJJ-MM, TT.MM. oder TT.MM.JJJJ) oder Titel eines Traktandums. */
+                    q: string;
+                    /** @description Höchstens so viele Treffer (Standard 5). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SitzungSuche"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/berichte": {
         parameters: {
             query?: never;
@@ -47903,6 +48001,26 @@ export interface components {
                 /** Format: uuid */
                 personId: string;
                 name: string | null;
+            }[];
+        };
+        SitzungSuche: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                gremium: {
+                    /** Format: uuid */
+                    id: string;
+                    kuerzel: string;
+                    name: string;
+                };
+                /**
+                 * @description Datum (JJJJ-MM-TT).
+                 * @example 2026-11-12
+                 */
+                datum: string;
+                stand: string;
+                /** @description Titel des gefundenen Traktandums, wenn die Suche über den Titel traf. */
+                traktandum: string | null;
             }[];
         };
         /** @description Beurteilung der Abweichung je Dimension. */

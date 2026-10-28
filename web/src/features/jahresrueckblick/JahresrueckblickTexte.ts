@@ -72,7 +72,8 @@ export const TJ = {
   rueckmeldung: (t: string) => `Der PRAT verlangt Anpassungen: ${t}`,
   nurLesen: 'Du siehst den Jahresrückblick lesend; zusammenstellen kann die Unternehmensentwicklung.',
   konflikt: 'Der Jahresrückblick wurde inzwischen geändert. Er ist neu geladen; prüfe deine Eingaben.',
-  keinRecht: 'Den Jahresrückblick sehen Personen, die die Ziele der Organisation lesen, etwa Geschäftsleitung und Unternehmensentwicklung. Traktandiert erscheint er in der Sitzung des PRAT.',
+  nochNichtTraktandiert: (j: number) => `Der Jahresrückblick ${j} ist noch nicht traktandiert. Du siehst ihn, sobald die Unternehmensentwicklung ihn dem PRAT vorlegt.`,
+  keinRecht: 'Den Jahresrückblick sehen Personen, die die Ziele der Organisation lesen, etwa Geschäftsleitung und Unternehmensentwicklung, und ab der Traktandierung die Mitglieder des PRAT.',
 
   dokument: 'Als Dokument herunterladen', pdf: 'PDF', word: 'Word',
   personendaten: 'Das Dokument kann Personendaten enthalten (Lessons Learned). Nur intern weitergeben.',

@@ -148,6 +148,27 @@ describe('Jahresrückblick', () => {
     await expectNoAxe(container);
   });
 
+  it('Mitglied des PRAT (A-67): vor dem Traktandieren Erklärung statt Daten', async () => {
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
+      const req = new Request(input, init);
+      if (new URL(req.url).pathname === '/v1/jahresrueckblicke/2026') return json({ type: 'about:blank', title: 'Nicht gefunden', status: 404 }, 404, { 'content-type': 'application/problem+json' });
+      return mockIamApi({}, { catalog: CATALOG_PPM as unknown as AuthzCatalog }).fetch(req);
+    });
+    renderWithIam(<JahresrueckblickPage jahr={2026} jahrWechseln={() => {}} />, { roles: [], permissions: ['tenant:read'], somewhere: ['sitzung:read', 'ziel:read'] });
+    expect(await screen.findByText(TJ.nochNichtTraktandiert(2026))).toBeInTheDocument();
+  });
+
+  it('Gremium eines anderen Portfolios (403): Erklärung statt Wartezustand', async () => {
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
+      const req = new Request(input, init);
+      if (new URL(req.url).pathname === '/v1/jahresrueckblicke/2026') return json({ type: 'about:blank', title: 'Kein Recht', status: 403 }, 403, { 'content-type': 'application/problem+json' });
+      return mockIamApi({}, { catalog: CATALOG_PPM as unknown as AuthzCatalog }).fetch(req);
+    });
+    renderWithIam(<JahresrueckblickPage jahr={2026} jahrWechseln={() => {}} />, { roles: [], permissions: ['tenant:read'], somewhere: ['sitzung:read', 'ziel:read'] });
+    expect(await screen.findByText(TJ.keinRecht)).toBeInTheDocument();
+    expect(screen.queryByText(TJ.nochNichtTraktandiert(2026))).not.toBeInTheDocument();
+  });
+
   it('ohne Recht: Erklärung statt Daten', () => {
     server();
     renderWithIam(<JahresrueckblickPage jahr={2026} jahrWechseln={() => {}} />, { roles: [], permissions: ['tenant:read'] });

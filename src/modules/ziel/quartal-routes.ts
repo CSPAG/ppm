@@ -31,6 +31,15 @@ const auftragOut = (a: store.AuftragRow): VrAuftragOut => ({ id: a.id, text: a.t
 const snap = (b: store.BerichtRow) => ({ id: b.id, quartal: b.quartal, stand: b.stand, version: b.version });
 const kommentareVoll = (k: Partial<KommentareOut>): KommentareOut => Object.fromEntries(ABSCHNITTE.map(a => [a, k[a] ?? ''])) as KommentareOut;
 
+/**
+ * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Mitglieder des
+ * PRAT sehen den Bericht ab «traktandiert», welchen Stand und welches Gremium, entscheidet die Lesesicht (331).
+ */
+async function lesend(req: FastifyRequest): Promise<void> {
+  if (await req.can('ziel:read') || await req.can(SCHREIBEN)) return;
+  await req.needSomewhere('sitzung:read');
+}
+
 async function berichtOut(req: FastifyRequest, tx: Tx, b: store.BerichtRow): Promise<QuartalsberichtOut> {
   const schreiben = await req.can(SCHREIBEN);
   return {
@@ -67,16 +76,16 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
   app.get('/v1/quartalsberichte', {
     schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreportings', description: 'Erzeugte Quartalsreportings mit Stand, neuestes zuerst.', response: { 200: Type.Ref('QuartalsberichtListe') } },
   }, async req => {
-    await req.need('ziel:read');
+    await lesend(req);
     const rows = await req.tx(tx => store.liste(tx));
     return { items: rows.map(r => ({ id: r.id, quartal: r.quartal, stand: r.stand, erzeugtAt: r.erzeugt_at.toISOString(), verabschiedetAt: r.verabschiedet_at?.toISOString() ?? null })) };
   });
 
   app.get('/v1/quartalsberichte/:quartal', {
-    schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreporting eines Quartals', description: 'Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist.', params: QuartalsberichtParams, response: { 200: Type.Ref('Quartalsbericht') } },
+    schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreporting eines Quartals', description: 'Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404.', params: QuartalsberichtParams, response: { 200: Type.Ref('Quartalsbericht') } },
   }, async (req, reply) => {
     const { quartal } = req.params as { quartal: string };
-    await req.need('ziel:read');
+    await lesend(req);
     return req.tx(async tx => {
       if (!(await store.bericht(tx, quartal))) throw notFound('Quartalsreporting');
       return antwort(req, reply, tx, quartal);
@@ -156,7 +165,7 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
   }, async (req, reply) => {
     const { quartal } = req.params as { quartal: string };
     const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
-    await req.need('ziel:read');
+    await lesend(req);
     const who = actorOf(req);
     const b = await req.tx(async tx => {
       const b = await store.bericht(tx, quartal);

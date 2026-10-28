@@ -8,7 +8,7 @@
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full, skipDb } from './harness.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 import { letztePeriode, letztesQuartal, zeitraum } from '../../src/modules/ziel/quartal.ts';
@@ -27,7 +27,7 @@ function mittwochIn(n: number): string {
 describe('Quartalsreporting an den VR', { skip }, () => {
   let api: TestApi;
   let tenantId = '';
-  let ue: H, gl: H, leser: H, verantwortlich: H;
+  let ue: H, gl: H, leser: H, verantwortlich: H, mitglied: H, fremd: H;
   let verantwortlichId = '', portfolioA = '', prat = '', zielId = '';
   const quartal = letztesQuartal(heute());
   const laufend = `${heute().slice(0, 4)}-Q${Math.floor((Number(heute().slice(5, 7)) - 1) / 3) + 1}`;
@@ -75,6 +75,15 @@ describe('Quartalsreporting an den VR', { skip }, () => {
     portfolioA = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'transformation', name: 'Transformation' }, 201)).json().id;
     prat = (await ok('POST', '/v1/gremien', ue, { portfolioId: portfolioA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).json().id;
     await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum: termin }, 201);
+    // A-67: Mitglied des PRAT (Gremium am Portfolio der Kategorie A) und eines anderen Gremiums
+    // Kategorie C: ohne Berichtspflicht, ändert den Entwurf nicht
+    const portfolioB = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'C', schluessel: 'direktion', name: 'Direktion' }, 201)).json().id;
+    const m = await login(api, 'demo', 'u-prat', null);
+    await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolioA });
+    mitglied = { authorization: m.authorization };
+    const f = await login(api, 'demo', 'u-fremd', null);
+    await grant(api, tenantId, `user:${f.principalId}`, 'gremium', { type: 'portfolio', id: portfolioB });
+    fremd = { authorization: f.authorization };
 
     // Ziel mit Stand im Quartal
     const feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
@@ -139,6 +148,9 @@ describe('Quartalsreporting an den VR', { skip }, () => {
     const g = await ok('GET', `/v1/quartalsberichte/${quartal}`, gl);
     assert.deepEqual(g.json().can, { erzeugen: false, bearbeiten: false, traktandieren: false, rueckmeldung: false });
     assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}`, verantwortlich)).statusCode, 403);
+    // A-67: in Arbeit sieht das Gremium den Bericht nicht
+    assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}`, mitglied)).statusCode, 404);
+    assert.deepEqual((await ok('GET', '/v1/quartalsberichte', mitglied)).json().items, []);
     assert.ok((await ok('GET', '/v1/quartalsberichte', gl)).json().items.some((x: { quartal: string }) => x.quartal === quartal));
   });
 
@@ -166,6 +178,13 @@ describe('Quartalsreporting an den VR', { skip }, () => {
     let r = await ok('GET', `/v1/quartalsberichte/${quartal}`, ue);
     r = await ok('POST', `/v1/quartalsberichte/${quartal}/traktandieren`, mit(ue, r.headers.etag as string));
     assert.equal(r.json().stand, 'traktandiert');
+    // A-67: ab «traktandiert» liest das Mitglied des PRAT den Bericht ohne Handlungen; ein anderes Gremium nie
+    const g = (await ok('GET', `/v1/quartalsberichte/${quartal}`, mitglied)).json();
+    assert.deepEqual([g.stand, g.can], ['traktandiert', { erzeugen: false, bearbeiten: false, traktandieren: false, rueckmeldung: false }]);
+    assert.equal((await ok('GET', '/v1/quartalsberichte', mitglied)).json().items.length, 1);
+    assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}/dokument`, mitglied)).statusCode, 200);
+    assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}`, fremd)).statusCode, 404);
+    assert.deepEqual((await ok('GET', '/v1/quartalsberichte', fremd)).json().items, []);
     assert.equal((await call('PATCH', `/v1/quartalsberichte/${quartal}`, mit(ue, r.headers.etag as string), { kommentare: { risiken: 'x' } })).statusCode, 409);
     assert.equal((await aufgaben('quartalsreporting.erstellen')).find(x => x.bezug_id === quartal)!.stand, 'erledigt');
 
@@ -203,7 +222,7 @@ describe('Quartalsreporting an den VR', { skip }, () => {
     const docx = await ok('GET', `/v1/quartalsberichte/${quartal}/dokument?format=docx`, ue);
     assert.match(String(docx.headers['content-disposition']), new RegExp(`Quartalsreporting_${quartal}\\.docx`));
     const audit = await sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.audit_log WHERE action = 'quartalsbericht.exported'")).rows[0]!.n);
-    assert.equal(audit, 2);
+    assert.equal(audit, 3, 'mit dem Export des Gremiums (A-67)');
   });
 
   test('Rückmeldung und Aufträge des VR: Aufgaben im Eingang der Verantwortlichen (Abnahme K6)', async () => {

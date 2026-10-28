@@ -10,9 +10,10 @@ export const matrix: Matrix = {
     },
   },
   policies: [
-    // Muster ORG: lesen mit ziel:read (oder quartalsbericht:write), erfassen mit quartalsbericht:write
+    // Muster ORG: lesen mit ziel:read (oder quartalsbericht:write), ab «traktandiert» auch das Gremium des PRAT (A-67, 381);
+    // erfassen mit quartalsbericht:write
     "ppm.jahresrueckblick.jahresrueckblick_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('quartalsbericht:write'::text)",
-    "ppm.jahresrueckblick.jahresrueckblick_read RESTRICTIVE SELECT ppm_app USING (app.has_permission('ziel:read'::text) OR app.has_permission('quartalsbericht:write'::text)) CHECK -",
+    "ppm.jahresrueckblick.jahresrueckblick_read RESTRICTIVE SELECT ppm_app USING (app.has_permission('ziel:read'::text) OR app.has_permission('quartalsbericht:write'::text) OR ((stand <> 'in_arbeit'::text) AND (EXISTS ( SELECT 1 FROM ppm.portfolio p WHERE ((p.kategorie = 'A'::text) AND app.has_permission('sitzung:read'::text, 'portfolio'::text, p.id)))))) CHECK -",
     "ppm.jahresrueckblick.jahresrueckblick_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('quartalsbericht:write'::text) CHECK app.has_permission('quartalsbericht:write'::text)",
   ],
   tags: ['Jahresrückblick'],

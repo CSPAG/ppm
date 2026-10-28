@@ -7,6 +7,7 @@ import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
+import { zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
@@ -15,6 +16,7 @@ import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/
 import { dashboardTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
+import { vorlagenTexte } from './features/vorlagen/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
 import { schnittstellenTexte as TX } from './features/schnittstellen/index.ts';
 import { roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
@@ -57,6 +59,8 @@ export const navigation: NavRegistrierung = {
     // Recht aus `useIamNav()` dazu (UC-016)
     { raum: 'administration', pfad: '/administration/organisation', label: TS.bereich.organisation, recht: 'stammdaten:write' },
     { raum: 'administration', pfad: '/administration/codetabellen', label: TS.bereich.codetabellen, recht: 'stammdaten:write' },
+    // Vorlagen (UI-48, AM.03.01, AP-E7-7): pflegt die UE (vorlage:write)
+    { raum: 'administration', pfad: '/administration/vorlagen', label: vorlagenTexte.bereich, recht: 'vorlage:write' },
     // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03) nur für wer es pflegt (IA: UE, PMO, ADM); lesen dürfen
     // alle Rollen (fachmodell.md 3.3), die Administration erscheint dafür aber nicht. Die Verwalten-Seiten des Baukastens
     // kommen nach Recht aus `useIamNav()` dazu (UC-016)
@@ -66,6 +70,8 @@ export const navigation: NavRegistrierung = {
     // Schnittstellen (UI-49, AM.03.02) nur ADM (schnittstelle:admin); Änderungsprotokoll (UI-50, AM.03.03) ADM und UE (audit:read)
     { raum: 'administration', pfad: '/administration/schnittstellen', label: TX.bereich.schnittstellen, recht: 'schnittstelle:admin' },
     { raum: 'administration', pfad: '/administration/aenderungsprotokoll', label: TX.bereich.protokoll, recht: 'audit:read' },
+    // Zugänge entziehen mit Neubesetzung (UC-016 A1): wer Mitglieder verwaltet; die Neubesetzung gehört dazu
+    { raum: 'administration', pfad: '/administration/zugaenge', label: zugangTexte.bereich, recht: 'members:admin', muster: /^\/administration\/(zugaenge|neubesetzungen)(\/|$)/ },
   ],
   aktionen: [
     // Befehlspalette «Projektidee einreichen» für alle, die Ideen erfassen (K4 Einstieg)
@@ -75,6 +81,7 @@ export const navigation: NavRegistrierung = {
     // Befehlspalette «Stellvertretung erfassen» (IA «Navigation», UC-016 Schritt 4)
     { id: 'stellvertretung-erfassen', label: kontoTexte.erfassen, icon: 'users', pfad: '/konto/stellvertretung?o=neu', recht: 'tenant:read' },
     { id: 'schnittstelle-einrichten', label: TX.aktion.einrichten, icon: 'plug', pfad: '/administration/schnittstellen?o=neu', recht: 'schnittstelle:admin' },
+    { id: 'zugang-entziehen', label: zugangTexte.aktionEntziehen, icon: 'user', pfad: '/administration/zugaenge?o=entziehen', recht: 'members:admin' },
     { id: 'portfolio-anlegen', label: portfoliosTexte.aktionAnlegen, icon: 'plus', pfad: '/administration/portfolios?o=neu', recht: 'portfolio:admin' },
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
     { id: 'ziel-anlegen', label: zieleTexte.aktionAnlegen, icon: 'plus', pfad: '/ziele/strategische-ziele?o=neu', recht: 'ziel:write' },

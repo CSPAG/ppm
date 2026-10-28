@@ -118,7 +118,9 @@ export function ProtokollPage({ kuerzel, datum, gehe }: { kuerzel: string; datum
   return (
     <section aria-labelledby={titelId} className="smo-seite smo-protokoll">
       {kopf}
-      <div className="body">
+      {/* scrollbar auch ohne Eingabefelder (nach dem Versand) mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body" tabIndex={0} role="region" aria-label={TM.protokoll}>
         {p.stand === 'versendet' ? <div className="sz-banner"><Hinweis stufe="hinweis">{TM.protokollVersendetBanner(fmtZeitpunkt(p.versendetAt!))} {TM.protokollFest}</Hinweis></div> : null}
         {ueber ? <div className="sz-banner"><Hinweis stufe="warnung">{TM.protokollFristVerletzt(fmtDatum(p.frist.bis!))}</Hinweis></div> : null}
         <div className="smo-prot">

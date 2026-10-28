@@ -80,7 +80,8 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
     if (!s) return;
     const ids = s.traktanden.map(x => x.id);
     const i = ids.indexOf(t.id), j = i + richtung;
-    if (j < 0 || j >= ids.length) return;
+    // das feste Traktandum 1 bleibt an Position 1 (K3 Schritt 4)
+    if (j < 0 || j >= ids.length || t.fest || s.traktanden[j]?.fest) return;
     [ids[i], ids[j]] = [ids[j]!, ids[i]!];
     m.ordnen.mutate({ s, reihenfolge: ids }, {
       onSuccess: () => { requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-griff="${j + 1}"]`)?.focus()); },

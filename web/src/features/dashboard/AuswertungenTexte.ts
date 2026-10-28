@@ -1,5 +1,5 @@
 /**
- * Texte der Ad-hoc-Auswertungen (UI-30; Namensraum je Datei, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte der Ad-hoc-Auswertungen (UI-30; Namensraum je Datei, docs/fachmodell.md 7.2): Anrede «Du» (UX-OF-1), Schweizer
  * Rechtschreibung, Begriffe aus der Spezifikation (Kennzahl, Gruppierung, Einzelwerte, Export).
  */
 export const TA = {

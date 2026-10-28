@@ -11,7 +11,7 @@ import {
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import {
-  aufnehmen, bezugVon, einplanen, entfernen, pruefeVorbereitung, sitzungAnlegen, unterlagenstand, verschieben, versandfrist,
+  aufnehmen, bezugVon, einplanen, entfernen, istFest, pruefeReihenfolge, pruefeVorbereitung, sitzungAnlegen, unterlagenstand, verschieben, versandfrist,
   versandvorschau, versenden, zeitfenster,
 } from './aktionen.ts';
 import { ARTEN, artLabel, type Art } from './arten.ts';
@@ -39,7 +39,7 @@ async function traktandumOut(tx: Tx, t: store.TraktandumRow, o: { stand: Awaited
     id: t.id, sitzungId: t.sitzung_id, art: t.art, artLabel: artLabel(t.art), bezug: { typ: t.bezug_typ, id: t.bezug_id },
     projekt: t.projekt_id && t.projekt_nummer ? { id: t.projekt_id, nummer: t.projekt_nummer, name: t.projekt_name!, phase: t.projekt_phase! } : null,
     titel: t.titel, antrag: t.antrag, position: t.position, dauerMin: t.dauer_min, zeit: o.zeit?.get(t.id) ?? null, stand: t.stand,
-    viaSns: t.via_sns, vertraulich: t.vertraulich, verschobenVon: t.verschoben_von_datum,
+    viaSns: t.via_sns, vertraulich: t.vertraulich, fest: istFest(t), verschobenVon: t.verschoben_von_datum,
     unterlagen: {
       stand: u.stand,
       liste: u.unterlagen.map(x => ({ art: x.art, titel: x.titel, bereit: x.bereit, ...(x.hinweis ? { hinweis: x.hinweis } : {}), ...(x.qualityCheck ? { qualityCheck: x.qualityCheck } : {}) })),
@@ -283,10 +283,12 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       await req.need('sitzung:write', ort(s.portfolio_id));
       if (s.version !== version) throw preconditionFailed(s.version);
       pruefeVorbereitung(s);
-      const ist = (await store.traktanden(tx, s.id)).filter(t => t.stand === 'traktandiert').map(t => t.id);
+      const ts = (await store.traktanden(tx, s.id)).filter(t => t.stand === 'traktandiert');
+      const ist = ts.map(t => t.id);
       if (ist.length !== reihenfolge.length || new Set(reihenfolge).size !== reihenfolge.length || !reihenfolge.every(x => ist.includes(x))) {
         throw invalid('Die Reihenfolge muss jedes Traktandum der Sitzung genau einmal enthalten.', [{ path: '/reihenfolge', message: 'nicht vollständig' }]);
       }
+      pruefeReihenfolge(ts, reihenfolge);
       await store.ordnen(tx, s.id, reihenfolge);
       if ((await store.touchSitzung(tx, s.id, version)) === null) throw preconditionFailed(s.version);
       await record(tx, who, { action: 'sitzung.reordered', resourceType: 'sitzung', resourceId: s.id, data: { before: ist, after: reihenfolge }, event: { id: s.id, reihenfolge } });

@@ -1,0 +1,29 @@
+{
+  "de": {
+    "themeAccent": "#0D6B5B",
+    "themeAccentDark": "#4CC2A5",
+    "themeAccentText": "#FFFFFF",
+    "themeAccentTextDark": "#06221B",
+    "themeClaim": "Strategieumsetzung und Projektportfoliomanagement",
+    "themeClaimSub": "Zielmanagement, Demand Management, Portfolioplanung und -steuerung, Portfoliocontrolling, Ressourcen.",
+    "themeMailFooter": "Diese E-Mail wurde automatisch von {0} versendet. Antworten darauf werden nicht gelesen.",
+    "themeSub.login-username": "Mit Ihrer E-Mail.",
+    "themeSub.login-password": "Jetzt Ihr Passwort.",
+    "themeSub.login-reset-password": "Wir senden Ihnen einen Link.",
+    "themeSub.login-update-password": "Wählen Sie ein neues Passwort.",
+    "themeSub.login-verify-email": "Sehen Sie in Ihrem Postfach nach.",
+    "themeSub.login-otp": "Code aus Ihrer App.",
+    "themeSub.select-authenticator": "Wählen Sie, wie Sie sich anmelden.",
+    "themeSub.logout-confirm": "Sie werden überall abgemeldet.",
+    "themeSub.error": "Bitte versuchen Sie es nochmals."
+  },
+  "en": {
+    "themeAccent": "#0D6B5B",
+    "themeAccentDark": "#4CC2A5",
+    "themeAccentText": "#FFFFFF",
+    "themeAccentTextDark": "#06221B",
+    "themeClaim": "Strategy execution and project portfolio management",
+    "themeClaimSub": "Objectives, demand management, portfolio planning and steering, portfolio controlling, resources.",
+    "themeMailFooter": "This email was sent automatically by {0}. Replies are not read."
+  }
+}

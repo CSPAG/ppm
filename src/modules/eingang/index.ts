@@ -12,6 +12,7 @@ import { aktivierenJob } from './stellvertretung.ts';
 
 export { aufgabe, mitteilung, type AufgabeAuswahl, type AufgabeOeffnen, type Bezug, type Empfaenger, type MitteilungSenden } from './aufgabe.ts';
 export { stellvertretung } from './stellvertretung.ts';
+export { iamHaken as eingangIamHaken } from './neubesetzung.ts';
 
 export const eingangModule = defineModule({
   name: 'eingang',

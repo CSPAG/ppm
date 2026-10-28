@@ -14,7 +14,7 @@ import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch } from './features/priorisierung/index.ts';
-import type { SetAuswertungenSearch, SetDashboardSearch } from './features/dashboard/index.ts';
+import type { SetAuswertungenSearch, SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -22,6 +22,7 @@ import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/i
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
 import type { SetVorlagenSearch } from './features/vorlagen/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
+import type { SetProtokollSearch, SetSchnittstellenSearch } from './features/schnittstellen/index.ts';
 import type { SetZugaengeSearch } from './features/zugang/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetRoadmapSearch, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
 import { kopfkarten } from './kopfkarten.ts';
@@ -42,10 +43,14 @@ const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx'), 'MatrixPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
+const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
+const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
 const AuswertungenPage = seite(() => import('./features/dashboard/AuswertungenPage.tsx'), 'AuswertungenPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
+const SchnittstellenPage = seite(() => import('./features/schnittstellen/SchnittstellenPage.tsx'), 'SchnittstellenPage');
+const AenderungsprotokollPage = seite(() => import('./features/schnittstellen/AenderungsprotokollPage.tsx'), 'AenderungsprotokollPage');
 const SitzungenPage = seite(() => import('./features/sitzung/SitzungenPage.tsx'), 'SitzungenPage');
 const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'SitzungPage');
 const SitzungsmodusPage = seite(() => import('./features/sitzung/SitzungsmodusPage.tsx'), 'SitzungsmodusPage');
@@ -352,6 +357,34 @@ function DashboardRoute() {
   return <DashboardPage search={search} setSearch={setSearch} />;
 }
 
+// Portfolio › Dashboard › Risiken (UI-18; PC.02.02, UC-014 Schritt 2; AP-E2-3)
+const risikenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/dashboard/risiken', validateSearch: searchOf.risiken, component: RisikenRoute,
+});
+
+function RisikenRoute() {
+  const search = risikenRoute.useSearch();
+  const navigate = useNavigate({ from: risikenRoute.fullPath });
+  const setSearch = useCallback<SetRisikenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <RisikenPage search={search} setSearch={setSearch} />;
+}
+
+// Portfolio › Auswertungen › Portfoliobericht (UI-29; PC.04.02, UC-014 Schritt 3, K3 Schritt 4; AP-E2-3)
+const portfolioberichtRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/auswertungen/portfoliobericht', validateSearch: searchOf.portfoliobericht, component: PortfolioberichtRoute,
+});
+
+function PortfolioberichtRoute() {
+  const search = portfolioberichtRoute.useSearch();
+  const navigate = useNavigate({ from: portfolioberichtRoute.fullPath });
+  const setSearch = useCallback<SetPortfolioberichtSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <PortfolioberichtPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Portfolio» › Auswertungen (UI-30; PC.04.03, UC-014 A2; AP-E7-6)
 const auswertungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/auswertungen', validateSearch: searchOf.auswertungen, component: AuswertungenRoute });
 function AuswertungenRoute() {
@@ -441,6 +474,33 @@ function PortfoliosRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <PortfoliosPage search={search} setSearch={setSearch} />;
+}
+
+// Arbeitsraum «Administration» › Schnittstellen (UI-49) und Änderungsprotokoll (UI-50), BC AM.03.02, AM.03.03, AP-E7-3
+const schnittstellenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/schnittstellen', validateSearch: searchOf.schnittstellen, component: SchnittstellenRoute,
+});
+
+function SchnittstellenRoute() {
+  const search = schnittstellenRoute.useSearch();
+  const navigate = useNavigate({ from: schnittstellenRoute.fullPath });
+  const setSearch = useCallback<SetSchnittstellenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SchnittstellenPage search={search} setSearch={setSearch} />;
+}
+
+const aenderungsprotokollRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/aenderungsprotokoll', validateSearch: searchOf.aenderungsprotokoll, component: AenderungsprotokollRoute,
+});
+
+function AenderungsprotokollRoute() {
+  const search = aenderungsprotokollRoute.useSearch();
+  const navigate = useNavigate({ from: aenderungsprotokollRoute.fullPath });
+  const setSearch = useCallback<SetProtokollSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <AenderungsprotokollPage search={search} setSearch={setSearch} />;
 }
 
 // Arbeitsraum «Gremien»: Sitzungen (UI-33, UC-006, K3); Adresse der Sitzung `/gremien/<kuerzel>/sitzungen/<datum>` (I-N5)
@@ -560,6 +620,8 @@ const routeTree = rootRoute.addChildren([
   zielerreichungStartRoute,
   zielerreichungRoute,
   dashboardRoute,
+  risikenRoute,
+  portfolioberichtRoute,
   auswertungenRoute,
   monatsabschlussRoute,
   organisationRoute,
@@ -567,6 +629,8 @@ const routeTree = rootRoute.addChildren([
   vorlagenRoute,
   phasenmodellRoute,
   portfoliosRoute,
+  schnittstellenRoute,
+  aenderungsprotokollRoute,
   zugaengeRoute,
   neubesetzungRoute,
   ressourcenRoute,

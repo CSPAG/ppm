@@ -6,15 +6,16 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, etag, forbidden, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
-import { record } from '../../platform.ts';
-import { FORMATE, MIME, vorlage, type Format } from '../vorlage/index.ts';
+import { fullTx, record } from '../../platform.ts';
+import { FORMATE, MIME, type Format } from '../vorlage/index.ts';
 import { daten, erzeugen, kurz, lesenOder404, voll, vorschlagen } from './bericht.ts';
-import { berichtDokument, dateiname } from './bericht-dokument.ts';
+import { dateiname } from './bericht-dokument.ts';
 import {
   Portfoliobericht, PortfolioberichtCreate, PortfolioberichtKurz, PortfolioberichtListe, PortfolioberichtPatch, PortfolioberichtQuery,
   type PortfolioberichtCreateIn, type PortfolioberichtOut, type PortfolioberichtPatchIn, type PortfolioberichtQueryIn,
 } from './bericht-schemas.ts';
 import * as store from './bericht-store.ts';
+import { berichtAusgeben } from './bericht-vorlage.ts';
 import { sichtbarePortfolios } from './risiko-routes.ts';
 
 export const TAG_BERICHT = 'Portfoliobericht';
@@ -150,10 +151,12 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
       await record(tx, who, { action: 'portfoliobericht.exported', resourceType: 'portfoliobericht', resourceId: id, data: { periode: b.periode, format } });
       return daten(b);
     });
+    // Word mit der aktiven eigenen Vorlage, sonst und für PDF der Grundbestand (AP-E7-7); Vorlage in voller Sicht
+    const datei = await fullTx(deps.db, req.requirePrincipal().tenantId, tx => berichtAusgeben(tx, b, format));
     return reply
       .header('content-type', MIME[format])
       .header('content-disposition', `attachment; filename="${dateiname(b, format)}"`)
       .header('cache-control', 'private, no-store')
-      .send(vorlage.setzen(berichtDokument(b), format));
+      .send(datei);
   });
 }

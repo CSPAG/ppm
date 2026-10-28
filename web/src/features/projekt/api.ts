@@ -25,6 +25,15 @@ export function useProjektKopf() {
   return useQuery({ queryKey: projektKeys.kopf, queryFn: async ({ signal }) => (await api.GET('/v1/projekte/kopf', { signal })).data! });
 }
 
+/** Stand der Berichte der Projekte auf der Kopfkarte: letzter Status und Trend, Bericht der laufenden Periode. */
+export function useBerichtStand(ids: readonly string[]) {
+  return useQuery({
+    queryKey: [...projektKeys.kopf, 'stand', ids] as const,
+    enabled: ids.length > 0,
+    queryFn: async ({ signal }) => (await api.GET('/v1/statusberichte/stand', { params: { query: { projektId: [...ids] } }, signal })).data!.items,
+  });
+}
+
 export function useProjektList(f: ListFilter) {
   return useInfiniteQuery({
     queryKey: projektKeys.list(f),

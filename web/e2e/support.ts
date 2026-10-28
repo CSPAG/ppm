@@ -58,3 +58,29 @@ export async function tabTo(page: Page, target: Locator, max = 40) {
   }
   throw new Error(`Mit ${max}× Tab nicht erreicht: ${target.toString()}`);
 }
+
+/**
+ * Jahre der Zielzyklen je Spec und Projekt der Konfiguration (hell, dunkel, schmal laufen gegen dieselbe Datenbank).
+ * Getrennt, weil freigabe-roadmap.spec den Zyklus seines Jahres freigibt: danach nimmt er keine Jahresziele mehr an, und
+ * zog zielzyklus.spec zufällig dasselbe Jahr, fehlte «Jahresziel hinzufügen» bis zum Zeitlimit (früheres Flackern).
+ */
+const ZIELJAHRE = { freigabe: 2031, zielzyklus: 2064 } as const;
+const PROJEKTE = ['hell', 'dunkel', 'schmal'];
+export function zieljahre(spec: keyof typeof ZIELJAHRE, projekt: string): number[] {
+  const breite = 11;
+  const von = ZIELJAHRE[spec] + Math.max(0, PROJEKTE.indexOf(projekt)) * breite;
+  return Array.from({ length: breite }, (_, i) => von + i);
+}
+
+/** Ein Jahr aus `jahre` ohne gestarteten Zielzyklus (sonst wäre er von einem früheren Versuch schon vorgelegt). */
+export async function freiesZieljahr(page: Page, jahre: number[]): Promise<number> {
+  const me = await (await page.request.get('/auth/me')).json() as { tenant: { alias: string } };
+  const start = Math.floor(Math.random() * jahre.length);
+  for (let i = 0; i < jahre.length; i++) {
+    const j = jahre[(start + i) % jahre.length]!;
+    const r = await page.request.get(`/v1/ziele/${j}`, { headers: { 'x-tenant': me.tenant.alias } });
+    expect(r.status(), `GET /v1/ziele/${j}`).toBe(200);
+    if ((await r.json() as { zieljahr: unknown }).zieljahr === null) return j;
+  }
+  throw new Error(`Kein Jahr ohne Zielzyklus in ${jahre[0]}–${jahre.at(-1)}`);
+}

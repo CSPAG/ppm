@@ -77682,7 +77682,7 @@
     },
     {
       "name": "Verwaltung: Mitglieder und Rollen",
-      "description": "Mitglieder und Maschinen-Clients der eigenen Organisation: einladen, entfernen, Rollen an der Organisation und Freigabestufe setzen (Recht «Mitglieder und Rollen verwalten»); eigene Rollen der Organisation zusammenstellen (Recht «Rollen zusammenstellen»)."
+      "description": "Mitglieder und Maschinen-Clients der eigenen Organisation: einladen, entfernen, Rollen an der Organisation und Freigabestufe setzen (Recht «Mitglieder und Rollen verwalten»)."
     },
     {
       "name": "Verwaltung: Anmeldung über Microsoft Entra ID",

@@ -6,6 +6,8 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { matrixTools } from './matrix-mcp.ts';
+import { registerMatrixRoutes } from './matrix-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
 export const priorisierungModule = defineModule({
@@ -13,5 +15,7 @@ export const priorisierungModule = defineModule({
   tags: [{ name: TAG, description: 'Bewertungsmodell mit Kriterien und Budgetrahmen (Entwurf, in Kraft), Bewertung der Projekte je Kriterium; ab AP-E5-2 Matrix, Rangfolge und Szenarien.' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerMatrixRoutes(app, deps);
   },
+  mcpTools: { ...matrixTools },
 });

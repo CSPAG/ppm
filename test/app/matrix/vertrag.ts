@@ -56,6 +56,8 @@ export const matrix: Matrix = {
       'PUT /v1/vertragsversionen/:id/kapitel/:nr': f('PUT', i => `${v(i)}/kapitel/4`, { body: { inhalt: { loesungsansatz: 'gehackt', annahmen: '' } }, ifMatch: true }),
       'GET /v1/vertragsversionen/:id/pflichtangaben': f('GET', i => `${v(i)}/pflichtangaben`),
       'POST /v1/vertragsversionen/:id/einreichen': f('POST', i => `${v(i)}/einreichen`, { ifMatch: true }),
+      // Projekt zurückziehen (DM.02.04)
+      'POST /v1/vertragsversionen/:id/zurueckziehen': f('POST', i => `${v(i)}/zurueckziehen`, { body: { begruendung: 'gehackt' }, ifMatch: true }),
       // Versionsvergleich, Hauptänderungen und Änderungsantrag (AP-E3-4)
       'GET /v1/vertragsversionen/:id/vergleich': f('GET', i => `${v(i)}/vergleich`),
       'GET /v1/vertragsversionen/:id/hauptaenderungen': f('GET', i => `${v(i)}/hauptaenderungen`),

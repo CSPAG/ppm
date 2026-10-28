@@ -93,7 +93,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
    erhält den Quality-Check. Bis zum Ergebnis ist der Entwurf gesperrt.» Stand «in Prüfung» (Z8 für die PL).
    Bei einer **Änderung** heisst die Aktion **Änderung einreichen** und geht direkt an den Sponsor (UC-007 Schritt 3;
    UC-007 kennt keinen Quality-Check).
-   **Zurückziehen** (UC-002 A4, nur SP): im Menü der Projektakte «Projekt zurückziehen» → Dialog (unumkehrbar, wirkt auf
+   **Zurückziehen** (UC-002 A4, nur SP, erster Vertrag bis «traktandiert»): im Kopf des Reiters «Vertrag» «Projekt zurückziehen» → Dialog (unumkehrbar, wirkt auf
    andere): «Projekt ‹Digitale Patientenaufnahme› zurückziehen? Vertrag und Projekt werden als ‹zurückgezogen›
    geschlossen, der Ressourcenbedarf (Grösse M) wird freigegeben, die Unternehmensentwicklung wird informiert.»
    Begründung Pflicht; Schaltflächen «Projekt zurückziehen» / «Abbrechen».

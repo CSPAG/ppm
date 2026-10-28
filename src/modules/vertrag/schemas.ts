@@ -32,8 +32,14 @@ export const VertragVersion = Type.Object({
   can: Type.Object({
     write: Type.Boolean({ description: 'Kapitel bearbeiten (Entwurf in Arbeit, vertrag:write).' }),
     einreichen: Type.Boolean({ description: 'Zur Prüfung einreichen (Entwurf in Arbeit, vertrag:write); Pflichtangaben prüft die Route.' }),
+    zurueckziehen: Type.Boolean({ description: 'Projekt zurückziehen (erster Vertrag als Entwurf, aktives Projekt, vertrag:decide; UC-002 A4).' }),
   }),
 }, { $id: 'VertragVersion', additionalProperties: false });
+
+export const Zurueckziehen = Type.Object({
+  begruendung: Type.String({ maxLength: 5000, description: 'Begründung des Sponsors (Pflicht, UC-002 A4.1).' }),
+}, { $id: 'VertragZurueckziehen', additionalProperties: false });
+export type ZurueckziehenIn = Static<typeof Zurueckziehen>;
 export type VertragVersionOut = Static<typeof VertragVersion>;
 
 export const KapitelKopf = Type.Object({

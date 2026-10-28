@@ -18801,7 +18801,8 @@
             "type": "object",
             "required": [
               "write",
-              "einreichen"
+              "einreichen",
+              "zurueckziehen"
             ],
             "properties": {
               "write": {
@@ -18810,6 +18811,10 @@
               },
               "einreichen": {
                 "description": "Zur Prüfung einreichen (Entwurf in Arbeit, vertrag:write); Pflichtangaben prüft die Route.",
+                "type": "boolean"
+              },
+              "zurueckziehen": {
+                "description": "Projekt zurückziehen (erster Vertrag als Entwurf, aktives Projekt, vertrag:decide; UC-002 A4).",
                 "type": "boolean"
               }
             }
@@ -19143,6 +19148,20 @@
                 }
               }
             }
+          }
+        }
+      },
+      "VertragZurueckziehen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "begruendung"
+        ],
+        "properties": {
+          "begruendung": {
+            "maxLength": 5000,
+            "description": "Begründung des Sponsors (Pflicht, UC-002 A4.1).",
+            "type": "string"
           }
         }
       },
@@ -69631,6 +69650,147 @@
           "Projektvertrag"
         ],
         "description": "Entwurf «in Arbeit» → «in Prüfung» (DM.02.02, UC-002 Schritt 8); die UE erhält die Aufgabe «Quality-Check». Fehlen Pflichtangaben der Zielphase: 422 mit je einem Fehler `/kapitel/<nr>/<feld>` (UC-002 A3). Eine Änderung reicht die PL beim Sponsor ein (UC-007, nicht hier). `If-Match` Pflicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragVersionDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/zurueckziehen": {
+      "post": {
+        "summary": "Projekt zurückziehen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Der Sponsor (`vertrag:decide`) zieht das Vorhaben mit Begründung zurück (DM.02.04, UC-002 A4): erster Vertrag als Entwurf (in Arbeit bis traktandiert) eines aktiven Projekts. Vertrag und Projekt sind danach «zurückgezogen», offene Aufgaben zum Vertrag entfallen, ein Gate-Traktandum wird zurückgenommen (versendet: 409 `traktandiert`), der Ressourcenbedarf zählt nicht mehr (A-63), die Unternehmensentwicklung wird informiert. Begründung fehlt: 422. `If-Match` Pflicht.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragZurueckziehen"
+              }
+            }
+          }
+        },
         "parameters": [
           {
             "schema": {

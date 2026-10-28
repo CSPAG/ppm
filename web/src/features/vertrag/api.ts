@@ -139,5 +139,18 @@ export function useVertragMutations(projektId: string | undefined) {
       await qc.invalidateQueries({ queryKey: ['vertrag', 'kapitel', id] });
     },
   });
-  return { anlegen, speichern, einreichen, neuLaden };
+  // Projekt zurückziehen (DM.02.04, UC-002 A4): Vertrag und Projekt sind danach «zurückgezogen»
+  const zurueckziehen = useMutation({
+    mutationFn: async ({ id, etag, begruendung }: { id: string; etag: string; begruendung: string }) => {
+      const { data, response } = await api.POST('/v1/vertragsversionen/{id}/zurueckziehen', { params: { path: { id }, header: { 'if-match': etag } }, body: { begruendung } });
+      return { detail: data!, etag: etagVon(response, data!.version.version) } satisfies VersionLoaded;
+    },
+    onSuccess: async (l, { id }) => {
+      qc.setQueryData(vertragKeys.version(id), l);
+      await neuLaden(id);
+      // Lebenszyklus des Projekts gilt in allen Reitern der Projektakte (Endzustand lesend)
+      await qc.invalidateQueries();
+    },
+  });
+  return { anlegen, speichern, einreichen, zurueckziehen, neuLaden };
 }

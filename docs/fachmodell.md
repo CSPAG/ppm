@@ -567,8 +567,9 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 - **Grösse:** ein PR, höchstens zwei (PR 1 Tabellen und API, PR 2 Oberfläche); jeder PR für sich grün und mergebar.
 - **Abnahme:** UX-Definition of Done ([pruefung.md](ux/rahmen/pruefung.md)) als Checkliste im PR; Zielgrössen des Kernablaufs
   als automatischer Test, wo die Spalte «Abnahme» «Test» nennt, sonst im Schlussbericht als «beim Aufgabentest zu messen».
-- **Stand nachführen:** Jedes Paket setzt seine Zeilen in [umsetzungsstand.md](umsetzungsstand.md) (in Arbeit beim ersten
-  Push, umgesetzt mit PR-Nummer beim Merge) und trägt verwendete Annahmen ein.
+- **Stand nachführen:** [umsetzungsstand.md](umsetzungsstand.md), Klärungsliste und Annahmen führt nur die Master-Session,
+  übergreifend in eigenen Doku-PRs (keine Konflikte zwischen den Paketen). Ein Paket meldet mit jedem Merge einen Block
+  «STAND:» mit seinen Zeilen (Paket, BC, Zielgrössen, UX-DoD, PR-Nummer, verwendete Annahmen).
 
 ### 7.2 Gemeinsame Dateien
 
@@ -584,7 +585,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | Texte | je Feature eine eigene Textdatei (Namensraum = Feature) nach dem Muster, das AP-E0-0 festlegt |
 | `test/app/rls.test.ts`, `test/app/tenant-isolation.test.ts` | AP-E0-1 teilt Matrix und Fälle in Dateien je Modul (`test/app/matrix/<modul>.ts`) mit einer Import-Zeile je Modul; danach ändert jedes Paket nur seine Datei und eine Zeile |
 | Erzeugte Dateien (`web/openapi.json`, `web/src/api/schema.d.ts`, `infra/keycloak/platform.json`, `.env.example`, `docs/konfiguration.md`) | nie von Hand auflösen: nach dem Merge von `main` neu erzeugen |
-| `docs/umsetzungsstand.md` | nur die eigenen Zeilen; Konflikt = beide Änderungen behalten |
+| `docs/umsetzungsstand.md`, Klärungsliste, Annahmen (Abschnitt 8) | nur die Master-Session; Pakete ändern sie nicht (Konflikt = Fassung von `main`) |
 | `src/modules/<x>/index.ts`, `web/src/features/<x>/index.ts` bei Erweiterungspaketen | Ein Paket, das Dateien in einem Modul oder Feature eines anderen Pakets besitzt (z. B. AP-E2-2 in `sitzung`, AP-E3-2–E3-5 in `vertrag`), legt eigene Dateien an (`routes-<teil>.ts`, `schemas-<teil>.ts`, `mcp-<teil>.ts`, Seiten) und ändert in `index.ts` des Moduls bzw. Features je Datei **eine** Zeile (Import und Aufruf in `register`, Werkzeuge, Export); `routes.ts`, `store.ts` und `schemas.ts` des Grundpakets bleiben unberührt, gemeinsame Abfragen kommen in eine eigene `store-<teil>.ts`. Das Grundpaket legt `register` so an, dass weitere Routendateien je eine Zeile brauchen |
 
 ### 7.3 Pakete

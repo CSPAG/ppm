@@ -153,7 +153,9 @@ export function PortfolioberichtPage({ search, setSearch }: { search: Portfoliob
           </select>
         </label>
       </div>
-      <div className="body">
+      {/* scrollbar mit der Tastatur erreichbar, auch für Lesende ohne Eingabefelder (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body" tabIndex={0} role="region" aria-label={TP.inhalt}>
         {dash.isPending || liste.isPending || (kurz && q.isPending) ? (
           <div aria-busy="true"><span className="sr" role="status">{TP.title}</span>{skelett ? <Skelett /> : null}</div>
         ) : dash.error || liste.error || q.error ? (

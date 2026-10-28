@@ -125,7 +125,7 @@ export function RisikenPage({ search, setSearch }: { search: RisikenSearch; setS
   return (
     <section aria-labelledby="page-title">
       <Kopf unter={d ? TR.stand(fmtZeitpunkt(d.stand)) : undefined} />
-      <div className="toolbar" role="search" aria-label={TR.title}>
+      <div className="toolbar" role="search" aria-label={TR.inhalt}>
         <label className="db-select">
           <span className="sr">Portfolio</span>
           <select value={search.portfolio ?? ''} onChange={e => setSearch({ portfolio: e.target.value || undefined })} disabled={!d}>
@@ -134,7 +134,9 @@ export function RisikenPage({ search, setSearch }: { search: RisikenSearch; setS
           </select>
         </label>
       </div>
-      <div className="body">
+      {/* scrollbar auch ohne Eingabefelder (nur lesen) mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body" tabIndex={0} role="region" aria-label={TR.inhalt}>
         {q.isPending ? (
           <div aria-busy="true"><span className="sr" role="status">{TR.title}</span>{skelett ? <Skelett /> : null}</div>
         ) : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : d ? <Lage r={d} projektLink={nr => `/projekte/${nr}`} /> : null}

@@ -6,6 +6,7 @@
 export const TR = {
   bereich: 'Risikolage',
   title: 'Risikolage',
+  inhalt: 'Inhalt der Risikolage',
   sub: 'Projekt- und Portfoliorisiken mit Bewertung und Massnahme, Abhängigkeiten und offene Eskalationen.',
   stand: (d: string) => `Stand der Register ${d}`,
   kennzahl: {
@@ -34,6 +35,7 @@ export const TR = {
 export const TP = {
   bereich: 'Portfoliobericht',
   title: 'Portfoliobericht',
+  inhalt: 'Inhalt des Portfolioberichts',
   sub: 'Bericht der Periode für das Gremium, erzeugt aus dem abgeschlossenen Dashboard und der Risikolage.',
   filter: { portfolio: 'Portfolio', periode: 'Periode' },
   liste: 'Berichte',

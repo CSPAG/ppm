@@ -236,6 +236,19 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
   });
 }
 
+/**
+ * Vor der Folge des Gate-Entscheids (Modul vertrag): Korrektur von «Gestoppt» auf ein anderes Ergebnis (A-30) nimmt den
+ * Abbruch zurück, bevor die Freigabe die Phase setzt (abgebrochen ist lesend).
+ */
+export async function vorGate(tx: Tx, g: GateEntscheid): Promise<void> {
+  if (g.ergebnis === 'abgelehnt') return;
+  await store.intern(tx, async () => {
+    const p = await store.projekt(tx, g.projektId);
+    const vorher = await store.entscheid(tx, 'gate', g.versionId);
+    if (p && vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await zuruecknehmen(tx, systemActor('system'), vorher, p);
+  });
+}
+
 /** Gate-Entscheid (Modul vertrag): «Gestoppt» bricht ab, P3–P4 freigegeben öffnet den Abschluss. */
 export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
   // der Gate-Entscheid übergibt keine Person; die Person steht im Audit des Entscheids (sitzung)
@@ -308,5 +321,6 @@ export function registriereAbschluss(): void {
     unterlagen: async (tx, bezug) => (bezug.typ === 'projekt' ? unterlagen(tx, bezug.id) : []),
     beiEntscheid,
   });
+  gateEntscheid.vorFolgeRegistrieren(vorGate);
   gateEntscheid.registrieren(nachGate);
 }

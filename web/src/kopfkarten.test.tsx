@@ -7,6 +7,7 @@ import { screen, within } from '@testing-library/react';
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
 import type { AuthzCatalog } from '@vollholz/iam-web';
 import { describe, expect, it, vi } from 'vitest';
+import type { AppPermission } from './auth/permissions.ts';
 import { EingangPage } from './features/eingang/EingangPage.tsx';
 import { kopfkarten } from './kopfkarten.ts';
 import { expectNoAxe } from './test/axe.ts';
@@ -32,7 +33,7 @@ function stub(routes: Parameters<typeof mockIamApi>[0]) {
   return api;
 }
 
-const UE = ['tenant:read', 'statusbericht:review', 'projekt:read', 'sitzung:read', 'idee:create'];
+const UE: AppPermission[] = ['tenant:read', 'statusbericht:review', 'projekt:read', 'sitzung:read', 'idee:create'];
 const page = () => <EingangPage search={{}} setSearch={() => {}} gehe={() => {}} kopfkarten={kopfkarten} />;
 
 describe('Kopfkarten je Rolle', () => {
@@ -73,7 +74,7 @@ describe('Kopfkarten je Rolle', () => {
       'GET /v1/projekte/kopf': () => json({ projekte: [], anzahl: 0 }),
       'GET /v1/sitzungen/kopf': () => json({ sitzungen: [] }),
     });
-    const { container } = renderWithIam(page(), { permissions: ['tenant:read', 'projekt:read', 'sitzung:read', 'idee:create'] });
+    const { container } = renderWithIam(page(), { permissions: ['tenant:read', 'projekt:read', 'sitzung:read', 'idee:create'] satisfies AppPermission[] });
     expect(await screen.findByRole('heading', { name: 'Ideen' })).toBeInTheDocument();
     await vi.waitFor(() => expect(api.calls.some(c => c.url.includes('/v1/sitzungen/kopf'))).toBe(true));
     await vi.waitFor(() => expect(container.querySelectorAll('.eg-karte:empty')).toHaveLength(2));

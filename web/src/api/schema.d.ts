@@ -33075,6 +33075,135 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/vertragsversionen/{id}/zurueckziehen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Projekt zurückziehen
+         * @description Der Sponsor (`vertrag:decide`) zieht das Vorhaben mit Begründung zurück (DM.02.04, UC-002 A4): erster Vertrag als Entwurf (in Arbeit bis traktandiert) eines aktiven Projekts. Vertrag und Projekt sind danach «zurückgezogen», offene Aufgaben zum Vertrag entfallen, ein Gate-Traktandum wird zurückgenommen (versendet: 409 `traktandiert`), der Ressourcenbedarf zählt nicht mehr (A-63), die Unternehmensentwicklung wird informiert. Begründung fehlt: 422. `If-Match` Pflicht.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragZurueckziehen"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragVersionDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/vertrag/ziele": {
         parameters: {
             query?: never;
@@ -49333,6 +49462,8 @@ export interface components {
                 write: boolean;
                 /** @description Zur Prüfung einreichen (Entwurf in Arbeit, vertrag:write); Pflichtangaben prüft die Route. */
                 einreichen: boolean;
+                /** @description Projekt zurückziehen (erster Vertrag als Entwurf, aktives Projekt, vertrag:decide; UC-002 A4). */
+                zurueckziehen: boolean;
             };
         };
         VertragKapitelKopf: {
@@ -49424,6 +49555,10 @@ export interface components {
                 erfuellt: boolean;
                 grund: null | string;
             }[];
+        };
+        VertragZurueckziehen: {
+            /** @description Begründung des Sponsors (Pflicht, UC-002 A4.1). */
+            begruendung: string;
         };
         VertragZielauswahl: {
             ziele: {

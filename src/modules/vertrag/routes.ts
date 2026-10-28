@@ -22,10 +22,11 @@ import { anlegen, entwurfsanlass, entwurfVon, pruefeBegruendung, STAND_TEXT, typ
 import { KAPITEL, KAPITEL_MIT_BETRAEGEN, LISTEN_SCHEMAS, ohneBetraege, titel } from './kapitel.ts';
 import { pruefen, type Modell, type Pruefung } from './pflichtangaben.ts';
 import {
-  EntwurfCreate, Kapitel, KapitelKopf, KapitelParams, KapitelPut, Pflichtangaben, Vertrag, VertragVersion, VertragVersionDetail,
-  type EntwurfCreateIn, type VertragVersionOut,
+  EntwurfCreate, Kapitel, KapitelKopf, KapitelParams, KapitelPut, Pflichtangaben, Vertrag, VertragVersion, VertragVersionDetail, Zurueckziehen,
+  type EntwurfCreateIn, type VertragVersionOut, type ZurueckziehenIn,
 } from './schemas.ts';
 import * as store from './store.ts';
+import { zurueckziehbar, zurueckziehen } from './zurueckziehen.ts';
 
 export const TAG = 'Projektvertrag';
 
@@ -62,7 +63,7 @@ async function versionOut(req: FastifyRequest, v: store.VersionRow, p: store.Pro
     id: v.id, projektId: v.projekt_id, nummer: v.nummer, anlass: v.anlass, zielphase: v.zielphase, stand: v.stand, baseline: v.baseline,
     baselineAt: v.baseline_at, basisVersionId: v.basis_version_id, begruendung: v.begruendung, eingereichtAt: v.eingereicht_at,
     version: v.version, createdAt: v.created_at, updatedAt: v.updated_at,
-    can: { write, einreichen: write && v.anlass !== 'aenderung' },
+    can: { write, einreichen: write && v.anlass !== 'aenderung', zurueckziehen: zurueckziehbar(v, p) && await req.can('vertrag:decide', projektOrt(p.id)) },
   };
 }
 
@@ -169,7 +170,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
    */
   const modell = (req: FastifyRequest): Promise<Phasenmodell> => fullTx(deps.db, req.requirePrincipal().tenantId, tx => aktuellesPhasenmodell(tx));
 
-  for (const s of [...LISTEN_SCHEMAS, ...KAPITEL, VertragVersion, KapitelKopf, VertragVersionDetail, Vertrag, EntwurfCreate, Kapitel, KapitelPut, Pflichtangaben]) app.addSchema(s);
+  for (const s of [...LISTEN_SCHEMAS, ...KAPITEL, VertragVersion, KapitelKopf, VertragVersionDetail, Vertrag, EntwurfCreate, Kapitel, KapitelPut, Pflichtangaben, Zurueckziehen]) app.addSchema(s);
 
   /** Detail einer Version: Kopf und Kapitel mit «geändert» und «Angaben fehlen». */
   async function detail(req: FastifyRequest, tx: Tx, v: store.VersionRow, p: store.ProjektKopf, m: Modell | null) {
@@ -353,5 +354,31 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     reply.header('etag', etag(out.version.version));
     return out;
   });
-}
 
+  app.post('/v1/vertragsversionen/:id/zurueckziehen', {
+    schema: {
+      tags: [TAG], summary: 'Projekt zurückziehen', params: IdParams, headers: IfMatchHeaders, body: Type.Ref('VertragZurueckziehen'),
+      response: { 200: Type.Ref('VertragVersionDetail') },
+      description: 'Der Sponsor (`vertrag:decide`) zieht das Vorhaben mit Begründung zurück (DM.02.04, UC-002 A4): erster Vertrag als Entwurf (in Arbeit bis traktandiert) '
+        + 'eines aktiven Projekts. Vertrag und Projekt sind danach «zurückgezogen», offene Aufgaben zum Vertrag entfallen, ein Gate-Traktandum wird zurückgenommen '
+        + '(versendet: 409 `traktandiert`), der Ressourcenbedarf zählt nicht mehr (A-63), die Unternehmensentwicklung wird informiert. Begründung fehlt: 422. `If-Match` Pflicht.',
+    },
+  }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const erwartet = requireIfMatch(req);
+    const { p } = await req.tx(tx => versionMitProjekt(tx, id));
+    await req.need('vertrag:decide', projektOrt(p.id));
+    const { begruendung } = req.body as ZurueckziehenIn;
+    const who = actorOf(req);
+    // Der SP hat weder vertrag:write noch projekt:write: nach der Prüfung des Rechts in voller Sicht (wie der Entscheid über eine Änderung)
+    await fullTx(deps.db, req.requirePrincipal().tenantId, async tx => {
+      const r = (await store.version(tx, id))!;
+      if (r.version !== erwartet) throw preconditionFailed(r.version);
+      if (!(await zurueckziehen(tx, who, { version: r, projekt: (await store.projekt(tx, p.id))!, erwartet, begruendung }))) throw preconditionFailed(r.version + 1);
+    });
+    const m = await modell(req);
+    const out = await req.tx(async tx => detail(req, tx, (await store.version(tx, id))!, (await store.projekt(tx, p.id))!, m));
+    reply.header('etag', etag(out.version.version));
+    return out;
+  });
+}

@@ -386,6 +386,7 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
 | `ch.ppm.vertrag.drafted`, `.chapter_updated`, `.submitted`, `.baselined` | Projektvertrag: Entwurf angelegt, Kapitel gespeichert, zur Prüfung eingereicht, Version Baseline |
+| `ch.ppm.vertrag.withdrawn` | Projektvertrag zurückgezogen (Sponsor, UC-002 A4); das Projekt ist danach `zurueckgezogen` (`ch.ppm.projekt.withdrawn`) |
 | `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
 | `ch.ppm.sitzung.created`, `ch.ppm.sitzung.updated` | Sitzung angelegt bzw. Beginn, Dauer, Ort geändert |
 | `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |

@@ -37,8 +37,7 @@ export const KapazitaetPut = Type.Object({
   zellen: Type.Array(Type.Object({
     rolle: Rolle,
     monat: Monat,
-    // null zuerst: mit der Typumwandlung der Prüfung würde null sonst zur Zahl 0
-    fte: Type.Union([Type.Null(), Type.Number({ minimum: 0, maximum: 1000, description: 'Neues Angebot in FTE (gespeichert mit zwei Nachkommastellen).' })], { description: 'null entfernt das Angebot der Zelle.' }),
+    fte: Nullable(Type.Number({ minimum: 0, maximum: 1000, description: 'Neues Angebot in FTE (gespeichert mit zwei Nachkommastellen); null entfernt das Angebot der Zelle.' })),
     version: Type.Optional(Type.Integer({ minimum: 1, description: 'Gelesene Version der Zelle; Pflicht, wenn die Zelle schon ein Angebot hat (sonst 412).' })),
   }, { additionalProperties: false }), { minItems: 1, maxItems: 2000 }),
 }, { $id: 'KapazitaetPut', additionalProperties: false });

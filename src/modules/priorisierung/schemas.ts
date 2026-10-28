@@ -106,8 +106,7 @@ export const BewertungenPut = Type.Object({
   zellen: Type.Array(Type.Object({
     projektId: Uuid,
     kriterium: Schluessel,
-    // null zuerst: mit der Typumwandlung der Prüfung würde null sonst zu einer Zeichenkette
-    einschaetzung: Type.Union([Type.Null(), Einschaetzung], { description: 'null entfernt die Bewertung des Kriteriums.' }),
+    einschaetzung: Nullable(Einschaetzung), // null entfernt die Bewertung des Kriteriums
     kommentar: Type.Optional(Type.String({ maxLength: 1000 })),
     version: Type.Optional(Type.Integer({ minimum: 1, description: 'Gelesene Version; Pflicht, wenn die Zelle schon bewertet ist (sonst 412).' })),
   }, { additionalProperties: false }), { minItems: 1, maxItems: 2000 }),

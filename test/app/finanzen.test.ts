@@ -133,6 +133,10 @@ describe('Finanzen (API)', { skip }, () => {
     assert.deepEqual([kt.json().ist, kt.json().istJeArt, kt.json().istBis], [36200, { capex: 35000, opex: 1200 }, '2026-10']);
     assert.equal((await call('fi', 'PUT', `/v1/projekte/${p.b}/kostentraeger`, { nummer: 'KT-1' })).statusCode, 409);
     assert.equal((await call('fi', 'PUT', `/v1/projekte/${p.b}/kostentraeger`, { nummer: 'KT 2' })).statusCode, 422);
+    // null entfernt den Kostenträger (Nullable aus der Plattform, ohne Typumwandlung)
+    const ohneKt = await call('fi', 'PUT', `/v1/projekte/${p.b}/kostentraeger`, { nummer: null });
+    assert.equal(ohneKt.statusCode, 200, ohneKt.body);
+    assert.equal(ohneKt.json().kostentraeger, null);
 
     const u = (await call('fi', 'GET', `/v1/finanzen?portfolio=${pf}`)).json();
     const a = u.projekte[0];
@@ -180,7 +184,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.deepEqual((await aufgaben('abweichung.klaeren')).map(x => x.stand), ['erledigt']);
     assert.equal((await call('fi', 'GET', `/v1/finanzen?portfolio=${pf}`)).json().projekte[0].begruendung.text, 'Lieferant teurer; Änderungsantrag folgt');
     const audit = await full(api.t.runtime, T, async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action LIKE 'abweichung.%' OR action = 'kostentraeger.assigned' ORDER BY seq")).rows.map(r => r.action));
-    assert.deepEqual(audit, ['kostentraeger.assigned', 'abweichung.justified', 'abweichung.justification_changed']);
+    assert.deepEqual(audit, ['kostentraeger.assigned', 'kostentraeger.assigned', 'abweichung.justified', 'abweichung.justification_changed']);
   });
 
   test('Jahresbedarf mit Korrektur durch FI (A-17), Übergabe an den Budgetprozess (Schritte 5–6)', async () => {
@@ -201,10 +205,11 @@ describe('Finanzen (API)', { skip }, () => {
     assert.ok(!g.body.includes('Reorganisation') && !g.body.includes(p.c), 'ohne Namen und Kennung');
     assert.equal((await call('gl', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [] })).statusCode, 403, 'übergeben FI');
     assert.equal((await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.a, capex: 1, opex: null }, { projektId: p.a, capex: 2, opex: null }] })).statusCode, 422);
-    const k = await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.b, capex: null, opex: 8000, bemerkung: 'Termine folgen' }, { projektId: p.a, capex: null, opex: null }] });
+    const k = await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.b, capex: 0, opex: 8000, bemerkung: 'Termine folgen' }, { projektId: p.a, capex: null, opex: null }] });
     assert.equal(k.statusCode, 200, k.body);
     assert.deepEqual([k.json().stand, k.json().version, k.json().summe], ['entwurf', 1, { capex: 0, opex: 82794.52 }]);
-    assert.deepEqual(k.json().positionen[1].korrektur, { capex: null, opex: 8000, bemerkung: 'Termine folgen' });
+    // 0 bleibt 0, null bleibt null, > 0 bleibt (Nullable ohne Typumwandlung zwischen null und 0)
+    assert.deepEqual(k.json().positionen[1].korrektur, { capex: 0, opex: 8000, bemerkung: 'Termine folgen' });
     assert.equal((await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [] })).statusCode, 428, 'danach mit If-Match');
     assert.deepEqual((await aufgaben('budget.uebergeben')).map(x => [x.bezug_id, x.stand, x.link]), [['2027', 'offen', '/portfolio/finanzen/budgetprozess?jahr=2027']]);
 

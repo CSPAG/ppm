@@ -9,7 +9,8 @@ export const TA = {
   titel: { abschluss: 'Abschlussbericht', sistierung: 'Bericht zur Sistierung', abbruch: 'Bericht zum Abbruch' } as Record<string, string>,
   stand: { entwurf: 'in Arbeit', eingereicht: 'eingereicht', traktandiert: 'beim Gremium', abgenommen: 'abgenommen', nacharbeit: 'Nacharbeit' } as Record<string, string>,
   gespeichert: 'Gespeichert', speichert: 'Speichert …', ungespeichert: 'Ungespeicherte Änderungen',
-  konflikt: 'Jemand anderes hat den Bericht geändert. Die Seite zeigt den neuen Stand; prüf deine letzte Eingabe.',
+  konflikt: 'Jemand anderes hat den Bericht inzwischen geändert. Deine Eingaben sind noch da, aber nicht gespeichert.',
+  konfliktBehalten: 'Neu laden, meine Änderungen behalten', konfliktUebernehmen: 'Stand der anderen übernehmen',
   keine: {
     titel: 'Noch kein Abschluss',
     text: (phase: string) => `Der Abschluss beginnt in Phase P4 oder mit einem Entscheid des Gremiums zu Sistierung oder Abbruch. Das Projekt ist in ${phase}.`,

@@ -6,6 +6,11 @@
 .db-select select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
 .db-hinweis{padding:12px 22px 0}
 .db-kennzahlen{margin:0;padding:12px 22px;color:var(--fg-2);border-bottom:1px solid var(--line)}
+.db-kennzahlen ul{display:flex;flex-wrap:wrap;gap:0;margin:0;padding:0;list-style:none}
+.db-kennzahlen li+li::before{content:"·";padding:0 6px;color:var(--muted)}
+/* Zahl als Schaltfläche zu ihren Einzelwerten (Seitentyp Bericht) */
+.db-zahl{font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px}
+.db-zahl:disabled{text-decoration:none;cursor:default}
 .db-tab td,.db-tab th{padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
 .db-tab tbody tr{height:52px}
 .db-tab tbody td{border-bottom:1px solid var(--line)}

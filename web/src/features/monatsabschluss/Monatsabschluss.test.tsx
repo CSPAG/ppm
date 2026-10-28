@@ -38,6 +38,12 @@ const kopf = (o: Record<string, unknown> = {}) => ({
   can: { pruefen: true, abschliessen: true }, ...o,
 });
 
+/** Einzelwerte der Terminabweichung (Meilensteine und Lieferergebnisse). */
+const MS = [
+  { phase: 'P2', art: 'lieferergebnis', text: 'Konzept', erreicht: true, baseline: '2027-01-15', aktuell: '2027-01-15', tage: 0 },
+  { phase: 'P2', art: 'meilenstein', text: 'Abnahme', erreicht: false, baseline: '2027-03-31', aktuell: '2027-04-21', tage: 21 },
+];
+
 const ZEILEN = [
   zeile(1),
   zeile(2, { auffaelligkeiten: [{ art: 'status', von: 'im_plan', nach: 'kritisch' }], status: 'kritisch' }),
@@ -224,7 +230,7 @@ describe('Monatsabschluss', () => {
   it('Termine: nach Verschiebung mit Text zum Balken und Projekten ohne Baseline', async () => {
     stub({
       [`GET /v1/perioden/${P}/terminabweichungen`]: () => json({
-        items: [{ projektId: id(3), projektNummer: '2026-003', projektName: 'Vorhaben 3', phase: 'P2', phasen: [{ phase: 'P2', baseline: '2027-03-31', aktuell: '2027-04-21', tage: 21 }], abschluss: { baseline: '2027-06-30', aktuell: '2027-07-21', tage: 21 }, maxTage: 21 }],
+        items: [{ projektId: id(3), projektNummer: '2026-003', projektName: 'Vorhaben 3', phase: 'P2', phasen: [{ phase: 'P2', baseline: '2027-03-31', aktuell: '2027-04-21', tage: 21 }], abschluss: { baseline: '2027-06-30', aktuell: '2027-07-21', tage: 21 }, maxTage: 21, meilensteine: MS }],
         ohneBaseline: [{ projektId: id(4), projektNummer: '2026-004', projektName: 'Vorhaben 4' }],
       }),
     });
@@ -233,6 +239,42 @@ describe('Monatsabschluss', () => {
     expect(screen.getAllByText('+3 Wochen').length).toBeGreaterThan(0);
     expect(screen.getByText(/2026-004/)).toBeInTheDocument();
     await expectNoAxe(container);
+  });
+
+  it('Termine: die Abweichung führt zu ihren Einzelwerten (Schublade in der Adresse); Export als CSV (Seitentyp Bericht)', async () => {
+    const abfragen: string[] = [];
+    stub({
+      [`GET /v1/perioden/${P}/terminabweichungen`]: (req: Request) => {
+        const q = new URL(req.url).searchParams;
+        abfragen.push(q.toString());
+        if (q.get('format') === 'csv') return new Response('\uFEFFNummer\r\n', { headers: { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': `attachment; filename="terminabweichungen-${P}.csv"` } });
+        return json({
+          items: [{ projektId: id(3), projektNummer: '2026-003', projektName: 'Vorhaben 3', phase: 'P2', phasen: [{ phase: 'P2', baseline: '2027-03-31', aktuell: '2027-04-21', tage: 21 }], abschluss: { baseline: '2027-03-31', aktuell: '2027-04-21', tage: 21 }, maxTage: 21, meilensteine: MS }],
+          ohneBaseline: [],
+        });
+      },
+    });
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:termine'), revokeObjectURL: vi.fn() }));
+    const klick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    renderWithIam(<Page initial={{ periode: P, ansicht: 'termine' }} />, UE);
+    await userEvent.click(await screen.findByRole('button', { name: /^Einzelwerte zu 2026-003: \+3\sWochen$/ }));
+    expect(screen.getByTestId('s').textContent).toContain('"o":"termine:2026-003"');
+    const d = await screen.findByRole('dialog', { name: TM.termine.drawerTitel('2026-003', 'Vorhaben 3') });
+    const zeilen = within(within(d).getByRole('table', { name: TM.termine.tabelle })).getAllByRole('row').slice(1);
+    expect(zeilen).toHaveLength(2);
+    expect(zeilen[1]).toHaveTextContent('Abnahme');
+    expect(zeilen[1]).toHaveTextContent(/\+3\sWochen/);
+    expect(zeilen[0]).toHaveTextContent(TM.termine.erreicht);
+    await expectNoAxe(d);
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.getByTestId('s').textContent).not.toContain('"o"'));
+
+    await userEvent.click(screen.getByRole('button', { name: TM.termine.exportieren }));
+    expect(await screen.findByText(TM.termine.exportiert(`terminabweichungen-${P}.csv`))).toBeInTheDocument();
+    expect(abfragen.at(-1)).toBe('format=csv');
+    expect(klick).toHaveBeenCalledOnce();
+    klick.mockRestore();
+    expect(validateMonatsabschlussSearch({ periode: P, ansicht: 'termine', o: 'termine:2026-003' })).toEqual({ periode: P, ansicht: 'termine', o: 'termine:2026-003' });
   });
 
   it('ohne Prüfrecht nur der Hinweis; Adresse prüft Periode, Stand und Schlüssel (I-N5)', async () => {

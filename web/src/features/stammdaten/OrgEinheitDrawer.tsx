@@ -8,6 +8,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { isConflict, isGone, newIdempotencyKey } from '../../api/index.ts';
 import { Confirm, Drawer, Empty, ErrorState, fmtDateTime, Icon, Loading, T, useToast } from '../../ui/index.ts';
 import { useOrg, useOrgMutations, type Loaded, type OrgEinheit } from './api.ts';
+import { geaendert, useFormStand } from './formStand.ts';
 import { TS } from './texte.ts';
 
 export function OrgEinheitDrawer({ id, alle, onClose, onOpen }: { id: string; alle: OrgEinheit[]; onClose(): void; onOpen(id: string): void }) {
@@ -88,7 +89,7 @@ function ViewDrawer({ loaded: { item, etag }, alle, onClose, onEdit }: { loaded:
   );
 }
 
-function EditDrawer({ loaded, alle, onDone, onReload }: { loaded: Loaded<OrgEinheit>; alle: OrgEinheit[]; onDone(): void; onReload(): Promise<unknown> }) {
+function EditDrawer({ loaded, alle, onDone, onReload }: { loaded: Loaded<OrgEinheit>; alle: OrgEinheit[]; onDone(): void; onReload(): Promise<{ error: unknown }> }) {
   const formId = useId();
   const toast = useToast();
   const { update } = useOrgMutations();
@@ -102,11 +103,17 @@ function EditDrawer({ loaded, alle, onDone, onReload }: { loaded: Loaded<OrgEinh
       {conflict ? (
         <div className="notice" role="alert">
           <p>{TS.org.conflict}</p>
-          <button type="button" className="btn" onClick={async () => { await onReload(); update.reset(); }}>{T.common.reload}</button>
+          <button type="button" className="btn" onClick={async () => { if (!(await onReload()).error) update.reset(); }}>{T.common.reload}</button>
         </div>
       ) : update.error ? <ErrorState error={update.error} /> : null}
-      <OrgForm key={item.version} formId={formId} initial={toValues(item)} alle={alle} selbst={item.id} busy={update.isPending} serverErrors={describeError(update.error).fields}
-        onSubmit={v => update.mutate({ id: item.id, etag, body: toInput(v) }, { onSuccess: () => { toast.show(TS.org.saved); onDone(); } })} />
+      {/* ohne key: «Neu laden» (Z7) holt den neuen Stand für If-Match, die Eingaben im Formular bleiben */}
+      <OrgForm formId={formId} initial={toValues(item)} alle={alle} selbst={item.id} busy={update.isPending} serverErrors={describeError(update.error).fields}
+        onSubmit={v => {
+          // nur Geändertes senden: die Änderung einer anderen Person an einem anderen Feld bleibt (Z7)
+          const body = geaendert(toInput(v), toInput(toValues(item)));
+          if (!Object.keys(body).length) { onDone(); return; }
+          update.mutate({ id: item.id, etag, body }, { onSuccess: () => { toast.show(TS.org.saved); onDone(); } });
+        }} />
     </Drawer>
   );
 }
@@ -144,7 +151,7 @@ function OrgForm({ formId, initial, alle, selbst, onSubmit, busy, serverErrors }
   serverErrors?: { path: string; message: string }[];
 }) {
   const id = useId();
-  const [v, setV] = useState(initial);
+  const [v, setV] = useFormStand(initial);
   const [touched, setTouched] = useState(false);
   const errors = { ...Object.fromEntries((serverErrors ?? []).map(x => [x.path.replace(/^\//, '').split('/')[0], x.message])), ...(touched ? validate(v) : {}) } as Partial<Record<string, string>>;
   const ausgeschlossen = selbst ? nachfahren(alle, selbst) : new Set<string>();

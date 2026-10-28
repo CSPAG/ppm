@@ -209,9 +209,17 @@ describe('Projektdaten', { skip }, () => {
     assert.deepEqual([u.statusCode, u.json().massnahmeStand], [200, 'umgesetzt']);
   });
 
-  test('Kosten: Prognose ohne Wert bleibt ohne Wert (nicht 0 durch die Typumwandlung der Eingabe)', async () => {
+  test('Kosten: Prognose ohne Wert bleibt ohne Wert, 0 bleibt 0 (keine Typumwandlung zwischen null und 0)', async () => {
     const ohne = await call('plx', 'POST', `/v1/projekte/${projekt.x}/kosten`, { phase: 'P1', art: 'opex', text: 'Lizenz', prognose: null });
     assert.equal(ohne.statusCode, 201, ohne.body);
     assert.equal(ohne.json().prognose, null);
+    const id = ohne.json().id as string;
+    let etag = ohne.headers.etag as string;
+    for (const prognose of [0, 1250.5, null]) {
+      const r = await call('plx', 'PATCH', `/v1/projekte/${projekt.x}/kosten/${id}`, { prognose }, { 'if-match': etag });
+      assert.equal(r.statusCode, 200, r.body);
+      assert.equal(r.json().prognose, prognose);
+      etag = r.headers.etag as string;
+    }
   });
 });

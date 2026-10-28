@@ -95,7 +95,7 @@ describe('Projektvertrag', { skip }, () => {
     assert.equal(c.statusCode, 201, c.body);
     const d = c.json();
     entwurf = d.version.id;
-    assert.deepEqual([d.version.nummer, d.version.anlass, d.version.zielphase, d.version.stand, d.version.baseline, d.version.can], ['0.1', 'initial', 'P1', 'in_arbeit', false, { write: true, einreichen: true }]);
+    assert.deepEqual([d.version.nummer, d.version.anlass, d.version.zielphase, d.version.stand, d.version.baseline, d.version.can], ['0.1', 'initial', 'P1', 'in_arbeit', false, { write: true, einreichen: true, zurueckziehen: false }]);
     assert.equal(c.headers.location, `/v1/vertragsversionen/${entwurf}`);
     assert.deepEqual(d.kapitel.map((k: { kapitel: number }) => k.kapitel), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     assert.deepEqual(d.kapitel.slice(0, 3).map((k: { titel: string }) => k.titel), ['Ausgangslage / Problembeschreibung', 'Strategiebezug', 'Ziele und Nutzenbeitrag']);

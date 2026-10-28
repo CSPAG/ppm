@@ -1,7 +1,8 @@
 /**
  * Schublade einer Codetabelle (`?o=<tabelle>`), UC-017 Schritt 2: Werte mit Schlüssel, Text, Reihenfolge und Stand;
  * Wert hinzufügen, Text und Reihenfolge ändern, deaktivieren statt löschen. Deaktivieren ist umkehrbar und wird sofort
- * ausgeführt, mit «Rückgängig» im Toast (I-R1 Stufe 1); bei 412 lädt die Liste neu (Z7).
+ * ausgeführt, mit «Rückgängig» im Toast (I-R1 Stufe 1). Bei 412 lädt «Neu laden» den Wert neu, die Eingaben im Formular
+ * bleiben (Z7); gespeichert wird immer mit der Version aus der Liste.
  */
 import { describeError } from '@vollholz/iam-web';
 import { useId, useState, type FormEvent } from 'react';
@@ -9,6 +10,7 @@ import { isConflict, newIdempotencyKey } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Drawer, Empty, ErrorState, Icon, Loading, Stand, T, useToast } from '../../ui/index.ts';
 import { useCodeMutations, useWerte, type Codetabelle, type Codewert, type TabelleKey } from './api.ts';
+import { geaendert, useFormStand } from './formStand.ts';
 import { TS } from './texte.ts';
 
 export function CodetabelleDrawer({ schluessel, tabellen, laedt, onClose }: { schluessel: string; tabellen: Codetabelle[]; laedt: boolean; onClose(): void }) {
@@ -101,8 +103,10 @@ function WertFormular({ tabelle, modus, onDone }: { tabelle: Codetabelle; modus:
   const m = useCodeMutations(tabelle.schluessel as TabelleKey);
   const [key] = useState(newIdempotencyKey);
   const neu = modus.art === 'neu';
-  const w = modus.art === 'bearbeiten' ? modus.wert : undefined;
-  const [v, setV] = useState<FormValues>({ schluessel: w?.schluessel ?? '', label: w?.label ?? '', position: String(w?.position ?? 0) });
+  const werte = useWerte(tabelle.schluessel as TabelleKey);
+  // aktueller Stand des Werts (nach «Neu laden» mit neuer Version), sonst der beim Öffnen
+  const w = modus.art === 'bearbeiten' ? werte.data?.find(x => x.id === modus.wert.id) ?? modus.wert : undefined;
+  const [v, setV] = useFormStand<FormValues>({ schluessel: w?.schluessel ?? '', label: w?.label ?? '', position: String(w?.position ?? 0) });
   const [touched, setTouched] = useState(false);
   const mutation = neu ? m.create : m.update;
   const errors = {
@@ -116,7 +120,12 @@ function WertFormular({ tabelle, modus, onDone }: { tabelle: Codetabelle; modus:
     if (Object.keys(fehler).length) { document.getElementById(`${id}-${Object.keys(fehler)[0]}`)?.focus(); return; }
     const fertig = { onSuccess: () => { toast.show(neu ? TS.code.created : TS.code.saved); onDone(); } };
     if (neu) m.create.mutate({ body: { schluessel: v.schluessel.trim(), label: v.label.trim(), position: Number(v.position) }, key }, fertig);
-    else m.update.mutate({ wert: w!, body: { label: v.label.trim(), position: Number(v.position) } }, fertig);
+    else {
+      // nur Geändertes senden: die Änderung einer anderen Person am anderen Feld bleibt (Z7)
+      const body = geaendert({ label: v.label.trim(), position: Number(v.position) }, { label: w!.label, position: w!.position });
+      if (!Object.keys(body).length) { onDone(); return; }
+      m.update.mutate({ wert: w!, body }, fertig);
+    }
   };
   const describedBy = (k: keyof FormValues, hint?: boolean) =>
     [hint ? `${id}-${k}-h` : '', errors[k] ? `${id}-${k}-e` : ''].filter(Boolean).join(' ') || undefined;
@@ -124,9 +133,14 @@ function WertFormular({ tabelle, modus, onDone }: { tabelle: Codetabelle; modus:
   return (
     <Drawer title={neu ? `${tabelle.label}: ${TS.code.neu}` : TS.code.bearbeiten(w!.label)} onClose={onDone} footer={<>
       <button type="button" className="btn" onClick={onDone}>{T.common.cancel}</button>
-      <button type="submit" form={formId} className="btn primary" disabled={mutation.isPending}>{T.common.save}</button>
+      <button type="submit" form={formId} className="btn primary" disabled={mutation.isPending || isConflict(mutation.error)}>{T.common.save}</button>
     </>}>
-      {isConflict(mutation.error) ? <div className="notice" role="alert"><p>{TS.code.conflict}</p></div> : mutation.error && !describeError(mutation.error).fields?.length ? <ErrorState error={mutation.error} /> : null}
+      {isConflict(mutation.error) ? (
+        <div className="notice" role="alert">
+          <p>{TS.code.conflict}</p>
+          <button type="button" className="btn" onClick={async () => { if (!(await werte.refetch()).error) mutation.reset(); }}>{T.common.reload}</button>
+        </div>
+      ) : mutation.error && !describeError(mutation.error).fields?.length ? <ErrorState error={mutation.error} /> : null}
       <form id={formId} className="form" onSubmit={submit} noValidate aria-busy={mutation.isPending}>
         <div className="field">
           <label htmlFor={`${id}-label`}>{TS.code.label}</label>

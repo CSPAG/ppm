@@ -132,6 +132,16 @@ export const TM = {
     ohneBaseline: (k: number) => `${k === 1 ? '1 Projekt hat' : `${k} Projekte haben`} noch keine Termine mit Baseline:`,
     imPlan: 'im Plan',
     frueher: (t: string) => `${t} früher`,
+    exportieren: 'Exportieren (CSV)', exportiert: (name: string) => `${name} gespeichert.`,
+    einzelwerte: (nummer: string, abweichung: string) => `Einzelwerte zu ${nummer}: ${abweichung}`,
+    drawerTitel: (nummer: string, name: string) => `Termine ${nummer} ${name}`,
+    drawerSub: 'Meilensteine und Lieferergebnisse mit Termin der Baseline; das Ende einer Phase ist ihr spätester Termin.',
+    tabelle: 'Meilensteine und Lieferergebnisse',
+    spalteMs: { phase: 'Phase', bezeichnung: 'Bezeichnung', baseline: 'Baseline', aktuell: 'Aktuell', abweichung: 'Abweichung' },
+    art: { meilenstein: 'Meilenstein', lieferergebnis: 'Lieferergebnis' } as Record<string, string>,
+    erreicht: 'erreicht',
+    projektOeffnen: 'Projekt öffnen',
+    unbekannt: 'Dieses Projekt steht nicht in den Terminabweichungen der Periode.',
   },
   // Kopfkarte «Monatszyklus» im Eingang (informationsarchitektur.md «Startseite je Rolle», UE und PMO)
   kopfkarte: {

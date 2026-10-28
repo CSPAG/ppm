@@ -21,4 +21,12 @@ export const kopfkarten: readonly KopfKarte[] = [
   { id: 'sitzung', recht: 'sitzung:read', Karte: seite(() => import('./features/sitzung/SitzungKopfKarte.tsx'), 'SitzungKopfKarte') },
   // Ideen (K4 «vom Eingang mit einem Klick zum Assistenten»): alle Mitglieder reichen Ideen ein (A-46)
   { id: 'idee', recht: 'idee:create', Karte: seite(() => import('./features/idee/IdeeKopfKarte.tsx'), 'IdeeKopfKarte') },
+  // Finanzen: Prognose gegenüber Budget, Überschreitungen, Ist-Kosten (FI; UC-010)
+  { id: 'finanzen', recht: 'finanzen:write', Karte: seite(() => import('./features/finanzen/FinanzenKopfKarte.tsx'), 'FinanzenKopfKarte') },
+  // Ressourcen: offene Bedarfe, Konflikte, Engpässe der nächsten drei Monate (RM; UC-009)
+  { id: 'ressourcen', recht: 'ressource:write', Karte: seite(() => import('./features/ressourcen/RessourcenKopfKarte.tsx'), 'RessourcenKopfKarte') },
+  // Schnittstellen mit fehlgeschlagenem Lauf (ADM; UC-018)
+  { id: 'schnittstellen', recht: 'schnittstelle:admin', Karte: seite(() => import('./features/schnittstellen/SchnittstellenKopfKarte.tsx'), 'SchnittstellenKopfKarte') },
+  // Zugänge mit offener Neubesetzung (ADM; UC-016 A1)
+  { id: 'neubesetzungen', recht: 'members:admin', Karte: seite(() => import('./features/zugang/NeubesetzungKopfKarte.tsx'), 'NeubesetzungKopfKarte') },
 ];

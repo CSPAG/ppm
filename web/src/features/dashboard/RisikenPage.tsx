@@ -1,20 +1,28 @@
 /**
  * Portfolio › Dashboard › Risiken (UI-18, Seitentyp Bericht; BC PC.02.02, UC-014 Schritt 2; Kernablauf K3 Schritt 7):
  * Filter oben (Portfolio), Kennzahlen, Verteilung nach Wahrscheinlichkeit × Auswirkung als Tabelle, Risiken mit
- * Massnahme, Abhängigkeiten und offene Eskalationen. Stufen als Text, nie nur Farbe (Q-B5).
- * Adresse: `/portfolio/dashboard/risiken?portfolio=transformation` (I-N5).
+ * Massnahme, Abhängigkeiten und offene Eskalationen. Stufen als Text, nie nur Farbe (Q-B5). Jede Zahl (Feld der Matrix,
+ * Kennzahl) führt zu ihren Einzelwerten: sie filtert die Risiken (`w`, `a`, `massnahme` in der Adresse); Export als CSV.
+ * Adresse: `/portfolio/dashboard/risiken?portfolio=transformation&w=hoch&a=hoch` (I-N5).
  */
+import { useState, type ReactNode } from 'react';
 import { useSession } from '../../auth/index.ts';
-import { Empty, ErrorState, fmtPeriode, fmtZeitpunkt, Icon, Skelett, Stand, useVerzoegert } from '../../ui/index.ts';
-import { useRisikolage, type Portfoliobericht, type RisikolageRisiko } from './PortfolioberichtApi.ts';
+import { Empty, ErrorState, fmtPeriode, fmtZeitpunkt, Icon, Skelett, Stand, useToast, useVerzoegert } from '../../ui/index.ts';
+import { risikenExportieren, useRisikolage, type Portfoliobericht, type RisikolageRisiko } from './PortfolioberichtApi.ts';
 import type { RisikenSearch, SetRisikenSearch } from './PortfolioberichtSuche.ts';
 import { TR } from './PortfolioberichtTexte.ts';
 import './dashboard.css';
 import './Portfoliobericht.css';
 
 const STUFEN = ['hoch', 'mittel', 'tief'] as const;
+type Stufe = (typeof STUFEN)[number];
 
-function Kopf({ unter }: { unter?: string }) {
+/** Auswahl der Risiken hinter einer Zahl (Feld der Matrix bzw. offene Massnahme). */
+export interface RisikoFilter { w?: Stufe; a?: Stufe; massnahme?: 'offen' }
+const passt = (f: RisikoFilter) => (r: RisikolageRisiko) =>
+  (!f.w || r.wahrscheinlichkeit === f.w) && (!f.a || r.auswirkung === f.a) && (!f.massnahme || r.massnahmeStand === f.massnahme);
+
+function Kopf({ unter, aktionen }: { unter?: string; aktionen?: ReactNode }) {
   return (
     <header className="mh">
       <div className="mh-row">
@@ -25,13 +33,17 @@ function Kopf({ unter }: { unter?: string }) {
             <div className="sub">{unter ?? TR.sub}</div>
           </div>
         </div>
+        {aktionen ? <div className="acts">{aktionen}</div> : null}
       </div>
     </header>
   );
 }
 
-/** Verteilung als Tabelle (Zeilen Wahrscheinlichkeit, Spalten Auswirkung); Zahl und Text, Farbe nur zusätzlich. */
-export function RisikoMatrix({ matrix }: { matrix: { wahrscheinlichkeit: string; auswirkung: string; anzahl: number }[] }) {
+/**
+ * Verteilung als Tabelle (Zeilen Wahrscheinlichkeit, Spalten Auswirkung); Zahl und Text, Farbe nur zusätzlich. Mit
+ * `waehlen` ist jedes Feld eine Schaltfläche zu seinen Risiken (Seitentyp Bericht); ohne (Portfoliobericht) nur Text.
+ */
+export function RisikoMatrix({ matrix, waehlen }: { matrix: { wahrscheinlichkeit: string; auswirkung: string; anzahl: number }[]; waehlen?(w: Stufe, a: Stufe): void }) {
   const n = (w: string, a: string) => matrix.find(m => m.wahrscheinlichkeit === w && m.auswirkung === a)?.anzahl ?? 0;
   return (
     <table className="pb-matrix">
@@ -46,7 +58,12 @@ export function RisikoMatrix({ matrix }: { matrix: { wahrscheinlichkeit: string;
             {STUFEN.map(a => {
               const k = n(w, a);
               const ton = w === 'hoch' && a === 'hoch' ? 'bad' : w === 'tief' && a === 'tief' ? 'ok' : 'mid';
-              return <td key={a} className={k ? `pb-feld pb-${ton}` : 'pb-feld'} aria-label={TR.matrix.feld(TR.stufe[w]!, TR.stufe[a]!, k)}>{k}</td>;
+              const label = TR.matrix.feld(TR.stufe[w]!, TR.stufe[a]!, k);
+              return (
+                <td key={a} className={k ? `pb-feld pb-${ton}` : 'pb-feld'} aria-label={waehlen ? undefined : label}>
+                  {waehlen ? <button type="button" className="pb-zahl" onClick={() => waehlen(w, a)} disabled={!k} aria-label={TR.zeigen(label)}>{k}</button> : k}
+                </td>
+              );
             })}
           </tr>
         ))}
@@ -84,16 +101,47 @@ export function RisikoTabelle({ risiken, projektLink }: { risiken: RisikolageRis
 /** Risikolage aus der API oder aus dem gespeicherten Stand des Portfolioberichts. */
 export type LageDaten = Pick<Portfoliobericht['risikolage'], 'matrix' | 'abhaengigkeiten' | 'eskalationen'> & { risiken: RisikolageRisiko[] };
 
-export function Lage({ r, projektLink }: { r: LageDaten; projektLink?(nr: string): string }) {
-  const hoch = r.risiken.filter(x => x.wahrscheinlichkeit === 'hoch' && x.auswirkung === 'hoch').length;
-  const offen = r.risiken.filter(x => x.massnahmeStand === 'offen').length;
+/**
+ * Risikolage; mit `filter` und `setFilter` (Seite UI-18) führt jede Zahl zu ihren Risiken in der Tabelle, ohne
+ * (Portfoliobericht) bleibt sie Text.
+ */
+export function Lage({ r, projektLink, filter, setFilter }: { r: LageDaten; projektLink?(nr: string): string; filter?: RisikoFilter; setFilter?(f: RisikoFilter): void }) {
+  const hoch = r.risiken.filter(passt({ w: 'hoch', a: 'hoch' })).length;
+  const offen = r.risiken.filter(passt({ massnahme: 'offen' })).length;
+  const f = filter ?? {};
+  const gefiltert = !!(f.w || f.a || f.massnahme);
+  const risiken = gefiltert ? r.risiken.filter(passt(f)) : r.risiken;
+  const zahl = (text: string, n: number, neu: RisikoFilter) => (setFilter
+    ? <button type="button" className="linkbtn db-zahl" onClick={() => setFilter(neu)} disabled={!n} aria-label={TR.zeigen(text)}>{text}</button>
+    : text);
   const A = TR.abhaengigkeiten;
   const E = TR.eskalationen;
   return (
     <>
-      <p className="db-kennzahlen" role="status">{[TR.kennzahl.risiken(r.risiken.length), TR.kennzahl.hoch(hoch), TR.kennzahl.offen(offen)].join(' · ')}</p>
-      <div className="pb-abschnitt"><RisikoMatrix matrix={r.matrix} /></div>
-      <section className="pb-abschnitt" aria-labelledby="pb-risiken"><h2 id="pb-risiken" className="grp-h">{TR.risiken.titel}</h2><RisikoTabelle risiken={r.risiken} projektLink={projektLink} /></section>
+      <div className="db-kennzahlen" role="status">
+        <ul>
+          {/* die Gesamtzahl hebt eine Auswahl auf und zeigt alle Risiken */}
+          <li>{gefiltert ? zahl(TR.kennzahl.risiken(r.risiken.length), r.risiken.length, {}) : TR.kennzahl.risiken(r.risiken.length)}</li>
+          <li>{zahl(TR.kennzahl.hoch(hoch), hoch, { w: 'hoch', a: 'hoch' })}</li>
+          <li>{zahl(TR.kennzahl.offen(offen), offen, { massnahme: 'offen' })}</li>
+        </ul>
+      </div>
+      <div className="pb-abschnitt"><RisikoMatrix matrix={r.matrix} waehlen={setFilter ? (w, a) => setFilter({ w, a }) : undefined} /></div>
+      <section className="pb-abschnitt" aria-labelledby="pb-risiken">
+        <h2 id="pb-risiken" className="grp-h">{TR.risiken.titel}</h2>
+        {gefiltert ? (
+          <p className="pb-auswahl">
+            <span className="chip">
+              <span className="v"><b>{TR.filter.label}:</b> {filterText(f)}</span>
+              <button type="button" className="x" aria-label={TR.filter.entfernen(filterText(f))} onClick={() => setFilter?.({})}><Icon name="x" /></button>
+            </span>
+          </p>
+        ) : null}
+        {gefiltert && !risiken.length ? (
+          // Z3: leer durch Filter, mit Ausweg
+          <Empty action={<button type="button" className="btn" onClick={() => setFilter?.({})}>{TR.zuruecksetzen}</button>}><span role="status">{TR.leerFilter}</span></Empty>
+        ) : <RisikoTabelle risiken={risiken} projektLink={projektLink} />}
+      </section>
       <section className="pb-abschnitt" aria-labelledby="pb-abh">
         <h2 id="pb-abh" className="grp-h">{A.titel}</h2>
         {r.abhaengigkeiten.length ? (
@@ -114,21 +162,34 @@ export function Lage({ r, projektLink }: { r: LageDaten; projektLink?(nr: string
   );
 }
 
+const filterText = (f: RisikoFilter) => [f.w && f.a ? TR.filter.feld(TR.stufe[f.w]!, TR.stufe[f.a]!) : null, f.massnahme ? TR.filter.offen : null].filter(Boolean).join(', ');
+
 export function RisikenPage({ search, setSearch }: { search: RisikenSearch; setSearch: SetRisikenSearch }) {
   const { canSomewhere } = useSession();
   const darf = canSomewhere('auswertung:read');
   const q = useRisikolage(search.portfolio, darf);
   const skelett = useVerzoegert(q.isPending && darf);
   const d = q.data;
+  const toast = useToast();
+  const [exportLaeuft, setExportLaeuft] = useState(false);
+  const filter: RisikoFilter = { w: search.w, a: search.a, massnahme: search.massnahme };
+  const exportieren = () => {
+    setExportLaeuft(true);
+    risikenExportieren({ portfolio: search.portfolio, ...filter })
+      .then(name => toast.show(TR.exportiert(name)), e => toast.error(e)).finally(() => setExportLaeuft(false));
+  };
 
   if (!darf) return <section aria-labelledby="page-title"><Kopf /><div className="body"><Empty>{TR.keinRecht}</Empty></div></section>;
   return (
     <section aria-labelledby="page-title">
-      <Kopf unter={d ? TR.stand(fmtZeitpunkt(d.stand)) : undefined} />
+      <Kopf unter={d ? TR.stand(fmtZeitpunkt(d.stand)) : undefined}
+        aktionen={d?.risiken.length ? (
+          <button type="button" className="btn" onClick={exportieren} disabled={exportLaeuft} aria-busy={exportLaeuft || undefined}><Icon name="download" />{TR.exportieren}</button>
+        ) : null} />
       <div className="toolbar" role="search" aria-label={TR.inhalt}>
         <label className="db-select">
           <span className="sr">Portfolio</span>
-          <select value={search.portfolio ?? ''} onChange={e => setSearch({ portfolio: e.target.value || undefined })} disabled={!d}>
+          <select value={search.portfolio ?? ''} onChange={e => setSearch({ portfolio: e.target.value || undefined, w: undefined, a: undefined, massnahme: undefined })} disabled={!d}>
             <option value="">Alle Portfolios</option>
             {d?.portfolios.map(p => <option key={p.id} value={p.schluessel}>{p.name}</option>)}
           </select>
@@ -139,7 +200,10 @@ export function RisikenPage({ search, setSearch }: { search: RisikenSearch; setS
       <div className="body" tabIndex={0} role="region" aria-label={TR.inhalt}>
         {q.isPending ? (
           <div aria-busy="true"><span className="sr" role="status">{TR.title}</span>{skelett ? <Skelett /> : null}</div>
-        ) : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : d ? <Lage r={d} projektLink={nr => `/projekte/${nr}`} /> : null}
+        ) : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : d ? (
+          <Lage r={d} projektLink={nr => `/projekte/${nr}`} filter={filter}
+            setFilter={fl => setSearch({ w: fl.w, a: fl.a, massnahme: fl.massnahme })} />
+        ) : null}
       </div>
     </section>
   );

@@ -74,18 +74,30 @@ async function oeffnen(tx: Tx, a: AufgabeOeffnen): Promise<string> {
       a.frist?.datum ?? null, a.frist?.art ?? null, a.manuell ?? false])).rows[0]!.id);
 }
 
-async function schliessen(tx: Tx, s: AufgabeAuswahl, stand: 'erledigt' | 'entfallen'): Promise<number> {
-  const args: unknown[] = [stand, s.art, s.bezug.typ, s.bezug.id];
-  let where = '';
+/** Bedingung für die Auswahl ab Platzhalter `$<von>`; mit den Werten in derselben Reihenfolge. */
+function auswahl(s: AufgabeAuswahl, von: number): { where: string; args: unknown[] } {
+  const args: unknown[] = [s.art, s.bezug.typ, s.bezug.id];
+  let where = `art = $${von} AND bezug_typ = $${von + 1} AND bezug_id = $${von + 2}`;
   if (s.empfaenger) {
     const e = empfaengerSpalten(s.empfaenger);
     args.push(e.person, e.recht, e.ortTyp, e.ortId);
-    where = ` AND empfaenger_person IS NOT DISTINCT FROM $5 AND empfaenger_recht IS NOT DISTINCT FROM $6
-              AND ort_typ = $7 AND ort_id IS NOT DISTINCT FROM $8::uuid`;
+    where += ` AND empfaenger_person IS NOT DISTINCT FROM $${von + 3} AND empfaenger_recht IS NOT DISTINCT FROM $${von + 4}
+              AND ort_typ = $${von + 5} AND ort_id IS NOT DISTINCT FROM $${von + 6}::uuid`;
   }
-  return intern(tx, async () => (await tx.query(
-    `UPDATE ${A} SET stand = $1, erledigt_von = app.principal_id(), erledigt_at = now()
-      WHERE stand = 'offen' AND art = $2 AND bezug_typ = $3 AND bezug_id = $4${where}`, args)).rowCount ?? 0);
+  return { where, args };
+}
+
+async function schliessen(tx: Tx, s: AufgabeAuswahl, stand: 'erledigt' | 'entfallen'): Promise<number> {
+  const a = auswahl(s, 2);
+  return intern(tx, async () => {
+    const n = (await tx.query(
+      `UPDATE ${A} SET stand = $1, erledigt_von = app.principal_id(), erledigt_at = now()
+        WHERE stand = 'offen' AND ${a.where}`, [stand, ...a.args])).rowCount ?? 0;
+    // Schon von Hand erledigt: die fachliche Handlung beendet sie endgültig, «Rückgängig» öffnet sie nicht mehr
+    const b = auswahl(s, 1);
+    await tx.query(`UPDATE ${A} SET manuell = false WHERE stand = 'erledigt' AND manuell AND ${b.where}`, b.args);
+    return n;
+  });
 }
 
 /** Aufgaben öffnen und schliessen (Fachmodell 4.1). */

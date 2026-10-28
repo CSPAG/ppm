@@ -30,7 +30,8 @@ test('Dashboard: Liste und Funnel; barrierefrei', async ({ page }) => {
   await page.goto(`/portfolio/dashboard?portfolio=${schluessel}&periode=${laufend()}`);
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
   await expect(page.getByRole('link', { name: new RegExp(`E2E Dashboard ${lauf}`) })).toBeVisible();
-  await expect(page.getByText(/^1 Projekt · /)).toBeVisible();
+  // Kennzahlen als Liste; jede Zahl ist eine Schaltfläche zu ihren Projekten (Seitentyp Bericht)
+  await expect(page.getByRole('listitem').filter({ hasText: /^1 Projekt$/ })).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 
@@ -44,6 +45,10 @@ test('Dashboard: Liste und Funnel; barrierefrei', async ({ page }) => {
   await expect(tab.getByRole('row', { name: /P1/ }).getByRole('cell').first()).toHaveText('1');
   await expectAccessible(page);
   await expectNoOverflow(page);
+  // die Zahl führt zu ihren Einzelwerten: Liste der Phase in der Adresse
+  await tab.getByRole('button', { name: /^Projekte in P1 .*anzeigen: 1 Projekte$/ }).click();
+  await expect(page).toHaveURL(/phase=P1/);
+  await expect(page.getByRole('link', { name: new RegExp(`E2E Dashboard ${lauf}`) })).toBeVisible();
 });
 
 test('Leser:in sieht das Dashboard nicht', async ({ page }) => {

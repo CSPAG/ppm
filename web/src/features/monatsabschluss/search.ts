@@ -2,7 +2,8 @@
  * Suchparameter des Monatsabschlusses (I-N5, docs/ux/informationsarchitektur.md «Adressen»):
  * `/portfolio/monatsabschluss?periode=2026-10&stand=eingereicht&sort=auffaellig`; Ansicht «Termine» über
  * `ansicht=termine` (UI-16), Filter `auffaellig=1` und `portfolio=<id>`, Bericht in der Schublade über
- * `o=bericht:<projektnummer>` (Schlüssel der Oberfläche statt interner ID).
+ * `o=bericht:<projektnummer>` bzw. die Einzelwerte der Termine über `o=termine:<projektnummer>` (Schlüssel der Oberfläche
+ * statt interner ID).
  */
 export type ZeilenStand = 'eingereicht' | 'zurueckgegeben' | 'geprueft' | 'ausstehend' | 'nicht_gemeldet';
 
@@ -19,10 +20,13 @@ export interface MonatsabschlussSearch {
 const STAENDE: readonly ZeilenStand[] = ['eingereicht', 'zurueckgegeben', 'geprueft', 'ausstehend', 'nicht_gemeldet'];
 const PERIODE = /^[0-9]{4}-(0[1-9]|1[0-2])$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const O = /^bericht:[0-9]{4}-[0-9]{3,4}$/;
+const O = /^(bericht|termine):[0-9]{4}-[0-9]{3,4}$/;
 
 export const berichtO = (nummer: string) => `bericht:${nummer}`;
 export const nummerAusO = (o: string) => o.slice('bericht:'.length);
+/** Einzelwerte der Terminabweichung eines Projekts in der Schublade (UI-16): `o=termine:<projektnummer>`. */
+export const termineO = (nummer: string) => `termine:${nummer}`;
+export const nummerAusTermineO = (o: string | undefined) => (o?.startsWith('termine:') ? o.slice('termine:'.length) : undefined);
 
 /** Prüft die rohen Suchparameter; Unbekanntes und Ungültiges fällt weg. */
 export function validateMonatsabschlussSearch(raw: Record<string, unknown>): MonatsabschlussSearch {

@@ -15,12 +15,13 @@ import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './featur
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { finanzenPfad, type SetBudgetSearch, type SetFinanzenSearch } from './features/finanzen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch, type SetSzenarioSearch } from './features/priorisierung/index.ts';
-import type { SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
+import type { SetAuswertungenSearch, SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
 import type { SetLessonsSearch } from './features/abschluss/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
 import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/index.ts';
+import { rueckblickJahr } from './features/jahresrueckblick/index.ts';
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
 import type { SetVorlagenSearch } from './features/vorlagen/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
@@ -52,6 +53,7 @@ const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx
 const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
 const LessonsPage = seite(() => import('./features/abschluss/LessonsPage.tsx'), 'LessonsPage');
 const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
+const AuswertungenPage = seite(() => import('./features/dashboard/AuswertungenPage.tsx'), 'AuswertungenPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
@@ -62,6 +64,7 @@ const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'S
 const SitzungsmodusPage = seite(() => import('./features/sitzung/SitzungsmodusPage.tsx'), 'SitzungsmodusPage');
 const ProtokollPage = seite(() => import('./features/sitzung/ProtokollPage.tsx'), 'ProtokollPage');
 const EntscheidePage = seite(() => import('./features/sitzung/EntscheidePage.tsx'), 'EntscheidePage');
+const JahresrueckblickPage = seite(() => import('./features/jahresrueckblick/JahresrueckblickPage.tsx'), 'JahresrueckblickPage');
 const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
 const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
 const VorlagenPage = seite(() => import('./features/vorlagen/VorlagenPage.tsx'), 'VorlagenPage');
@@ -480,6 +483,14 @@ function PortfolioberichtRoute() {
   return <PortfolioberichtPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Portfolio» › Auswertungen (UI-30; PC.04.03, UC-014 A2; AP-E7-6)
+const auswertungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/auswertungen', validateSearch: searchOf.auswertungen, component: AuswertungenRoute });
+function AuswertungenRoute() {
+  const navigate = useNavigate({ from: auswertungenRoute.fullPath });
+  const setSearch = useCallback<SetAuswertungenSearch>((next, o) => { void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false }); }, [navigate]);
+  return <AuswertungenPage search={auswertungenRoute.useSearch()} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -666,6 +677,23 @@ function EntscheideRoute() {
   return <EntscheidePage search={search} setSearch={setSearch} />;
 }
 
+// Gremien › Jahresrückblick (UI-37, UC-013; AP-E7-5): `/gremien/jahresrueckblick/2026`; ohne Jahr im Q4 das laufende, sonst das Vorjahr
+const jahresrueckblickStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/jahresrueckblick',
+  beforeLoad: () => { throw redirect({ to: '/gremien/jahresrueckblick/$jahr', params: { jahr: String(rueckblickJahr()) }, replace: true }); },
+});
+
+const jahresrueckblickRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/jahresrueckblick/$jahr', component: JahresrueckblickRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function JahresrueckblickRoute() {
+  const { jahr } = jahresrueckblickRoute.useParams();
+  const navigate = useNavigate();
+  return <JahresrueckblickPage key={jahr} jahr={Number(jahr)} jahrWechseln={j => void navigate({ to: '/gremien/jahresrueckblick/$jahr', params: { jahr: String(j) } })} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -715,6 +743,8 @@ const routeTree = rootRoute.addChildren([
   sitzungsmodusRoute,
   protokollRoute,
   entscheideRoute,
+  jahresrueckblickStartRoute,
+  jahresrueckblickRoute,
   zielzyklusRoute,
   freigabeRoute,
   roadmapRoute,
@@ -729,6 +759,7 @@ const routeTree = rootRoute.addChildren([
   risikenRoute,
   portfolioberichtRoute,
   lessonsRoute,
+  auswertungenRoute,
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,

@@ -28,7 +28,6 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
 .e{color:var(--fg-3);font-style:italic}
 
 /* Lade-, Leer- und Fehlerzustände */
-.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:48px 22px;color:var(--fg-2)}
 .loading-inline{display:inline-flex;align-items:center;gap:8px;color:var(--fg-2);font-size:13px}
 .skeleton{padding:8px 22px}
 .sk-row{display:flex;gap:16px;height:42px;align-items:center;border-bottom:1px solid var(--line)}

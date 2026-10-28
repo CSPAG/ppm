@@ -5,8 +5,8 @@
  * (I-L6). Zustände: Laden als Skelett erst nach 300 ms (Z1), leer beim ersten Mal mit erster Aktion (Z2), leer durch
  * Filter mit «Filter zurücksetzen» (Z3), teilweise (Z4), Fehler mit «Erneut versuchen» (Z5).
  */
-import { useEffect, useState, type ReactNode } from 'react';
-import { Empty, ErrorState } from './states.tsx';
+import type { ReactNode } from 'react';
+import { Empty, ErrorState, Skelett, useVerzoegert } from './states.tsx';
 import { T } from './texte/index.ts';
 
 export interface Spalte<R> {
@@ -45,24 +45,6 @@ export interface DatenlisteProps<R> {
   mehr?: { vorhanden: boolean; laedt: boolean; laden(): void };
 }
 
-/** `wert` erst nach `ms` übernehmen (Skelett nicht bei kurzen Ladezeiten, Z1). */
-export function useVerzoegert(wert: boolean, ms = 300): boolean {
-  const [spaet, setSpaet] = useState(false);
-  useEffect(() => {
-    if (!wert) return;
-    const t = setTimeout(() => setSpaet(true), ms);
-    return () => { clearTimeout(t); setSpaet(false); };
-  }, [wert, ms]);
-  return wert && spaet;
-}
-
-export function Skelett({ zeilen = 5 }: { zeilen?: number }) {
-  return (
-    <div className="skeleton" aria-hidden="true">
-      {Array.from({ length: zeilen }, (_, i) => <div key={i} className="sk-row"><span className="sk" /><span className="sk" /><span className="sk" /></div>)}
-    </div>
-  );
-}
 
 export function Datenliste<R>(p: DatenlisteProps<R>) {
   const skelett = useVerzoegert(p.laedt);

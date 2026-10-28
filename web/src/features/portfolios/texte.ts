@@ -65,4 +65,10 @@ export const TP = {
   terminDoppelt: 'An diesem Tag ist schon ein Termin geplant.',
   terminUngueltig: 'Gib ein Datum ein.',
   anzahlTermine: (n: number) => (n === 1 ? '1 Termin' : `${n} Termine`),
+  // Kopfkarte im Eingang, solange die Organisation kein Portfolio hat (Zustand Z2 «leer beim ersten Mal»)
+  kopfkarte: {
+    titel: 'Organisation einrichten',
+    text: 'Deine Organisation hat noch kein Portfolio. Lege zuerst Portfolios und Gremien an: Erst dann gibt es Projekte, Sitzungen und ein Dashboard.',
+    einrichten: 'Portfolios und Gremien einrichten',
+  },
 };

@@ -41686,7 +41686,7 @@ export interface components {
             trend: string | null;
             meldung: "gemeldet" | "ausstehend" | "nicht_gemeldet" | "ohne_pflicht";
             werteAus: string | null;
-            /** @description «Eskalation»: Bericht der Periode mit «Entscheid des PRAT nötig» (UC-004 A2.2). */
+            /** @description «Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4). */
             merkmale: "eskalation"[];
         };
         FunnelStufe: {

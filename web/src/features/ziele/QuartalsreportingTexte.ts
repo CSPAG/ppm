@@ -1,5 +1,5 @@
 /**
- * Texte der Seite «Quartalsreporting» (UI-41; Kernablauf K6 Schritte 11–14, Regeln und Texte): Anrede «Sie» (UX-E7),
+ * Texte der Seite «Quartalsreporting» (UI-41; Kernablauf K6 Schritte 11–14, Regeln und Texte): Anrede «Du» (UX-OF-1, #121),
  * Schweizer Rechtschreibung; Aktionen aus K6 «Bericht erstellen», «Als Dokument herunterladen».
  */
 export const TQR = {
@@ -10,7 +10,7 @@ export const TQR = {
   stand: { in_arbeit: 'in Arbeit', traktandiert: 'traktandiert', verabschiedet: 'verabschiedet' } as Record<string, string>,
   erstellen: 'Bericht erstellen',
   neuErstellen: 'Neu erstellen',
-  neuWirkung: 'Der Inhalt wird aus dem aktuellen Stand neu erzeugt; Ihre Kommentare bleiben.',
+  neuWirkung: 'Der Inhalt wird aus dem aktuellen Stand neu erzeugt; deine Kommentare bleiben.',
   traktandieren: 'Im PRAT traktandieren',
   traktandierenWirkung: 'Der Bericht erscheint als Vorschlag in der nächsten PRAT-Sitzung und lässt sich danach nicht mehr ändern.',
   leer: (q: string) => `Für ${q} gibt es noch kein Quartalsreporting. Das System erstellt den Entwurf aus Zielerreichung, Portfolioberichten und den an den VR weitergeleiteten Geschäften.`,
@@ -18,10 +18,10 @@ export const TQR = {
   laeuftNoch: 'Das Quartal läuft noch; das Quartalsreporting entsteht nach Quartalsende.',
   erzeugtAm: (d: string) => `Erstellt am ${d}`,
   bannerTraktandiert: (d: string) => `Dem PRAT vorgelegt am ${d}. Der Entscheid fällt in der Sitzung.`,
-  bannerVerabschiedet: (d: string) => `Im PRAT verabschiedet am ${d}. Laden Sie das Dokument für den VR herunter und erfassen Sie danach dessen Rückmeldung.`,
+  bannerVerabschiedet: (d: string) => `Im PRAT verabschiedet am ${d}. Lade das Dokument für den VR herunter und erfasse danach dessen Rückmeldung.`,
   rueckmeldungPrat: (t: string) => `Der PRAT verlangt Anpassungen: ${t}`,
   hinweise: 'Hinweise zum Entwurf',
-  nurLesen: 'Sie sehen den Bericht lesend; erstellen kann die Unternehmensentwicklung.',
+  nurLesen: 'Du siehst den Bericht lesend; erstellen kann die Unternehmensentwicklung.',
 
   abschnitte: {
     gesamtstatus: '1 Gesamtstatus', zielerreichung: '2 Zielerreichung', entwicklungen: '3 Wesentliche Entwicklungen', risiken: '4 Kritische Portfoliorisiken',
@@ -59,9 +59,9 @@ export const TQR = {
   auftrag: 'Auftrag', verantwortlich: 'Verantwortlich', terminOptional: 'Termin (optional)',
   auftragHinzufuegen: 'Auftrag erfassen',
   auftragWirkung: 'Die verantwortliche Person erhält den Auftrag als Aufgabe in ihrem Eingang.',
-  auftragFehlt: 'Auftrag fehlt: Beschreiben Sie, was der VR verlangt.',
-  verantwortlichFehlt: 'Verantwortliche Person fehlt: Wählen Sie, wer den Auftrag erledigt.',
+  auftragFehlt: 'Auftrag fehlt: Beschreibe, was der VR verlangt.',
+  verantwortlichFehlt: 'Verantwortliche Person fehlt: Wähle, wer den Auftrag erledigt.',
   offen: 'offen', erledigt: (d: string) => `erledigt am ${d}`,
   auftragErfasst: 'Auftrag erfasst.',
-  konflikt: 'Der Bericht wurde inzwischen geändert. Laden Sie ihn neu und wiederholen Sie die Aktion.',
+  konflikt: 'Der Bericht wurde inzwischen geändert. Lade ihn neu und wiederhole die Aktion.',
 };

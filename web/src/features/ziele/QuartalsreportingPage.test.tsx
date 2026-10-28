@@ -21,7 +21,7 @@ const P = '00000000-0000-4000-8000-0000000000a1';
 const bericht = (o: Record<string, unknown> = {}) => ({
   id: '00000000-0000-4000-8000-0000000000b1', quartal: '2026-Q3', stand: 'in_arbeit', erzeugtAt: '2026-10-05T08:00:00Z', traktandiertAt: null, verabschiedetAt: null, version: 2,
   inhalt: {
-    hinweise: ['Zielerreichung Q3 2026: 1 von 2 Zielen ohne neuen Stand. Sie erscheinen mit dem letzten früheren Stand.'],
+    hinweise: ['Zielerreichung Q3 2026: 1 von 2 Zielen ohne neuen Stand; diese erscheinen mit dem letzten früheren Stand.'],
     zielerreichung: { nachgefuehrt: 1, gesamt: 2, ziele: [
       { typ: 'strategisch', id: '00000000-0000-4000-8000-0000000000c1', nummer: '1.1', text: 'Wartezeit senken', metrik: 'Median', zielwert: '−10 %', stand: '−4 %', beurteilung: 'auf Kurs', quartal: '2026-Q3' },
       { typ: 'strategisch', id: '00000000-0000-4000-8000-0000000000c2', nummer: '1.2', text: 'Kosten senken', metrik: 'CHF', zielwert: '−5 %', stand: '−1 %', beurteilung: '', quartal: '2026-Q2' },

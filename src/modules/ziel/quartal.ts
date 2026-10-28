@@ -85,7 +85,7 @@ export async function inhaltErzeugen(tx: Tx, quartal: string): Promise<Inhalt> {
   });
   const nachgefuehrt = zz.filter(z => z.quartal === quartal).length;
   // K6 Regel «Zielerreichung unvollständig»: Warnung mit dem Stand des Vorquartals
-  if (nachgefuehrt < zz.length) hinweise.push(`Zielerreichung ${quartalLabel(quartal)}: ${zz.length - nachgefuehrt} von ${zz.length} Zielen ohne neuen Stand. Sie erscheinen mit dem letzten früheren Stand.`);
+  if (nachgefuehrt < zz.length) hinweise.push(`Zielerreichung ${quartalLabel(quartal)}: ${zz.length - nachgefuehrt} von ${zz.length} Zielen ohne neuen Stand; diese erscheinen mit dem letzten früheren Stand.`);
 
   const periode = letztePeriode(quartal);
   const berichte = new Map((await store.portfolioberichte(tx, periode)).map(b => [b.portfolio_id, b]));

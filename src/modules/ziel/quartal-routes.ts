@@ -191,7 +191,7 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
     const { quartal } = req.params as { quartal: string };
     await req.need(SCHREIBEN);
     const body = req.body as { text: string; verantwortlich: string; termin?: string | null };
-    if (!body.text.trim()) throw invalid('Auftrag fehlt.', [{ path: '/text', message: 'Beschreiben Sie den Auftrag des VR.' }]);
+    if (!body.text.trim()) throw invalid('Auftrag fehlt.', [{ path: '/text', message: 'Beschreibe den Auftrag des VR.' }]);
     const who = actorOf(req);
     const a = await req.tx(async tx => {
       await store.sperren(tx, quartal);
@@ -251,7 +251,7 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
     await req.tx(async tx => {
       const e = await store.entscheidAnVr(tx, body.entscheidId);
       if (!e) throw notFound('Entscheid');
-      if (!e.an_vr) throw invalid('Das Geschäft ist nicht zur Weiterleitung an den VR markiert.', [{ path: '/entscheidId', message: 'Markieren Sie die Weiterleitung beim Entscheid (UC-006 A4).' }]);
+      if (!e.an_vr) throw invalid('Das Geschäft ist nicht zur Weiterleitung an den VR markiert.', [{ path: '/entscheidId', message: 'Markiere die Weiterleitung beim Entscheid (UC-006 A4).' }]);
       const am = body.weitergeleitetAm ?? await store.heute(tx);
       if (!(await store.weiterleitungAnlegen(tx, body.entscheidId, am, body.bemerkung ?? ''))) throw conflict('Die Weiterleitung ist bereits erfasst.');
       await record(tx, who, { action: 'vr_weiterleitung.created', resourceType: 'entscheid', resourceId: body.entscheidId, data: { weitergeleitetAm: am, bemerkung: body.bemerkung ?? '' }, event: { entscheidId: body.entscheidId, weitergeleitetAm: am } });

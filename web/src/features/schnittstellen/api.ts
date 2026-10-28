@@ -80,3 +80,21 @@ export function useProtokoll(f: ProtokollSearch) {
 export function useProtokollObjekte() {
   return useQuery({ queryKey: schnittstellenKeys.objekte, queryFn: async ({ signal }) => (await api.GET('/v1/aenderungsprotokoll/objekte', { signal })).data!.items });
 }
+
+/**
+ * Export des Änderungsprotokolls als CSV (UI-50, Seitentyp Bericht): alle Einträge zum Filter über den typisierten
+ * Client (gleiche Herkunft, Organisation im Kopf), im Browser gespeichert; liefert den Dateinamen.
+ */
+export async function protokollExportieren(f: ProtokollSearch): Promise<string> {
+  const { data, response } = await api.GET('/v1/aenderungsprotokoll', { params: { query: { ...f, format: 'csv' } }, parseAs: 'blob' });
+  const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') ?? '')?.[1] ?? 'aenderungsprotokoll.csv';
+  const url = URL.createObjectURL(data as Blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+  return name;
+}

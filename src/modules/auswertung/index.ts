@@ -37,3 +37,5 @@ export const auswertungModule = defineModule({
 
 /** Lese-Schnittstelle des Portfolioberichts für obere Module (Quartalsreporting, AP-E6-4). */
 export { portfoliobericht, type PortfolioberichtDaten } from './bericht-schnittstelle.ts';
+/** CSV (Semikolon, BOM, ohne Formeln) für den Export der Seiten vom Typ Bericht. */
+export { csv } from './adhoc.ts';

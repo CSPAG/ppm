@@ -38,6 +38,7 @@ export const TX = {
   },
   p: {
     title: 'Änderungsprotokoll', sub: 'Wer hat wann was geändert: alter und neuer Wert, nach Objekt und Zeitraum.',
+    exportieren: 'Exportieren (CSV)', exportiert: (name: string) => `${name} gespeichert.`,
     tabelle: 'Änderungen', filter: 'Filter', objekt: 'Objekt', objektAlle: 'alle Objekte', objektId: 'Kennung des Objekts',
     objektIdHint: 'optional, z. B. aus der Adresse des Objekts', von: 'von', bis: 'bis', zeitraum: 'Zeitraum',
     spalte: { zeit: 'Zeitpunkt', person: 'Person', objekt: 'Objekt', aktion: 'Aktion', aenderungen: 'Änderungen' },

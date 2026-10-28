@@ -9370,6 +9370,432 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/zugaenge/{person}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Zugang: Vorschau vor dem Entziehen
+         * @description Was mit dem Zugang entfällt (UC-016 A1): Rollen an der Organisation, Rollen an Projekten, Portfolios und anderen Orten, die neu zu besetzen sind, und offene Aufgaben an die Person. Ändert nichts.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Person (Principal) der Organisation. */
+                    person: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ZugangVorschau"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/zugaenge/{person}/entziehen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Zugang entziehen
+         * @description Hält die Rollen der Person an Orten ausser der Organisation fest, entfernt sie dann im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration) und legt der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben. Ein abgebrochener Versuch wird beim nächsten Aufruf fortgesetzt.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    /** @description Person (Principal) der Organisation. */
+                    person: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ZugangEntzogen"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/neubesetzungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Neubesetzungen
+         * @description Entzogene Zugänge mit der Zahl der festgehaltenen und noch nicht wieder besetzten Rollen, neueste zuerst.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Nur mit offener Aufgabe «neu besetzen». */
+                    offen?: boolean;
+                    /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
+                    cursor?: string;
+                    /** @description Seitengrösse (höchstens 200). */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NeubesetzungList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/neubesetzungen/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Neubesetzung
+         * @description Festgehaltene Rollen mit Stand (wieder besetzt, sobald jemand die Rolle am Ort hat) und offene Aufgaben, die noch an die Person gehen. Neu besetzt wird dort, wo die Rolle vergeben wird (z. B. Projektorganisation); erledigt wird die Aufgabe im Eingang.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NeubesetzungDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/org-einheiten": {
         parameters: {
             query?: never;
@@ -37491,6 +37917,110 @@ export interface components {
              * @default false
              */
             unterschriften: boolean;
+        };
+        ZugangVorschau: {
+            person: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** @description Rollen an der Organisation (Programmrollen, Administration); entfallen mit dem Zugang. */
+            orgRollen: {
+                rolle: string;
+                rolleName: string;
+            }[];
+            /** @description Rollen an Projekten, Portfolios und anderen Orten, die neu zu besetzen sind. */
+            rollen: {
+                /** @description Den Namen des Orts löst die Oberfläche auf (wie im Baukasten). */
+                ort: {
+                    /** @description Typ des Orts aus dem Modell, z. B. `projekt` oder `portfolio`. */
+                    typ: string;
+                    /** Format: uuid */
+                    id: string;
+                };
+                /** @description Rolle des Modells, z. B. `pl`. */
+                rolle: string;
+                /** @description Name der Rolle, z. B. «Projektleitung». */
+                rolleName: string;
+            }[];
+            /** @description Offene Aufgaben an die Person persönlich. */
+            aufgaben: {
+                /** Format: uuid */
+                id: string;
+                art: string;
+                titel: string;
+                kontext: string | null;
+                /** @description Adresse der Aufgabe in der Oberfläche. */
+                link: string;
+                frist: string | null;
+                fristArt: ("kalendertage" | "arbeitstage") | null;
+            }[];
+            can: {
+                /** @description Nicht für sich selbst. */
+                entziehen: boolean;
+            };
+        };
+        ZugangEntzogen: {
+            /** Format: uuid */
+            neubesetzung: string;
+            rollen: number;
+            /** @description Offene Aufgaben der Person beim Entziehen. */
+            aufgaben: number;
+        };
+        Neubesetzung: {
+            /** Format: uuid */
+            id: string;
+            person: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            entzogenAt: string;
+            entzogenVon: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            rollen: number;
+            /** @description Rollen, die am Ort noch niemand wieder hat. */
+            offeneRollen: number;
+            /** @description Keine offene Aufgabe «neu besetzen» (nichts zu tun oder von Hand erledigt). */
+            erledigt: boolean;
+        };
+        NeubesetzungList: {
+            items: components["schemas"]["Neubesetzung"][];
+            nextCursor: string | null;
+        };
+        NeubesetzungDetail: {
+            neubesetzung: components["schemas"]["Neubesetzung"];
+            rollen: {
+                /** @description Den Namen des Orts löst die Oberfläche auf (wie im Baukasten). */
+                ort: {
+                    /** @description Typ des Orts aus dem Modell, z. B. `projekt` oder `portfolio`. */
+                    typ: string;
+                    /** Format: uuid */
+                    id: string;
+                };
+                /** @description Rolle des Modells, z. B. `pl`. */
+                rolle: string;
+                /** @description Name der Rolle, z. B. «Projektleitung». */
+                rolleName: string;
+                /** @description Jemand hat die Rolle am Ort wieder. */
+                besetzt: boolean;
+            }[];
+            /** @description Offene Aufgaben, die noch an die Person gehen. */
+            aufgaben: {
+                /** Format: uuid */
+                id: string;
+                art: string;
+                titel: string;
+                kontext: string | null;
+                /** @description Adresse der Aufgabe in der Oberfläche. */
+                link: string;
+                frist: string | null;
+                fristArt: ("kalendertage" | "arbeitstage") | null;
+            }[];
         };
         OrgEinheit: {
             /** Format: uuid */

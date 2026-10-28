@@ -15,6 +15,7 @@ import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/
 import { dashboardTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
+import { vorlagenTexte } from './features/vorlagen/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
 import { roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
@@ -56,6 +57,8 @@ export const navigation: NavRegistrierung = {
     // Recht aus `useIamNav()` dazu (UC-016)
     { raum: 'administration', pfad: '/administration/organisation', label: TS.bereich.organisation, recht: 'stammdaten:write' },
     { raum: 'administration', pfad: '/administration/codetabellen', label: TS.bereich.codetabellen, recht: 'stammdaten:write' },
+    // Vorlagen (UI-48, AM.03.01, AP-E7-7): pflegt die UE (vorlage:write)
+    { raum: 'administration', pfad: '/administration/vorlagen', label: vorlagenTexte.bereich, recht: 'vorlage:write' },
     // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03) nur für wer es pflegt (IA: UE, PMO, ADM); lesen dürfen
     // alle Rollen (fachmodell.md 3.3), die Administration erscheint dafür aber nicht. Die Verwalten-Seiten des Baukastens
     // kommen nach Recht aus `useIamNav()` dazu (UC-016)

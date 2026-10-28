@@ -41071,6 +41071,336 @@ export interface paths {
         };
         trace?: never;
     };
+    "/v1/jahresrueckblicke/{jahr}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Jahresrückblick
+         * @description Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`. ETag = Fassung (W/"0", solange nichts gespeichert ist).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Jahresrueckblick"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        /**
+         * Erkenntnisse und Massnahmen erfassen
+         * @description Legt den Jahresrückblick an bzw. erfasst Erkenntnisse und Massnahmen für den nächsten Zielzyklus (UC-013 Schritt 4); nicht während der Traktandierung (409). Bestehend nur mit `If-Match`.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["JahresrueckblickPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Jahresrueckblick"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/jahresrueckblicke/{jahr}/traktandieren": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Jahresrückblick traktandieren
+         * @description Hält die Jahresauswertung fest und schlägt sie dem PRAT vor (entscheidendes Gremium des Portfolios der Kategorie A; UC-013 Schritt 3, UC-006). Ohne gespeicherten Jahresrückblick 404, bereits traktandiert oder ausgewertet 409. Recht `quartalsbericht:write`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Jahresrueckblick"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks": {
         parameters: {
             query?: never;
@@ -48013,6 +48343,86 @@ export interface components {
             nextCursor: string | null;
             /** @description Kategorien in Gebrauch (Filter). */
             kategorien: string[];
+        };
+        Jahresauswertung: {
+            /** @description Zielerreichung des Jahres: je Ziel der letzte Stand bis Q4 (UC-012). */
+            zielerreichung: {
+                gesamt: number;
+                /** @description Ziele mit einem Stand im Jahr. */
+                mitStand: number;
+                ziele: {
+                    typ: "strategisch" | "jahresziel";
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    text: string;
+                    metrik: string;
+                    zielwert: string;
+                    stand: string | null;
+                    beurteilung: string;
+                    quartal: string | null;
+                }[];
+            };
+            vorhaben: {
+                /** @description Im Jahr abgeschlossen. */
+                abgeschlossen: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    name: string;
+                    portfolio: string;
+                    phase: string;
+                    /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
+                    lebenszyklus: string;
+                    seit: string | null;
+                }[];
+                /** @description Im Jahr abgebrochen. */
+                abgebrochen: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    name: string;
+                    portfolio: string;
+                    phase: string;
+                    /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
+                    lebenszyklus: string;
+                    seit: string | null;
+                }[];
+                /** @description Aktive und sistierte Vorhaben. */
+                laufend: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    name: string;
+                    portfolio: string;
+                    phase: string;
+                    /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
+                    lebenszyklus: string;
+                    seit: string | null;
+                }[];
+            };
+        };
+        Jahresrueckblick: {
+            jahr: number;
+            /** @description `offen` (noch nichts erfasst), `in_arbeit` (UE stellt zusammen), `traktandiert` (beim PRAT), `ausgewertet` («Verabschiedet»). */
+            stand: "offen" | "in_arbeit" | "traktandiert" | "ausgewertet";
+            erkenntnisse: string;
+            massnahmen: string;
+            /** @description Rückmeldung des PRAT bei «Anpassungen verlangt». */
+            rueckmeldung: string;
+            traktandiertAt: string | null;
+            ausgewertetAt: string | null;
+            /** @description 0, solange nichts gespeichert ist (If-Match W/"0" beim ersten Speichern). */
+            version: number;
+            auswertung: components["schemas"]["Jahresauswertung"];
+            can: {
+                bearbeiten: boolean;
+                traktandieren: boolean;
+            };
+        };
+        JahresrueckblickPut: {
+            erkenntnisse: string;
+            massnahmen: string;
         };
         WebhookSubscription: {
             /** Format: uuid */

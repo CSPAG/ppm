@@ -1376,7 +1376,7 @@
             }
           },
           "empfaenger": {
-            "description": "`person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
+            "description": "`person`: an dich persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
             "anyOf": [
               {
                 "type": "string",
@@ -1396,7 +1396,7 @@
             "anyOf": [
               {
                 "additionalProperties": false,
-                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die Sie heute vertreten (UC-016 Schritt 4).",
+                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die du heute vertrittst (UC-016 Schritt 4).",
                 "type": "object",
                 "required": [
                   "person",
@@ -1689,7 +1689,7 @@
             "type": "boolean"
           },
           "richtung": {
-            "description": "`eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten.",
+            "description": "`eigene`: du wirst vertreten; `fuer_andere`: du vertrittst.",
             "anyOf": [
               {
                 "type": "string",
@@ -39230,7 +39230,7 @@
         "tags": [
           "Stellvertretungen"
         ],
-        "description": "Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.",
+        "description": "Laufende und künftige Stellvertretungen: wer dich vertritt und wen du vertrittst.",
         "responses": {
           "200": {
             "description": "Default Response",

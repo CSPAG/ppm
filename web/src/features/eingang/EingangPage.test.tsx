@@ -55,7 +55,7 @@ describe('Eingang', () => {
     const { container } = renderWithIam(<Page gehe={gehe} />);
     expect(await screen.findByText(E.kopf.offen(2))).toBeInTheDocument();
     expect(screen.getByText(`· ${E.kopf.ueberfaellig(1)}`)).toBeInTheDocument();
-    expect(await screen.findByText(/Sie vertreten Anna Muster/)).toBeInTheDocument();
+    expect(await screen.findByText(/Du vertrittst Anna Muster/)).toBeInTheDocument();
     const liste = (await screen.findByRole('link', { name: 'Projektvertrag unterzeichnen' })).closest('ul')!;
     const zeilen = within(liste).getAllByRole('listitem');
     expect(within(zeilen[0]!).getByText(/überfällig seit/)).toBeInTheDocument();
@@ -108,12 +108,12 @@ describe('Eingang', () => {
     stub({
       'GET /v1/eingang/anzahl': () => json({ offen: 0, ueberfaellig: 0, naechsteFrist: null }),
       'GET /v1/eingang': () => json({ items: [], nextCursor: null }),
-      'GET /v1/mitteilungen': () => json({ items: [{ id: '00000000-0000-4000-8000-0000000000m1', text: 'Ihre Idee wurde zurückgewiesen.', link: null, bezug: { typ: 'idee', id: '7' }, gelesenAt: gelesen ? '2026-10-27T10:00:00Z' : null, createdAt: '2026-10-27T09:00:00Z' }], nextCursor: null, ungelesen: gelesen ? 0 : 1 }),
+      'GET /v1/mitteilungen': () => json({ items: [{ id: '00000000-0000-4000-8000-0000000000m1', text: 'Deine Idee wurde zurückgewiesen.', link: null, bezug: { typ: 'idee', id: '7' }, gelesenAt: gelesen ? '2026-10-27T10:00:00Z' : null, createdAt: '2026-10-27T09:00:00Z' }], nextCursor: null, ungelesen: gelesen ? 0 : 1 }),
       'POST /v1/mitteilungen/00000000-0000-4000-8000-0000000000m1/gelesen': () => { gelesen = true; return new Response(null, { status: 204 }); },
     });
     renderWithIam(<Page />);
     expect(await screen.findByText(E.mitteilungen.ungelesen(1))).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: E.mitteilungen.gelesenAria('Ihre Idee wurde zurückgewiesen.') }));
+    await userEvent.click(screen.getByRole('button', { name: E.mitteilungen.gelesenAria('Deine Idee wurde zurückgewiesen.') }));
     await waitFor(() => expect(screen.queryByText(E.mitteilungen.ungelesen(1))).not.toBeInTheDocument());
   });
 

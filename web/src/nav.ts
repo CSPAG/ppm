@@ -15,6 +15,7 @@ import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
+import { schnittstellenTexte as TX } from './features/schnittstellen/index.ts';
 import { roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
@@ -59,6 +60,9 @@ export const navigation: NavRegistrierung = {
     { raum: 'administration', pfad: '/administration/phasenmodell', label: T.bereich.phasenmodell, recht: 'phasenmodell:write' },
     // Portfolios und Gremien (UI-47): sichtbar für UE, PMO und ADM (IA «Sichtbarkeit je Rolle»: Recht portfolio:admin)
     { raum: 'administration', pfad: '/administration/portfolios', label: portfoliosTexte.bereich, recht: 'portfolio:admin' },
+    // Schnittstellen (UI-49, AM.03.02) nur ADM (schnittstelle:admin); Änderungsprotokoll (UI-50, AM.03.03) ADM und UE (audit:read)
+    { raum: 'administration', pfad: '/administration/schnittstellen', label: TX.bereich.schnittstellen, recht: 'schnittstelle:admin' },
+    { raum: 'administration', pfad: '/administration/aenderungsprotokoll', label: TX.bereich.protokoll, recht: 'audit:read' },
   ],
   aktionen: [
     // Befehlspalette «Projektidee einreichen» für alle, die Ideen erfassen (K4 Einstieg)
@@ -67,6 +71,7 @@ export const navigation: NavRegistrierung = {
     { id: 'feiertag-erfassen', label: TS.aktion.feiertagErfassen, icon: 'plus', pfad: '/administration/organisation?ansicht=feiertage&o=neu', recht: 'stammdaten:write' },
     // Befehlspalette «Stellvertretung erfassen» (IA «Navigation», UC-016 Schritt 4)
     { id: 'stellvertretung-erfassen', label: kontoTexte.erfassen, icon: 'users', pfad: '/konto/stellvertretung?o=neu', recht: 'tenant:read' },
+    { id: 'schnittstelle-einrichten', label: TX.aktion.einrichten, icon: 'plug', pfad: '/administration/schnittstellen?o=neu', recht: 'schnittstelle:admin' },
     { id: 'portfolio-anlegen', label: portfoliosTexte.aktionAnlegen, icon: 'plus', pfad: '/administration/portfolios?o=neu', recht: 'portfolio:admin' },
     { id: 'handlungsfeld-anlegen', label: T.aktion.handlungsfeldAnlegen, icon: 'plus', pfad: '/ziele/handlungsfelder?o=neu', recht: 'handlungsfeld:write' },
     { id: 'ziel-anlegen', label: zieleTexte.aktionAnlegen, icon: 'plus', pfad: '/ziele/strategische-ziele?o=neu', recht: 'ziel:write' },

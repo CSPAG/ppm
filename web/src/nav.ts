@@ -8,7 +8,7 @@ import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
-import { zugangTexte } from './features/zugang/index.ts';
+import { suchePersonen, zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { naechsteSitzungPfad, sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
@@ -141,6 +141,13 @@ export const navigation: NavRegistrierung = {
       id: 'ideen', recht: ['idee:create', 'idee:read'],
       suchen: async (q, signal) => (await sucheIdeen(q, signal)).map(i => ({
         id: `idee:${i.id}`, label: `${i.nummer} ${i.titel}`, detail: ideeTexte.bereich, icon: 'doc', pfad: `/portfolio/ideen/${i.nummer}`,
+      })),
+    },
+    // Personen nach Name oder E-Mail (I-N4): nur für die Administration (members:admin), Treffer in Verwalten › Mitglieder
+    {
+      id: 'personen', recht: 'members:admin',
+      suchen: async (q, signal) => (await suchePersonen(q, signal)).map(p => ({
+        id: `person:${p.id}`, label: p.name || p.email || p.id, detail: [p.email, zugangTexte.palette.mitglieder].filter(Boolean).join(' · '), icon: 'user', pfad: '/verwalten/mitglieder',
       })),
     },
     {

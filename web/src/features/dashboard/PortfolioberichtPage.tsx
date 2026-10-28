@@ -111,7 +111,11 @@ function Kommentar({ b, speichern, busy }: { b: Portfoliobericht; speichern(text
   return (
     <div className="pb-abschnitt pb-kommentar field">
       <label htmlFor={id}>{TP.kommentar.label}</label>
-      <textarea id={id} value={text} maxLength={8000} aria-describedby={`${id}-h`} onChange={e => setText(e.target.value)} />
+      <textarea id={id} value={text} maxLength={8000} aria-describedby={`${id}-h`} onChange={e => {
+        setText(e.target.value);
+        // den gespeicherten Stand übernommen: kein offener Konflikt mehr
+        if (andere !== null && e.target.value.trim() === b.kommentar.trim()) setAndere(null);
+      }} />
       <div id={`${id}-h`} className="note">{TP.kommentar.hinweis}</div>
       {andere !== null ? <Hinweis stufe="warnung">{TP.kommentar.andere(andere || TP.kommentar.leer)}</Hinweis> : null}
       <button type="button" className="btn sm" disabled={busy || text.trim() === b.kommentar} onClick={() => speichern(text)}><Icon name="check" />{TP.aktion.speichern}</button>

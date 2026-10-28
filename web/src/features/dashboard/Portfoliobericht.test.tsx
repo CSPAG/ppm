@@ -148,6 +148,12 @@ describe('Portfoliobericht', () => {
     expect(await screen.findByText(/Dein Kommentar ist noch da/)).toBeInTheDocument(); // Toast: «TP.konflikt: Titel»
     expect(await screen.findByText(TP.kommentar.andere('Von Paula'))).toBeInTheDocument();
     expect(feld).toHaveValue('Meins');
+    // den Text der anderen übernehmen: der Hinweis verschwindet
+    await userEvent.clear(feld);
+    await userEvent.type(feld, 'Von Paula');
+    expect(screen.queryByText(TP.kommentar.andere('Von Paula'))).toBeNull();
+    await userEvent.clear(feld);
+    await userEvent.type(feld, 'Meins');
     await userEvent.click(screen.getByRole('button', { name: TP.aktion.speichern }));
     await waitFor(() => expect(s.calls.filter(c => c.pfad === 'kommentar').at(-1)).toMatchObject({ ifMatch: 'W/"2"', body: { kommentar: 'Meins' } }));
     await waitFor(() => expect(screen.queryByText(TP.kommentar.andere('Von Paula'))).toBeNull());

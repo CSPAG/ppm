@@ -92,7 +92,8 @@ describe('Dashboard', () => {
     renderWithIam(<Page />, GREMIUM);
     await userEvent.click(await screen.findByRole('button', { name: TD.zeigen('1 kritisch') }));
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"auswahl":"kritisch"}'));
-    expect(screen.getAllByRole('link').map(a => a.textContent)).toEqual(['2026-001 Vorhaben 1'], 'das nicht gemeldete (Vorperiode kritisch) zählt nicht');
+    // das nicht gemeldete (Vorperiode kritisch) zählt nicht
+    expect(screen.getAllByRole('link').map(a => a.textContent)).toEqual(['2026-001 Vorhaben 1']);
     expect(screen.getByText(TD.auswahl.kritisch!, { selector: '.chip .v *, .chip .v' })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: TD.auswahlEntfernen(TD.auswahl.kritisch!) }));
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{}'));

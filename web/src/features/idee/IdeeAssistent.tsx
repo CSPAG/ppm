@@ -7,7 +7,7 @@
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ApiError, isConflict, newIdempotencyKey } from '../../api/index.ts';
-import { Confirm, Hinweis, Icon, useToast } from '../../ui/index.ts';
+import { Confirm, Hinweis, Icon, TeilFehler, useToast } from '../../ui/index.ts';
 import { useAuswahl, useIdeeMutations, type IdeeAuswahl, type Loaded, type Rueckfrage } from './api.ts';
 import { ideePfad, MEINE_IDEEN, Verweis, type Gehe } from './stand.tsx';
 import { ideeNeuPfad } from './search.ts';
@@ -252,6 +252,7 @@ export function IdeeAssistent({ start, vorbelegung, schritt: schrittStart, onSch
 
         {schritt === 2 ? (
           <Strategie id={id} werte={werte} setze={setze} auswahl={auswahl.data} laedt={auswahl.isPending} fehler={fehler} fehlerText={fehlerText}
+            ladefehler={auswahl.error} erneut={() => void auswahl.refetch()}
             fragen={<Fragen fragen={fragenZu(['handlungsfeld', 'strategischesZiel', 'bereiche', 'herkunft'])} ideeId={item?.id} />} />
         ) : null}
 
@@ -305,12 +306,15 @@ function SpeicherStand({ s }: { s: Speichern }) {
   return <span role="status" aria-live="polite">{text}</span>;
 }
 
-function Strategie({ id, werte, setze, auswahl, laedt, fehler, fehlerText, fragen }: {
+function Strategie({ id, werte, setze, auswahl, laedt, ladefehler, erneut, fehler, fehlerText, fragen }: {
   id: string; werte: Werte; setze<K extends keyof Werte>(k: K, v: Werte[K]): void; auswahl: IdeeAuswahl | undefined; laedt: boolean;
+  /** Fehler beim Laden der Auswahl: nicht als «keine Handlungsfelder» zeigen, sonst ist das Pflichtfeld unerfüllbar (Z5) */
+  ladefehler: unknown; erneut(): void;
   fehler: Partial<Record<string, string>>; fehlerText(k: string): ReactNode; fragen: ReactNode;
 }) {
   const feld = auswahl?.handlungsfelder.find(h => h.id === werte.handlungsfeldId);
   if (laedt) return <p role="status" className="muted">…</p>;
+  if (ladefehler) return <TeilFehler was={TI.auswahlLaden} error={ladefehler} onRetry={erneut} />;
   const felder = auswahl?.handlungsfelder ?? [];
   return (
     <div className="form idee-form">

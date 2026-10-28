@@ -64,6 +64,14 @@ describe('Quality-Check', () => {
     expect(await screen.findByText(TP.bestaetigt)).toBeInTheDocument();
   });
 
+  it('Fehler der Pflichtangaben erscheint als Fehler, nicht als «vollständig» (Z5)', async () => {
+    stub({ [`GET /v1/vertragsversionen/${V}/pflichtangaben`]: () => json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' }) });
+    renderWithIam(<PruefenPage nummer="2026-014" />);
+    expect(await screen.findByText(`${TP.pflichtangaben} konnte nicht geladen werden.`)).toBeInTheDocument();
+    expect(screen.queryByText(TP.checkPflicht(0))).toBeNull();
+    expect(screen.getByRole('button', { name: 'Erneut versuchen' })).toBeInTheDocument();
+  });
+
   it('ohne Recht nur lesen (Z8)', async () => {
     stub({ [`GET /v1/vertragsversionen/${V}/pruefung`]: () => json(pruefung({ can: { qualityCheck: false, unterzeichnen: [] } }), 200, { ETag: 'W/"2"' }) });
     renderWithIam(<PruefenPage nummer="2026-014" />);

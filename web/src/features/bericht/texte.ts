@@ -1,7 +1,13 @@
 /**
- * Texte des Features «Bericht» (UI-13, Kernablauf K1; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie»
+ * Texte des Features «Bericht» (UI-13, Kernablauf K1; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du»
  * (UX-E7), Schweizer Rechtschreibung, Texte aus K1 «Texte» und «Regeln und Rückmeldungen».
  */
+const NACHFUEHREN = 'Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantrage eine Änderung oder eskaliere.';
+const TB_GRUND = {
+  termin: (text: string, neu: string, alt: string, w: string) => `${text} neu ${neu} statt ${alt} laut Baseline (${w}).`,
+  kosten: (phase: string, p: string) => `Prognose ${phase} ${p} über Budget.`,
+};
+
 export const TB = {
   reiter: 'Bericht',
   palette: (nr: string, name: string) => `Statusbericht erstellen: ${nr} ${name}`,
@@ -28,8 +34,18 @@ export const TB = {
   },
   wesentlich: {
     beantragen: 'Änderung beantragen',
-    termin: (text: string, neu: string, alt: string, w: string) => `${text} neu ${neu} statt ${alt} laut Baseline (${w}). Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.`,
-    kosten: (phase: string, p: string) => `Prognose ${phase} ${p} über Budget. Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.`,
+    eskalieren: 'Eskalieren',
+    eskalierenTitel: 'Abweichung eskalieren?',
+    eskalierenWirkung: 'Die Eskalation erscheint als Traktandenvorschlag in der nächsten Sitzung des entscheidenden Gremiums; die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren. Dein Bericht bleibt ein Entwurf und ist mit der Eskalation verknüpft.',
+    grund: 'Grund', grundHint: 'Worum es geht; vorbelegt mit der Abweichung.', grundFehlt: 'Angaben fehlen: Der Grund ist leer. Beschreib, worum es geht.',
+    massnahme: 'Vorgeschlagene Massnahme (optional)', massnahmeHint: 'Leer: Das Gremium entscheidet über das weitere Vorgehen.',
+    eskaliertOk: 'Eskaliert. Die Eskalation steht als Vorschlag für die nächste Sitzung des Gremiums.',
+    eskaliert: (d: string, stand: string) => `Eskaliert am ${d} · ${stand}`,
+    eskalationStand: { offen: 'Vorschlag ans Gremium', traktandiert: 'vom Gremium zurückgestellt', erledigt: 'vom Gremium erledigt' } as Record<string, string>,
+    termin: (text: string, neu: string, alt: string, w: string) => `${TB_GRUND.termin(text, neu, alt, w)} ${NACHFUEHREN}`,
+    kosten: (phase: string, p: string) => `${TB_GRUND.kosten(phase, p)} ${NACHFUEHREN}`,
+    /** Abweichung allein, als Vorbelegung des Grunds der Eskalation. */
+    grundVon: TB_GRUND,
     regel: 'Termin', regelKosten: 'Kosten',
   },
   kosten: {
@@ -49,7 +65,7 @@ export const TB = {
   },
   kpi: {
     leer: 'Keine Projekt-KPIs erfasst.', ziel: 'Zielwert', letzter: 'Letzter Ist-Wert', neu: (t: string) => `Ist-Wert ${t}`, keiner: 'noch keiner',
-    abP2: 'KPI-Werte erfassen Sie ab der Implementierung (P2).',
+    abP2: 'KPI-Werte erfasst du ab der Implementierung (P2).',
   },
   beurteilung: {
     status: 'Status', trend: 'Trend', vorperiode: (w: string) => `Vorperiode: ${w}`,
@@ -61,7 +77,7 @@ export const TB = {
     naechster: 'Nächster Meilenstein', abschlussPer: 'Abschluss per', abhaengigkeiten: 'Abhängigkeiten', entscheide: 'Anstehende Entscheide',
     begruendung: 'Begründung', massnahme: 'Massnahme', entscheidNoetig: 'Entscheid des PRAT nötig',
     kritischHinweis: 'Kritisch: Begründung und Massnahme fehlen. Sponsor und Unternehmensentwicklung brauchen beides, um handeln zu können.',
-    wirkungKritisch: 'Ihr Sponsor und die Unternehmensentwicklung werden beim Einreichen informiert. Mit «Entscheid des PRAT nötig» wird eine Eskalation für die nächste PRAT-Sitzung angelegt.',
+    wirkungKritisch: 'Dein Sponsor und die Unternehmensentwicklung werden beim Einreichen informiert. Mit «Entscheid des PRAT nötig» wird eine Eskalation für die nächste PRAT-Sitzung angelegt.',
   },
   panel: {
     titel: 'Bereit zum Einreichen', bereit: 'Alle Pflichtangaben sind erfasst.',
@@ -69,7 +85,7 @@ export const TB = {
     wirkung: 'Die Unternehmensentwicklung erhält den Bericht zur Prüfung. Das Dashboard zeigt ihn sofort.',
     einreichen: 'Statusbericht einreichen',
     nichtBearbeitbar: (stand: string) => `Stand: ${stand}. Einreichen ist nicht möglich.`,
-    sperre: (liste: string) => `Angaben fehlen: ${liste}. Ergänzen Sie sie, um den Bericht einzureichen.`,
+    sperre: (liste: string) => `Angaben fehlen: ${liste}. Ergänze sie, um den Bericht einzureichen.`,
   },
   eingereicht: (monat: string) => `Statusbericht ${monat} eingereicht. Die Unternehmensentwicklung prüft ihn bis Monatsende.`,
   rueckgaengig: 'Rückgängig',
@@ -77,12 +93,12 @@ export const TB = {
   banner: {
     eingereicht: (seit: string) => `In Prüfung bei der Unternehmensentwicklung seit ${seit}. Ändern ist erst nach einer Rückfrage möglich.`,
     geprueft: 'Der Bericht ist geprüft. Er kann nicht mehr geändert werden.',
-    zurueckgegeben: 'Rückfrage der Unternehmensentwicklung: Der Bericht ist wieder bearbeitbar. Reichen Sie ihn nach der Korrektur erneut ein.',
+    zurueckgegeben: 'Rückfrage der Unternehmensentwicklung: Der Bericht ist wieder bearbeitbar. Reich ihn nach der Korrektur erneut ein.',
     abgeschlossen: (monat: string) => `${monat} ist abgeschlossen. Das Dashboard ist für die Gremien freigegeben.`,
-    nurLesen: 'Sie können diesen Bericht nur ansehen.',
+    nurLesen: 'Du kannst diesen Bericht nur ansehen.',
     keinBericht: 'Dieses Projekt berichtet nicht monatlich (Phase P4 oder nicht aktiv).',
     zukunft: 'Diese Periode hat noch nicht begonnen.',
   },
-  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüfen Sie Ihre letzte Eingabe.',
-  projektFehlt: 'Dieses Projekt gibt es nicht, oder Sie sehen es nicht.',
+  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüf deine letzte Eingabe.',
+  projektFehlt: 'Dieses Projekt gibt es nicht, oder du siehst es nicht.',
 };

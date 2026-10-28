@@ -57,6 +57,7 @@ export const Traktandum = Type.Object({
   stand: TraktandumStandT,
   viaSns: Type.Boolean({ description: '«via SNS-VR»: Der Entscheid des Gremiums ist eine Stellungnahme (UC-006 A1).' }),
   vertraulich: Type.Boolean(),
+  fest: Type.Boolean({ description: 'Festes Traktandum 1 «Bericht der Programmleitung» (K3 Schritt 4): weder entfernen noch verschieben, bleibt an Position 1.' }),
   verschobenVon: Beschrieben(Datum, 'Datum der Sitzung, von der das Traktandum verschoben wurde (UC-006 A2).'),
   unterlagen: Type.Object({ stand: UnterlagenStandT, liste: Type.Array(Type.Ref('Unterlage')) }, { additionalProperties: false }),
   einladungen: Type.Array(Type.Ref('Einladung')),

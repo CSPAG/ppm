@@ -217,7 +217,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/schliessen`, { ...ue, 'if-match': 'W/"1"' })).statusCode, 412);
     const vorPl = (await mitteilungen(pl)).length;
     const r = await ok('POST', `/v1/sitzungen/${sitzung.id}/schliessen`, { ...ue, 'if-match': `W/"${s0.version}"` });
-    assert.deepEqual([r.nichtBehandelt, r.zurueckgestellt, r.auflagen, r.sitzung.stand, r.sitzung.traktanden.length], [1, 1, 2, 'geschlossen', 4]);
+    assert.deepEqual([r.nichtBehandelt, r.zurueckgestellt, r.auflagen, r.sitzung.stand, r.sitzung.traktanden.length], [1, 1, 2, 'geschlossen', 5], 'mit dem festen Traktandum 1');
 
     // PL: genau eine neue, gebündelte Mitteilung (I-B3)
     const neu = (await mitteilungen(pl)).slice(vorPl);

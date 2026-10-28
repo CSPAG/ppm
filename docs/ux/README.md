@@ -96,7 +96,7 @@ Vorschläge von CSP; heutige Vergleichswerte (Excel, Word, E-Mail) sind nicht er
 | UX-E4 | **Die Projektakte ist der Projektvertrag.** Bericht, Gate, Änderung und Abschluss sind Bereiche bzw. Entwürfe derselben Akte; Dashboard, Gate Review Packet und Dokument sind Sichten darauf. | G3; Master §7 «Daten werden einmal erfasst» |
 | UX-E5 | **Höchstens ein Entwurf je Projekt** neben der Baseline. | eine Wahrheit je Projekt, kein Zusammenführen paralleler Versionen (Heuristik «weniger Möglichkeiten für folgenreiche Fehler»); UX-OF-8 |
 | UX-E6 | **Projektstatus und Bearbeitungsstand getrennt dargestellt:** Status als Kreis mit Symbol, Stand als Badge. | Verwechslung «Kritisch» mit «abgelehnt» vermeiden ([darstellung.md](darstellung.md)) |
-| UX-E7 | **Anrede «Sie»**, Schweizer Rechtschreibung mit «ss». | Vorschlag bis zur Klärung (UX-OF-1); PM-Handbuch und Vorlagen sind unpersönlich formuliert |
+| UX-E7 | **Anrede «Du»**, Schweizer Rechtschreibung mit «ss». | Entscheid UX-OF-1 (28.10.2026); gleiche Anrede wie der Baukasten (Anmeldung, Verwaltung, E-Mails) |
 | UX-E8 | **VR und SNS-VR sind keine Benutzer.** Sie erhalten Dokumente; die UE erfasst Vorlagen, Freigaben und Entscheide. | Vorschlag K02; wenige, seltene Vorgänge |
 | UX-E9 | **Gremienunterlagen im System**, PDF zum Herunterladen, E-Mail nur mit Link. | G3, I-B2; ein Stand für alle; UX-OF-15 |
 | UX-E10 | **«Projekt» statt «Vorhaben»** in der Oberfläche. | Sprache des PM-Handbuchs und des Dashboards (G10); siehe Glossar |

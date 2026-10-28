@@ -2,7 +2,7 @@
  * Sitzung vorbereiten (AP-E2-1, UI-33, K3) gegen die nachgebildete API: leere Sitzung mit Vorschlägen (Z2), Aufnehmen
  * mit Idempotency-Key, Traktandum mit Zeitbedarf, «via SNS-VR» und Warnung «Unterlagen fehlen» samt Verschieben und
  * Rückgängig, Umordnen mit Alt+↓ und If-Match, Versand mit Vorschau der Wirkung (I-R1), Lesemodus nach dem Versand,
- * Termin ohne Sitzung anlegen, Übersicht je Gremium.
+ * Termin ohne Sitzung anlegen, Übersicht je Gremium; festes Traktandum 1 ohne Griff und Entfernen (K3 Schritt 4).
  */
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -27,7 +27,7 @@ const frist = { bis: '2026-11-11', arbeitstage: 5, restArbeitstage: 4, vorlauf: 
 const traktandum = (o: Record<string, unknown> = {}) => ({
   id: T1, sitzungId: SID, art: 'gate', artLabel: 'Gate-Review', bezug: { typ: 'gate_antrag', id: 'x' },
   projekt: { id: PF, nummer: '2026-014', name: 'Neues KIS', phase: 'P1' }, titel: 'Gate P1–P2 Neues KIS', antrag: 'Freigabe Phase P2 und Projektvertrag Version 2.0',
-  position: 1, dauerMin: 35, zeit: '14:00', stand: 'traktandiert', viaSns: true, vertraulich: false, verschobenVon: null,
+  position: 1, dauerMin: 35, zeit: '14:00', stand: 'traktandiert', viaSns: true, vertraulich: false, fest: false, verschobenVon: null,
   unterlagen: { stand: 'bereit', liste: [{ art: 'packet', titel: 'Gate Review Packet', bereit: true, hinweis: 'Quality-Check bestanden 28.10.' }] },
   einladungen: [{ personId: PF, name: 'Anna Muster', funktion: 'pl' }], version: 1, ...o,
 });
@@ -110,6 +110,20 @@ describe('Sitzung vorbereiten', () => {
     const put = api.calls.find(c => c.method === 'PUT')!;
     expect(put.headers.get('If-Match')).toBe('W/"3"');
     expect(await put.json()).toEqual({ reihenfolge: [T2, T1] });
+  });
+
+  it('festes Traktandum 1 «Bericht der Programmleitung»: ohne Griff und Entfernen, mit Hinweis; nichts darüber (K3 Schritt 4)', async () => {
+    const fest = traktandum({ id: T2, art: 'portfoliobericht', artLabel: 'Portfoliobericht', bezug: { typ: 'sitzung', id: SID }, projekt: null, titel: 'Bericht der Programmleitung',
+      antrag: '', dauerMin: null, viaSns: false, fest: true, einladungen: [], unterlagen: { stand: 'fehlt', liste: [] } });
+    const s = sitzung({ traktanden: [fest, traktandum({ position: 2 })], zeitbedarfMin: 35 });
+    stub({ [`GET ${URL_S}`]: () => json(s), [`GET /v1/sitzungen/${SID}/vorschlaege`]: () => json({ gruppen: [] }) });
+    const { container } = renderWithIam(<Page />, UE);
+    const liste = await screen.findByRole('list', { name: TS.liste });
+    expect(within(liste).getByText(`${TS.festHinweis} ${TS.festPlatzhalter}`)).toBeInTheDocument();
+    expect(within(liste).queryByRole('button', { name: /Bericht der Programmleitung/ })).toBeNull();
+    expect(within(liste).queryByRole('button', { name: /Auf nächste Sitzung verschieben/ })).toBeNull();
+    expect(within(liste).getByRole('button', { name: TS.nachOben('2026-014 Gate P1–P2 Neues KIS') })).toBeDisabled();
+    await expectNoAxe(container);
   });
 
   it('Versand: Vorschau der Wirkung, dann ein bewusster Klick (K3 Schritt 5, I-R1)', async () => {

@@ -47,6 +47,9 @@ describe('Dashboard der Periode', { skip }, () => {
       await bericht('2026-002', VORPERIODE, 'geprueft', 'kritisch');
       // Laufende Periode: 2026-001 kritisch mit Entscheidbedarf (Eskalation); 2026-002 fehlt
       await bericht('2026-001', PERIODE, 'eingereicht', 'kritisch', true);
+      // Badge «Eskalation» aus der Tabelle eskalation (AP-E2-4), nicht aus «Entscheid nötig» allein
+      await tx.query(`INSERT INTO ppm.eskalation (tenant_id, projekt_id, statusbericht_id, grund)
+        SELECT $1, projekt_id, id, 'Lieferverzug' FROM ppm.statusbericht WHERE projekt_id = $2 AND periode = $3`, [T, p['2026-001'], PERIODE]);
       await tx.query("INSERT INTO ppm.meilenstein (tenant_id, projekt_id, phase, art, text, termin_baseline) VALUES ($1, $2, 'P1', 'meilenstein', 'Pilot', '2027-03-31')", [T, p['2026-001']]);
     });
     pl = { authorization: l.authorization };
@@ -118,5 +121,13 @@ describe('Dashboard der Periode', { skip }, () => {
     const ms = performance.now() - start;
     assert.ok(d.items.length >= 1000, String(d.items.length));
     assert.ok(ms < 3000, `${Math.round(ms)} ms`);
+  });
+
+  test('Badge «Eskalation» nur, solange die Eskalation nicht erledigt ist (AP-E2-4)', async () => {
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.eskalation SET stand = 'erledigt', ergebnis = 'erledigt' WHERE projekt_id = $1", [p['2026-001']]));
+    for (const q of [`?periode=${PERIODE}`, '']) {
+      const d = await dashboard(ue, q);
+      assert.deepEqual(d.items.find(i => i.nummer === '2026-001')?.merkmale ?? [], [], q);
+    }
   });
 });

@@ -156,6 +156,7 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', { skip }, () => {
     await ok('ue', 'PUT', `/v1/traktanden/${id.t1}/entscheid`, { ergebnis: 'freigegeben', begruendung: 'Nutzen belegt' }, { 'if-match': `W/"${e4.body.version}"` });
     [v] = await versionen();
     assert.deepEqual([v!.stand, v!.baseline, (await projektZeile()).phase, await lebenszyklus()], ['abgenommen', true, 'P1', 'aktiv']);
+    assert.equal((await ok('pl', 'GET', `/v1/projekte/${projekt.id}/abschluss`)).body.entscheid?.ergebnis, 'weiterfuehren', 'Projektakte nicht mehr «abgebrochen»');
     assert.equal((await ok('ue', 'GET', `/v1/vertragsversionen/${id.v1}/gate`)).body.entscheid.ergebnis, 'freigegeben');
   });
 

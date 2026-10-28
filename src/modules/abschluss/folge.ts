@@ -245,8 +245,17 @@ export async function vorGate(tx: Tx, g: GateEntscheid): Promise<void> {
   await store.intern(tx, async () => {
     const p = await store.projekt(tx, g.projektId);
     const vorher = await store.entscheid(tx, 'gate', g.versionId);
-    if (p && vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await zuruecknehmen(tx, systemActor('system'), vorher, p);
+    if (p && vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await gateAbbruchZuruecknehmen(tx, systemActor('system'), vorher, p);
   });
+}
+
+/**
+ * Abbruch nach Gate «Gestoppt» zurücknehmen (A-30); der Eintrag gilt danach als «weiterführen», damit ein späterer Abbruch
+ * aus einem anderen Geschäft nicht als Folge dieses Gates gilt und die Projektakte nicht mehr «abgebrochen» zeigt.
+ */
+async function gateAbbruchZuruecknehmen(tx: Tx, who: Actor, vorher: store.EntscheidRow, p: store.ProjektKopf): Promise<void> {
+  await zuruecknehmen(tx, who, vorher, p);
+  await store.entscheidSetzen(tx, { ...vorher, kontext: 'aktiv', ergebnis: 'weiterfuehren', bericht_id: null, bericht_art_vorher: null });
 }
 
 /** Gate-Entscheid (Modul vertrag): «Gestoppt» bricht ab, P3–P4 freigegeben öffnet den Abschluss. */
@@ -267,12 +276,7 @@ export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
       });
       return;
     }
-    if (vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') {
-      // Abbruch zurücknehmen (A-30); der Eintrag gilt danach als «weiterführen», damit ein späterer Abbruch aus einem
-      // anderen Geschäft nicht als Folge dieses Gates gilt und die Projektakte nicht mehr «abgebrochen» zeigt
-      await zuruecknehmen(tx, who, vorher, p);
-      await store.entscheidSetzen(tx, { ...vorher, kontext: 'aktiv', ergebnis: 'weiterfuehren', bericht_id: null, bericht_art_vorher: null });
-    }
+    if (vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await gateAbbruchZuruecknehmen(tx, who, vorher, p);
     if (g.gate !== 'P3_P4') return;
     if (g.ergebnis === 'freigegeben' && p.phase === 'P4' && p.lebenszyklus === 'aktiv') await erstellenOeffnen(tx, p, 'abschluss');
     else if (!(await store.offenerBericht(tx, p.id))) await erstellenEntfallen(tx, p);

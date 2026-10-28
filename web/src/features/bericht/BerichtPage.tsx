@@ -38,7 +38,11 @@ const heute = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Z
 const tageZwischen = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000);
 const plusMonate = (d: string, n: number) => { const t = new Date(`${d}T00:00:00Z`); t.setUTCMonth(t.getUTCMonth() + n); return t.toISOString().slice(0, 10); };
 const periodeEnde = (p: string) => { const [j, m] = p.split('-').map(Number) as [number, number]; return new Date(Date.UTC(j, m, 0)).toISOString().slice(0, 10); };
-const toleranz = (t: Toleranz[] | undefined, d: Toleranz['dimension']) => t?.find(x => x.dimension === d)?.wert ?? null;
+/** Toleranz der Dimension: Termin in Tagen, Kosten in Prozent (A-10); in anderer Einheit keine Warnung. */
+const toleranz = (t: Toleranz[] | undefined, d: 'termin' | 'kosten') => {
+  const x = t?.find(y => y.dimension === d);
+  return x && (d === 'kosten' ? x.einheit === 'prozent' : x.einheit !== 'prozent') ? x.wert : null;
+};
 const statusUi = (s: string | null) => (s === 'kritisch' ? 'kritisch' : 'im-plan') as 'kritisch' | 'im-plan';
 
 function Abschnitt({ id, titel, kurz, children }: { id: string; titel: string; kurz?: ReactNode; children: ReactNode }) {
@@ -375,7 +379,7 @@ export function BerichtPage({ nummer, periode }: { nummer: string; periode: stri
 function Arbeitsflaeche({ nummer, projektId, periode, geladen, refetch }: { nummer: string; projektId: string; periode: string; geladen: { bericht: Bericht; etag: string }; refetch(): Promise<unknown> }) {
   const b = geladen.bericht;
   const toast = useToast();
-  const toleranzen = useToleranzen();
+  const toleranzen = useToleranzen(projektId);
   const speichern = useSpeichern(projektId, periode);
   const einreichen = useUebergang(projektId, periode, 'einreichen');
   const zurueckziehen = useUebergang(projektId, periode, 'zurueckziehen');

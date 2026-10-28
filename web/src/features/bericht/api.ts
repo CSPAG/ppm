@@ -173,15 +173,18 @@ export function useKpiWertSetzen(id: string, periode: string) {
   });
 }
 
-export type Toleranz = Schemas['Phasenmodell']['toleranzen'][number];
+export type Toleranz = Schemas['GueltigeToleranzen']['toleranzen'][number];
 
-/** Toleranzen des Phasenmodells in Kraft (A-10); ohne Recht oder ohne Phasenmodell keine Warnung «wesentlich». */
-export function useToleranzen() {
+/**
+ * Gültige Toleranzen des Projekts (A-10): Baseline des Projektvertrags, sonst Standard des Phasenmodells; die API liest
+ * den Standard auch für die PL ohne `phasenmodell:read`. Ohne Wert keine Warnung «wesentlich».
+ */
+export function useToleranzen(projektId: string) {
   return useQuery({
-    queryKey: ['bericht', 'toleranzen'] as const,
+    queryKey: ['bericht', 'toleranzen', projektId] as const,
     queryFn: async ({ signal }): Promise<Toleranz[]> => {
       try {
-        return (await api.GET('/v1/phasenmodelle/aktuell', { signal })).data!.toleranzen;
+        return (await api.GET('/v1/projekte/{id}/toleranzen', { params: { path: { id: projektId } }, signal })).data!.toleranzen;
       } catch (e) {
         if (statusOf(e) === 403 || statusOf(e) === 404) return [];
         throw e;

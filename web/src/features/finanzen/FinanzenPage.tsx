@@ -29,7 +29,8 @@ export function FinanzenPage({ art = 'uebersicht', search, setSearch, navigieren
   const q = useFinanzen(art, pf?.id ?? null, !!search.alle, bereit);
   const d = q.data;
   const skelett = useVerzoegert((!!search.portfolio && portfolios.isPending) || (bereit && q.isPending));
-  const query = new URLSearchParams(pf ? { portfolio: pf.schluessel } : {}).toString();
+  // Reiter behalten den Filter (Portfolio, auch nicht aktive)
+  const query = new URLSearchParams({ ...(pf ? { portfolio: pf.schluessel } : {}), ...(search.alle ? { alle: '1' } : {}) }).toString();
   const offen = search.o && d ? d.projekte.find(p => p.nummer === search.o) : undefined;
 
   const exportieren = () => {
@@ -57,6 +58,7 @@ export function FinanzenPage({ art = 'uebersicht', search, setSearch, navigieren
         </label>
       </div>
       <div className="body fi-body">
+        {portfolios.error && search.portfolio ? <ErrorState error={portfolios.error} onRetry={() => void portfolios.refetch()} /> : null}
         {q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : null}
         {skelett ? <Skelett zeilen={8} /> : null}
         {portfolios.data && search.portfolio && !pf ? <Empty>{TF.portfolioUnbekannt}</Empty> : null}

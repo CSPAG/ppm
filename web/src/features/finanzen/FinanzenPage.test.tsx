@@ -56,13 +56,13 @@ function Page({ initial = {}, art = 'uebersicht' }: { initial?: FinanzenSearch; 
   return <><P search={search} setSearch={setSearch} navigieren={() => {}} /><output data-testid="o">{search.o ?? ''}</output></>;
 }
 
-function server(o: { write?: boolean } = {}) {
+function server(o: { write?: boolean; portfoliosFehler?: boolean } = {}) {
   const write = o.write ?? true;
   const puts: { url: string; ifMatch: string | null; body: unknown }[] = [];
   let begruendungen: { periode: string; text: string; version: number; geaendertAt: string }[] = [];
   const periode = laufendePeriode();
   const api = mockIamApi({
-    'GET /v1/portfolios': () => json({ items: [PF], nextCursor: null }),
+    'GET /v1/portfolios': () => (o.portfoliosFehler ? json({ type: 'about:blank', title: 'Fehler', status: 500 }, 500) : json({ items: [PF], nextCursor: null })),
     'GET /v1/finanzen': () => json(liste(write)),
     'GET /v1/finanzen/abweichungen': () => json(liste(write, true)),
     [`PUT /v1/projekte/${B}/kostentraeger`]: async req => {
@@ -101,6 +101,17 @@ describe('Finanzen', () => {
     expect(screen.getByRole('button', { name: /^2026-001 Projekt 1: Prognose CHF.170.Tsd., Budget CHF.150.Tsd.$/ })).toBeInTheDocument();
     expect(screen.getByText(/Ist-Kosten bis Oktober 2026/)).toBeInTheDocument();
     await expectNoAxe(container);
+  });
+
+  it('Reiter behalten den Filter (Portfolio, auch nicht aktive); Fehler beim Laden der Portfolios mit Wiederholen', async () => {
+    server();
+    const { unmount } = renderWithIam(<Page initial={{ portfolio: 'transformation', alle: '1' }} />, FI);
+    const reiter = await screen.findByRole('link', { name: 'Abweichungen' });
+    await waitFor(() => expect(reiter).toHaveAttribute('href', '/portfolio/finanzen/abweichungen?portfolio=transformation&alle=1'));
+    unmount();
+    server({ portfoliosFehler: true });
+    renderWithIam(<Page initial={{ portfolio: 'transformation' }} />, FI);
+    expect(await screen.findByRole('button', { name: 'Erneut versuchen' }, { timeout: 10_000 })).toBeInTheDocument();
   });
 
   it('Schublade: Werte je Phase, Verlauf; Kostenträger zuordnen mit Prüfung und 409', async () => {

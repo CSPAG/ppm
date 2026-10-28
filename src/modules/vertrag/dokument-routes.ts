@@ -6,6 +6,7 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance } from 'fastify';
 import { actorOf, IdParams, notFound, type Deps } from '@vollholz/platform';
+import { aktuellesPhasenmodell, phasenmodellLesen } from '../phasenmodell/index.ts';
 import { fullTx, record } from '../../platform.ts';
 import { FORMATE, MIME, vorlage, type Format } from '../vorlage/index.ts';
 import { dateiname, vertragDokument, type VertragInhalt } from './dokument.ts';
@@ -59,9 +60,13 @@ export function registerDokumentRoutes(app: FastifyInstance, deps: Deps): void {
     // Bezeichnungen der Konfiguration in voller Sicht (gleiches Dokument für alle Lesenden)
     const k2 = daten.inhalt[2];
     const bez = await fullTx(deps.db, req.requirePrincipal().tenantId, tx => dok.bezeichnungen(tx, { portfolioId: daten.kopf.portfolio_id, handlungsfeldId: k2.handlungsfeldId, zielId: k2.strategischesZielId, jahreszielId: k2.jahreszielId }));
+    // Standard-Toleranzen des Phasenmodells des Projekts (A-13), ohne dieses der Version in Kraft; Vorgabe der
+    // Organisation, darum in voller Sicht wie `toleranzen()` (A-10)
+    const pmId = daten.kopf.phasenmodell_id;
+    const standardToleranzen = (await fullTx(deps.db, req.requirePrincipal().tenantId, tx => (pmId ? phasenmodellLesen(tx, pmId) : aktuellesPhasenmodell(tx))))?.toleranzen ?? [];
 
     // Word mit der aktiven eigenen Vorlage, sonst und für PDF der Grundbestand (AP-E7-7); Vorlage in voller Sicht
-    const dokument = vertragDokument({ version: v, ...daten, bez, betraege });
+    const dokument = vertragDokument({ version: v, ...daten, bez, betraege, standardToleranzen });
     const { datei } = await fullTx(deps.db, req.requirePrincipal().tenantId, tx => vorlage.ausgeben(tx, { art: 'projektvertrag', format, dokument }));
     const name = dateiname(daten.kopf.nummer, v.nummer, format);
     return reply

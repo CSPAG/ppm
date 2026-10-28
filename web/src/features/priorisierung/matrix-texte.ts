@@ -62,6 +62,8 @@ export const TM = {
   angesagt: (p: string, rang: number) => `${p} auf Rang ${rang}`,
   speichern: 'Rangfolge speichern',
   verwerfen: 'Änderungen verwerfen',
+  verworfen: 'Änderungen an der Rangfolge verworfen.',
+  rueckgaengig: 'Rückgängig',
   gespeichert: 'Rangfolge gespeichert.',
   ungespeichert: 'Ungespeicherte Änderungen an der Rangfolge',
   konflikt: 'Jemand anderes hat die Rangfolge inzwischen geändert. Lade neu und ordne danach nochmals.',

@@ -98,6 +98,24 @@ describe('Bedarf (UI-25)', () => {
     await expectNoAxe(container);
   });
 
+  it('Zuteilung entfernen mit «Rückgängig»: dieselbe Person im selben Monat wieder zugeteilt (I-R1 Stufe 1)', async () => {
+    const z = { id: '00000000-0000-4000-8000-0000000000d9', bedarfId: B1, projektId: P1, personId: ANNA, personName: 'Anna Muster', monat: '2027-01', fte: 0.5, version: 2, updatedAt: '2026-10-01T08:00:00Z', can: { write: true } };
+    let wieder: unknown;
+    const api = stub({
+      'GET /v1/bedarfe': () => liste(),
+      [`GET /v1/bedarfe/${B1}`]: () => json({ bedarf: bedarf(), can: { write: true }, monate: [{ monat: '2027-01', bedarf: 1, zugeteilt: 0.5 }], zuteilungen: [z] }),
+      [`GET /v1/bedarfe/${B1}/personen`]: () => personen,
+      [`DELETE /v1/zuteilungen/${z.id}`]: () => new Response(null, { status: 204 }),
+      [`POST /v1/bedarfe/${B1}/zuteilungen`]: async (req: Request) => { wieder = await req.json(); return json({ bedarf: bedarf(), zuteilungen: [], konflikte: [] }, 201); },
+    });
+    renderWithIam(<Page initial={{ von: '2027-01', bis: '2027-06', o: B1 }} />, RM);
+    const dialog = await screen.findByRole('dialog', { name: /CTL · 2026-001/ });
+    await userEvent.click(await within(dialog).findByRole('button', { name: /^Zuteilung von Anna Muster im .* entfernen$/ }));
+    await userEvent.click(await screen.findByRole('button', { name: TB.rueckgaengig }));
+    await waitFor(() => expect(wieder).toEqual({ personId: ANNA, fte: 0.5, vonMonat: '2027-01', bisMonat: '2027-01' }));
+    expect(api.calls.find(c => c.method === 'DELETE')!.headers.get('If-Match')).toBe('W/"2"');
+  });
+
   it('Lücke melden (UC-009 A2) und nur lesend ohne ressource:write', async () => {
     let lueckeText: unknown;
     stub({

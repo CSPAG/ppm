@@ -35,6 +35,11 @@ export function useVorschau(person: string | undefined) {
   });
 }
 
+/** Personen für die Befehlspalette (I-N4): Name oder E-Mail, höchstens 5; nur mit `members:admin`. */
+export async function suchePersonen(q: string, signal: AbortSignal) {
+  return (await api.GET('/v1/people', { params: { query: { q, limit: 5 } }, signal })).data!.items.filter(p => p.kind === 'user');
+}
+
 /** Personen der Organisation zum Suchtext (höchstens 8). */
 export function usePersonen(q: string) {
   return useQuery({

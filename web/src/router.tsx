@@ -21,6 +21,7 @@ import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
 import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/index.ts';
+import { rueckblickJahr } from './features/jahresrueckblick/index.ts';
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
 import type { SetVorlagenSearch } from './features/vorlagen/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
@@ -63,6 +64,7 @@ const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'S
 const SitzungsmodusPage = seite(() => import('./features/sitzung/SitzungsmodusPage.tsx'), 'SitzungsmodusPage');
 const ProtokollPage = seite(() => import('./features/sitzung/ProtokollPage.tsx'), 'ProtokollPage');
 const EntscheidePage = seite(() => import('./features/sitzung/EntscheidePage.tsx'), 'EntscheidePage');
+const JahresrueckblickPage = seite(() => import('./features/jahresrueckblick/JahresrueckblickPage.tsx'), 'JahresrueckblickPage');
 const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
 const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
 const VorlagenPage = seite(() => import('./features/vorlagen/VorlagenPage.tsx'), 'VorlagenPage');
@@ -675,6 +677,23 @@ function EntscheideRoute() {
   return <EntscheidePage search={search} setSearch={setSearch} />;
 }
 
+// Gremien › Jahresrückblick (UI-37, UC-013; AP-E7-5): `/gremien/jahresrueckblick/2026`; ohne Jahr im Q4 das laufende, sonst das Vorjahr
+const jahresrueckblickStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/jahresrueckblick',
+  beforeLoad: () => { throw redirect({ to: '/gremien/jahresrueckblick/$jahr', params: { jahr: String(rueckblickJahr()) }, replace: true }); },
+});
+
+const jahresrueckblickRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/jahresrueckblick/$jahr', component: JahresrueckblickRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function JahresrueckblickRoute() {
+  const { jahr } = jahresrueckblickRoute.useParams();
+  const navigate = useNavigate();
+  return <JahresrueckblickPage key={jahr} jahr={Number(jahr)} jahrWechseln={j => void navigate({ to: '/gremien/jahresrueckblick/$jahr', params: { jahr: String(j) } })} />;
+}
+
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
   createRoute({ getParentRoute: () => rootRoute, path: r.path, component: lazyRouteComponent(r.load) }));
 
@@ -724,6 +743,8 @@ const routeTree = rootRoute.addChildren([
   sitzungsmodusRoute,
   protokollRoute,
   entscheideRoute,
+  jahresrueckblickStartRoute,
+  jahresrueckblickRoute,
   zielzyklusRoute,
   freigabeRoute,
   roadmapRoute,

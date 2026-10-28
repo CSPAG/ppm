@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.5.0) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.0 sync
+# Verwaltet von identity-kit (create-iam-app 0.5.4) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.4 sync
 #
 # OpenTofu, Provider, Backend (S3, Werte aus identity.app.json › state, gesetzt von kc.sh) und Verschlüsselung von
 # State und Plan (Passphrase TF_STATE_PASSPHRASE).

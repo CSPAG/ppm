@@ -32,6 +32,7 @@ export const TG = {
   gespeichert: 'Gespeichert',
   speichert: 'Speichert …',
   konflikt: 'Die Antwort wurde inzwischen geändert. Lade neu; dein Text bleibt im Feld.',
+  konfliktNutzen: 'Die Nutzenprüfung wurde inzwischen geändert. Lade neu und speichere danach nochmals; deine Werte bleiben in den Feldern.',
   neuLaden: 'Neu laden',
   unbeantwortet: (n: number, gesamt: number, je: string) =>
     `Leitfragen: ${n} von ${gesamt} unbeantwortet (${je}). Beantworte sie oder begründe, warum sie nicht zutreffen.`,

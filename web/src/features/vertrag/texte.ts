@@ -67,6 +67,18 @@ export const TV = {
   weiterBearbeiten: 'Weiter bearbeiten',
   aenderungEinreichen: 'Eine Änderung reichst du beim Sponsor ein («Änderung einreichen»).',
 
+  // Projekt zurückziehen (K2 Schritt 6, UC-002 A4; I-R1 Stufe 3: unumkehrbar, wirkt auf andere)
+  zurueckziehen: 'Projekt zurückziehen',
+  zurueckziehenFrage: (name: string) => `Projekt «${name}» zurückziehen?`,
+  zurueckziehenWirkung: 'Vertrag und Projekt werden als «zurückgezogen» geschlossen und können danach nur noch gelesen werden. '
+    + 'Offene Aufgaben zum Vertrag entfallen, ein geplantes Gate-Review wird von der Traktandenliste genommen, der Ressourcenbedarf wird freigegeben '
+    + 'und die Unternehmensentwicklung wird informiert. Du kannst das nicht rückgängig machen.',
+  zurueckziehenBegruendung: 'Begründung',
+  zurueckziehenHint: 'Warum wird das Vorhaben nicht weiterverfolgt? Die Begründung steht im Protokoll und in der Mitteilung an die Unternehmensentwicklung.',
+  zurueckziehenBegruendungFehlt: 'Begründung fehlt: Ohne Begründung wissen Projektleitung und Unternehmensentwicklung nicht, warum das Vorhaben endet.',
+  zurueckgezogen: 'Projekt zurückgezogen. Die Unternehmensentwicklung ist informiert.',
+  abbrechen: 'Abbrechen',
+
   // Kapitelinhalte
   optional: 'optional',
   keine: 'Keine Einträge.',

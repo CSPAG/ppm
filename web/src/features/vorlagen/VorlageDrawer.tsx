@@ -142,7 +142,8 @@ function Version({ detail, v, onZurueck, onClose, neuLaden }: { detail: VorlageD
       actions={<button type="button" className="btn sm" onClick={onZurueck}><Icon name="arrow" className="vl-zurueck" />{TV.zurueck}</button>}
       footer={v.stand === 'entwurf' ? (
         <>
-          <button type="button" className="btn" onClick={() => setDialog('entfernen')}>{TV.entfernen}</button>
+          {/* nur mit Recht (Z8): ohne `can.entfernen` kein Element, das am Server scheitert */}
+          {v.can.entfernen ? <button type="button" className="btn" onClick={() => setDialog('entfernen')}>{TV.entfernen}</button> : null}
           {bearbeitbar ? <button type="button" className="btn" onClick={speichern} disabled={!geaendert || m.zuordnen.isPending}>{TV.speichern}</button> : null}
           <button type="button" className="btn primary" onClick={() => setDialog('aktivieren')} disabled={!v.can.aktivieren || geaendert}
             aria-describedby={!v.can.aktivieren || geaendert ? `${id}-p` : undefined}>{TV.aktivieren}</button>
@@ -208,7 +209,7 @@ function Version({ detail, v, onZurueck, onClose, neuLaden }: { detail: VorlageD
           {v.pruefung.meldungen.filter(x => x.stufe === 'warnung').map(x => <Hinweis key={x.regel} stufe="warnung">{x.text}</Hinweis>)}
         </Dialog>
       ) : null}
-      {dialog === 'entfernen' ? (
+      {dialog === 'entfernen' && v.can.entfernen ? (
         <Confirm title={TV.entfernenFrage(v.version)} text={TV.entfernenText} confirm={TV.entfernen} onConfirm={entfernen} onClose={() => setDialog(null)} busy={m.entfernen.isPending} />
       ) : null}
     </Drawer>

@@ -154,6 +154,16 @@ describe('Vorlagen', () => {
     await waitFor(() => expect(screen.getByTestId('s')).not.toHaveTextContent('"v"'));
   });
 
+  it('ohne can.entfernen kein «Entwurf löschen» (Z8)', async () => {
+    stub({
+      'GET /v1/vorlagen': () => json(liste()),
+      'GET /v1/vorlagen/projektvertrag': () => json(detail([fertig({ can: { zuordnen: true, aktivieren: true, entfernen: false } })])),
+    });
+    renderWithIam(<Page initial={{ o: 'projektvertrag', v: 1 }} />, UE);
+    expect(await screen.findByRole('button', { name: TV.aktivieren })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: TV.entfernen })).not.toBeInTheDocument();
+  });
+
   it('Art ohne Datenquelle: Hinweis; Adresse mit Art und Version (I-N5)', async () => {
     stub({ 'GET /v1/vorlagen': () => json(liste()), 'GET /v1/vorlagen/vorstudie': () => json({ ...detail([]), art: 'vorstudie', name: 'Vorstudie', grundbestand: null, felder: null }) });
     renderWithIam(<Page initial={{ o: 'vorstudie' }} />, UE);

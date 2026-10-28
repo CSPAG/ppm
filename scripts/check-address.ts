@@ -1,16 +1,14 @@
 /**
  * Texte (Leitentscheidung L10): Oberfläche und Fehlertexte der API mit Anrede «Du» (docs/ux/README.md, UX-E7,
  * UX-OF-1 entschieden 28.10.2026), Schweizer Rechtschreibung ohne ß; in sichtbaren Texten der Oberfläche «Organisation»
- * statt «Mandant»/«Tenant». Während der Umstellung von «Sie» auf «Du» prüft das Skript die Anrede nicht; danach meldet
- * es die Sie-Form (FORMAL).
+ * statt «Mandant»/«Tenant». Die Sie-Form (FORMAL) ist ein Fehler.
  *
  *   node scripts/check-address.ts
  */
 import { files, lineOf, read, report, stripComments } from './lib.ts';
 
-/** Sie-Form in Texten (Höflichkeitspronomen; Imperative wie «Geben Sie» erkennt die Prüfung über «Sie»). Bis zum Ende der Umstellung aus. */
-const FORMAL = /\b(Sie|Ihnen|Ihr(e[mnrs]?)?)\b/;
-const PRUEFE_ANREDE = false;
+/** Sie-Form in Texten (Höflichkeitspronomen samt «Ihrerseits», «Ihretwegen»; Imperative wie «Geben Sie» über «Sie»). */
+const FORMAL = /\b(Sie|Ihnen|Ihr\w*)\b/;
 const SHARP_S = /ß/;
 const TENANT = /\b(Mandant(en)?|Tenants?)\b/i;
 
@@ -30,7 +28,7 @@ const check = (file: string, ui: boolean) => {
   for (const t of texts(src)) {
     // Nur Texte mit Leerzeichen sind Sätze; Bezeichner, Pfade und Schlüssel bleiben aussen vor
     if (!/\s/.test(t.text.trim())) continue;
-    if (PRUEFE_ANREDE && FORMAL.test(t.text)) problems.push(`${file}:${lineOf(src, t.index)}: Sie-Form «${t.text.trim().slice(0, 60)}» (Anrede «Du» verwenden)`);
+    if (FORMAL.test(t.text)) problems.push(`${file}:${lineOf(src, t.index)}: Sie-Form «${t.text.trim().slice(0, 60)}» (Anrede «Du» verwenden)`);
     if (ui && TENANT.test(t.text)) problems.push(`${file}:${lineOf(src, t.index)}: «Mandant»/«Tenant» in sichtbarem Text «${t.text.trim().slice(0, 60)}» (Begriff «Organisation»)`);
   }
 };

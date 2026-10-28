@@ -34722,6 +34722,8 @@ export interface paths {
                     eigene?: boolean;
                     /** @description Genau diese Nummer (Schlüssel in der Oberfläche, I-N5). */
                     nummer?: number;
+                    /** @description Suche im Titel (Teilstring) oder nach der Nummer (Befehlspalette, I-N4). */
+                    q?: string;
                     /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
                     cursor?: string;
                     /** @description Seitengrösse (höchstens 200). */

@@ -68,6 +68,24 @@ export async function lebenszyklusWechseln(tx: Tx, who: Actor, id: string, ziel:
   return r;
 }
 
+/**
+ * Endzustand zurücknehmen (A-30): Ein Entscheid ist bis zum Schliessen der Sitzung korrigierbar, seine Folge wird
+ * zurückgenommen. Nur aus der Folge einer Entscheidkorrektur (oberes Modul, keine Route) und nur als Umkehr eines
+ * direkten Übergangs: abgeschlossen bzw. abgebrochen → aktiv. Audit `projekt.reopened` mit Grund.
+ */
+export async function endzustandZuruecknehmen(tx: Tx, who: Actor, id: string, von: 'abgeschlossen' | 'abgebrochen', ziel: 'aktiv', grund: Record<string, unknown>): Promise<store.Row> {
+  const before = await store.get(tx, id);
+  if (!before) throw notFound('Projekt');
+  if (before.lebenszyklus !== von || !UEBERGAENGE[ziel].includes(von)) {
+    throw conflict(`Das Projekt ${before.nummer} ist ${LEBENSZYKLUS_TEXT[before.lebenszyklus]}; die Rücknahme von «${LEBENSZYKLUS_TEXT[von]}» ist nicht möglich.`,
+      { reason: 'lebenszyklus', lebenszyklus: before.lebenszyklus, ziel });
+  }
+  if (!(await store.setzen(tx, id, { lebenszyklus: ziel }))) throw notFound('Projekt');
+  const r = (await store.get(tx, id))!;
+  await record(tx, who, { action: 'projekt.reopened', resourceType: 'projekt', resourceId: id, data: { before: snapshot(before), after: snapshot(r), ...grund }, event: snapshot(r) });
+  return r;
+}
+
 /** Phase nachführen (Gate-Entscheid, UC-003 Schritt 10), mit der Version des Phasenmodells ab diesem Gate (A-13). */
 export async function phaseSetzen(tx: Tx, who: Actor, id: string, phase: Phase, phasenmodellId?: string | null): Promise<store.Row> {
   const before = await store.get(tx, id);

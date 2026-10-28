@@ -152,9 +152,20 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
     assert.ok(g.body.bericht.abgenommenAt);
     assert.ok((await aufgaben(pj.exit!.id)).every(a => a.stand !== 'offen'));
 
-    // Korrektur weg vom Endzustand: 409, Entscheid bleibt
-    await entscheiden(id.tExit!, 'nacharbeiten', 409);
-    assert.equal(await lz(pj.exit!.id), 'abgeschlossen');
+    // Korrektur weg vom Endzustand in der offenen Sitzung (A-30): Projekt wieder aktiv, Bericht wieder bearbeitbar
+    await entscheiden(id.tExit!, 'nacharbeiten');
+    g = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
+    assert.deepEqual([g.body.lage, g.body.projekt.lebenszyklus, g.body.bericht.stand, g.body.bericht.abgenommenAt, g.body.can.bearbeiten],
+      ['abschluss', 'aktiv', 'nacharbeit', null, true]);
+    assert.ok((await aufgaben(pj.exit!.id)).some(a => a.stand === 'offen'));
+    const audit = await sys(async tx => (await tx.query<{ action: string }>(
+      "SELECT action FROM ppm.audit_log WHERE resource_type = 'projekt' AND resource_id = $1 AND action = 'projekt.reopened'", [pj.exit!.id])).rows);
+    assert.equal(audit.length, 1);
+
+    // und wieder zurück: abgeschlossen
+    await entscheiden(id.tExit!, 'abgeschlossen');
+    g = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
+    assert.deepEqual([g.body.projekt.lebenszyklus, g.body.bericht.stand], ['abgeschlossen', 'abgenommen']);
 
     // Abnahme «Endzustand lesend»: Projekt, Register und Bericht nur noch lesen; Lessons Learned bleiben möglich (UC-013 A1)
     const projekt = await ok('ue', 'GET', `/v1/projekte/${pj.exit!.id}`);
@@ -232,7 +243,13 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
     await sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'abgelehnt', begruendung: 'Nutzen nicht belegt' }));
     assert.equal(await lz(pj.gate!.id), 'abgebrochen');
     await sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'abgelehnt', begruendung: 'Nutzen nicht belegt' }));
-    await assert.rejects(sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'zurueckgestellt', begruendung: '' })), /nicht mehr korrigieren/);
+    // Korrektur des Gate-Entscheids (A-30): Abbruch zurückgenommen, der unbearbeitete Bericht entfällt; danach wieder «Gestoppt»
+    await sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'zurueckgestellt', begruendung: '' }));
+    assert.equal(await lz(pj.gate!.id), 'aktiv');
+    const k = (await ok('pl', 'GET', `/v1/projekte/${pj.gate!.id}/abschluss`)).body;
+    assert.deepEqual([k.bericht, k.entscheid?.ergebnis], [null, 'weiterfuehren']);
+    await sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'abgelehnt', begruendung: 'Nutzen nicht belegt' }));
+    assert.equal(await lz(pj.gate!.id), 'abgebrochen');
 
     const url = `/v1/projekte/${pj.gate!.id}/abschluss`;
     const g = await ok('pl', 'GET', url);
@@ -241,7 +258,8 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
     r = await ok('pl', 'POST', `${url}/einreichen`, undefined, { 'if-match': r.etag });
     assert.deepEqual([r.body.bericht.stand, r.body.can.bearbeiten], ['eingereicht', false]);
     assert.equal((await call('pl', 'PUT', url, LEER, { 'if-match': r.etag })).statusCode, 409);
-    assert.ok((await aufgaben(pj.gate!.id)).every(a => a.stand === 'erledigt'));
+    // die Aufgabe des zurückgenommenen Abbruchs ist entfallen, die neue erledigt
+    assert.deepEqual((await aufgaben(pj.gate!.id)).map(a => a.stand), ['entfallen', 'erledigt']);
   });
 
   test('Lessons Learned: Liste mit Filter, Ändern und Löschen nur mit projekt:write (PS.04.03, UI-32)', async () => {

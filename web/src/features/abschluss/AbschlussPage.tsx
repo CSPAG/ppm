@@ -220,7 +220,8 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
         </div>
         <aside className="ab-panel" aria-labelledby="ab-panel-h">
           <h2 id="ab-panel-h" className="grp-h">{TA.panel.titel}</h2>
-          {a.can.einreichen ? (
+          {/* Vor dem ersten Speichern gibt es noch keinen Bericht: die Projektleitung sieht trotzdem, was fehlt */}
+          {a.can.einreichen || (!b && bearbeitbar) ? (
             <>
               {liste.length ? (
                 <>
@@ -231,7 +232,7 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
                 </>
               ) : <p className="small"><Icon name="check" /> {TA.panel.bereit}</p>}
               <p className="muted small">{art === 'abschluss' ? TA.panel.wirkungAbschluss : TA.panel.wirkungAnderer}</p>
-              <button type="button" className="btn primary" onClick={versuchen} disabled={einreichen.isPending}>{TA.panel.einreichen}</button>
+              <button type="button" className="btn primary" onClick={versuchen} disabled={einreichen.isPending || (!a.can.einreichen && !liste.length)}>{TA.panel.einreichen}</button>
             </>
           ) : <p className="muted small">{b ? TA.panel.nichtBearbeitbar(TA.stand[b.stand] ?? b.stand) : TA.banner.nurLesen}</p>}
         </aside>

@@ -35,6 +35,9 @@ writeFileSync(join(ROOT, 'web', 'e2e', '.env.e2e'), [
   `DATABASE_ADMIN_URL=${admin}`,
   `DATABASE_WORKER_URL=${url('worker', 'DB_WORKER_PASSWORD')}`,
   'RATE_LIMIT_NAMESPACE=e2e',
+  // Alle Specs einer Organisation laufen als dieselbe Person, parallel in drei Projekten (hell, dunkel, 360 px) und mit
+  // Testdaten über die API (web/e2e/daten.ts): die 600 Anfragen je Minute und Principal reichen dafür nicht
+  'API_RATE_LIMIT=6000',
   '',
 ].join('\n'), { mode: 0o600 });
 console.log(`e2e-db: ${E2E} neu angelegt, ${r.applied.length} Migrationen, web/e2e/.env.e2e geschrieben`);

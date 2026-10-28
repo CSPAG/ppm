@@ -1,7 +1,7 @@
 /**
  * Abnahme AP-E5-3 (UI-22; BC PP.03.01–03, UC-008 Schritte 5–6, K5): Portfolio › Priorisierung › Szenarien; Szenario
  * anlegen bzw. öffnen, Banner «Ist-Stand ändert sich nicht», Rangliste; Umordnen mit Alt+↓ ab 1024 px; axe hell, dunkel
- * und 360 px ohne Überlauf; Szenarienvergleich.
+ * und 360 px ohne Überlauf; Szenarienvergleich. AP-E5-5: Abschnitt «Antrag ans Gremium» (Folgeentscheide, Traktandieren).
  */
 import { expect, test } from '@playwright/test';
 import { ANNA, expectAccessible, expectNoOverflow, login } from './support.ts';
@@ -35,6 +35,9 @@ test('Szenario anlegen, umordnen, vergleichen; barrierefrei', async ({ page }) =
     await expect(liste.getByRole('rowheader').nth(1)).toContainText(erste);
     await expect(page.getByText(new RegExp(`^${erste} auf Rang 2`))).toBeVisible();
   }
+  // Antrag ans Gremium (K5 Schritt 7): Folgeentscheide bzw. Hinweis ohne laufendes Projekt unter der Wasserlinie
+  await expect(page.getByRole('heading', { name: 'Antrag ans Gremium' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Folgeentscheide für laufende Projekte unter der Wasserlinie' })).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 

@@ -36,12 +36,19 @@ const COLUMN = {
 
 const wert = (v: unknown) => (typeof v === 'string' ? v.trim() : v);
 
-export async function list(tx: Tx, o: { stand?: Stand[]; eigene?: boolean; nummer?: number; after?: number | null; limit: number }): Promise<Row[]> {
+export async function list(tx: Tx, o: { stand?: Stand[]; eigene?: boolean; nummer?: number; q?: string; after?: number | null; limit: number }): Promise<Row[]> {
   const where: string[] = [];
   const args: unknown[] = [];
   if (o.stand?.length) { args.push(o.stand); where.push(`i.stand = ANY ($${args.length}::text[])`); }
   if (o.eigene) where.push('i.erfasst_von = app.principal_id()');
   if (o.nummer) { args.push(o.nummer); where.push(`i.nummer = $${args.length}`); }
+  if (o.q) {
+    // Titel als Teilstring, Nummer genau (Befehlspalette, I-N4)
+    args.push(`%${o.q.replace(/[\\%_]/g, m => `\\${m}`)}%`);
+    const like = `$${args.length}`;
+    args.push(/^[0-9]{1,9}$/.test(o.q) ? Number(o.q) : null);
+    where.push(`(i.titel ILIKE ${like} OR i.nummer = $${args.length}::int)`);
+  }
   if (o.after) { args.push(o.after); where.push(`i.nummer < $${args.length}`); }
   args.push(o.limit + 1);
   return (await tx.query<Row>(`SELECT ${COLS} FROM ${T} i ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY i.nummer DESC LIMIT $${args.length}`, args)).rows;

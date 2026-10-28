@@ -84,6 +84,9 @@ describe('sichtbare Arbeitsräume', () => {
     const wenige = aufteilenUnten(sichtbareRaeume(REG, darf(['handlungsfeld:read']), '/', VERWALTEN));
     expect(wenige.unten.map(x => x.id)).toEqual(['ziele', 'administration']);
     expect(wenige.mehr).toEqual([]);
+    // Portfolio mit nur einem Bereich heisst unten wie dieser (Antragstellende: «Ideen»)
+    const ideen = sichtbareRaeume({ bereiche: [{ raum: 'portfolio', pfad: '/portfolio/ideen', label: 'Ideen', recht: 'handlungsfeld:read' }] }, darf(['handlungsfeld:read']), '/');
+    expect(aufteilenUnten(ideen).unten.map(x => x.label)).toEqual(['Ideen']);
   });
 });
 
@@ -166,6 +169,18 @@ describe('Befehlspalette', () => {
     await userEvent.keyboard('anlegen{Enter}');
     expect(onClose).toHaveBeenCalled();
     expect(r.navigate).toHaveBeenCalledWith('/ziele/handlungsfelder?o=neu');
+  });
+
+  it('Aktion mit Ziel aus der API («Nächste Sitzung öffnen»): Adresse beim Ausführen, sonst die feste', async () => {
+    const r = router();
+    const ziel = vi.fn(async () => '/gremien/prat/sitzungen/2026-11-12');
+    mit(<CommandPalette raeume={[]} aktionen={[{ id: 'sitzung', label: 'Nächste Sitzung öffnen', icon: 'gavel', pfad: '/gremien/sitzungen', recht: 'handlungsfeld:read', ziel }]} suchen={[]} onClose={() => undefined} />, { r });
+    await userEvent.keyboard('sitzung{Enter}');
+    await waitFor(() => expect(r.navigate).toHaveBeenCalledWith('/gremien/prat/sitzungen/2026-11-12'));
+    const r2 = router();
+    mit(<CommandPalette raeume={[]} aktionen={[{ id: 'sitzung', label: 'Nächste Sitzung öffnen', icon: 'gavel', pfad: '/gremien/sitzungen', recht: 'handlungsfeld:read', ziel: async () => null }]} suchen={[]} onClose={() => undefined} />, { r: r2 });
+    await userEvent.click(screen.getAllByRole('option', { name: 'Nächste Sitzung öffnen' }).at(-1)!);
+    await waitFor(() => expect(r2.navigate).toHaveBeenCalledWith('/gremien/sitzungen'));
   });
 
   it('Suche nach Objekten ab zwei Zeichen, Treffer führen zum Objekt', async () => {

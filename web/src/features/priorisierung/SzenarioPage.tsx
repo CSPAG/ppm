@@ -2,7 +2,8 @@
  * Seite «Szenarien» (UI-22, Seitentyp Arbeitsfläche; BC PP.03.01–03, UC-008 Schritte 5–6, K5 Schritte 5–6): Szenario
  * anlegen (Kopie des Ist-Stands), Reihenfolge und Start durchspielen mit live gerechneter Wasserlinie gegen Budget und
  * Kapazität und den Engpässen je Quartal und Rolle, Szenarien vergleichen (`?vergleich=`), als Antrag wählen
- * (Entscheidungsvorlage als Vorschau). Zustände: leer (Z2), teilweise (Z4: ohne Budgetrahmen, Bedarf nur als Grösse),
+ * (Entscheidungsvorlage als Vorschau), Folgeentscheide beantragen und für das Gremium traktandieren (K5 Schritt 7,
+ * AP-E5-5). Zustände: leer (Z2), teilweise (Z4: ohne Budgetrahmen, Bedarf nur als Grösse),
  * Konflikt (Z7: Bedarf geändert, 412), nur lesen (Gremium), mobil nur lesend (K5 «Mobil»).
  */
 import { useEffect, useId, useRef, useState } from 'react';
@@ -13,6 +14,7 @@ import { usePortfolios } from './api.ts';
 import { useBreit } from './breite.ts';
 import { Kopf, PFAD, type Reiter } from './Kopf.tsx';
 import { useRollen, useSzenarien, useSzenario, useSzenarioMutations, useVergleich } from './SzenarioApi.ts';
+import { SzenarioAntrag } from './SzenarioAntrag.tsx';
 import { SzenarioListe, type Reihe } from './SzenarioListe.tsx';
 import type { SetSzenarioSearch, SzenarioSearch } from './SzenarioSearch.ts';
 import { fmtQuartalVon, TS } from './SzenarioTexte.ts';
@@ -207,6 +209,7 @@ function Detail({ id, breit, portfolioName, onVerworfen, onBewerten }: { id: str
           </ul>
         ) : <p className="note">{TS.keineEngpaesse}</p>}
       </section>
+      {s.stand !== 'verworfen' ? <SzenarioAntrag key={s.version} s={s} breit={breit} /> : null}
       {vorlage ? (
         <section className="sz-vorlage" aria-labelledby={`${id}-v`}>
           <h2 id={`${id}-v`} className="grp-h"><Icon name="doc" /> {TS.vorlage} <span className="muted small">{TS.vorlageSeit(fmtDatum(vorlage.erstelltAt))}</span></h2>

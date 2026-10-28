@@ -3,8 +3,10 @@
  * docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer Rechtschreibung, Wortlaut aus K3 («Portfoliobericht
  * erzeugen», «Bericht der Programmleitung»).
  */
+import { NAV } from './nav.ts';
+
 export const TR = {
-  bereich: 'Risikolage',
+  bereich: NAV.risiken,
   title: 'Risikolage',
   inhalt: 'Inhalt der Risikolage',
   sub: 'Projekt- und Portfoliorisiken mit Bewertung und Massnahme, Abhängigkeiten und offene Eskalationen.',
@@ -39,7 +41,7 @@ export const TR = {
 };
 
 export const TP = {
-  bereich: 'Portfoliobericht',
+  bereich: NAV.portfoliobericht,
   title: 'Portfoliobericht',
   inhalt: 'Inhalt des Portfolioberichts',
   sub: 'Bericht der Periode für das Gremium, erzeugt aus dem abgeschlossenen Dashboard und der Risikolage.',
@@ -55,7 +57,10 @@ export const TP = {
   keinBericht: (periode: string) => `Für ${periode} gibt es noch keinen Portfoliobericht.`,
   keinBerichtLeser: (periode: string) => `Für ${periode} ist noch kein Portfoliobericht bereitgestellt.`,
   periodeOffen: (periode: string) => `${periode} ist noch nicht abgeschlossen. Der Portfoliobericht entsteht aus dem abgeschlossenen Dashboard.`,
-  kommentar: { label: 'Bericht der Programmleitung', hinweis: 'Dein Kommentar steht zuoberst im Bericht.', leer: 'Kein Kommentar.' },
+  kommentar: {
+    label: 'Bericht der Programmleitung', hinweis: 'Dein Kommentar steht zuoberst im Bericht.', leer: 'Kein Kommentar.',
+    andere: (t: string) => `Inzwischen gespeichert: «${t}». Dein Text oben ist noch nicht gespeichert.`,
+  },
   bereitstellenDialog: {
     titel: (p: string) => `Portfoliobericht ${p} bereitstellen?`,
     text: (gremium: string) => `Der Bericht wird fest und ist für ${gremium} sichtbar. Das Gremium erhält das Traktandum «Bericht der Programmleitung» als Vorschlag für die nächste Sitzung. Danach änderst du ihn nicht mehr.`,
@@ -68,7 +73,7 @@ export const TP = {
     gespeichert: 'Kommentar gespeichert.',
     bereitgestellt: (p: string) => `Portfoliobericht ${p} bereitgestellt.`,
   },
-  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüfe deinen Kommentar.',
+  konflikt: 'Der Bericht wurde inzwischen geändert und ist neu geladen. Dein Kommentar ist noch da; speichere ihn nochmals.',
   abschnitt: { uebersicht: 'Übersicht', funnel: 'Funnel nach Phase', projekte: 'Projekte', risiken: 'Risikolage' },
   keinRecht: 'Den Portfoliobericht sehen Gremien, Direktionen, Geschäftsleitung, Finanzen, Ressourcen und die Unternehmensentwicklung.',
 };

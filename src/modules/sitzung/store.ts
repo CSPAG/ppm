@@ -307,6 +307,21 @@ export async function unterlageAnlegen(tx: Tx, traktandumId: string, u: { art: U
 }
 
 /** Je Gremium die nächste Sitzung, die die Person sieht, nach Datum (Kopf im Eingang). */
+/** Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab `ab`, die die Person sieht (Kopf im Eingang). */
+export async function naechsteTraktanden(tx: Tx, projektIds: readonly string[], ab: string): Promise<{
+  projekt_id: string; id: string; art: Art; titel: string; sitzung_id: string; datum: string; gremium_id: string; gremium_kuerzel: string; gremium_name: string;
+  eingeladen: boolean;
+}[]> {
+  return (await tx.query(
+    `SELECT DISTINCT ON (t.projekt_id) t.projekt_id, t.id, t.art, t.titel, s.id AS sitzung_id, to_char(s.datum, 'YYYY-MM-DD') AS datum,
+            g.id AS gremium_id, g.kuerzel AS gremium_kuerzel, g.name AS gremium_name,
+            EXISTS (SELECT 1 FROM ${E} e WHERE e.tenant_id = t.tenant_id AND e.traktandum_id = t.id AND e.person_id = app.principal_id()) AS eingeladen
+       FROM ${T} t JOIN ${S} s ON s.tenant_id = t.tenant_id AND s.id = t.sitzung_id
+       JOIN ${SCHEMA}.gremium g ON g.tenant_id = s.tenant_id AND g.id = s.gremium_id
+      WHERE t.projekt_id = ANY ($1::uuid[]) AND t.stand = 'traktandiert' AND s.datum >= $2::date
+      ORDER BY t.projekt_id, s.datum, t.position`, [projektIds, ab])).rows;
+}
+
 export async function naechsteSitzungen(tx: Tx, ab: string, limit: number): Promise<(SitzungRow & { traktanden: number })[]> {
   return (await tx.query<SitzungRow & { traktanden: number }>(
     `SELECT * FROM (

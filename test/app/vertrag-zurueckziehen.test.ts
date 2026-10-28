@@ -5,15 +5,15 @@
  * Begründung, If-Match und Audit.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { login, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
-describe('Projektvertrag: zurückziehen', { skip }, () => {
+describe('Projektvertrag: zurückziehen', () => {
   let api: TestApi;
   let T = '';
   const h: Record<string, H> = {};

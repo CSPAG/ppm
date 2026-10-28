@@ -4,18 +4,18 @@
  * Projektrolle wirkt nur im eigenen Projekt –, «vertraulich» (A-34), Filter, Cursor und Kopf.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { systemActor } from '@vollholz/platform';
 import { projekt as aktionen } from '../../src/modules/projekt/index.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 interface Person { h: H; id: string }
 
-describe('Projekte', { skip }, () => {
+describe('Projekte', () => {
   let api: TestApi;
   let T: string;
   let ue: Person, pl: Person, sp: Person, kt: Person, ctl: Person, gremiumC: Person, direktionC: Person, ohne: Person;
@@ -173,6 +173,22 @@ describe('Projekte', { skip }, () => {
     assert.deepEqual((await call('GET', '/v1/projekte/kopf', kt.h)).json(), {
       projekte: [{ id: eigenes.id, nummer: eigenes.nummer, name: 'Eigenes Projekt (PL)', phase: 'P0', lebenszyklus: 'aktiv', rollen: ['kt'] }], anzahl: 1,
     });
+
+    // Personensuche der Befehlspalette (I-N4): nur Personen in Projekten, die die suchende Person sieht; ohne E-Mail
+    await full(api.t.runtime, T, async tx => {
+      await tx.query("UPDATE ppm.principal SET display_name = 'Sabine Sponsorin' WHERE id = $1", [sp.id]);
+      await tx.query("UPDATE ppm.principal SET display_name = 'Ulla Unternehmensentwicklung' WHERE id = $1", [ue.id]);
+    });
+    const drittes = await anlegen({ name: 'Drittes Projekt' });
+    assert.equal((await organisation(drittes.id, 0, [{ personId: ue.id, funktion: 'pl' }])).statusCode, 200);
+    const suche = async (q: string, p: Person) => call('GET', `/v1/projekte/personen?q=${encodeURIComponent(q)}`, p.h);
+    const s1 = await suche('sabine', kt);
+    assert.equal(s1.statusCode, 200, s1.body);
+    assert.deepEqual(s1.json().items, [{ id: sp.id, name: 'Sabine Sponsorin', kontexte: [{ projektId: eigenes.id, nummer: eigenes.nummer, name: 'Eigenes Projekt (PL)', funktion: 'sp' }] }]);
+    assert.deepEqual((await suche('ulla', kt)).json().items, [], 'Person nur in einem Projekt, das KT nicht sieht');
+    assert.deepEqual((await suche('ulla', ue)).json().items.map((x: { id: string }) => x.id), [ue.id]);
+    assert.equal((await suche('sabine', ohne)).statusCode, 403);
+    assert.equal((await suche('s', kt)).statusCode, 422);
 
     // SP wechselt die Projektleitung: alte PL verliert die Rolle sofort, neue erhält sie
     const stale = await organisation(eigenes.id, 0, [], sp.h);

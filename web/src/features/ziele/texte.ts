@@ -2,9 +2,11 @@
  * Texte des Features «Ziele» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung, Begriffe der Ebenen aus K6 («Handlungsfeld», «Strategisches Ziel»).
  */
+import { NAV } from './nav.ts';
+
 export const TZ = {
-  bereich: 'Strategische Ziele',
-  aktionAnlegen: 'Strategisches Ziel anlegen',
+  bereich: NAV.ziele,
+  aktionAnlegen: NAV.aktionAnlegen,
   title: 'Strategische Ziele',
   sub: 'Mehrjahresziele je Handlungsfeld mit Metrik und Zielwert; jede Änderung bleibt im Verlauf nachvollziehbar.',
   one: 'Strategisches Ziel',

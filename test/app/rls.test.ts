@@ -9,16 +9,13 @@
  * Matrix des Moduls, Ausnahmen mit Begründung hierher – sonst schlägt der Test fehl.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
 import type pg from 'pg';
-import {
-  bypassRoleProblems, grantedTableProblems, publicExecuteProblems, publicSchemaProblems, readViewProblems, securityDefinerProblems, tenantTableProblems,
-} from '@vollholz/iam-testkit';
+import { bypassRoleProblems, dbTests, grantedTableProblems, postgresSkip, publicExecuteProblems, publicSchemaProblems, readViewProblems, securityDefinerProblems, tenantTableProblems } from '@vollholz/iam-testkit';
 import { withTenant, type Tx } from '@vollholz/platform';
-import { createTestDb, full, skipDb, tenant, type Harness } from './harness.ts';
+import { createTestDb, full, tenant, type Harness } from './harness.ts';
 import { MATRIX } from './matrix/index.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 const S = 'ppm';
 
 /** Tabellen der App mit tenant_id je Modul (test/app/matrix/<modul>.ts): Testdaten und Bedingung auf die eigene Zeile. */
@@ -73,7 +70,7 @@ async function policyLines(c: pg.ClientBase | pg.Pool): Promise<string[]> {
   return rows.filter(x => x.n !== 'tenant_isolation').map(x => `${x.s}.${x.t}.${x.n} ${x.p} ${x.c} ${x.r.join(',')} USING ${norm(x.q)} CHECK ${norm(x.w)}`).sort();
 }
 
-describe('PostgreSQL RLS', { skip }, () => {
+describe('PostgreSQL RLS', () => {
   let t: Harness;
   let A: string, B: string;
   const where: Record<string, string> = {};

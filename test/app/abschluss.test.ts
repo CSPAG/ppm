@@ -6,15 +6,15 @@
  * Lessons Learned und Dokument.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { abschlussPruefen } from '../../src/modules/abschluss/aufgabe-job.ts';
 import { nachGate } from '../../src/modules/abschluss/folge.ts';
 import { _abmelden } from '../../src/modules/abschluss/lessons-haken.ts';
 import { lessonsLearned } from '../../src/modules/abschluss/index.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const heute = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(new Date());
 function mittwochIn(n: number): string {
@@ -26,7 +26,7 @@ function mittwochIn(n: number): string {
 type H = Record<string, string>;
 const LEER = { projektstand: '', zielerreichung: '', kpiWerte: [], businessCase: '', uebergabe: '', offenePunkte: [] };
 
-describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, () => {
+describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
   let api: TestApi;
   let T = '';
   const h: Record<string, H> = {};

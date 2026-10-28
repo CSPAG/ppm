@@ -68,6 +68,8 @@ export const matrix: Matrix = {
     'GET /v1/gremien/:kuerzel/sitzungen/:datum': () => ({ method: 'GET', url: '/v1/gremien/gremium-a/sitzungen/2026-12-02', kind: 'foreign' }),
     'GET /v1/sitzungen/kopf': () => ({ method: 'GET', url: '/v1/sitzungen/kopf', kind: 'list' }),
     'GET /v1/sitzungen': () => ({ method: 'GET', url: '/v1/sitzungen?q=probe', kind: 'list' }),
+    // Kopfkarte «Meine Projekte»: fremde Projekte ergeben nichts (Liste ohne IDs von A)
+    'GET /v1/traktanden/naechste': i => ({ method: 'GET', url: `/v1/traktanden/naechste?projektId=${i.berichtProjekt}`, kind: 'list' }),
     'GET /v1/sitzungen/:id': i => ({ method: 'GET', url: `/v1/sitzungen/${i.sitzung}`, kind: 'foreign' }),
     'PATCH /v1/sitzungen/:id': i => ({ method: 'PATCH', url: `/v1/sitzungen/${i.sitzung}`, body: { ort: 'gehackt' }, headers: { 'if-match': 'W/"2"' }, kind: 'foreign' }),
     'GET /v1/sitzungen/:id/vorschlaege': i => ({ method: 'GET', url: `/v1/sitzungen/${i.sitzung}/vorschlaege`, kind: 'foreign' }),

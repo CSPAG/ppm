@@ -35,10 +35,11 @@ export async function erfassen(tx: Tx, id: string, version: number, t: { erkennt
     [id, version, t.erkenntnisse, t.massnahmen])).rowCount ?? 0) > 0;
 }
 
-/** Traktandieren; false, wenn der Rückblick gleichzeitig nicht mehr in Arbeit ist. */
-export async function traktandieren(tx: Tx, id: string, inhalt: unknown): Promise<boolean> {
-  return ((await tx.query(`UPDATE ${S}.jahresrueckblick SET stand = 'traktandiert', inhalt = $2, traktandiert_at = now(), rueckmeldung = ''
-     WHERE id = $1 AND stand = 'in_arbeit'`, [id, JSON.stringify(inhalt)])).rowCount ?? 0) > 0;
+/** Traktandieren beim PRAT des Portfolios (Lesesicht des Gremiums, A-67); false, wenn der Rückblick gleichzeitig nicht mehr in Arbeit ist. */
+export async function traktandieren(tx: Tx, id: string, inhalt: unknown, portfolioId: string): Promise<boolean> {
+  return ((await tx.query(`UPDATE ${S}.jahresrueckblick SET stand = 'traktandiert', inhalt = $2, traktandiert_at = now(), rueckmeldung = '',
+       gremium_portfolio_id = $3
+     WHERE id = $1 AND stand = 'in_arbeit'`, [id, JSON.stringify(inhalt), portfolioId])).rowCount ?? 0) > 0;
 }
 
 /**

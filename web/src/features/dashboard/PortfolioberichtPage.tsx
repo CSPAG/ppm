@@ -94,14 +94,30 @@ function Inhalt({ b }: { b: Portfoliobericht }) {
   );
 }
 
+/**
+ * Kommentar der Programmleitung. Ein neuer Stand vom Server (nach Speichern oder Konflikt 412) ersetzt den Text nur, solange
+ * er nicht geändert ist; sonst bleibt die Eingabe, und der inzwischen gespeicherte Kommentar steht daneben (Z7).
+ */
 function Kommentar({ b, speichern, busy }: { b: Portfoliobericht; speichern(text: string): void; busy: boolean }) {
   const id = useId();
   const [text, setText] = useState(b.kommentar);
+  const [basis, setBasis] = useState(b.kommentar);
+  const [andere, setAndere] = useState<string | null>(null);
+  // neuer Stand vom Server: während des Renderns abgleichen (React «Zustand bei geänderten Props anpassen»)
+  if (b.kommentar !== basis) {
+    setBasis(b.kommentar);
+    if (text === basis || text.trim() === b.kommentar.trim()) { setText(b.kommentar); setAndere(null); } else setAndere(b.kommentar);
+  }
   return (
     <div className="pb-abschnitt pb-kommentar field">
       <label htmlFor={id}>{TP.kommentar.label}</label>
-      <textarea id={id} value={text} maxLength={8000} aria-describedby={`${id}-h`} onChange={e => setText(e.target.value)} />
+      <textarea id={id} value={text} maxLength={8000} aria-describedby={`${id}-h`} onChange={e => {
+        setText(e.target.value);
+        // den gespeicherten Stand übernommen: kein offener Konflikt mehr
+        if (andere !== null && e.target.value.trim() === b.kommentar.trim()) setAndere(null);
+      }} />
       <div id={`${id}-h`} className="note">{TP.kommentar.hinweis}</div>
+      {andere !== null ? <Hinweis stufe="warnung">{TP.kommentar.andere(andere || TP.kommentar.leer)}</Hinweis> : null}
       <button type="button" className="btn sm" disabled={busy || text.trim() === b.kommentar} onClick={() => speichern(text)}><Icon name="check" />{TP.aktion.speichern}</button>
     </div>
   );
@@ -173,7 +189,7 @@ export function PortfolioberichtPage({ search, setSearch }: { search: Portfoliob
               <a className="btn" href={dokumentUrl(b.id, 'pdf')} download><Icon name="download" />{TP.aktion.pdf}</a>
               <a className="btn" href={dokumentUrl(b.id, 'docx')} download><Icon name="download" />{TP.aktion.word}</a>
             </div>
-            {b.can.bearbeiten ? <Kommentar key={b.version} b={b} busy={busy} speichern={text => a.kommentieren.mutate({ b, kommentar: text }, { onSuccess: () => toast.show(TP.toast.gespeichert), onError: fehler })} /> : null}
+            {b.can.bearbeiten ? <Kommentar key={b.id} b={b} busy={busy} speichern={text => a.kommentieren.mutate({ b, kommentar: text }, { onSuccess: () => toast.show(TP.toast.gespeichert), onError: fehler })} /> : null}
             <Inhalt b={b} />
           </>
         )}

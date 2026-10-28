@@ -1,7 +1,8 @@
 /**
  * Seite «Kapazität» (UI-24, AP-E5-4; BC RK.01.01, UC-009 Schritt 2) gegen die nachgebildete API: Raster Rolle × Monat,
  * automatisches Speichern mit Version je Zelle, Entfernen, Rückgängig, Tastatur, Konflikt (412, Z7), ungültige Eingabe,
- * nur lesen (Z8), keine Rollen (Z2) und Q-L5: 50 × 31 Zellen virtualisiert und flüssig (Messung).
+ * nur lesen (Z8), keine Rollen (Z2), Kapazität laut HR-System (RK.01.02, Annahme AP-E7-2) und Q-L5: 50 × 31 Zellen
+ * virtualisiert und flüssig (Messung).
  */
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -31,7 +32,7 @@ function Page({ initial = { von: '2027-04', bis: '2027-06' } }: { initial?: Kapa
 }
 
 /** Nachgebildete API mit Zustand: Angebot je Zelle mit Version, 412 wie der Server. */
-function server(o: { zellen?: { rolle: string; monat: string; fte: number; version: number }[]; rollen?: ReturnType<typeof wert>[]; write?: boolean } = {}) {
+function server(o: { zellen?: { rolle: string; monat: string; fte: number; version: number }[]; rollen?: ReturnType<typeof wert>[]; write?: boolean; hr?: { rolle: string; monat: string; fte: number; abwesend: number; personen: number }[] } = {}) {
   const zellen = new Map((o.zellen ?? []).map(z => [`${z.rolle}|${z.monat}`, { ...z }]));
   const puts: unknown[] = [];
   const api = mockIamApi({
@@ -39,6 +40,10 @@ function server(o: { zellen?: { rolle: string; monat: string; fte: number; versi
     'GET /v1/kapazitaet': req => {
       const u = new URL(req.url);
       return json({ von: u.searchParams.get('von'), bis: u.searchParams.get('bis'), zellen: [...zellen.values()], can: { write: o.write ?? true } });
+    },
+    'GET /v1/kapazitaet/hr': req => {
+      const u = new URL(req.url);
+      return json({ von: u.searchParams.get('von'), bis: u.searchParams.get('bis'), zellen: o.hr ?? [], uebernommenAt: o.hr?.length ? '2026-10-01T06:00:00Z' : null });
     },
     'PUT /v1/kapazitaet': async req => {
       const body = await req.json() as { zellen: { rolle: string; monat: string; fte: number | null; version?: number }[] };
@@ -164,6 +169,43 @@ describe('Kapazität', () => {
     expect(within(raster).getByText('1,5')).toBeInTheDocument();
     expect(screen.getByText(TR.nurLesen)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: TR.rueckgaengig })).not.toBeInTheDocument();
+    await expectNoAxe(container);
+  });
+
+  it('Kapazität laut HR (RK.01.02): grau mit «HR» in Zellen ohne Angebot, das Festgelegte hat Vorrang; Rolle nur aus HR als Zeile (axe ohne Befund)', async () => {
+    const s = server({
+      zellen: [{ rolle: 'ctl', monat: '2027-04', fte: 3, version: 1 }],
+      hr: [
+        { rolle: 'ctl', monat: '2027-04', fte: 1.5, abwesend: 0, personen: 2 },
+        { rolle: 'ctl', monat: '2027-05', fte: 1.75, abwesend: 0.25, personen: 2 },
+        { rolle: 'neu', monat: '2027-04', fte: 1, abwesend: 0, personen: 1 },
+      ],
+    });
+    const { container } = renderWithIam(<Page />, RM);
+    const raster = await screen.findByRole('table', { name: TR.rasterLabel });
+    await waitFor(() => expect(within(raster).getAllByRole('rowheader').map(h => h.textContent)).toContain(`neu (${TR.deaktiviert})`));
+    expect(screen.getByText(/Kapazität laut HR-System/)).toBeInTheDocument();
+    // festgelegt: Wert, nicht grau (HR erst als Platzhalter, wenn die Zelle geleert wird)
+    expect(zelle('CTL', 'April 2027')).toHaveValue('3');
+    expect(zelle('CTL', 'April 2027')).not.toHaveClass('res-hr');
+    // ohne Angebot: HR-Wert als Platzhalter, im Namen angesagt, Einzelheiten im Titel
+    const mai = screen.getByRole('textbox', { name: TR.zelleEingabe('CTL', 'Mai 2027') + TR.hrLabel('1,75') });
+    expect(mai).toHaveValue('');
+    expect(mai).toHaveAttribute('placeholder', `1,75 ${TR.hrMarke}`);
+    expect(mai.getAttribute('title')).toContain('2 Personen');
+    await expectNoAxe(container);
+    // eintragen übersteuert HR und wird gespeichert
+    await userEvent.type(mai, '2');
+    await waitFor(() => expect(s.puts).toHaveLength(1), { timeout: 3000 });
+    expect(s.puts[0]).toEqual({ zellen: [{ rolle: 'ctl', monat: '2027-05', fte: 2 }] });
+  });
+
+  it('Kapazität laut HR nur lesen (Z8): Wert grau mit «HR», angesagt', async () => {
+    server({ write: false, hr: [{ rolle: 'ctl', monat: '2027-06', fte: 0.5, abwesend: 0, personen: 1 }] });
+    const { container } = renderWithIam(<Page />, UE);
+    const raster = await screen.findByRole('table', { name: TR.rasterLabel });
+    await waitFor(() => expect(within(raster).getByText(TR.hrMarke)).toBeInTheDocument());
+    expect(within(raster).getByText('0,5')).toBeInTheDocument();
     await expectNoAxe(container);
   });
 

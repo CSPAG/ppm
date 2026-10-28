@@ -2,13 +2,15 @@
  * Texte des Features «Ressourcen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung; Pool = Rolle (A-20), Mengen in FTE.
  */
+import { NAV } from './pfade.ts';
+
 export const TR = {
-  bereich: 'Ressourcen',
+  bereich: NAV.bereich,
   title: 'Ressourcen',
   sub: 'Kapazitätsangebot je Rolle und Monat gegen den Ressourcenbedarf der Projekte.',
   tabs: { auslastung: 'Auslastung', kapazitaet: 'Kapazität', bedarf: 'Bedarf' },
-  aktionKapazitaet: 'Kapazität planen',
-  aktionAuslastung: 'Auslastung analysieren',
+  aktionKapazitaet: NAV.aktionKapazitaet,
+  aktionAuslastung: NAV.aktionAuslastung,
   zeitraum: 'Zeitraum', von: 'Von', bis: 'Bis',
   zeitraumUngueltig: 'Wähle einen Zeitraum von höchstens 60 Monaten, der nicht vor seinem Beginn endet.',
   rolle: 'Rolle',
@@ -71,5 +73,10 @@ export const TR = {
   neuLaden: 'Neu laden',
   fehlerSpeichern: 'Das Angebot konnte nicht gespeichert werden.',
   erneut: 'Erneut versuchen',
+  // RK.01.02: Kapazität laut HR-System (Annahme AP-E7-2: das festgelegte Angebot hat Vorrang, HR füllt Lücken)
+  hrHinweis: (zeitpunkt: string) => `Grau mit «HR»: Kapazität laut HR-System (Pensum minus Abwesenheiten), übernommen ${zeitpunkt}. Der Wert zählt, solange du kein Angebot festlegst.`,
+  hrMarke: 'HR',
+  hrZelle: (fte: string, personen: number, abwesend: string) => `Laut HR-System ${fte} FTE (${personen === 1 ? '1 Person' : `${personen} Personen`}, Abwesenheiten ${abwesend} FTE)`,
+  hrLabel: (fte: string) => `, laut HR-System ${fte} FTE`,
   tastatur: 'Pfeiltasten und Eingabetaste wechseln die Zeile; Strg+Z macht rückgängig.',
 };

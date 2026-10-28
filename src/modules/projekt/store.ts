@@ -135,6 +135,21 @@ export async function personenVorhanden(tx: Tx, ids: string[]): Promise<Set<stri
 }
 
 /** Kopf: laufende Projekte, in denen die Person eine Funktion hat. */
+/**
+ * Personen mit einer Funktion in laufenden Projekten, die die anfragende Person sieht (Lesesicht von `projekt_person`
+ * über `projekt_sichtbar`), nach Name; je Person höchstens drei Funktionen nach Projektnummer.
+ */
+export async function personen(tx: Tx, q: string, limit: number): Promise<{ id: string; name: string; kontexte: { projektId: string; nummer: string; name: string; funktion: Funktion }[] }[]> {
+  const like = `%${q.replace(/[\\%_]/g, m => `\\${m}`)}%`;
+  return (await tx.query(
+    `SELECT pe.id, pe.display_name AS name,
+            to_jsonb((array_agg(jsonb_build_object('projektId', p.id, 'nummer', p.nummer, 'name', p.name, 'funktion', x.funktion) ORDER BY p.nummer, x.funktion))[1:3]) AS kontexte
+       FROM ${P} x JOIN ${T} p ON p.tenant_id = x.tenant_id AND p.id = x.projekt_id
+       JOIN ${SCHEMA}.principal pe ON pe.tenant_id = x.tenant_id AND pe.id = x.person_id
+      WHERE pe.kind = 'user' AND pe.removed_at IS NULL AND pe.display_name ILIKE $1 AND p.lebenszyklus IN ('aktiv', 'sistiert')
+      GROUP BY pe.id, pe.display_name ORDER BY pe.display_name, pe.id LIMIT $2`, [like, limit])).rows;
+}
+
 export async function kopf(tx: Tx, limit: number): Promise<{ rows: Row[]; anzahl: number }> {
   const eigene = `EXISTS (SELECT 1 FROM ${P} x WHERE x.projekt_id = p.id AND x.person_id = app.principal_id()) AND p.lebenszyklus IN ('aktiv', 'sistiert')`;
   const rows = (await tx.query<Row>(`${SELECT} WHERE ${eigene} ORDER BY p.nummer LIMIT $1`, [limit])).rows;

@@ -9709,6 +9709,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/eingang/aufgaben/{id}/wieder-oeffnen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Von Hand erledigte Aufgabe wieder öffnen
+         * @description «Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat und die keine fachliche Handlung inzwischen beendet hat (z. B. Sitzung geschlossen), sonst 404. Ist dieselbe Aufgabe wieder offen, 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Aufgabe"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/mitteilungen": {
         parameters: {
             query?: never;
@@ -15654,6 +15770,103 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projekte/personen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Personen in sichtbaren Projekten suchen
+         * @description Befehlspalette (I-N4): Personen nach Name mit ihren Funktionen in laufenden Projekten, die die anfragende Person sieht; ohne E-Mail. Personen ohne Funktion in einem sichtbaren Projekt erscheinen nicht.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Teil des Namens. */
+                    q: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjektPersonen"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -24071,7 +24284,7 @@ export interface paths {
         };
         /**
          * Quartalsreporting eines Quartals
-         * @description Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist.
+         * @description Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404.
          */
         get: {
             parameters: {
@@ -25621,6 +25834,102 @@ export interface paths {
                 };
                 /** @description Nicht gefunden oder nicht sichtbar */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/traktanden/naechste": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Nächstes Traktandum je Projekt
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», «Du stellst am … vor» nur mit Einladung): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Projekte (mehrfach, höchstens 20). */
+                    projektId: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NaechsteTraktanden"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -39177,6 +39486,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/kapazitaet/hr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kapazität laut HR-System lesen
+         * @description Summen der Schnittstelle «HR-System › Personal- und Abwesenheitsdaten» je Rolle und Monat (UC-009 Schritt 1): Pensum minus Abwesenheit und Anzahl Personen, ohne Personendaten. Wo die RM kein Angebot festgelegt hat, zählt dieser Wert in der Auslastung (Annahme AP-E7-2).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    von?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    bis?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["KapazitaetHr"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/bewertungsmodelle": {
         parameters: {
             query?: never;
@@ -42850,7 +43263,7 @@ export interface paths {
         };
         /**
          * Jahresrückblick
-         * @description Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`. ETag = Fassung (W/"0", solange nichts gespeichert ist).
+         * @description Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404. ETag = Fassung (W/"0", solange nichts gespeichert ist).
          */
         get: {
             parameters: {
@@ -46381,7 +46794,7 @@ export interface components {
             }[];
             toleranzen?: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
+                wert: null | number;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
         };
@@ -46681,6 +47094,26 @@ export interface components {
             /** @description Anzahl dieser Projekte. */
             anzahl: number;
         };
+        /** @description Personen mit einer Funktion in einem Projekt, das die anfragende Person sieht; ohne E-Mail. */
+        ProjektPersonen: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @description Funktionen in sichtbaren laufenden Projekten (höchstens drei, nach Nummer). */
+                kontexte: {
+                    /** Format: uuid */
+                    projektId: string;
+                    nummer: string;
+                    name: string;
+                    /**
+                     * @description `sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition.
+                     * @enum {string}
+                     */
+                    funktion: "sp" | "pl" | "ctl" | "kt" | "koalition";
+                }[];
+            }[];
+        };
         UebernahmeIn: {
             /** @description Dashboard als CSV (Excel «CSV UTF-8», Trennzeichen `;` oder `,`), Spalten nach `scripts/uebernahme/vorlage.csv`. */
             csv: string;
@@ -46844,7 +47277,6 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
-            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
             prognose: null | number;
             budgetBaseline: null | number;
             ist: null | number;
@@ -46874,8 +47306,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
-            prognose?: number | null;
+            prognose?: null | number;
         };
         KostenPatch: {
             /**
@@ -46894,8 +47325,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
-            prognose?: number | null;
+            prognose?: null | number;
         };
         Risiko: {
             /** Format: uuid */
@@ -47956,6 +48386,39 @@ export interface components {
             weitergeleitetAm?: string;
             bemerkung?: string;
         };
+        /** @description Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»). */
+        NaechsteTraktanden: {
+            items: {
+                /** Format: uuid */
+                projektId: string;
+                /** Format: uuid */
+                traktandumId: string;
+                /**
+                 * @description Art des Traktandums (fachmodell.md 2.9).
+                 * @enum {string}
+                 */
+                art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
+                artLabel: string;
+                titel: string;
+                /** @description Die anfragende Person ist zu diesem Traktandum eingeladen (stellt vor, K3 Schritt 2). */
+                eingeladen: boolean;
+                sitzung: {
+                    /** Format: uuid */
+                    id: string;
+                    /**
+                     * @description Datum (JJJJ-MM-TT).
+                     * @example 2026-11-12
+                     */
+                    datum: string;
+                    gremium: {
+                        /** Format: uuid */
+                        id: string;
+                        kuerzel: string;
+                        name: string;
+                    };
+                };
+            }[];
+        };
         Versandfrist: {
             /** @description Versand spätestens (Q8 Kap. 8.1); ohne Phasenmodell in Kraft null. */
             bis: string | null;
@@ -48629,6 +49092,8 @@ export interface components {
                     trend: null | string;
                     /** @description Begründung des Status (Pflicht bei «kritisch»). */
                     begruendung: string;
+                    /** @description Nächster Meilenstein laut Bericht (Freitext, leer ohne Angabe). */
+                    naechsterMeilenstein: string;
                 };
                 laufend: null | {
                     periode: string;
@@ -50421,7 +50886,6 @@ export interface components {
                  * @example 2027-04
                  */
                 monat: string;
-                /** @description null entfernt das Angebot der Zelle. */
                 fte: null | number;
                 /** @description Gelesene Version der Zelle; Pflicht, wenn die Zelle schon ein Angebot hat (sonst 412). */
                 version?: number;
@@ -50671,6 +51135,22 @@ export interface components {
         PersonBelegungList: {
             items: components["schemas"]["PersonBelegung"][];
         };
+        KapazitaetHr: {
+            von: string;
+            bis: string;
+            /** @description Je Rolle und Monat mit Lieferung des HR-Systems; Monate ohne Lieferung fehlen. */
+            zellen: {
+                rolle: string;
+                monat: string;
+                /** @description Pensum minus Abwesenheit der Personen der Rolle in FTE. */
+                fte: number;
+                /** @description Abwesenheit in FTE. */
+                abwesend: number;
+                /** @description Anzahl Personen der Rolle im Monat. */
+                personen: number;
+            }[];
+            uebernommenAt: null | string;
+        };
         Kriterium: {
             schluessel: string;
             text: string;
@@ -50833,7 +51313,6 @@ export interface components {
                 projektId: string;
                 /** @description Fester Schlüssel des Kriteriums (Kleinbuchstaben, Ziffern, Unterstrich); bleibt über Modellversionen gleich. */
                 kriterium: string;
-                /** @description null entfernt die Bewertung des Kriteriums. */
                 einschaetzung: null | ("hoch" | "mittel" | "tief");
                 kommentar?: string;
                 /** @description Gelesene Version; Pflicht, wenn die Zelle schon bewertet ist (sonst 412). */

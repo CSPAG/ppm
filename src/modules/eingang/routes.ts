@@ -125,6 +125,29 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     });
   });
 
+  app.post('/v1/eingang/aufgaben/:id/wieder-oeffnen', {
+    schema: {
+      tags: [TAG_EINGANG], summary: 'Von Hand erledigte Aufgabe wieder öffnen', params: IdParams, headers: IdempotencyHeaders, response: { 200: Type.Ref('Aufgabe') },
+      description: '«Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat und die keine '
+        + 'fachliche Handlung inzwischen beendet hat (z. B. Sitzung geschlossen), sonst 404. Ist dieselbe Aufgabe wieder offen, 409.',
+    },
+  }, async req => {
+    const { id } = req.params as { id: string };
+    const me = await person(req);
+    const who = actorOf(req);
+    return req.tx(async tx => {
+      let ok: boolean;
+      try { ok = await store.wiederOeffnen(tx, id); } catch (e) {
+        if ((e as { code?: string }).code === '23505') throw conflict('Diese Aufgabe ist schon wieder offen.');
+        throw e;
+      }
+      const r = ok ? await store.aufgabe(tx, me, id) : null;
+      if (!r) throw notFound('Aufgabe');
+      await record(tx, who, { action: 'aufgabe.reopened', resourceType: 'aufgabe', resourceId: id, data: { art: r.art, bezug: { typ: r.bezug_typ, id: r.bezug_id } } });
+      return aufgabeOut(r);
+    });
+  });
+
   // ---- Mitteilungen
 
   app.get('/v1/mitteilungen', {

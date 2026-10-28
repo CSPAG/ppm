@@ -5,15 +5,15 @@
  * gebündelten Mitteilungen, Protokoll bereinigen und versenden, Auflage erfüllen, Liste der Entscheide.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { registriereTraktandenart, traktandum, type EntscheidFolge, type FolgeKontext } from '../../src/modules/sitzung/index.ts';
 import { _abmelden, traktandenart, type Traktandenart } from '../../src/modules/sitzung/arten.ts';
 import { optionen } from '../../src/modules/sitzung/entscheid.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 function mittwochIn(n: number): string {
   const d = new Date(Date.parse(`${heute()}T00:00:00Z`) + n * 86_400_000);
@@ -38,7 +38,7 @@ function probeArt(a: Traktandenart): void {
   wiederherstellen.push(() => { _abmelden(a.art); if (vorher) registriereTraktandenart(vorher); });
 }
 
-describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () => {
+describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', () => {
   let api: TestApi;
   let tenantId: string;
   let ueId = '';

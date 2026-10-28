@@ -89,7 +89,8 @@ export const TF = {
   herunterladen: 'Als CSV herunterladen',
   nurLesen: 'Du kannst den Jahresbedarf nur ansehen; übergeben wird er von Finanzen (FI).',
   keinRecht: 'Den Jahresbedarf aller Projekte sehen Personen mit Recht auf die Beträge der Organisation (FI, GL, UE).',
-  budgetKonflikt: 'Der Jahresbedarf wurde inzwischen geändert. Lade neu; deine Korrekturen gehen dabei verloren.',
+  budgetKonflikt: 'Der Jahresbedarf wurde inzwischen geändert. Lade neu und speichere danach nochmals; deine Korrekturen bleiben erhalten.',
+  uebergebenKonflikt: 'Der Jahresbedarf wurde inzwischen geändert. Lade neu und prüfe die Summe, bevor du übergibst.',
   // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», FI)
   kopfkarte: {
     titel: 'Finanzen',

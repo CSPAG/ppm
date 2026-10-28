@@ -2,13 +2,14 @@
  * Texte des Features «Projekte» (Namensraum des Features, fachmodell.md 7.2): Anrede «Du», Schweizer Rechtschreibung,
  * Begriffe nach docs/ux/darstellung.md (Rollen ausgeschrieben, «CTL» als Kurzform der Insel).
  */
+import { NAV } from './nav.ts';
 import type { StandFamilie } from '../../ui/index.ts';
 
 type Funktion = 'sp' | 'pl' | 'ctl' | 'kt' | 'koalition';
 type Lebenszyklus = 'aktiv' | 'sistiert' | 'abgebrochen' | 'abgeschlossen' | 'zurueckgezogen';
 
 export const TP = {
-  bereich: 'Meine Projekte',
+  bereich: NAV.bereich,
   titel: 'Projekte',
   sub: 'Projekte, in denen du eine Rolle hast oder die du sehen darfst. Öffne ein Projekt, um seine Projektakte zu führen.',
   suche: 'Projekte durchsuchen',
@@ -25,7 +26,7 @@ export const TP = {
     nummer: 'Nummer', handlungsfeld: 'Handlungsfeld', name: 'Projekt', projektleitung: 'Projektleitung', phase: 'Phase',
     portfolio: 'Portfolio', rollen: 'Meine Rolle', stand: 'Stand',
   },
-  funktion: { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL', kt: 'Kernteam', koalition: 'Sponsoren-Koalition' } satisfies Record<Funktion, string>,
+  funktion: NAV.funktion satisfies Record<Funktion, string>,
   funktionLang: {
     sp: 'Sponsor', pl: 'Projektleitung', ctl: 'Clinical Transformation Lead (CTL)', kt: 'Kernteam', koalition: 'Sponsoren-Koalition',
   } satisfies Record<Funktion, string>,
@@ -41,7 +42,7 @@ export const TP = {
   keinePl: 'keine Projektleitung',
   // Projektakte (Rahmen)
   akte: {
-    reiter: 'Bereiche der Projektakte', inhalt: 'Inhalt der Projektakte', uebersicht: 'Übersicht', zurueck: 'Zu den Projekten',
+    reiter: 'Bereiche der Projektakte', inhalt: 'Inhalt der Projektakte', uebersicht: NAV.uebersicht, zurueck: 'Zu den Projekten',
     nichtGefunden: 'Dieses Projekt gibt es nicht, oder du siehst es nicht.',
     beendet: (stand: string) => `Das Projekt ist ${stand}. Die Projektakte kann nur noch gelesen werden.`,
     sistiert: 'Das Projekt ist sistiert. Es wird mit einem Entscheid des Gremiums wieder aufgenommen.',
@@ -67,7 +68,7 @@ export const TP = {
     verlieren: 'verlieren ihre Rolle im Projekt:',
     keineWirkung: 'Die Zugriffe auf das Projekt bleiben gleich.',
   },
-  palette: { detail: 'Projekt' },
+  palette: NAV.palette,
   // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle»: PL, CTL, SP)
   kopfkarte: {
     titel: 'Meine Projekte',
@@ -75,5 +76,8 @@ export const TP = {
     berichtFaellig: (monat: string, frist: string) => `Statusbericht ${monat} fällig ${frist}`,
     berichtOffen: (monat: string) => `Statusbericht ${monat} offen`,
     kritischGrund: (grund: string) => `Grund: ${grund}`,
+    meilenstein: (m: string) => `Nächster Meilenstein: ${m}`,
+    traktandum: (art: string, gremium: string, datum: string) => `${art} im ${gremium} ${datum}`,
+    vorstellen: (datum: string, gremium: string) => `Du stellst am ${datum} im ${gremium} vor`,
   },
 };

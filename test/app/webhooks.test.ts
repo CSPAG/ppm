@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { createServer, type IncomingMessage } from 'node:http';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { createMailer, isPublicAddress, outboxTask, resolveTarget, safeRequest } from '@vollholz/platform';
 import { app } from '../../src/app.ts';
 import { verify } from '../../src/modules/webhooks/index.ts';
@@ -12,10 +12,9 @@ import { platform } from '../../src/platform.ts';
 
 const CONSUMERS = app.modules.flatMap(m => m.consumers ?? []);
 const TASKS = app.modules.flatMap(m => m.tasks ?? []);
-import { skipDb } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 const quiet = { info() {}, warn() {}, error() {} };
 
 test('SSRF: private und reservierte Adressen gesperrt', async () => {
@@ -46,7 +45,7 @@ test('Zustellung: feste Frist auch bei tröpfchenweiser Antwort, Grössengrenze 
   } finally { slow.closeAllConnections(); slow.close(); }
 });
 
-describe('Webhooks', { skip }, () => {
+describe('Webhooks', () => {
   let api: TestApi;
   let admin: Record<string, string>, other: Record<string, string>;
   const received: { headers: IncomingMessage['headers']; body: string }[] = [];

@@ -5,12 +5,12 @@
  * Begründung, Rechte, If-Match und Audit.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { unterzeichnung } from '../../src/modules/vertrag/index.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 const heute = (tage = 0) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(new Date(Date.now() + tage * 86_400_000));
@@ -19,7 +19,7 @@ const heute = (tage = 0) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe
 const unterzeichnet: string[] = [];
 unterzeichnung.registrieren(async (_tx, o) => { unterzeichnet.push(`${o.projekt.nummer}:${o.version.nummer}:${o.version.stand}`); });
 
-describe('Projektvertrag: Quality-Check und Unterschriften', { skip }, () => {
+describe('Projektvertrag: Quality-Check und Unterschriften', () => {
   let api: TestApi;
   let T: string;
   const h: Record<string, H> = {};

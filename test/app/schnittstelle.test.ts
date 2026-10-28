@@ -7,15 +7,15 @@
  */
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { verarbeitungSetzen } from '../../src/modules/schnittstelle/index.ts';
 import { faelligeAusfuehren } from '../../src/modules/schnittstelle/lauf.ts';
 import { login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
+describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', () => {
   let api: TestApi;
   let T: string;
   let server: Server;
@@ -43,9 +43,11 @@ describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
     await new Promise<void>(r => server.listen(0, '127.0.0.1', r));
     basis = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
     api = await testApi();
-    // Das Modul finanzen registriert die Verarbeitung von Ist-Kosten und Jahresbedarf (AP-E7-4); hier zuerst ohne
+    // Die Module finanzen (Ist-Kosten, Jahresbedarf, AP-E7-4) und ressource (Personal, AP-E7-2) registrieren ihre
+    // Verarbeitung; hier zuerst ohne
     verarbeitungSetzen('ist_kosten', null);
     verarbeitungSetzen('jahresbedarf', null);
+    verarbeitungSetzen('personal', null);
     T = await tenant(api.t.runtime, 'acme');
     for (const [sub, rolle] of [['adm', 'org-admin'], ['ue', 'ue'], ['gl', 'gl']] as const) {
       h[sub] = { authorization: (await login(api, 'acme', sub, rolle)).authorization };
@@ -54,6 +56,7 @@ describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
   after(async () => {
     verarbeitungSetzen('ist_kosten', null);
     verarbeitungSetzen('jahresbedarf', null);
+    verarbeitungSetzen('personal', null);
     await api?.close();
     await new Promise(r => server.close(r));
   });

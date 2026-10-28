@@ -12,6 +12,7 @@ import type { Actor, Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
 import { projektdaten } from '../projektdaten/index.ts';
 import { record } from '../../platform.ts';
+import { hrList, mitHr } from './hr.ts';
 import { monate, plusMonate } from './rechnung.ts';
 import * as store from './store.ts';
 import * as zs from './zuteilung-store.ts';
@@ -122,14 +123,14 @@ export interface Konflikt {
 
 /**
  * Überbuchungen im Zeitraum: eine Person mit mehr als einer Stelle oder eine Rolle (Pool) mit mehr Zuteilung als
- * erfasstem Angebot (Monate ohne Angebot zeigt die Auslastung als «ohne Angebot»). Beteiligte nach Priorität (höchste zuerst; ohne Priorität nach Projektnummer).
+ * Angebot (festgelegt, sonst laut HR-System, RK.01.02, Annahme AP-E7-2; Monate ohne Angebot zeigt die Auslastung als «ohne Angebot»). Beteiligte nach Priorität (höchste zuerst; ohne Priorität nach Projektnummer).
  */
 export async function konflikte(tx: Tx, von: string, bis: string): Promise<Konflikt[]> {
   const out: Konflikt[] = [];
   for (const p of await zs.belegungJePerson(tx, von, bis)) {
     if (p.fte > STELLE + EPS) out.push({ art: 'person', monat: p.monat, personId: p.person_id, personName: p.person_name, rolle: null, summe: rund(p.fte), grenze: STELLE, beteiligte: [] });
   }
-  const angebot = new Map((await store.list(tx, von, bis)).map(a => [`${a.rolle}|${a.monat}`, a.fte]));
+  const angebot = new Map(mitHr(await store.list(tx, von, bis), await hrList(tx, von, bis)).map(a => [`${a.rolle}|${a.monat}`, a.fte]));
   for (const r of await zs.belegungJeRolle(tx, von, bis)) {
     // Ohne erfasstes Angebot keine Grenze (die Auslastung zeigt «ohne Angebot»)
     const a = angebot.get(`${r.rolle}|${r.monat}`);

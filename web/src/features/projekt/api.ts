@@ -34,6 +34,15 @@ export function useBerichtStand(ids: readonly string[]) {
   });
 }
 
+/** Nächstes traktandiertes Geschäft je Projekt (Gremium und Datum) für die Kopfkarte. */
+export function useNaechsteTraktanden(ids: readonly string[]) {
+  return useQuery({
+    queryKey: [...projektKeys.kopf, 'traktanden', ids] as const,
+    enabled: ids.length > 0,
+    queryFn: async ({ signal }) => (await api.GET('/v1/traktanden/naechste', { params: { query: { projektId: [...ids] } }, signal })).data!.items,
+  });
+}
+
 export function useProjektList(f: ListFilter) {
   return useInfiniteQuery({
     queryKey: projektKeys.list(f),
@@ -89,6 +98,11 @@ export function useOrganisationSpeichern() {
 }
 
 /** Suche für die Befehlspalette (I-N4): Projekte nach Name oder Nummer, nur die sichtbaren (API). */
+/** Personen in sichtbaren Projekten für die Befehlspalette (I-N4): Name und Funktionen, ohne E-Mail. */
+export async function suchePersonen(q: string, signal: AbortSignal) {
+  return (await api.GET('/v1/projekte/personen', { params: { query: { q, limit: 5 } }, signal })).data!.items;
+}
+
 export async function sucheProjekte(q: string, signal: AbortSignal): Promise<Projekt[]> {
   const { data } = await api.GET('/v1/projekte', { params: { query: { q, limit: 5 } }, signal });
   return data!.items;

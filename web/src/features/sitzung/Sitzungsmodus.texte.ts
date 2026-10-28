@@ -2,6 +2,8 @@
  * Texte für Sitzungsmodus, Protokoll und Entscheide (AP-E2-2; Namensraum des Features «Sitzungen»): Anrede «Du»
  * (UX-E7), Schweizer Rechtschreibung, Schaltflächen und Meldungen aus K3 (docs/ux/ablaeufe/K3-gremiumssitzung.md).
  */
+import { NAV } from './nav.ts';
+
 export const TM = {
   // Sitzungsmodus (K3 Schritte 7–9)
   modus: 'Sitzungsmodus',
@@ -103,7 +105,7 @@ export const TM = {
   drucken: 'Drucken',
 
   // Entscheide und Auflagen (UI-36)
-  entscheide: 'Entscheide',
+  entscheide: NAV.entscheide,
   entscheideSub: 'Entscheide der Gremien mit Begründung und Auflagen, neueste Sitzung zuerst.',
   entscheideLeer: 'Noch keine Entscheide. Entscheide entstehen im Sitzungsmodus einer Sitzung.',
   entscheideGefiltert: 'Keine Entscheide für diesen Filter.',

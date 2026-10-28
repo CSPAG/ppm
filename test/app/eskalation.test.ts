@@ -9,13 +9,13 @@
  * Test die Folge `beiEntscheid` der Art so auf, wie es der Sitzungsmodus in der Transaktion des Entscheids tut.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
 import { traktandenart, type EntscheidFolge } from '../../src/modules/sitzung/arten.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const PERIODE = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }).slice(0, 7);
 const VOLL = {
@@ -32,7 +32,7 @@ function mittwochIn(n: number): string {
 
 interface Vorschlag { id: string; art: string; bezug_id: string; titel: string; antrag: string; stand: string; sitzung_id: string | null }
 
-describe('Eskalation und Meilensteinabnahme', { skip }, () => {
+describe('Eskalation und Meilensteinabnahme', () => {
   let api: TestApi;
   let T = '';
   let ue: Record<string, string>, pl: Record<string, string>;

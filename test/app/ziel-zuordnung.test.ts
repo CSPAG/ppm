@@ -5,16 +5,16 @@
  */
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import type { Principal } from '@vollholz/iam';
 import { systemActor } from '@vollholz/platform';
 import { projektZuordnen } from '../../src/modules/ziel/index.ts';
 import { grant, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Zuordnung Projekt ↔ Ziel aus oberen Modulen', { skip }, () => {
+describe('Zuordnung Projekt ↔ Ziel aus oberen Modulen', () => {
   let api: TestApi;
   let T: string;
   const id: Record<string, string> = {};

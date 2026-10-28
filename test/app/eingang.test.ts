@@ -4,20 +4,20 @@
  * (Aufgabe einer Person sieht die Vertretung, befristete Tupel, künftiger Zeitraum über den Job) und Lesesicht.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { aufgabe, mitteilung, stellvertretung } from '../../src/modules/eingang/index.ts';
 import { platform } from '../../src/platform.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const tag = (offset: number) => {
   const d = new Date(Date.now() + offset * 86_400_000);
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(d);
 };
 
-describe('Eingang', { skip }, () => {
+describe('Eingang', () => {
   let api: TestApi;
   let tenantId: string;
   type P = { h: Record<string, string>; id: string };
@@ -106,7 +106,31 @@ describe('Eingang', { skip }, () => {
     assert.equal((await call('POST', `/v1/eingang/aufgaben/${m}/erledigen`, anna.h)).statusCode, 404);
     const audit = await sys(tx => tx.query("SELECT action FROM ppm.audit_log WHERE action = 'aufgabe.completed' AND resource_id = $1", [m]));
     assert.equal(audit.rowCount, 1);
+
+    // «Rückgängig» (I-R1): nur die eigene Erledigung, danach wieder offen und erneut erledigbar
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${m}/wieder-oeffnen`, beat.h)).statusCode, 404);
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${f}/wieder-oeffnen`, anna.h)).statusCode, 404);
+    const zurueck = await call('POST', `/v1/eingang/aufgaben/${m}/wieder-oeffnen`, anna.h);
+    assert.equal(zurueck.statusCode, 200, zurueck.body);
+    assert.deepEqual([zurueck.json().titel, zurueck.json().can.erledigen], ['Unterlagen lesen', true]);
+    assert.deepEqual((await titel(anna)).sort(), ['Unterlagen lesen', 'Vertrag unterzeichnen']);
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${m}/wieder-oeffnen`, anna.h)).statusCode, 404);
+    const wieder = await sys(tx => tx.query("SELECT action FROM ppm.audit_log WHERE action = 'aufgabe.reopened' AND resource_id = $1", [m]));
+    assert.equal(wieder.rowCount, 1);
+    // ist dieselbe Aufgabe inzwischen neu offen, bleibt die erledigte zu (409)
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${m}/erledigen`, anna.h)).statusCode, 200);
+    const neu = await sys(tx => aufgabe.oeffnen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's1' }, empfaenger: { person: anna.id }, titel: 'Unterlagen lesen', link: '/gremien/prat', manuell: true }));
+    assert.notEqual(neu, m);
+    const doppelt = await call('POST', `/v1/eingang/aufgaben/${m}/wieder-oeffnen`, anna.h);
+    assert.equal(doppelt.statusCode, 409, doppelt.body);
+    assert.match(doppelt.headers['content-type'] as string, /application\/problem\+json/);
+    await sys(tx => aufgabe.entfallen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's1' } }));
     await sys(tx => aufgabe.entfallen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertrag_version', id: 'v1' } }));
+    // beendet eine fachliche Handlung die von Hand erledigte Aufgabe (Sitzung geschlossen), bleibt sie zu
+    const s2 = await sys(tx => aufgabe.oeffnen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's2' }, empfaenger: { person: anna.id }, titel: 'Unterlagen lesen', link: '/gremien/prat', manuell: true }));
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${s2}/erledigen`, anna.h)).statusCode, 200);
+    await sys(tx => aufgabe.erledigen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's2' } }));
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${s2}/wieder-oeffnen`, anna.h)).statusCode, 404);
   });
 
   test('Mitteilungen: nur an die Empfängerin, gelesen markieren', async () => {

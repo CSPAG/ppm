@@ -4,13 +4,13 @@
  * Anpassungen mit Aufgabe an die GL), Roadmap mit Vorschau, Publizieren und Lesen für alle angemeldeten Personen.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Freigabe der Jahresziele und Roadmap', { skip }, () => {
+describe('Freigabe der Jahresziele und Roadmap', () => {
   let api: TestApi;
   let gl: Record<string, string>, ue: Record<string, string>, leser: Record<string, string>, ohneZiele: Record<string, string>;
   let tenantId = '';

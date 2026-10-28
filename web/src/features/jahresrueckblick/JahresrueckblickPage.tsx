@@ -8,7 +8,7 @@
  */
 import { describeError } from '@vollholz/iam-web';
 import { useId, useState, type ReactNode } from 'react';
-import { isConflict } from '../../api/index.ts';
+import { isConflict, statusOf } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Dialog, Empty, ErrorState, fmtDatum, fmtPhase, fmtQuartal, Hinweis, Icon, Skelett, Stand, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
 import {
@@ -26,8 +26,9 @@ export interface JahresrueckblickPageProps {
 const quartal = (q: string) => fmtQuartal(Number(q.slice(0, 4)), Number(q.slice(6)) as 1 | 2 | 3 | 4);
 
 export function JahresrueckblickPage({ jahr, jahrWechseln }: JahresrueckblickPageProps) {
-  const { can } = useSession();
-  const darf = can('ziel:read') || can('quartalsbericht:write');
+  const { can, canSomewhere } = useSession();
+  // Mitglieder des PRAT (sitzung:read am Portfolio) lesen ab «traktandiert» (A-67); die API entscheidet, andere Gremien 403
+  const darf = can('ziel:read') || can('quartalsbericht:write') || canSomewhere('sitzung:read');
   const q = useJahresrueckblick(jahr, darf);
   const skelett = useVerzoegert(q.isPending && darf);
   const l = q.data;
@@ -62,9 +63,9 @@ export function JahresrueckblickPage({ jahr, jahrWechseln }: JahresrueckblickPag
       <div className="body jr-body" tabIndex={0} role="region" aria-label={TJ.inhalt(jahr)}>
         {!darf ? <Empty>{TJ.keinRecht}</Empty> : q.isPending ? (
           <div aria-busy="true"><span className="sr" role="status">{TJ.title(jahr)}</span>{skelett ? <Skelett /> : null}</div>
-        ) : q.error ? (
+        ) : q.error && statusOf(q.error) === 403 ? <Empty>{TJ.keinRecht}</Empty> : q.error ? (
           <ErrorState error={q.error} onRetry={() => void q.refetch()} />
-        ) : <Rueckblick key={l!.etag} l={l!} neuLaden={() => void q.refetch()} />}
+        ) : !l ? <Empty>{TJ.nochNichtTraktandiert(jahr)}</Empty> : <Rueckblick key={l.etag} l={l} neuLaden={() => void q.refetch()} />}
       </div>
     </section>
   );

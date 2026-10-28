@@ -5,11 +5,11 @@
  * 1000 Zeilen (Q-L5).
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const heute = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
 const PERIODE = heute.slice(0, 7);
@@ -18,7 +18,7 @@ const VORPERIODE = (() => { const [j, m] = PERIODE.split('-').map(Number) as [nu
 interface Zeile { nummer: string; status: string | null; statusVorperiode: string | null; meldung: string; merkmale: string[]; phase: string; portfolio: string; projektleitung: string | null; naechsterMeilenstein: { termin: string | null; text: string } | null; werteAus: string | null }
 interface Antwort { periode: string; periodeStand: string; portfolios: { schluessel: string }[]; items: Zeile[]; funnel: { phase: string; anzahl: number; kritisch: number; imPlan: number; nichtGemeldet: number }[] }
 
-describe('Dashboard der Periode', { skip }, () => {
+describe('Dashboard der Periode', () => {
   let api: TestApi;
   let T = '';
   let ue: Record<string, string>, gremium: Record<string, string>, direktion: Record<string, string>, pl: Record<string, string>;

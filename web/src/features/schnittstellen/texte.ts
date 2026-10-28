@@ -2,9 +2,11 @@
  * Texte des Features «Schnittstellen» (Namensraum = Feature, docs/fachmodell.md 7.2): Administration › Schnittstellen
  * (UI-49) und Änderungsprotokoll (UI-50); BC AM.03.02, AM.03.03, UC-018. Anrede «Du», Schweizer Rechtschreibung.
  */
+import { NAV } from './nav.ts';
+
 export const TX = {
-  bereich: { schnittstellen: 'Schnittstellen', protokoll: 'Änderungsprotokoll' },
-  aktion: { einrichten: 'Schnittstelle einrichten' },
+  bereich: NAV.bereich,
+  aktion: NAV.aktion,
   s: {
     title: 'Schnittstellen', sub: 'Datenaustausch mit Umsystemen wie ERP, HR-System und Budgetprozess, mit Laufprotokoll.',
     tabelle: 'Schnittstellen', one: 'Schnittstelle', create: 'Neue Schnittstelle',

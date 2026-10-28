@@ -3,7 +3,7 @@
  * Antwort mit ETag in den Cache; das erste Speichern legt den Rückblick ohne `If-Match` an (Fassung 0).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, type Schemas } from '../../api/index.ts';
+import { api, isGone, type Schemas } from '../../api/index.ts';
 
 export type Jahresrueckblick = Schemas['Jahresrueckblick'];
 export type Jahresauswertung = Schemas['Jahresauswertung'];
@@ -16,9 +16,15 @@ export function useJahresrueckblick(jahr: number, enabled: boolean) {
   return useQuery({
     queryKey: rueckblickKeys.jahr(jahr),
     enabled,
-    queryFn: async ({ signal }): Promise<JahresrueckblickLoaded> => {
-      const { data, response } = await api.GET('/v1/jahresrueckblicke/{jahr}', { params: { path: { jahr } }, signal });
-      return { item: data!, etag: response.headers.get('ETag') ?? '' };
+    // `null` (404): für Mitglieder des PRAT ist der Rückblick noch nicht traktandiert (A-67)
+    queryFn: async ({ signal }): Promise<JahresrueckblickLoaded | null> => {
+      try {
+        const { data, response } = await api.GET('/v1/jahresrueckblicke/{jahr}', { params: { path: { jahr } }, signal });
+        return { item: data!, etag: response.headers.get('ETag') ?? '' };
+      } catch (e) {
+        if (isGone(e)) return null;
+        throw e;
+      }
     },
   });
 }

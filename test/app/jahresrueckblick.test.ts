@@ -4,13 +4,13 @@
  * (K3 Schritt 8) in der Sitzung, Rechte.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { login, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { grant, login, testApi, type TestApi } from './api.ts';
+import { full } from './harness.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 import { letztesQuartal } from '../../src/modules/ziel/quartal.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
@@ -20,10 +20,10 @@ function mittwochIn(n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-describe('Jahresrückblick', { skip }, () => {
+describe('Jahresrückblick', () => {
   let api: TestApi;
   let tenantId = '';
-  let ue: H, gl: H, ohne: H;
+  let ue: H, gl: H, ohne: H, prat: H, fremd: H, zweitesA: H;
   let portfolioA = '';
   const quartal = letztesQuartal(heute());
   const jahr = Number(quartal.slice(0, 4));
@@ -54,8 +54,21 @@ describe('Jahresrückblick', { skip }, () => {
     const pm = await ok('POST', '/v1/phasenmodelle', ue, { quelle: 'vorgabe' }, 201);
     await ok('POST', `/v1/phasenmodelle/${pm.json().id}/in-kraft-setzen`, mit(adm, pm.headers.etag as string));
     portfolioA = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'transformation', name: 'Transformation' }, 201)).json().id;
-    const prat = (await ok('POST', '/v1/gremien', ue, { portfolioId: portfolioA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).json().id;
-    await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum: termin }, 201);
+    const pratId = (await ok('POST', '/v1/gremien', ue, { portfolioId: portfolioA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).json().id;
+    await ok('POST', `/v1/gremien/${pratId}/termine`, ue, { datum: termin }, 201);
+    // A-67: Mitglied des PRAT (Gremium am Portfolio der Kategorie A) und eines anderen Gremiums
+    const portfolioB = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'B', schluessel: 'medizin', name: 'Medizin' }, 201)).json().id;
+    const m = await login(api, 'demo', 'u-prat', null);
+    await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolioA });
+    prat = { authorization: m.authorization };
+    const f = await login(api, 'demo', 'u-fremd', null);
+    await grant(api, tenantId, `user:${f.principalId}`, 'gremium', { type: 'portfolio', id: portfolioB });
+    fremd = { authorization: f.authorization };
+    // ein zweites Portfolio der Kategorie A (nach Name später): sein Gremium ist nicht der PRAT
+    const portfolioA2 = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'zentrum', name: 'Zentrum' }, 201)).json().id;
+    const z = await login(api, 'demo', 'u-zweites-a', null);
+    await grant(api, tenantId, `user:${z.principalId}`, 'gremium', { type: 'portfolio', id: portfolioA2 });
+    zweitesA = { authorization: z.authorization };
 
     // Ziel mit Stand im Jahr
     const feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
@@ -108,6 +121,8 @@ describe('Jahresrückblick', { skip }, () => {
 
   test('Erkenntnisse erfassen: anlegen, If-Match, nur UE; traktandieren erst gespeichert', async () => {
     assert.equal((await call('POST', `${url}/traktandieren`, ue)).statusCode, 404, 'noch nichts gespeichert');
+    // A-67: das Gremium sieht weder die Auswertung live noch den Rückblick in Arbeit
+    assert.equal((await call('GET', url, prat)).statusCode, 404);
     assert.equal((await call('PUT', url, gl, { erkenntnisse: 'x', massnahmen: '' })).statusCode, 403);
     let r = await ok('PUT', url, ue, { erkenntnisse: ' Zu viele Vorhaben parallel. ', massnahmen: '' });
     assert.deepEqual([r.json().stand, r.json().erkenntnisse, r.headers.etag], ['in_arbeit', 'Zu viele Vorhaben parallel.', 'W/"1"']);
@@ -115,6 +130,8 @@ describe('Jahresrückblick', { skip }, () => {
     assert.equal((await call('PUT', url, mit(ue, 'W/"9"'), { erkenntnisse: 'x', massnahmen: '' })).statusCode, 412);
     r = await ok('PUT', url, mit(ue, r.headers.etag as string), { erkenntnisse: 'Zu viele Vorhaben parallel.', massnahmen: 'WIP-Limite je Portfolio' });
     assert.deepEqual([r.json().massnahmen, r.json().version], ['WIP-Limite je Portfolio', 2]);
+    assert.equal((await call('GET', url, prat)).statusCode, 404, 'in Arbeit');
+    assert.equal((await call('GET', `${url}/dokument`, prat)).statusCode, 404, 'in Arbeit');
   });
 
   test('Traktandieren im PRAT, «Anpassungen verlangt», Korrektur zu «Verabschiedet»', async () => {
@@ -122,6 +139,15 @@ describe('Jahresrückblick', { skip }, () => {
     assert.equal(r.json().stand, 'traktandiert');
     assert.deepEqual(r.json().can, { bearbeiten: false, traktandieren: false });
     assert.equal((await call('POST', `${url}/traktandieren`, ue)).statusCode, 409);
+    // A-67: ab «traktandiert» liest das Mitglied des PRAT den Stand bei Traktandierung, ohne Handlungen; ein anderes Gremium nie
+    const g = await ok('GET', url, prat);
+    assert.deepEqual([g.json().stand, g.json().erkenntnisse, g.json().can], ['traktandiert', 'Zu viele Vorhaben parallel.', { bearbeiten: false, traktandieren: false }]);
+    assert.equal((await call('GET', `${url}/dokument`, prat)).statusCode, 200);
+    assert.equal((await call('PUT', url, mit(prat, g.headers.etag as string), { erkenntnisse: 'x', massnahmen: '' })).statusCode, 403);
+    for (const u of [`${url}`, `${url}/dokument`]) assert.equal((await call('GET', u, fremd)).statusCode, 403, u);
+    // Gremium eines anderen Portfolios der Kategorie A: liest nie, auch wenn es nur sein eigenes Portfolio sieht
+    for (const u of [`${url}`, `${url}/dokument`]) assert.ok([403, 404].includes((await call('GET', u, zweitesA)).statusCode), u);
+    assert.equal((await call('GET', url, ohne)).statusCode, 403);
     assert.equal((await call('PUT', url, mit(ue, r.headers.etag as string), { erkenntnisse: 'x', massnahmen: '' })).statusCode, 409);
     // Stand bei Traktandierung: ein später abgeschlossenes Vorhaben ändert die Auswertung nicht mehr
     await sys(tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgeschlossen' WHERE id = $1", [projekt['2020-904']]));
@@ -146,11 +172,20 @@ describe('Jahresrückblick', { skip }, () => {
     assert.equal(r.json().stand, 'ausgewertet');
     assert.ok(r.json().ausgewertetAt);
     assert.deepEqual(r.json().can, { bearbeiten: true, traktandieren: false });
+    // A-67: Ein neues Portfolio der Kategorie A sortiert nach dem Traktandieren vorne ein. Das ursprüngliche PRAT liest
+    // weiter (festgehaltenes Portfolio), das Gremium des neuen nicht
+    const vorne = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'aare', name: 'Aare' }, 201)).json().id;
+    const n = await login(api, 'demo', 'u-vorne', null);
+    await grant(api, tenantId, `user:${n.principalId}`, 'gremium', { type: 'portfolio', id: vorne });
+    assert.equal((await ok('GET', url, prat)).json().stand, 'ausgewertet');
+    assert.equal((await call('GET', `${url}/dokument`, prat)).statusCode, 200);
+    for (const u of [url, `${url}/dokument`]) assert.notEqual((await call('GET', u, { authorization: n.authorization })).statusCode, 200, u);
     // Erkenntnisse nach dem Entscheid des PRAT nachführen (UC-013 Schritt 4)
     r = await ok('PUT', url, mit(ue, r.headers.etag as string), { erkenntnisse: 'Zu viele Vorhaben parallel.', massnahmen: 'WIP-Limite 5 je Portfolio' });
     assert.deepEqual([r.json().stand, r.json().massnahmen], ['ausgewertet', 'WIP-Limite 5 je Portfolio']);
     const audit = await sys(async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action LIKE 'jahresrueckblick.%' ORDER BY id")).rows.map(x => x.action));
-    assert.deepEqual(audit, ['jahresrueckblick.created', 'jahresrueckblick.updated', 'jahresrueckblick.scheduled', 'jahresrueckblick.updated']);
+    // dazu der Export des Gremiums (A-67)
+    assert.deepEqual(audit, ['jahresrueckblick.created', 'jahresrueckblick.updated', 'jahresrueckblick.scheduled', 'jahresrueckblick.exported', 'jahresrueckblick.exported', 'jahresrueckblick.updated']);
   });
 
   test('Lessons Learned anfordern (A1): Aufgabe an die PL, erledigt mit der ersten Lesson Learned', async () => {
@@ -178,6 +213,6 @@ describe('Jahresrückblick', { skip }, () => {
     const docx = await ok('GET', `${url}/dokument?format=docx`, ue);
     assert.match(String(docx.headers['content-disposition']), new RegExp(`Jahresrueckblick_${jahr}\\.docx`));
     const n = await sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.audit_log WHERE action = 'jahresrueckblick.exported'")).rows[0]!.n);
-    assert.equal(n, 2);
+    assert.equal(n, 4, 'mit den beiden Exporten des Gremiums im Traktandieren-Test');
   });
 });

@@ -43,26 +43,34 @@ export function FreigabePage({ jahr, zumZyklus }: FreigabePageProps) {
       </header>
       <div className="body pad">
         {q.isPending ? (verzoegert ? <Skelett zeilen={6} /> : null)
-          : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} />
-          : q.data.can.vorlegen ? <Vorlegen v={q.data} jahr={jahr} zumZyklus={zumZyklus} />
-          : q.data.can.freigabe ? <Erfassen v={q.data} jahr={jahr} zumZyklus={zumZyklus} />
+          : q.error && !q.data ? <ErrorState error={q.error} onRetry={() => void q.refetch()} />
+          : q.data.can.vorlegen ? <Vorlegen v={q.data} jahr={jahr} zumZyklus={zumZyklus} neuLaden={() => q.refetch()} />
+          : q.data.can.freigabe ? <Erfassen v={q.data} jahr={jahr} zumZyklus={zumZyklus} neuLaden={() => q.refetch()} />
           : <p className="note">{TF.nichtsZuTun[q.data.stand]?.(jahr)}</p>}
       </div>
     </section>
   );
 }
 
-/** Fehler des Servers am Schritt (I-P6); 412 mit Weg zum Neuladen (Z7). */
-function ServerMeldung({ error, onReload }: { error: unknown; onReload(): void }) {
+/**
+ * Fehler des Servers am Schritt (I-P6); 412 mit «Neu laden» an Ort und Stelle (Z7): Der neue Stand kommt in die Seite, die
+ * Eingaben bleiben; erst wenn er da ist, verschwindet der Hinweis.
+ */
+function ServerMeldung({ error, neuLaden, zuruecksetzen }: { error: unknown; neuLaden(): Promise<{ error: unknown }>; zuruecksetzen(): void }) {
+  const [laedt, setLaedt] = useState(false);
   if (!error) return null;
   if (isConflict(error)) {
-    return <div className="notice" role="alert"><p>{TF.konflikt}</p><button type="button" className="btn" onClick={onReload}>{TF.neuLaden}</button></div>;
+    const laden = async () => {
+      setLaedt(true);
+      try { if (!(await neuLaden()).error) zuruecksetzen(); } finally { setLaedt(false); }
+    };
+    return <div className="notice" role="alert"><p>{TF.konflikt}</p><button type="button" className="btn" disabled={laedt} onClick={() => void laden()}>{TF.neuLaden}</button></div>;
   }
   const e = describeError(error);
   return <Hinweis stufe="sperre" live>{e.detail || e.title}</Hinweis>;
 }
 
-function Vorlegen({ v, jahr, zumZyklus }: { v: Vorlage; jahr: number; zumZyklus(nummer?: string): void }) {
+function Vorlegen({ v, jahr, zumZyklus, neuLaden }: { v: Vorlage; jahr: number; zumZyklus(nummer?: string): void; neuLaden(): Promise<{ error: unknown }> }) {
   const [schritt, setSchritt] = useState(0);
   const toast = useToast();
   const m = useFreigabeMutations(jahr);
@@ -107,7 +115,7 @@ function Vorlegen({ v, jahr, zumZyklus }: { v: Vorlage; jahr: number; zumZyklus(
           {sperre
             ? <Hinweis stufe="sperre">{v.anzahl === 0 ? TF.leer : TF.metrikFehlt(v.ohneMetrik.map(x => x.nummer))}</Hinweis>
             : <Hinweis stufe="warnung">{TF.wirkungVorlegen(v.anzahl)}</Hinweis>}
-          <ServerMeldung error={m.vorlegen.error} onReload={() => { m.vorlegen.reset(); zumZyklus(); }} />
+          <ServerMeldung error={m.vorlegen.error} neuLaden={neuLaden} zuruecksetzen={() => m.vorlegen.reset()} />
         </section>
       )}
       <div className="acts fg-nav">
@@ -115,7 +123,7 @@ function Vorlegen({ v, jahr, zumZyklus }: { v: Vorlage; jahr: number; zumZyklus(
         {schritt < 2
           ? <button type="button" className="btn primary" onClick={() => setSchritt(schritt + 1)}>{TF.weiter}</button>
           : (
-            <button type="button" className="btn primary" disabled={sperre || m.vorlegen.isPending}
+            <button type="button" className="btn primary" disabled={sperre || m.vorlegen.isPending || isConflict(m.vorlegen.error)}
               onClick={() => m.vorlegen.mutate({ version: v.version }, { onSuccess: () => { toast.show(TF.vorgelegt(jahr)); zumZyklus(); } })}>
               <Icon name="send" />{TF.vorlegen}
             </button>
@@ -125,7 +133,7 @@ function Vorlegen({ v, jahr, zumZyklus }: { v: Vorlage; jahr: number; zumZyklus(
   );
 }
 
-function Erfassen({ v, jahr, zumZyklus }: { v: Vorlage; jahr: number; zumZyklus(nummer?: string): void }) {
+function Erfassen({ v, jahr, zumZyklus, neuLaden }: { v: Vorlage; jahr: number; zumZyklus(nummer?: string): void; neuLaden(): Promise<{ error: unknown }> }) {
   const id = useId();
   const toast = useToast();
   const m = useFreigabeMutations(jahr);
@@ -164,8 +172,8 @@ function Erfassen({ v, jahr, zumZyklus }: { v: Vorlage; jahr: number; zumZyklus(
         {fehler.text ? <div id={`${id}-te`} className="ferr">{fehler.text}</div> : null}
       </div>
       <Hinweis stufe={entscheid === 'freigegeben' ? 'hinweis' : 'warnung'}>{entscheid === 'freigegeben' ? TF.wirkungFreigegeben(jahr) : TF.wirkungAnpassungen(jahr)}</Hinweis>
-      <ServerMeldung error={m.erfassen.error} onReload={() => { m.erfassen.reset(); zumZyklus(); }} />
-      <div className="acts"><button type="submit" className="btn primary" disabled={m.erfassen.isPending}><Icon name="check" />{TF.erfassen}</button></div>
+      <ServerMeldung error={m.erfassen.error} neuLaden={neuLaden} zuruecksetzen={() => m.erfassen.reset()} />
+      <div className="acts"><button type="submit" className="btn primary" disabled={m.erfassen.isPending || isConflict(m.erfassen.error)}><Icon name="check" />{TF.erfassen}</button></div>
     </form>
   );
 }

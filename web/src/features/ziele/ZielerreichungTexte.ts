@@ -2,8 +2,10 @@
  * Texte der Seite «Zielerreichung» (UI-40; Kernablauf K6 Schritt 10, Regeln und Texte): Anrede «Du» (UX-E7),
  * Schweizer Rechtschreibung, Ebenen aus dem Glossar («Strategisches Ziel», «Jahresziel»).
  */
+import { NAV } from './nav.ts';
+
 export const TZE = {
-  bereich: 'Zielerreichung',
+  bereich: NAV.zielerreichung,
   title: (q: string) => `Zielerreichung ${q}`,
   sub: 'Führe je Ziel den Stand der Metrik mit Kommentar nach. Jeder Stand wird mit Datum und Person gespeichert, sobald du die Zeile verlässt.',
   vorher: 'Vorheriges Quartal', nachher: 'Nächstes Quartal',

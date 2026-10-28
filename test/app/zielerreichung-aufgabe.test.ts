@@ -4,12 +4,12 @@
  * letzten erfassten Ziel, wieder offen nach dem Entfernen eines Stands; ältere Quartale öffnen keine Aufgabe.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { app as ppm } from '../../src/app.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 /** Zuletzt abgeschlossenes Quartal nach Schweizer Zeit. */
 const QUARTAL = (() => {
@@ -19,7 +19,7 @@ const QUARTAL = (() => {
 })();
 const log = { info() {}, warn() {}, error(o: object, m: string) { throw new Error(`${m} ${JSON.stringify(o)}`); } };
 
-describe('Aufgabe «Zielerreichung erfassen»', { skip }, () => {
+describe('Aufgabe «Zielerreichung erfassen»', () => {
   let api: TestApi;
   let T = '';
   let gl: Record<string, string>, leser: Record<string, string>;

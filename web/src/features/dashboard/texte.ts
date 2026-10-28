@@ -2,11 +2,13 @@
  * Texte des Features «Dashboard» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung, Begriffe aus darstellung.md («Nicht gemeldet», «Eskalation»).
  */
+import { NAV } from './nav.ts';
+
 export const TD = {
-  bereich: 'Dashboard',
+  bereich: NAV.dashboard,
   title: 'Dashboard',
   sub: 'Stand der Projekte je Portfolio und Periode: Status, Trend, Phase und nächster Meilenstein.',
-  aktionOeffnen: 'Dashboard öffnen',
+  aktionOeffnen: NAV.aktionOeffnen,
   filter: { portfolio: 'Portfolio', allePortfolios: 'Alle Portfolios', periode: 'Periode', ansicht: 'Ansicht' },
   ansicht: { liste: 'Liste', funnel: 'Funnel nach Phase' },
   kennzahl: {

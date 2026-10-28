@@ -54,9 +54,11 @@ export async function kommentareSetzen(tx: Tx, id: string, version: number, komm
 }
 
 /** Stand setzen (mit Zeitpunkten); `version` nur bei Handlungen mit If-Match. */
-export async function standSetzen(tx: Tx, id: string, stand: Stand, o: { version?: number; rueckmeldungPrat?: string } = {}): Promise<boolean> {
+export async function standSetzen(tx: Tx, id: string, stand: Stand, o: { version?: number; rueckmeldungPrat?: string; gremiumPortfolioId?: string } = {}): Promise<boolean> {
   const args: unknown[] = [id, stand];
   let extra = '';
+  // Portfolio des PRAT, an dem das Traktandum liegt (Lesesicht des Gremiums, A-67)
+  if (o.gremiumPortfolioId !== undefined) { args.push(o.gremiumPortfolioId); extra += `, gremium_portfolio_id = $${args.length}`; }
   if (o.rueckmeldungPrat !== undefined) { args.push(o.rueckmeldungPrat); extra += `, rueckmeldung_prat = btrim($${args.length})`; }
   let where = 'id = $1';
   if (o.version !== undefined) { args.push(o.version); where += ` AND version = $${args.length}`; }

@@ -96,11 +96,16 @@ describe('Eingang', () => {
       'GET /v1/eingang/anzahl': () => json({ offen: offen ? 1 : 0, ueberfaellig: 0, naechsteFrist: null }),
       'GET /v1/eingang': () => json({ items: offen ? [aufgabe({ titel: 'Unterlagen lesen', frist: null, fristArt: null, can: { erledigen: true } })] : [], nextCursor: null }),
       'POST /v1/eingang/aufgaben/00000000-0000-4000-8000-000000000001/erledigen': () => { offen = false; return json(aufgabe({ can: { erledigen: false } })); },
+      'POST /v1/eingang/aufgaben/00000000-0000-4000-8000-000000000001/wieder-oeffnen': () => { offen = true; return json(aufgabe({ titel: 'Unterlagen lesen', can: { erledigen: true } })); },
     });
     renderWithIam(<Page />);
     await userEvent.click(await screen.findByRole('button', { name: E.zuTun.erledigtAria('Unterlagen lesen') }));
     expect(await screen.findByText(E.zuTun.leer)).toBeInTheDocument();
     expect(api.calls.some(c => c.method === 'POST' && c.headers.get('idempotency-key'))).toBe(true);
+    // Rückgängig im Toast öffnet die Aufgabe wieder (I-R1 Stufe 1)
+    await userEvent.click(screen.getByRole('button', { name: E.zuTun.rueckgaengig }));
+    expect(await screen.findByText(E.zuTun.wiederOffen('Unterlagen lesen'))).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: E.zuTun.erledigtAria('Unterlagen lesen') })).toBeInTheDocument();
   });
 
   it('Mitteilungen: ungelesen markiert, als gelesen markieren', async () => {

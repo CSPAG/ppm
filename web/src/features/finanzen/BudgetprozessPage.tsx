@@ -66,8 +66,9 @@ export function BudgetprozessPage({ search, setSearch, navigieren, heute = new D
         {q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : null}
         {skelett ? <Skelett zeilen={6} /> : null}
         {schritt === 1 ? <Jahr jahr={jahr} heute={heute} u={u} weiter={j => setSearch({ jahr: String(j), schritt: '2' })} /> : null}
-        {schritt === 2 && u ? <Pruefen key={`${jahr}-${u.version}`} u={u} zurueck={() => gehe(1)} weiter={() => gehe(3)} /> : null}
-        {schritt === 3 && u ? <Uebergeben u={u} zurueck={() => gehe(2)} /> : null}
+        {/* key nur das Jahr: ein neuer Stand (Speichern, «Neu laden» nach 412) behält die Korrekturen (Z7) */}
+        {schritt === 2 && u ? <Pruefen key={jahr} u={u} zurueck={() => gehe(1)} weiter={() => gehe(3)} neuLaden={() => q.refetch()} /> : null}
+        {schritt === 3 && u ? <Uebergeben u={u} zurueck={() => gehe(2)} neuLaden={() => q.refetch()} /> : null}
       </div>
     </section>
   );
@@ -89,11 +90,42 @@ function Jahr({ jahr, heute, u, weiter }: { jahr: number; heute: Date; u?: Budge
   );
 }
 
-function Pruefen({ u, zurueck, weiter }: { u: Budgetuebergabe; zurueck(): void; weiter(): void }) {
+/**
+ * Neuer Stand vom Server: Werte, die die Person nicht geändert hat, kommen aus dem neuen Stand; ihre Korrekturen bleiben
+ * (Z7). So überschreibt das Speichern nach «Neu laden» die Korrekturen anderer an anderen Projekten nicht.
+ */
+function abgleichen(eingabe: Eingabe, alt: Eingabe, neu: Eingabe): Eingabe {
+  return Object.fromEntries(Object.entries(neu).map(([id, n]) => {
+    const e = eingabe[id];
+    const a = alt[id];
+    if (!e || !a) return [id, n];
+    return [id, { capex: e.capex === a.capex ? n.capex : e.capex, opex: e.opex === a.opex ? n.opex : e.opex, bemerkung: e.bemerkung === a.bemerkung ? n.bemerkung : e.bemerkung }];
+  }));
+}
+
+/** Konflikt (412) mit «Neu laden»: wartet auf den neuen Stand; erst wenn er da ist, verschwindet der Hinweis (Z7). */
+function useKonflikt(neuLaden: () => Promise<{ error: unknown }>) {
+  const [konflikt, setKonflikt] = useState(false);
+  const [laedt, setLaedt] = useState(false);
+  const laden = async () => {
+    setLaedt(true);
+    try { if (!(await neuLaden()).error) setKonflikt(false); } finally { setLaedt(false); }
+  };
+  return { konflikt, laedt, laden, melden: () => setKonflikt(true) };
+}
+
+function Pruefen({ u, zurueck, weiter, neuLaden }: { u: Budgetuebergabe; zurueck(): void; weiter(): void; neuLaden(): Promise<{ error: unknown }> }) {
   const toast = useToast();
   const { korrigieren } = useUebergabeAendern(u.jahr);
   const [eingabe, setEingabe] = useState<Eingabe>(() => eingabeAus(u));
-  const [konflikt, setKonflikt] = useState(false);
+  const [basis, setBasis] = useState<Eingabe>(() => eingabeAus(u));
+  const stand = eingabeAus(u);
+  if (JSON.stringify(stand) !== JSON.stringify(basis)) {
+    // während des Renderns abgleichen (React «Zustand bei geänderten Props anpassen»)
+    setBasis(stand);
+    setEingabe(abgleichen(eingabe, basis, stand));
+  }
+  const { konflikt, laedt, laden, melden } = useKonflikt(neuLaden);
   const darf = u.can.write && u.stand !== 'uebergeben';
   const geaendert = JSON.stringify(eingabe) !== JSON.stringify(eingabeAus(u));
   const ungueltig = Object.values(eingabe).some(e => Number.isNaN(zahl(e.capex)) || Number.isNaN(zahl(e.opex)));
@@ -104,12 +136,15 @@ function Pruefen({ u, zurueck, weiter }: { u: Budgetuebergabe; zurueck(): void; 
     if (ungueltig) return;
     if (!geaendert) { danach?.(); return; }
     const korrekturen = Object.entries(eingabe).map(([projektId, e]) => ({ projektId, capex: zahl(e.capex), opex: zahl(e.opex), bemerkung: e.bemerkung.trim() }));
+    const gesendet = eingabe;
     try {
-      await korrigieren.mutateAsync({ version: u.version, korrekturen });
+      const neu = await korrigieren.mutateAsync({ version: u.version, korrekturen });
+      // gespeicherte Felder in der Form des Servers («8'000» → «8000», Bemerkung ohne Leerraum), ausser seither geändert
+      setEingabe(e => abgleichen(e, gesendet, eingabeAus(neu)));
       toast.show(TF.entwurfGespeichert);
       danach?.();
     } catch (e) {
-      if (isConflict(e)) setKonflikt(true);
+      if (isConflict(e)) melden();
       else toast.error(e);
     }
   };
@@ -118,7 +153,7 @@ function Pruefen({ u, zurueck, weiter }: { u: Budgetuebergabe; zurueck(): void; 
     <div className="fi-pruefen">
       {u.stand === 'uebergeben' && u.uebergebenAt ? <Hinweis stufe="hinweis">{TF.uebergebenAm(fmtDateTime(u.uebergebenAt))}</Hinweis> : null}
       {!u.can.write && u.stand !== 'uebergeben' ? <Hinweis stufe="hinweis">{TF.nurLesen}</Hinweis> : null}
-      {konflikt ? <Hinweis stufe="warnung" live>{TF.budgetKonflikt}</Hinweis> : null}
+      {konflikt ? <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laedt} onClick={() => void laden()}>{TF.neuLaden}</button>}>{TF.budgetKonflikt}</Hinweis> : null}
       {ohne ? <Hinweis stufe="hinweis">{TF.ohneTermineHinweis(ohne)}</Hinweis> : null}
       {darf ? <p className="fi-hint">{TF.korrekturHilfe}</p> : null}
       {!u.positionen.length ? <Empty>{TF.keineProjekte}</Empty> : (
@@ -172,17 +207,18 @@ function Pruefen({ u, zurueck, weiter }: { u: Budgetuebergabe; zurueck(): void; 
       {ungueltig ? <p className="ferr" role="alert">{TF.korrekturUngueltig}</p> : null}
       <div className="fi-akt">
         <button type="button" className="btn" onClick={zurueck}>{TF.zurueck}</button>
-        {darf && geaendert ? <button type="button" className="btn" disabled={korrigieren.isPending || ungueltig} onClick={() => void speichern()}>{TF.entwurfSpeichern}</button> : null}
-        <button type="button" className="btn primary" disabled={korrigieren.isPending || ungueltig} onClick={() => void (darf ? speichern(weiter) : weiter())}>{TF.weiter}</button>
+        {darf && geaendert ? <button type="button" className="btn" disabled={korrigieren.isPending || ungueltig || konflikt} onClick={() => void speichern()}>{TF.entwurfSpeichern}</button> : null}
+        <button type="button" className="btn primary" disabled={korrigieren.isPending || ungueltig || konflikt} onClick={() => void (darf ? speichern(weiter) : weiter())}>{TF.weiter}</button>
       </div>
     </div>
   );
 }
 
-function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
+function Uebergeben({ u, zurueck, neuLaden }: { u: Budgetuebergabe; zurueck(): void; neuLaden(): Promise<{ error: unknown }> }) {
   const toast = useToast();
   const { uebergeben } = useUebergabeAendern(u.jahr);
   const [frage, setFrage] = useState(false);
+  const { konflikt, laedt, laden, melden } = useKonflikt(neuLaden);
   const fertig = u.stand === 'uebergeben';
   const datei = () => herunterladen(`jahresbedarf-${u.jahr}.csv`, csv(
     [TF.projekt, 'Name', `${TF.capex} CHF`, `${TF.opex} CHF`, `${TF.capex} ${TF.berechnet} CHF`, `${TF.opex} ${TF.berechnet} CHF`, TF.bemerkung],
@@ -191,17 +227,18 @@ function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
   ));
   const los = () => uebergeben.mutate(u.version, {
     onSuccess: () => { setFrage(false); toast.show(TF.uebergebenToast); },
-    onError: e => { setFrage(false); toast.error(e, isConflict(e) ? TF.budgetKonflikt : undefined); },
+    onError: e => { setFrage(false); if (isConflict(e)) melden(); else toast.error(e); },
   });
   return (
     <div className="fi-uebergeben">
       <p className="fi-zusammenfassung" role="status">{TF.zusammenfassung(u.jahr, u.positionen.length + (u.vertraulich?.anzahl ?? 0), lang(u.summe.capex), lang(u.summe.opex))}</p>
       {fertig && u.uebergebenAt ? <Hinweis stufe="hinweis">{TF.uebergebenAm(fmtDateTime(u.uebergebenAt))}</Hinweis> : <p>{TF.wirkung}</p>}
       {!fertig && !u.can.write ? <Hinweis stufe="hinweis">{TF.nurLesen}</Hinweis> : null}
+      {konflikt ? <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laedt} onClick={() => void laden()}>{TF.neuLaden}</button>}>{TF.uebergebenKonflikt}</Hinweis> : null}
       <div className="fi-akt">
         <button type="button" className="btn" onClick={zurueck}>{TF.zurueck}</button>
         <button type="button" className="btn" onClick={datei}><Icon name="download" />{TF.herunterladen}</button>
-        {!fertig && u.can.write ? <button type="button" className="btn primary" onClick={() => setFrage(true)}>{TF.uebergeben}</button> : null}
+        {!fertig && u.can.write ? <button type="button" className="btn primary" disabled={konflikt} onClick={() => setFrage(true)}>{TF.uebergeben}</button> : null}
       </div>
       {frage ? <Confirm title={TF.uebergebenDialog(u.jahr)} text={`${TF.zusammenfassung(u.jahr, u.positionen.length + (u.vertraulich?.anzahl ?? 0), lang(u.summe.capex), lang(u.summe.opex))} ${TF.wirkung}`} confirm={TF.uebergeben} onConfirm={los} onClose={() => setFrage(false)} busy={uebergeben.isPending} /> : null}
     </div>

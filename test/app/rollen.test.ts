@@ -4,14 +4,13 @@
  * iam 5.0»), `roles:admin` nur für org-admin, Rollen des Modells nie mit `c-`.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { platform } from '../../src/platform.ts';
-import { skipDb } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Rollen zur Laufzeit', { skip }, () => {
+describe('Rollen zur Laufzeit', () => {
   let api: TestApi;
   let A: Record<string, string>, B: Record<string, string>, leser: Record<string, string>;
 

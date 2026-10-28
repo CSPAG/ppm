@@ -1,21 +1,21 @@
 {
-  "kit": "0.5.4",
+  "kit": "0.5.6",
   "versions": {
-    "@vollholz/iam": "5.0.2",
-    "@vollholz/iam-testkit": "2.4.4",
+    "@vollholz/iam": "5.0.3",
+    "@vollholz/iam-testkit": "2.5.0",
     "product-realm": "2.0.0",
     "product-realm-bootstrap": "0.1.1"
   },
   "files": {
-    ".github/workflows/identity-conformity.yml": "sha256:f1c9a815d84cbe932f4fec57141d11ddd63ba3a704b010572ec2da2a7879f264",
-    ".github/workflows/keycloak.yml": "sha256:e59c92f9ce9f511b2a19ca56fdc3eab850f2d8d41cbeb7d68190a5d2b04b6c04",
-    "docs/identity-kit.md": "sha256:2ec280d5a73e34f2ed2f89565918890f96005fd462600c2f3971a89eec62810c",
-    "infra/keycloak/bootstrap/main.tf": "sha256:7c43c781ad0518e0c0dd30ae759ae7b96b5c45bc3ea41628fbed49e088bd877d",
-    "infra/keycloak/kc.sh": "sha256:6e7836c4aff78557a190fafaf8ff14cf0c13e5aa79999b33a2468289762bd19d",
-    "infra/keycloak/main.tf": "sha256:397f7efcbdf218d3f0e60bb5de2c7fb6d53771eeb94b9712c1aa8759ef37a70c",
-    "infra/keycloak/outputs.tf": "sha256:1b80d18deae14288e54e0750486f8cbd942c41fdedb4894cfb75c1109f2aa25a",
-    "infra/keycloak/platform.ts": "sha256:5ce68a818bf3890fa9609ad08ec448734b0026106fc8bbf36ecb1a05d4b9ea76",
-    "infra/keycloak/variables.tf": "sha256:0ebe2fa0ba4cd382a293559a25f19c0e4a9e489d6a2775504de38558e65688e7",
-    "infra/keycloak/versions.tf": "sha256:919033ac5182e8564b47ae6e51204f1ce8b571e923d75ff2439b4f79d77e94c6"
+    ".github/workflows/identity-conformity.yml": "sha256:fbfc1cc337b6d247e9c6afd6c57a941ccf755b5d750ea754f603bf3099453d75",
+    ".github/workflows/keycloak.yml": "sha256:d5d1d44e4e630bf545c5275324ea992c172a7705139c7d4146f18d0f790ec40e",
+    "docs/identity-kit.md": "sha256:cc0bef4854c504a43d43edeccd2bc54e828485b626dc5375ed88244b7f6b2c3e",
+    "infra/keycloak/bootstrap/main.tf": "sha256:95d5ce2ad8230eb64c6b847d0666c83feb4b22f2f1adf4135f91a99bdd7c8c9c",
+    "infra/keycloak/kc.sh": "sha256:cdf03d337cdc9fe61e9caa77c5324ad13d7667c02da3ae43a60e72aef1f62d80",
+    "infra/keycloak/main.tf": "sha256:2b0a1e785e52c3ebe65e1499f5574a28a0f62fecb671687ef9f8b91ab7390c44",
+    "infra/keycloak/outputs.tf": "sha256:d7fcc5fd1d4fe2e500c47b622436039a1d576abb97830c72bbc367bf1866277d",
+    "infra/keycloak/platform.ts": "sha256:285312e36f4351cb3a1d96219ce8824c08503a2f9f128f221edfe462d581c579",
+    "infra/keycloak/variables.tf": "sha256:157da584f83283a4efdd92158ab94438194e1f7bce85d6f99f2293b4122cd61f",
+    "infra/keycloak/versions.tf": "sha256:7be1aedc0ce1ff3602e8cecb73151af5e7b0bb168af2342af8b86f4577cfbf7e"
   }
 }

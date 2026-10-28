@@ -1,9 +1,11 @@
 /** Navigation je Rolle aus der Registrierung (src/nav.ts): Antragstellende sehen nur Eingang und Ideen (AP-E4-1, A-46). */
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
+import type { AuthzCatalog } from '@vollholz/iam-web';
 import { describe, expect, it, vi } from 'vitest';
 import type { AppPermission } from './auth/permissions.ts';
 import { navigation } from './nav.ts';
 import { aufteilenUnten, sichtbareRaeume } from './shell/index.ts';
+import { CATALOG_PPM } from './test/render.tsx';
 
 const ANTRAGSTELLER: AppPermission[] = ['tenant:read', 'stammdaten:read', 'phasenmodell:read', 'portfolio:read', 'idee:create'];
 
@@ -32,6 +34,22 @@ describe('Navigation der Antragstellenden', () => {
     // Personensuche nur für die Administration (members:admin)
     expect(ids(['tenant:read', 'members:admin'])).toContain('personen');
     expect(ids(['tenant:read', 'projekt:read', 'sitzung:read', 'auswertung:read'])).not.toContain('personen');
+    // Personen aus sichtbaren Projekten für alle mit projekt:read (I-N4)
+    expect(ids(['tenant:read', 'projekt:read'])).toContain('personen-projekte');
+    expect(ids(['tenant:read', 'idee:create'])).not.toContain('personen-projekte');
+  });
+
+  it('Personensuche: Name mit Funktion und Projekt, ohne E-Mail; Treffer führt ins Projekt', async () => {
+    const api = mockIamApi({
+      'GET /v1/projekte/personen': () => json({ items: [
+        { id: 'p1', name: 'Sabine Sponsorin', kontexte: [{ projektId: 'x1', nummer: '2026-014', name: 'Digitale Aufnahme', funktion: 'sp' }, { projektId: 'x2', nummer: '2026-020', name: 'Labor', funktion: 'kt' }] },
+      ] }),
+    }, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
+    vi.stubGlobal('fetch', api.fetch);
+    const suche = navigation.suchen.find(s => s.id === 'personen-projekte')!;
+    const t = await suche.suchen('sab', new AbortController().signal);
+    expect(t).toEqual([{ id: 'projekt-person:p1', label: 'Sabine Sponsorin', detail: 'Sponsor · 2026-014, Kernteam · 2026-020', icon: 'user', pfad: '/projekte/2026-014' }]);
+    expect(new URL(api.calls[0]!.url).searchParams.get('q')).toBe('sab');
   });
 
   it('Suche nach Sitzungen (I-N4): Gremium und Datum, Fundstelle im Traktandum, Ziel ist die Sitzung', async () => {

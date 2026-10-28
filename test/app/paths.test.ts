@@ -3,13 +3,12 @@
  * Routenmuster und am dekodierten Pfad, nicht am rohen `req.url` – sonst liesse sich beides umgehen.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Kodierte Pfade', { skip }, () => {
+describe('Kodierte Pfade', () => {
   let api: TestApi;
   let editor: Record<string, string>;
   before(async () => {

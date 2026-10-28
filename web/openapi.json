@@ -14213,6 +14213,331 @@
           }
         }
       },
+      "AuswertungGruppe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schluessel",
+          "label",
+          "werte"
+        ],
+        "properties": {
+          "schluessel": {
+            "description": "Schlüssel der Gruppe; `-` für «ohne» (z. B. ohne Handlungsfeld).",
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "werte": {
+            "description": "Wert je gewählter Kennzahl (Beträge in CHF).",
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "AuswertungEinzelwert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "nummer",
+          "name",
+          "portfolio",
+          "phase",
+          "lebenszyklus",
+          "status",
+          "handlungsfeld",
+          "gruppe",
+          "werte"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "portfolio": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          },
+          "lebenszyklus": {
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handlungsfeld": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gruppe": {
+            "description": "Schlüssel der Gruppe, zu der das Projekt zählt.",
+            "type": "string"
+          },
+          "werte": {
+            "description": "Wert je gewählter Kennzahl (Beträge in CHF).",
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "Auswertung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "periode",
+          "gruppierung",
+          "kennzahlen",
+          "gruppen",
+          "summe",
+          "einzelwerte",
+          "optionen"
+        ],
+        "properties": {
+          "periode": {
+            "type": "string"
+          },
+          "gruppierung": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "keine"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "portfolio"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "phase"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "status"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "lebenszyklus"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "handlungsfeld"
+                ]
+              }
+            ]
+          },
+          "kennzahlen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "schluessel",
+                "label",
+                "einheit"
+              ],
+              "properties": {
+                "schluessel": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "projekte"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kritisch"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "eskalationen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "meilensteine_offen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "risiken"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "budget"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "prognose"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ist"
+                      ]
+                    }
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "anzahl"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "chf"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "gruppen": {
+            "description": "In der Ordnung der Gruppierung (Phase P0–P4, Status, sonst nach Name).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuswertungGruppe"
+            }
+          },
+          "summe": {
+            "description": "Wert je gewählter Kennzahl (Beträge in CHF).",
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "einzelwerte": {
+            "description": "Projekte hinter den Zahlen, nach Nummer.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuswertungEinzelwert"
+            }
+          },
+          "optionen": {
+            "additionalProperties": false,
+            "description": "Auswahl für die Filter, nur Sichtbares.",
+            "type": "object",
+            "required": [
+              "portfolios",
+              "handlungsfelder",
+              "finanzen"
+            ],
+            "properties": {
+              "portfolios": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "schluessel",
+                    "name"
+                  ],
+                  "properties": {
+                    "schluessel": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "handlungsfelder": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "label"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "finanzen": {
+                "description": "Beträge wählbar (`finanzen:read` an der Organisation).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
       "Vorlage": {
         "additionalProperties": false,
         "type": "object",
@@ -54801,6 +55126,248 @@
         }
       }
     },
+    "/v1/auswertungen": {
+      "get": {
+        "summary": "Ad-hoc-Auswertung",
+        "tags": [
+          "Auswertungen"
+        ],
+        "description": "Ad-hoc-Auswertung (UC-014 A2, PC.04.03): Projekte der sichtbaren Portfolios nach Filter (Portfolio, Phase, Lebenszyklus, Status des letzten Berichts bis zur Stichperiode, Handlungsfeld), Kennzahlen je Gruppe mit Summe und den Einzelwerten je Projekt. Beträge (Budget, Prognose, Ist aus den Kostenpositionen) nur mit `finanzen:read` an der Organisation. Mit `format=csv` als Export (Gruppen oder mit `ebene=einzelwerte` je Projekt). Recht `auswertung:write` an der Organisation.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "periode",
+            "required": false,
+            "description": "Stichperiode für den Status (letzter eingereichter Bericht bis zu dieser Periode); ohne Angabe die laufende."
+          },
+          {
+            "schema": {
+              "pattern": "^[a-z0-9_-]{1,40}(,[a-z0-9_-]{1,40})*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false,
+            "description": "Schlüssel der Portfolios (I-N5), mehrere mit Komma; ohne Angabe alle sichtbaren."
+          },
+          {
+            "schema": {
+              "pattern": "^(P0|P1|P2|P3|P4)(,(P0|P1|P2|P3|P4))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "phase",
+            "required": false,
+            "description": "Phasen. Mehrere mit Komma: `P0`, `P1`, `P2`, `P3`, `P4`."
+          },
+          {
+            "schema": {
+              "pattern": "^(aktiv|sistiert|abgebrochen|abgeschlossen|zurueckgezogen)(,(aktiv|sistiert|abgebrochen|abgeschlossen|zurueckgezogen))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "lebenszyklus",
+            "required": false,
+            "description": "Lebenszyklus; ohne Angabe `aktiv`. Mehrere mit Komma: `aktiv`, `sistiert`, `abgebrochen`, `abgeschlossen`, `zurueckgezogen`."
+          },
+          {
+            "schema": {
+              "pattern": "^(im_plan|kritisch|ohne)(,(im_plan|kritisch|ohne))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "description": "Status des letzten Berichts; `ohne`: noch kein eingereichter Bericht. Mehrere mit Komma: `im_plan`, `kritisch`, `ohne`."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "handlungsfeld",
+            "required": false
+          },
+          {
+            "schema": {
+              "pattern": "^(projekte|kritisch|eskalationen|meilensteine_offen|risiken|budget|prognose|ist)(,(projekte|kritisch|eskalationen|meilensteine_offen|risiken|budget|prognose|ist))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "kennzahlen",
+            "required": false,
+            "description": "Kennzahlen; ohne Angabe `projekte,kritisch`. Beträge nur mit `finanzen:read`. Mehrere mit Komma: `projekte`, `kritisch`, `eskalationen`, `meilensteine_offen`, `risiken`, `budget`, `prognose`, `ist`."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "keine"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfolio"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "phase"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "status"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "lebenszyklus"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "handlungsfeld"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "gruppierung",
+            "required": false,
+            "description": "Gruppierung; ohne Angabe `portfolio`."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "json"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "csv"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "`csv`: Export (UTF-8 mit BOM, Semikolon) statt JSON."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "gruppen"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "einzelwerte"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "ebene",
+            "required": false,
+            "description": "Nur mit `format=csv`: Gruppen mit Summe (Standard) oder Einzelwerte je Projekt."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Auswertung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/vorlagen": {
       "get": {
         "summary": "Vorlagen auflisten",
@@ -62045,6 +62612,10 @@
     {
       "name": "Dashboard",
       "description": "Dashboard der Periode: Projekte der sichtbaren Portfolios mit Status, Trend, Phase und Meldung, Funnel nach Phase."
+    },
+    {
+      "name": "Auswertungen",
+      "description": "Ad-hoc-Auswertungen (AP-E7-6): Filter, Kennzahlen, Gruppierung, Einzelwerte und Export als CSV."
     },
     {
       "name": "Vorlagen",

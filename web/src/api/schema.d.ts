@@ -27725,6 +27725,119 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auswertungen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ad-hoc-Auswertung
+         * @description Ad-hoc-Auswertung (UC-014 A2, PC.04.03): Projekte der sichtbaren Portfolios nach Filter (Portfolio, Phase, Lebenszyklus, Status des letzten Berichts bis zur Stichperiode, Handlungsfeld), Kennzahlen je Gruppe mit Summe und den Einzelwerten je Projekt. Beträge (Budget, Prognose, Ist aus den Kostenpositionen) nur mit `finanzen:read` an der Organisation. Mit `format=csv` als Export (Gruppen oder mit `ebene=einzelwerte` je Projekt). Recht `auswertung:write` an der Organisation.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Stichperiode für den Status (letzter eingereichter Bericht bis zu dieser Periode); ohne Angabe die laufende. */
+                    periode?: string;
+                    /** @description Schlüssel der Portfolios (I-N5), mehrere mit Komma; ohne Angabe alle sichtbaren. */
+                    portfolio?: string;
+                    /** @description Phasen. Mehrere mit Komma: `P0`, `P1`, `P2`, `P3`, `P4`. */
+                    phase?: string;
+                    /** @description Lebenszyklus; ohne Angabe `aktiv`. Mehrere mit Komma: `aktiv`, `sistiert`, `abgebrochen`, `abgeschlossen`, `zurueckgezogen`. */
+                    lebenszyklus?: string;
+                    /** @description Status des letzten Berichts; `ohne`: noch kein eingereichter Bericht. Mehrere mit Komma: `im_plan`, `kritisch`, `ohne`. */
+                    status?: string;
+                    handlungsfeld?: string;
+                    /** @description Kennzahlen; ohne Angabe `projekte,kritisch`. Beträge nur mit `finanzen:read`. Mehrere mit Komma: `projekte`, `kritisch`, `eskalationen`, `meilensteine_offen`, `risiken`, `budget`, `prognose`, `ist`. */
+                    kennzahlen?: string;
+                    /** @description Gruppierung; ohne Angabe `portfolio`. */
+                    gruppierung?: "keine" | "portfolio" | "phase" | "status" | "lebenszyklus" | "handlungsfeld";
+                    /** @description `csv`: Export (UTF-8 mit BOM, Semikolon) statt JSON. */
+                    format?: "json" | "csv";
+                    /** @description Nur mit `format=csv`: Gruppen mit Summe (Standard) oder Einzelwerte je Projekt. */
+                    ebene?: "gruppen" | "einzelwerte";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Auswertung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/vorlagen": {
         parameters: {
             query?: never;
@@ -37436,6 +37549,63 @@ export interface components {
             /** @description Kritische zuerst, dann nicht gemeldete, sonst nach Nummer. */
             items: components["schemas"]["DashboardZeile"][];
             funnel: components["schemas"]["FunnelStufe"][];
+        };
+        AuswertungGruppe: {
+            /** @description Schlüssel der Gruppe; `-` für «ohne» (z. B. ohne Handlungsfeld). */
+            schluessel: string;
+            label: string;
+            /** @description Wert je gewählter Kennzahl (Beträge in CHF). */
+            werte: {
+                [key: string]: number;
+            };
+        };
+        AuswertungEinzelwert: {
+            /** Format: uuid */
+            projektId: string;
+            nummer: string;
+            name: string;
+            portfolio: string;
+            phase: string;
+            lebenszyklus: string;
+            status: ("im_plan" | "kritisch") | null;
+            handlungsfeld: string | null;
+            /** @description Schlüssel der Gruppe, zu der das Projekt zählt. */
+            gruppe: string;
+            /** @description Wert je gewählter Kennzahl (Beträge in CHF). */
+            werte: {
+                [key: string]: number;
+            };
+        };
+        Auswertung: {
+            periode: string;
+            gruppierung: "keine" | "portfolio" | "phase" | "status" | "lebenszyklus" | "handlungsfeld";
+            kennzahlen: {
+                schluessel: "projekte" | "kritisch" | "eskalationen" | "meilensteine_offen" | "risiken" | "budget" | "prognose" | "ist";
+                label: string;
+                einheit: "anzahl" | "chf";
+            }[];
+            /** @description In der Ordnung der Gruppierung (Phase P0–P4, Status, sonst nach Name). */
+            gruppen: components["schemas"]["AuswertungGruppe"][];
+            /** @description Wert je gewählter Kennzahl (Beträge in CHF). */
+            summe: {
+                [key: string]: number;
+            };
+            /** @description Projekte hinter den Zahlen, nach Nummer. */
+            einzelwerte: components["schemas"]["AuswertungEinzelwert"][];
+            /** @description Auswahl für die Filter, nur Sichtbares. */
+            optionen: {
+                portfolios: {
+                    schluessel: string;
+                    name: string;
+                }[];
+                handlungsfelder: {
+                    /** Format: uuid */
+                    id: string;
+                    label: string;
+                }[];
+                /** @description Beträge wählbar (`finanzen:read` an der Organisation). */
+                finanzen: boolean;
+            };
         };
         Vorlage: {
             /** @description Art der Vorlage, z. B. `projektvertrag`. */

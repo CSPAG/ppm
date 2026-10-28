@@ -33,7 +33,7 @@ export async function anlegen(tx: Tx, ctx: { db: Db; tenantId: string }, who: Ac
   const id = await store.create(tx, nummer, input);
   const r = await store.get(tx, id);
   // Ein Projekt, das die Person danach nicht lesen dürfte (vertraulich, A-34), legt sie nicht an (Transaktion zurück)
-  if (!r) throw conflict('Sie können dieses Projekt nicht anlegen, weil Sie es danach nicht sehen dürften (vertraulich).', { reason: 'vertraulich' });
+  if (!r) throw conflict('Du kannst dieses Projekt nicht anlegen, weil du es danach nicht sehen dürftest (vertraulich).', { reason: 'vertraulich' });
   await record(tx, who, { action: 'projekt.created', resourceType: 'projekt', resourceId: id, data: snapshot(r), event: snapshot(r) });
   return r;
 }

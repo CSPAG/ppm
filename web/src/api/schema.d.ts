@@ -29152,7 +29152,7 @@ export interface paths {
         put?: never;
         /**
          * Rückfrage stellen
-         * @description Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»). Sie erhält im Eingang «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».
+         * @description Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»); im Eingang erhält sie «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».
          */
         post: {
             parameters: {

@@ -16,7 +16,7 @@ export const uebernahmeBericht: UebernahmeTeil = {
     // Ohne Status gibt es nichts zu berichten (z. B. Projekt noch ohne Meldung im Dashboard)
     if (!zeile.status) return;
     if ((await store.periodeSichern(tx, periode)) === 'abgeschlossen') {
-      throw conflict(`Die Periode ${periode} ist abgeschlossen. Wählen Sie für die Übernahme eine offene Periode.`);
+      throw conflict(`Die Periode ${periode} ist abgeschlossen. Wähle für die Übernahme eine offene Periode.`);
     }
     const r = await store.create(tx, projektId, periode, zeile.phase, {
       status: zeile.status, trend: zeile.trend, abschlussPer: zeile.abschlussPer, naechsterMeilenstein: zeile.meilenstein,

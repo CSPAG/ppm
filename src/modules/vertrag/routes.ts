@@ -267,7 +267,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     const erwartet = requireIfMatch(req);
     const { v, p } = await mitRecht(req, id, 'vertrag:write');
     if (KAPITEL_MIT_BETRAEGEN.includes(nr) && !(await req.can('finanzen:read', projektOrt(p.id)))) {
-      throw forbidden('Kapitel 9 enthält Beträge; ohne Recht auf Beträge können Sie es nicht bearbeiten.');
+      throw forbidden('Kapitel 9 enthält Beträge; ohne Recht auf Beträge kannst du es nicht bearbeiten.');
     }
     const who = actorOf(req);
     // Strategische Ziele sind Stammdaten der Organisation (AP-E0-9, Lesen an der Organisation): Prüfung in voller Sicht,
@@ -324,10 +324,10 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     const out = await req.tx(async tx => {
       if (!bearbeitbar(v, p)) throw conflict(`Version ${v.nummer} ist ${STAND_TEXT[v.stand]} und kann nicht eingereicht werden.`, { reason: 'stand', stand: v.stand });
       if (v.version !== erwartet) throw preconditionFailed(v.version);
-      if (v.anlass === 'aenderung') throw conflict('Eine Änderung reichen Sie beim Sponsor ein («Änderung einreichen»).', { reason: 'anlass' });
+      if (v.anlass === 'aenderung') throw conflict('Eine Änderung reichst du beim Sponsor ein («Änderung einreichen»).', { reason: 'anlass' });
       const fehlend = (await pflichtangaben(tx, v, m)).filter(a => !a.erfuellt);
       if (fehlend.length) {
-        throw invalid(`Angaben für Phase ${v.zielphase} fehlen: ${fehlend.map(a => `${a.text} (Kap. ${a.kapitel})`).join(', ')}. Ergänzen Sie sie, um einzureichen.`,
+        throw invalid(`Angaben für Phase ${v.zielphase} fehlen: ${fehlend.map(a => `${a.text} (Kap. ${a.kapitel})`).join(', ')}. Ergänze sie, um einzureichen.`,
           fehlend.map(a => ({ path: `/kapitel/${a.kapitel}/${a.feld}`, message: a.grund ?? a.text })));
       }
       if (!(await store.standSetzen(tx, id, erwartet, ['in_arbeit'], 'in_pruefung', { eingereicht: true }))) throw preconditionFailed(v.version + 1);

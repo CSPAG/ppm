@@ -11,6 +11,7 @@ import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
+import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
 import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
 import { dashboardTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
@@ -46,6 +47,8 @@ export const navigation: NavRegistrierung = {
     // Priorisierung mit Bewertung und Modell (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1); Gremium mit Recht am Portfolio
     { raum: 'portfolio', pfad: '/portfolio/priorisierung', label: priorisierungTexte.bereich, recht: 'priorisierung:read' },
     { raum: 'portfolio', pfad: '/portfolio/ressourcen', label: ressourcenTexte.bereich, recht: 'ressource:read' },
+    // Finanzen (UI-26–UI-28, UC-010, AP-E7-4): Beträge mit finanzen:read (Organisation oder Portfolio, A-33)
+    { raum: 'portfolio', pfad: finanzenPfad.uebersicht, label: finanzenTexte.bereich, recht: 'finanzen:read' },
     // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
     // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): sichtbar wie die Auswertungen (auswertung:read; IA «Sichtbarkeit je
     // Rolle»: Portfolio nicht für Antragstellende und Leser:innen); lesen über die API dürfen alle Angemeldeten (A-35)
@@ -76,6 +79,7 @@ export const navigation: NavRegistrierung = {
     { id: 'projekte-bewerten', label: priorisierungTexte.aktionBewerten, icon: 'layers', pfad: priorisierungPfad.bewertung, recht: 'priorisierung:write' },
     { id: 'bewertungsmodell', label: priorisierungTexte.aktionModell, icon: 'rules', pfad: priorisierungPfad.modell, recht: 'priorisierung:write' },
     { id: 'auslastung-analysieren', label: ressourcenTexte.aktionAuslastung, icon: 'grid', pfad: ressourcenPfad.auslastung, recht: 'ressource:read' },
+    { id: 'budget-uebergeben', label: finanzenTexte.aktionBudget, icon: 'download', pfad: finanzenPfad.budgetprozess, recht: 'finanzen:write' },
     { id: 'kapazitaet-planen', label: ressourcenTexte.aktionKapazitaet, icon: 'calendar', pfad: ressourcenPfad.kapazitaet, recht: 'ressource:write' },
   ],
   // Zähler offener Aufgaben an «Eingang» (I-N3); jede Rolle enthält tenant:read

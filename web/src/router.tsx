@@ -13,6 +13,7 @@ import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { finanzenPfad, type SetBudgetSearch, type SetFinanzenSearch } from './features/finanzen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch } from './features/priorisierung/index.ts';
 import type { SetDashboardSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
@@ -39,6 +40,9 @@ const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), '
 const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx'), 'MatrixPage');
+const FinanzenPage = seite(() => import('./features/finanzen/FinanzenPage.tsx'), 'FinanzenPage');
+const AbweichungenPage = seite(() => import('./features/finanzen/FinanzenPage.tsx'), 'AbweichungenPage');
+const BudgetprozessPage = seite(() => import('./features/finanzen/BudgetprozessPage.tsx'), 'BudgetprozessPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
@@ -346,6 +350,39 @@ function DashboardRoute() {
   return <DashboardPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Portfolio» › Finanzen: Übersicht (UI-26), Abweichungen (UI-27), Budgetprozess (UI-28) (BC PC.01.02,
+// PC.01.04, PC.01.05; UC-010; AP-E7-4)
+const finanzenRoute = createRoute({ getParentRoute: () => rootRoute, path: finanzenPfad.uebersicht, validateSearch: searchOf.finanzen, component: FinanzenRoute });
+const abweichungenRoute = createRoute({ getParentRoute: () => rootRoute, path: finanzenPfad.abweichungen, validateSearch: searchOf.finanzen, component: AbweichungenRoute });
+const budgetprozessRoute = createRoute({ getParentRoute: () => rootRoute, path: finanzenPfad.budgetprozess, validateSearch: searchOf.budgetprozess, component: BudgetprozessRoute });
+
+function FinanzenRoute() {
+  const search = finanzenRoute.useSearch();
+  const navigate = useNavigate({ from: finanzenRoute.fullPath });
+  const setSearch = useCallback<SetFinanzenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <FinanzenPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+function AbweichungenRoute() {
+  const search = abweichungenRoute.useSearch();
+  const navigate = useNavigate({ from: abweichungenRoute.fullPath });
+  const setSearch = useCallback<SetFinanzenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <AbweichungenPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+function BudgetprozessRoute() {
+  const search = budgetprozessRoute.useSearch();
+  const navigate = useNavigate({ from: budgetprozessRoute.fullPath });
+  const setSearch = useCallback<SetBudgetSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BudgetprozessPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -520,6 +557,9 @@ const routeTree = rootRoute.addChildren([
   priorisierungRoute,
   bewertungRoute,
   matrixRoute,
+  finanzenRoute,
+  abweichungenRoute,
+  budgetprozessRoute,
   modellRoute,
   ...iamRoutes,
   ...devRoutes,

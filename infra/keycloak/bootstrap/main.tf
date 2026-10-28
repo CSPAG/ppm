@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.2.3) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.2.3 sync
+# Verwaltet von identity-kit (create-iam-app 0.4.0) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.4.0 sync
 #
 # Bootstrap des Realms (einmalig bzw. beim Neuaufbau, nur lokal): als Service Account <produkt>-tofu im Realm master
 # (nur Rolle create-realm, eingerichtet vom Betreiber der Keycloak-Instanz) den Realm anlegen und darin den IaC-Client

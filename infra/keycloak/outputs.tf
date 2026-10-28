@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.2.3) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.2.3 sync
+# Verwaltet von identity-kit (create-iam-app 0.4.0) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.4.0 sync
 
 output "issuer" {
   description = "OIDC_ISSUER_URL der App."

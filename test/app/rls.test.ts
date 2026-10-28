@@ -25,7 +25,7 @@ const S = 'ppm';
 const TENANT_TABLES = MATRIX.tables;
 
 /** Tabellen von @vollholz/iam mit tenant_id: RLS, Policies und Trennung prüft das Paket selbst (und die Prüfungen unten). */
-const KIT_TABLES = ['principal', 'authz_tuple', 'member_invitation', 'audit_log', 'audit_anchor', 'entra_connection', 'entra_consent', 'entra_consent_link'];
+const KIT_TABLES = ['principal', 'authz_tuple', 'authz_role', 'member_invitation', 'audit_log', 'audit_anchor', 'entra_connection', 'entra_consent', 'entra_consent_link'];
 
 /** Tabellen ohne tenant_id, auf die Laufzeit oder Worker Rechte haben – jede mit Begründung. */
 const WITHOUT_TENANT: Record<string, string> = {
@@ -41,6 +41,8 @@ const POLICIES = [
   'ppm.tenant.tenant_self PERMISSIVE ALL ppm_app USING (id = app.tenant_id()) CHECK (id = app.tenant_id())',
   "ppm.entra_connection.entra_scan PERMISSIVE SELECT ppm_owner USING (current_setting('app.entra_scan'::text, true) = 'on'::text) CHECK -",
   'ppm.principal.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
+  // iam 5.0 (iam_019): eigene Rollen der Organisation (UC-016 A2)
+  'ppm.authz_role.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
   'ppm.authz_tuple.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
   'ppm.audit_log.owner_tenant PERMISSIVE ALL ppm_owner USING (tenant_id = app.tenant_id()) CHECK (tenant_id = app.tenant_id())',
   ...MATRIX.policies,

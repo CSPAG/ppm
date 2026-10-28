@@ -21,7 +21,7 @@ const datumCh = (d: string) => d.split('-').reverse().join('.');
 
 /** Sperre der Vorlage (K6 Regeln, I-P2): Regel, Ist-Wert, betroffene Ziele, Ausweg. */
 export const metrikFehltText = (nummern: string[]) =>
-  `Metrik fehlt: ${nummern.length === 1 ? '1 Jahresziel hat' : `${nummern.length} Jahresziele haben`} keine Metrik oder keinen Zielwert (${nummern.join(', ')}). Ergänzen Sie Metrik und Zielwert.`;
+  `Metrik fehlt: ${nummern.length === 1 ? '1 Jahresziel hat' : `${nummern.length} Jahresziele haben`} keine Metrik oder keinen Zielwert (${nummern.join(', ')}). Ergänze Metrik und Zielwert.`;
 
 const snapshot = (r: zyklus.ZieljahrRow) => ({ id: r.id, jahr: r.jahr, stand: r.stand, freigabeAt: r.freigabe_at, version: r.version });
 
@@ -79,7 +79,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, _deps: Deps): void 
       if (!before) throw notFound(`Zielzyklus ${jahr}`);
       if (before.version !== version) throw preconditionFailed(before.version);
       if (before.stand !== 'in_arbeit') throw conflict(`Die Jahresziele ${jahr} sind nicht in Arbeit und können nicht vorgelegt werden.`, { reason: 'stand', stand: before.stand });
-      if (!(await store.anzahl(tx, jahr))) throw conflict(`Der Zielzyklus ${jahr} hat noch keine Jahresziele. Fügen Sie zuerst Jahresziele hinzu.`, { reason: 'leer' });
+      if (!(await store.anzahl(tx, jahr))) throw conflict(`Der Zielzyklus ${jahr} hat noch keine Jahresziele. Füge zuerst Jahresziele hinzu.`, { reason: 'leer' });
       // Jedes Ziel hat eine Metrik (UC-011 Schritt 5): Sperre beim Vorlegen (K6 Regeln)
       const fehlt = await store.ohneMetrik(tx, jahr);
       if (fehlt.length) throw conflict(metrikFehltText(fehlt.map(f => f.nummer)), { reason: 'metrik_fehlt', ohneMetrik: fehlt });
@@ -105,7 +105,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, _deps: Deps): void 
     const body = req.body as FreigabeErfassenIn;
     const text = (body.text ?? '').trim();
     if (body.entscheid === 'anpassungen' && !text) {
-      throw invalid('Die Rückmeldungen des VR fehlen.', [{ path: '/text', message: 'Erfassen Sie, welche Anpassungen der VR verlangt.' }]);
+      throw invalid('Die Rückmeldungen des VR fehlen.', [{ path: '/text', message: 'Erfasse, welche Anpassungen der VR verlangt.' }]);
     }
     const who = actorOf(req);
     const row = await req.tx(async tx => {

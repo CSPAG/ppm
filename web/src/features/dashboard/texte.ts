@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Dashboard» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte des Features «Dashboard» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung, Begriffe aus darstellung.md («Nicht gemeldet», «Eskalation»).
  */
 export const TD = {
@@ -23,7 +23,7 @@ export const TD = {
   spalte: { projekt: 'Projekt', portfolio: 'Portfolio', handlungsfeld: 'Handlungsfeld', projektleitung: 'Projektleitung', phase: 'Phase', meilenstein: 'Nächster Meilenstein', status: 'Status' },
   keinStatus: 'kein Status',
   oeffnen: (nr: string, name: string) => `Projekt ${nr} ${name} öffnen`,
-  leer: 'In dieser Periode gibt es keine Projekte in Ihren Portfolios.',
+  leer: 'In dieser Periode gibt es keine Projekte in deinen Portfolios.',
   keinRecht: 'Das Dashboard sehen Gremien, Direktionen, Geschäftsleitung, Finanzen, Ressourcen und die Unternehmensentwicklung.',
   funnel: {
     titel: 'Funnel nach Phase',

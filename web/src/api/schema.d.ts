@@ -35362,7 +35362,7 @@ export interface paths {
         put?: never;
         /**
          * Rückfrage stellen
-         * @description Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu Ihrer Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.
+         * @description Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu deiner Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.
          */
         post: {
             parameters: {
@@ -47643,6 +47643,14 @@ export interface components {
                     beiRang: number | null;
                     grund: ("budget" | "kapazitaet") | null;
                     text: string | null;
+                    kapazitaet: {
+                        rolle: string;
+                        /** @description Monat «JJJJ-MM». */
+                        monat: string;
+                        bedarf: number;
+                        angebot: number;
+                        projekte: number;
+                    } | null;
                 };
                 engpaesse: {
                     rolle: string;
@@ -47711,6 +47719,15 @@ export interface components {
                     beiRang: number | null;
                     grund: ("budget" | "kapazitaet") | null;
                     text: string | null;
+                    kapazitaet: {
+                        rolle: string;
+                        /** @description Monat «JJJJ-MM». */
+                        monat: string;
+                        bedarf: number;
+                        angebot: number;
+                        /** @description Projekte mit Bedarf in diesem Monat und dieser Rolle. */
+                        projekte: number;
+                    } | null;
                 };
                 budget: {
                     rahmen: number | null;

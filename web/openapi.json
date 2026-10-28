@@ -25389,7 +25389,8 @@
                   "required": [
                     "beiRang",
                     "grund",
-                    "text"
+                    "text",
+                    "kapazitaet"
                   ],
                   "properties": {
                     "beiRang": {
@@ -25429,6 +25430,43 @@
                       "anyOf": [
                         {
                           "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "kapazitaet": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "rolle",
+                            "monat",
+                            "bedarf",
+                            "angebot",
+                            "projekte"
+                          ],
+                          "properties": {
+                            "rolle": {
+                              "type": "string"
+                            },
+                            "monat": {
+                              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                              "description": "Monat «JJJJ-MM».",
+                              "type": "string"
+                            },
+                            "bedarf": {
+                              "type": "number"
+                            },
+                            "angebot": {
+                              "type": "number"
+                            },
+                            "projekte": {
+                              "type": "integer"
+                            }
+                          }
                         },
                         {
                           "type": "null"
@@ -25893,7 +25931,8 @@
                 "required": [
                   "beiRang",
                   "grund",
-                  "text"
+                  "text",
+                  "kapazitaet"
                 ],
                 "properties": {
                   "beiRang": {
@@ -25935,6 +25974,45 @@
                       {
                         "description": "Regel mit Ist-Wert (K5 Regeln), z. B. «Budget: CHF 14,2 Mio. statt höchstens 12,0 Mio. …».",
                         "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "kapazitaet": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "description": "Rolle und Monat, in denen das Projekt an der Wasserlinie die Kapazität übersteigt.",
+                        "type": "object",
+                        "required": [
+                          "rolle",
+                          "monat",
+                          "bedarf",
+                          "angebot",
+                          "projekte"
+                        ],
+                        "properties": {
+                          "rolle": {
+                            "type": "string"
+                          },
+                          "monat": {
+                            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                            "description": "Monat «JJJJ-MM».",
+                            "type": "string"
+                          },
+                          "bedarf": {
+                            "type": "number"
+                          },
+                          "angebot": {
+                            "type": "number"
+                          },
+                          "projekte": {
+                            "description": "Projekte mit Bedarf in diesem Monat und dieser Rolle.",
+                            "type": "integer"
+                          }
+                        }
                       },
                       {
                         "type": "null"
@@ -70471,7 +70549,7 @@
         "tags": [
           "Ideen"
         ],
-        "description": "Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu Ihrer Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.",
+        "description": "Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu deiner Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.",
         "requestBody": {
           "required": true,
           "content": {

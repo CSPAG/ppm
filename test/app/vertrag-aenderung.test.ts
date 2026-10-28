@@ -156,7 +156,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
     assert.deepEqual([f.json().stand, f.json().entscheid.ergebnis, f.json().entscheid.personId], ['abgenommen', 'freigegeben', id.sp]);
     assert.equal(await baseline(), v1);
     assert.deepEqual((await aufgaben('aenderung.entscheiden', v1)).map(x => x.stand), ['erledigt']);
-    assert.ok((await mitteilungen(id.pl)).includes('Änderung freigegeben: Version 0.2 des Projektvertrags Digitale Aufnahme ist Baseline.'));
+    assert.ok((await mitteilungen(id.pl!)).includes('Änderung freigegeben: Version 0.2 des Projektvertrags Digitale Aufnahme ist Baseline.'));
   });
 
   let v2 = '';
@@ -246,7 +246,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
     assert.equal(r.statusCode, 200, r.body);
     assert.deepEqual([r.json().stand, r.json().entscheid.ergebnis, r.json().entscheid.begruendung], ['abgelehnt', 'abgelehnt', 'Nicht im Budget']);
     assert.equal(await baseline(), v2);
-    assert.ok((await mitteilungen(id.pl)).some(m => m.startsWith('Änderung abgelehnt: Version 0.4')));
+    assert.ok((await mitteilungen(id.pl!)).some(m => m.startsWith('Änderung abgelehnt: Version 0.4')));
     assert.equal((await entscheiden(v3, 'freigegeben')).statusCode, 409, 'bereits entschieden');
     assert.equal((await entwurf('Neuer Anlauf')).nummer, '0.5');
   });

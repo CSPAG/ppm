@@ -5,6 +5,9 @@
 export const TS = {
   bereich: 'Sitzungen',
   title: 'Sitzungen',
+  // Gremium im Kopf des Arbeitsraums (IA «Kontext im Kopf»)
+  gremium: 'Gremium', alleGremien: 'Alle Gremien',
+  gremiumUnbekannt: 'Dieses Gremium gibt es nicht, oder du siehst seine Sitzungen nicht.', zuAllenGremien: 'Alle Gremien anzeigen',
   sub: 'Sitzungen der Gremien vorbereiten: Traktandenliste aus Vorschlägen, Unterlagen prüfen und spätestens 5 Arbeitstage vorher versenden.',
   keineGremien: 'Du siehst noch keine Sitzungen. Sitzungen entstehen aus den Sitzungsterminen der Gremien (Administration › Portfolios und Gremien).',
   keineTermine: 'Für dieses Gremium sind keine weiteren Sitzungstermine geplant.',

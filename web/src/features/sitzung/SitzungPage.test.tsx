@@ -176,7 +176,7 @@ describe('Sitzung vorbereiten', () => {
       'GET /v1/gremien/prat/sitzungen': () => json({ gremium: { id: GID, kuerzel: 'prat', name: 'Programmausschuss' }, items: [{ datum: '2026-11-18', id: SID, stand: 'versendet', traktanden: 6, versendetAt: '2026-11-05T09:00:00Z' }], nextCursor: null, can: { write: false } }),
     });
     const gehe = vi.fn();
-    const { container } = renderWithIam(<SitzungenPage gehe={gehe} />, UE);
+    const { container } = renderWithIam(<SitzungenPage kuerzel="prat" gehe={gehe} />, UE);
     await userEvent.click(await screen.findByRole('button', { name: /Sitzung PRAT .*18\.11\..* öffnen/ }));
     expect(gehe).toHaveBeenCalledWith('/gremien/prat/sitzungen/2026-11-18');
     await expectNoAxe(container);

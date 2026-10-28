@@ -163,7 +163,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, deps: Deps): void {
     await alsDirektion(req, id, async tx => {
       const r = await laden(tx, id, version, ['traktandiert']);
       await pruefePersonen(tx, body.sponsor, body.projektleitung);
-      await initialisieren(tx, who, principalId, r, { sponsor: body.sponsor, projektleitung: body.projektleitung, begruendung: (body.begruendung ?? '').trim() });
+      await initialisieren(tx, { db: deps.db, tuples: deps.iam.tuples }, who, principalId, r, { sponsor: body.sponsor, projektleitung: body.projektleitung, begruendung: (body.begruendung ?? '').trim() });
     });
     return req.tx(tx => antwort(req, reply, tx, id));
   });

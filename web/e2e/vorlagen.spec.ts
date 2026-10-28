@@ -17,8 +17,10 @@ test('Vorlage hochladen, zuordnen und aktiv setzen; barrierefrei', async ({ page
   await page.getByRole('button', { name: 'Projektvertrag öffnen' }).click();
   const drawer = page.getByRole('dialog', { name: 'Projektvertrag' });
   await expect(drawer.getByRole('button', { name: 'Neue Version hochladen' })).toBeVisible();
-  // Platzhalter über zwei Läufe; «Freitext» ist kein bekanntes Feld
-  const datei = wordVorlage([['Vertrag «Projekt', 'name»'], ['«Freitext»']], 'Intern · enthält Personendaten');
+  // Platzhalter über zwei Läufe; der zweite ist je Lauf neu und kein bekanntes Feld (die Projekte hell, dunkel und
+  // schmal teilen die Datenbank; eine neue Version übernimmt die Zuordnung der letzten)
+  const frei = `Freitext${Date.now()}`;
+  const datei = wordVorlage([['Vertrag «Projekt', 'name»'], [`«${frei}»`]], 'Intern · enthält Personendaten');
   await drawer.locator('input[type=file]').setInputFiles({ name: `Vertrag ${Date.now()}.docx`, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', buffer: datei });
 
   const version = page.getByRole('dialog', { name: /^Projektvertrag · Version \d+$/ });
@@ -27,7 +29,7 @@ test('Vorlage hochladen, zuordnen und aktiv setzen; barrierefrei', async ({ page
   await expectAccessible(page);
   await expectNoOverflow(page);
 
-  await version.getByLabel('«Freitext»').selectOption({ label: 'Ausgangslage' });
+  await version.getByLabel(`«${frei}»`).selectOption({ label: 'Ausgangslage' });
   await version.getByRole('button', { name: 'Zuordnung speichern' }).click();
   await expect(page.getByText('Zuordnung gespeichert.')).toBeVisible();
   await version.getByRole('button', { name: 'Aktiv setzen' }).click();

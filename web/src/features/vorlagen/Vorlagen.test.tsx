@@ -121,6 +121,8 @@ describe('Vorlagen', () => {
     const patch = api.calls.find(c => c.method === 'PATCH')!;
     expect(patch.headers.get('If-Match')).toBe('W/"1"');
     expect(await patch.json()).toEqual({ zuordnung: { Projektname: 'projekt.name', Unbekannt: 'kap1.ausgangslage' } });
+    // Meldung auch, wenn die Schublade die Version nach dem Neuladen neu aufbaut
+    expect(await screen.findByText(TV.gespeichert)).toBeInTheDocument();
 
     const aktiv = await screen.findByRole('button', { name: TV.aktivieren });
     await waitFor(() => expect(aktiv).toBeEnabled());
@@ -130,6 +132,7 @@ describe('Vorlagen', () => {
     await userEvent.click(within(frage).getByRole('button', { name: TV.aktivieren }));
     await waitFor(() => expect(api.calls.some(c => c.method === 'POST' && c.url.endsWith('/aktivieren'))).toBe(true));
     expect(await screen.findByText(TV.gesperrt)).toBeInTheDocument();
+    expect(await screen.findByText(TV.aktiviert(1))).toBeInTheDocument();
   });
 
   it('Konflikt (412) mit «Neu laden»; Entwurf löschen mit Dialog', async () => {

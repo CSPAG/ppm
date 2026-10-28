@@ -38,7 +38,9 @@ const etag = (v: VorlageVersion) => `W/"${v.rev}"`;
 
 export function useVorlageMutations(art: Art) {
   const qc = useQueryClient();
-  const refresh = () => qc.invalidateQueries({ queryKey: vorlagenKeys.all });
+  // nicht abwarten: die Schublade baut die Version nach dem Neuladen neu auf (Schlüssel mit `rev`); die Meldungen der
+  // Aufrufe (`mutate(…, { onSuccess })`) müssen vorher laufen
+  const refresh = () => { void qc.invalidateQueries({ queryKey: vorlagenKeys.all }); };
   const pfad = (v: VorlageVersion) => ({ path: { art, version: v.version }, header: { 'if-match': etag(v) } });
   return {
     hochladen: useMutation({

@@ -168,6 +168,24 @@ Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/mod
 |---|---|---|
 | `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
 
+## Risikolage und Portfoliobericht
+
+Risikolage (BC PC.02.02, UC-014 Schritt 2) und Portfoliobericht (BC PC.04.02, UC-014 Schritt 3, K3 Schritt 4;
+`src/modules/auswertung/` Dateien `risiko*`, `bericht*`, Tabelle `portfoliobericht` aus 150, AP-E2-3). Art
+`portfoliobericht` in der Registry der Sitzung: Beim Bereitstellen schlägt der Bericht dem entscheidenden Gremium das
+Traktandum «Bericht der Programmleitung» vor (K3 Schritte 1 und 4), Unterlage ist der Bericht selbst; Kenntnisnahme
+ohne Entscheid.
+
+| Methode und Pfad | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/dashboard/risiken?portfolio=` | `auswertung:read` an der Organisation oder am Portfolio | Projektrisiken der aktiven Projekte und Portfoliorisiken, höchste Auswirkung und Wahrscheinlichkeit zuerst; Matrix 3 × 3; Abhängigkeiten; offene Eskalationen |
+| `GET /v1/portfolioberichte?portfolio=` | `auswertung:read` | Entwürfe nur mit `auswertung:write`, sonst bereitgestellte Berichte der sichtbaren Portfolios |
+| `POST /v1/portfolioberichte` | `auswertung:write` | aus dem abgeschlossenen Dashboard (offene Periode 409); 201 neu, 200 im Entwurf neu erzeugt (Kommentar bleibt), bereitgestellt 409 |
+| `GET /v1/portfolioberichte/:id` | `auswertung:read` (Lesesicht) | Stand bei Erzeugung; ETag |
+| `PATCH /v1/portfolioberichte/:id` | `auswertung:write` | Kommentar im Entwurf; `If-Match` |
+| `POST /v1/portfolioberichte/:id/bereitstellen` | `auswertung:write` | danach fest und für Gremien sichtbar, Vorschlag an das entscheidende Gremium; `If-Match`; Ereignis `portfoliobericht.provided` |
+| `GET /v1/portfolioberichte/:id/dokument?format=pdf\|docx` | `auswertung:read` (Lesesicht) | über die Ausgabe des Moduls `vorlage`; Export im Audit |
+
 ## Ressourcen
 
 Kapazitätsangebot und Auslastung (docs/fachmodell.md 2.12, AP-E5-4; RK.01.01, RK.02.04; UC-009 Schritte 1–2, 5). Pool =
@@ -234,7 +252,7 @@ DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5,
 (ohne: Beträge `null`, Speichern 403; A-33). Endzustände des Projekts sind lesend (409).
 
 | `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
-| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `aenderung` (nur mit Baseline, Begründung Pflicht: nächste Unternummer, alle Kapitel aus der Baseline); `gate` folgt mit AP-E3-3 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `aenderung` (nur mit Baseline, Begründung Pflicht: nächste Unternummer, alle Kapitel aus der Baseline); `gate` (AP-E3-3: Kopie der Baseline als «n.0» für die Phase Pn, Standard-Ergebnisse der Zielphase in Kap. 7; nur mit Baseline, P0–P3); besteht ein Entwurf: 409 mit `entwurf` |
 | `GET /v1/projekte/{id}/vertrag/ziele` | `projekt:write` | Ziele zur Wahl in Kap. 2: strategische Ziele mit Handlungsfeld, Jahresziele ab dem laufenden Jahr (in voller Sicht gelesen, auch ohne `ziel:read` an der Organisation) |
 | `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
 | `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
@@ -247,6 +265,9 @@ DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5,
 | `GET /v1/vertragsversionen/{id}/aenderung` | `projekt:read` | Änderungsantrag (UC-007): Begründung, Baseline, `wirkung` (geänderte Kapitel mit Wirkung auf Scope, Budget, Ressourcen nach `kapitel_wirkung` → `prat`), `entscheid`, `can`; 404 für andere Anlässe |
 | `POST /v1/vertragsversionen/{id}/aenderung/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung» beim Sponsor (kein Quality-Check); Pflichtangaben der Phase (422), mindestens ein Kapitel geändert und ein Sponsor (409); Aufgabe `aenderung.entscheiden` an den SP |
 | `POST /v1/vertragsversionen/{id}/aenderung/entscheiden` | `vertrag:decide` | `ergebnis` `freigegeben` (Baseline mit Register; mit Wirkung 409 `prat`), `an_prat` (Traktandum `aenderung` beim entscheidenden Gremium, nur mit Wirkung), `abgelehnt` (Begründung Pflicht); PL per Mitteilung informiert; `If-Match` |
+| `GET /v1/vertragsversionen/{id}/gate` | `projekt:read` | Gate-Modus (AP-E3-3, UC-003 Schritt 1): Gate in die Zielphase, Gremienweg (PRAT/GLPA, via SNS-VR), Leitfragen je Wertestrom mit Antworten und Fortschritt, Standard-Lieferergebnisse der laufenden Phase mit Stand, ab Gate P2–P3 die Nutzenprüfung, nach dem Entscheid dessen Ergebnis; Änderung ohne Gate: 409 |
+| `PUT /v1/vertragsversionen/{id}/gate/leitfragen/{leitfrageId}` | `vertrag:write` | Antwort (UC-003 Schritt 4), leer entfernt sie; `zutreffend: false` = «trifft nicht zu» mit Begründung (sonst 422); nur «in Arbeit»; `If-Match` = Stand der Antwort (`W/"0"` neu) |
+| `PUT /v1/vertragsversionen/{id}/gate/nutzen` | `vertrag:write` oder `vertrag:decide` | Nutzenprüfung ab Gate P2–P3 (UC-003 A2, PC.03.02): erreichte Werte je KPI des Registers und Beurteilung; sonst 409; `If-Match` = `nutzen.version` (`W/"0"` neu) |
 
 Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategisches_ziel_id`), die Kapitel camelCase
 (`strategischesZielId`). Ab dem Gate P1–P2 verlangen `personal` FTE mit Monaten (nicht Grösse S/M/L) und `kosten` einen
@@ -255,6 +276,15 @@ Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `sr
 über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
 Die Traktandenart `aenderung` (Ergebnisse «Freigegeben», «Abgelehnt») registriert `vertrag`; ihre Folge setzt die
 Baseline bzw. lehnt den Entwurf ab und läuft in der Transaktion der UE mit `app.vertrag_intern` (200_vertrag_aenderung).
+
+Gate (AP-E3-3): Nach der dritten Unterschrift schlägt `vertrag` das Gate-Review als Traktandum der Art `gate` mit Bezug
+`projekt` beim Gremium des Gremienwegs vor (ein von der UE eingeplantes Gate-Review bleibt dasselbe Traktandum); die
+Version ist «traktandiert». Die Art liefert das Gate Review Packet (Kapitel, Business Case, Leitfragen, Hauptänderungen,
+Nutzenprüfung) und die Folge des Entscheids in dessen Transaktion: freigegeben = Baseline, Phase und Phasenmodell (A-13);
+mit Auflagen oder zurückgestellt = «in Arbeit» mit Aufgabe `vertrag.ueberarbeiten`; gestoppt = «abgelehnt». Eine
+Korrektur in der Sitzung nimmt die Folge zurück (A-30). Obere Module hängen sich mit `gateEntscheid.registrieren` an
+(Abschluss, AP-E7-1). Die Aufgabe `gate.vorbereiten` öffnet ein stündlicher Lauf 30 Arbeitstage vor der geplanten
+Gate-Sitzung (A-27).
 
 ## Priorisierung
 
@@ -273,6 +303,27 @@ Portfolio optional (A-18).
 | `GET /v1/portfolios/{id}/matrix` | `priorisierung:read` (Organisation oder Portfolio) | aktive Projekte mit Nutzen/Risiko je Achse (Durchschnitt hoch=3/mittel=2/tief=1 der zugeordneten Kriterien, A-39, ohne Score A-01), Feld (Q6 F9; Grenze = kein Feld), Ressourcen (FTE-Monate, Grösse), Kosten nur mit `finanzen:read`, Abhängigkeiten im Portfolio, Rang (PP.03.04) |
 | `GET /v1/portfolios/{id}/rangfolge` | `priorisierung:read` (Organisation oder Portfolio) | Rangfolge entschieden und Entwurf mit Begründung; `ETag` = Version des Entwurfs (PP.02.02) |
 | `PUT /v1/portfolios/{id}/rangfolge` | `priorisierung:write` | ganze Liste als Entwurf, `If-Match` (428/412); nur aktive Projekte des Portfolios, ohne Doppel (422) |
+
+## Schnittstellen und Änderungsprotokoll
+
+Schnittstellen zu Umsystemen mit Laufprotokoll (docs/fachmodell.md 2.13, AP-E7-3; AM.03.02; UC-018 Schritte 3–4, A1) und
+Änderungsprotokoll aus dem Audit (AM.03.03; UC-018 Schritt 5). Katalog: ERP › Ist-Kosten (eingehend, A-16), HR-System ›
+Personal- und Abwesenheitsdaten (eingehend, RK.01.02), Budgetprozess › Jahresbedarf (ausgehend, A-17). Austausch über
+HTTP(S) mit JSON an der Adresse der Schnittstelle, nur über `safeRequest` (SSRF-Schutz); die Verarbeitung der Daten
+registriert das Fachmodul (`verarbeitungSetzen`), ohne sie schlägt ein Lauf mit «noch nicht verfügbar» fehl. Ein
+fehlgeschlagener Lauf (ausser Testlauf) öffnet die Aufgabe «Schnittstelle prüfen» (`schnittstelle.fehler`) an alle mit
+`schnittstelle:admin`, ein erfolgreicher schliesst sie. Geplante Läufe stündlich geprüft: einmal je Tag, Woche bzw. Monat
+(Europe/Zurich).
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/schnittstellen` | `schnittstelle:admin` | mit letztem Lauf und Katalog (`verfuegbar` = Verarbeitung vorhanden) |
+| `POST /v1/schnittstellen` | `schnittstelle:admin` | Umsystem, Daten, Rhythmus, Adresse (Richtung aus dem Katalog; unbekannt 422, doppelt 409, Adresse nicht zulässig 422); aktiv: Testlauf (nur Verbindung) in der Antwort |
+| `GET /v1/schnittstellen/{id}`, `PATCH …` | `schnittstelle:admin` | Rhythmus, Adresse, `aktiv` (deaktivieren statt löschen), `If-Match`; neue Adresse oder Aktivieren mit Testlauf |
+| `GET /v1/schnittstellen/{id}/laeufe` | `schnittstelle:admin` | je Lauf Art, Stand, Start, Ende, Umfang, Fehler; neueste zuerst, Cursor |
+| `POST /v1/schnittstellen/{id}/starten` | `schnittstelle:admin` | Lauf von Hand, auch erneut nach Fehler (A1.1), wartet auf das Ergebnis; nicht aktiv oder läuft schon 409 |
+| `GET /v1/aenderungsprotokoll?objekt=&objektId=&von=&bis=` | `audit:read` | Einträge des Audits mit Person, Zeitpunkt, Aktion, `aenderungen` (Feld, `vorher`, `nachher`; aus `before`/`after`); neueste zuerst, Cursor; `von`/`bis` Kalendertage |
+| `GET /v1/aenderungsprotokoll/objekte` | `audit:read` | Objekttypen mit Einträgen (Filter) |
 
 ## Webhooks und Ereignisse
 

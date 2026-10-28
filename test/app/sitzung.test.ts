@@ -8,7 +8,7 @@ import { after, before, describe, test } from 'node:test';
 import { full, skipDb } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { registriereTraktandenart, traktandum } from '../../src/modules/sitzung/index.ts';
-import { _abmelden } from '../../src/modules/sitzung/arten.ts';
+import { _abmelden, traktandenart, type Traktandenart } from '../../src/modules/sitzung/arten.ts';
 import { fristenPruefen } from '../../src/modules/sitzung/fristen.ts';
 import { heute, kurzDatum as kurz } from '../../src/modules/sitzung/format.ts';
 
@@ -31,6 +31,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
   let pl: string, ctl: string, sp: string;
   let portfolio: string, prat: string;
   let p1: { id: string; nummer: string }, p2: { id: string; nummer: string };
+  let gateVorher: Traktandenart | undefined;
   const termin1 = mittwochIn(28), termin2 = mittwochIn(56);
 
   const call = (method: string, url: string, headers: Record<string, string>, payload?: unknown) =>
@@ -82,7 +83,9 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     await grant(api, tenantId, `user:${m.principalId}`, 'gremium', { type: 'portfolio', id: portfolio });
     mitglied = { authorization: m.authorization };
 
-    // Probe-Arten: gate wie es vertrag (AP-E3-3) registrieren wird, abschluss ohne Unterlagen (noch nicht registriert)
+    // Probe-Arten: gate statt der Art aus vertrag (AP-E3-3, danach wiederhergestellt), abschluss ohne Unterlagen
+    gateVorher = traktandenart('gate');
+    _abmelden('gate');
     registriereTraktandenart({
       art: 'gate', ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }],
       zusammenfassung: async (_tx, b) => ({ antrag: `Freigabe Gate für ${b.projektId === p1.id ? p1.nummer : p2.nummer}` }),
@@ -93,7 +96,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     });
     registriereTraktandenart({ art: 'abschluss', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }] });
   });
-  after(async () => { _abmelden('gate'); _abmelden('abschluss'); await api?.close(); });
+  after(async () => { _abmelden('gate'); _abmelden('abschluss'); if (gateVorher) registriereTraktandenart(gateVorher); await api?.close(); });
 
   let sitzung: { id: string; version: number };
 

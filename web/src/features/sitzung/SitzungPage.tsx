@@ -80,7 +80,8 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
     if (!s) return;
     const ids = s.traktanden.map(x => x.id);
     const i = ids.indexOf(t.id), j = i + richtung;
-    if (j < 0 || j >= ids.length) return;
+    // das feste Traktandum 1 bleibt an Position 1 (K3 Schritt 4)
+    if (j < 0 || j >= ids.length || t.fest || s.traktanden[j]?.fest) return;
     [ids[i], ids[j]] = [ids[j]!, ids[i]!];
     m.ordnen.mutate({ s, reihenfolge: ids }, {
       onSuccess: () => { requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-griff="${j + 1}"]`)?.focus()); },
@@ -150,7 +151,9 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
           ) : <div className="acts"><SitzungsmodusEinstieg kuerzel={kuerzel} datum={datum} stand={s.stand} gehe={gehe} /></div>}
         </div>
       </header>
-      <div className="body sz-body">
+      {/* scrollbar auch nach dem Versand ohne Eingabefelder mit der Tastatur erreichbar (axe scrollable-region-focusable, 360 px) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body sz-body" tabIndex={0} role="region" aria-label={TS.sitzungInhalt}>
         {versendet ? (
           <div className="sz-banner"><Hinweis stufe="hinweis">{TS.versendetBanner(fmtZeitpunkt(s.versendetAt!))}</Hinweis></div>
         ) : null}

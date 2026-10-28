@@ -12,7 +12,7 @@ import {
 import { record } from '../../platform.ts';
 import { stellvertretung } from '../eingang/index.ts';
 import { artLabel } from './arten.ts';
-import { auflageErfuellen, ergebnisLabel, erfassen, ohneEntscheid, optionen, schliessen, snsNachtragen, starten } from './entscheid.ts';
+import { auflageErfuellen, ergebnisLabel, erfassen, ohneEntscheid, optionen, schliessen, snsNachtragen, starten, type FolgeUmgebung } from './entscheid.ts';
 import {
   Auflage, AuflageParams, Entscheid, EntscheidEintrag, EntscheidList, EntscheidPut, EntscheidQuery, Ergebnis, Geschlossen, Sitzungsmodus, SnsPut,
   type AuflageOut, type EntscheidEintragOut, type EntscheidOut, type EntscheidPutIn, type SitzungsmodusOut,
@@ -108,7 +108,9 @@ const entscheidSnapshot = (t: store.TraktandumRow, e: es.EntscheidRow, auflagen:
   ergebnis: e.ergebnis, stellungnahme: e.stellungnahme, anVr: e.an_vr, snsErgebnis: e.sns_ergebnis, auflagen, version: e.version,
 });
 
-export function registerEntscheidRoutes(app: FastifyInstance, _deps: Deps): void {
+export function registerEntscheidRoutes(app: FastifyInstance, deps: Deps): void {
+  /** Kontext der Folge (FolgeKontext): entscheidende Person und Zugang wie `deps`. */
+  const umgebung = (req: FastifyRequest): FolgeUmgebung => ({ akteur: actorOf(req), principalId: req.requirePrincipal().principalId, db: deps.db, tuples: deps.iam.tuples });
   for (const s of [Ergebnis, Auflage, Entscheid, EntscheidPut, SnsPut, Sitzungsmodus, Geschlossen, EntscheidEintrag, EntscheidList]) app.addSchema(s);
 
   // --- Sitzungsmodus ----------------------------------------------------------------------------------------------
@@ -208,7 +210,7 @@ export function registerEntscheidRoutes(app: FastifyInstance, _deps: Deps): void
       const bestehend = await es.entscheidVon(tx, t.id);
       const version = bestehend ? requireIfMatch(req) : null;
       if (bestehend && bestehend.version !== version) throw preconditionFailed(bestehend.version);
-      const r = await erfassen(tx, s, t, body, version);
+      const r = await erfassen(tx, s, t, body, version, umgebung(req));
       const n = (await store.getTraktandum(tx, t.id))!;
       const snap = entscheidSnapshot(n, r.entscheid, body.auflagen?.length ?? 0);
       await record(tx, who, {
@@ -237,7 +239,7 @@ export function registerEntscheidRoutes(app: FastifyInstance, _deps: Deps): void
       const e = await es.entscheidVon(tx, t.id);
       if (!e) throw notFound('Entscheid');
       if (e.version !== version) throw preconditionFailed(e.version);
-      const n = await snsNachtragen(tx, s, t, body, version);
+      const n = await snsNachtragen(tx, s, t, body, version, umgebung(req));
       const snap = entscheidSnapshot(t, n, 0);
       await record(tx, who, { action: 'entscheid.sns_recorded', resourceType: 'entscheid', resourceId: n.id, data: snap, event: snap });
       return entscheidOut(req, tx, s, t, n);

@@ -56,7 +56,7 @@ async function ausgabe(req: FastifyRequest, tx: Tx, v: store.VersionRow, p: stor
       }),
     } : null,
     can: {
-      qualityCheck: v.stand === 'in_pruefung' && await req.can('vertrag:review'),
+      qualityCheck: v.stand === 'in_pruefung' && v.anlass !== 'aenderung' && await req.can('vertrag:review'),
       unterzeichnen: offen,
     },
   };
@@ -110,6 +110,8 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
       const r = await store.version(tx, id);
       if (!r) throw notFound('Vertragsversion');
       if (r.stand !== 'in_pruefung') throw conflict(`Version ${r.nummer} ist ${STAND_TEXT[r.stand]}, nicht in Prüfung.`, { reason: 'stand', stand: r.stand });
+      // eine Änderung entscheidet der Sponsor ohne Quality-Check (UC-007 Schritt 3; AP-E3-4)
+      if (r.anlass === 'aenderung') throw conflict('Eine Änderung entscheidet der Sponsor; ein Quality-Check ist nicht vorgesehen.', { reason: 'anlass' });
       if (r.version !== erwartet) throw preconditionFailed(r.version);
       const q = await pruefung.qualityCheckErfassen(tx, { version: r, projekt: p, erwartet, person, ergebnis: body.ergebnis, kommentare });
       if (!q.id) throw preconditionFailed(r.version + 1);

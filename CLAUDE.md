@@ -34,15 +34,15 @@ Tests mit Datenbank brauchen `POSTGRES_SUPERUSER_PASSWORD` (und `POSTGRES_PORT`,
 - Migrationen nur vorwärts (`db/migrations/NNN_name.sql`), Nummer nur aus dem Bereich des Arbeitspakets
   (`docs/fachmodell.md` Abschnitt 7); veröffentlichte nie ändern.
 - **Arbeitspakete:** nur die Dateien im Besitz des Pakets ändern; gemeinsame Dateien (`src/app.ts`, `src/authz/`,
-  Router, Navigation, Testmatrix) nach den Regeln in `docs/fachmodell.md` Abschnitt 7.2; eigene Zeilen in
-  `docs/umsetzungsstand.md` nachführen.
+  Router, Navigation, Testmatrix) nach den Regeln in `docs/fachmodell.md` Abschnitt 7.2. `docs/umsetzungsstand.md`,
+  Klärungsliste und Annahmen führt nur die Master-Session; ein Paket meldet seinen Stand mit dem Merge (Block «STAND:»).
 - **Fachlich** gilt nur die Spezifikation in `docs/`: keine Regel bauen, die dort fehlt; `[OFFEN]` bleibt offen und
   kommt in die Klärungsliste; bis zur Klärung gilt die Annahme `A-nn` aus `docs/fachmodell.md`. IDs aus Funktionsbaum und Use Cases (z. B. `ZM.01.01`, `UC-004`) in Kommentaren nennen.
 - **Oberfläche:** vor einem Feature den Kernablauf in `docs/ux/ablaeufe/` lesen (oder anlegen); Seitentyp, Zustände und
   Regeln aus `docs/ux/rahmen/interaktion.md`; jeder PR mit Oberfläche erfüllt die UX-Definition of Done
   (`docs/ux/rahmen/pruefung.md`). `docs/ux/rahmen/` ist projektneutral: nicht projektbezogen ändern.
-- **Sprache:** Kommentare, Doku und Oberfläche Deutsch, Schweizer Rechtschreibung ohne ß; Oberfläche mit Anrede «Sie»
-  (UX-E7, bis zur Klärung von UX-OF-1); in sichtbaren Texten «Organisation», nie «Mandant»/«Tenant».
+- **Sprache:** Kommentare, Doku und Oberfläche Deutsch, Schweizer Rechtschreibung ohne ß; Oberfläche mit Anrede «Du»
+  (UX-E7, UX-OF-1 entschieden 28.10.2026); in sichtbaren Texten «Organisation», nie «Mandant»/«Tenant».
 - **Versionen exakt**, ohne `^`/`~`. `@vollholz/*` nur gemeinsam anheben (Renovate-Gruppe «identity-kit»).
 - **Netz:** ausgehende Aufrufe nur in den Netz-Adaptern aus `scripts/check-network.ts` (mit Begründung), mit
   SSRF-Schutz (`safeRequest` aus `@vollholz/platform`). Die Webapp spricht nur same-origin.

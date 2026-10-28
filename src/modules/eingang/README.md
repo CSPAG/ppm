@@ -73,3 +73,33 @@ if (!v?.unterschriften) throw forbidden('Unterschriften sind in dieser Stellvert
 Jedes Fachmodul bietet `GET /v1/<modul>/kopf` mit den Kennzahlen der Person (Fachmodell 4.1); die Startseite
 (`web/src/features/eingang`) ruft die Köpfe der Module auf, für die die Person ein Recht hat. Der Eingang selbst liefert
 `GET /v1/eingang/anzahl` (offen, überfällig, nächste Frist) für den Zähler an «Eingang» (I-N3).
+
+## Zugang entziehen und Neubesetzung (AP-E7-8)
+
+UC-016 A1 (AM.01.01): Die Administration (`members:admin`) sieht vor dem Entziehen, was mit dem Zugang entfällt
+(`GET /v1/zugaenge/:person`: Rollen an der Organisation, unbefristete Rollen an Projekten, Portfolios und anderen
+Orten, offene Aufgaben an die Person). Entfernt wird immer im Baukasten (`iam.admin.removeMember`; Regeln des
+Baukastens: nicht sich selbst, nicht die letzte Administration) – über `POST /v1/zugaenge/:person/entziehen`, die Seite
+«Benutzer und Rollen» des Baukastens oder die Plattform-Administration. Die Neubesetzung entsteht in den Haken
+(`iamHaken`, `AppSpec.iamEvents` in `src/app.ts`), in der Transaktion des Baukastens:
+
+1. `member.removing` (vor Keycloak): Rollen an Orten ausser der Organisation festhalten (`neubesetzung`, Stand
+   `vorbereitet`; Migration 410, Schreiben als Modul nach 411).
+2. `member.removed`: Stand `entzogen`, Audit `neubesetzung.created`; bleiben Rollen oder offene Aufgaben, erhält die
+   Administration die Aufgabe `zugang.neu_besetzen` «Rollen von ‹Person› neu besetzen» (an `members:admin`, von Hand
+   erledigbar). Scheitert das Entfernen, rollt alles zurück.
+
+Neu besetzt wird dort, wo die Rolle vergeben wird (Projektorganisation, Portfolio); `GET /v1/neubesetzungen/:id` zeigt
+je Rolle, ob jemand sie am Ort wieder unbefristet hat, und die offenen Aufgaben, die noch an die Person gehen.
+Befristete Rollen (Stellvertretung) zählen nicht: Sie entfallen mit ihrem Ablauf.
+
+## Rollenänderungen mitteilen (UC-016 Schritt 3)
+
+Aus `access.granted` und `access.revoked` (Haken `after`) erhält die Person eine Mitteilung («Sie haben die Rolle
+‹Projektleitung› (Projekt) erhalten.»), wenn eine Person die Rolle vergeben oder entzogen hat: nicht beim Ablauf, nicht
+für befristete Rollen (Stellvertretung), nicht für Änderungen an sich selbst und nicht, solange die Person entfernt
+wird. Den Namen des Orts kennt `eingang` nicht (es kennt kein Fachmodul).
+
+**Grenzen des Baukastens (Folgearbeit fürs Paket):** Rollen mit Berechtigungen (UC-016 A2) stehen im Modell
+(`src/authz/model.ts`) und sind zur Laufzeit nicht definierbar. `member.left` (Austritt ausserhalb der App) legt keine
+Neubesetzung an.

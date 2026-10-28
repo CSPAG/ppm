@@ -9,14 +9,23 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { registriereAenderung } from './aenderung.ts';
+import { registerAenderungRoutes } from './aenderung-routes.ts';
 import { baselineSetzen } from './baseline.ts';
 import { registerDokumentRoutes } from './dokument-routes.ts';
 import { entwurfsanlass } from './entwurf.ts';
+import { registriereGate } from './gate.ts';
+import { gateTask } from './gate-job.ts';
+import { registerGateRoutes } from './gate-routes.ts';
 import { vertragTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 import * as store from './store.ts';
+import { vergleichTools } from './vergleich-mcp.ts';
+import { registerVergleichRoutes } from './vergleich-routes.ts';
 import { registerZielauswahl } from './zielauswahl.ts';
+
+registriereGate(); // Anlass, Traktandum und Art `gate` (AP-E3-3)
 
 export const vertragModule = defineModule({
   name: 'vertrag',
@@ -26,9 +35,15 @@ export const vertragModule = defineModule({
     registerZielauswahl(app, deps, TAG); // Ziele zur Wahl in Kap. 2 (PP.02.05)
     registerPruefungRoutes(app, deps);
     registerDokumentRoutes(app, deps); // Dokumentausgabe Word/PDF (AP-E3-5)
+    registerGateRoutes(app, deps); // Gate-Modus (AP-E3-3)
+    registerVergleichRoutes(app, deps); // Versionsvergleich und Hauptänderungen (AP-E3-4)
+    registerAenderungRoutes(app, deps); // Änderungsantrag (AP-E3-4)
   },
-  mcpTools: { ...vertragTools },
+  tasks: [gateTask], // Aufgabe «Gate vorbereiten» (AP-E3-3)
+  mcpTools: { ...vertragTools, ...vergleichTools },
 });
+
+registriereAenderung(); // Traktandenart «Änderung» (AP-E3-4, fachmodell.md 2.9)
 
 /** Für Erweiterungspakete und obere Module (in deren Transaktion; Rechte prüft der Aufrufer). */
 export const vertrag = {
@@ -39,5 +54,6 @@ export const vertrag = {
   kapitel: store.kapitel,
 };
 export { unterzeichnung } from './pruefung.ts';
+export { gateEntscheid, type GateEntscheid } from './gate.ts';
 export { KAPITEL, titel as kapitelTitel, type Inhalt as KapitelInhalt } from './kapitel.ts';
 export type { Anlass, Stand, VersionRow } from './store.ts';

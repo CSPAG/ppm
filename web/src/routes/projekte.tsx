@@ -8,7 +8,7 @@ import { type AnyRoute, createRoute, Outlet, redirect, useNavigate } from '@tans
 import { Suspense, useCallback } from 'react';
 import { type ProjekteSearch, PROJEKTNUMMER, projektTexte, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
 import { berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
-import { type SetVertragSearch, type VertragSearch, vertragTexte } from '../features/vertrag/index.ts';
+import { type SetVersionenSearch, type SetVertragSearch, type VersionenSearch, type VertragSearch, vertragTexte } from '../features/vertrag/index.ts';
 import { Loading } from '../ui/index.ts';
 import { seite } from './seite.ts';
 import { searchOf } from '../search.ts';
@@ -21,12 +21,15 @@ const BerichtPage = seite(() => import('../features/bericht/BerichtPage.tsx'), '
 const VertragPage = seite(() => import('../features/vertrag/VertragPage.tsx'), 'VertragPage');
 const PruefenPage = seite(() => import('../features/vertrag/PruefenPage.tsx'), 'PruefenPage');
 const UnterzeichnenPage = seite(() => import('../features/vertrag/UnterzeichnenPage.tsx'), 'UnterzeichnenPage');
+const AenderungPage = seite(() => import('../features/vertrag/AenderungPage.tsx'), 'AenderungPage');
+const VersionenPage = seite(() => import('../features/vertrag/VersionenPage.tsx'), 'VersionenPage');
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektTexte.akte.uebersicht },
   { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
   { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
+  { pfad: 'versionen', label: vertragTexte.reiterVersionen, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -97,5 +100,22 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><UnterzeichnenPage nummer={nr} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, berichtRoute])] as const;
+  // Änderung entscheiden (UI-09, K2 Schritt 9) und Versionen mit Vergleich (UI-10, `?vergleich=baseline...entwurf`), AP-E3-4
+  const aenderungRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag/aenderung', component: AenderungRoute });
+  function AenderungRoute() {
+    const { nr } = akteRoute.useParams();
+    return <Suspense fallback={<Loading />}><AenderungPage nummer={nr} /></Suspense>;
+  }
+  const versionenRoute = createRoute({ getParentRoute: () => akteRoute, path: '/versionen', validateSearch: searchOf.versionen, component: VersionenRoute });
+  function VersionenRoute() {
+    const { nr } = akteRoute.useParams();
+    const search = versionenRoute.useSearch();
+    const navigate = useNavigate({ from: versionenRoute.fullPath });
+    const setSearch = useCallback<SetVersionenSearch>((next, o) => {
+      void navigate({ search: (prev: VersionenSearch) => ({ ...prev, ...next }), replace: o?.replace ?? false });
+    }, [navigate]);
+    return <Suspense fallback={<Loading />}><VersionenPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
+  }
+
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, berichtRoute, versionenRoute])] as const;
 }

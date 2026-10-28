@@ -118,6 +118,7 @@ export const BerichtStandList = Type.Object({
     letzter: Nullable(Type.Object({
       periode: Type.String(), status: Nullable(Status), trend: Nullable(Type.String()),
       begruendung: Type.String({ description: 'Begründung des Status (Pflicht bei «kritisch»).' }),
+      naechsterMeilenstein: Type.String({ description: 'Nächster Meilenstein laut Bericht (Freitext, leer ohne Angabe).' }),
     }, { additionalProperties: false, description: 'Letzter eingereichter Bericht (auch zurückgegeben oder geprüft).' })),
     laufend: Nullable(Type.Object({
       periode: Type.String(), stand: Nullable(Type.Union(STAENDE.map(s => Type.Literal(s)))),

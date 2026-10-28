@@ -25781,6 +25781,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/traktanden/naechste": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Nächstes Traktandum je Projekt
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», «Du stellst am … vor» nur mit Einladung): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Projekte (mehrfach, höchstens 20). */
+                    projektId: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NaechsteTraktanden"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/sitzungen/kopf": {
         parameters: {
             query?: never;
@@ -47971,6 +48067,39 @@ export interface components {
             weitergeleitetAm?: string;
             bemerkung?: string;
         };
+        /** @description Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»). */
+        NaechsteTraktanden: {
+            items: {
+                /** Format: uuid */
+                projektId: string;
+                /** Format: uuid */
+                traktandumId: string;
+                /**
+                 * @description Art des Traktandums (fachmodell.md 2.9).
+                 * @enum {string}
+                 */
+                art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
+                artLabel: string;
+                titel: string;
+                /** @description Die anfragende Person ist zu diesem Traktandum eingeladen (stellt vor, K3 Schritt 2). */
+                eingeladen: boolean;
+                sitzung: {
+                    /** Format: uuid */
+                    id: string;
+                    /**
+                     * @description Datum (JJJJ-MM-TT).
+                     * @example 2026-11-12
+                     */
+                    datum: string;
+                    gremium: {
+                        /** Format: uuid */
+                        id: string;
+                        kuerzel: string;
+                        name: string;
+                    };
+                };
+            }[];
+        };
         Versandfrist: {
             /** @description Versand spätestens (Q8 Kap. 8.1); ohne Phasenmodell in Kraft null. */
             bis: string | null;
@@ -48624,6 +48753,8 @@ export interface components {
                     trend: null | string;
                     /** @description Begründung des Status (Pflicht bei «kritisch»). */
                     begruendung: string;
+                    /** @description Nächster Meilenstein laut Bericht (Freitext, leer ohne Angabe). */
+                    naechsterMeilenstein: string;
                 };
                 laufend: null | {
                     periode: string;

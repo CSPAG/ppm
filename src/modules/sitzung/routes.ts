@@ -17,7 +17,7 @@ import {
 import { ARTEN, artLabel, type Art } from './arten.ts';
 import { heute } from './format.ts';
 import {
-  Einladung, EinladungenPut, KuerzelDatumParams, KuerzelParams, Kopf, Reihenfolge, Sitzung, SitzungCreate, SitzungEintrag, SitzungenQuery,
+  Einladung, EinladungenPut, KuerzelDatumParams, KuerzelParams, Kopf, NaechsteQuery, NaechsteTraktanden, Reihenfolge, Sitzung, SitzungCreate, SitzungEintrag, SitzungenQuery,
   SitzungList, SitzungPatch, Traktandum, TraktandumCreate, TraktandumPatch, Unterlage, Verschoben, Versandfrist, Versandvorschau, Vorschlaege,
   type EinladungenPutIn, type SitzungOut, type SitzungPatchIn, type TraktandumCreateIn, type TraktandumOut, type TraktandumPatchIn,
 } from './schemas.ts';
@@ -99,7 +99,7 @@ async function gremiumLesen(tx: Tx, kuerzel: string): Promise<store.GremiumRow> 
 }
 
 export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
-  for (const s of [Versandfrist, Unterlage, Einladung, Traktandum, Sitzung, SitzungPatch, SitzungEintrag, SitzungList, SitzungCreate, Vorschlaege,
+  for (const s of [NaechsteTraktanden, Versandfrist, Unterlage, Einladung, Traktandum, Sitzung, SitzungPatch, SitzungEintrag, SitzungList, SitzungCreate, Vorschlaege,
     TraktandumCreate, Reihenfolge, TraktandumPatch, EinladungenPut, Verschoben, Versandvorschau, Kopf]) app.addSchema(s);
 
   // --- Sitzungen eines Gremiums -------------------------------------------------------------------------------------
@@ -178,6 +178,24 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   });
 
   // --- Sitzung --------------------------------------------------------------------------------------------------------
+
+  app.get('/v1/traktanden/naechste', {
+    schema: {
+      tags: [TAG], summary: 'Nächstes Traktandum je Projekt',
+      description: 'Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», «Du stellst am … vor» nur mit Einladung): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.',
+      querystring: NaechsteQuery, response: { 200: Type.Ref('NaechsteTraktanden') },
+    },
+  }, async req => {
+    const ids = [...new Set((req.query as { projektId: string[] }).projektId)];
+    await req.needSomewhere('projekt:read');
+    const rows = await req.tx(tx => store.naechsteTraktanden(tx, ids, heute()));
+    return {
+      items: rows.map(r => ({
+        projektId: r.projekt_id, traktandumId: r.id, art: r.art, artLabel: artLabel(r.art), titel: r.titel, eingeladen: r.eingeladen,
+        sitzung: { id: r.sitzung_id, datum: r.datum, gremium: { id: r.gremium_id, kuerzel: r.gremium_kuerzel, name: r.gremium_name } },
+      })),
+    };
+  });
 
   app.get('/v1/sitzungen/kopf', {
     schema: { tags: [TAG], summary: 'Kopf im Eingang', description: 'Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).', response: { 200: Type.Ref('SitzungKopf') } },

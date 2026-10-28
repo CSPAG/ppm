@@ -97,13 +97,55 @@ describe('Risikolage', () => {
     stubRisiken();
     const { container } = renderWithIam(<RisikenPage search={{}} setSearch={() => {}} />, GREMIUM);
     const m = await screen.findByRole('table', { name: TR.matrix.titel });
-    expect(within(m).getByLabelText(TR.matrix.feld('hoch', 'hoch', 1))).toHaveTextContent('1');
-    expect(screen.getByText('2 Risiken · 1 mit hoher Auswirkung und Wahrscheinlichkeit · 1 Massnahme offen')).toBeInTheDocument();
+    expect(within(m).getByRole('button', { name: TR.zeigen(TR.matrix.feld('hoch', 'hoch', 1)) })).toHaveTextContent('1');
+    expect(within(m).getByRole('button', { name: TR.zeigen(TR.matrix.feld('tief', 'tief', 0)) })).toBeDisabled();
+    const kennzahlen = within(document.querySelector('.db-kennzahlen') as HTMLElement).getAllByRole('listitem').map(li => li.textContent);
+    expect(kennzahlen).toEqual(['2 Risiken', '1 mit hoher Auswirkung und Wahrscheinlichkeit', '1 Massnahme offen']);
     expect(screen.getByRole('link', { name: '2026-001 Vorhaben 1' })).toHaveAttribute('href', '/projekte/2026-001');
     expect(screen.getByText('umgesetzt')).toBeInTheDocument();
     expect(screen.getByText('Schnittstelle')).toBeInTheDocument();
     expect(screen.getByText('Lieferverzug')).toBeInTheDocument();
     await expectNoAxe(container);
+  });
+
+  it('jede Zahl führt zu ihren Risiken (Feld der Matrix, Kennzahl; Adresse); Z3; Export als CSV mit Auswahl', async () => {
+    const api = stubRisiken();
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:risiken'), revokeObjectURL: vi.fn() }));
+    const klick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    function Seite() {
+      const [s, set] = useState<Record<string, string>>({});
+      const setSearch = useCallback((next: Record<string, string | undefined>) => set(v => Object.fromEntries(Object.entries({ ...v, ...next }).filter(([, x]) => x !== undefined)) as Record<string, string>), []);
+      return <><RisikenPage search={s} setSearch={setSearch} /><output data-testid="s">{JSON.stringify(s)}</output></>;
+    }
+    renderWithIam(<Seite />, GREMIUM);
+    const m = await screen.findByRole('table', { name: TR.matrix.titel });
+    await userEvent.click(within(m).getByRole('button', { name: TR.zeigen(TR.matrix.feld('hoch', 'hoch', 1)) }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"w":"hoch","a":"hoch"}'));
+    const tab = screen.getByRole('table', { name: TR.risiken.titel });
+    expect(within(tab).getAllByRole('row')).toHaveLength(2);
+    expect(screen.getByText(TR.filter.feld('hoch', 'hoch'))).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: TR.exportieren }));
+    expect(await screen.findByText(TR.exportiert('risikolage.csv'))).toBeInTheDocument();
+    const exp = api.calls.find(c => c.url.includes('format=csv'))!;
+    expect(exp.url).toContain('w=hoch');
+    expect(exp.url).toContain('a=hoch');
+    expect(klick).toHaveBeenCalledOnce();
+    klick.mockRestore();
+
+    await userEvent.click(screen.getByRole('button', { name: TR.filter.entfernen(TR.filter.feld('hoch', 'hoch')) }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{}'));
+    await userEvent.click(screen.getByRole('button', { name: TR.zeigen(TR.kennzahl.offen(1)) }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"massnahme":"offen"}'));
+  });
+
+  it('Z3: leer durch Filter mit «Filter zurücksetzen»', async () => {
+    stubRisiken();
+    const gesetzt: unknown[] = [];
+    renderWithIam(<RisikenPage search={{ w: 'tief', a: 'tief' }} setSearch={n => gesetzt.push(n)} />, GREMIUM);
+    expect(await screen.findByText(TR.leerFilter)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TR.zuruecksetzen }));
+    expect(gesetzt).toEqual([{ w: undefined, a: undefined, massnahme: undefined }]);
   });
 
   it('ohne Recht: Erklärung statt Daten', () => {

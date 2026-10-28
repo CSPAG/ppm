@@ -30586,13 +30586,21 @@ export interface paths {
         };
         /**
          * Risikolage des Portfolios
-         * @description Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         * @description Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Mit `format=csv` als Export der Risiken (optional nach Feld der Matrix `w`, `a` und `massnahme=offen`). Recht `auswertung:read` an der Organisation oder am Portfolio.
          */
         get: {
             parameters: {
                 query?: {
                     /** @description Schlüssel des Portfolios (I-N5), z. B. `transformation`. */
                     portfolio?: string;
+                    /** @description Nur für den Export: Wahrscheinlichkeit (Feld der Matrix). */
+                    w?: "hoch" | "mittel" | "tief";
+                    /** @description Nur für den Export: Auswirkung (Feld der Matrix). */
+                    a?: "hoch" | "mittel" | "tief";
+                    /** @description Nur für den Export: Risiken mit offener Massnahme. */
+                    massnahme?: "offen";
+                    /** @description Export der Risiken als CSV (mit `w`, `a`, `massnahme` wie die Tabelle der Oberfläche). */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;

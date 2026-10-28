@@ -67,3 +67,21 @@ export function useBerichtAktionen() {
 
 /** `If-Match` als Kopfzeile in Kleinbuchstaben (Schema der API). */
 const lower = (h: Record<string, string | undefined>) => ({ 'if-match': h['If-Match']! });
+
+/**
+ * Export der Risikolage als CSV (UI-18, Seitentyp Bericht): die Risiken wie die Tabelle, über den typisierten Client
+ * (gleiche Herkunft, Organisation im Kopf), im Browser gespeichert; liefert den Dateinamen.
+ */
+export async function risikenExportieren(q: { portfolio?: string; w?: 'hoch' | 'mittel' | 'tief'; a?: 'hoch' | 'mittel' | 'tief'; massnahme?: 'offen' }): Promise<string> {
+  const { data, response } = await api.GET('/v1/dashboard/risiken', { params: { query: { ...q, format: 'csv' } }, parseAs: 'blob' });
+  const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') ?? '')?.[1] ?? 'risikolage.csv';
+  const url = URL.createObjectURL(data as Blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+  return name;
+}

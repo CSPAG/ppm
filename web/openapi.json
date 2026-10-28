@@ -67165,7 +67165,7 @@
         "tags": [
           "Risikolage"
         ],
-        "description": "Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Recht `auswertung:read` an der Organisation oder am Portfolio.",
+        "description": "Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Mit `format=csv` als Export der Risiken (optional nach Feld der Matrix `w`, `a` und `massnahme=offen`). Recht `auswertung:read` an der Organisation oder am Portfolio.",
         "parameters": [
           {
             "schema": {
@@ -67176,6 +67176,86 @@
             "name": "portfolio",
             "required": false,
             "description": "Schlüssel des Portfolios (I-N5), z. B. `transformation`."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "hoch"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "mittel"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "tief"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "w",
+            "required": false,
+            "description": "Nur für den Export: Wahrscheinlichkeit (Feld der Matrix)."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "hoch"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "mittel"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "tief"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "a",
+            "required": false,
+            "description": "Nur für den Export: Auswirkung (Feld der Matrix)."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "offen"
+              ]
+            },
+            "in": "query",
+            "name": "massnahme",
+            "required": false,
+            "description": "Nur für den Export: Risiken mit offener Massnahme."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export der Risiken als CSV (mit `w`, `a`, `massnahme` wie die Tabelle der Oberfläche)."
           }
         ],
         "responses": {

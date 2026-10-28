@@ -22800,6 +22800,7 @@
           "version",
           "uebergebenAt",
           "positionen",
+          "vertraulich",
           "summe",
           "can"
         ],
@@ -22957,6 +22958,35 @@
                 }
               }
             }
+          },
+          "vertraulich": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Vertrauliche Projekte, die die Person nicht sieht, als Summe ohne Namen (in `summe` enthalten, nicht korrigierbar).",
+                "type": "object",
+                "required": [
+                  "anzahl",
+                  "capex",
+                  "opex"
+                ],
+                "properties": {
+                  "anzahl": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "capex": {
+                    "type": "number"
+                  },
+                  "opex": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "summe": {
             "additionalProperties": false,

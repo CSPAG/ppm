@@ -6,7 +6,7 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, etag, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
-import { record, SCHEMA } from '../../platform.ts';
+import { fullTx, record, SCHEMA } from '../../platform.ts';
 import { abweichungenPruefen, uebergabeAufgabe } from './aufgaben.ts';
 import { bedarf, finanzen, type ProjektFinanzen } from './lesen.ts';
 import { periode } from './rechnen.ts';
@@ -41,7 +41,9 @@ const fassung = (req: FastifyRequest, vorhanden: boolean): number => (!vorhanden
 
 const begr = (b: store.BegruendungRow) => ({ periode: b.periode, text: b.text, version: b.version, geaendertAt: b.updated_at.toISOString() });
 
-export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
+type Voll = <T>(fn: (tx: Tx) => Promise<T>) => Promise<T>;
+
+export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   for (const s of [FinanzProjekt, Finanzuebersicht, KostentraegerPut, BegruendungOut, BegruendungList, BegruendungPut, Budgetuebergabe, BudgetuebergabePut]) app.addSchema(s);
 
   /** Übersicht bzw. Abweichungen: Recht am Portfolio oder (ohne Portfolio) an der Organisation. */
@@ -146,15 +148,24 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     return begr(b);
   });
 
-  /** Übergabe lesen: berechnet mit Korrekturen (Entwurf) bzw. der übergebene Inhalt. */
-  async function uebergabeLesen(tx: Tx, jahr: number, write: boolean): Promise<BudgetuebergabeOut> {
+  /** Volle Sicht der Organisation (nur für die Summe der vertraulichen Projekte, ohne Namen). */
+  const voll = (req: FastifyRequest): Voll => fn => fullTx(deps.db, req.requirePrincipal().tenantId, fn);
+
+  /**
+   * Übergabe lesen: berechnet mit Korrekturen (Entwurf) bzw. der übergebene Inhalt. Vertrauliche Projekte, die die
+   * Person nicht sieht, zählen als Summe ohne Namen mit (sonst wäre der Jahresbedarf zu tief).
+   */
+  async function uebergabeLesen(tx: Tx, alle: Voll, jahr: number, write: boolean): Promise<BudgetuebergabeOut> {
     const u = await store.uebergabe(tx, jahr);
     if (u?.stand === 'uebergeben') {
-      const inhalt = u.inhalt as unknown as Pick<BudgetuebergabeOut, 'positionen' | 'summe'>;
-      return { jahr, stand: 'uebergeben', version: u.version, uebergebenAt: u.uebergeben_at!.toISOString(), positionen: inhalt.positionen, summe: inhalt.summe, can: { write: false } };
+      const inhalt = u.inhalt as unknown as Pick<BudgetuebergabeOut, 'positionen' | 'summe' | 'vertraulich'>;
+      return { jahr, stand: 'uebergeben', version: u.version, uebergebenAt: u.uebergeben_at!.toISOString(), positionen: inhalt.positionen, vertraulich: inhalt.vertraulich ?? null, summe: inhalt.summe, can: { write: false } };
     }
     const korr = new Map((u?.inhalt.korrekturen ?? []).map(k => [k.projektId, k]));
-    const positionen = (await bedarf(tx, jahr)).map(b => {
+    const sichtbar = await bedarf(tx, jahr);
+    const ids = new Set(sichtbar.map(b => b.projektId));
+    const verborgen = (await alle(full => bedarf(full, jahr))).filter(b => !ids.has(b.projektId));
+    const positionen = sichtbar.map(b => {
       const k = korr.get(b.projektId);
       return {
         projektId: b.projektId, nummer: b.nummer, name: b.name, portfolioId: b.portfolioId,
@@ -164,8 +175,11 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
         ohneTermine: b.ohneTermine,
       };
     });
-    const s = (a: 'capex' | 'opex') => rund(positionen.reduce((x, p) => x + p.wert[a], 0));
-    return { jahr, stand: u ? 'entwurf' : 'neu', version: u?.version ?? 0, uebergebenAt: null, positionen, summe: { capex: s('capex'), opex: s('opex') }, can: { write } };
+    const vertraulich = verborgen.length
+      ? { anzahl: verborgen.length, capex: rund(verborgen.reduce((x, b) => x + b.capex, 0)), opex: rund(verborgen.reduce((x, b) => x + b.opex, 0)) }
+      : null;
+    const s = (a: 'capex' | 'opex') => rund(positionen.reduce((x, p) => x + p.wert[a], 0) + (vertraulich?.[a] ?? 0));
+    return { jahr, stand: u ? 'entwurf' : 'neu', version: u?.version ?? 0, uebergebenAt: null, positionen, vertraulich, summe: { capex: s('capex'), opex: s('opex') }, can: { write } };
   }
 
   app.get('/v1/budgetuebergaben/:jahr', {
@@ -178,7 +192,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const { jahr } = req.params as { jahr: number };
     await req.need('finanzen:read');
     const write = await req.can('finanzen:write');
-    const u = await req.tx(tx => uebergabeLesen(tx, jahr, write));
+    const u = await req.tx(tx => uebergabeLesen(tx, voll(req), jahr, write));
     reply.header('etag', etag(u.version));
     return u;
   });
@@ -209,7 +223,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!(await store.korrekturenSetzen(tx, jahr, version, korrekturen))) throw preconditionFailed((await store.uebergabe(tx, jahr))?.version ?? 0);
       await record(tx, who, { action: 'budget.corrected', resourceType: 'budgetuebergabe', resourceId: jahrKennung(jahr), data: { jahr, korrekturen }, event: { jahr, anzahl: korrekturen.length } });
       await uebergabeAufgabe(tx, jahr, 'entwurf');
-      return uebergabeLesen(tx, jahr, true);
+      return uebergabeLesen(tx, voll(req), jahr, true);
     });
     reply.header('etag', etag(u.version));
     return u;
@@ -230,12 +244,12 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       const version = fassung(req, !!alt);
       if (alt?.stand === 'uebergeben') throw conflict(`Der Jahresbedarf ${jahr} ist schon übergeben.`);
       if ((alt?.version ?? 0) !== version) throw preconditionFailed(alt?.version ?? 0);
-      const jetzt = await uebergabeLesen(tx, jahr, true);
-      const inhalt = { korrekturen: alt?.inhalt.korrekturen ?? [], positionen: jetzt.positionen, summe: jetzt.summe };
+      const jetzt = await uebergabeLesen(tx, voll(req), jahr, true);
+      const inhalt = { korrekturen: alt?.inhalt.korrekturen ?? [], positionen: jetzt.positionen, vertraulich: jetzt.vertraulich, summe: jetzt.summe };
       if (!(await store.uebergeben(tx, jahr, version, inhalt))) throw preconditionFailed((await store.uebergabe(tx, jahr))?.version ?? 0);
       await record(tx, who, { action: 'budget.handed_over', resourceType: 'budgetuebergabe', resourceId: jahrKennung(jahr), data: { jahr, summe: jetzt.summe, projekte: jetzt.positionen.length }, event: { jahr, projekte: jetzt.positionen.length } });
       await uebergabeAufgabe(tx, jahr, 'uebergeben');
-      return uebergabeLesen(tx, jahr, true);
+      return uebergabeLesen(tx, voll(req), jahr, true);
     });
     reply.header('etag', etag(u.version));
     return u;

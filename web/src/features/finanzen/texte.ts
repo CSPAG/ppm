@@ -77,6 +77,8 @@ export const TF = {
   entwurfSpeichern: 'Korrekturen speichern',
   entwurfGespeichert: 'Korrekturen gespeichert.',
   summe: 'Summe',
+  vertraulich: (n: number) => (n === 1 ? '1 vertrauliches Projekt' : `${n} vertrauliche Projekte`),
+  vertraulichHilfe: 'ohne Namen, nicht korrigierbar',
   zusammenfassung: (jahr: number, n: number, capex: string, opex: string) =>
     `Jahresbedarf ${jahr}: CAPEX ${capex}, OPEX ${opex} für ${n === 1 ? '1 Projekt' : `${n} Projekte`}.`,
   wirkung: 'Nach der Übergabe ist der Jahresbedarf festgehalten und lässt sich nicht mehr ändern. Die Schnittstelle zum Budgetprozess liefert ihn; die Übergabe wird protokolliert.',

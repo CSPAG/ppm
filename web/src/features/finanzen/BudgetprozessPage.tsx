@@ -161,7 +161,11 @@ function Pruefen({ u, zurueck, weiter }: { u: Budgetuebergabe; zurueck(): void; 
                 );
               })}
             </tbody>
-            <tfoot><tr><th scope="row">{TF.summe}</th><td className="num">{lang(u.summe.capex)}</td><td className="num">{lang(u.summe.opex)}</td><td colSpan={3} /></tr></tfoot>
+            <tfoot>{u.vertraulich ? (
+              <tr><th scope="row">{TF.vertraulich(u.vertraulich.anzahl)}<div className="fi-hint">{TF.vertraulichHilfe}</div></th>
+                <td className="num">{lang(u.vertraulich.capex)}</td><td className="num">{lang(u.vertraulich.opex)}</td><td colSpan={3} /></tr>
+            ) : null}<tr><th scope="row">{TF.summe}</th><td className="num">{lang(u.summe.capex)}</td><td className="num">{lang(u.summe.opex)}</td><td colSpan={3} /></tr>
+            </tfoot>
           </table>
         </div>
       )}
@@ -182,7 +186,8 @@ function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
   const fertig = u.stand === 'uebergeben';
   const datei = () => herunterladen(`jahresbedarf-${u.jahr}.csv`, csv(
     [TF.projekt, 'Name', `${TF.capex} CHF`, `${TF.opex} CHF`, `${TF.capex} ${TF.berechnet} CHF`, `${TF.opex} ${TF.berechnet} CHF`, TF.bemerkung],
-    u.positionen.map(p => [p.nummer, p.name, p.wert.capex, p.wert.opex, p.berechnet.capex, p.berechnet.opex, p.korrektur?.bemerkung ?? null]),
+    [...u.positionen.map(p => [p.nummer, p.name, p.wert.capex, p.wert.opex, p.berechnet.capex, p.berechnet.opex, p.korrektur?.bemerkung ?? null]),
+      ...(u.vertraulich ? [[null, TF.vertraulich(u.vertraulich.anzahl), u.vertraulich.capex, u.vertraulich.opex, u.vertraulich.capex, u.vertraulich.opex, null]] : [])],
   ));
   const los = () => uebergeben.mutate(u.version, {
     onSuccess: () => { setFrage(false); toast.show(TF.uebergebenToast); },
@@ -190,7 +195,7 @@ function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
   });
   return (
     <div className="fi-uebergeben">
-      <p className="fi-zusammenfassung" role="status">{TF.zusammenfassung(u.jahr, u.positionen.length, lang(u.summe.capex), lang(u.summe.opex))}</p>
+      <p className="fi-zusammenfassung" role="status">{TF.zusammenfassung(u.jahr, u.positionen.length + (u.vertraulich?.anzahl ?? 0), lang(u.summe.capex), lang(u.summe.opex))}</p>
       {fertig && u.uebergebenAt ? <Hinweis stufe="hinweis">{TF.uebergebenAm(fmtDateTime(u.uebergebenAt))}</Hinweis> : <p>{TF.wirkung}</p>}
       {!fertig && !u.can.write ? <Hinweis stufe="hinweis">{TF.nurLesen}</Hinweis> : null}
       <div className="fi-akt">
@@ -198,7 +203,7 @@ function Uebergeben({ u, zurueck }: { u: Budgetuebergabe; zurueck(): void }) {
         <button type="button" className="btn" onClick={datei}><Icon name="download" />{TF.herunterladen}</button>
         {!fertig && u.can.write ? <button type="button" className="btn primary" onClick={() => setFrage(true)}>{TF.uebergeben}</button> : null}
       </div>
-      {frage ? <Confirm title={TF.uebergebenDialog(u.jahr)} text={`${TF.zusammenfassung(u.jahr, u.positionen.length, lang(u.summe.capex), lang(u.summe.opex))} ${TF.wirkung}`} confirm={TF.uebergeben} onConfirm={los} onClose={() => setFrage(false)} busy={uebergeben.isPending} /> : null}
+      {frage ? <Confirm title={TF.uebergebenDialog(u.jahr)} text={`${TF.zusammenfassung(u.jahr, u.positionen.length + (u.vertraulich?.anzahl ?? 0), lang(u.summe.capex), lang(u.summe.opex))} ${TF.wirkung}`} confirm={TF.uebergeben} onConfirm={los} onClose={() => setFrage(false)} busy={uebergeben.isPending} /> : null}
     </div>
   );
 }

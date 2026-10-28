@@ -41,7 +41,7 @@ function server(write = true) {
       return { ...p, korrektur: k ?? null, wert: { capex: k?.capex ?? p.berechnet.capex, opex: k?.opex ?? p.berechnet.opex } };
     });
     return { jahr: 2027, stand, version, uebergebenAt: stand === 'uebergeben' ? '2026-10-28T11:00:00Z' : null, positionen: pos,
-      summe: { capex: pos.reduce((s, p) => s + p.wert.capex, 0), opex: Math.round(pos.reduce((s, p) => s + p.wert.opex, 0) * 100) / 100 }, can: { write: write && stand !== 'uebergeben' } };
+      vertraulich: write ? null : { anzahl: 1, capex: 0, opex: 50000 }, summe: { capex: pos.reduce((s, p) => s + p.wert.capex, 0), opex: Math.round(pos.reduce((s, p) => s + p.wert.opex, 0) * 100) / 100 + (write ? 0 : 50000) }, can: { write: write && stand !== 'uebergeben' } };
   };
   const api = mockIamApi({
     'GET /v1/budgetuebergaben/2027': () => json(uebergabe()),
@@ -106,6 +106,7 @@ describe('Budgetprozess', () => {
     const { unmount } = renderWithIam(<Page initial={{ jahr: '2027', schritt: '2' }} />, GL);
     expect(await screen.findByText(/übergeben wird er von Finanzen/)).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getByRole('rowheader', { name: /1 vertrauliches Projekt/ }).closest('tr')).toHaveTextContent(/CHF.50.000/);
     unmount();
     renderWithIam(<Page />, PL);
     expect(await screen.findByText(/Den Jahresbedarf aller Projekte sehen Personen/)).toBeInTheDocument();

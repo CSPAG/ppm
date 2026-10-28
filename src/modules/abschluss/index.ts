@@ -10,6 +10,7 @@ import type { FastifyInstance } from 'fastify';
 import { abschlussTask } from './aufgabe-job.ts';
 import { registerDokumentRoutes } from './dokument-routes.ts';
 import { registriereAbschluss } from './folge.ts';
+import { beimErfassen } from './lessons-haken.ts';
 import { registerLessonsRoutes, TAG_LESSONS } from './lessons-routes.ts';
 import { abschlussTools } from './mcp.ts';
 import { registerRoutes, TAG } from './routes.ts';
@@ -36,5 +37,10 @@ export const abschlussModule = defineModule({
 export const lessonsLearned = {
   /** Lessons Learned, neueste zuerst (Filter Jahr, Projekt, Kategorie). */
   lesen: (tx: Parameters<typeof store.lessons>[0], f: { jahr?: number; projektId?: string; kategorie?: string }) => store.lessons(tx, { ...f, limit: 100000 }),
+  /** Personen der Projektleitung (Empfänger von Aufgaben zum Projekt, z. B. `lessons_learned.erfassen`). */
+  projektleitung: store.projektleitung,
+  /** Haken in der Transaktion von `POST /v1/projekte/:id/lessons-learned` nach dem Anlegen (UC-013 A1.2). */
+  beimErfassen,
 };
+export type { LessonErfasst } from './lessons-haken.ts';
 export type { LessonRow } from './store.ts';

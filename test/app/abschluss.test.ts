@@ -9,6 +9,8 @@ import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 import { abschlussPruefen } from '../../src/modules/abschluss/aufgabe-job.ts';
 import { nachGate } from '../../src/modules/abschluss/folge.ts';
+import { _abmelden } from '../../src/modules/abschluss/lessons-haken.ts';
+import { lessonsLearned } from '../../src/modules/abschluss/index.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
 import { full, skipDb } from './harness.ts';
 
@@ -275,5 +277,23 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
     assert.equal(p.body.kategorie, 'Betrieb');
     await ok('pl', 'DELETE', `/v1/lessons-learned/${eintrag.id}`, undefined, { 'if-match': p.etag }, 204);
     assert.equal((await ok('kt', 'GET', '/v1/lessons-learned')).body.items.length, 1);
+  });
+
+  test('Haken beim Erfassen (AP-E7-5): läuft in der Transaktion, ein Fehler bricht das Erfassen ab; Projektleitung lesbar', async () => {
+    const gesehen: { projektId: string; jahr: number }[] = [];
+    const ok1 = async (_tx: unknown, l: { projektId: string; jahr: number }) => { gesehen.push({ projektId: l.projektId, jahr: l.jahr }); };
+    lessonsLearned.beimErfassen(ok1);
+    await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/lessons-learned`, { text: 'Haken probieren' }, {}, 201);
+    assert.deepEqual(gesehen, [{ projektId: pj.exit!.id, jahr: Number(heute().slice(0, 4)) }]);
+    _abmelden(ok1);
+
+    const fehler = async () => { throw new Error('Haken scheitert'); };
+    lessonsLearned.beimErfassen(fehler);
+    const r = await call('pl', 'POST', `/v1/projekte/${pj.exit!.id}/lessons-learned`, { text: 'nicht gespeichert' });
+    _abmelden(fehler);
+    assert.equal(r.statusCode, 500);
+    assert.equal((await sys(tx => tx.query("SELECT 1 FROM ppm.lessons_learned WHERE text = 'nicht gespeichert'"))).rowCount, 0);
+
+    assert.deepEqual(await sys(tx => lessonsLearned.projektleitung(tx, pj.exit!.id)), [id.pl]);
   });
 });

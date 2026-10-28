@@ -83,11 +83,11 @@ describe('Statusbericht erfassen', { skip }, () => {
     assert.deepEqual(b.abweichung.budget, { stufe: null, kommentar: '' });
     assert.deepEqual(b.vorperiode, { periode: VORPERIODE, status: 'kritisch', trend: 'abwaerts', stand: 'geprueft' });
     assert.deepEqual(b.fehlend.map((f: { feld: string }) => f.feld), ['abweichung.inhalt', 'abweichung.ressourcen', 'abweichung.budget', 'status', 'trend']);
-    assert.deepEqual(b.can, { write: true, einreichen: false, zurueckziehen: false });
+    assert.deepEqual(b.can, { write: true, einreichen: false, zurueckziehen: false, eskalieren: true });
 
     const k = await call('GET', url('2026-001'), kt);
     assert.equal(k.statusCode, 200);
-    assert.deepEqual(k.json().can, { write: false, einreichen: false, zurueckziehen: false });
+    assert.deepEqual(k.json().can, { write: false, einreichen: false, zurueckziehen: false, eskalieren: false });
     assert.equal((await call('GET', url('2026-001'), fremd)).statusCode, 403, 'ohne Rolle am Projekt');
   });
 
@@ -99,7 +99,7 @@ describe('Statusbericht erfassen', { skip }, () => {
     const b = c.json();
     assert.equal(c.headers.etag, 'W/"1"');
     assert.deepEqual([b.version, b.trend, b.abhaengigkeiten, b.naechsterMeilenstein, b.status], [1, 'aufwaerts', 'keine', 'Abnahme Pilot', null], 'Vorbelegung gespeichert');
-    assert.deepEqual(b.can, { write: true, einreichen: true, zurueckziehen: false });
+    assert.deepEqual(b.can, { write: true, einreichen: true, zurueckziehen: false, eskalieren: true });
     assert.equal((await call('PUT', url('2026-001'), { ...pl, 'if-match': 'W/"0"' }, { trend: 'abwaerts' })).statusCode, 412);
 
     const leer = await call('POST', url('2026-001', PERIODE, '/einreichen'), { ...pl, 'if-match': 'W/"1"' });
@@ -122,7 +122,7 @@ describe('Statusbericht erfassen', { skip }, () => {
     const s = e.json();
     assert.deepEqual([s.stand, s.version, s.eingereichtBy, s.phase], ['eingereicht', 4, plId, 'P2']);
     assert.ok(s.eingereichtAt);
-    assert.deepEqual(s.can, { write: false, einreichen: false, zurueckziehen: true });
+    assert.deepEqual(s.can, { write: false, einreichen: false, zurueckziehen: true, eskalieren: false });
     assert.deepEqual(eingereicht, [s.id], 'Folgen der Erweiterungen in derselben Transaktion');
 
     const z8 = await call('PUT', url('2026-001'), { ...pl, 'if-match': 'W/"4"' }, { trend: 'abwaerts' });
@@ -147,7 +147,7 @@ describe('Statusbericht erfassen', { skip }, () => {
     const z = await call('POST', url('2026-001', PERIODE, '/zurueckziehen'), { ...pl, 'if-match': 'W/"4"' });
     assert.equal(z.statusCode, 200, z.body);
     assert.deepEqual([z.json().stand, z.json().eingereichtAt, z.json().version], ['entwurf', null, 5]);
-    assert.deepEqual(z.json().can, { write: true, einreichen: true, zurueckziehen: false });
+    assert.deepEqual(z.json().can, { write: true, einreichen: true, zurueckziehen: false, eskalieren: true });
 
     assert.equal((await call('POST', url('2026-001', PERIODE, '/einreichen'), { ...pl, 'if-match': 'W/"5"' })).statusCode, 200);
     await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.statusbericht SET eingereicht_at = now() - interval '1 minute' WHERE projekt_id = $1 AND periode = $2", [projekt['2026-001'], PERIODE]));

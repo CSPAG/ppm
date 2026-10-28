@@ -174,6 +174,8 @@ export const Versandvorschau = Type.Object({
 export const Kopf = Type.Object({
   sitzungen: Type.Array(Type.Object({
     id: Uuid, gremium: GremiumKurz, datum: Datum, stand: SitzungStandT, traktanden: Type.Integer(), versandBis: Nullable(Datum),
+    // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle»: «4 von 6 Traktanden mit Unterlagen»)
+    unterlagenBereit: Type.Integer({ description: 'Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste.' }),
   }, { additionalProperties: false })),
 }, { $id: 'SitzungKopf', additionalProperties: false });
 

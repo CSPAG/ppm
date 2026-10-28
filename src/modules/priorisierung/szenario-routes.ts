@@ -136,17 +136,19 @@ async function rechnen(tx: Tx, g: Grundlage, s: sz.SzenarioRow): Promise<Gerechn
   const unter = pos.filter(p => p.aktiv && wl.ueber.get(p.projektId) === false).length;
   const bei = pos.find(p => p.projektId === wl.beiProjektId);
   let text: string | null = null;
+  let kapazitaet: SzenarioOut['rechnung']['wasserlinie']['kapazitaet'] = null;
   if (wl.grund === 'budget' && g.rahmen !== null) {
     text = `Budget: CHF ${fmtChf(wl.budget.bedarf ?? wl.kumuliert.get(bei!.projektId) ?? 0)} statt höchstens ${fmtChf(g.rahmen)} (${g.portfolio.name}). Unter der Wasserlinie: ${projekteText(unter)}.`;
   } else if (wl.grund === 'kapazitaet' && wl.durchbruch) {
     const d = wl.durchbruch;
     const betroffen = new Set(zellen.find(z => z.rolle === d.rolle && z.monat === d.monat)?.beitraege.map(b => b.projektId)).size;
+    kapazitaet = { ...d, projekte: betroffen };
     text = `Kapazität ${quartal(d.monat)}: ${fmtFte(d.bedarf)} FTE ${d.rolle} statt höchstens ${fmtFte(d.angebot)}. Betroffen: ${projekteText(betroffen)}. Unter der Wasserlinie: ${projekteText(unter)}.`;
   }
 
   const hinweise: string[] = [];
   if (!g.modell) hinweise.push('Kein Bewertungsmodell in Kraft: Nutzen, Risiko und Budgetrahmen fehlen.');
-  if (!g.kostenSichtbar) hinweise.push('Beträge sehen Sie nicht. Die Wasserlinie zeigt nur die Kapazität.');
+  if (!g.kostenSichtbar) hinweise.push('Beträge siehst du nicht. Die Wasserlinie zeigt nur die Kapazität.');
   else if (g.rahmen === null) hinweise.push('Ohne Budgetrahmen zeigt die Wasserlinie nur die Kapazität.');
   const nurGroesse = pos.filter(p => p.aktiv && g.projekte.get(p.projektId)!.nurGroesse.length).length;
   if (nurGroesse) hinweise.push(`Ressourcenbedarf nur als Grösse: ${projekteText(nurGroesse)}. Dieser Bedarf ist in der Kapazität nicht gerechnet.`);
@@ -176,7 +178,7 @@ async function rechnen(tx: Tx, g: Grundlage, s: sz.SzenarioRow): Promise<Gerechn
   return {
     positionen,
     rechnung: {
-      wasserlinie: { beiRang: bei?.rang ?? null, grund: wl.grund, text },
+      wasserlinie: { beiRang: bei?.rang ?? null, grund: wl.grund, text, kapazitaet },
       budget: { rahmen: g.kostenSichtbar ? g.rahmen : null, bedarf: g.kostenSichtbar ? wl.budget.bedarf : null },
       engpaesse: erg.engpaesse, unter, hinweise,
     },
@@ -223,7 +225,7 @@ async function vergleichen(tx: Tx, g: Grundlage, liste: readonly sz.SzenarioRow[
     });
   }
   const hinweise: string[] = [];
-  if (!g.kostenSichtbar) hinweise.push('Beträge sehen Sie nicht. Die Wasserlinie zeigt nur die Kapazität.');
+  if (!g.kostenSichtbar) hinweise.push('Beträge siehst du nicht. Die Wasserlinie zeigt nur die Kapazität.');
   else if (g.rahmen === null) hinweise.push('Ohne Budgetrahmen zeigt die Wasserlinie nur die Kapazität.');
   return {
     portfolioId: g.portfolio.id,
@@ -321,7 +323,7 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
     const ids = [...new Set((req.query as { ids: string }).ids.split(',').map(x => x.trim()).filter(Boolean))];
     const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!ids.length || ids.length > 3 || ids.some(x => !uuid.test(x))) {
-      throw invalid('Wählen Sie ein bis drei Szenarien.', [{ path: '/ids', message: 'ein bis drei IDs, mit Komma getrennt' }]);
+      throw invalid('Wähle ein bis drei Szenarien.', [{ path: '/ids', message: 'ein bis drei IDs, mit Komma getrennt' }]);
     }
     const rows: sz.SzenarioRow[] = [];
     for (const x of ids) rows.push(await szenario(req, x));

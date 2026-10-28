@@ -196,7 +196,7 @@ elf folgenden, höchstens 60 Monate.
 |---|---|---|
 | `GET /v1/kapazitaet?von=&bis=` | `ressource:read` | Angebot je Rolle und Monat mit `version` je Zelle, `can.write` |
 | `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
-| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
+| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren aktiven Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
 
 Bedarfsliste, Zuteilung und Konflikte (AP-E7-2; RK.02.02, RK.02.03; UC-009 Schritte 3–4, A1, A2). Zugeteilt wird je
 Bedarf, Person und Monat ein Anteil in FTE (höchstens eine Stelle je Person, Beschäftigungsgrad aus dem HR-System offen);
@@ -204,6 +204,13 @@ nur Bedarf in FTE × Monate (A-20). Zuteilungen einzelner Personen sehen RM, UE,
 des Projekts (darstellung.md), auch in der Lesesicht. Jede Änderung führt «gedeckt» im Register nach, informiert Person
 und Projektleitung (Mitteilung) und führt die Sammelaufgaben `bedarf.decken` und `konflikt.aufloesen` nach (zusätzlich
 stündlich). Priorität kommt aus der Priorisierung (`prioritaetQuelleSetzen`), sonst `null`.
+
+Projekte, die nicht mehr aktiv sind (`sistiert`, `abgebrochen`, `abgeschlossen`, `zurueckgezogen`), geben ihre Ressourcen
+frei (UC-015 Schritt 6, A1.2): Ihr Bedarf und ihre Zuteilungen zählen in Auslastung (auch je Szenario), Bedarfsliste,
+Konflikten, Belegung und Sammelaufgaben nicht mehr. Entschieden wird beim Lesen, gelöscht wird nichts; bei einer
+Wiederaufnahme zählen sie wieder. Zuteilen, Anteil ändern und Lücke melden ergeben 409 (`reason: lebenszyklus`),
+Entfernen bleibt möglich und führt «gedeckt» nach. Wer das Projekt nicht sieht, sieht seinen Lebenszyklus nicht; für ihn zählen dessen
+Zuteilungen weiter.
 
 | Route | Recht | Hinweis |
 |---|---|---|
@@ -303,6 +310,24 @@ Portfolio optional (A-18).
 | `GET /v1/portfolios/{id}/matrix` | `priorisierung:read` (Organisation oder Portfolio) | aktive Projekte mit Nutzen/Risiko je Achse (Durchschnitt hoch=3/mittel=2/tief=1 der zugeordneten Kriterien, A-39, ohne Score A-01), Feld (Q6 F9; Grenze = kein Feld), Ressourcen (FTE-Monate, Grösse), Kosten nur mit `finanzen:read`, Abhängigkeiten im Portfolio, Rang (PP.03.04) |
 | `GET /v1/portfolios/{id}/rangfolge` | `priorisierung:read` (Organisation oder Portfolio) | Rangfolge entschieden und Entwurf mit Begründung; `ETag` = Version des Entwurfs (PP.02.02) |
 | `PUT /v1/portfolios/{id}/rangfolge` | `priorisierung:write` | ganze Liste als Entwurf, `If-Match` (428/412); nur aktive Projekte des Portfolios, ohne Doppel (422) |
+
+## Finanzen
+
+Ist-Kosten aus dem ERP, Finanzübersicht, Budgetabweichungen mit Begründung, Jahresbedarf und Übergabe an den
+Budgetprozess (docs/fachmodell.md 2.13, AP-E7-4; PC.01.02, PC.01.04, PC.01.05; UC-010). Budget und Prognose aus dem
+Register `kosten`; Ist-Kosten kommen über die Schnittstelle «ERP · Ist-Kosten» je Kostenträger und Monat (A-16), der
+Jahresbedarf geht über «Budgetprozess · Jahresbedarf» hinaus (A-17). Beträge nur mit `finanzen:read` (A-33).
+
+| Route | Recht | Hinweis |
+|---|---|---|
+| `GET /v1/finanzen?portfolio=&alle=` | `finanzen:read` (Organisation, Portfolio oder Projekt; nur Projekte mit sichtbaren Beträgen) | je Projekt Budget, Prognose (je Phase, CAPEX/OPEX), Ist (`null` = noch nicht verfügbar), Abweichung mit Toleranz «Kosten» des Phasenmodells (A-10), Verlauf je Monat, letzte Begründung; Summe; mit `finanzen:write` Kostenträger ohne Projekt (UC-010 A1) |
+| `GET /v1/finanzen/abweichungen?portfolio=` | wie oben | nur Projekte mit Abweichung, wesentliche zuerst |
+| `PUT /v1/projekte/{id}/kostentraeger` | `finanzen:write` | Kostenträger im ERP zuordnen (A-16, A1.1), `null` hebt auf; schon vergeben → 409 |
+| `GET /v1/projekte/{id}/abweichungsbegruendungen` | `finanzen:read` am Projekt | Begründungen je Periode, neueste zuerst |
+| `PUT /v1/projekte/{id}/abweichungsbegruendungen/{periode}` | `finanzen:read` und `projekt:write` am Projekt oder `finanzen:write` | festhalten bzw. ändern, `If-Match` (`W/"0"` neu); erledigt die Aufgabe «Abweichung klären» |
+| `GET /v1/budgetuebergaben/{jahr}` | `finanzen:read` an der Organisation | Jahresbedarf CAPEX/OPEX je aktivem Projekt zeitanteilig nach Phasenterminen (A-17) mit Korrekturen; nach der Übergabe der exportierte Inhalt |
+| `PUT /v1/budgetuebergaben/{jahr}` | `finanzen:write` | Korrekturen von FI als ganze Liste; `If-Match` (beim ersten Speichern ohne); öffnet die Aufgabe «Jahresbedarf übergeben» |
+| `POST /v1/budgetuebergaben/{jahr}/export` | `finanzen:write` | übergeben: Inhalt festhalten, Audit `budget.handed_over`, danach unveränderlich (409) |
 
 ## Schnittstellen und Änderungsprotokoll
 

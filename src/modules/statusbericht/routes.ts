@@ -6,16 +6,17 @@
  */
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
+import { actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
 import { projektdaten } from '../projektdaten/index.ts';
 import { record } from '../../platform.ts';
 import {
   abweichungVon, fehlend, laufendePeriode, meilensteinText, pruefeBearbeitbar, pruefePflichtangaben, rueckgaengigMoeglich, sperre, vorbelegung, werteVon,
 } from './bericht.ts';
+import * as eskalation from './eskalation.ts';
 import { nachEinreichen, nachZurueckziehen } from './folgen.ts';
 import {
-  Abweichung, BerichtParams, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut,
-  type StatusberichtOut, type StatusberichtPutIn,
+  Abweichung, BerichtParams, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut,
+  type EskalationNeuIn, type StatusberichtOut, type StatusberichtPutIn,
 } from './schemas.ts';
 import * as store from './store.ts';
 
@@ -29,6 +30,8 @@ interface Lage {
   bericht: store.Row | null; vor: store.Row | null; sekunden: number | null;
   /** Nächster offener Meilenstein aus dem Plan (nur für die Vorbelegung gelesen). */
   plan: string | null;
+  /** Eskalation zum Bericht (UC-004 A1.2, A2.2). */
+  eskalation: eskalation.EskalationRow | null;
 }
 
 async function lage(tx: Tx, projektId: string, periode: string, o: { sperren?: boolean } = {}): Promise<Lage> {
@@ -42,6 +45,7 @@ async function lage(tx: Tx, projektId: string, periode: string, o: { sperren?: b
     vor: await store.vorperiode(tx, projektId, periode),
     sekunden: bericht?.eingereicht_at ? await store.sekundenSeitEinreichen(tx, bericht.id) : null,
     plan: bericht ? null : await naechsterMeilenstein(tx, projektId),
+    eskalation: bericht ? await eskalation.vonBericht(tx, bericht.id) : null,
   };
 }
 
@@ -79,10 +83,12 @@ function out(l: Lage, schreiben: boolean, principalId: string | null): Statusber
     fehlend: fehlend(felder),
     eingereichtAt: r?.eingereicht_at ?? null, eingereichtBy: r?.eingereicht_by ?? null, geprueftAt: r?.geprueft_at ?? null,
     version: r?.version ?? 0, updatedAt: r?.updated_at ?? null,
+    eskalation: l.eskalation ? { id: l.eskalation.id, anlass: l.eskalation.anlass, stand: l.eskalation.stand, vorgeschlagen: l.eskalation.vorgeschlagen, angelegtAt: l.eskalation.created_at.toISOString() } : null,
     can: {
       write: bearbeitbar,
       einreichen: bearbeitbar && !!r,
       zurueckziehen: schreiben && !!r && !!principalId && l.periodeStand === 'offen' && rueckgaengigMoeglich(r, principalId, l.sekunden),
+      eskalieren: bearbeitbar && !l.eskalation,
     },
   };
 }
@@ -98,7 +104,7 @@ function pruefeVersion(r: store.Row | null, version: number): void {
 }
 
 export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
-  for (const s of [Abweichung, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut]) app.addSchema(s);
+  for (const s of [Abweichung, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut]) app.addSchema(s);
 
   app.get('/v1/projekte/:id/berichte', {
     schema: {
@@ -186,7 +192,42 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!r) throw preconditionFailed(vorher.bericht.version);
       await record(tx, who, { action: 'statusbericht.submitted', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       await nachEinreichen(tx, r, who);
-      return { ...vorher, bericht: r, sekunden: 0 };
+      // Eskalation nach den Folgen neu lesen («kritisch» mit Entscheidbedarf legt sie eben an)
+      return { ...vorher, bericht: r, sekunden: 0, eskalation: await eskalation.vonBericht(tx, r.id) };
+    });
+    reply.header('etag', etag(l.bericht!.version));
+    return antwort(req, l);
+  });
+
+  app.post('/v1/projekte/:id/berichte/:periode/eskalation', {
+    schema: {
+      tags: [TAG], summary: 'Aus der Warnung «wesentliche Abweichung» eskalieren',
+      description: 'UC-004 A1.2, K1 Schritt 2: Die PL startet eine Eskalation (UC-006) zum Bericht, auch im Entwurf und unabhängig vom Status; '
+        + 'fehlt der Entwurf noch, entsteht er mit der Vorbelegung. Die Eskalation geht als Traktandenvorschlag an die nächste Sitzung des '
+        + 'entscheidenden Gremiums, die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren. Der Bericht bleibt, wie er ist. '
+        + 'Je Bericht höchstens eine Eskalation (409); nur, solange der Bericht bearbeitbar ist (409).',
+      params: BerichtParams, headers: IdempotencyHeaders, body: Type.Ref('StatusberichtEskalationNeu'), response: { 200: Type.Ref('Statusbericht') },
+    },
+  }, async (req, reply) => {
+    const { id, periode } = req.params as { id: string; periode: string };
+    await req.need('statusbericht:write', ort(id));
+    const body = req.body as EskalationNeuIn;
+    if (!body.grund.trim()) throw invalid('Angaben fehlen: Der Grund ist leer. Beschreib, worum es geht.', [{ path: '/grund', message: 'Grund' }]);
+    const who = actorOf(req);
+    const l = await req.tx(async tx => {
+      const vorher = await lage(tx, id, periode, { sperren: true });
+      pruefeBearbeitbar(vorher.projekt, periode, vorher.laufend, vorher.periodeStand, vorher.bericht);
+      if ((await store.periodeSichern(tx, periode)) !== 'offen') throw conflict('Die Periode ist abgeschlossen.', { reason: 'periode' });
+      let r = vorher.bericht;
+      if (!r) {
+        r = await store.create(tx, id, periode, vorher.projekt.phase, vorbelegung(vorher.vor, vorher.plan));
+        await record(tx, who, { action: 'statusbericht.created', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
+      }
+      const e = await eskalation.ausAbweichung(tx, r, { grund: body.grund, massnahme: body.massnahme ?? '' });
+      const daten = { statusbericht: r.id, projekt: vorher.projekt.nummer, periode, anlass: 'abweichung', vorgeschlagen: e.eskalation.vorgeschlagen };
+      // im Audit; kein eigenes Ereignis (Traktandenvorschlag und Aufgabe sind die Wirkung)
+      await record(tx, who, { action: 'eskalation.created', resourceType: 'eskalation', resourceId: e.eskalation.id, data: daten });
+      return { ...vorher, bericht: r, eskalation: e.eskalation, periodeStand: 'offen' as const };
     });
     reply.header('etag', etag(l.bericht!.version));
     return antwort(req, l);
@@ -215,7 +256,8 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!r) throw preconditionFailed(vorher.bericht.version);
       await record(tx, who, { action: 'statusbericht.withdrawn', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       await nachZurueckziehen(tx, r, who);
-      return { ...vorher, bericht: r, sekunden: null };
+      // Eskalation nach den Folgen neu lesen (die aus dem Einreichen entfällt, die der PL bleibt)
+      return { ...vorher, bericht: r, sekunden: null, eskalation: await eskalation.vonBericht(tx, r.id) };
     });
     reply.header('etag', etag(l.bericht!.version));
     return antwort(req, l);

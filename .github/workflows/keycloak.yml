@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.2.3) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.2.3 sync
+# Verwaltet von identity-kit (create-iam-app 0.5.0) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.0 sync
 #
 # Realm der App (infra/keycloak, OpenTofu) auf der Keycloak-Instanz aus identity.app.json.
 #   pull_request (infra/keycloak/**, identity.app.json): nur Prüfen (fmt, validate, tflint, Konformität Repository) –

@@ -1,6 +1,7 @@
 /** Abfragen und Änderungen der Sitzungen (TanStack Query über den typisierten Client; UC-006 Schritte 1–5). */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, newIdempotencyKey, statusOf, type Schemas } from '../../api/index.ts';
+import { sitzungPfad } from './search.ts';
 
 export type Sitzung = Schemas['Sitzung'];
 export type Traktandum = Schemas['Traktandum'];
@@ -22,6 +23,12 @@ export const sitzungKeys = {
 /** Nächste Sitzungen, die die Person sieht, für die Kopfkarte im Eingang (`GET /v1/sitzungen/kopf`). */
 export function useSitzungKopf() {
   return useQuery({ queryKey: sitzungKeys.kopf, queryFn: async ({ signal }) => (await api.GET('/v1/sitzungen/kopf', { signal })).data!.sitzungen });
+}
+
+/** Adresse der nächsten Sitzung, die die Person sieht (Befehlspalette «Nächste Sitzung öffnen», I-N4); null ohne Sitzung. */
+export async function naechsteSitzungPfad(signal: AbortSignal): Promise<string | null> {
+  const s = (await api.GET('/v1/sitzungen/kopf', { signal })).data!.sitzungen[0];
+  return s ? sitzungPfad(s.gremium.kuerzel, s.datum) : null;
 }
 
 /** Entscheidende Gremien, deren Sitzungen die Person sieht (externe wie der SNS-VR haben keine Sitzungen im System). */

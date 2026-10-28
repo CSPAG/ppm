@@ -71591,6 +71591,17 @@
           },
           {
             "schema": {
+              "minLength": 1,
+              "maxLength": 200,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "description": "Suche im Titel (Teilstring) oder nach der Nummer (Befehlspalette, I-N4)."
+          },
+          {
+            "schema": {
               "maxLength": 512,
               "type": "string"
             },

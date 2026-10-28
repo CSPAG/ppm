@@ -6,6 +6,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
 import type { AuthzCatalog } from '@vollholz/iam-web';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxe } from '../../test/axe.ts';
 import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
@@ -68,6 +69,19 @@ describe('Änderungsantrag der Projektleitung', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(onGeschlossen).toHaveBeenCalledOnce();
     expect([validateVertragSearch({ aenderung: 1 }), validateVertragSearch({ aenderung: 'ja' })]).toEqual([{ aenderung: true }, {}]);
+  });
+
+  it('`oeffnen` später gesetzt (Befehlspalette auf dem offenen Vertrag): Dialog öffnet', async () => {
+    stub();
+    function Probe() {
+      const [oeffnen, setOeffnen] = useState(false);
+      return <><button type="button" onClick={() => setOeffnen(true)}>Palette</button><AenderungBeantragen projektId={P} oeffnen={oeffnen} onAngelegt={vi.fn()} /></>;
+    }
+    renderWithIam(<Probe />);
+    expect(await screen.findByRole('button', { name: TA.beantragen })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Palette' }));
+    expect(await screen.findByRole('dialog', { name: TA.beantragenFrage })).toBeInTheDocument();
   });
 
   it('Seitenpanel: Hauptänderungen umformulieren und «Änderung einreichen» mit Wirkung davor', async () => {

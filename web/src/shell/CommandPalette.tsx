@@ -43,7 +43,13 @@ export function CommandPalette({ raeume, aktionen, suchen, onClose }: {
     ...raeume.flatMap(r => (r.bereiche.length > 1
       ? r.bereiche.map(b => ({ id: b.pfad, label: `${r.label} › ${b.label}`, icon: r.icon, gruppe: T.palette.seiten, run: () => router.navigate(b.pfad) }))
       : [{ id: r.pfad, label: r.bereiche[0]!.label === r.label ? r.label : `${r.label} › ${r.bereiche[0]!.label}`, icon: r.icon, gruppe: T.palette.seiten, run: () => router.navigate(r.pfad) }])),
-    ...aktionen.map(a => ({ id: `aktion:${a.id}`, label: a.label, icon: a.icon, gruppe: T.palette.aktionen, run: () => router.navigate(a.pfad) })),
+    ...aktionen.map(a => ({
+      id: `aktion:${a.id}`, label: a.label, icon: a.icon, gruppe: T.palette.aktionen,
+      // Ziel erst beim Ausführen (z. B. nächste Sitzung); ohne Antwort oder bei Fehler die feste Adresse
+      run: () => (a.ziel
+        ? void a.ziel(new AbortController().signal).then(p => router.navigate(p ?? a.pfad), () => router.navigate(a.pfad))
+        : router.navigate(a.pfad)),
+    })),
     { id: 'theme-light', label: `${T.theme.label}: ${T.theme.light}`, icon: 'eye', gruppe: T.palette.darstellung, run: () => applyTheme('light') },
     { id: 'theme-dark', label: `${T.theme.label}: ${T.theme.dark}`, icon: 'eye', gruppe: T.palette.darstellung, run: () => applyTheme('dark') },
     { id: 'theme-system', label: `${T.theme.label}: ${T.theme.system}`, icon: 'eye', gruppe: T.palette.darstellung, run: () => applyTheme('system') },

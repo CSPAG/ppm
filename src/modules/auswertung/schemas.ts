@@ -12,6 +12,9 @@ const PHASEN = ['P0', 'P1', 'P2', 'P3', 'P4'] as const;
  */
 export const MELDUNGEN = ['gemeldet', 'ausstehend', 'nicht_gemeldet', 'ohne_pflicht'] as const;
 export type Meldung = (typeof MELDUNGEN)[number];
+/** Auswahl hinter den Zahlen des Dashboards (UI-17): im Plan, kritisch, ohne Status, offen, nicht gemeldet, ausstehend, Eskalation. */
+export const AUSWAHLEN = ['im_plan', 'kritisch', 'ohne_status', 'offen', 'nicht_gemeldet', 'ausstehend', 'eskalation'] as const;
+export type Auswahl = (typeof AUSWAHLEN)[number];
 
 export const DashboardZeile = Type.Object({
   projektId: Uuid,
@@ -62,5 +65,8 @@ export const DashboardQuery = Type.Object({
   portfolio: Type.Optional(Type.String({ pattern: '^[a-z0-9_-]{1,40}$', description: 'Schlüssel des Portfolios (I-N5), z. B. `transformation`.' })),
   periode: Type.Optional(Type.String({ pattern: '^[0-9]{4}-(0[1-9]|1[0-2])$', description: 'Ohne Angabe die letzte abgeschlossene Periode, sonst die laufende.' })),
   ansicht: Type.Optional(Type.Union([Type.Literal('liste'), Type.Literal('funnel')], { description: 'Darstellung der Oberfläche; die Antwort enthält Liste und Funnel.' })),
+  phase: Type.Optional(Type.Union(PHASEN.map(p => Type.Literal(p)), { description: 'Nur für den Export: Projekte dieser Phase.' })),
+  auswahl: Type.Optional(Type.Union(AUSWAHLEN.map(a => Type.Literal(a)), { description: 'Nur für den Export: Projekte hinter einer Zahl (wie die Oberfläche, `dashboard.ts`).' })),
+  format: Type.Optional(Type.Literal('csv', { description: 'Export der Projekte als CSV (mit `phase` und `auswahl`).' })),
 }, { additionalProperties: false });
 export type DashboardQueryIn = Static<typeof DashboardQuery>;

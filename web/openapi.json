@@ -16564,7 +16564,8 @@
           "phase",
           "phasen",
           "abschluss",
-          "maxTage"
+          "maxTage",
+          "meilensteine"
         ],
         "properties": {
           "projektId": {
@@ -16648,6 +16649,63 @@
           },
           "maxTage": {
             "type": "integer"
+          },
+          "meilensteine": {
+            "description": "Einzelwerte: Meilensteine und Lieferergebnisse mit Termin der Baseline, nach Phase und Termin (Seitentyp Bericht).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "phase",
+                "art",
+                "text",
+                "erreicht",
+                "baseline",
+                "aktuell",
+                "tage"
+              ],
+              "properties": {
+                "phase": {
+                  "type": "string"
+                },
+                "art": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "meilenstein"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "lieferergebnis"
+                      ]
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string"
+                },
+                "erreicht": {
+                  "description": "Erreicht (aktuell = Datum erreicht).",
+                  "type": "boolean"
+                },
+                "baseline": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "aktuell": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "tage": {
+                  "description": "Abweichung in Kalendertagen (positiv = später).",
+                  "type": "integer"
+                }
+              }
+            }
           }
         }
       },
@@ -69028,8 +69086,20 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.",
+        "description": "Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert, mit den Einzelwerten (`meilensteine`). Stand der Register heute. Mit `format=csv` als Export (eine Zeile je Meilenstein bzw. Lieferergebnis).",
         "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export als CSV: eine Zeile je Meilenstein bzw. Lieferergebnis."
+          },
           {
             "schema": {
               "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
@@ -69905,7 +69975,7 @@
         "tags": [
           "Dashboard"
         ],
-        "description": "Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.",
+        "description": "Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Mit `format=csv` als Export der Projekte (optional nach `phase` und `auswahl`, wie die Liste der Oberfläche). Recht `auswertung:read` an der Organisation oder am Portfolio.",
         "parameters": [
           {
             "schema": {
@@ -69948,6 +70018,110 @@
             "name": "ansicht",
             "required": false,
             "description": "Darstellung der Oberfläche; die Antwort enthält Liste und Funnel."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "P0"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P1"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P2"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P3"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P4"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "phase",
+            "required": false,
+            "description": "Nur für den Export: Projekte dieser Phase."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "im_plan"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "kritisch"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ohne_status"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "offen"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "nicht_gemeldet"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ausstehend"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "eskalation"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "auswahl",
+            "required": false,
+            "description": "Nur für den Export: Projekte hinter einer Zahl (wie die Oberfläche, `dashboard.ts`)."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export der Projekte als CSV (mit `phase` und `auswahl`)."
           }
         ],
         "responses": {
@@ -70030,7 +70204,7 @@
         "tags": [
           "Risikolage"
         ],
-        "description": "Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Recht `auswertung:read` an der Organisation oder am Portfolio.",
+        "description": "Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Mit `format=csv` als Export der Risiken (optional nach Feld der Matrix `w`, `a` und `massnahme=offen`). Recht `auswertung:read` an der Organisation oder am Portfolio.",
         "parameters": [
           {
             "schema": {
@@ -70041,6 +70215,86 @@
             "name": "portfolio",
             "required": false,
             "description": "Schlüssel des Portfolios (I-N5), z. B. `transformation`."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "hoch"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "mittel"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "tief"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "w",
+            "required": false,
+            "description": "Nur für den Export: Wahrscheinlichkeit (Feld der Matrix)."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "hoch"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "mittel"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "tief"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "a",
+            "required": false,
+            "description": "Nur für den Export: Auswirkung (Feld der Matrix)."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "offen"
+              ]
+            },
+            "in": "query",
+            "name": "massnahme",
+            "required": false,
+            "description": "Nur für den Export: Risiken mit offener Massnahme."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export der Risiken als CSV (mit `w`, `a`, `massnahme` wie die Tabelle der Oberfläche)."
           }
         ],
         "responses": {

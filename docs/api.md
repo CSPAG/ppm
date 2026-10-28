@@ -149,7 +149,7 @@ Prüfung und Abschluss der Periode durch die Unternehmensentwicklung (BC PS.01.0
 | `POST /v1/perioden/{periode}/bestaetigen` | `statusbericht:review` | Sammelbestätigung; auffällige und Berichte in anderem Stand werden übersprungen und genannt (A-28) |
 | `POST /v1/perioden/{periode}/einfordern` | `statusbericht:review` | ausstehende Berichte einfordern: Aufgabe `statusbericht.erstellen` an die Projektleitung |
 | `POST /v1/perioden/{periode}/abschliessen` | `periode:close` | 409 bei eingereichten, ungeprüften Berichten; sonst Stand je Projekt mit «nicht gemeldet» (A-11), Periode gesperrt (A-37); `If-Match` optional |
-| `GET /v1/perioden/{periode}/terminabweichungen` | `statusbericht:review` | Baseline und aufdatiert je Phase und Abschluss, nach grösster Verschiebung |
+| `GET /v1/perioden/{periode}/terminabweichungen` | `statusbericht:review` | Baseline und aufdatiert je Phase und Abschluss, nach grösster Verschiebung, mit den Einzelwerten (`meilensteine`); `format=csv`: Export, eine Zeile je Meilenstein bzw. Lieferergebnis |
 | `POST /v1/projekte/{id}/berichte/{periode}/pruefen` | `statusbericht:review` am Portfolio | Bericht bestätigen («geprüft»), `If-Match` Pflicht |
 | `POST /v1/projekte/{id}/berichte/{periode}/pruefung-zuruecknehmen` | `statusbericht:review` am Portfolio | Rückgängig: wieder «eingereicht» |
 | `GET /v1/projekte/{id}/berichte/{periode}/rueckfragen` | `projekt:read` am Projekt | Rückfragen, neueste zuerst |
@@ -166,7 +166,7 @@ Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/mod
 
 | Methode und Pfad | Recht | Hinweis |
 |---|---|---|
-| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
+| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel&format=&phase=&auswahl=` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase; `format=csv` (mit `phase` und `auswahl` `im_plan`, `kritisch`, `ohne_status`, `offen`, `nicht_gemeldet`, `ausstehend`, `eskalation`): Export der Projekte wie die Liste der Oberfläche |
 
 ## Risikolage und Portfoliobericht
 
@@ -178,7 +178,7 @@ ohne Entscheid.
 
 | Methode und Pfad | Recht | Hinweis |
 |---|---|---|
-| `GET /v1/dashboard/risiken?portfolio=` | `auswertung:read` an der Organisation oder am Portfolio | Projektrisiken der aktiven Projekte und Portfoliorisiken, höchste Auswirkung und Wahrscheinlichkeit zuerst; Matrix 3 × 3; Abhängigkeiten; offene Eskalationen |
+| `GET /v1/dashboard/risiken?portfolio=&format=&w=&a=&massnahme=` | `auswertung:read` an der Organisation oder am Portfolio | Projektrisiken der aktiven Projekte und Portfoliorisiken, höchste Auswirkung und Wahrscheinlichkeit zuerst; Matrix 3 × 3; Abhängigkeiten; offene Eskalationen; `format=csv` (optional `w`, `a`, `massnahme=offen`): Export der Risiken wie die Tabelle |
 | `GET /v1/portfolioberichte?portfolio=` | `auswertung:read` | Entwürfe nur mit `auswertung:write`, sonst bereitgestellte Berichte der sichtbaren Portfolios |
 | `POST /v1/portfolioberichte` | `auswertung:write` | aus dem abgeschlossenen Dashboard (offene Periode 409); 201 neu, 200 im Entwurf neu erzeugt (Kommentar bleibt), bereitgestellt 409 |
 | `GET /v1/portfolioberichte/:id` | `auswertung:read` (Lesesicht) | Stand bei Erzeugung; ETag |

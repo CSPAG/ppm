@@ -29665,11 +29665,14 @@ export interface paths {
         };
         /**
          * Terminabweichungen über alle Projekte
-         * @description Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.
+         * @description Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert, mit den Einzelwerten (`meilensteine`). Stand der Register heute. Mit `format=csv` als Export (eine Zeile je Meilenstein bzw. Lieferergebnis).
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Export als CSV: eine Zeile je Meilenstein bzw. Lieferergebnis. */
+                    format?: "csv";
+                };
                 header?: never;
                 path: {
                     /**
@@ -30477,7 +30480,7 @@ export interface paths {
         };
         /**
          * Dashboard der Periode
-         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Mit `format=csv` als Export der Projekte (optional nach `phase` und `auswahl`, wie die Liste der Oberfläche). Recht `auswertung:read` an der Organisation oder am Portfolio.
          */
         get: {
             parameters: {
@@ -30488,6 +30491,12 @@ export interface paths {
                     periode?: string;
                     /** @description Darstellung der Oberfläche; die Antwort enthält Liste und Funnel. */
                     ansicht?: "liste" | "funnel";
+                    /** @description Nur für den Export: Projekte dieser Phase. */
+                    phase?: "P0" | "P1" | "P2" | "P3" | "P4";
+                    /** @description Nur für den Export: Projekte hinter einer Zahl (wie die Oberfläche, `dashboard.ts`). */
+                    auswahl?: "im_plan" | "kritisch" | "ohne_status" | "offen" | "nicht_gemeldet" | "ausstehend" | "eskalation";
+                    /** @description Export der Projekte als CSV (mit `phase` und `auswahl`). */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;
@@ -30577,13 +30586,21 @@ export interface paths {
         };
         /**
          * Risikolage des Portfolios
-         * @description Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         * @description Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Mit `format=csv` als Export der Risiken (optional nach Feld der Matrix `w`, `a` und `massnahme=offen`). Recht `auswertung:read` an der Organisation oder am Portfolio.
          */
         get: {
             parameters: {
                 query?: {
                     /** @description Schlüssel des Portfolios (I-N5), z. B. `transformation`. */
                     portfolio?: string;
+                    /** @description Nur für den Export: Wahrscheinlichkeit (Feld der Matrix). */
+                    w?: "hoch" | "mittel" | "tief";
+                    /** @description Nur für den Export: Auswirkung (Feld der Matrix). */
+                    a?: "hoch" | "mittel" | "tief";
+                    /** @description Nur für den Export: Risiken mit offener Massnahme. */
+                    massnahme?: "offen";
+                    /** @description Export der Risiken als CSV (mit `w`, `a`, `massnahme` wie die Tabelle der Oberfläche). */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;
@@ -48777,6 +48794,20 @@ export interface components {
                 tage: number;
             };
             maxTage: number;
+            /** @description Einzelwerte: Meilensteine und Lieferergebnisse mit Termin der Baseline, nach Phase und Termin (Seitentyp Bericht). */
+            meilensteine: {
+                phase: string;
+                art: "meilenstein" | "lieferergebnis";
+                text: string;
+                /** @description Erreicht (aktuell = Datum erreicht). */
+                erreicht: boolean;
+                /** Format: date */
+                baseline: string;
+                /** Format: date */
+                aktuell: string;
+                /** @description Abweichung in Kalendertagen (positiv = später). */
+                tage: number;
+            }[];
         };
         TerminabweichungList: {
             items: components["schemas"]["Terminabweichung"][];

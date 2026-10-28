@@ -89,6 +89,20 @@ describe('Dashboard der Periode', { skip }, () => {
     // Portfolio über seinen Schlüssel (I-N5)
     assert.deepEqual((await dashboard(ue, `?periode=${PERIODE}&portfolio=dir-med`)).items.map(i => i.nummer), ['2026-004']);
     assert.equal((await get(ue, '?portfolio=gibtsnicht')).statusCode, 404);
+
+    // Export (Seitentyp Bericht): die Projekte wie die Liste, nach Phase und Auswahl (dieselben Bedingungen wie die Zahlen)
+    const x = await get(ue, `?periode=${PERIODE}&format=csv`);
+    assert.equal(x.statusCode, 200, x.body);
+    assert.match(x.headers['content-disposition'] as string, new RegExp(`filename="dashboard-${PERIODE}\\.csv"`));
+    const zeilen = x.body.replace(/^﻿/, '').trim().split('\r\n');
+    assert.ok(zeilen[0]!.startsWith('Nummer;Projekt;Portfolio;Handlungsfeld;Projektleitung;Phase;'));
+    assert.deepEqual(zeilen.slice(1).map(z => z.split(';')[0]), ['2026-001', '2026-002', '2026-003', '2026-004']);
+    const kritischP1 = (await get(ue, `?periode=${PERIODE}&format=csv&phase=P1&auswahl=kritisch`)).body.replace(/^﻿/, '').trim().split('\r\n');
+    assert.deepEqual(kritischP1.slice(1).map(z => z.split(';')[0]), ['2026-001']);
+    const offen = (await get(ue, `?periode=${PERIODE}&format=csv&auswahl=offen`)).body.replace(/^﻿/, '').trim().split('\r\n');
+    assert.deepEqual(offen.slice(1).map(z => z.split(';')[0]), ['2026-002']);
+    assert.equal((await get(ue, `?periode=${PERIODE}&phase=P1`)).statusCode, 422, '`phase` nur für den Export');
+    assert.equal((await get(gremium, `?periode=${PERIODE}&format=csv&portfolio=dir-med`)).statusCode, 404);
   });
 
   test('Sichtbarkeit je Rolle: Gremium und Direktion nur ihr Portfolio, Projektleitung kein Dashboard', async () => {

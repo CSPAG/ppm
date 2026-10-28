@@ -15099,7 +15099,11 @@
                   "eingereicht",
                   "ausstehend",
                   "auffaellig",
-                  "abschlussBis"
+                  "abschlussBis",
+                  "projekte",
+                  "zurueckgegeben",
+                  "geprueft",
+                  "stichtag"
                 ],
                 "properties": {
                   "periode": {
@@ -15118,6 +15122,28 @@
                   "abschlussBis": {
                     "format": "date",
                     "type": "string"
+                  },
+                  "projekte": {
+                    "description": "Berichtspflichtige Projekte der Periode.",
+                    "type": "integer"
+                  },
+                  "zurueckgegeben": {
+                    "type": "integer"
+                  },
+                  "geprueft": {
+                    "type": "integer"
+                  },
+                  "stichtag": {
+                    "anyOf": [
+                      {
+                        "format": "date",
+                        "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 }
               },
@@ -62619,7 +62645,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.",
+        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.",
         "responses": {
           "200": {
             "description": "Default Response",

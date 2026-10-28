@@ -28711,7 +28711,7 @@ export interface paths {
         };
         /**
          * Kennzahlen der Statusberichte für die Startseite
-         * @description Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.
+         * @description Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.
          */
         get: {
             parameters: {
@@ -45637,6 +45637,11 @@ export interface components {
                 auffaellig: number;
                 /** Format: date */
                 abschlussBis: string;
+                /** @description Berichtspflichtige Projekte der Periode. */
+                projekte: number;
+                zurueckgegeben: number;
+                geprueft: number;
+                stichtag: string | null;
             } | null;
         };
         DashboardZeile: {

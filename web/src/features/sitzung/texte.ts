@@ -95,4 +95,11 @@ export const TS = {
   versandOk: 'Unterlagen versendet.',
   weiterBearbeiten: 'Weiter bearbeiten',
   fristBanner: (n: number, soll: number) => `Versand: ${n} statt mindestens ${soll} Arbeitstage vor der Sitzung.`,
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle»: UE, PRAT, GLPA)
+  kopfkarte: {
+    titel: (n: number) => (n === 1 ? 'Nächste Sitzung' : 'Nächste Sitzungen'),
+    sitzung: (g: string, d: string) => `${g} ${d}`,
+    traktanden: (n: number) => (n === 1 ? '1 Traktandum' : `${n} Traktanden`),
+    versandBis: (d: string) => `Versand bis ${d}`,
+  },
 };

@@ -113,7 +113,7 @@ export const TI = {
   kopfErgaenzung: (n: number) => `${n} in Ergänzung`,
   kopfLaufend: (n: number) => `${n} in Bearbeitung`,
   kopfZuPruefen: (n: number) => `${n} zu prüfen`,
-  kopfLeer: 'Haben Sie eine Idee für ein Projekt?',
+  kopfLeer: 'Hast du eine Idee für ein Projekt?',
 };
 
 /** Pflichtfelder je Schritt mit Text der Sperre (K4 «Regeln und Rückmeldungen»; verbindlich prüft der Server, I-P6). */

@@ -21,6 +21,7 @@ const BerichtPage = seite(() => import('../features/bericht/BerichtPage.tsx'), '
 const VertragPage = seite(() => import('../features/vertrag/VertragPage.tsx'), 'VertragPage');
 const PruefenPage = seite(() => import('../features/vertrag/PruefenPage.tsx'), 'PruefenPage');
 const UnterzeichnenPage = seite(() => import('../features/vertrag/UnterzeichnenPage.tsx'), 'UnterzeichnenPage');
+const GatePage = seite(() => import('../features/vertrag/GatePage.tsx'), 'GatePage');
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
@@ -96,6 +97,12 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     const { nr } = akteRoute.useParams();
     return <Suspense fallback={<Loading />}><UnterzeichnenPage nummer={nr} /></Suspense>;
   }
+  // Gate-Modus (UI-08, K2 Schritte 1–4): Ziel der Aufgabe «Gate vorbereiten» (I-B1)
+  const gateRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag/gate', component: GateRoute });
+  function GateRoute() {
+    const { nr } = akteRoute.useParams();
+    return <Suspense fallback={<Loading />}><GatePage nummer={nr} /></Suspense>;
+  }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, berichtRoute])] as const;
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, gateRoute, berichtRoute])] as const;
 }

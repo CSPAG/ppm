@@ -6,6 +6,7 @@ export type Auslastung = Schemas['Auslastung'];
 export type AuslastungZelle = Schemas['AuslastungZelle'];
 export type Kapazitaet = Schemas['Kapazitaet'];
 export type KapazitaetZelle = Schemas['KapazitaetZelle'];
+export type KapazitaetHr = Schemas['KapazitaetHr'];
 export type KapazitaetAenderung = Schemas['KapazitaetPut']['zellen'][number];
 export interface Rolle { schluessel: string; label: string; aktiv: boolean }
 
@@ -13,6 +14,7 @@ export const ressourcenKeys = {
   all: ['ressourcen'] as const,
   auslastung: (von: string, bis: string, szenario?: string) => ['ressourcen', 'auslastung', von, bis, szenario ?? ''] as const,
   kapazitaet: (von: string, bis: string) => ['ressourcen', 'kapazitaet', von, bis] as const,
+  kapazitaetHr: (von: string, bis: string) => ['ressourcen', 'kapazitaet-hr', von, bis] as const,
   rollen: ['ressourcen', 'rollen'] as const,
 };
 
@@ -29,6 +31,15 @@ export function useKapazitaet(z: { von: string; bis: string } | null) {
     queryKey: ressourcenKeys.kapazitaet(z?.von ?? '', z?.bis ?? ''),
     enabled: !!z,
     queryFn: async ({ signal }) => (await api.GET('/v1/kapazitaet', { params: { query: { von: z!.von, bis: z!.bis } }, signal })).data!,
+  });
+}
+
+/** Kapazität laut HR-System je Rolle und Monat (RK.01.02, UC-009 Schritt 1; Annahme AP-E7-2). */
+export function useKapazitaetHr(z: { von: string; bis: string } | null) {
+  return useQuery({
+    queryKey: ressourcenKeys.kapazitaetHr(z?.von ?? '', z?.bis ?? ''),
+    enabled: !!z,
+    queryFn: async ({ signal }) => (await api.GET('/v1/kapazitaet/hr', { params: { query: { von: z!.von, bis: z!.bis } }, signal })).data!,
   });
 }
 

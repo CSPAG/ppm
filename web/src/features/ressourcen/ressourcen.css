@@ -49,3 +49,6 @@
 .res-beitraege tfoot th,.res-beitraege tfoot td{padding:8px 12px;font-weight:600;text-align:left}
 .res-beitraege tfoot td.num{text-align:right}
 @media (max-width:640px){ .res-body{padding:10px 14px 14px} }
+.res-eingabe input.res-hr::placeholder{color:var(--fg-3);font-style:italic;opacity:1}
+.res-hr{color:var(--fg-3);font-style:italic}
+.res-hr-marke{font-size:10px;color:var(--fg-3);margin-left:3px;vertical-align:super}

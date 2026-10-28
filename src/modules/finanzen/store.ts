@@ -5,7 +5,7 @@ import type { Art } from './rechnen.ts';
 
 const S = SCHEMA;
 
-export interface ProjektRow { id: string; nummer: string; name: string; phase: string; lebenszyklus: string; portfolio_id: string; phasenmodell_id: string | null }
+export interface ProjektRow { id: string; nummer: string; name: string; phase: string; lebenszyklus: string; portfolio_id: string; phasenmodell_id: string | null; vertraulich: boolean }
 
 /**
  * Projekte des Portfolios (bzw. alle sichtbaren) mit sichtbaren Beträgen; das Modul projekt bietet (noch) keine Abfrage
@@ -13,13 +13,13 @@ export interface ProjektRow { id: string; nummer: string; name: string; phase: s
  */
 export async function projekte(tx: Tx, o: { portfolioId?: string; alle?: boolean } = {}): Promise<ProjektRow[]> {
   return (await tx.query<ProjektRow>(
-    `SELECT id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id FROM ${S}.projekt p
+    `SELECT id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id, vertraulich FROM ${S}.projekt p
      WHERE ($1::uuid IS NULL OR p.portfolio_id = $1) AND ($2 OR p.lebenszyklus = 'aktiv') AND ${S}.betrag_sichtbar(p.id)
      ORDER BY nummer`, [o.portfolioId ?? null, !!o.alle])).rows;
 }
 
 export async function projekt(tx: Tx, id: string): Promise<ProjektRow | null> {
-  return (await tx.query<ProjektRow>(`SELECT id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id FROM ${S}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
+  return (await tx.query<ProjektRow>(`SELECT id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id, vertraulich FROM ${S}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
 // Kostenträger (A-16)
@@ -37,12 +37,21 @@ export async function kostentraegerSetzen(tx: Tx, projektId: string, nummer: str
     await tx.query(`DELETE FROM ${S}.kostentraeger WHERE projekt_id = $1`, [projektId]);
     return true;
   }
-  // Vergeben an ein anderes Projekt? (Ein Fehler der Eindeutigkeit bräche die Transaktion ab.)
+  // Vergeben an ein anderes Projekt? Eine gleichzeitige Zuordnung derselben Nummer fängt der Savepoint ab (sonst bräche
+  // der Fehler der Eindeutigkeit die Transaktion ab)
   const andere = await tx.query(`SELECT 1 FROM ${S}.kostentraeger WHERE nummer = $1 AND projekt_id <> $2`, [nummer, projektId]);
   if (andere.rowCount) return false;
-  await tx.query(
-    `INSERT INTO ${S}.kostentraeger (tenant_id, projekt_id, nummer) VALUES (app.tenant_id(), $1, $2)
-     ON CONFLICT (tenant_id, projekt_id) DO UPDATE SET nummer = EXCLUDED.nummer WHERE ${S}.kostentraeger.nummer <> EXCLUDED.nummer`, [projektId, nummer]);
+  await tx.query('SAVEPOINT kostentraeger');
+  try {
+    await tx.query(
+      `INSERT INTO ${S}.kostentraeger (tenant_id, projekt_id, nummer) VALUES (app.tenant_id(), $1, $2)
+       ON CONFLICT (tenant_id, projekt_id) DO UPDATE SET nummer = EXCLUDED.nummer WHERE ${S}.kostentraeger.nummer <> EXCLUDED.nummer`, [projektId, nummer]);
+  } catch (e) {
+    if ((e as { code?: string }).code !== '23505') throw e;
+    await tx.query('ROLLBACK TO SAVEPOINT kostentraeger');
+    return false;
+  }
+  await tx.query('RELEASE SAVEPOINT kostentraeger');
   return true;
 }
 

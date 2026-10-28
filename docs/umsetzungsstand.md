@@ -1,8 +1,9 @@
 # Umsetzungsstand
 
-Stand der Umsetzung nach dem Bauplan [fachmodell.md](fachmodell.md). Jedes Arbeitspaket führt nur seine Zeilen nach: «in
-Arbeit» beim ersten Push, «umgesetzt» mit PR-Nummer beim Merge, Annahmen (`A-nn`, [fachmodell.md Abschnitt
-8](fachmodell.md#8-annahmen)) in der Spalte des Pakets.
+Stand der Umsetzung nach dem Bauplan [fachmodell.md](fachmodell.md). Diese Datei führt nur die Master-Session,
+übergreifend in eigenen Doku-PRs ([fachmodell.md 7.1](fachmodell.md#71-regeln-für-alle-pakete)): Die Pakete ändern sie
+nicht, sondern melden mit jedem Merge einen Block «STAND:» mit ihren Zeilen («in Arbeit», «umgesetzt» mit PR-Nummer,
+Annahmen `A-nn` aus [fachmodell.md Abschnitt 8](fachmodell.md#8-annahmen)).
 
 Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunktion umgesetzt, Rest in späterem Paket).
 
@@ -11,7 +12,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP | Inhalt | Migr. | Stand | PR | Annahmen |
 |---|---|---|---|---|---|
 | S1 | Bauplan: fachmodell.md und umsetzungsstand.md | – | umgesetzt | #11 | A-01–A-47 festgelegt |
-| AP-E0-0 | Webapp-Fundament und Navigation (Session S2) | – | in Arbeit (S2) | – | – |
+| AP-E0-0 | Webapp-Fundament und Navigation (Session S2) | – | umgesetzt (Shell, Arbeitsräume, Bausteine `web/src/ui/`, Routen je Arbeitsraum) | #12 | – |
 | AP-E0-1 | Rechte Stufe «mittel», Orte Portfolio und Projekt | 010–019 | umgesetzt (Modell, 010, Matrix je Modul, Test «Lesesicht = can») | #14 | A-33, A-34, A-41, A-42, A-45, A-46 |
 | AP-E0-2 | Organisation, Codetabellen, Feiertage | 020–029 | umgesetzt (PR 1 Tabellen und API, PR 2 Oberfläche UI-44, UI-45) | #20, #26 | A-23, A-43; Arten der Organisationseinheit vorerst `direktion`/`bereich`; Vorgabewerte per Aktion «Vorgabe laden» |
 | AP-E0-3 | Phasenmodell mit Gates, Leitfragen, Pflichtangaben, Fristen | 030–039 | umgesetzt (Modul, 030, Fristen in Arbeitstagen über `stammdaten`, UI-46) | #17 | A-10, A-12, A-13, A-27, A-43 |
@@ -26,12 +27,12 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E1-3 | Dashboard der Periode | 110–119 | umgesetzt (Modul `auswertung`, `GET /v1/dashboard`, MCP `get_dashboard`, ohne Migration; Oberfläche Portfolio › Dashboard UI-17 mit Funnel, Liste virtualisiert; E2E offen bis CI läuft) | #66, (PR 2) | A-11, A-33 (Projektrollen ohne Dashboard, UX-OF-12); Badge «Eskalation» bis AP-E2-4 aus «Entscheid des PRAT nötig» des Berichts; offene Periode live, abgeschlossene aus dem Stand bei Abschluss |
 | AP-E2-1 | Sitzung, Traktanden, Versand | 130–139 | umgesetzt (130, 131, Modul `sitzung` mit Registry, Vorschlägen, Einladungen, Unterlagenstand, Versand, Lauf der Fristen; Oberfläche Gremien › Sitzungen, UI-33 Vorbereiten; E2E offen bis CI läuft) | #32, #39, #65 | A-27, A-34, A-36, A-44, A-45; «via SNS-VR» nur für Gate und Meilenstein eines Projekts in P0/P1 (UC-006 A1); Sitzungsdauer ohne Vorgabe; Traktandenliste nach dem Versand fest |
 | AP-E2-2 | Sitzungsmodus, Entscheide, Auflagen, Protokoll | 140–149 | umgesetzt (140; Dateien `entscheid*`, `protokoll*` im Modul `sitzung`: Starten, Entscheid mit Folge über die Registry, Auflagen als Aufgaben, Korrektur bis Schliessen mit Verlauf, SNS-VR nachtragen, Schliessen mit Folgevorschlägen, Protokoll bereinigen und versenden, Liste Entscheide, MCP `list_entscheide`; Oberfläche UI-34 Sitzungsmodus, UI-35 Protokoll, UI-36 Entscheide und Auflagen) | #42, #45 | A-02, A-30, A-34, A-44; Ergebnisse je Art aus K3 Schritt 8, solange die Art nicht registriert ist; Stellungnahme «via SNS-VR» mit Ergebnis des Gremiums, Entscheid des SNS-VR nach dem Schliessen; Auflagen-Aufgaben und Mitteilungen erst beim Schliessen; Weiterleitung an den VR als Markierung (K03); Protokoll ohne PDF (Druckansicht); Entscheide bei unterbrochener Verbindung nicht lokal gehalten (I-F7, offen) |
-| AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | offen | – | – |
+| AP-E2-3 | Portfoliobericht und Risikolage | 150–159 | in Arbeit | #99 | – |
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | umgesetzt (160, `statusbericht/eskalation*`, `abnahme*`: Arten `eskalation` und `meilenstein` in der Registry, Folge des Entscheids in dessen Transaktion; Entscheid über die Route mit AP-E2-2) | #65 | A-30, A-46; Vorschlag ohne entscheidendes Gremium entfällt, die Aufgabe «Eskalation behandeln» bleibt; «Nicht abgenommen» ändert das Register nicht, eine erteilte Abnahme bleibt bei Korrektur (Zurücknehmen bietet `projektdaten` nicht); Abnahme als System, solange `EntscheidFolge` keinen Akteur trägt; Frist der Aufgabe offen |
-| AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | in Arbeit (PR 1: 170, Modul `vertrag` mit Versionen, Kapiteln 1–13, Pflichtangaben, Einreichen, Baseline mit Register-Übernahme und Zuordnung zum Ziel, MCP `get_vertrag`; PR 2 Oberfläche Reiter «Vertrag» der Projektakte) | #43, #48 | A-04 (Koalition als Liste in Kap. 8), A-12 (Pflichtangaben aus dem Phasenmodell; ab Gate P1–P2 Personal in FTE und Kosten bis P4), A-19 (Business Case als Text, Kosten aus Kap. 9), A-29; erster Vertrag eines übernommenen Projekts gilt für die laufende Phase; Register-Übernahme erst bei der Baseline; Beilagen ohne Datei |
-| AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | in Arbeit (PR 1: 180, `pruefung*` im Modul `vertrag`: Quality-Check mit Kommentar je Kapitel, Unterschriften SP/PL/CTL mit Stellvertretung, Verweigern mit Begründung, Aufgaben; PR 2: Oberfläche UI-12 `/projekte/<nr>/vertrag/pruefen` und `…/unterzeichnen`, Aufgabe «Quality-Check» verweist auf die Prüfansicht) | #64, #75 | A-04, A-31 |
-| AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
-| AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
+| AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | umgesetzt (170, Modul `vertrag` mit Versionen, Kapiteln 1–13, Pflichtangaben, Einreichen, Baseline mit Register-Übernahme und Zuordnung zum Ziel, MCP `get_vertrag`; Oberfläche Reiter «Vertrag» der Projektakte) | #43, #48 | A-04 (Koalition als Liste in Kap. 8), A-12 (Pflichtangaben aus dem Phasenmodell; ab Gate P1–P2 Personal in FTE und Kosten bis P4), A-19 (Business Case als Text, Kosten aus Kap. 9), A-29; erster Vertrag eines übernommenen Projekts gilt für die laufende Phase; Register-Übernahme erst bei der Baseline; Beilagen ohne Datei |
+| AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | umgesetzt (180, `pruefung*` im Modul `vertrag`: Quality-Check mit Kommentar je Kapitel, Unterschriften SP/PL/CTL mit Stellvertretung, Verweigern mit Begründung, Aufgaben; PR 2: Oberfläche UI-12 `/projekte/<nr>/vertrag/pruefen` und `…/unterzeichnen`, Aufgabe «Quality-Check» verweist auf die Prüfansicht) | #64, #75 | A-04, A-31 |
+| AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | in Arbeit | #90 | – |
+| AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | in Arbeit (PR 1: 200, `aenderung*`, `vergleich*` im Modul `vertrag`: Entwurf «Änderung» aus der Baseline, Vergleich je Kapitel, Hauptänderungen mit Umformulierung, Einreichen beim SP, Entscheid SP oder Antrag an den PRAT nach Kapitelwirkung, Traktandenart `aenderung`, MCP `compare_vertrag`; PR 2: Oberfläche Versionen/Vergleich UI-10 und Änderungsantrag UI-09) | – | A-29; Zuordnung Kapitel → Rubriken der Hauptänderungen (Scope: Kap. 3, 4, 5; Zeitplan: 7; Ressourcen/Budget: 9; Annahmen: 4; Key-Risiken: 10), Q7 legt sie nicht fest; Wirkung aus den gegenüber der Baseline geänderten Kapiteln und `kapitel_wirkung` des Phasenmodells in Kraft (ohne Phasenmodell entscheidet der SP); «Antrag an den PRAT» nur mit Wirkung; eingereichte Änderung im Stand «in Prüfung» (beim SP, ohne Quality-Check); Ergebnisse des Gremiums «Freigegeben»/«Abgelehnt» (K3 Schritt 8); Korrektur eines Gremiumsentscheids hebt eine gesetzte Baseline nicht auf; UE wird nicht per Mitteilung informiert (Mitteilungen nur an Personen; Ereignis `vertrag.baselined`) |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | umgesetzt (Modul `vorlage` mit Grundbestand Projektvertrag nach Q7 und Ausgabe PDF/Word ohne Fremdbibliothek, `GET /v1/vorlagen`; `GET /v1/vertragsversionen/:id/dokument?format=pdf|docx`; Baustein `DokumentAusgabe` im Kopf der Projektakte › Vertrag, nachgeladen mit der Seite) | #73 | Format PDF und Word (Vorschlag K2, «Format offen»); Grundbestand als Vorlage im Code, ohne Tabelle `vorlage` (Hochladen, Fassungen und Feldzuordnung mit AP-E7-7, Migration 210–219 ungenutzt); Beträge ohne `finanzen:read` «nicht verfügbar» (A-33); Unterschriften in Kap. 12 «noch keine» bis AP-E3-2; Export im Audit (`vertrag.exported`) |
 | AP-E4-1 | Projektidee einreichen | 220–229 | umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`; Assistent, Meine Ideen, Ansicht, Rückfragen beantworten); offen: Kopfkarte «Ideen» auf der Startseite (Eintrag über Feature-Grenze), E2E bis CI läuft | #36, #50 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | umgesetzt (230 Leitfragen, Raster, Vorschlag; Pool mit Funnel, Prüfung, Rückfrage, Zurückweisen, Zusammenführen; Oberfläche Pool und Prüfansicht) | #70 | A-06 (UE weist allein zurück, Gremium des Portfolios per Mitteilung informiert), A-32; Vorschlag der Kategorie: Mehrheit «hoch» → A, Mehrheit «tief» → C, sonst B (Annahme bis zur Klärung, G11); Leitfragen als Abschrift aus dem Phasenmodell in Kraft; erste Prüfhandlung setzt «in Prüfung»; Bereich Portfolio › Ideen zeigt mit `idee:read` den Pool, «Meine Ideen» als Ansicht |
@@ -39,20 +40,20 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | umgesetzt (250, Modul `priorisierung`; Portfolio › Priorisierung mit Bewertung UI-20 und Modell UI-19; E2E grün) | #71, #79 | A-01, A-18; Modell «Entwurf»/«in Kraft», gilt das zuletzt in Kraft gesetzte; Entscheid des Gremiums als Text erfasst; Vorgabe = Kriterien aus UC-008 Schritt 2 ohne Zuordnung Nutzen/Risiko (A-39 legt die UE fest); Budgetrahmen je Portfolio; Modell lesen auch mit `priorisierung:read` am Portfolio (Gremium) |
 | AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | umgesetzt (260, API Matrix und Rangfolge im Modul `priorisierung`; Portfolio › Priorisierung › Matrix UI-21 mit Rangfolge, Abhängigkeiten und Portfoliorisiken) | #83, #88 | A-01, A-33, A-39; Annahmen: Achse = Durchschnitt hoch=3/mittel=2/tief=1 der zugeordneten Kriterien, über 2 «hoch», unter 2 «tief», genau 2 «Grenze» ohne Feld (Gremium beurteilt); Felder nach Q6 F9; Kosten = Summe Prognose, sonst Budget-Baseline; Ressourcen = FTE × Monate und grösste Grösse; Rangfolge der UE als Entwurf, «entschieden» erst mit dem Entscheid des Gremiums (Folgepaket); Abhängigkeiten und Portfoliorisiken aus den Registern von `projektdaten` |
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | umgesetzt (270, Modul `ressource`, `get_auslastung`; Portfolio › Ressourcen mit Auslastung UI-23 und Kapazität UI-24; Bedarfsliste UI-25 mit AP-E7-2; E2E offen bis CI läuft) | #35 (über #46), #40 | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
-| AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
+| AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | in Arbeit | #92 | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
 | AP-E6-1 | Zielzyklus mit Jahreszielen | 300–309 | umgesetzt (300 Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung Projekt ↔ Ziel; Aufgabe «Jahresziele vervollständigen» über den Eingang; `projektZuordnen` für den Vertrag mit 301; Oberfläche UI-38 Zielzyklus; E2E offen bis CI läuft) | #28, #34, #38, #49 | Spalte `zieljahr.vorlage_bis` (geplante Vorlage an den VR, K6); Projekte am Jahresziel bzw. strategischen Ziel, nicht an der Hauptaktivität (2.7); Sperre ausserhalb «in Arbeit» schon in AP-E6-1; Arbeitsfläche speichert beim Verlassen eines Feldes, ohne Rückgängig/Wiederholen; «Projektidee anstossen» erscheint erst mit AP-E4-1; «Aus Vorjahr übernehmen» (K6 Z2) erst mit der Zielerreichung (AP-E6-3) |
 | AP-E6-2 | Freigabe Jahresziele und Roadmap | 310–319 | umgesetzt (310, Vorlage an den VR mit Sperre ohne Metrik, Freigabe erfassen, Roadmap mit Vorschau und Publikation; Oberfläche UI-39, UI-31; E2E) | #72 | A-35 (Roadmap für alle Angemeldeten); «Anpassungen verlangt» informiert die GL über die Aufgabe im Eingang (Recht `ziel:write`), keine Mitteilung je Person; Roadmap ohne vertrauliche Projekte (A-34) und ohne Zeitplan (Termine liegen in `projektdaten`, das `ziel` nicht nutzt); Unterlagen für den VR als gedruckte Zusammenfassung, Dokumentausgabe folgt mit `vorlage` |
 | AP-E6-3 | Zielerreichung | 320–329 | teilweise (PR 1: 320, `/v1/zielerreichung/:quartal`, Seite Ziele › Zielerreichung UI-40; PR 2 Aufgabe im Eingang folgt) | #37 | Zielerreichung je strategischem Ziel und Jahresziel des Jahres (`ziel_typ`); `beurteilung` als Kommentar ohne Skala (keine festgelegt); ein Stand je Ziel und Quartal, Änderungen im Audit; Jahresziele nur im Quartal ihres Jahres; Aufgabe `zielerreichung.erfassen` (Job nach Quartalsende) folgt in PR 2, sobald es ein Muster für zeitgesteuerte Aufgaben je Organisation gibt (wie AP-E1-1, Job am 18.) |
-| AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
+| AP-E6-4 | Quartalsreporting | 330–339 | in Arbeit | – | – |
 | AP-E7-1 | Abschluss, Sistierung, Abbruch, Lessons Learned | 340–349 | offen | – | – |
 | AP-E7-2 | Ressourcen zuteilen, Konflikte | 350–359 | umgesetzt (350, `zuteilung*` im Modul `ressource`: Bedarfsliste, Zuteilung, Konflikte, Lücke, Sammelaufgaben, MCP `list_bedarfe`; Oberfläche UI-25 Portfolio › Ressourcen › Bedarf: Liste + Schublade, Zuteilen, Lücke, Überbuchungen; HR-Übernahme RK.01.02 offen) | #69, #77 | A-20; eine Person höchstens eine Stelle (Beschäftigungsgrad aus dem HR-System offen, RK.01.02, K23); Pool-Konflikt nur gegen erfasstes Angebot; Priorität über `prioritaetQuelleSetzen` der Priorisierung (ohne: nach Projektnummer); «gedeckt» im Register darf auch `ressource:write` ändern (Policy in 350) |
-| AP-E7-3 | Schnittstellen und Änderungsprotokoll | 360–369 | in Arbeit: PR 1 (360, Modul `schnittstelle`: Schnittstellen mit Testlauf, Rhythmus, Laufprotokoll, Aufgabe `schnittstelle.fehler`; Änderungsprotokoll aus dem Audit); PR 2 Oberfläche UI-49, UI-50 | – | Adresse und Protokoll der Umsysteme stehen nicht in docs/: Austausch über HTTP(S) mit JSON an einer Adresse je Schnittstelle, ohne Anmeldung am Umsystem (folgt mit dem Anschluss, z. B. AP-E7-4); Katalog nur ERP › Ist-Kosten (A-16), HR-System › Personal (RK.01.02, K23 offen), Budgetprozess › Jahresbedarf (A-17); Verarbeitung registriert das Fachmodul, ohne sie «noch nicht verfügbar»; Testlauf prüft nur die Verbindung und meldet keinen Fehler im Eingang; private Adressen nur mit `WEBHOOK_ALLOW_PRIVATE` (Entwicklung, Tests); geplanter Lauf einmal je Tag, Woche bzw. Monat, ein Lauf von Hand zählt; Änderungsprotokoll: alter und neuer Wert aus `before`/`after` des Audits |
-| AP-E7-4 | Finanzen | 370–379 | in Arbeit: PR 1 (370, Modul `finanzen`: Kostenträger, Ist-Kosten über die Schnittstelle ERP, Übersicht und Abweichungen, Begründungen, Aufgaben `abweichung.klaeren` und `budget.uebergeben`, Jahresbedarf mit Korrektur und Übergabe, `get_finanzen`); PR 2 Oberfläche UI-26–UI-28 | – | A-10, A-16, A-17, A-33; Lieferung des ERP als JSON-Liste von Buchungen {kostentraeger, monat, art capex/opex, betrag}, ein Lauf ersetzt die gelieferten Monate je Kostenträger; Projekt über den Kostenträger beim Lesen (Zuordnung durch FI wirkt ohne neuen Lauf); Ist nur je Projekt, Art und Monat (das ERP kennt keine Phase), Register `kosten.ist` bleibt leer; Toleranz «Kosten» in Prozent aus dem Phasenmodell des Projekts (Übersteuerung im Vertrag noch nicht erfasst), ohne Budget nie wesentlich; Prognose ohne Wert = Budget; Phasenzeitraum = vom Tag nach dem Ende der Vorphase bis zum spätesten Meilensteintermin der Phase, Phasen ohne Termin zählen nicht (genannt); Aufgabe «Abweichung klären» an `finanzen:write`, solange wesentlich und für die laufende Periode keine Begründung (täglich geprüft); Begründung durch PL, UE (projekt:write) oder FI; «Jahresbedarf übergeben» öffnet mit dem ersten Entwurf; Export als JSON (Schnittstelle) |
+| AP-E7-3 | Schnittstellen und Änderungsprotokoll | 360–369 | in Arbeit | #89, #95 | – |
+| AP-E7-4 | Finanzen | 370–379 | in Arbeit | – | – |
 | AP-E7-5 | Jahresrückblick | 380–389 | offen | – | – |
-| AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | offen | – | – |
+| AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | in Arbeit | #97 | – |
 | AP-E7-7 | Vorlagen mit Feldzuordnung | 400–409 | in Arbeit (PR 1: 400, Versionen je Dokumentart, Word-Vorlage hochladen, Platzhalter «…» lesen, Zuordnung zu Datenfeldern mit Vorschlag und Prüfung, aktiv setzen; Word-Ausgabe des Projektvertrags über die aktive Vorlage; PR 2 Oberfläche UI-48 folgt) | – | Platzhalter in Guillemets wie in den Vorlagen des PM-Handbuchs (Q7 «Projektname»); nur Word-Vorlagen (.docx, ≤ 5 MB, ohne Makros); PDF weiter im Layout des Grundbestands (eigene Word-Vorlage als PDF bräuchte einen Word-Renderer); Feldkatalog registriert das erzeugende Modul, Arten ohne Modul nur als Zuordnungsziel (Entwurf, nicht aktivierbar); Kennzeichnung «Personendaten» fehlt → Warnung (G12); Leserecht der Vorlagen = `vorlage:write` (kein eigenes Leserecht im Modell) |
-| AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | offen | – | – |
+| AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | in Arbeit | #87 | – |
 
 ## Business Cases
 
@@ -73,12 +74,12 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
 | DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
-| DM.02.01 | Projektvertrag erstellen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
-| DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | in Arbeit (API) | – |
-| DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | in Arbeit (Kapitel bearbeiten, API) | – |
+| DM.02.01 | Projektvertrag erstellen | 002 | E3 | AP-E3-1 | umgesetzt (API und Reiter «Vertrag») | #43, #48 |
+| DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | umgesetzt (API und Reiter «Vertrag») | #43, #48 |
+| DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | umgesetzt (Kapitel bearbeiten #43, #48; Rückmeldungen aus dem Quality-Check #64, #75) | #43, #48, #64, #75 |
 | DM.02.04 | Projektvertrag zurückziehen | 002 | E3 | AP-E3-1 | offen | – |
-| DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API, Prüfansicht UI-12) | – |
-| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | – |
+| DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | umgesetzt (API, Prüfansicht UI-12) | #64, #75 |
+| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | teilweise (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | #64, #75 |
 | DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | umgesetzt (PDF und Word; Word mit aktiver eigener Vorlage ab AP-E7-7) | #73 |
 | PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | umgesetzt | #71, #79 |
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | umgesetzt (Budgetrahmen je Portfolio, A-18) | #71, #79 |
@@ -105,10 +106,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | umgesetzt (UC-006 Schritt 7) | #65 |
 | PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | offen | – |
-| PS.03.01 | Änderung am Projektvertrag beantragen | 007 | E3 | AP-E3-4 | offen | – |
-| PS.03.02 | Änderung am Projektvertrag entscheiden | 007 | E3 | AP-E3-4 | offen | – |
+| PS.03.01 | Änderung am Projektvertrag beantragen | 007 | E3 | AP-E3-4 | in Arbeit (API) | – |
+| PS.03.02 | Änderung am Projektvertrag entscheiden | 007 | E3 | AP-E3-4 | in Arbeit (API; SP und Traktandenart `aenderung`) | – |
 | PS.03.03 | Eskalation behandeln | 004, 006 | E2 | AP-E2-4 | umgesetzt (UC-004 A2.2, UC-006 Schritt 7) | #65 |
-| PS.03.04 | Vertragsversionen vergleichen | 003, 007 | E3 | AP-E3-4 | offen | – |
+| PS.03.04 | Vertragsversionen vergleichen | 003, 007 | E3 | AP-E3-4 | in Arbeit (API, MCP `compare_vertrag`) | – |
 | PS.04.01 | Vorhaben abschliessen | 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.02 | Vorhaben sistieren oder abbrechen | 006, 015 | E7 | AP-E7-1 | offen | – |
 | PS.04.03 | Lessons Learned erfassen | 013, 015 | E7 | AP-E7-1, AP-E7-5 | offen | – |
@@ -116,10 +117,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.05.02 | Kommunikationsplan erstellen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PS.05.03 | Kommunikationsmassnahme nachführen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
 | PC.01.01 | Projektbudget planen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
-| PC.01.02 | Ist-Kosten übernehmen | 010 | E7 | AP-E7-4 | in Arbeit (API, Schnittstelle ERP) | – |
+| PC.01.02 | Ist-Kosten übernehmen | 010 | E7 | AP-E7-4 | offen | – |
 | PC.01.03 | Kostenprognose aktualisieren | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
-| PC.01.04 | Budgetabweichungen analysieren | 010 | E7 | AP-E7-4 | in Arbeit (API) | – |
-| PC.01.05 | Budgetbedarf in den Budgetprozess übergeben | 010, 011 | E7 | AP-E7-4 | in Arbeit (API, Schnittstelle Budgetprozess) | – |
+| PC.01.04 | Budgetabweichungen analysieren | 010 | E7 | AP-E7-4 | offen | – |
+| PC.01.05 | Budgetbedarf in den Budgetprozess übergeben | 010, 011 | E7 | AP-E7-4 | offen | – |
 | PC.02.01 | Portfoliorisiko erfassen | 008 | E5 | AP-E5-2 | umgesetzt (Register `projektdaten`, «Portfoliorisiko erfassen» in der Matrix) | #83, #88 |
 | PC.02.02 | Risikolage des Portfolios beurteilen | 006, 014 | E2 | AP-E2-3 | offen | – |
 | PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
@@ -128,7 +129,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
 | PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht ab P2, UI-13) | #58 |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
-| PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | in Arbeit (API) | – |
+| PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | umgesetzt (API, MCP `get_dashboard`, Oberfläche UI-17) | #66, #84 |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
 | RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |
@@ -147,8 +148,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | umgesetzt | #19, #24 |
 | AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | in Arbeit (Grundbestand #73; Versionen, Hochladen, Feldzuordnung als API, Oberfläche UI-48 folgt) | #73 |
-| AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks); Umsysteme API in Arbeit (AP-E7-3 PR 1) | Gerüst (695ab82) |
-| AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | API in Arbeit (AP-E7-3 PR 1) | – |
+| AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks) | Gerüst (695ab82) |
+| AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | offen | – |
 
 PP.01.01 entfällt (aufgegangen in ZM.01.02).
 

@@ -42238,6 +42238,11 @@ export interface components {
                 /** @description Phasen mit Kosten, aber ohne Termine (zählen nicht, A-17). */
                 ohneTermine: string[];
             }[];
+            vertraulich: {
+                anzahl: number;
+                capex: number;
+                opex: number;
+            } | null;
             summe: {
                 capex: number;
                 opex: number;

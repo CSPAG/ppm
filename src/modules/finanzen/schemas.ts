@@ -74,6 +74,9 @@ export const Budgetuebergabe = Type.Object({
     wert: Wert,
     ohneTermine: Type.Array(Type.String(), { description: 'Phasen mit Kosten, aber ohne Termine (zählen nicht, A-17).' }),
   }, { additionalProperties: false })),
+  vertraulich: Nullable(Type.Object({ anzahl: Type.Integer({ minimum: 1 }), capex: Type.Number(), opex: Type.Number() }, {
+    additionalProperties: false, description: 'Vertrauliche Projekte, die die Person nicht sieht, als Summe ohne Namen (in `summe` enthalten, nicht korrigierbar).',
+  })),
   summe: Wert,
   can: Type.Object({ write: Type.Boolean() }, { additionalProperties: false }),
 }, { $id: 'Budgetuebergabe', additionalProperties: false });

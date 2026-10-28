@@ -58,7 +58,7 @@ describe('Finanzen (API)', { skip }, () => {
   let pf: string;
   let server: Server;
   let basis = '';
-  const p = { a: '', b: '' };
+  const p = { a: '', b: '', c: '' };
   const h: Record<string, Record<string, string>> = {};
   let erpAntwort = '[]';
   const empfangen: unknown[] = [];
@@ -184,17 +184,26 @@ describe('Finanzen (API)', { skip }, () => {
   });
 
   test('Jahresbedarf mit Korrektur durch FI (A-17), Übergabe an den Budgetprozess (Schritte 5–6)', async () => {
+    // Vertrauliches Projekt: GL und FI sehen es nicht; es zählt als Summe ohne Namen (OPEX 2027 ganz im Jahr)
+    await full(api.t.runtime, T, async tx => {
+      p.c = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase, vertraulich) VALUES ($1, '2026-003', 'Reorganisation', $2, 'P1', true) RETURNING id", [T, pf])).rows[0]!.id;
+      await tx.query("INSERT INTO ppm.kosten (tenant_id, projekt_id, phase, art, text, budget_baseline, prognose) VALUES ($1, $2, 'P2', 'opex', 'Umzug', 40000, 50000)", [T, p.c]);
+      await tx.query(`INSERT INTO ppm.meilenstein (tenant_id, projekt_id, phase, art, text, termin_baseline) VALUES
+        ($1, $2, 'P1', 'meilenstein', 'Plan', '2026-12-31'), ($1, $2, 'P2', 'meilenstein', 'Umzug', '2027-12-31')`, [T, p.c]);
+    });
     const g = await call('gl', 'GET', '/v1/budgetuebergaben/2027');
     assert.equal(g.statusCode, 200, g.body);
     const j = g.json();
     assert.deepEqual([j.stand, j.version, j.can.write, g.headers.etag], ['neu', 0, false, 'W/"0"']);
     assert.deepEqual(j.positionen.map((x: { nummer: string; berechnet: unknown; ohneTermine: string[] }) => [x.nummer, x.berechnet, x.ohneTermine]),
       [['2026-001', { capex: 0, opex: 24794.52 }, []], ['2026-002', { capex: 0, opex: 0 }, ['P1']]]);
+    assert.deepEqual([j.vertraulich, j.summe], [{ anzahl: 1, capex: 0, opex: 50000 }, { capex: 0, opex: 74794.52 }]);
+    assert.ok(!g.body.includes('Reorganisation') && !g.body.includes(p.c), 'ohne Namen und Kennung');
     assert.equal((await call('gl', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [] })).statusCode, 403, 'übergeben FI');
     assert.equal((await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.a, capex: 1, opex: null }, { projektId: p.a, capex: 2, opex: null }] })).statusCode, 422);
     const k = await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.b, capex: null, opex: 8000, bemerkung: 'Termine folgen' }, { projektId: p.a, capex: null, opex: null }] });
     assert.equal(k.statusCode, 200, k.body);
-    assert.deepEqual([k.json().stand, k.json().version, k.json().summe], ['entwurf', 1, { capex: 0, opex: 32794.52 }]);
+    assert.deepEqual([k.json().stand, k.json().version, k.json().summe], ['entwurf', 1, { capex: 0, opex: 82794.52 }]);
     assert.deepEqual(k.json().positionen[1].korrektur, { capex: null, opex: 8000, bemerkung: 'Termine folgen' });
     assert.equal((await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [] })).statusCode, 428, 'danach mit If-Match');
     assert.deepEqual((await aufgaben('budget.uebergeben')).map(x => [x.bezug_id, x.stand, x.link]), [['2027', 'offen', '/portfolio/finanzen/budgetprozess?jahr=2027']]);
@@ -202,28 +211,39 @@ describe('Finanzen (API)', { skip }, () => {
     assert.equal((await call('fi', 'POST', '/v1/budgetuebergaben/2027/export', undefined, { 'if-match': 'W/"0"' })).statusCode, 412);
     const x = await call('fi', 'POST', '/v1/budgetuebergaben/2027/export', undefined, { 'if-match': 'W/"1"' });
     assert.equal(x.statusCode, 200, x.body);
-    assert.deepEqual([x.json().stand, x.json().summe, x.json().can.write], ['uebergeben', { capex: 0, opex: 32794.52 }, false]);
+    assert.deepEqual([x.json().stand, x.json().summe, x.json().can.write], ['uebergeben', { capex: 0, opex: 82794.52 }, false]);
     assert.ok(x.json().uebergebenAt);
     assert.equal((await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [] }, { 'if-match': 'W/"2"' })).statusCode, 409);
     assert.deepEqual((await aufgaben('budget.uebergeben')).map(a => a.stand), ['erledigt']);
     // Prognose ändert sich danach: die Übergabe bleibt wie exportiert
     await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.kosten SET prognose = 90000 WHERE text = 'Betrieb'"));
-    assert.deepEqual((await call('ue', 'GET', '/v1/budgetuebergaben/2027')).json().summe, { capex: 0, opex: 32794.52 });
+    assert.deepEqual((await call('ue', 'GET', '/v1/budgetuebergaben/2027')).json().summe, { capex: 0, opex: 82794.52 });
 
     // Ausgehende Schnittstelle «Budgetprozess · Jahresbedarf» liefert den übergebenen Inhalt
     const s = await call('adm', 'POST', '/v1/schnittstellen', { umsystem: 'budget', daten: 'jahresbedarf', rhythmus: 'manuell', adresse: `${basis}/budget` });
     const l = await call('adm', 'POST', `/v1/schnittstellen/${s.json().schnittstelle.id}/starten`);
     assert.deepEqual([l.json().stand, l.json().umfang], ['erfolgreich', 2]);
     const geliefert = empfangen.at(-1) as { jahr: number; summe: unknown; positionen: unknown[] };
-    assert.deepEqual([geliefert.jahr, geliefert.summe, geliefert.positionen.length], [2027, { capex: 0, opex: 32794.52 }, 2]);
+    assert.deepEqual([geliefert.jahr, geliefert.summe, geliefert.positionen.length], [2027, { capex: 0, opex: 82794.52 }, 2]);
+  });
+
+  test('Aufgabe «Abweichung klären»: keine für vertrauliche Projekte; entfällt, wenn das Projekt nicht mehr aktiv ist', async () => {
+    const pruefen = () => full(api.t.runtime, T, async tx => abweichungenPruefen(tx, await store.projekte(tx, { alle: true })));
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.kosten SET prognose = 20000 WHERE text = 'Beratung'"));
+    await pruefen();
+    const stand = async () => (await aufgaben('abweichung.klaeren')).map(x => [x.bezug_id, x.stand]);
+    assert.deepEqual(await stand(), [[p.a, 'erledigt'], [p.b, 'offen']], 'das vertrauliche Projekt (wesentlich) ohne Aufgabe');
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgeschlossen' WHERE id = $1", [p.b]));
+    await pruefen();
+    assert.deepEqual(await stand(), [[p.a, 'erledigt'], [p.b, 'entfallen']]);
   });
 
   test('Rechte: Beträge nur mit finanzen:read (A-33); Gremium am Portfolio liest; Leser nicht', async () => {
     assert.equal((await call('leser', 'GET', `/v1/finanzen?portfolio=${pf}`)).statusCode, 403);
     assert.equal((await call('leser', 'GET', '/v1/budgetuebergaben/2027')).statusCode, 403);
     const g = await call('gremium', 'GET', `/v1/finanzen?portfolio=${pf}`);
-    assert.deepEqual([g.statusCode, g.json().projekte.length, g.json().can.write], [200, 2, false]);
-    assert.equal((await call('gremium', 'GET', '/v1/finanzen')).json().projekte.length, 2, 'ohne Portfolio: alle Projekte mit sichtbaren Beträgen');
+    assert.deepEqual([g.statusCode, g.json().projekte.map((x: { nummer: string }) => x.nummer), g.json().can.write], [200, ['2026-001', '2026-003'], false], 'aktive, vertrauliche mit projekt:vertraulich');
+    assert.equal((await call('gremium', 'GET', '/v1/finanzen')).json().projekte.length, 2, 'ohne Portfolio: alle aktiven Projekte mit sichtbaren Beträgen');
     assert.equal((await call('gremium', 'GET', '/v1/budgetuebergaben/2027')).statusCode, 403);
     assert.equal((await call('fi', 'GET', '/v1/finanzen?portfolio=00000000-0000-4000-8000-000000000099')).statusCode, 404);
   });

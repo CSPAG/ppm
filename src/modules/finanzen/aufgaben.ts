@@ -1,6 +1,6 @@
 /**
  * Aufgaben der Finanzen im Eingang (fachmodell.md 4.2): `abweichung.klaeren` an alle mit `finanzen:write`, solange die
- * Prognose eines aktiven Projekts das Budget wesentlich überschreitet (A-10, UC-010 A2) und für die laufende Periode
+ * Prognose eines aktiven, nicht vertraulichen Projekts das Budget wesentlich überschreitet (A-10, UC-010 A2) und für die laufende Periode
  * keine Begründung vorliegt; erledigt mit der Begründung (Schritt 4). `budget.uebergeben` mit dem Entwurf einer
  * Übergabe, erledigt mit der Übergabe (Schritt 6). Geprüft täglich je Organisation und nach jeder
  * Begründung.
@@ -20,7 +20,10 @@ const fmt = (n: number) => new Intl.NumberFormat('de-CH', { maximumFractionDigit
 export async function abweichungenPruefen(tx: Tx, projekte: readonly store.ProjektRow[], jetzt = new Date()): Promise<number> {
   const p = periode(jetzt);
   let offen = 0;
-  for (const f of await finanzen(tx, projekte)) {
+  // Nicht aktive Projekte werden nicht mehr überwacht; vertrauliche sieht FI nicht (projekt:vertraulich fehlt), die
+  // Aufgabe an alle mit finanzen:write zeigte Nummer, Name und Betrag (Annahme AP-E7-4: keine Aufgabe)
+  for (const r of projekte.filter(x => x.lebenszyklus !== 'aktiv' || x.vertraulich)) await aufgabe.entfallen(tx, { art: 'abweichung.klaeren', bezug: { typ: 'projekt', id: r.id } });
+  for (const f of await finanzen(tx, projekte.filter(x => x.lebenszyklus === 'aktiv' && !x.vertraulich))) {
     const bezug = { typ: 'projekt', id: f.id };
     if (f.abweichung.wesentlich && f.begruendung?.periode !== p) {
       offen++;
@@ -44,7 +47,7 @@ export async function uebergabeAufgabe(tx: Tx, jahr: number, stand: 'entwurf' | 
 }
 
 export async function alleAbweichungenPruefen(db: Db, tenantId: string): Promise<number> {
-  return fullTx(db, tenantId, async tx => abweichungenPruefen(tx, await store.projekte(tx)));
+  return fullTx(db, tenantId, async tx => abweichungenPruefen(tx, await store.projekte(tx, { alle: true })));
 }
 
 /** Täglich je aktiver Organisation (Prognosen ändern sich auch ohne Lauf des ERP). */

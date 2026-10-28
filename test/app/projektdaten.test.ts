@@ -208,4 +208,10 @@ describe('Projektdaten', { skip }, () => {
     const u = await call('ue', 'PATCH', `${base}/${r.json().id}`, { massnahmeStand: 'umgesetzt' }, { 'if-match': 'W/"1"' });
     assert.deepEqual([u.statusCode, u.json().massnahmeStand], [200, 'umgesetzt']);
   });
+
+  test('Kosten: Prognose ohne Wert bleibt ohne Wert (nicht 0 durch die Typumwandlung der Eingabe)', async () => {
+    const ohne = await call('plx', 'POST', `/v1/projekte/${projekt.x}/kosten`, { phase: 'P1', art: 'opex', text: 'Lizenz', prognose: null });
+    assert.equal(ohne.statusCode, 201, ohne.body);
+    assert.equal(ohne.json().prognose, null);
+  });
 });

@@ -45600,7 +45600,7 @@ export interface components {
             }[];
             toleranzen: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
+                wert: null | number;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
             /** @description Prüfbericht (I-P4): Hinweise und Warnungen vor dem In-Kraft-Setzen. */
@@ -45707,7 +45707,7 @@ export interface components {
             }[];
             toleranzen?: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
+                wert: null | number;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
         };
@@ -46170,7 +46170,7 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
-            prognose: number | null;
+            prognose: null | number;
             budgetBaseline: number | null;
             ist: number | null;
         };
@@ -46199,7 +46199,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: number | null;
+            prognose?: null | number;
         };
         KostenPatch: {
             /**
@@ -46218,7 +46218,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: number | null;
+            prognose?: null | number;
         };
         Risiko: {
             /** Format: uuid */

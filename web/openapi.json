@@ -3854,12 +3854,12 @@
                 "wert": {
                   "anyOf": [
                     {
+                      "type": "null"
+                    },
+                    {
                       "minimum": 0,
                       "maximum": 9999999,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -4597,12 +4597,12 @@
                 "wert": {
                   "anyOf": [
                     {
+                      "type": "null"
+                    },
+                    {
                       "minimum": 0,
                       "maximum": 9999999,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -6557,14 +6557,14 @@
           "prognose": {
             "anyOf": [
               {
+                "type": "null"
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6687,14 +6687,14 @@
           "prognose": {
             "anyOf": [
               {
+                "type": "null"
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -6745,14 +6745,14 @@
           "prognose": {
             "anyOf": [
               {
+                "type": "null"
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }

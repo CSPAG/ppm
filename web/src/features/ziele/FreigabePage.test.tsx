@@ -89,6 +89,36 @@ describe('Freigabe der Jahresziele', () => {
     expect(await post.json()).toEqual({ entscheid: 'anpassungen', datum: '2026-12-01', text: 'Ziel 3.1.1 schärfen' });
   });
 
+  it('Konflikt (412): «Neu laden» holt den neuen Stand, die Eingaben bleiben, erneut mit neuer Version (Z7)', async () => {
+    let version = 4;
+    let erster = true;
+    const api = stub({
+      'GET /v1/ziele/2027/vorlage': () => json(vorlage({ stand: 'zur_freigabe', version, can: { vorlegen: false, freigabe: true } })),
+      'POST /v1/ziele/2027/freigabe': () => {
+        if (erster) { erster = false; version = 5; return json({ title: 'Inzwischen geändert', status: 412 }, 412); }
+        return json(zieljahr('in_arbeit'));
+      },
+    });
+    const zumZyklus = vi.fn();
+    renderWithIam(<FreigabePage jahr={2027} zumZyklus={zumZyklus} />, { roles: ['ue'], permissions: ['tenant:read', 'ziel:read', 'ziel:freigabe'] });
+    await userEvent.click(await screen.findByRole('radio', { name: TF.anpassungen }));
+    await userEvent.clear(screen.getByLabelText(TF.datum));
+    await userEvent.type(screen.getByLabelText(TF.datum), '2026-12-01');
+    await userEvent.type(screen.getByLabelText(TF.text), 'Ziel 3.1.1 schärfen');
+    await userEvent.click(screen.getByRole('button', { name: TF.erfassen }));
+    expect(await screen.findByText(TF.konflikt)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: TF.erfassen })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: TF.neuLaden }));
+    await waitFor(() => expect(screen.queryByText(TF.konflikt)).not.toBeInTheDocument());
+    expect(zumZyklus).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(TF.text)).toHaveValue('Ziel 3.1.1 schärfen');
+    expect(screen.getByRole('radio', { name: TF.anpassungen })).toBeChecked();
+    await userEvent.click(screen.getByRole('button', { name: TF.erfassen }));
+    await waitFor(() => expect(zumZyklus).toHaveBeenCalled());
+    const posts = api.calls.filter(c => c.method === 'POST');
+    expect(posts.map(c => c.headers.get('If-Match'))).toEqual(['W/"4"', 'W/"5"']);
+  });
+
   it('ohne Recht: nur der Stand (Z8)', async () => {
     stub({ 'GET /v1/ziele/2027/vorlage': () => json(vorlage({ stand: 'zur_freigabe', can: { vorlegen: false, freigabe: false } })) });
     renderWithIam(<FreigabePage jahr={2027} zumZyklus={() => undefined} />, { roles: ['leser'], permissions: ['tenant:read', 'ziel:read'] });

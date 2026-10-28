@@ -42,6 +42,6 @@ export const TF = {
   erfasst: { freigegeben: (jahr: number) => `Jahresziele ${jahr} in Kraft gesetzt.`, anpassungen: (jahr: number) => `Jahresziele ${jahr} zur Anpassung zurückgegeben.` },
   // anderer Stand
   nichtsZuTun: { in_arbeit: (jahr: number) => `Die Jahresziele ${jahr} sind in Arbeit. Vorlegen kann die Geschäftsleitung.`, zur_freigabe: (jahr: number) => `Die Jahresziele ${jahr} liegen dem VR zur Freigabe vor. Den Entscheid erfasst die Unternehmensentwicklung.`, in_kraft: (jahr: number) => `Die Jahresziele ${jahr} sind in Kraft.` } as Record<string, (jahr: number) => string>,
-  konflikt: 'Der Zielzyklus wurde inzwischen geändert. Lade die Seite neu und prüfe den Stand.',
+  konflikt: 'Der Zielzyklus wurde inzwischen geändert. Lade den neuen Stand und prüfe ihn; deine Eingaben bleiben erhalten.',
   neuLaden: 'Neu laden',
 };

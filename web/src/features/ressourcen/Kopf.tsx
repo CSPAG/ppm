@@ -5,9 +5,9 @@
 import { useId, type MouseEvent, type ReactNode } from 'react';
 import { Icon } from '../../ui/index.ts';
 import { TR } from './texte.ts';
+import { PFAD, type Reiter } from './pfade.ts';
 
-export type Reiter = 'auslastung' | 'kapazitaet' | 'bedarf';
-export const PFAD = { auslastung: '/portfolio/ressourcen/auslastung', kapazitaet: '/portfolio/ressourcen/kapazitaet', bedarf: '/portfolio/ressourcen/bedarf' } as const satisfies Record<Reiter, string>;
+export { PFAD, type Reiter };
 
 export interface KopfProps {
   reiter: Reiter;

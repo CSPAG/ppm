@@ -2,12 +2,14 @@
  * Texte für Änderungsantrag und Versionsvergleich (UI-09, UI-10; Kernablauf K2 Schritte 1, 5, 6 und 9, «Texte»,
  * «Regeln»): Anrede «Du», Schweizer Rechtschreibung, Schaltflächen wie im Kernablauf.
  */
+import { NAV } from './nav.ts';
+
 type Rubrik = 'scope' | 'zeitplan' | 'ressourcen_budget' | 'annahmen' | 'key_risiken';
 
 export const TA = {
   // Beantragen (UC-007 Schritt 1, K2 Einstieg «Projektakte»)
   beantragen: 'Änderung beantragen',
-  palette: (nr: string, name: string) => `Änderung beantragen: ${nr} ${name}`,
+  palette: NAV.palette,
   beantragenFrage: 'Änderung am Projektvertrag beantragen?',
   beantragenWirkung: 'Es entsteht ein Entwurf aus der Baseline. Passe die betroffenen Kapitel an; der Sponsor entscheidet.',
   begruendung: 'Begründung',
@@ -19,7 +21,7 @@ export const TA = {
   zumEntwurf: 'Zum Entwurf',
 
   // Seitenpanel der PL (K2 Schritt 5)
-  antrag: 'Änderungsantrag',
+  antrag: NAV.antrag,
   hauptaenderungen: 'Hauptänderungen',
   hauptaenderungenHint: 'Das System erzeugt sie aus dem Vergleich zur Baseline. Du kannst jede Rubrik umformulieren.',
   rubrik: { scope: 'Scope', zeitplan: 'Zeitplan', ressourcen_budget: 'Ressourcen/Budget', annahmen: 'Annahmen', key_risiken: 'Key-Risiken' } satisfies Record<Rubrik, string>,

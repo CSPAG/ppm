@@ -2,8 +2,10 @@
  * Texte der Ad-hoc-Auswertungen (UI-30; Namensraum je Datei, docs/fachmodell.md 7.2): Anrede «Du» (UX-OF-1), Schweizer
  * Rechtschreibung, Begriffe aus der Spezifikation (Kennzahl, Gruppierung, Einzelwerte, Export).
  */
+import { NAV } from './nav.ts';
+
 export const TA = {
-  bereich: 'Auswertungen',
+  bereich: NAV.auswertungen,
   title: 'Auswertungen',
   sub: 'Spezifische Fragen beantworten: Filter, Kennzahlen und Gruppierung wählen, Einzelwerte ansehen und exportieren.',
   keinRecht: 'Ad-hoc-Auswertungen erstellen die Unternehmensentwicklung und die Finanzen.',

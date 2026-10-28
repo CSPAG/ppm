@@ -6,10 +6,10 @@
  */
 import { type AnyRoute, createRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { Suspense, useCallback } from 'react';
-import { type ProjekteSearch, PROJEKTNUMMER, projektTexte, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
-import { abschlussTexte } from '../features/abschluss/index.ts';
-import { berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
-import { type SetVersionenSearch, type SetVertragSearch, type VersionenSearch, type VertragSearch, vertragTexte } from '../features/vertrag/index.ts';
+import { type ProjekteSearch, PROJEKTNUMMER, projektNav, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
+import { abschlussNav } from '../features/abschluss/index.ts';
+import { berichtNav, laufendePeriode } from '../features/bericht/index.ts';
+import { type SetVersionenSearch, type SetVertragSearch, type VersionenSearch, type VertragSearch, vertragNav } from '../features/vertrag/index.ts';
 import { Loading } from '../ui/index.ts';
 import { seite } from './seite.ts';
 import { searchOf } from '../search.ts';
@@ -29,11 +29,11 @@ const AbschlussPage = seite(() => import('../features/abschluss/AbschlussPage.ts
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
-  { pfad: '', label: projektTexte.akte.uebersicht },
-  { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
-  { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
-  { pfad: 'versionen', label: vertragTexte.reiterVersionen, recht: 'projekt:read' },
-  { pfad: 'abschluss', label: abschlussTexte.reiter, recht: 'projekt:read' },
+  { pfad: '', label: projektNav.uebersicht },
+  { pfad: 'vertrag', label: vertragNav.reiter, recht: 'projekt:read' },
+  { pfad: 'bericht', label: berichtNav.reiter, recht: 'projekt:read' },
+  { pfad: 'versionen', label: vertragNav.reiterVersionen, recht: 'projekt:read' },
+  { pfad: 'abschluss', label: abschlussNav.reiter, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {

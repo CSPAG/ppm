@@ -3,8 +3,10 @@
  * UC-015, PS.04.03; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7, Entscheid UX-OF-1), Schweizer Rechtschreibung,
  * «Organisation» statt «Mandant».
  */
+import { NAV } from './nav.ts';
+
 export const TA = {
-  reiter: 'Abschluss',
+  reiter: NAV.reiter,
   projektFehlt: 'Dieses Projekt gibt es nicht oder du hast keinen Zugriff darauf.',
   titel: { abschluss: 'Abschlussbericht', sistierung: 'Bericht zur Sistierung', abbruch: 'Bericht zum Abbruch' } as Record<string, string>,
   stand: { entwurf: 'in Arbeit', eingereicht: 'eingereicht', traktandiert: 'beim Gremium', abgenommen: 'abgenommen', nacharbeit: 'Nacharbeit' } as Record<string, string>,
@@ -90,7 +92,7 @@ export const TA = {
 
   // Portfolio › Auswertungen › Lessons Learned (UI-32)
   liste: {
-    bereich: 'Lessons Learned', titel: 'Lessons Learned', sub: 'Erkenntnisse aus abgeschlossenen, sistierten und abgebrochenen Vorhaben',
+    bereich: NAV.lessons, titel: 'Lessons Learned', sub: 'Erkenntnisse aus abgeschlossenen, sistierten und abgebrochenen Vorhaben',
     suche: 'Suchen in Erkenntnis und Projekt', jahr: 'Jahr', alleJahre: 'Alle Jahre', kategorie: 'Kategorie', alleKategorien: 'Alle Kategorien',
     ohneKategorie: 'ohne Kategorie', projekt: 'Projekt', erkenntnis: 'Erkenntnis', erfasst: 'Erfasst',
     leer: 'Noch keine Lessons Learned. Die Projektleitungen erfassen sie in der Projektakte unter «Abschluss».',

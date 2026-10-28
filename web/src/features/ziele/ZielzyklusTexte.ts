@@ -3,10 +3,11 @@
  * (UX-E7), Schweizer Rechtschreibung, Ebenen aus dem Glossar («Handlungsfeld», «Strategisches Ziel», «Jahresziel»,
  * «Hauptaktivität», «Projekt»), Schaltflächen aus K6 «Texte».
  */
+import { NAV } from './nav.ts';
 import { fmtDatum } from '../../ui/index.ts';
 
 export const TZZ = {
-  bereich: 'Zielzyklus',
+  bereich: NAV.zielzyklus,
   title: (jahr: number) => `Zielzyklus ${jahr}`,
   sub: 'Jahresziele aus den strategischen Zielen ableiten, mit Metrik, Zielwert, Hauptaktivitäten und beitragenden Projekten.',
   jahrVor: (jahr: number) => `Zielzyklus ${jahr}`,

@@ -50,6 +50,7 @@ export const TJ = {
   sammlung: 'Alle Lessons Learned des Jahres',
   anfordern: 'Lessons Learned anfordern',
   anfordernWirkung: (n: number) => `Die Projektleitungen von ${mehr(n, 'Vorhaben', 'Vorhaben')} erhalten die Aufgabe «Lessons Learned erfassen» in ihrem Eingang; erledigt ist sie mit der ersten erfassten Lesson Learned.`,
+  anfordernVorher: 'Speichere zuerst deine Erkenntnisse und Massnahmen; danach kannst du die Lessons Learned anfordern.',
   angefordert: (v: number, a: number) => (a === 0
     ? `Keine Aufgabe geöffnet: Für ${mehr(v, 'Vorhaben', 'Vorhaben')} ist keine Projektleitung erfasst.`
     : `${mehr(a, 'Aufgabe', 'Aufgaben')} an die Projektleitungen geöffnet.`),

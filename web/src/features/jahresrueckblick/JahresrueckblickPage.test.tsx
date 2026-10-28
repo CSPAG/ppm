@@ -89,7 +89,12 @@ describe('Jahresrückblick', () => {
     expect(screen.queryByRole('group', { name: TJ.dokument })).not.toBeInTheDocument();
     await expectNoAxe(container);
 
+    // ein neuer Rückblick lässt sich auch leer speichern; ungespeicherte Eingaben sperren «Lessons Learned anfordern»
+    expect(screen.getByRole('button', { name: TJ.speichern })).toBeEnabled();
+    expect(screen.getByRole('button', { name: TJ.anfordern })).toBeEnabled();
     await userEvent.type(screen.getByRole('textbox', { name: TJ.erkenntnisse }), 'Zu viele Vorhaben parallel');
+    expect(screen.getByRole('button', { name: TJ.anfordern })).toBeDisabled();
+    expect(screen.getByText(TJ.anfordernVorher)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: TJ.speichern }));
     await waitFor(() => expect(s.calls[0]).toMatchObject({ method: 'PUT', ifMatch: null, body: { erkenntnisse: 'Zu viele Vorhaben parallel', massnahmen: '' } }));
     await userEvent.type(await screen.findByRole('textbox', { name: TJ.massnahmen }), 'WIP-Limite');

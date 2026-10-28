@@ -133,10 +133,11 @@ function Rueckblick({ l, neuLaden }: { l: JahresrueckblickLoaded; neuLaden(): vo
           zeilen={ll.ohne.map(p => [<a key="p" href={`/projekte/${p.nummer}/abschluss`}>{p.nummer} {p.name}</a>, p.portfolio, p.seit ? fmtDatum(p.seit) : '–'])} />
         {r.can.bearbeiten && r.stand !== 'ausgewertet' && ll.ohne.length ? (
           <div>
-            <button type="button" className="btn" disabled={busy} onClick={() => m.anfordern.mutate(undefined, {
+            {/* Anfordern lädt den Rückblick neu: ungespeicherte Eingaben gingen verloren */}
+            <button type="button" className="btn" disabled={busy || geaendert} onClick={() => m.anfordern.mutate(undefined, {
               onSuccess: n => toast.show(TJ.angefordert(n.vorhaben, n.aufgaben)), onError: fehler,
             })}><Icon name="send" />{TJ.anfordern}</button>
-            <p className="hint">{TJ.anfordernWirkung(ll.ohne.length)}</p>
+            <p className="hint">{geaendert ? TJ.anfordernVorher : TJ.anfordernWirkung(ll.ohne.length)}</p>
           </div>
         ) : null}
       </Teil>
@@ -149,7 +150,7 @@ function Rueckblick({ l, neuLaden }: { l: JahresrueckblickLoaded; neuLaden(): vo
           }}>
             <Feld label={TJ.erkenntnisse} hinweis={TJ.erkenntnisseHinweis} wert={erkenntnisse} setzen={setErkenntnisse} />
             <Feld label={TJ.massnahmen} hinweis={TJ.massnahmenHinweis(r.jahr + 1)} wert={massnahmen} setzen={setMassnahmen} />
-            <div className="acts"><button type="submit" className="btn primary" aria-busy={m.speichern.isPending} disabled={busy || !geaendert}><Icon name="check" />{TJ.speichern}</button></div>
+            <div className="acts"><button type="submit" className="btn primary" aria-busy={m.speichern.isPending} disabled={busy || !(geaendert || r.version === 0)}><Icon name="check" />{TJ.speichern}</button></div>
           </form>
         ) : (
           <>

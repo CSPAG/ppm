@@ -15357,7 +15357,7 @@
             ]
           },
           "merkmale": {
-            "description": "«Eskalation»: Bericht der Periode mit «Entscheid des PRAT nötig» (UC-004 A2.2).",
+            "description": "«Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4).",
             "type": "array",
             "items": {
               "type": "string",

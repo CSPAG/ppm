@@ -47,7 +47,8 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   /** Übersicht bzw. Abweichungen: Recht am Portfolio oder (ohne Portfolio) an der Organisation. */
   async function uebersicht(req: FastifyRequest, nurAbweichungen: boolean): Promise<FinanzuebersichtOut> {
     const q = req.query as { portfolio?: string; alle?: boolean };
-    await req.need('finanzen:read', q.portfolio ? portfolioOrt(q.portfolio) : undefined);
+    // Recht irgendwo genügt: die Lesesicht zeigt nur Projekte mit sichtbaren Beträgen (BETRAG), z. B. der PL nur ihre
+    await req.needSomewhere('finanzen:read');
     const write = await req.can('finanzen:write');
     return req.tx(async tx => {
       const pf = q.portfolio ? await portfolioKopf(tx, q.portfolio) : null;
@@ -65,7 +66,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   app.get('/v1/finanzen', {
     schema: {
       tags: [TAG], summary: 'Finanzübersicht',
-      description: 'Je Projekt Budget und Prognose (Register Kosten, je Phase und CAPEX/OPEX), Ist-Kosten aus dem ERP über den Kostenträger (A-16), Abweichung mit Toleranz (A-10) und letzte Begründung; Summe des Portfolios (UC-010 Schritt 2). Mit `portfolio` finanzen:read am Portfolio, sonst an der Organisation.',
+      description: 'Je Projekt Budget und Prognose (Register Kosten, je Phase und CAPEX/OPEX), Ist-Kosten aus dem ERP über den Kostenträger (A-16), Abweichung mit Toleranz (A-10) und letzte Begründung; Summe des Portfolios (UC-010 Schritt 2). finanzen:read an der Organisation, am Portfolio oder am Projekt; die Liste enthält nur Projekte mit sichtbaren Beträgen.',
       querystring: FinanzQuery, response: { 200: Type.Ref('Finanzuebersicht') },
     },
   }, req => uebersicht(req, false));

@@ -162,7 +162,11 @@ describe('Finanzen (API)', { skip }, () => {
 
     const per = periode();
     const url = `/v1/projekte/${p.a}/abweichungsbegruendungen`;
-    assert.equal((await call('pl', 'GET', `/v1/finanzen?portfolio=${pf}`)).statusCode, 403, 'PL ohne Recht am Portfolio');
+    const plR = await call('pl', 'GET', '/v1/finanzen');
+    assert.equal(plR.statusCode, 200, plR.body);
+    const plSicht = plR.json();
+    assert.deepEqual([plSicht.projekte.map((x: { nummer: string }) => x.nummer), plSicht.can.write], [['2026-001'], false], 'PL sieht nur ihr Projekt (das Portfolio selbst nicht)');
+    assert.equal((await call('pl', 'GET', `/v1/finanzen?portfolio=${pf}`)).statusCode, 404);
     assert.deepEqual((await call('pl', 'GET', url)).json(), { items: [], can: { write: true } });
     assert.equal((await call('pl', 'PUT', `${url}/${per}`, { text: 'x' })).statusCode, 428);
     assert.equal((await call('pl', 'PUT', `/v1/projekte/${p.a}/abweichungsbegruendungen/2099-01`, { text: 'x' }, { 'if-match': 'W/"0"' })).statusCode, 422);
@@ -219,7 +223,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.equal((await call('leser', 'GET', '/v1/budgetuebergaben/2027')).statusCode, 403);
     const g = await call('gremium', 'GET', `/v1/finanzen?portfolio=${pf}`);
     assert.deepEqual([g.statusCode, g.json().projekte.length, g.json().can.write], [200, 2, false]);
-    assert.equal((await call('gremium', 'GET', '/v1/finanzen')).statusCode, 403, 'ohne Portfolio: Recht an der Organisation');
+    assert.equal((await call('gremium', 'GET', '/v1/finanzen')).json().projekte.length, 2, 'ohne Portfolio: alle Projekte mit sichtbaren Beträgen');
     assert.equal((await call('gremium', 'GET', '/v1/budgetuebergaben/2027')).statusCode, 403);
     assert.equal((await call('fi', 'GET', '/v1/finanzen?portfolio=00000000-0000-4000-8000-000000000099')).statusCode, 404);
   });

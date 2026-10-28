@@ -66922,7 +66922,7 @@
         "tags": [
           "Finanzen"
         ],
-        "description": "Je Projekt Budget und Prognose (Register Kosten, je Phase und CAPEX/OPEX), Ist-Kosten aus dem ERP über den Kostenträger (A-16), Abweichung mit Toleranz (A-10) und letzte Begründung; Summe des Portfolios (UC-010 Schritt 2). Mit `portfolio` finanzen:read am Portfolio, sonst an der Organisation.",
+        "description": "Je Projekt Budget und Prognose (Register Kosten, je Phase und CAPEX/OPEX), Ist-Kosten aus dem ERP über den Kostenträger (A-16), Abweichung mit Toleranz (A-10) und letzte Begründung; Summe des Portfolios (UC-010 Schritt 2). finanzen:read an der Organisation, am Portfolio oder am Projekt; die Liste enthält nur Projekte mit sichtbaren Beträgen.",
         "parameters": [
           {
             "schema": {

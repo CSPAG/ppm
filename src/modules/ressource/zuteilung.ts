@@ -1,7 +1,8 @@
 /**
  * Bedarfsliste, Zuteilung und Konflikte (BC RK.02.02, RK.02.03; UC-009 Schritte 3–4, A1, A2; AP-E7-2). Der Bedarf kommt
  * aus dem Register des Moduls projektdaten (nur über dessen `index.ts`, nur Bedarf in FTE × Monate: eine Grösse S/M/L
- * lässt sich nicht zuteilen, A-20). Deckung, Konflikte und Aufgaben rechnet dieses Modul.
+ * lässt sich nicht zuteilen, A-20). Deckung, Konflikte und Aufgaben rechnet dieses Modul. Bedarf und Zuteilungen von
+ * Projekten, die nicht mehr aktiv sind, zählen nicht (UC-015 Schritt 6, A1.2: «gibt Ressourcen frei»; `store.inaktiv`).
  *
  * Priorität (UC-009 A1.1): Die Priorisierung nutzt dieses Modul, nicht umgekehrt (fachmodell.md 1.1); sie meldet ihre
  * Rangfolge hier an (`prioritaetQuelleSetzen` beim Laden ihres Moduls, wie die Szenarien). Ohne Quelle ist die
@@ -34,6 +35,8 @@ export interface BedarfZeile {
   vonMonat: string; bisMonat: string; bemerkung: string;
   /** «gedeckt» im Register (nachgeführt von `nachfuehren`). */
   gedeckt: boolean;
+  /** Projekt im Lebenszyklus `aktiv`; sonst zählt der Bedarf nicht und lässt sich nicht mehr zuteilen. */
+  aktiv: boolean;
   /** Bedarf und Zuteilung in FTE-Monaten. */
   benoetigt: number; zugeteilt: number; stand: Stand; prioritaet: Prioritaet | null;
   luecke: zs.LueckeRow | null;
@@ -41,7 +44,7 @@ export interface BedarfZeile {
 
 type Register = Awaited<ReturnType<typeof projektdaten.bedarfImZeitraum>>[number];
 
-function zeile(b: Register): Omit<BedarfZeile, 'projekt' | 'benoetigt' | 'zugeteilt' | 'stand' | 'prioritaet' | 'luecke'> {
+function zeile(b: Register): Omit<BedarfZeile, 'aktiv' | 'projekt' | 'benoetigt' | 'zugeteilt' | 'stand' | 'prioritaet' | 'luecke'> {
   return {
     id: b.id, projektId: b.projektId!, phase: String(b.phase), rolle: String(b.rolle), fte: Number(b.fte), vonMonat: String(b.vonMonat),
     bisMonat: String(b.bisMonat), bemerkung: String(b.bemerkung ?? ''), gedeckt: Boolean(b.gedeckt),
@@ -61,9 +64,14 @@ function stand(gedeckt: boolean, zugeteilt: number, luecke: boolean): Stand {
   return zugeteilt > 0 ? 'teilweise' : 'offen';
 }
 
-/** Alle sichtbaren Bedarfe in FTE mit Deckung, Lücke und Priorität (UC-009 Schritt 3). */
-export async function bedarfe(tx: Tx): Promise<BedarfZeile[]> {
-  const register = (await projektdaten.bedarfImZeitraum(tx, '0001-01', '9999-12')).map(zeile);
+/**
+ * Alle sichtbaren Bedarfe in FTE mit Deckung, Lücke und Priorität (UC-009 Schritt 3); ohne `mitInaktiven` nur die der
+ * aktiven Projekte.
+ */
+export async function bedarfe(tx: Tx, mitInaktiven = false): Promise<BedarfZeile[]> {
+  const alle = (await projektdaten.bedarfImZeitraum(tx, '0001-01', '9999-12')).map(zeile);
+  const inaktiv = await store.inaktiv(tx, [...new Set(alle.map(b => b.projektId))]);
+  const register = mitInaktiven ? alle : alle.filter(b => !inaktiv.has(b.projektId));
   const ids = register.map(b => b.id);
   const summen = new Map<string, Map<string, number>>();
   for (const z of await zs.list(tx, { bedarfIds: ids })) {
@@ -80,24 +88,26 @@ export async function bedarfe(tx: Tx): Promise<BedarfZeile[]> {
     const luecke = luecken.get(b.id) ?? null;
     // `gedeckt` bleibt der Stand im Register; `stand` ist die Rechnung aus den Zuteilungen
     return {
-      ...b, projekt: projekte.get(b.projektId) ?? null, benoetigt: d.benoetigt, zugeteilt: d.zugeteilt, stand: stand(d.voll, d.zugeteilt, !!luecke),
+      ...b, aktiv: !inaktiv.has(b.projektId), projekt: projekte.get(b.projektId) ?? null, benoetigt: d.benoetigt, zugeteilt: d.zugeteilt, stand: stand(d.voll, d.zugeteilt, !!luecke),
       prioritaet: prio.get(b.projektId) ?? null, luecke,
     };
   });
 }
 
+/** Ein Bedarf, auch eines Projekts, das nicht mehr aktiv ist (Zuteilung entfernen bleibt möglich). */
 export async function bedarf(tx: Tx, id: string): Promise<BedarfZeile | null> {
-  return (await bedarfe(tx)).find(b => b.id === id) ?? null;
+  return (await bedarfe(tx, true)).find(b => b.id === id) ?? null;
 }
 
 /**
  * Nach jeder Änderung: «gedeckt» im Register nachführen (RK.02.04), eine gemeldete Lücke entfällt, sobald der Bedarf
- * gedeckt ist; Sammelaufgaben der RM nachführen.
+ * gedeckt ist; Sammelaufgaben der RM nachführen. «gedeckt» auch bei einem Projekt, das nicht mehr aktiv ist (Zuteilung
+ * entfernt), damit es nach einer Wiederaufnahme stimmt.
  */
 export async function nachfuehren(tx: Tx, who: Actor, bedarfId: string): Promise<BedarfZeile> {
   const b = (await bedarf(tx, bedarfId))!;
   if (b.gedeckt !== (b.stand === 'gedeckt')) await projektdaten.bedarfGedeckt(tx, who, b.id, b.stand === 'gedeckt');
-  if (b.stand === 'gedeckt' && b.luecke) await zs.lueckeEntfernen(tx, b.id);
+  if (b.aktiv && b.stand === 'gedeckt' && b.luecke) await zs.lueckeEntfernen(tx, b.id);
   await aufgabenNachfuehren(tx);
   return (await bedarf(tx, bedarfId))!;
 }

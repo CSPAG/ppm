@@ -196,7 +196,7 @@ elf folgenden, höchstens 60 Monate.
 |---|---|---|
 | `GET /v1/kapazitaet?von=&bis=` | `ressource:read` | Angebot je Rolle und Monat mit `version` je Zelle, `can.write` |
 | `PUT /v1/kapazitaet` | `ressource:write` | mehrere Zellen, alles oder nichts; vorhandene Zelle nur mit gelesener `version` (sonst 412); `fte: null` entfernt; Rolle nur aktiver Codewert (422) |
-| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
+| `GET /v1/auslastung?von=&bis=&szenario=` | `ressource:read` | je Rolle und Monat Angebot, Bedarf, frei, Lage (`ueberbucht`, `ohne_angebot`, `ausgelastet`, `frei`, `leer`) mit Beiträgen je Projekt; Engpässe je Quartal; Bedarf der sichtbaren aktiven Projekte, nur FTE × Monate (Grösse S/M/L zählt nicht); `szenario` liefert die Priorisierung (AP-E5-3), sonst 404 |
 
 Bedarfsliste, Zuteilung und Konflikte (AP-E7-2; RK.02.02, RK.02.03; UC-009 Schritte 3–4, A1, A2). Zugeteilt wird je
 Bedarf, Person und Monat ein Anteil in FTE (höchstens eine Stelle je Person, Beschäftigungsgrad aus dem HR-System offen);
@@ -204,6 +204,13 @@ nur Bedarf in FTE × Monate (A-20). Zuteilungen einzelner Personen sehen RM, UE,
 des Projekts (darstellung.md), auch in der Lesesicht. Jede Änderung führt «gedeckt» im Register nach, informiert Person
 und Projektleitung (Mitteilung) und führt die Sammelaufgaben `bedarf.decken` und `konflikt.aufloesen` nach (zusätzlich
 stündlich). Priorität kommt aus der Priorisierung (`prioritaetQuelleSetzen`), sonst `null`.
+
+Projekte, die nicht mehr aktiv sind (`sistiert`, `abgebrochen`, `abgeschlossen`, `zurueckgezogen`), geben ihre Ressourcen
+frei (UC-015 Schritt 6, A1.2): Ihr Bedarf und ihre Zuteilungen zählen in Auslastung (auch je Szenario), Bedarfsliste,
+Konflikten, Belegung und Sammelaufgaben nicht mehr. Entschieden wird beim Lesen, gelöscht wird nichts; bei einer
+Wiederaufnahme zählen sie wieder. Zuteilen, Anteil ändern und Lücke melden ergeben 409 (`reason: lebenszyklus`),
+Entfernen bleibt möglich und führt «gedeckt» nach. Wer das Projekt nicht sieht, sieht seinen Lebenszyklus nicht; für ihn zählen dessen
+Zuteilungen weiter.
 
 | Route | Recht | Hinweis |
 |---|---|---|

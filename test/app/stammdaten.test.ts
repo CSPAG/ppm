@@ -52,7 +52,7 @@ describe('Stammdaten', { skip }, () => {
     api.app.inject({ method: method as 'GET', url, headers: { ...headers, ...(payload !== undefined ? { 'content-type': 'application/json' } : {}) }, ...(payload !== undefined ? { payload: JSON.stringify(payload) } : {}) });
 
   test('Organisationseinheiten: Hierarchie, Kürzel eindeutig, kein Kreis, löschen nur ohne Untereinheiten', async () => {
-    const dir = await call('POST', '/v1/org-einheiten', adm, { kuerzel: 'DTI', name: ' Direktion Technologie und Innovation ', art: 'direktion' });
+    const dir = await call('POST', '/v1/org-einheiten', adm, { kuerzel: 'DTI', name: ' Direktion Technologie und Innovation ', art: 'direktion', parentId: null });
     assert.equal(dir.statusCode, 201, dir.body);
     const d = dir.json();
     assert.deepEqual([d.kuerzel, d.name, d.art, d.parentId, d.aktiv, d.version], ['DTI', 'Direktion Technologie und Innovation', 'direktion', null, true, 1]);
@@ -66,6 +66,8 @@ describe('Stammdaten', { skip }, () => {
 
     assert.equal((await call('POST', '/v1/org-einheiten', adm, { kuerzel: 'dti', name: 'Doppelt' })).statusCode, 409, 'Kürzel ohne Gross/klein eindeutig');
     assert.equal((await call('POST', '/v1/org-einheiten', adm, { kuerzel: 'X', name: 'Ohne Eltern', parentId: '00000000-0000-4000-8000-000000000000' })).statusCode, 422);
+    // Nullable (platform 0.7.0): "" und 0 sind keine Uuid (422), null heisst oberste Ebene (oben DTI); die Webapp schickt für «keine» null
+    for (const parentId of ['', 0]) assert.equal((await call('POST', '/v1/org-einheiten', adm, { kuerzel: 'X', name: 'Leer', parentId })).statusCode, 422, JSON.stringify(parentId));
     assert.equal((await call('POST', '/v1/org-einheiten', adm, { kuerzel: 'mit leer', name: 'x' })).statusCode, 422);
 
     // Direktion unter ihren eigenen Bereich: Kreis

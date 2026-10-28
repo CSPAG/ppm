@@ -73,3 +73,26 @@ if (!v?.unterschriften) throw forbidden('Unterschriften sind in dieser Stellvert
 Jedes Fachmodul bietet `GET /v1/<modul>/kopf` mit den Kennzahlen der Person (Fachmodell 4.1); die Startseite
 (`web/src/features/eingang`) ruft die Köpfe der Module auf, für die die Person ein Recht hat. Der Eingang selbst liefert
 `GET /v1/eingang/anzahl` (offen, überfällig, nächste Frist) für den Zähler an «Eingang» (I-N3).
+
+## Zugang entziehen und Neubesetzung (AP-E7-8)
+
+UC-016 A1 (AM.01.01): Die Administration (`members:admin`) sieht vor dem Entziehen, was mit dem Zugang entfällt
+(`GET /v1/zugaenge/:person`: Rollen an der Organisation, unbefristete Rollen an Projekten, Portfolios und anderen
+Orten, offene Aufgaben an die Person) und entzieht ihn mit `POST /v1/zugaenge/:person/entziehen`:
+
+1. Rollen an Orten ausser der Organisation festhalten (`neubesetzung`, Stand `vorbereitet`; Migration 410).
+2. Mitglied im Baukasten entfernen (`iam.admin.removeMember`: Mitgliedschaft in Keycloak und alle Tupel, Regeln des
+   Baukastens: nicht sich selbst, nicht die letzte Administration). Scheitert das, bleibt alles wie es war; der nächste
+   Aufruf nimmt die vorbereitete Neubesetzung wieder auf.
+3. Stand `entzogen`, Audit `neubesetzung.created`; bleiben Rollen oder offene Aufgaben, erhält die Administration die
+   Aufgabe `zugang.neu_besetzen` «Rollen von ‹Person› neu besetzen» (an das Recht `members:admin`, von Hand erledigbar).
+
+Neu besetzt wird dort, wo die Rolle vergeben wird (Projektorganisation, Portfolio); `GET /v1/neubesetzungen/:id` zeigt
+je Rolle, ob jemand sie am Ort wieder unbefristet hat, und die offenen Aufgaben, die noch an die Person gehen.
+Befristete Rollen (Stellvertretung) zählen nicht: Sie entfallen mit ihrem Ablauf.
+
+**Grenzen des Baukastens (Folgearbeit fürs Paket):** Das Entfernen eines Mitglieds hat keinen Haken für die App (kein
+Ereignis über `IamEvents`, keine Vorschau in der Verwaltungsseite); deshalb führt PPM das Entziehen über eine eigene
+Route, die den Baukasten aufruft. Wer Mitglieder auf der Seite «Benutzer und Rollen» des Baukastens entfernt, umgeht
+die Neubesetzung. Rollen mit Berechtigungen (UC-016 A2) stehen im Modell (`src/authz/model.ts`) und sind zur Laufzeit
+nicht definierbar; Benachrichtigung der Person bei Rollenänderungen (UC-016 Schritt 3) bietet der Baukasten nicht.

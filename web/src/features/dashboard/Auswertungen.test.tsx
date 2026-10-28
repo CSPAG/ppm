@@ -106,7 +106,7 @@ describe('Ad-hoc-Auswertungen', () => {
     await userEvent.click(screen.getAllByRole('button', { name: TA.filter.zuruecksetzen }).at(-1)!);
     expect(suche()).toEqual({});
     unmount();
-    stub(() => json({ type: 'about:blank', title: 'Ungültige Angaben', status: 422, detail: 'Diese Portfolios gibt es nicht, oder du siehst sie nicht.' }, 422));
+    stub(() => json({ type: 'about:blank', title: 'Ungültige Angaben', status: 422, detail: 'Diese Portfolios gibt es nicht, oder sie sind nicht sichtbar.' }, 422));
     renderWithIam(<Page initial={{ portfolio: 'weg' }} />, UE);
     expect(await screen.findByText(/Diese Portfolios gibt es nicht/)).toBeInTheDocument();
   });

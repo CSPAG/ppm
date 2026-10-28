@@ -159,7 +159,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       const before = await store.getPortfolio(tx, id);
       if (!before) throw notFound('Portfolio');
       if (before.version !== version) throw preconditionFailed(before.version);
-      if (await store.hatGremien(tx, id)) throw conflict('Das Portfolio hat noch Gremien. Entfernen Sie zuerst die Gremien.');
+      if (await store.hatGremien(tx, id)) throw conflict('Das Portfolio hat noch Gremien. Entferne zuerst die Gremien.');
       if (!(await store.removePortfolio(tx, id, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: 'portfolio.deleted', resourceType: 'portfolio', resourceId: id, data: portfolioSnapshot(before), event: { id } });
     });
@@ -285,7 +285,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (before.version !== version) throw preconditionFailed(before.version);
       if (body.art && body.art !== before.art) {
         const weg = await store.gremienweg(tx, before.portfolio_id);
-        if (weg.some(w => w.gremium_id === id || w.zusaetzlich_gremium_id === id)) throw conflict('Das Gremium steht im Gremienweg. Passen Sie zuerst den Gremienweg an.');
+        if (weg.some(w => w.gremium_id === id || w.zusaetzlich_gremium_id === id)) throw conflict('Das Gremium steht im Gremienweg. Passe zuerst den Gremienweg an.');
       }
       const r = await store.updateGremium(tx, id, version, body);
       if (!r) throw preconditionFailed(before.version);
@@ -308,7 +308,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!before) throw notFound('Gremium');
       if (before.version !== version) throw preconditionFailed(before.version);
       const weg = await store.gremienweg(tx, before.portfolio_id);
-      if (weg.some(w => w.gremium_id === id || w.zusaetzlich_gremium_id === id)) throw conflict('Das Gremium steht im Gremienweg. Passen Sie zuerst den Gremienweg an.');
+      if (weg.some(w => w.gremium_id === id || w.zusaetzlich_gremium_id === id)) throw conflict('Das Gremium steht im Gremienweg. Passe zuerst den Gremienweg an.');
       if (!(await store.removeGremium(tx, id, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: 'gremium.deleted', resourceType: 'gremium', resourceId: id, data: gremiumSnapshot(before), event: { id } });
     });

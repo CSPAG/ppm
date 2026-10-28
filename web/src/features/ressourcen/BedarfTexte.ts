@@ -1,5 +1,5 @@
 /**
- * Texte der Seite «Bedarf» (UI-25, AP-E7-2; Namensraum des Features «Ressourcen»): Anrede «Sie», Schweizer
+ * Texte der Seite «Bedarf» (UI-25, AP-E7-2; Namensraum des Features «Ressourcen»): Anrede «Du», Schweizer
  * Rechtschreibung, Mengen in FTE, Muster der Regelmeldung aus darstellung.md (Regel, Ist, Grenze, Vorschlag).
  */
 import type { BedarfStand } from './BedarfSearch.ts';
@@ -21,7 +21,7 @@ export const TB = {
   leer: 'Noch kein Projekt hat Bedarf in FTE und Monaten angemeldet. Bedarf als Grösse S, M oder L lässt sich erst nach der Planung in FTE zuteilen.',
   leerGefiltert: 'Kein Bedarf passt zu Zeitraum und Stand.',
   filterZuruecksetzen: 'Filter zurücksetzen',
-  nurFte: 'Gezeigt wird Bedarf in FTE × Monate der Projekte, die Sie sehen; Bedarf nur als Grösse S, M oder L folgt nach der Planung in FTE.',
+  nurFte: 'Gezeigt wird Bedarf in FTE × Monate der Projekte, die du siehst; Bedarf nur als Grösse S, M oder L folgt nach der Planung in FTE.',
   ohnePrioritaet: 'Eine Rangfolge der Projekte gibt es noch nicht; die Liste ist nach Beginn geordnet.',
   // Schublade
   drawerTitel: (rolle: string, projekt: string) => `${rolle} · ${projekt}`,
@@ -50,10 +50,10 @@ export const TB = {
   zuteilenAktion: 'Zuteilen',
   zugeteilt_: (person: string) => `${person} zugeteilt. Person und Projektleitung erhalten eine Mitteilung.`,
   wirkung: 'Wirkung: Die Kapazität wird gebucht; Person und Projektleitung erhalten eine Mitteilung.',
-  personFehlt: 'Wählen Sie eine Person.',
+  personFehlt: 'Wähle eine Person.',
   anteilUngueltig: 'Anteil von 0,05 bis 1,0 FTE in Schritten von 0,05.',
-  doppelt: 'Diese Person ist dem Bedarf in mindestens einem dieser Monate schon zugeteilt. Ändern Sie dort den Anteil.',
-  konflikt: 'Die Zuteilung wurde inzwischen geändert. Die Ansicht ist neu geladen; prüfen Sie den Anteil und speichern Sie erneut.',
+  doppelt: 'Diese Person ist dem Bedarf in mindestens einem dieser Monate schon zugeteilt. Ändere dort den Anteil.',
+  konflikt: 'Die Zuteilung wurde inzwischen geändert. Die Ansicht ist neu geladen; prüfe den Anteil und speichere erneut.',
   nurLesen: 'Personen teilt das Ressourcenmanagement zu.',
   // Lücke (UC-009 A2)
   luecke: 'Lücke',
@@ -73,7 +73,7 @@ export const TB = {
   regelPool: 'Kapazität der Rolle',
   ist: (fte: string) => `${fte} zugeteilt`,
   grenze: (fte: string) => `höchstens ${fte}`,
-  vorschlag: 'Senken Sie den Anteil im Projekt mit der tieferen Priorität oder teilen Sie eine andere Person zu.',
+  vorschlag: 'Senke den Anteil im Projekt mit der tieferen Priorität oder teile eine andere Person zu.',
   beteiligte: 'Beteiligte Projekte nach Priorität',
   warnungNachSpeichern: 'Die Zuteilung überbucht:',
 };

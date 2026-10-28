@@ -1,6 +1,6 @@
 /**
  * Texte des Features «Schnittstellen» (Namensraum = Feature, docs/fachmodell.md 7.2): Administration › Schnittstellen
- * (UI-49) und Änderungsprotokoll (UI-50); BC AM.03.02, AM.03.03, UC-018. Anrede «Sie», Schweizer Rechtschreibung.
+ * (UI-49) und Änderungsprotokoll (UI-50); BC AM.03.02, AM.03.03, UC-018. Anrede «Du», Schweizer Rechtschreibung.
  */
 export const TX = {
   bereich: { schnittstellen: 'Schnittstellen', protokoll: 'Änderungsprotokoll' },
@@ -22,10 +22,10 @@ export const TX = {
     belegt: 'bereits eingerichtet', nichtVerfuegbar: 'Verarbeitung noch nicht verfügbar',
     nichtVerfuegbarHinweis: 'Die Verarbeitung dieser Daten ist noch nicht verfügbar: Der Testlauf prüft die Verbindung, Läufe schlagen bis dahin fehl.',
     quelle: 'Grundlage', geaendert: 'Zuletzt geändert',
-    umsystemFehlt: 'Wählen Sie Umsystem und Daten.', adresseUngueltig: 'Geben Sie eine Adresse ein, die mit https:// beginnt.',
+    umsystemFehlt: 'Wähle Umsystem und Daten.', adresseUngueltig: 'Gib eine Adresse ein, die mit https:// beginnt.',
     alleBelegt: 'Für alle Umsysteme im Katalog ist schon eine Schnittstelle eingerichtet.',
     starten: 'Lauf starten', laeuft: 'Lauf läuft …',
-    startenGesperrt: 'Nur aktive Schnittstellen laufen. Aktivieren Sie die Schnittstelle unter «Bearbeiten».',
+    startenGesperrt: 'Nur aktive Schnittstellen laufen. Aktiviere die Schnittstelle unter «Bearbeiten».',
     laufe: 'Laufprotokoll', laufeLeer: 'Noch kein Lauf.', start: 'Start', dauer: 'Dauer', umfang: 'Umfang', fehler: 'Fehler',
     gestartetVon: 'gestartet von',
     datensaetze: (n: number) => (n === 1 ? '1 Datensatz' : `${n} Datensätze`),
@@ -33,8 +33,8 @@ export const TX = {
     eingerichtet: 'Schnittstelle eingerichtet.', gespeichert: 'Änderungen gespeichert.',
     testOk: 'Testlauf erfolgreich: Das Umsystem ist erreichbar.', testFehler: (f: string) => `Testlauf fehlgeschlagen: ${f}`,
     laufOk: (u: string) => `Lauf erfolgreich: ${u}.`, laufFehler: (f: string) => `Lauf fehlgeschlagen: ${f}`,
-    conflict: 'Diese Schnittstelle wurde inzwischen geändert. Laden Sie sie neu und übernehmen Sie Ihre Änderungen danach nochmals.',
-    gone: 'Diese Schnittstelle gibt es nicht, oder Sie sehen sie nicht.',
+    conflict: 'Diese Schnittstelle wurde inzwischen geändert. Lade sie neu und übernimm deine Änderungen danach nochmals.',
+    gone: 'Diese Schnittstelle gibt es nicht, oder du siehst sie nicht.',
   },
   p: {
     title: 'Änderungsprotokoll', sub: 'Wer hat wann was geändert: alter und neuer Wert, nach Objekt und Zeitraum.',
@@ -47,7 +47,7 @@ export const TX = {
     leer: 'Noch keine Änderungen protokolliert. Hier steht, wer wann was geändert hat.',
     leerGefiltert: 'Keine Änderung passt zu den Filtern.', zuruecksetzen: 'Filter zurücksetzen',
     keineAenderung: 'ohne Feldänderung', leerWert: 'leer', ja: 'ja', nein: 'nein',
-    vonNachBis: '«von» liegt nach «bis». Wählen Sie einen gültigen Zeitraum.',
+    vonNachBis: '«von» liegt nach «bis». Wähle einen gültigen Zeitraum.',
     objektIdUngueltig: 'Die Kennung hat das Format 8-4-4-4-12 (z. B. aus der Adresse).',
   },
 };

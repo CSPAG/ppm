@@ -110,10 +110,10 @@ describe('Eingang', { skip }, () => {
   });
 
   test('Mitteilungen: nur an die Empfängerin, gelesen markieren', async () => {
-    const id = await sys(tx => mitteilung.senden(tx, { an: anna.id, bezug: { typ: 'idee', id: '7' }, text: 'Ihre Idee wurde zurückgewiesen.', link: '/portfolio/ideen' }));
+    const id = await sys(tx => mitteilung.senden(tx, { an: anna.id, bezug: { typ: 'idee', id: '7' }, text: 'Deine Idee wurde zurückgewiesen.', link: '/portfolio/ideen' }));
     const r = (await call('GET', '/v1/mitteilungen', anna.h)).json();
     assert.equal(r.ungelesen, 1);
-    assert.equal(r.items[0].text, 'Ihre Idee wurde zurückgewiesen.');
+    assert.equal(r.items[0].text, 'Deine Idee wurde zurückgewiesen.');
     assert.deepEqual((await call('GET', '/v1/mitteilungen', beat.h)).json().items, []);
     assert.equal((await call('POST', `/v1/mitteilungen/${id}/gelesen`, beat.h)).statusCode, 404);
     assert.equal((await call('POST', `/v1/mitteilungen/${id}/gelesen`, anna.h)).statusCode, 204);
@@ -137,7 +137,7 @@ describe('Eingang', { skip }, () => {
     assert.deepEqual(await titel(cora), []);
     // die Vertretung erhält eine Mitteilung mit Link auf die Stellvertretung
     const m = (await call('GET', '/v1/mitteilungen', beat.h)).json().items;
-    assert.match(m[0].text, /hat Sie als Stellvertretung erfasst/);
+    assert.match(m[0].text, /hat dich als Stellvertretung erfasst/);
     assert.equal(m[0].link, '/konto/stellvertretung');
     // beide sehen die Stellvertretung, beenden nur die vertretene Person
     const lb = (await call('GET', '/v1/stellvertretungen', beat.h)).json().items;

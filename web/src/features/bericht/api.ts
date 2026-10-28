@@ -30,6 +30,19 @@ export function useProjekt(nr: string) {
   });
 }
 
+/**
+ * Darf die Person jetzt eine Änderung des Projektvertrags beantragen (UC-004 A1 → UC-007 Schritt 1; wie der Vertrag:
+ * `can.entwerfen` enthält «aenderung»)? Gleiche Abfrage und gleicher Schlüssel wie im Vertrag, damit beide denselben
+ * Stand zeigen; ohne Recht auf den Vertrag oder bei einem Fehler: nein.
+ */
+export function useAenderungMoeglich(projektId: string): boolean {
+  const q = useQuery({
+    queryKey: ['vertrag', 'versionen', projektId] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/projekte/{id}/vertrag', { params: { path: { id: projektId } }, signal })).data!,
+  });
+  return !!q.data?.can.entwerfen.includes('aenderung');
+}
+
 export interface Geladen { bericht: Bericht; etag: string }
 const geladen = (bericht: Bericht, response?: Response): Geladen => ({ bericht, etag: response?.headers.get('ETag') ?? ifMatch(bericht.version)['If-Match']! });
 

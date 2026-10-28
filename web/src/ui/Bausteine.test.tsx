@@ -40,8 +40,8 @@ describe('Bearbeitungsstand', () => {
 
 describe('Hinweis und Regelmeldung', () => {
   it('Text nach «‹Regel›: ‹Ist› statt ‹Grenze› (‹wer›). ‹Vorschlag›.»', () => {
-    expect(regelText({ regel: 'Unterlagen', ist: 'Versand 3', grenze: 'mindestens 5 Arbeitstage vor der Sitzung', wer: 'PRAT Mi 12.11.', vorschlag: 'Verschieben Sie das Traktandum.' }))
-      .toBe('Unterlagen: Versand 3 statt mindestens 5 Arbeitstage vor der Sitzung (PRAT Mi 12.11.). Verschieben Sie das Traktandum.');
+    expect(regelText({ regel: 'Unterlagen', ist: 'Versand 3', grenze: 'mindestens 5 Arbeitstage vor der Sitzung', wer: 'PRAT Mi 12.11.', vorschlag: 'Verschiebe das Traktandum.' }))
+      .toBe('Unterlagen: Versand 3 statt mindestens 5 Arbeitstage vor der Sitzung (PRAT Mi 12.11.). Verschiebe das Traktandum.');
   });
 
   it('Stufe als Text, Sperre live als Alarm, Quelle einblendbar', async () => {

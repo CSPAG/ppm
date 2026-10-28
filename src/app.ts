@@ -7,6 +7,7 @@
  */
 import { join } from 'node:path';
 import { defineApp } from '@vollholz/platform';
+import { abschlussModule } from './modules/abschluss/index.ts';
 import { auswertungModule } from './modules/auswertung/index.ts';
 import { eingangIamHaken, eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
@@ -49,6 +50,7 @@ export const app = defineApp({
     ideeModule,
     ressourceModule,
     priorisierungModule,
+    abschlussModule,
     webhooksModule,
     schnittstelleModule,
     finanzenModule,

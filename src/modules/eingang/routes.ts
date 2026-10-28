@@ -118,7 +118,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     return req.tx(async tx => {
       const r = await store.aufgabe(tx, me, id);
       if (!r) throw notFound('Aufgabe');
-      if (!r.manuell) throw conflict('Diese Aufgabe schliesst die Handlung selbst. Öffnen Sie sie über den Link.');
+      if (!r.manuell) throw conflict('Diese Aufgabe schliesst die Handlung selbst. Öffne sie über den Link.');
       await store.erledigen(tx, id);
       await record(tx, who, { action: 'aufgabe.completed', resourceType: 'aufgabe', resourceId: id, data: { art: r.art, bezug: { typ: r.bezug_typ, id: r.bezug_id } }, event: { id, art: r.art } });
       return { ...aufgabeOut(r), can: { erledigen: false } };
@@ -157,7 +157,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   // ---- Stellvertretungen (UC-016 Schritt 4, Fachmodell 4.3)
 
   app.get('/v1/stellvertretungen', {
-    schema: { tags: [TAG_STELLVERTRETUNGEN], summary: 'Stellvertretungen', description: 'Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.', response: { 200: Type.Ref('StellvertretungList') } },
+    schema: { tags: [TAG_STELLVERTRETUNGEN], summary: 'Stellvertretungen', description: 'Laufende und künftige Stellvertretungen: wer dich vertritt und wen du vertrittst.', response: { 200: Type.Ref('StellvertretungList') } },
   }, async req => {
     const me = await person(req);
     const rows = await req.tx(tx => stv.list(tx, me));
@@ -173,7 +173,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     const me = await person(req);
     const body = req.body as StellvertretungCreateIn;
     const who = actorOf(req);
-    if (body.vertreter === me) throw invalid('Sie können sich nicht selbst vertreten.', [{ path: '/vertreter', message: 'Wählen Sie eine andere Person.' }]);
+    if (body.vertreter === me) throw invalid('Du kannst dich nicht selbst vertreten.', [{ path: '/vertreter', message: 'Wähle eine andere Person.' }]);
     if (body.bis < body.von) throw invalid('Der Zeitraum endet vor seinem Beginn.', [{ path: '/bis', message: 'Bis muss am oder nach Von liegen.' }]);
     if (body.bis < heute()) throw invalid('Der Zeitraum liegt in der Vergangenheit.', [{ path: '/bis', message: 'Bis muss heute oder später sein.' }]);
     const row = await req.tx(async tx => {
@@ -184,7 +184,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       const r = (await stv.get(tx, id))!;
       await mitteilung.senden(tx, {
         an: body.vertreter, bezug: { typ: 'stellvertretung', id },
-        text: `${r.vertretene_name ?? 'Eine Person'} hat Sie als Stellvertretung erfasst: ${datum(r.von)} bis ${datum(r.bis)}${r.unterschriften ? ', mit Unterschriften' : ''}.`,
+        text: `${r.vertretene_name ?? 'Eine Person'} hat dich als Stellvertretung erfasst: ${datum(r.von)} bis ${datum(r.bis)}${r.unterschriften ? ', mit Unterschriften' : ''}.`,
         link: '/konto/stellvertretung',
       });
       await record(tx, who, { action: 'stellvertretung.created', resourceType: 'stellvertretung', resourceId: id, data: { ...stvSnapshot(r), tupel: r.tupel.length }, event: stvSnapshot(r) });

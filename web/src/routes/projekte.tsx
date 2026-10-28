@@ -21,6 +21,7 @@ const BerichtPage = seite(() => import('../features/bericht/BerichtPage.tsx'), '
 const VertragPage = seite(() => import('../features/vertrag/VertragPage.tsx'), 'VertragPage');
 const PruefenPage = seite(() => import('../features/vertrag/PruefenPage.tsx'), 'PruefenPage');
 const UnterzeichnenPage = seite(() => import('../features/vertrag/UnterzeichnenPage.tsx'), 'UnterzeichnenPage');
+const GatePage = seite(() => import('../features/vertrag/GatePage.tsx'), 'GatePage');
 const AenderungPage = seite(() => import('../features/vertrag/AenderungPage.tsx'), 'AenderungPage');
 const VersionenPage = seite(() => import('../features/vertrag/VersionenPage.tsx'), 'VersionenPage');
 
@@ -99,6 +100,12 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     const { nr } = akteRoute.useParams();
     return <Suspense fallback={<Loading />}><UnterzeichnenPage nummer={nr} /></Suspense>;
   }
+  // Gate-Modus (UI-08, K2 Schritte 1–4): Ziel der Aufgabe «Gate vorbereiten» (I-B1)
+  const gateRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag/gate', component: GateRoute });
+  function GateRoute() {
+    const { nr } = akteRoute.useParams();
+    return <Suspense fallback={<Loading />}><GatePage nummer={nr} /></Suspense>;
+  }
 
   // Änderung entscheiden (UI-09, K2 Schritt 9) und Versionen mit Vergleich (UI-10, `?vergleich=baseline...entwurf`), AP-E3-4
   const aenderungRoute = createRoute({ getParentRoute: () => akteRoute, path: '/vertrag/aenderung', component: AenderungRoute });
@@ -117,5 +124,5 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><VersionenPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, berichtRoute, versionenRoute])] as const;
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, gateRoute, berichtRoute, versionenRoute])] as const;
 }

@@ -51,7 +51,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E7-4 | Finanzen | 370–379 | offen | – | – |
 | AP-E7-5 | Jahresrückblick | 380–389 | offen | – | – |
 | AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | offen | – | – |
-| AP-E7-7 | Vorlagen mit Feldzuordnung | 400–409 | in Arbeit (PR 1 #93: 400, Versionen je Dokumentart, Word-Vorlage hochladen, Platzhalter «…» lesen, Zuordnung zu Datenfeldern mit Vorschlag und Prüfung, aktiv setzen; Word-Ausgabe des Projektvertrags über die aktive Vorlage; PR 2: Administration › Vorlagen UI-48 mit Hochladen, Zuordnung, Prüfbericht, Aktiv setzen) | #93 | Platzhalter in Guillemets wie in den Vorlagen des PM-Handbuchs (Q7 «Projektname»); nur Word-Vorlagen (.docx, ≤ 5 MB, ohne Makros); PDF weiter im Layout des Grundbestands (eigene Word-Vorlage als PDF bräuchte einen Word-Renderer); Feldkatalog registriert das erzeugende Modul, Arten ohne Modul nur als Zuordnungsziel (Entwurf, nicht aktivierbar); Kennzeichnung «Personendaten» fehlt → Warnung (G12); Leserecht der Vorlagen = `vorlage:write` (kein eigenes Leserecht im Modell) |
+| AP-E7-7 | Vorlagen mit Feldzuordnung | 400–409 | umgesetzt (400, Versionen je Dokumentart, Word-Vorlage hochladen, Platzhalter «…» lesen, Zuordnung zu Datenfeldern mit Vorschlag und Prüfung, aktiv setzen; Word-Ausgabe des Projektvertrags über die aktive Vorlage; Administration › Vorlagen UI-48 mit Hochladen, Zuordnung, Prüfbericht, Aktiv setzen) | #93, #98 | Platzhalter in Guillemets wie in den Vorlagen des PM-Handbuchs (Q7 «Projektname»); nur Word-Vorlagen (.docx, ≤ 5 MB, ohne Makros); PDF weiter im Layout des Grundbestands (eigene Word-Vorlage als PDF bräuchte einen Word-Renderer); Feldkatalog registriert das erzeugende Modul, Arten ohne Modul nur als Zuordnungsziel (Entwurf, nicht aktivierbar); Kennzeichnung «Personendaten» fehlt → Warnung (G12); Leserecht der Vorlagen = `vorlage:write` (kein eigenes Leserecht im Modell) |
 | AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | offen | – | – |
 
 ## Business Cases
@@ -146,7 +146,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | umgesetzt | #19, #24 |
-| AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | in Arbeit (Grundbestand #73; Versionen, Hochladen, Feldzuordnung #93; Oberfläche UI-48) | #73, #93 |
+| AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | umgesetzt (Grundbestand #73; Versionen, Hochladen, Feldzuordnung #93; Oberfläche UI-48 #98) | #73, #93, #98 |
 | AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks) | Gerüst (695ab82) |
 | AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | offen | – |
 

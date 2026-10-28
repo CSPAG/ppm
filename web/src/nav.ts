@@ -34,7 +34,7 @@ export const navigation: NavRegistrierung = {
     // Arbeitsraum «Projekte»: Meine Projekte mit der Projektakte (UI-05, UI-06; Projektrollen sehen nur ihre Projekte)
     { raum: 'projekte', pfad: '/projekte', label: projektTexte.bereich, recht: 'projekt:read' },
     // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1)
-    { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read' },
+    { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read', muster: /^\/gremien\/(sitzungen|(?!(entscheide|jahresrueckblick)\/?$)[a-z0-9][a-z0-9-]*(\/sitzungen.*)?)\/?$/ },
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
     { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
     // Jahresrückblick (UI-37, UC-013, AP-E7-5); führt im Q4 ins laufende Jahr, sonst ins Vorjahr

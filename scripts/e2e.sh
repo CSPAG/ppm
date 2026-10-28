@@ -29,17 +29,24 @@ pids=""
 stop() { for p in $pids; do kill "$p" 2>/dev/null || true; done; wait 2>/dev/null || true; }
 trap stop EXIT INT TERM
 # shellcheck disable=SC2086
-OPS_PORT=9190 node $ENV src/cli.ts api >"$LOGS/api.log" 2>&1 & pids="$pids $!"
+OPS_PORT=9190 node $ENV src/cli.ts api >"$LOGS/api.log" 2>&1 & api=$!; pids="$pids $api"
 # shellcheck disable=SC2086
 OPS_PORT=9191 node $ENV src/cli.ts worker >"$LOGS/worker.log" 2>&1 & pids="$pids $!"
 
+# Start der API: Fastify baut beim Start für jede Route den Serialisierer der Antworten und prüft dabei jedes Mal alle
+# gemeinsamen Schemas (fast-json-stringify, `options.schema`). Das wächst mit Routen × Schemas und dauerte am
+# 28.10.2026 in CI 33–61 s (lokal über 70 s), reine Rechenzeit. Darum bis 240 s warten, die Dauer ausgeben und beim
+# Abbruch beide Protokolle zeigen; endet der Prozess vorher, sofort abbrechen (Fehler statt Langsamkeit).
+zeige() { echo "--- $LOGS/api.log" >&2; tail -n 80 "$LOGS/api.log" >&2; echo "--- $LOGS/worker.log" >&2; tail -n 20 "$LOGS/worker.log" >&2; }
+WARTEN=${E2E_API_WARTEN:-240}
 i=0
 until curl -sf -o /dev/null "$BASE/readyz"; do
+  if ! kill -0 "$api" 2>/dev/null; then echo "e2e: API nach $i s beendet, bevor sie bereit war" >&2; zeige; exit 1; fi
   i=$((i + 1))
-  if [ "$i" -gt 60 ]; then echo "e2e: API nicht bereit nach 60 s" >&2; tail -n 50 "$LOGS/api.log" >&2; exit 1; fi
+  if [ "$i" -gt "$WARTEN" ]; then echo "e2e: API nicht bereit nach $WARTEN s" >&2; zeige; exit 1; fi
   sleep 1
 done
-echo "e2e: API bereit unter $BASE"
+echo "e2e: API bereit unter $BASE nach $i s"
 # Anmeldekette kurz prüfen (Hinweis bei Fehlern in der Umgebung, kein Abbruch): /auth/login → Keycloak → Anmeldeseite
 loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "$BASE/auth/login?returnTo=/ziele/handlungsfelder") || true
 echo "e2e: /auth/login → $loc"

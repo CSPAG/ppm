@@ -11,6 +11,7 @@
 .eg-karte li{display:flex;flex-direction:column;min-width:0}
 .eg-karte li > a{font-weight:600;color:var(--fg);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .eg-karte li > a:hover{text-decoration:underline}
+.eg-karte li > a.small{font-weight:400;color:var(--accent)}
 .eg-zahl{margin:0;font-size:15px}
 .eg-ueber{color:var(--bad);font-weight:600}
 .eg-sektion{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-width:0}

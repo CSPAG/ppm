@@ -13,6 +13,7 @@ export const TP = {
   // Quality-Check (K2 Schritt 7)
   pruefenTitel: 'Quality-Check',
   checkliste: 'Checkliste',
+  pflichtangaben: 'Pflichtangaben',
   checkPflicht: (fehlen: number) => (fehlen === 0 ? 'Pflichtangaben der Phase vollständig' : `${fehlen === 1 ? '1 Pflichtangabe fehlt' : `${fehlen} Pflichtangaben fehlen`}`),
   checkHandbuch: 'Einhaltung PM-Handbuch: prüfe die Kapitel; Abweichungen kommentierst du am Kapitel.',
   kapitel: 'Kapitel',

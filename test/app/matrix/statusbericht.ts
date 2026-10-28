@@ -42,6 +42,8 @@ export const matrix: Matrix = {
     return { berichtProjekt: projekt };
   },
   cases: {
+    // Kopfkarte «Meine Projekte»: fremde Projekte entfallen (Liste ohne IDs von A)
+    'GET /v1/statusberichte/stand': i => ({ method: 'GET', url: `/v1/statusberichte/stand?projektId=${i.berichtProjekt}`, kind: 'list' }),
     'GET /v1/projekte/:id/berichte': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte`, kind: 'foreign' }),
     'GET /v1/projekte/:id/berichte/:periode': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}`, kind: 'foreign' }),
     'PUT /v1/projekte/:id/berichte/:periode': i => ({ method: 'PUT', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}`, body: { entscheide: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),

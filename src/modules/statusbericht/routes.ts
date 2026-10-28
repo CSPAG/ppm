@@ -10,14 +10,15 @@ import { actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, 
 import { projektdaten } from '../projektdaten/index.ts';
 import { record } from '../../platform.ts';
 import {
-  abweichungVon, fehlend, laufendePeriode, meilensteinText, pruefeBearbeitbar, pruefePflichtangaben, rueckgaengigMoeglich, sperre, vorbelegung, werteVon,
+  abweichungVon, BERICHTSPHASEN, fehlend, laufendePeriode, meilensteinText, pruefeBearbeitbar, pruefePflichtangaben, rueckgaengigMoeglich, sperre, vorbelegung, werteVon,
 } from './bericht.ts';
 import * as eskalation from './eskalation.ts';
 import { nachEinreichen, nachZurueckziehen } from './folgen.ts';
 import {
-  Abweichung, BerichtParams, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut,
+  Abweichung, BerichtParams, BerichtStandList, BerichtStandQuery, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut,
   type EskalationNeuIn, type StatusberichtOut, type StatusberichtPutIn,
 } from './schemas.ts';
+import { fristen } from './pruefung.ts';
 import * as store from './store.ts';
 
 const TAG = 'Statusberichte';
@@ -104,7 +105,37 @@ function pruefeVersion(r: store.Row | null, version: number): void {
 }
 
 export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
-  for (const s of [Abweichung, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut]) app.addSchema(s);
+  for (const s of [Abweichung, BerichtStandList, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut]) app.addSchema(s);
+
+  app.get('/v1/statusberichte/stand', {
+    schema: {
+      tags: [TAG], summary: 'Stand der Berichte mehrerer Projekte',
+      description: 'Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»): je Projekt der letzte eingereichte Bericht mit Status, Trend und Begründung und der Bericht der laufenden Periode mit Stichtag. Projekte ohne Leserecht entfallen.',
+      querystring: BerichtStandQuery, response: { 200: Type.Ref('BerichtStandList') },
+    },
+  }, async req => {
+    const ids = [...new Set((req.query as { projektId: string[] }).projektId)];
+    await req.needSomewhere('projekt:read');
+    const sichtbar = (await Promise.all(ids.map(async id => ((await req.can('projekt:read', ort(id))) ? id : null)))).filter((x): x is string => !!x);
+    return req.tx(async tx => {
+      const laufend = await laufendePeriode(tx);
+      const { stichtag } = await fristen(tx, laufend);
+      const items = [];
+      for (const id of sichtbar) {
+        const p = await store.projekt(tx, id);
+        if (!p) continue;
+        // Letzter eingereichter Bericht bis und mit der laufenden Periode
+        const l = await store.vorperiode(tx, id, '9999-12');
+        const pflichtig = p.lebenszyklus === 'aktiv' && BERICHTSPHASEN.includes(p.phase);
+        items.push({
+          projektId: id,
+          letzter: l ? { periode: l.periode, status: l.status, trend: l.trend, begruendung: l.begruendung } : null,
+          laufend: pflichtig ? { periode: laufend, stand: (await store.get(tx, id, laufend))?.stand ?? null, stichtag } : null,
+        });
+      }
+      return { items };
+    });
+  });
 
   app.get('/v1/projekte/:id/berichte', {
     schema: {

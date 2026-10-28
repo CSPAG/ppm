@@ -13,6 +13,7 @@ import { expectNoAxe } from '../../test/axe.ts';
 import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
 import { feldId, KAPITEL, TERMINE } from './felder.ts';
 import type { SetVertragSearch, VertragSearch } from './search.ts';
+import { T } from '../../ui/index.ts';
 import { TV } from './texte.ts';
 import { VertragPage } from './VertragPage.tsx';
 
@@ -118,6 +119,20 @@ describe('Projektvertrag (UI-07)', () => {
     await expectNoAxe(container);
   });
 
+  it('Pflichtangaben nicht ladbar: Seitenpanel meldet es mit «Erneut versuchen» statt «keine verlangt» (Z5)', async () => {
+    let fehler = true;
+    stub({ routes: { [`GET /v1/vertragsversionen/${V}/pflichtangaben`]: () => fehler
+      ? json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' })
+      : json({ versionId: V, zielphase: 'P1', vollstaendig: false, angaben: FEHLEND }) } });
+    renderWithIam(<Page />, PL as never);
+    const panel = await screen.findByRole('complementary');
+    expect(await within(panel).findByText(T.common.teilFehler(TV.pflicht))).toBeInTheDocument();
+    expect(within(panel).queryByText(TV.pflichtKeine)).toBeNull();
+    fehler = false;
+    await userEvent.click(within(panel).getByRole('button', { name: T.common.retry }));
+    expect(await within(panel).findByText(TV.pflichtFehlen(3, 'P1 Konzept und Planung'))).toBeInTheDocument();
+  });
+
   it('Alt+N springt zur nächsten fehlenden Angabe', async () => {
     stub();
     renderWithIam(<Page initial={{ kapitel: 2 }} />, PL as never);
@@ -212,6 +227,26 @@ describe('Projektvertrag (UI-07)', () => {
     expect(await screen.findByText('Patientenpfade')).toBeInTheDocument();
     await waitFor(() => expect(puts.length).toBe(1), { timeout: 3000 });
     expect(puts[0]).toMatchObject({ strategischesZielId: Z, handlungsfeldId: H, jahreszielId: null });
+  });
+
+  it('Kap. 7: Toleranzen je Dimension erfassen (A-10), doppelte Dimension vor dem Speichern gemeldet', async () => {
+    const puts: Record<string, unknown>[] = [];
+    stub({ routes: {
+      [`PUT /v1/vertragsversionen/${V}/kapitel/7`]: async req => { const b = await req.json(); puts.push(b.inhalt); return mitEtag(kapitel(7, b.inhalt, { version: 2 }), 2); },
+    } });
+    const { container } = renderWithIam(<Page initial={{ kapitel: 7 }} />, PL as never);
+    const gruppe = await screen.findByRole('group', { name: 'Toleranzen' });
+    expect(within(gruppe).getByText(/Gilt ab der Baseline und ersetzt je Dimension den Standard des Phasenmodells/)).toBeInTheDocument();
+    await userEvent.click(within(gruppe).getByRole('button', { name: 'Toleranz hinzufügen' }));
+    await userEvent.selectOptions(within(gruppe).getByLabelText(/^Dimension \(Toleranz 1\)/), 'kosten');
+    await userEvent.type(within(gruppe).getByLabelText(/^Wert \(Toleranz 1\)/), '5');
+    await userEvent.selectOptions(within(gruppe).getByLabelText(/^Einheit \(Toleranz 1\)/), 'prozent');
+    await waitFor(() => expect(puts.at(-1)?.toleranzen).toEqual([{ dimension: 'kosten', wert: 5, einheit: 'prozent' }]), { timeout: 3000 });
+    await expectNoAxe(container);
+
+    await userEvent.click(within(gruppe).getByRole('button', { name: 'Toleranz hinzufügen' }));
+    await userEvent.selectOptions(within(gruppe).getByLabelText(/^Dimension \(Toleranz 2\)/), 'kosten');
+    expect(await within(gruppe).findByText('Für diese Dimension gibt es schon eine Toleranz.')).toBeInTheDocument();
   });
 
   it('Kapitelnavigation mit ↑/↓', async () => {

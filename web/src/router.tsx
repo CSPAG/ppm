@@ -602,7 +602,22 @@ const sitzungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gr
 
 function SitzungenRoute() {
   const navigate = useNavigate();
-  return <SitzungenPage gehe={pfad => void navigate({ to: pfad })} />;
+  const gehe = useCallback((pfad: string, o?: { replace?: boolean }) => void navigate({ to: pfad, replace: o?.replace ?? false }), [navigate]);
+  return <SitzungenPage gehe={gehe} />;
+}
+
+// Gremium im Kopf und in der Adresse (IA «Kontext im Kopf»): `/gremien/prat` führt auf dessen Sitzungen
+const gremiumRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/$kuerzel',
+  beforeLoad: ({ params }) => { throw redirect({ to: '/gremien/$kuerzel/sitzungen', params, replace: true }); },
+});
+const gremiumSitzungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen', component: GremiumSitzungenRoute });
+
+function GremiumSitzungenRoute() {
+  const { kuerzel } = gremiumSitzungenRoute.useParams();
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string, o?: { replace?: boolean }) => void navigate({ to: pfad, replace: o?.replace ?? false }), [navigate]);
+  return <SitzungenPage key={kuerzel} kuerzel={kuerzel} gehe={gehe} />;
 }
 
 const sitzungRoute = createRoute({
@@ -713,6 +728,8 @@ const routeTree = rootRoute.addChildren([
   strategischeZieleRoute,
   gremienRoute,
   sitzungenRoute,
+  gremiumRoute,
+  gremiumSitzungenRoute,
   sitzungRoute,
   sitzungsmodusRoute,
   protokollRoute,

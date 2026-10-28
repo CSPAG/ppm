@@ -16,14 +16,14 @@ export const LINK = '/portfolio/finanzen';
 const EMPF = { recht: 'finanzen:write' } as const;
 const fmt = (n: number) => new Intl.NumberFormat('de-CH', { maximumFractionDigits: 0 }).format(n);
 
-/** Aufgaben `abweichung.klaeren` der Projekte öffnen bzw. erledigen (in der Transaktion des Aufrufers). */
-export async function abweichungenPruefen(tx: Tx, projekte: readonly store.ProjektRow[], jetzt = new Date()): Promise<number> {
+/** Aufgaben `abweichung.klaeren` der Projekte öffnen bzw. erledigen (in der Transaktion des Aufrufers; `voll` liest die Toleranz). */
+export async function abweichungenPruefen(tx: Tx, projekte: readonly store.ProjektRow[], jetzt = new Date(), voll: Tx = tx): Promise<number> {
   const p = periode(jetzt);
   let offen = 0;
   // Nicht aktive Projekte werden nicht mehr überwacht; vertrauliche sieht FI nicht (projekt:vertraulich fehlt), die
   // Aufgabe an alle mit finanzen:write zeigte Nummer, Name und Betrag (Annahme AP-E7-4: keine Aufgabe)
   for (const r of projekte.filter(x => x.lebenszyklus !== 'aktiv' || x.vertraulich)) await aufgabe.entfallen(tx, { art: 'abweichung.klaeren', bezug: { typ: 'projekt', id: r.id } });
-  for (const f of await finanzen(tx, projekte.filter(x => x.lebenszyklus === 'aktiv' && !x.vertraulich))) {
+  for (const f of await finanzen(tx, projekte.filter(x => x.lebenszyklus === 'aktiv' && !x.vertraulich), voll)) {
     const bezug = { typ: 'projekt', id: f.id };
     if (f.abweichung.wesentlich && f.begruendung?.periode !== p) {
       offen++;

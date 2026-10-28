@@ -211,6 +211,19 @@ th.num{text-align:right}
   tbody tr:hover td{background:none}
   .dl-teil{padding:8px 14px}
 }
+/* Ziele unter 768 px mindestens 44 px (Q-B4, I-M1; docs/ux/rahmen/pruefung.md). min-height schlägt die festen Höhen der
+   Features; Kontrollkästchen und Optionen treffen über ihre Beschriftung, Links im Fliesstext sind ausgenommen (WCAG 2.5.8). */
+@media (max-width:767px){
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),select,textarea,
+  .btn,.btn.sm,.search,.omni,.field .pickbtn,.tab,.seg button,.nav,.chip{min-height:44px}
+  .btn,.btn.sm,.chip{height:auto}
+  .iconbtn{width:44px;height:44px;min-width:44px}
+  .chip .x{width:44px;height:44px}
+  /* Die Seite rollt als Ganzes: Mit den grösseren Zielen bliebe unter Kopf und Werkzeugleiste sonst nur ein schmaler Bildlauf im Inhalt. */
+  .main{overflow-y:auto}
+  .main > section{flex:1 0 auto}
+  label:has(> input[type="checkbox"]),label:has(> input[type="radio"]){min-height:44px;display:inline-flex;align-items:center;gap:8px}
+}
 /* Galerie (nur Entwicklungsbuild) */
 .galerie h2{font:600 15px var(--f-display);margin:24px 0 10px}
 .galerie-reihe{display:flex;flex-wrap:wrap;gap:12px;align-items:center}

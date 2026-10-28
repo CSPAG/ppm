@@ -113,6 +113,7 @@ export const TI = {
   kopfErgaenzung: (n: number) => `${n} in Ergänzung`,
   kopfLaufend: (n: number) => `${n} in Bearbeitung`,
   kopfZuPruefen: (n: number) => `${n} zu prüfen`,
+  auswahlLaden: 'Die Auswahl (Handlungsfelder, Bereiche, Herkunft)',
   kopfLeer: 'Hast du eine Idee für ein Projekt?',
 };
 

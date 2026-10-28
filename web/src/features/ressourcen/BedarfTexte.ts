@@ -76,4 +76,14 @@ export const TB = {
   vorschlag: 'Senke den Anteil im Projekt mit der tieferen Priorität oder teile eine andere Person zu.',
   beteiligte: 'Beteiligte Projekte nach Priorität',
   warnungNachSpeichern: 'Die Zuteilung überbucht:',
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», RM)
+  kopfkarte: {
+    titel: 'Ressourcen',
+    offen: (n: number) => (n === 1 ? '1 offener Bedarf' : `${n} offene Bedarfe`),
+    ungedeckt: (n: number) => `${n} ungedeckt`,
+    konflikte: (n: number) => (n === 1 ? '1 Konflikt' : `${n} Konflikte`),
+    engpaesse: (n: number) => (n === 1 ? '1 Engpass in den nächsten drei Monaten' : `${n} Engpässe in den nächsten drei Monaten`),
+    keinEngpass: 'Kein Engpass in den nächsten drei Monaten',
+    bedarfDecken: 'Bedarf decken',
+  },
 };

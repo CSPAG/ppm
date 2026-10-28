@@ -22,6 +22,7 @@ import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/i
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
 import type { SetVorlagenSearch } from './features/vorlagen/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
+import type { SetProtokollSearch, SetSchnittstellenSearch } from './features/schnittstellen/index.ts';
 import type { SetZugaengeSearch } from './features/zugang/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetRoadmapSearch, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
 import { kopfkarten } from './kopfkarten.ts';
@@ -47,6 +48,8 @@ const PortfolioberichtPage = seite(() => import('./features/dashboard/Portfoliob
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
+const SchnittstellenPage = seite(() => import('./features/schnittstellen/SchnittstellenPage.tsx'), 'SchnittstellenPage');
+const AenderungsprotokollPage = seite(() => import('./features/schnittstellen/AenderungsprotokollPage.tsx'), 'AenderungsprotokollPage');
 const SitzungenPage = seite(() => import('./features/sitzung/SitzungenPage.tsx'), 'SitzungenPage');
 const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'SitzungPage');
 const SitzungsmodusPage = seite(() => import('./features/sitzung/SitzungsmodusPage.tsx'), 'SitzungsmodusPage');
@@ -464,6 +467,33 @@ function PortfoliosRoute() {
   return <PortfoliosPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Administration» › Schnittstellen (UI-49) und Änderungsprotokoll (UI-50), BC AM.03.02, AM.03.03, AP-E7-3
+const schnittstellenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/schnittstellen', validateSearch: searchOf.schnittstellen, component: SchnittstellenRoute,
+});
+
+function SchnittstellenRoute() {
+  const search = schnittstellenRoute.useSearch();
+  const navigate = useNavigate({ from: schnittstellenRoute.fullPath });
+  const setSearch = useCallback<SetSchnittstellenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SchnittstellenPage search={search} setSearch={setSearch} />;
+}
+
+const aenderungsprotokollRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/aenderungsprotokoll', validateSearch: searchOf.aenderungsprotokoll, component: AenderungsprotokollRoute,
+});
+
+function AenderungsprotokollRoute() {
+  const search = aenderungsprotokollRoute.useSearch();
+  const navigate = useNavigate({ from: aenderungsprotokollRoute.fullPath });
+  const setSearch = useCallback<SetProtokollSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <AenderungsprotokollPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Gremien»: Sitzungen (UI-33, UC-006, K3); Adresse der Sitzung `/gremien/<kuerzel>/sitzungen/<datum>` (I-N5)
 const gremienRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/gremien',
@@ -589,6 +619,8 @@ const routeTree = rootRoute.addChildren([
   vorlagenRoute,
   phasenmodellRoute,
   portfoliosRoute,
+  schnittstellenRoute,
+  aenderungsprotokollRoute,
   zugaengeRoute,
   neubesetzungRoute,
   ressourcenRoute,

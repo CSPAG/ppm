@@ -90,4 +90,6 @@ Klären mit: UE. Fragen, die beim Bau aufgefallen sind; bis zur Antwort gilt die
 | K31 | Erzeugt das System eine Aufgabe «Jahresrückblick vorbereiten», und an wen? | UC-013 Schritt 1; fachmodell 4.2; A-61 | Aufgabe an die UE zu Beginn des neuen Jahres; heute keine automatische Aufgabe. |
 | K32 | Zählt eine Zuteilung zu einem Projekt, das die lesende Person nicht sieht (z. B. vertraulich), in deren Auslastung? | UC-015 Schritt 6; A-63; A-33 | Lebenszyklus unabhängig von der Sicht prüfen; heute zählt sie weiter, wenn das Projekt nicht sichtbar ist. |
 | K33 | Soll ein Gremium einen Priorisierungsantrag auch zurückstellen können? | UC-008 Schritt 7; K3; A-64 | Zweites Ergebnis «Zurückgestellt» für die Art `priorisierung`; heute nur «Szenario gewählt». |
+| K34 | Sollen Mitglieder des PRAT Jahresrückblick und Quartalsreporting schon vor dem Traktandieren lesen? | UC-012, UC-013; A-67 | Heute erst ab «traktandiert». |
+| K35 | Dürfen Abwesenheiten aus dem HR-System je Person gespeichert werden (Verfügbarkeit je Person)? | UC-009 Schritte 1 und 3, A1; A-69; K23 | Heute nur die Summe je Rolle und Monat, keine Personendaten. |
 

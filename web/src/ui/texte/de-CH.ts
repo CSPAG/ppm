@@ -28,6 +28,18 @@ export const deCH = {
     fehler: 'Die Suche ist gerade nicht möglich. Seiten und Aktionen findest du trotzdem.',
     anzahl: (n: number) => (n === 1 ? '1 Eintrag' : `${n} Einträge`),
   },
+  // Kürzel (docs/ux/rahmen/interaktion.md Abschnitt 11)
+  kuerzel: {
+    titel: 'Tastaturkürzel', allgemein: 'Überall', ansicht: 'In dieser Ansicht', taste: 'Taste', wirkung: 'Wirkung', schliessen: 'Schliessen',
+    keineAnsicht: 'Diese Ansicht hat keine eigenen Kürzel.',
+    fest: [
+      { taste: 'Strg+K', wirkung: 'Befehle: Seite, Aktion oder Objekt suchen' },
+      { taste: '/', wirkung: 'Suche der aktuellen Liste' },
+      { taste: 'Esc', wirkung: 'Schublade, Dialog oder Auswahl schliessen' },
+      { taste: '?', wirkung: 'Diese Übersicht' },
+      { taste: '↑ ↓ Enter Leertaste', wirkung: 'In Listen bewegen, öffnen, auswählen' },
+    ],
+  },
   common: {
     save: 'Speichern', cancel: 'Abbrechen', close: 'Schliessen', delete: 'Löschen', edit: 'Bearbeiten', retry: 'Erneut versuchen',
     reload: 'Neu laden', more: 'Mehr laden', loading: 'Wird geladen …', search: 'Suchen', error: 'Etwas ist schiefgegangen.',

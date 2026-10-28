@@ -101,4 +101,5 @@ export const ProtokollQuery = Type.Object({
   bis: Type.Optional(Datum),
   cursor: Type.Optional(Cursor),
   limit: Type.Optional(Limit),
+  format: Type.Optional(Type.Literal('csv', { description: 'Export als CSV: alle Einträge zum Filter, eine Zeile je geändertes Feld.' })),
 }, { additionalProperties: false });

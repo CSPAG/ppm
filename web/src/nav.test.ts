@@ -29,6 +29,9 @@ describe('Navigation der Antragstellenden', () => {
     // Gremium: nächste Sitzung und Dashboard
     expect(ids(['tenant:read', 'sitzung:read', 'auswertung:read'])).toEqual(expect.arrayContaining(['naechste-sitzung', 'dashboard', 'sitzungen']));
     expect(navigation.aktionen.find(a => a.id === 'naechste-sitzung')).toMatchObject({ irgendwo: true, pfad: '/gremien/sitzungen' });
+    // Personensuche nur für die Administration (members:admin)
+    expect(ids(['tenant:read', 'members:admin'])).toContain('personen');
+    expect(ids(['tenant:read', 'projekt:read', 'sitzung:read', 'auswertung:read'])).not.toContain('personen');
   });
 
   it('Suche nach Sitzungen (I-N4): Gremium und Datum, Fundstelle im Traktandum, Ziel ist die Sitzung', async () => {

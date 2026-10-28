@@ -4,17 +4,16 @@
  * axe hell, dunkel und 360 px; Leser:in sieht die Roadmap, publiziert aber nicht.
  */
 import { expect, test } from '@playwright/test';
-import { ANNA, BRUNO, expectAccessible, expectNoOverflow, login } from './support.ts';
+import { ANNA, BRUNO, expectAccessible, expectNoOverflow, freiesZieljahr, login, zieljahre } from './support.ts';
 
-/** Eindeutiges Jahr und eindeutige Nummer je Lauf (Projekte hell, dunkel, schmal laufen gegen dieselbe Datenbank). */
-const jahr = () => 2031 + Math.floor(Math.random() * 69);
+/** Eindeutige Nummer je Lauf; das Jahr aus dem eigenen Bereich je Projekt und ohne Zyklus (support.ts). */
 const nummer = () => `${100 + Math.floor(Math.random() * 900)}.${Math.floor(Math.random() * 1000)}`;
 
-test('Jahresziele vorlegen, Freigabe erfassen, Roadmap publizieren; barrierefrei', async ({ page }) => {
+test('Jahresziele vorlegen, Freigabe erfassen, Roadmap publizieren; barrierefrei', async ({ page }, info) => {
   const feld = `E2E Freigabe ${Date.now()}`;
   const nr = nummer();
-  const j = jahr();
   await login(page, ANNA);
+  const j = await freiesZieljahr(page, zieljahre('freigabe', info.project.name));
   await page.goto('/ziele/handlungsfelder?o=neu');
   await page.getByLabel('Bezeichnung').fill(feld);
   await page.getByRole('button', { name: 'Speichern' }).click();

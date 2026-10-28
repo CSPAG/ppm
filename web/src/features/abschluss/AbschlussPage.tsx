@@ -89,24 +89,35 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
     if (!offen.current) { const neu = felderVon(geladen.abschluss.bericht); aktuell.current = neu; setF(neu); }
   }, [geladen]);
 
+  // Höchstens ein Speichern zugleich: ein weiteres wartet auf das laufende und nimmt dessen ETag (sonst 412 und Verlust)
+  const laufend = useRef<Promise<boolean> | null>(null);
   const sichern = useCallback(async (): Promise<boolean> => {
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    while (laufend.current) await laufend.current;
     if (!offen.current) return true;
-    offen.current = false;
-    setZustand('speichert');
-    try {
-      const l = await speichern.mutateAsync({ etag: etag.current, body: body(aktuell.current) });
-      etag.current = l.etag;
-      setZustand(offen.current ? 'ungespeichert' : 'gespeichert');
-      return true;
-    } catch (e) {
-      setZustand('ungespeichert');
-      if (isConflict(e)) { toast.show(TA.konflikt, { tone: 'error' }); await refetch(); return false; }
-      offen.current = true;
-      toast.error(e);
-      return false;
-    }
+    const lauf = (async () => {
+      offen.current = false;
+      setZustand('speichert');
+      try {
+        const l = await speichern.mutateAsync({ etag: etag.current, body: body(aktuell.current) });
+        etag.current = l.etag;
+        setZustand(offen.current ? 'ungespeichert' : 'gespeichert');
+        return true;
+      } catch (e) {
+        setZustand('ungespeichert');
+        if (isConflict(e)) { toast.show(TA.konflikt, { tone: 'error' }); await refetch(); return false; }
+        offen.current = true;
+        toast.error(e);
+        return false;
+      } finally {
+        laufend.current = null;
+      }
+    })();
+    laufend.current = lauf;
+    return lauf;
   }, [speichern, refetch, toast]);
+  const sichernRef = useRef(sichern);
+  useEffect(() => { sichernRef.current = sichern; }, [sichern]);
 
   const setze = useCallback((patch: Partial<Felder>) => {
     const neu = { ...aktuell.current, ...patch };
@@ -118,7 +129,11 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
     timer.current = setTimeout(() => { void sichern(); }, SPEICHERN_NACH_MS);
   }, [sichern]);
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  // Beim Verlassen der Seite (anderer Reiter, andere Adresse) offene Eingaben noch speichern statt verwerfen
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+    if (offen.current) void sichernRef.current();
+  }, []);
 
   const liste = useMemo(() => fehlend(art, f), [art, f]);
   const reichEin = async () => {

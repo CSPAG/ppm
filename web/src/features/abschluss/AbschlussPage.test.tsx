@@ -83,6 +83,38 @@ describe('Abschluss (UI-14)', () => {
     expect(screen.getByRole('textbox', { name: TA.felder.zielerreichung })).toBeDisabled();
   });
 
+  it('Speichern nacheinander mit dem neuen ETag; offene Eingabe wird beim Verlassen gespeichert (I-R3)', async () => {
+    const puts: { etag: string | null; body: Record<string, unknown> }[] = [];
+    let freigeben: (() => void) | null = null;
+    stub({
+      [`GET ${URL_A}`]: () => json(abschluss(), 200, { etag: 'W/"1"' }),
+      [`PUT ${URL_A}`]: async req => {
+        const body = await req.json() as Record<string, unknown>;
+        puts.push({ etag: req.headers.get('If-Match'), body });
+        const v = puts.length + 1;
+        // der erste Aufruf bleibt hängen, bis der Test ihn freigibt
+        if (puts.length === 1) await new Promise<void>(r => { freigeben = r; });
+        return json(abschluss({}, { ...body, version: v }), 200, { etag: `W/"${v}"` });
+      },
+    });
+    const { unmount } = renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
+    const feld = await screen.findByRole('textbox', { name: TA.felder.zielerreichung });
+    await userEvent.type(feld, 'A');
+    await waitFor(() => expect(puts.length).toBe(1), { timeout: 3000 });
+    await userEvent.type(feld, 'B');
+    await new Promise(r => setTimeout(r, 900));
+    expect(puts.length).toBe(1);
+    freigeben!();
+    await waitFor(() => expect(puts.length).toBe(2), { timeout: 3000 });
+    expect(puts.map(p => p.etag)).toEqual(['W/"1"', 'W/"2"']);
+    expect(puts[1]!.body.zielerreichung).toBe('AB');
+
+    await userEvent.type(screen.getByRole('textbox', { name: TA.felder.uebergabe }), 'X');
+    unmount();
+    await waitFor(() => expect(puts.length).toBe(3));
+    expect(puts[2]!.body.uebergabe).toBe('X');
+  });
+
   it('Sponsor beurteilt die Nutzenrealisierung; Lessons Learned erfassen', async () => {
     let nutzen: Record<string, unknown> = {};
     let lesson: Record<string, unknown> = {};

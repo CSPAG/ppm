@@ -70,6 +70,25 @@ describe('Lessons Learned (UI-32)', () => {
     expect(api.calls.find(c => c.method === 'PATCH')!.headers.get('If-Match')).toBe('W/"1"');
   });
 
+  it('Suchfeld folgt der Adresse (Zurück/Vor) und überschreibt sie nicht', async () => {
+    stub({ 'GET /v1/lessons-learned': () => json({ items: [], nextCursor: null, kategorien: [] }) });
+    const gesetzt = vi.fn();
+    function Extern() {
+      const [search, set] = useState<LessonsSearch>({ q: 'neu' });
+      return <>
+        <button type="button" onClick={() => set({ q: 'alt' })}>zurück</button>
+        <LessonsPage search={search} setSearch={gesetzt} projektOeffnen={projektOeffnen} />
+      </>;
+    }
+    renderWithIam(<Extern />, { roles: ['gremium'], permissions: ['tenant:read', 'auswertung:read'] });
+    const feld = await screen.findByRole('searchbox');
+    expect(feld).toHaveValue('neu');
+    await userEvent.click(screen.getByRole('button', { name: 'zurück' }));
+    expect(feld).toHaveValue('alt');
+    await new Promise(r => setTimeout(r, 400));
+    expect(gesetzt).not.toHaveBeenCalled();
+  });
+
   it('leer beim ersten Mal; Adresse: Jahr vierstellig', async () => {
     stub({ 'GET /v1/lessons-learned': () => json({ items: [], nextCursor: null, kategorien: [] }) });
     renderWithIam(<Page />, { roles: ['gremium'], permissions: ['tenant:read', 'auswertung:read'] });

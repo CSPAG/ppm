@@ -30,6 +30,9 @@ export function LessonsPage({ search, setSearch, projektOeffnen }: LessonsPagePr
   const id = useId();
   const [text, setText] = useState(search.q ?? '');
   const q = search.q ?? '';
+  // Adresse von aussen geändert (Zurück/Vor, Link): das Suchfeld folgt ihr, statt sie mit dem alten Text zu überschreiben
+  const [qVorher, setQVorher] = useState(q);
+  if (q !== qVorher) { setQVorher(q); if (q !== text.trim()) setText(q); }
   useEffect(() => {
     const t = setTimeout(() => { if (text.trim() !== q) setSearch({ q: text.trim() || undefined }, { replace: true }); }, 250);
     return () => clearTimeout(t);

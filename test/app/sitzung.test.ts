@@ -8,7 +8,7 @@ import { after, before, describe, test } from 'node:test';
 import { full, skipDb } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { registriereTraktandenart, traktandum } from '../../src/modules/sitzung/index.ts';
-import { _abmelden, traktandenart } from '../../src/modules/sitzung/arten.ts';
+import { _abmelden } from '../../src/modules/sitzung/arten.ts';
 import { fristenPruefen } from '../../src/modules/sitzung/fristen.ts';
 import { heute, kurzDatum as kurz } from '../../src/modules/sitzung/format.ts';
 
@@ -42,10 +42,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
   };
   const sys = <T>(fn: Parameters<typeof full<T>>[2]) => full(api.t.runtime, tenantId, fn);
 
-  // Traktandum 1 «Bericht der Programmleitung» (Art portfoliobericht, AP-E2-3) gehört nicht zu diesem Test
-  const bericht = traktandenart('portfoliobericht');
   before(async () => {
-    if (bericht) _abmelden('portfoliobericht');
     api = await testApi();
     const u = await login(api, 'demo', 'u-ue', 'ue');
     tenantId = u.tenantId;
@@ -96,7 +93,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     });
     registriereTraktandenart({ art: 'abschluss', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }] });
   });
-  after(async () => { _abmelden('gate'); _abmelden('abschluss'); if (bericht) registriereTraktandenart(bericht); await api?.close(); });
+  after(async () => { _abmelden('gate'); _abmelden('abschluss'); await api?.close(); });
 
   let sitzung: { id: string; version: number };
 

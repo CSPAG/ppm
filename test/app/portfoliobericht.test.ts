@@ -1,7 +1,7 @@
 /**
  * Risikolage und Portfoliobericht (BC PC.02.02, PC.04.02; UC-014 Schritte 2–3; K3 Schritt 4; AP-E2-3): Risikolage aus
  * Projekt- und Portfoliorisiken mit Abhängigkeiten und Eskalationen, Sichtbarkeit je Rolle; Bericht aus dem
- * abgeschlossenen Dashboard (PPM-4), Kommentar, Bereitstellen, Dokument über `vorlage`; Traktandum 1 «Bericht der
+ * abgeschlossenen Dashboard (PPM-4), Kommentar, Bereitstellen, Dokument über `vorlage`; Vorschlag «Bericht der
  * Programmleitung» mit dem Bericht als Unterlage.
  */
 import assert from 'node:assert/strict';
@@ -24,7 +24,7 @@ function mittwochIn(n: number): string {
 describe('Risikolage und Portfoliobericht', { skip }, () => {
   let api: TestApi;
   let T = '';
-  let ue: Record<string, string>, gremium: Record<string, string>, pl: Record<string, string>;
+  let ue: Record<string, string>, gremium: Record<string, string>, pl: Record<string, string>, gl: Record<string, string>;
   const p: Record<string, string> = {};
   let pfA = '', pfC = '';
 
@@ -40,6 +40,8 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
       for (const [nr, pf, phase] of [['2026-001', pfA, 'P1'], ['2026-002', pfA, 'P2'], ['2026-003', pfC, 'P1']] as const) {
         p[nr] = (await tx.query<{ id: string }>('INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, $2, $3, $4, $5) RETURNING id', [T, nr, `Projekt ${nr}`, pf, phase])).rows[0]!.id;
       }
+      // vertraulich: nur mit projekt:vertraulich (UE, Gremium; nicht GL)
+      await tx.query('UPDATE ppm.projekt SET vertraulich = true WHERE id = $1', [p['2026-002']]);
       // abgeschlossenes Projekt: seine Risiken zählen nicht
       p['2025-009'] = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase, lebenszyklus) VALUES ($1, '2025-009', 'Altprojekt', $2, 'P4', 'abgeschlossen') RETURNING id", [T, pfA])).rows[0]!.id;
       await tx.query("INSERT INTO ppm.projekt_person (tenant_id, projekt_id, person_id, funktion) VALUES ($1, $2, $3, 'pl')", [T, p['2026-001'], l.principalId]);
@@ -63,6 +65,7 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     const g = await login(api, 'demo', 'u-gremium', null);
     await grant(api, T, `user:${g.principalId}`, 'gremium', { type: 'portfolio', id: pfA });
     gremium = { authorization: g.authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
   });
   after(async () => { await api?.close(); });
 
@@ -97,6 +100,7 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
   });
 
   let id = '';
+  let prat = '';
 
   test('Portfoliobericht aus dem abgeschlossenen Dashboard; Kommentar, neu erzeugen, bereitstellen (UC-014 Schritt 3, PPM-4)', async () => {
     const neu = { portfolio: 'transformation', periode: VORPERIODE };
@@ -128,6 +132,8 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.deepEqual((await ok('GET', '/v1/portfolioberichte', gremium)).items, []);
     assert.equal((await call('GET', `/v1/portfolioberichte/${id}`, gremium)).statusCode, 404);
 
+    // entscheidendes Gremium des Portfolios: erhält beim Bereitstellen den Vorschlag
+    prat = (await ok('POST', '/v1/gremien', ue, { portfolioId: pfA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).id;
     const r = await ok('POST', `/v1/portfolioberichte/${id}/bereitstellen`, { ...ue, 'if-match': 'W/"3"' });
     assert.deepEqual([r.stand, r.bereitgestelltAt !== null, r.can.bearbeiten], ['bereitgestellt', true, false]);
     // fest: weder Kommentar noch neu erzeugen
@@ -138,6 +144,13 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.deepEqual([g.stand, g.can.bearbeiten], ['bereitgestellt', false]);
     assert.deepEqual((await ok('GET', '/v1/portfolioberichte?portfolio=transformation', gremium)).items.map((x: { id: string }) => x.id), [id]);
     assert.equal((await call('GET', '/v1/portfolioberichte', pl)).statusCode, 403);
+    // gespeicherter Stand in der Sicht der Person: GL ohne projekt:vertraulich sieht 2026-002 weder als Zeile noch über
+    // Risiken oder Abhängigkeiten; Funnel und Matrix neu gezählt
+    const l = await ok('GET', `/v1/portfolioberichte/${id}`, gl);
+    assert.ok(!JSON.stringify(l).includes('2026-002'));
+    assert.deepEqual([l.risikolage.risiken.length, l.risikolage.abhaengigkeiten.length], [2, 0]);
+    assert.equal(l.dashboard.funnel.reduce((n: number, f: { anzahl: number }) => n + f.anzahl, 0), l.dashboard.items.length);
+    assert.ok(JSON.stringify(await ok('GET', `/v1/portfolioberichte/${id}`, ue)).includes('2026-002'));
   });
 
   test('Dokument als PDF und Word über die Ausgabe der Vorlagen; Export im Audit', async () => {
@@ -153,17 +166,20 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.equal(n, 2);
   });
 
-  test('Traktandum 1 «Bericht der Programmleitung» mit dem bereitgestellten Bericht als Unterlage (K3 Schritt 4)', async () => {
-    const g = (await ok('POST', '/v1/gremien', ue, { portfolioId: pfA, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, 201)).id;
+  test('Vorschlag «Bericht der Programmleitung» an das Gremium mit dem Bericht als Unterlage (K3 Schritte 1 und 4)', async () => {
     const datum = mittwochIn(35);
-    await ok('POST', `/v1/gremien/${g}/termine`, ue, { datum }, 201);
+    await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum }, 201);
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum }, 201);
-    const t = s.traktanden[0];
-    assert.equal(s.traktanden.length, 1);
-    assert.deepEqual([t.art, t.titel, t.position], ['portfoliobericht', 'Bericht der Programmleitung', 1]);
-    assert.match(t.antrag, /^Kenntnisnahme des Portfolioberichts /);
-    assert.deepEqual([t.unterlagen.stand, t.unterlagen.liste[0].hinweis], ['bereit', 'bereitgestellt']);
-    const e = await ok('GET', `/v1/sitzungen/${s.id}/entscheide`, ue);
-    assert.ok(JSON.stringify(e).includes('kenntnis_genommen'), 'Ergebnis «Zur Kenntnis genommen»');
+    assert.equal(s.traktanden.length, 0, 'kein festes Traktandum');
+    const v = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
+    const g = v.gruppen.find((x: { art: string }) => x.art === 'portfoliobericht');
+    assert.equal(g.traktanden.length, 1);
+    const t = g.traktanden[0];
+    const monat = new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${VORPERIODE}-01T00:00:00Z`));
+    assert.deepEqual([t.titel, t.antrag], ['Bericht der Programmleitung', `Kenntnisnahme des Portfolioberichts ${monat}`]);
+    // aufnehmen: Unterlage «Portfoliobericht <Monat>» bereit
+    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: t.id });
+    const a = r.traktanden.find((x: { art: string }) => x.art === 'portfoliobericht');
+    assert.deepEqual([a.unterlagen.stand, a.unterlagen.liste[0].titel], ['bereit', `Portfoliobericht ${monat}`]);
   });
 });

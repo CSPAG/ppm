@@ -1,13 +1,14 @@
 /**
  * Portfoliobericht der Periode (BC PC.04.02, UC-014 Schritt 3; Kernablauf K3 Schritt 4; AP-E2-3): entsteht im System aus
  * dem abgeschlossenen Dashboard und der Risikolage (PPM-4: keine Datei von Hand), die UE ergänzt ihren Kommentar und
- * stellt ihn bereit. Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9): Traktandum 1 «Bericht der
- * Programmleitung» steht in jeder Sitzung (UC-006 Schritt 4), Unterlage ist der bereitgestellte Bericht der letzten
- * abgeschlossenen Periode, Folge des Entscheids ist die Kenntnisnahme.
+ * stellt ihn bereit. Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9): Beim Bereitstellen schlägt
+ * der Bericht das Traktandum «Bericht der Programmleitung» dem entscheidenden Gremium vor (K3 Schritte 1 und 4), Unterlage
+ * ist der Bericht selbst, Folge des Entscheids die Kenntnisnahme.
  */
 import { conflict, notFound, type Tx } from '@vollholz/platform';
-import { registriereTraktandenart } from '../sitzung/index.ts';
+import { registriereTraktandenart, traktandum } from '../sitzung/index.ts';
 import { funnel, sortieren, zeile } from './dashboard.ts';
+import { matrix } from './risiko.ts';
 import { risikolage } from './risiko-routes.ts';
 import type { PortfolioberichtKurzOut, PortfolioberichtOut } from './bericht-schemas.ts';
 import * as store from './bericht-store.ts';
@@ -54,37 +55,85 @@ export function kurz(b: Omit<store.BerichtRow, 'inhalt' | 'kommentar'>): Portfol
   };
 }
 
+/**
+ * Gespeicherten Stand auf die Sicht der lesenden Person beschränken: Projekte, die sie nicht sieht (vertraulich ohne
+ * `projekt:vertraulich`, Lesesicht `projekt_sichtbar`), fallen mit ihren Risiken, Abhängigkeiten und Eskalationen weg;
+ * Funnel und Matrix werden neu gezählt.
+ */
+export async function fuerLeser(tx: Tx, b: store.BerichtRow): Promise<store.BerichtRow> {
+  const i = b.inhalt as unknown as BerichtInhalt;
+  const alle = [...new Set([
+    ...i.dashboard.items.map(z => z.projektId),
+    ...i.risikolage.risiken.flatMap(r => (r.projekt ? [r.projekt.id] : [])),
+    ...i.risikolage.abhaengigkeiten.flatMap(a => [a.von.id, a.zu.id]),
+    ...i.risikolage.eskalationen.map(e => e.projekt.id),
+  ])];
+  const sicht = new Set(await store.sichtbareProjekte(tx, alle));
+  if (sicht.size === alle.length) return b;
+  const items = i.dashboard.items.filter(z => sicht.has(z.projektId));
+  const risiken = i.risikolage.risiken.filter(r => !r.projekt || sicht.has(r.projekt.id));
+  const inhalt: BerichtInhalt = {
+    dashboard: { ...i.dashboard, items, funnel: funnel(items) },
+    risikolage: {
+      risiken, matrix: matrix(risiken),
+      abhaengigkeiten: i.risikolage.abhaengigkeiten.filter(a => sicht.has(a.von.id) && sicht.has(a.zu.id)),
+      eskalationen: i.risikolage.eskalationen.filter(e => sicht.has(e.projekt.id)),
+    },
+  };
+  return { ...b, inhalt: inhalt as unknown as Record<string, unknown> };
+}
+
 export function voll(b: store.BerichtRow, schreiben: boolean): PortfolioberichtOut {
   const i = b.inhalt as unknown as BerichtInhalt;
   const entwurf = b.stand === 'entwurf';
   return { ...kurz(b), kommentar: b.kommentar, dashboard: i.dashboard, risikolage: i.risikolage, can: { bearbeiten: schreiben && entwurf, bereitstellen: schreiben && entwurf } };
 }
 
+/** Bericht in der Sicht der lesenden Person (siehe `fuerLeser`) oder 404. */
 export async function lesenOder404(tx: Tx, id: string): Promise<store.BerichtRow> {
   const b = await store.lesen(tx, id);
   if (!b) throw notFound('Portfoliobericht');
-  return b;
+  return fuerLeser(tx, b);
 }
 
-/** Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9; UC-006 Schritt 4, K3 Schritt 4). */
+const bezugVon = (id: string) => ({ typ: 'portfoliobericht', id });
+
+/**
+ * Traktandum «Bericht der Programmleitung» dem entscheidenden Gremium des Portfolios vorschlagen (K3 Schritt 1
+ * «Vorschläge: Portfoliobericht», Schritt 4), beim Bereitstellen in derselben Transaktion; ohne entscheidendes Gremium
+ * bleibt der Bericht ohne Vorschlag.
+ */
+export async function vorschlagen(tx: Tx, b: store.BerichtRow): Promise<string | null> {
+  try {
+    return await traktandum.vorschlagen(tx, {
+      art: 'portfoliobericht', bezug: bezugVon(b.id), portfolioId: b.portfolio_id,
+      titel: TITEL_TRAKTANDUM, antrag: `Kenntnisnahme des Portfolioberichts ${monat(b.periode)}`,
+    });
+  } catch (e) {
+    if ((e as { status?: number }).status === 409) return null;
+    throw e;
+  }
+}
+
+/** Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9; K3 Schritt 4): Unterlage ist der Bericht selbst. */
 export function registrierePortfoliobericht(): void {
   registriereTraktandenart({
     art: 'portfoliobericht',
     label: 'Portfoliobericht',
-    fest: true,
-    ergebnisse: [{ schluessel: 'kenntnis_genommen', label: 'Zur Kenntnis genommen' }],
+    // Kenntnisnahme ohne Entscheid (fachmodell.md 2.9; leer wie in der Sitzung vorgesehen)
+    ergebnisse: [],
     zusammenfassung: async (tx, bezug) => {
-      const s = bezug.typ === 'sitzung' ? await store.zurSitzung(tx, bezug.id) : null;
-      return { titel: TITEL_TRAKTANDUM, antrag: s?.periode ? `Kenntnisnahme des Portfolioberichts ${monat(s.periode)}` : 'Kenntnisnahme des Portfolioberichts' };
+      const b = bezug.typ === 'portfoliobericht' ? await store.lesen(tx, bezug.id) : null;
+      return b ? { titel: TITEL_TRAKTANDUM, antrag: `Kenntnisnahme des Portfolioberichts ${monat(b.periode)}` } : null;
     },
     unterlagen: async (tx, bezug) => {
-      const s = bezug.typ === 'sitzung' ? await store.zurSitzung(tx, bezug.id) : null;
-      if (!s?.periode) return [];
-      const titel = `Portfoliobericht ${monat(s.periode)}`;
-      const b = s.bericht;
-      if (!b) return [{ art: 'bericht', titel, bereit: false, hinweis: 'noch nicht erzeugt' }];
-      if (b.stand === 'entwurf') return [{ art: 'bericht', titel, bereit: false, hinweis: 'Entwurf, noch nicht bereitgestellt' }];
-      return [{ art: 'bericht', titel, bereit: true, hinweis: 'bereitgestellt', inhalt: { portfoliobericht: b.id, periode: b.periode } }];
+      const b = bezug.typ === 'portfoliobericht' ? await store.lesen(tx, bezug.id) : null;
+      if (!b) return [];
+      return [{
+        art: 'bericht', titel: `Portfoliobericht ${monat(b.periode)}`, bereit: b.stand === 'bereitgestellt',
+        hinweis: b.stand === 'bereitgestellt' ? 'bereitgestellt' : 'Entwurf, noch nicht bereitgestellt',
+        inhalt: { portfoliobericht: b.id, periode: b.periode },
+      }];
     },
     // Folge des Entscheids: Kenntnisnahme (fachmodell.md 2.9), am Bericht ändert sich nichts
   });

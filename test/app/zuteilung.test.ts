@@ -2,7 +2,8 @@
  * Bedarfsliste, Zuteilung und Konflikte (AP-E7-2; BC RK.02.02, RK.02.03; UC-009 Schritte 3–4, A1, A2). Abnahme:
  * Zuteilung einzelner Personen nur für RM, UE, die Person selbst und die Projektleitung des eigenen Projekts
  * (darstellung.md), in der API und in der Lesesicht. Dazu: Deckung und «gedeckt» im Register, Mitteilungen an Person und
- * Projektleitung, Konflikte nach Priorität, Lücke melden, Sammelaufgaben.
+ * Projektleitung, Konflikte nach Priorität, Lücke melden, Sammelaufgaben. Projekte, die nicht mehr aktiv sind, zählen
+ * nicht (UC-015 Schritt 6, A1.2).
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
@@ -143,5 +144,39 @@ describe('Zuteilung (AP-E7-2)', { skip }, () => {
     assert.equal(r.statusCode, 200, r.body);
     const anna = r.json().items.find((p: { id: string }) => p.id === id.anna);
     assert.deepEqual(anna.monate.map((m: { monat: string; zugeteilt: number; frei: number }) => [m.monat, m.zugeteilt, m.frei]), [['2027-01', 1.25, -0.25], ['2027-02', 0.5, 0.5], ['2027-03', 0.5, 0.5]]);
+  });
+
+  test('Projekt nicht mehr aktiv (UC-015 Schritt 6, A1.2): Bedarf und Zuteilungen zählen nicht, nichts wird gelöscht; Wiederaufnahme zählt wieder', async () => {
+    const lebenszyklus = (lz: string) => full(api.t.runtime, T, tx => tx.query('UPDATE ppm.projekt SET lebenszyklus = $2 WHERE id = $1', [projekt.y, lz]));
+    const bedarfJan = async () => (await call('rm', 'GET', '/v1/auslastung?von=2027-01&bis=2027-01')).json().rollen.find((x: { rolle: string }) => x.rolle === 'ctl').zellen[0].bedarf;
+    const konflikte = async () => (await call('rm', 'GET', '/v1/zuteilungen/konflikte?von=2027-01&bis=2027-03')).json().items.map((k: { art: string }) => k.art);
+    const annaJan = async () => (await call('rm', 'GET', `/v1/bedarfe/${bedarfX}/personen?limit=50`)).json().items.find((p: { id: string }) => p.id === id.anna).monate[0].zugeteilt;
+    // Zuteilungen der Person, gelesen von RM (sieht die Projekte); wer das Projekt nicht sieht, sieht seinen Lebenszyklus nicht
+    const eigene = async () => (await call('rm', 'GET', `/v1/zuteilungen?person=${id.anna}`)).json().items.length;
+    // Ausgang: Anna und Pool im Januar mit 0,5 (X) und 0,75 (Y) überbucht
+    assert.deepEqual([await bedarfJan(), await konflikte(), await annaJan(), await eigene()], [1.5, ['person', 'pool'], 1.25, 4]);
+    const zy = (await call('rm', 'GET', `/v1/bedarfe/${bedarfY}`)).json().zuteilungen[0];
+
+    await lebenszyklus('sistiert');
+    const liste = (await call('rm', 'GET', '/v1/bedarfe')).json();
+    assert.deepEqual(liste.items.map((b: { projekt: { nummer: string } }) => b.projekt.nummer), ['2026-001'], 'Bedarfsliste ohne Y');
+    assert.deepEqual([await bedarfJan(), await konflikte(), await annaJan(), await eigene()], [1, [], 0.5, 3]);
+    const zuteilen = await call('rm', 'POST', `/v1/bedarfe/${bedarfY}/zuteilungen`, { personId: id.ben, fte: 0.25 });
+    assert.deepEqual([zuteilen.statusCode, zuteilen.json().reason], [409, 'lebenszyklus']);
+    assert.equal((await call('rm', 'PATCH', `/v1/zuteilungen/${zy.id}`, { fte: 0.5 }, { 'if-match': `W/"${zy.version}"` })).statusCode, 409);
+    assert.equal((await call('rm', 'PUT', `/v1/bedarfe/${bedarfY}/luecke`, { text: 'x' })).statusCode, 409);
+    // Projektleitung sieht die Zuteilungen ihres Projekts weiter; Aufgaben ohne Y
+    assert.equal((await call('pl-y', 'GET', `/v1/zuteilungen?projekt=${projekt.y}`)).json().items.length, 1);
+    assert.equal((await full(api.t.runtime, T, tx => aufgabenNachfuehren(tx))).konflikte, 0);
+
+    // Wiederaufnahme: Bedarf und Zuteilungen zählen wieder (Annahme: nur nicht zählen, nichts löschen)
+    await lebenszyklus('aktiv');
+    assert.deepEqual([await bedarfJan(), await konflikte(), await annaJan()], [1.5, ['person', 'pool'], 1.25]);
+
+    // Abgebrochen: Zuteilung entfernen bleibt möglich, das Register bleibt, wie es war
+    await lebenszyklus('abgebrochen');
+    const d = await call('rm', 'DELETE', `/v1/zuteilungen/${zy.id}`, undefined, { 'if-match': `W/"${zy.version}"` });
+    assert.equal(d.statusCode, 204, d.body);
+    assert.equal((await call('rm', 'GET', `/v1/bedarfe/${bedarfY}`)).json().zuteilungen.length, 0);
   });
 });

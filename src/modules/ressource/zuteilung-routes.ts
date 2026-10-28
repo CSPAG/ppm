@@ -33,6 +33,13 @@ const zuteilungOut = (z: zs.ZuteilungRow, write: boolean) => ({
   fte: z.fte, version: z.version, updatedAt: z.updated_at, can: { write },
 });
 
+/** Bedarf eines Projekts, das nicht mehr aktiv ist: nur noch lesen und Zuteilungen entfernen (UC-015 Schritt 6, A1.2). */
+function nurAktiv(b: BedarfZeile): void {
+  if (!b.aktiv) {
+    throw conflict('Das Projekt ist nicht mehr aktiv; sein Bedarf zählt nicht mehr. Du kannst bestehende Zuteilungen nur noch entfernen.', { reason: 'lebenszyklus' });
+  }
+}
+
 /** Reihenfolge der Bedarfsliste: Priorität (ohne zuletzt), Beginn, Projektnummer, Rolle. */
 const ordnung = (a: BedarfZeile, b: BedarfZeile) =>
   (a.prioritaet?.rang ?? Infinity) - (b.prioritaet?.rang ?? Infinity) || a.vonMonat.localeCompare(b.vonMonat)
@@ -54,7 +61,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.get('/v1/bedarfe', {
     schema: {
       tags: [TAG], summary: 'Bedarfsliste',
-      description: 'Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.',
+      description: 'Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20), ebenso Bedarf von Projekten, die nicht mehr aktiv sind (UC-015 Schritt 6). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.',
       querystring: BedarfQuery, response: { 200: Type.Ref('BedarfList') },
     },
   }, async req => {
@@ -125,7 +132,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.post('/v1/bedarfe/:id/zuteilungen', {
     schema: {
       tags: [TAG], summary: 'Person zuteilen',
-      description: 'Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt: 409.',
+      description: 'Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt oder Projekt nicht mehr aktiv: 409.',
       params: IdParams, headers: IdempotencyHeaders, body: Type.Ref('ZuteilungCreate'), response: { 201: Type.Ref('ZuteilungErgebnis') },
     },
   }, async (req, reply) => {
@@ -136,6 +143,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
     const ergebnis = await req.tx(async tx => {
       const b = await bedarf(tx, id);
       if (!b) throw notFound('Bedarf');
+      nurAktiv(b);
       const von = body.vonMonat ?? b.vonMonat;
       const bis = body.bisMonat ?? b.bisMonat;
       if (von > bis || von < b.vonMonat || bis > b.bisMonat) {
@@ -146,7 +154,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
       try {
         await zs.anlegen(tx, b.id, b.projektId, body.personId, ms, body.fte);
       } catch (e) {
-        if (e instanceof zs.Doppelt) throw conflict('Diese Person ist dem Bedarf in mindestens einem dieser Monate schon zugeteilt. Ändern Sie dort den Anteil.', { reason: 'doppelt' });
+        if (e instanceof zs.Doppelt) throw conflict('Diese Person ist dem Bedarf in mindestens einem dieser Monate schon zugeteilt. Ändere dort den Anteil.', { reason: 'doppelt' });
         throw e;
       }
       const neu = (await zs.list(tx, { bedarfIds: [b.id], personId: body.personId })).filter(z => ms.includes(z.monat));
@@ -161,7 +169,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.patch('/v1/zuteilungen/:id', {
     schema: {
       tags: [TAG], summary: 'Anteil ändern',
-      description: 'Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412. Informiert Person und Projektleitung.',
+      description: 'Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412; Projekt nicht mehr aktiv: 409. Informiert Person und Projektleitung.',
       params: IdParams, headers: IfMatchHeaders, body: Type.Ref('ZuteilungPatch'), response: { 200: Type.Ref('ZuteilungErgebnis') },
     },
   }, async req => {
@@ -173,6 +181,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
     const e = await req.tx(async tx => {
       const vorher = await zs.get(tx, id);
       if (!vorher) throw notFound('Zuteilung');
+      nurAktiv((await bedarf(tx, vorher.ressourcenbedarf_id))!);
       if (vorher.version !== version || !(await zs.aendern(tx, id, version, fte))) throw preconditionFailed(vorher.version);
       const z = (await zs.get(tx, id))!;
       await protokoll(tx, who, 'zuteilung.updated', id, { before: snapshot(vorher), after: snapshot(z) }, snapshot(z));
@@ -187,7 +196,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.delete('/v1/zuteilungen/:id', {
     schema: {
       tags: [TAG], summary: 'Zuteilung entfernen',
-      description: 'Nur mit `If-Match`. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.',
+      description: 'Nur mit `If-Match`, auch bei Projekten, die nicht mehr aktiv sind. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.',
       params: IdParams, headers: IfMatchHeaders, response: { 204: Type.Null({ description: 'Entfernt' }) },
     },
   }, async (req, reply) => {
@@ -210,7 +219,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.put('/v1/bedarfe/:id/luecke', {
     schema: {
       tags: [TAG], summary: 'Lücke melden',
-      description: 'Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf 409.',
+      description: 'Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf oder Projekt, das nicht mehr aktiv ist, 409.',
       params: IdParams, body: Type.Ref('LueckeMelden'), response: { 200: Type.Ref('Bedarf') },
     },
   }, async req => {
@@ -221,6 +230,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
     const b = await req.tx(async tx => {
       const b = await bedarf(tx, id);
       if (!b) throw notFound('Bedarf');
+      nurAktiv(b);
       if (b.stand === 'gedeckt') throw conflict('Dieser Bedarf ist gedeckt; eine Lücke gibt es nicht.', { reason: 'gedeckt' });
       await zs.lueckeMelden(tx, id, b.projektId, text);
       const daten = { ressourcenbedarfId: id, projektId: b.projektId, rolle: b.rolle, vonMonat: b.vonMonat, bisMonat: b.bisMonat, text: text.trim() };
@@ -249,7 +259,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.get('/v1/zuteilungen/konflikte', {
     schema: {
       tags: [TAG], summary: 'Überbuchungen',
-      description: 'Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Ohne Zeitraum der laufende Monat und die elf folgenden.',
+      description: 'Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Zuteilungen von Projekten, die nicht mehr aktiv sind, zählen nicht (UC-015 Schritt 6). Ohne Zeitraum der laufende Monat und die elf folgenden.',
       querystring: Type.Object({ von: Type.Optional(Type.String({ pattern: '^[0-9]{4}-(0[1-9]|1[0-2])$' })), bis: Type.Optional(Type.String({ pattern: '^[0-9]{4}-(0[1-9]|1[0-2])$' })) }, { additionalProperties: false }),
       response: { 200: Type.Ref('KonfliktList') },
     },
@@ -263,7 +273,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
   app.get('/v1/zuteilungen', {
     schema: {
       tags: [TAG], summary: 'Zuteilungen lesen',
-      description: 'Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt.',
+      description: 'Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt. Ohne `projekt` fehlen Zuteilungen sichtbarer Projekte, die nicht mehr aktiv sind (UC-015 Schritt 6).',
       querystring: ZuteilungQuery, response: { 200: Type.Ref('ZuteilungList') },
     },
   }, async req => {
@@ -273,7 +283,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
     if (q.projekt) await req.need('projekt:read', { type: 'projekt', id: q.projekt });
     else if (!ich) await req.need('ressource:read');
     const personId = q.person === 'ich' ? p.principalId : q.person;
-    const rows = await req.tx(tx => zs.list(tx, { personId, projektId: q.projekt, von: q.von, bis: q.bis }));
+    const rows = await req.tx(tx => zs.list(tx, { personId, projektId: q.projekt, von: q.von, bis: q.bis, nurZaehlende: !q.projekt }));
     const write = await req.can('ressource:write');
     return { items: rows.map(z => zuteilungOut(z, write)) };
   });

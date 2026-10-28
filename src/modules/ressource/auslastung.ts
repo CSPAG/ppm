@@ -1,7 +1,7 @@
 /**
  * Auslastung aus Angebot und Ressourcenbedarf (BC RK.02.04, UC-009 Schritt 5, UC-008 Schritt 5). Der Bedarf kommt aus
  * dem Register des Moduls projektdaten (nur über dessen `index.ts`), unter der Lesesicht der Person: gezählt wird der
- * Bedarf der Projekte, die sie sieht.
+ * Bedarf der Projekte, die sie sieht. Projekte, die nicht mehr aktiv sind, zählen nicht (UC-015 Schritt 6, `store.inaktiv`).
  */
 import type { Tx } from '@vollholz/platform';
 import { projektdaten } from '../projektdaten/index.ts';
@@ -20,10 +20,11 @@ let quelle: SzenarioQuelle | null = null;
 export function szenarioQuelleSetzen(q: SzenarioQuelle | null): void { quelle = q; }
 export const szenarioLesen = (tx: Tx, id: string) => (quelle ? quelle(tx, id) : Promise.resolve(null));
 
-/** Bedarf in FTE aller sichtbaren Projekte, der den Zeitraum berührt (Grösse S/M/L ohne FTE zählt nicht, A-20). */
+/** Bedarf in FTE aller sichtbaren aktiven Projekte, der den Zeitraum berührt (Grösse S/M/L ohne FTE zählt nicht, A-20). */
 async function bedarf(tx: Tx, von: string, bis: string): Promise<Bedarf[]> {
   const rows = await projektdaten.bedarfImZeitraum(tx, von, bis);
-  return rows.map(r => ({
+  const weg = await store.inaktiv(tx, [...new Set(rows.map(r => r.projektId!))]);
+  return rows.filter(r => !weg.has(r.projektId!)).map(r => ({
     id: r.id, projektId: r.projektId!, phase: String(r.phase), rolle: String(r.rolle), fte: Number(r.fte),
     vonMonat: String(r.vonMonat), bisMonat: String(r.bisMonat), gedeckt: Boolean(r.gedeckt),
   }));

@@ -40,6 +40,8 @@ export const TS = {
 
   // Traktandenliste (K3 Schritte 2–3)
   liste: 'Traktandenliste',
+  /** scrollbarer Bereich der Seite (beschriftete Region für die Tastatur) */
+  sitzungInhalt: 'Traktandenliste und Vorschläge',
   griff: (n: number, t: string) => `${n}. ${t}: mit Alt+Pfeil nach oben oder unten verschieben`,
   nachOben: (t: string) => `${t} nach oben`,
   nachUnten: (t: string) => `${t} nach unten`,

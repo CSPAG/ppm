@@ -76,7 +76,7 @@ function Entscheid({ nummer, projektId, projektName, version, geladen }: { numme
 
       <p className="ae-links">
         <a className="btn" href={`/projekte/${nummer}/versionen?vergleich=${a.basisVersionId ?? 'baseline'}...${a.versionId}`}><Icon name="columns" />{TA.vergleich}</a>
-        <a className="btn" href={`/projekte/${nummer}/vertrag?version=${version.stand === 'abgenommen' ? 'baseline' : 'entwurf'}`}><Icon name="doc" />{TA.ganzerVertrag}</a>
+        <a className="btn" href={`/projekte/${nummer}/vertrag?version=${a.versionId}`}><Icon name="doc" />{TA.ganzerVertrag}</a>
       </p>
 
       {isConflict(entscheiden.error) ? <Hinweis stufe="warnung" live>{TA.konflikt}</Hinweis> : null}

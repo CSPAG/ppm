@@ -75,6 +75,8 @@ describe('Änderung entscheiden', () => {
     expect(post.headers.get('If-Match')).toBe('W/"6"');
     expect(await post.json()).toEqual({ ergebnis: 'an_prat' });
     expect(await screen.findByText(TA.traktandiert)).toBeInTheDocument();
+    // «Ganzen Vertrag ansehen» zeigt genau diese Version, auch nach einem Entscheid
+    expect(screen.getByRole('link', { name: TA.ganzerVertrag })).toHaveAttribute('href', `/projekte/2026-014/vertrag?version=${V}`);
   });
 
   it('ohne Wirkung: «Änderung freigeben» mit Wirkung davor, bestätigt durch den Server', async () => {

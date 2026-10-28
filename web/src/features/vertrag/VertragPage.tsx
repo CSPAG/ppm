@@ -57,7 +57,8 @@ export function VertragPage({ nummer, search, setSearch }: { nummer: string; sea
   if (anlegen.error) return <ErrorState error={anlegen.error} onRetry={() => anlegen.mutate({ key: key.current })} />;
   if (!v || !projekt.data) return null;
   if (ohneVersion) return <Empty>{TV.leer}</Empty>;
-  const versionId = search.version === 'baseline' ? v.baseline ?? v.entwurf : v.entwurf ?? v.baseline;
+  const gewaehlt = search.version && search.version !== 'baseline' && search.version !== 'entwurf' ? v.versionen.find(x => x.id === search.version)?.id : undefined;
+  const versionId = gewaehlt ?? (search.version === 'baseline' ? v.baseline ?? v.entwurf : v.entwurf ?? v.baseline);
   return <Akte nummer={nummer} projektId={projekt.data.id} versionId={versionId!} search={search} setSearch={setSearch} />;
 }
 

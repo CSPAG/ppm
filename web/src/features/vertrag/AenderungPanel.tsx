@@ -70,7 +70,8 @@ export function AenderungPanel({ projektId, nummer, version: v, speichern }: { p
   const a = antrag.data?.aenderung;
   const sperre = einreichen.error && (statusOf(einreichen.error) === 422 || statusOf(einreichen.error) === 409) ? describeError(einreichen.error).detail : null;
 
-  const start = async () => { await speichern(); setDialog(true); };
+  // erst einreichen, wenn das offene Kapitel gespeichert ist (sonst ginge der alte Stand an den Sponsor)
+  const start = async () => { if (await speichern()) setDialog(true); };
   const jetzt = () => {
     if (!antrag.data) return;
     einreichen.mutate({ id: v.id, etag: antrag.data.etag }, {
@@ -124,11 +125,12 @@ export function HauptaenderungenBlock({ geladen, projektId }: { geladen: Hauptae
     setBearbeiten(true);
   };
   const speichern = () => {
-    // unverändert gegenüber dem erzeugten Text: null (die erzeugten Sätze gelten weiter)
-    const rubriken = Object.fromEntries(h.rubriken.map(r => {
+    // nur geänderte Rubriken senden (unveränderte bleiben, auch Ressourcen/Budget ohne Recht auf Beträge);
+    // leer oder gleich den erzeugten Sätzen: null (die erzeugten Sätze gelten wieder)
+    const rubriken = Object.fromEntries(h.rubriken.filter(r => (werte[r.rubrik] ?? '').trim() !== anzeige(r).trim()).map(r => {
       const w = (werte[r.rubrik] ?? '').trim();
       return [r.rubrik, !w || w === r.erzeugt.join('\n') ? null : w];
-    })) as Record<Rubrik, string | null>;
+    })) as Partial<Record<Rubrik, string | null>>;
     hauptSpeichern.mutate({ id: h.versionId, etag: geladen.etag, body: { rubriken, andere: werte.andere.trim() } }, {
       onSuccess: () => { setBearbeiten(false); toast.show(TA.gespeichert); },
     });

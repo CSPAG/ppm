@@ -76,12 +76,19 @@ describe('Änderungsantrag der Projektleitung', () => {
     const put = api.calls.find(c => c.method === 'PUT')!;
     expect(put.headers.get('If-Match')).toBe('W/"3"');
     const body = await put.json();
-    expect(body.rubriken).toEqual({ scope: null, zeitplan: 'Go-live drei Monate später', ressourcen_budget: null, annahmen: null, key_risiken: null });
+    expect(body.rubriken).toEqual({ zeitplan: 'Go-live drei Monate später' }); // nur geänderte Rubriken (Ressourcen/Budget ohne Recht auf Beträge bliebe sonst gesperrt)
 
     await userEvent.click(screen.getByRole('button', { name: TA.einreichen }));
     expect(await screen.findByText(TA.einreichenWirkung)).toBeInTheDocument();
     await userEvent.click(screen.getAllByRole('button', { name: TA.einreichen }).at(-1)!);
     expect(await screen.findByText(TA.eingereicht)).toBeInTheDocument();
     expect(api.calls.some(c => c.method === 'POST' && c.url.endsWith('/aenderung/einreichen'))).toBe(true);
+  });
+
+  it('reicht nicht ein, wenn das offene Kapitel nicht gespeichert werden konnte', async () => {
+    stub();
+    renderWithIam(<AenderungPanel projektId={P} nummer="2026-014" version={version} speichern={async () => false} />);
+    await userEvent.click(await screen.findByRole('button', { name: TA.einreichen }));
+    expect(screen.queryByText(TA.einreichenWirkung)).not.toBeInTheDocument();
   });
 });

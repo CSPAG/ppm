@@ -31,10 +31,12 @@ export function AenderungPage({ nummer }: { nummer: string }) {
   const fehler = projekt.error ?? vertrag.error ?? antrag.error;
   if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void antrag.refetch(); }} />;
   if (!projekt.data || !version || !antrag.data) return <Empty>{TA.keinAntrag}</Empty>;
-  return <Entscheid nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={antrag.data} />;
+  return <Entscheid nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={antrag.data} neuLaden={() => void antrag.refetch()} />;
 }
 
-function Entscheid({ nummer, projektId, projektName, version, geladen }: { nummer: string; projektId: string; projektName: string; version: Version; geladen: AenderungLoaded }) {
+function Entscheid({ nummer, projektId, projektName, version, geladen, neuLaden }: {
+  nummer: string; projektId: string; projektName: string; version: Version; geladen: AenderungLoaded; neuLaden(): void;
+}) {
   const id = useId();
   const toast = useToast();
   const a = geladen.aenderung;
@@ -79,7 +81,9 @@ function Entscheid({ nummer, projektId, projektName, version, geladen }: { numme
         <a className="btn" href={`/projekte/${nummer}/vertrag?version=${a.versionId}`}><Icon name="doc" />{TA.ganzerVertrag}</a>
       </p>
 
-      {isConflict(entscheiden.error) ? <Hinweis stufe="warnung" live>{TA.konflikt}</Hinweis> : null}
+      {isConflict(entscheiden.error) ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { entscheiden.reset(); neuLaden(); }}>{TA.neuLaden}</button>}>{TA.konflikt}</Hinweis>
+      ) : null}
       {statusOf(entscheiden.error) === 409 ? <Hinweis stufe="sperre" live>{describeError(entscheiden.error).detail}</Hinweis> : null}
       {fehlerText ? <ErrorState error={fehlerText} /> : null}
 
@@ -101,12 +105,13 @@ function Entscheid({ nummer, projektId, projektName, version, geladen }: { numme
         </div>
       ) : a.stand === 'in_pruefung' ? <p className="muted">{TA.nurSponsor}</p> : null}
 
-      {ablehnen ? <AblehnenDialog onClose={() => setAblehnen(false)} busy={entscheiden.isPending} fehler={entscheiden.error} onSenden={b => senden('abgelehnt', b)} /> : null}
+      {ablehnen ? <AblehnenDialog onClose={() => setAblehnen(false)} busy={entscheiden.isPending} fehler={entscheiden.error} onSenden={b => senden('abgelehnt', b)}
+        onNeuLaden={() => { entscheiden.reset(); neuLaden(); }} /> : null}
     </section>
   );
 }
 
-function AblehnenDialog({ onClose, onSenden, busy, fehler }: { onClose(): void; onSenden(b: string): void; busy: boolean; fehler: unknown }) {
+function AblehnenDialog({ onClose, onSenden, onNeuLaden, busy, fehler }: { onClose(): void; onSenden(b: string): void; onNeuLaden(): void; busy: boolean; fehler: unknown }) {
   const id = useId();
   const [text, setText] = useState('');
   const [versucht, setVersucht] = useState(false);
@@ -119,6 +124,9 @@ function AblehnenDialog({ onClose, onSenden, busy, fehler }: { onClose(): void; 
       <button type="submit" form={`${id}-f`} className="btn primary" disabled={busy}>{TA.ablehnen}</button>
     </>}>
       <p>{TA.ablehnenWirkung}</p>
+      {isConflict(fehler) ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={onNeuLaden}>{TA.neuLaden}</button>}>{TA.konflikt}</Hinweis>
+      ) : null}
       <form id={`${id}-f`} className="form" noValidate onSubmit={e => { e.preventDefault(); setVersucht(true); if (!leer) onSenden(text.trim()); }}>
         <div className="field">
           <label htmlFor={`${id}-b`}>{TA.begruendung}</label>

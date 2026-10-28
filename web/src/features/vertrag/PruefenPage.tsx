@@ -30,7 +30,7 @@ export function PruefenPage({ nummer }: { nummer: string }) {
   if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
   const version = vertrag.data?.versionen.find(v => v.id === entwurf);
   if (!projekt.data || !version || !pruefung.data) return <Empty>{TP.keinEntwurf}</Empty>;
-  return <Pruefansicht nummer={nummer} projektId={projekt.data.id} version={version} geladen={pruefung.data} />;
+  return <Pruefansicht nummer={nummer} projektId={projekt.data.id} version={version} geladen={pruefung.data} neuLaden={() => void pruefung.refetch()} />;
 }
 
 const entwurfSchluessel = (versionId: string) => `ppm.qc.kommentare.${versionId}`;
@@ -51,7 +51,7 @@ function entwurfSchreiben(versionId: string, k: Record<number, string>): void {
   } catch { /* ohne Speicher bleibt der Entwurf nur auf der Seite */ }
 }
 
-function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string; projektId: string; version: Version; geladen: PruefungLoaded }) {
+function Pruefansicht({ nummer, projektId, version, geladen, neuLaden }: { nummer: string; projektId: string; version: Version; geladen: PruefungLoaded; neuLaden(): void }) {
   const id = useId();
   const toast = useToast();
   const { qualityCheck } = usePruefungMutations(projektId);
@@ -127,7 +127,9 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
 
           {darf ? (
             <div className="qc-aktion">
-              {isConflict(qualityCheck.error) ? <Hinweis stufe="warnung" live>{TP.konflikt}</Hinweis> : null}
+              {isConflict(qualityCheck.error) ? (
+                <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { qualityCheck.reset(); neuLaden(); }}>{TP.neuLaden}</button>}>{TP.konflikt}</Hinweis>
+              ) : null}
               {serverFehler ? <Hinweis stufe="sperre" live>{statusOf(qualityCheck.error) === 409 && serverFehler.detail?.includes('Projektorganisation') ? `${serverFehler.detail} ${TP.organisationFehlt}` : serverFehler.detail ?? serverFehler.title}</Hinweis> : null}
               <p className="small" role="status">{TP.kommentareAnzahl(liste.length)}</p>
               {liste.length ? <p className="muted small">{TP.entwurfBleibt}</p> : null}

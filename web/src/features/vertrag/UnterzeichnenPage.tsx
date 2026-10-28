@@ -27,15 +27,15 @@ export function UnterzeichnenPage({ nummer }: { nummer: string }) {
   if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
   const version = vertrag.data?.versionen.find(v => v.id === entwurf);
   if (!projekt.data || !version || !pruefung.data) return <Empty>{TP.keinEntwurf}</Empty>;
-  return <Zusammenfassung nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={pruefung.data} />;
+  return <Zusammenfassung nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={pruefung.data} neuLaden={() => void pruefung.refetch()} />;
 }
 
 /** Funktionen ohne Unterschrift als Text («Lea Brunner (CTL)» geht nur mit Namen; hier die Funktion). */
 const fehlendText = (p: Pruefung, ohne: readonly Funktion[]) =>
   (p.unterzeichnung?.funktionen ?? []).filter(f => !f.unterschrift && !ohne.includes(f.funktion)).map(f => TP.funktion[f.funktion]).join(', ');
 
-function Zusammenfassung({ nummer, projektId, projektName, version, geladen }: {
-  nummer: string; projektId: string; projektName: string; version: Version; geladen: PruefungLoaded;
+function Zusammenfassung({ nummer, projektId, projektName, version, geladen, neuLaden }: {
+  nummer: string; projektId: string; projektName: string; version: Version; geladen: PruefungLoaded; neuLaden(): void;
 }) {
   const id = useId();
   const toast = useToast();
@@ -93,7 +93,9 @@ function Zusammenfassung({ nummer, projektId, projektName, version, geladen }: {
       <p><a className="btn" href={`/projekte/${nummer}/vertrag?version=entwurf`}><Icon name="doc" />{TP.zurueckZumVertrag}</a></p>
 
       {unterschrift.error && !isConflict(unterschrift.error) ? <ErrorState error={unterschrift.error} /> : null}
-      {isConflict(unterschrift.error) ? <Hinweis stufe="warnung" live>{TP.konflikt}</Hinweis> : null}
+      {isConflict(unterschrift.error) ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { unterschrift.reset(); neuLaden(); }}>{TP.neuLaden}</button>}>{TP.konfliktUnterzeichnen}</Hinweis>
+      ) : null}
 
       {offen.length ? (
         <div className="uz-aktion">

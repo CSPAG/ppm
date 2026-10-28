@@ -100,11 +100,21 @@ describe('Unterzeichnen', () => {
     expect(await screen.findByText(TP.toastNicht)).toBeInTheDocument();
   });
 
-  it('Konflikt (412): Hinweis statt Unterschrift', async () => {
-    stub({ [`POST /v1/vertragsversionen/${V}/unterschriften`]: () => json({ title: 'Inzwischen geändert', status: 412 }, 412) });
+  it('Konflikt (412): Hinweis mit «Neu laden»; danach mit dem neuen Stand unterzeichnen (Z7)', async () => {
+    let n = 0;
+    const api = stub({
+      [`GET /v1/vertragsversionen/${V}/pruefung`]: () => json(pruefung(), 200, { ETag: n ? 'W/"5"' : 'W/"4"' }),
+      [`POST /v1/vertragsversionen/${V}/unterschriften`]: () => (n++ ? json(pruefung(), 200, { ETag: 'W/"6"' }) : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
+    });
     renderWithIam(<UnterzeichnenPage nummer="2026-014" />);
     await userEvent.click(await screen.findByRole('button', { name: TP.unterzeichnen }));
-    expect(await screen.findByText(TP.konflikt)).toBeInTheDocument();
+    expect(await screen.findByText(TP.konfliktUnterzeichnen)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TP.neuLaden }));
+    await waitFor(() => expect(screen.queryByText(TP.konfliktUnterzeichnen)).toBeNull());
+    await waitFor(() => expect(api.calls.filter(c => c.url.endsWith('/pruefung')).length).toBeGreaterThan(1));
+    await userEvent.click(screen.getByRole('button', { name: TP.unterzeichnen }));
+    await waitFor(() => expect(api.calls.filter(c => c.method === 'POST')).toHaveLength(2));
+    expect(api.calls.filter(c => c.method === 'POST')[1]!.headers.get('If-Match')).toBe('W/"5"');
   });
 
   it('ohne offene Unterschrift keine Schaltfläche', async () => {

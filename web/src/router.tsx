@@ -20,6 +20,7 @@ import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
 import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/index.ts';
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
+import type { SetVorlagenSearch } from './features/vorlagen/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetRoadmapSearch, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
 import { kopfkarten } from './kopfkarten.ts';
@@ -49,6 +50,7 @@ const ProtokollPage = seite(() => import('./features/sitzung/ProtokollPage.tsx')
 const EntscheidePage = seite(() => import('./features/sitzung/EntscheidePage.tsx'), 'EntscheidePage');
 const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
 const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
+const VorlagenPage = seite(() => import('./features/vorlagen/VorlagenPage.tsx'), 'VorlagenPage');
 const StellvertretungPage = seite(() => import('./features/konto/StellvertretungPage.tsx'), 'StellvertretungPage');
 const ZielePage = seite(() => import('./features/ziele/ZielePage.tsx'), 'ZielePage');
 const ZielzyklusPage = seite(() => import('./features/ziele/ZielzyklusPage.tsx'), 'ZielzyklusPage');
@@ -372,6 +374,20 @@ function CodetabellenRoute() {
   return <CodetabellenPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Administration»: Vorlagen (UI-48; UC-018 Schritte 1–2, AP-E7-7)
+const vorlagenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/vorlagen', validateSearch: searchOf.vorlagen, component: VorlagenRoute,
+});
+
+function VorlagenRoute() {
+  const search = vorlagenRoute.useSearch();
+  const navigate = useNavigate({ from: vorlagenRoute.fullPath });
+  const setSearch = useCallback<SetVorlagenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <VorlagenPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03)
 const phasenmodellRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/administration/phasenmodell', validateSearch: searchOf.phasenmodell, component: PhasenmodellRoute,
@@ -496,6 +512,7 @@ const routeTree = rootRoute.addChildren([
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,
+  vorlagenRoute,
   phasenmodellRoute,
   portfoliosRoute,
   ressourcenRoute,

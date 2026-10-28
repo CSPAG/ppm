@@ -37,6 +37,7 @@ export const TB = {
   speichern: 'Speichern',
   entfernen: (person: string, monat: string) => `Zuteilung von ${person} im ${monat} entfernen`,
   entfernt: 'Zuteilung entfernt.',
+  rueckgaengig: 'Rückgängig',
   geaendert: 'Anteil geändert.',
   zuteilen: 'Person zuteilen',
   personSuchen: 'Person suchen',

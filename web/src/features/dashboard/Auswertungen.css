@@ -1,0 +1,29 @@
+/*
+ * Auswertungen (UI-30): Filter und Kennzahlen oben, Ergebnistabelle mit Zahlen als Schaltflächen (Einzelwerte in der
+ * Schublade). Farben nur aus den Tokens (hell und dunkel); auf dem Telefon untereinander und waagrecht scrollbar.
+ */
+.aw-steuer{padding:12px 22px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.aw-filter{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}
+.aw-feld{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--fg-2)}
+.aw-feld input{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background-color:var(--surface);color:var(--fg)}
+.aw-feld input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.aw-kennzahlen{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 16px}
+.aw-kennzahlen legend{font-size:12.5px;color:var(--fg-2);padding:0;margin-bottom:4px}
+.aw-check{display:flex;gap:6px;align-items:center}
+.aw-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.aw-scroll{overflow-x:auto;padding:12px 22px}
+.aw-tabelle,.aw-einzel{border-collapse:collapse;min-width:100%}
+.aw-tabelle caption{text-align:left;color:var(--fg-2);padding-bottom:8px}
+.aw-tabelle th,.aw-tabelle td,.aw-einzel th,.aw-einzel td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left}
+.aw-tabelle .num,.aw-einzel .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.aw-tabelle tfoot th,.aw-tabelle tfoot td,.aw-einzel tfoot th,.aw-einzel tfoot td{font-weight:600;border-top:2px solid var(--line-2)}
+.aw-tabelle tr.cur{background:var(--accent-soft)}
+.aw-zahl{border:0;background:none;padding:2px 4px;font:inherit;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.aw-zahl:focus-visible,.aw-link:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.aw-link{color:var(--fg);text-decoration:none}
+.aw-link:hover{text-decoration:underline}
+@media (max-width:767px){
+  .aw-steuer,.aw-scroll{padding-left:14px;padding-right:14px}
+  .aw-feld{flex:1 1 140px}
+  .aw-feld select,.aw-feld input{width:100%}
+}

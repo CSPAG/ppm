@@ -14,7 +14,7 @@ import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetModellSearch } from './features/priorisierung/index.ts';
-import type { SetDashboardSearch } from './features/dashboard/index.ts';
+import type { SetAuswertungenSearch, SetDashboardSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -39,6 +39,7 @@ const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), '
 const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
+const AuswertungenPage = seite(() => import('./features/dashboard/AuswertungenPage.tsx'), 'AuswertungenPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
@@ -331,6 +332,14 @@ function DashboardRoute() {
   return <DashboardPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Portfolio» › Auswertungen (UI-30; PC.04.03, UC-014 A2; AP-E7-6)
+const auswertungenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/auswertungen', validateSearch: searchOf.auswertungen, component: AuswertungenRoute });
+function AuswertungenRoute() {
+  const navigate = useNavigate({ from: auswertungenRoute.fullPath });
+  const setSearch = useCallback<SetAuswertungenSearch>((next, o) => { void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false }); }, [navigate]);
+  return <AuswertungenPage search={auswertungenRoute.useSearch()} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -493,6 +502,7 @@ const routeTree = rootRoute.addChildren([
   zielerreichungStartRoute,
   zielerreichungRoute,
   dashboardRoute,
+  auswertungenRoute,
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,

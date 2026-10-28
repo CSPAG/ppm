@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Vorlagen» (UI-48; UC-018 Schritte 1–2): Anrede «Sie» (UX-E7), Schweizer Rechtschreibung,
+ * Texte des Features «Vorlagen» (UI-48; UC-018 Schritte 1–2): Anrede «Du» (UX-E7), Schweizer Rechtschreibung,
  * «Organisation» statt «Mandant».
  */
 export const TV = {
@@ -13,13 +13,13 @@ export const TV = {
   anzahl: (n: number, e: number) => (e ? `${n} (${e} ${e === 1 ? 'Entwurf' : 'Entwürfe'})` : String(n)),
   liefert: 'geliefert',
   vorbereitet: 'noch kein Modul',
-  vorbereitetHinweis: 'Für diese Dokumentart liefert noch kein Modul Daten. Sie können Vorlagen hochladen und zuordnen; aktiv setzen lassen sie sich, sobald die Ausgabe gebaut ist.',
+  vorbereitetHinweis: 'Für diese Dokumentart liefert noch kein Modul Daten. Du kannst Vorlagen hochladen und zuordnen; aktiv setzen lassen sie sich, sobald die Ausgabe gebaut ist.',
   hochladen: 'Neue Version hochladen',
   hochladenHint: 'Word-Datei (.docx), höchstens 5 MB. Platzhalter in Guillemets, z. B. «Projektname».',
   wirdHochgeladen: 'Datei wird hochgeladen …',
-  hochgeladen: (n: number) => `Version ${n} hochgeladen. Prüfen Sie die Zuordnung.`,
+  hochgeladen: (n: number) => `Version ${n} hochgeladen. Prüfe die Zuordnung.`,
   zuGross: 'Die Datei ist grösser als 5 MB.',
-  keinWord: 'Wählen Sie eine Word-Datei (.docx).',
+  keinWord: 'Wähle eine Word-Datei (.docx).',
   versionenTitel: 'Versionen',
   version: (n: number) => `Version ${n}`,
   stand: { entwurf: 'Entwurf', aktiv: 'aktiv', abgeloest: 'abgelöst' } as Record<string, string>,
@@ -43,9 +43,9 @@ export const TV = {
   entfernenFrage: (n: number) => `Entwurf «Version ${n}» löschen?`,
   entfernenText: 'Die hochgeladene Datei und ihre Zuordnung werden gelöscht. Aktive und abgelöste Versionen bleiben erhalten.',
   entfernt: (n: number) => `Entwurf Version ${n} gelöscht.`,
-  gesperrt: 'Aktive und abgelöste Versionen lassen sich nicht mehr ändern. Laden Sie für Änderungen eine neue Version hoch.',
-  conflict: 'Diese Version wurde inzwischen geändert. Laden Sie neu und prüfen Sie die Zuordnung danach erneut.',
-  gone: 'Diese Dokumentart gibt es nicht, oder Sie sehen sie nicht.',
+  gesperrt: 'Aktive und abgelöste Versionen lassen sich nicht mehr ändern. Lade für Änderungen eine neue Version hoch.',
+  conflict: 'Diese Version wurde inzwischen geändert. Lade neu und prüfe die Zuordnung danach erneut.',
+  gone: 'Diese Dokumentart gibt es nicht, oder du siehst sie nicht.',
   versionGone: 'Diese Version gibt es nicht mehr.',
   leer: 'Noch keine eigene Vorlage. Es gilt der Grundbestand bzw. noch keine Vorlage.',
   zurueck: 'Alle Versionen',

@@ -141,7 +141,7 @@ export function lesen(csv: string): { zeilen: (UebernahmeZeile & { fehler: Fehle
   for (const s of Object.keys(SPALTEN) as Spalte[]) pos[s] = kopf.findIndex(k => (SPALTEN[s] as readonly string[]).map(norm).includes(k));
   const fehlt = PFLICHT.filter(s => pos[s] < 0);
   if (fehlt.length) {
-    return { zeilen: [], kopf: fehlt.map(s => ({ spalte: TEXT[s], text: `Spalte «${TEXT[s]}» fehlt in der Kopfzeile. Verwenden Sie die Vorlage.` })) };
+    return { zeilen: [], kopf: fehlt.map(s => ({ spalte: TEXT[s], text: `Spalte «${TEXT[s]}» fehlt in der Kopfzeile. Verwende die Vorlage.` })) };
   }
   const zeilen = roh.slice(1).map((r, i) => {
     const wert = (s: Spalte) => (pos[s] >= 0 ? (r[pos[s]] ?? '').trim() : '');
@@ -153,7 +153,7 @@ export function lesen(csv: string): { zeilen: (UebernahmeZeile & { fehler: Fehle
     const phase = wert('phase').toUpperCase().replace(/\s/g, '');
     if (!(PHASEN as readonly string[]).includes(phase)) f('phase', `Projektphase «${wert('phase')}» statt P0 bis P4.`);
     const abschluss = datum(wert('abschlussPer'));
-    if (abschluss === undefined) f('abschlussPer', `Abschluss per «${wert('abschlussPer')}» ist kein Datum (TT.MM.JJJJ). Tragen Sie ein Datum ein oder lassen Sie das Feld leer.`);
+    if (abschluss === undefined) f('abschlussPer', `Abschluss per «${wert('abschlussPer')}» ist kein Datum (TT.MM.JJJJ). Trage ein Datum ein oder lass das Feld leer.`);
     const termin = datum(wert('meilensteinTermin'));
     if (termin === undefined) f('meilensteinTermin', `Meilenstein Termin «${wert('meilensteinTermin')}» ist kein Datum (TT.MM.JJJJ).`);
     const meilenstein = wert('meilenstein');
@@ -166,7 +166,7 @@ export function lesen(csv: string): { zeilen: (UebernahmeZeile & { fehler: Fehle
     if (trend === undefined) f('trend', `Trend «${tr}» statt Pfeil (↗ → ↘) oder «aufwärts», «gleichbleibend», «abwärts».`);
     const begruendung = wert('begruendung'), massnahme = wert('massnahme');
     if (status === 'kritisch' && (!begruendung || !massnahme)) {
-      f(begruendung ? 'massnahme' : 'begruendung', 'Status «kritisch»: Begründung und Massnahme sind Pflicht (UC-004 A2). Ergänzen Sie die Spalten «Begründung» und «Massnahme».');
+      f(begruendung ? 'massnahme' : 'begruendung', 'Status «kritisch»: Begründung und Massnahme sind Pflicht (UC-004 A2). Ergänze die Spalten «Begründung» und «Massnahme».');
     }
     if (begruendung.length > 4000 || massnahme.length > 4000) f('begruendung', 'Begründung und Massnahme: je höchstens 4000 Zeichen.');
     return {
@@ -199,7 +199,7 @@ async function person(tx: Tx, wer: string): Promise<{ id: string } | { fehler: s
     `SELECT id FROM ${SCHEMA}.principal WHERE kind = 'user' AND removed_at IS NULL
         AND (lower(email) = lower($1) OR lower(btrim(display_name)) = lower(btrim($1))) LIMIT 2`, [wer])).rows;
   if (rows.length === 1) return { id: rows[0]!.id };
-  return { fehler: rows.length ? `Projektleitung «${wer}» ist nicht eindeutig. Geben Sie die E-Mail-Adresse an.` : `Projektleitung «${wer}» gibt es in der Organisation nicht.` };
+  return { fehler: rows.length ? `Projektleitung «${wer}» ist nicht eindeutig. Gib die E-Mail-Adresse an.` : `Projektleitung «${wer}» gibt es in der Organisation nicht.` };
 }
 
 /**
@@ -226,7 +226,7 @@ export async function uebernehmen(tx: Tx, ctx: { db: Db; tenantId: string; tuple
         const hf = z.handlungsfeld
           ? (await tx.query<{ id: string }>(`SELECT id FROM ${SCHEMA}.handlungsfeld WHERE lower(btrim(label)) = lower($1)`, [z.handlungsfeld.replace(/\s+/g, ' ')])).rows[0] ?? null
           : null;
-        if (z.handlungsfeld && !hf) fehler.push({ spalte: TEXT.handlungsfeld, text: `Handlungsfeld «${z.handlungsfeld}» gibt es nicht. Erfassen Sie es zuerst oder lassen Sie das Feld leer.` });
+        if (z.handlungsfeld && !hf) fehler.push({ spalte: TEXT.handlungsfeld, text: `Handlungsfeld «${z.handlungsfeld}» gibt es nicht. Erfasse es zuerst oder lass das Feld leer.` });
         const pl = z.projektleitung ? await person(tx, z.projektleitung) : null;
         if (pl && 'fehler' in pl) fehler.push({ spalte: TEXT.projektleitung, text: pl.fehler });
         if (!fehler.length) {

@@ -1,6 +1,6 @@
 /**
  * Texte des Features «Stammdaten» (Namensraum = Feature, docs/fachmodell.md 7.2): Administration › Organisation (UI-44)
- * und Codetabellen (UI-45). Anrede «Sie», Schweizer Rechtschreibung, «Organisation» statt Mandant.
+ * und Codetabellen (UI-45). Anrede «Du», Schweizer Rechtschreibung, «Organisation» statt Mandant.
  */
 export const TS = {
   bereich: { organisation: 'Organisation', codetabellen: 'Codetabellen' },
@@ -18,28 +18,28 @@ export const TS = {
     aktivHint: 'Nicht mehr bestehende Einheiten deaktivieren; sie bleiben an bestehenden Projekten sichtbar.',
     nurAktive: 'Nur aktive', geaendert: 'Zuletzt geändert',
     created: 'Organisationseinheit angelegt.', saved: 'Änderungen gespeichert.', deleted: 'Organisationseinheit gelöscht.',
-    confirmDelete: (k: string) => `«${k}» wirklich löschen? Wird die Einheit noch verwendet, deaktivieren Sie sie stattdessen.`,
-    nichtLoeschbar: 'Löschen geht nur ohne untergeordnete Einheiten; deaktivieren Sie die Einheit stattdessen.',
-    conflict: 'Diese Einheit wurde inzwischen geändert. Laden Sie sie neu und übernehmen Sie Ihre Änderungen danach nochmals.',
-    gone: 'Diese Einheit gibt es nicht mehr, oder Sie sehen sie nicht.',
-    noRight: 'Sie können die Organisation nur ansehen. Ändern können Personen mit dem Recht «Stammdaten pflegen».',
-    kuerzelMissing: 'Geben Sie ein Kürzel ein (bis 20 Zeichen, ohne Leerzeichen).', nameMissing: 'Geben Sie einen Namen ein.',
+    confirmDelete: (k: string) => `«${k}» wirklich löschen? Wird die Einheit noch verwendet, deaktiviere sie stattdessen.`,
+    nichtLoeschbar: 'Löschen geht nur ohne untergeordnete Einheiten; deaktiviere die Einheit stattdessen.',
+    conflict: 'Diese Einheit wurde inzwischen geändert. Lade sie neu und übernimm deine Änderungen danach nochmals.',
+    gone: 'Diese Einheit gibt es nicht mehr, oder du siehst sie nicht.',
+    noRight: 'Du kannst die Organisation nur ansehen. Ändern können Personen mit dem Recht «Stammdaten pflegen».',
+    kuerzelMissing: 'Gib ein Kürzel ein (bis 20 Zeichen, ohne Leerzeichen).', nameMissing: 'Gib einen Namen ein.',
     untereinheiten: (n: number) => (n === 1 ? '1 untergeordnete Einheit' : `${n} untergeordnete Einheiten`),
   },
   feiertag: {
     one: 'Feiertag', create: 'Neuer Feiertag', datum: 'Datum', label: 'Bezeichnung', jahr: 'Jahr',
     empty: 'Noch keine Feiertage erfasst. Fristen in Arbeitstagen zählen Montag bis Freitag ohne diese Tage.',
     emptyJahr: (j: number) => `Für ${j} sind keine Feiertage erfasst.`,
-    datumInvalid: 'Geben Sie ein gültiges Datum im Format TT.MM.JJJJ ein.', labelMissing: 'Geben Sie eine Bezeichnung ein.',
+    datumInvalid: 'Gib ein gültiges Datum im Format TT.MM.JJJJ ein.', labelMissing: 'Gib eine Bezeichnung ein.',
     created: 'Feiertag erfasst.', saved: 'Änderungen gespeichert.', deleted: 'Feiertag gelöscht.',
     confirmDelete: (l: string, d: string) => `«${l}» (${d}) wirklich löschen? Fristen in Arbeitstagen zählen diesen Tag danach mit.`,
-    conflict: 'Dieser Feiertag wurde inzwischen geändert. Laden Sie ihn neu und übernehmen Sie Ihre Änderungen danach nochmals.',
-    gone: 'Diesen Feiertag gibt es nicht mehr, oder Sie sehen ihn nicht.',
+    conflict: 'Dieser Feiertag wurde inzwischen geändert. Lade ihn neu und übernimm deine Änderungen danach nochmals.',
+    gone: 'Diesen Feiertag gibt es nicht mehr, oder du siehst ihn nicht.',
   },
   code: {
     title: 'Codetabellen', sub: 'Auswahlwerte für Status, Trend, Grössen, Kategorien und weitere Angaben.',
     tabelle: 'Codetabelle', beschreibung: 'Wofür', werte: 'Werte', anzahl: (aktiv: number, alle: number) => (aktiv === alle ? `${alle}` : `${aktiv} von ${alle} aktiv`),
-    empty: 'Die Codetabellen enthalten noch keine Werte. Laden Sie die Vorgabe des PM-Handbuchs und passen Sie sie danach an.',
+    empty: 'Die Codetabellen enthalten noch keine Werte. Lade die Vorgabe des PM-Handbuchs und passe sie danach an.',
     vorgabe: 'Vorgabe laden', vorgabeGeladen: (n: number) => (n === 0 ? 'Die Vorgabe ist bereits vollständig geladen.' : n === 1 ? '1 Wert angelegt.' : `${n} Werte angelegt.`),
     vorgabeHint: 'Ergänzt fehlende Werte aus dem PM-Handbuch; vorhandene Werte bleiben unverändert.',
     schluessel: 'Schlüssel', label: 'Text', position: 'Reihenfolge', stand: 'Stand',
@@ -50,10 +50,10 @@ export const TS = {
     deaktiviertHint: 'Deaktivierte Werte erscheinen nicht mehr zur Auswahl; gespeicherte Angaben behalten ihren Wert. Werte werden nie gelöscht.',
     deaktiviert: (l: string) => `«${l}» deaktiviert.`, aktiviert: (l: string) => `«${l}» aktiviert.`, rueckgaengig: 'Rückgängig',
     created: 'Wert hinzugefügt.', saved: 'Änderungen gespeichert.',
-    conflict: 'Dieser Wert wurde inzwischen geändert. Die Liste ist neu geladen; versuchen Sie es nochmals.',
+    conflict: 'Dieser Wert wurde inzwischen geändert. Die Liste ist neu geladen; versuche es nochmals.',
     gone: 'Diese Codetabelle gibt es nicht.',
-    schluesselInvalid: 'Bis 40 Zeichen: Buchstaben, Ziffern und Unterstrich.', labelMissing: 'Geben Sie einen Text ein.',
+    schluesselInvalid: 'Bis 40 Zeichen: Buchstaben, Ziffern und Unterstrich.', labelMissing: 'Gib einen Text ein.',
     positionInvalid: 'Ganze Zahl von 0 bis 999.',
-    noRight: 'Sie können die Codetabellen nur ansehen. Ändern können Personen mit dem Recht «Stammdaten pflegen».',
+    noRight: 'Du kannst die Codetabellen nur ansehen. Ändern können Personen mit dem Recht «Stammdaten pflegen».',
   },
 };

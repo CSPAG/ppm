@@ -30,26 +30,34 @@ rm -f "$PKG"/*.tgz
 (cd "$KIT" && npm ci >/dev/null && npm run build >/dev/null)
 for d in "$KIT"/packages/*; do (cd "$d" && npm pack --pack-destination "$PKG" --silent >/dev/null); done
 
-# 2 Versionen, die die Lockfiles verlangen, aber nicht dem aktuellen Stand entsprechen, aus der Historie bauen
+# 2 Versionen, die die Lockfiles verlangen, aus dem Tag des Releases bauen (<paket>-v<version>, setzt der
+# Release-Workflow des identity-kit), auch wenn main dieselbe Versionsnummer trägt: main kann nach dem Release schon
+# Änderungen der nächsten Version enthalten. Ohne Tag: Stand von main, sonst Suche in der Historie.
 need=$(node -e '
   const fs=require("fs"); const out=new Set();
   for (const f of process.argv.slice(1)) for (const [k,v] of Object.entries(JSON.parse(fs.readFileSync(f)).packages ?? {}))
     { const m=k.match(/node_modules\/(@vollholz\/[^/]+)$/); if (m) out.add(m[1]+"@"+v.version); }
   console.log([...out].join("\n"));' "$ROOT/package-lock.json" "$ROOT/web/package-lock.json")
+bauen() { # <name> <dir> <ver> <commit>
+  old=$WORK/alt-$2-$3; rm -rf "$old"; (cd "$KIT" && git worktree prune && git worktree add -q -f "$old" "$4")
+  ln -s "$KIT/node_modules" "$old/node_modules"
+  (cd "$old" && npm run build --workspace "$1" >/dev/null && cd "packages/$2" && npm pack --pack-destination "$PKG" --silent >/dev/null)
+}
 for nv in $need; do
   name=${nv%@*}; ver=${nv##*@}; file=$(echo "$name" | sed 's#^@##; s#/#-#')-$ver.tgz
-  [ -f "$PKG/$file" ] && continue
-  dir=${name#@vollholz/}
-  for c in $(cd "$KIT" && git log --format=%H -S"\"version\": \"$ver\"" -- "packages/$dir/package.json"); do
-    for cand in "$c" "$c^"; do
-      if (cd "$KIT" && git show "$cand:packages/$dir/package.json" 2>/dev/null | grep -q "\"version\": \"$ver\""); then
-        old=$WORK/alt-$dir-$ver; rm -rf "$old"; (cd "$KIT" && git worktree prune && git worktree add -q -f "$old" "$cand")
-        ln -s "$KIT/node_modules" "$old/node_modules"
-        (cd "$old" && npm run build --workspace "$name" >/dev/null && cd "packages/$dir" && npm pack --pack-destination "$PKG" --silent >/dev/null)
-        break 2
-      fi
+  dir=${name#@vollholz/}; tag=$dir-v$ver
+  if (cd "$KIT" && git fetch -q --depth 1 origin "refs/tags/$tag:refs/tags/$tag" 2>/dev/null); then
+    rm -f "$PKG/$file"; bauen "$name" "$dir" "$ver" "$tag"
+  else
+    [ -f "$PKG/$file" ] && continue
+    for c in $(cd "$KIT" && git log --format=%H -S"\"version\": \"$ver\"" -- "packages/$dir/package.json"); do
+      for cand in "$c" "$c^"; do
+        if (cd "$KIT" && git show "$cand:packages/$dir/package.json" 2>/dev/null | grep -q "\"version\": \"$ver\""); then
+          bauen "$name" "$dir" "$ver" "$cand"; break 2
+        fi
+      done
     done
-  done
+  fi
   [ -f "$PKG/$file" ] || { echo "setup: $nv nicht gefunden" >&2; exit 1; }
 done
 

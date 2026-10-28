@@ -26845,7 +26845,8 @@
               "businessCase",
               "kpis",
               "kosten",
-              "offeneMeilensteine"
+              "offeneMeilensteine",
+              "nutzenpruefung"
             ],
             "properties": {
               "baseline": {
@@ -27012,6 +27013,37 @@
                     }
                   }
                 }
+              },
+              "nutzenpruefung": {
+                "anyOf": [
+                  {
+                    "description": "Letzte Nutzenprüfung aus dem Gate-Modus (UC-003 A2), Grundlage der Beurteilung am Abschluss; null ohne.",
+                    "type": "object",
+                    "required": [
+                      "version",
+                      "beurteilung",
+                      "werte"
+                    ],
+                    "properties": {
+                      "version": {
+                        "description": "Vertragsversion des Gates.",
+                        "type": "string"
+                      },
+                      "beurteilung": {
+                        "type": "string"
+                      },
+                      "werte": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/AbschlussKpiWert"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             }
           },

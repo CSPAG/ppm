@@ -113,6 +113,11 @@ export const Abschluss = Type.Object({
       description: 'Summen der Kostenpositionen; null ohne Recht auf Beträge (A-33, «nicht verfügbar»).',
     })),
     offeneMeilensteine: Type.Array(Meilenstein, { description: 'Meilensteine und Lieferergebnisse ohne «erreicht am».' }),
+    nutzenpruefung: Nullable(Type.Object({
+      version: Type.String({ description: 'Vertragsversion des Gates.' }),
+      beurteilung: Type.String(),
+      werte: Type.Array(Type.Ref('AbschlussKpiWert')),
+    }, { description: 'Letzte Nutzenprüfung aus dem Gate-Modus (UC-003 A2), Grundlage der Beurteilung am Abschluss; null ohne.' })),
   }, { description: 'Was das System zum Abschluss zeigt (UC-015 Schritt 1).' }),
   lessonsLearned: Type.Array(Type.Ref('AbschlussLessonLearned')),
   entscheid: Nullable(Type.Object({
@@ -130,7 +135,11 @@ export const Abschluss = Type.Object({
   }),
 }, { $id: 'Abschluss', additionalProperties: false });
 type BerichtT = Omit<Static<typeof Bericht>, 'kpiWerte' | 'offenePunkte'> & { kpiWerte: KpiWertT[]; offenePunkte: OffenerPunktT[] };
-export type AbschlussOut = Omit<Static<typeof Abschluss>, 'bericht' | 'lessonsLearned'> & { bericht: BerichtT | null; lessonsLearned: LessonOut[] };
+type Grundlagen = Static<typeof Abschluss>['grundlagen'];
+export type AbschlussOut = Omit<Static<typeof Abschluss>, 'bericht' | 'lessonsLearned' | 'grundlagen'> & {
+  bericht: BerichtT | null; lessonsLearned: LessonOut[];
+  grundlagen: Omit<Grundlagen, 'nutzenpruefung'> & { nutzenpruefung: { version: string; beurteilung: string; werte: KpiWertT[] } | null };
+};
 
 export const LessonIn = Type.Object({
   text: Type.String({ minLength: 1, maxLength: 5000, description: 'Erkenntnis für künftige Vorhaben.' }),

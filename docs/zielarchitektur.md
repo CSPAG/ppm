@@ -41,7 +41,7 @@ Anmeldung über Keycloak (auch Microsoft Entra ID je Organisation), Maschinenzug
 | L7 | Modularer Monolith mit maschinell geprüften Grenzen | `.dependency-cruiser.cjs`, [Modulgrenzen](#modulgrenzen) |
 | L8 | Konfiguration nur über Umgebungsvariablen, eine Liste als Quelle, Exit 78 bei Fehlern | `app.vars` (IAM, `@vollholz/platform`, App), [konfiguration.md](konfiguration.md) |
 | L9 | Browser nur same-origin; Drittsysteme erreicht nur das Backend über erlaubte Netz-Adapter | `scripts/check-network.ts` |
-| L10 | Deutsch, Schweizer Rechtschreibung (ohne Eszett), Oberfläche mit Anrede «Sie» (UX-E7, bis zur Klärung von UX-OF-1) | `scripts/check-address.ts`, `web/src/ui/texts.test.ts` |
+| L10 | Deutsch, Schweizer Rechtschreibung (ohne Eszett), Oberfläche mit Anrede «Du» (UX-E7, UX-OF-1 entschieden 28.10.2026) | `scripts/check-address.ts` |
 
 ## Schichten
 

@@ -177,6 +177,17 @@ export async function letzteKpiWerte(tx: Tx, projektId: string): Promise<Map<str
   return new Map(rows.map(r => [r.kpi_id, { periode: r.periode, wert: Number(r.wert) }]));
 }
 
+/**
+ * Letzte Nutzenprüfung aus dem Gate-Modus (UC-003 A2, Gate P2–P3 bzw. P3–P4; Tabelle des Moduls vertrag, nur lesend):
+ * Grundlage der Beurteilung am Abschluss (UC-015 Schritt 3).
+ */
+export async function letzteNutzenpruefung(tx: Tx, projektId: string): Promise<{ version: string; beurteilung: string; werte: KpiWert[] } | null> {
+  return (await tx.query<{ version: string; beurteilung: string; werte: KpiWert[] }>(
+    `SELECT v.nummer AS version, n.beurteilung, n.werte FROM ${SCHEMA}.nutzenpruefung n
+       JOIN ${SCHEMA}.vertrag_version v ON v.tenant_id = n.tenant_id AND v.id = n.version_id
+      WHERE n.projekt_id = $1 ORDER BY v.created_at DESC LIMIT 1`, [projektId])).rows[0] ?? null;
+}
+
 /** Anzeigenamen der Personen (Lesesicht). */
 export async function personen(tx: Tx, ids: string[]): Promise<Map<string, string>> {
   if (!ids.length) return new Map();

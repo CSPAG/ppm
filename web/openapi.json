@@ -13587,6 +13587,26 @@
           }
         }
       },
+      "StatusberichtEskalationNeu": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "grund"
+        ],
+        "properties": {
+          "grund": {
+            "minLength": 1,
+            "maxLength": 4000,
+            "description": "Worum es geht, z. B. die wesentliche Abweichung zur Baseline.",
+            "type": "string"
+          },
+          "massnahme": {
+            "maxLength": 4000,
+            "description": "Vorgeschlagene Massnahme; leer: das Gremium entscheidet über das weitere Vorgehen.",
+            "type": "string"
+          }
+        }
+      },
       "StatusberichtFehlend": {
         "additionalProperties": false,
         "type": "object",
@@ -13634,6 +13654,7 @@
           "geprueftAt",
           "version",
           "updatedAt",
+          "eskalation",
           "can"
         ],
         "properties": {
@@ -13918,12 +13939,84 @@
               }
             ]
           },
+          "eskalation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "anlass",
+                  "stand",
+                  "vorgeschlagen",
+                  "angelegtAt"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "anlass": {
+                    "description": "`kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "kritisch"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "abweichung"
+                        ]
+                      }
+                    ]
+                  },
+                  "stand": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "offen"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "traktandiert"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "erledigt"
+                        ]
+                      }
+                    ]
+                  },
+                  "vorgeschlagen": {
+                    "description": "Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand.",
+                    "type": "boolean"
+                  },
+                  "angelegtAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "can": {
             "type": "object",
             "required": [
               "write",
               "einreichen",
-              "zurueckziehen"
+              "zurueckziehen",
+              "eskalieren"
             ],
             "properties": {
               "write": {
@@ -13935,6 +14028,10 @@
               },
               "zurueckziehen": {
                 "description": "Rückgängig innert 10 s nach dem Einreichen.",
+                "type": "boolean"
+              },
+              "eskalieren": {
+                "description": "Eskalation aus der Warnung «wesentliche Abweichung» starten (UC-004 A1.2): bearbeitbar und noch ohne Eskalation.",
                 "type": "boolean"
               }
             }
@@ -64429,6 +64526,150 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/eskalation": {
+      "post": {
+        "summary": "Aus der Warnung «wesentliche Abweichung» eskalieren",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "UC-004 A1.2, K1 Schritt 2: Die PL startet eine Eskalation (UC-006) zum Bericht, auch im Entwurf und unabhängig vom Status; fehlt der Entwurf noch, entsteht er mit der Vorbelegung. Die Eskalation geht als Traktandenvorschlag an die nächste Sitzung des entscheidenden Gremiums, die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren. Der Bericht bleibt, wie er ist. Je Bericht höchstens eine Eskalation (409); nur, solange der Bericht bearbeitbar ist (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusberichtEskalationNeu"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

@@ -1,5 +1,10 @@
-/** Modul statusbericht, Eskalation (160_eskalation; BC PS.03.03, AP-E2-4). Keine eigenen Routen: Traktandum über sitzung. */
+/**
+ * Modul statusbericht, Eskalation (160_eskalation, 161; BC PS.03.03, AP-E2-4). Traktandum über sitzung; eigene Route nur
+ * «aus der Warnung eskalieren» (UC-004 A1.2) am Bericht aus matrix/statusbericht.ts.
+ */
 import type { Matrix } from './typ.ts';
+
+const periode = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }).slice(0, 7);
 
 export const matrix: Matrix = {
   tables: {
@@ -8,6 +13,9 @@ export const matrix: Matrix = {
       await tx.query("INSERT INTO ppm.eskalation (tenant_id, projekt_id, statusbericht_id, grund) SELECT $1, projekt_id, id, 'Probe' FROM ppm.statusbericht WHERE entscheide = 'Probe'", [t]);
       return "grund = 'Probe'";
     },
+  },
+  cases: {
+    'POST /v1/projekte/:id/berichte/:periode/eskalation': i => ({ method: 'POST', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/eskalation`, body: { grund: 'gehackt' }, kind: 'foreign' }),
   },
   policies: [
     // Muster KIND: lesen wer das Projekt sieht; anlegen und (solange offen) löschen mit statusbericht:write am Projekt;

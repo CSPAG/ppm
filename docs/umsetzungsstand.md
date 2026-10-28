@@ -47,7 +47,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E6-4 | Quartalsreporting | 330–339 | offen | – | – |
 | AP-E7-1 | Abschluss, Sistierung, Abbruch, Lessons Learned | 340–349 | offen | – | – |
 | AP-E7-2 | Ressourcen zuteilen, Konflikte | 350–359 | umgesetzt (350, `zuteilung*` im Modul `ressource`: Bedarfsliste, Zuteilung, Konflikte, Lücke, Sammelaufgaben, MCP `list_bedarfe`; Oberfläche UI-25 Portfolio › Ressourcen › Bedarf: Liste + Schublade, Zuteilen, Lücke, Überbuchungen; HR-Übernahme RK.01.02 offen) | #69, #77 | A-20; eine Person höchstens eine Stelle (Beschäftigungsgrad aus dem HR-System offen, RK.01.02, K23); Pool-Konflikt nur gegen erfasstes Angebot; Priorität über `prioritaetQuelleSetzen` der Priorisierung (ohne: nach Projektnummer); «gedeckt» im Register darf auch `ressource:write` ändern (Policy in 350) |
-| AP-E7-3 | Schnittstellen und Änderungsprotokoll | 360–369 | in Arbeit: PR 1 (360, Modul `schnittstelle`: Schnittstellen mit Testlauf, Rhythmus, Laufprotokoll, Aufgabe `schnittstelle.fehler`; Änderungsprotokoll aus dem Audit); PR 2 Oberfläche UI-49, UI-50 | – | Adresse und Protokoll der Umsysteme stehen nicht in docs/: Austausch über HTTP(S) mit JSON an einer Adresse je Schnittstelle, ohne Anmeldung am Umsystem (folgt mit dem Anschluss, z. B. AP-E7-4); Katalog nur ERP › Ist-Kosten (A-16), HR-System › Personal (RK.01.02, K23 offen), Budgetprozess › Jahresbedarf (A-17); Verarbeitung registriert das Fachmodul, ohne sie «noch nicht verfügbar»; Testlauf prüft nur die Verbindung und meldet keinen Fehler im Eingang; private Adressen nur mit `WEBHOOK_ALLOW_PRIVATE` (Entwicklung, Tests); geplanter Lauf einmal je Tag, Woche bzw. Monat, ein Lauf von Hand zählt; Änderungsprotokoll: alter und neuer Wert aus `before`/`after` des Audits |
+| AP-E7-3 | Schnittstellen und Änderungsprotokoll | 360–369 | offen | – | – |
 | AP-E7-4 | Finanzen | 370–379 | offen | – | – |
 | AP-E7-5 | Jahresrückblick | 380–389 | offen | – | – |
 | AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | offen | – | – |
@@ -147,8 +147,8 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | AM.02.03 | Phasenmodell und Gates konfigurieren | 017 | E0 | AP-E0-3 | umgesetzt | #17 |
 | AM.02.04 | Portfolioebenen und Gremien konfigurieren | 017 | E0 | AP-E0-5 | umgesetzt | #19, #24 |
 | AM.03.01 | Vorlagen verwalten | 018 | E3, E7 | AP-E3-5, AP-E7-7 | in Arbeit (Grundbestand #73; Versionen, Hochladen, Feldzuordnung als API, Oberfläche UI-48 folgt) | #73 |
-| AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks); Umsysteme API in Arbeit (AP-E7-3 PR 1) | Gerüst (695ab82) |
-| AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | API in Arbeit (AP-E7-3 PR 1) | – |
+| AM.03.02 | Schnittstelle konfigurieren | 018 | E7 | AP-E7-3 | teilweise (Webhooks) | Gerüst (695ab82) |
+| AM.03.03 | Änderungsprotokoll einsehen | 018 | E7 | AP-E7-3 | offen | – |
 
 PP.01.01 entfällt (aufgegangen in ZM.01.02).
 

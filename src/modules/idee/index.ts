@@ -6,16 +6,23 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { freigabeUmgebung, registriereIdee } from './freigabe.ts';
+import { registerFreigabeRoutes } from './freigabe-routes.ts';
 import { ideeTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
 export const ideeModule = defineModule({
   name: 'idee',
-  tags: [{ name: TAG, description: 'Projektideen nach Vorlage: Assistent für Antragstellende, eigene Ideen mit Stand, Rückfragen beantworten; ab AP-E4-2 Ideenpool und Prüfung.' }],
+  tags: [{ name: TAG, description: 'Projektideen nach Vorlage: Assistent für Antragstellende, eigene Ideen mit Stand, Rückfragen beantworten; ab AP-E4-2 Ideenpool und Prüfung, ab AP-E4-3 Freigabe der Initialisierung.' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
     registerPruefungRoutes(app, deps);
+    registerFreigabeRoutes(app, deps);
+    freigabeUmgebung(deps);
   },
   mcpTools: { ...ideeTools },
 });
+
+// Freigabe der Initialisierung (AP-E4-3): Traktandenart `idee` in der Registry der Sitzung
+registriereIdee();

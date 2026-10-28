@@ -6,6 +6,8 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { registrierePriorisierung } from './entscheid.ts';
+import { registerEntscheidRoutes } from './entscheid-routes.ts';
 import { matrixTools } from './matrix-mcp.ts';
 import { registerMatrixRoutes } from './matrix-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
@@ -19,6 +21,10 @@ export const priorisierungModule = defineModule({
     registerRoutes(app, deps);
     registerMatrixRoutes(app, deps);
     registerSzenarioRoutes(app, deps);
+    registerEntscheidRoutes(app, deps);
   },
   mcpTools: { ...matrixTools, ...szenarioTools },
 });
+
+// Priorisierungsentscheid (AP-E5-5): Traktandenart `priorisierung` in der Registry der Sitzung
+registrierePriorisierung();

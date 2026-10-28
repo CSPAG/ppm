@@ -1,6 +1,7 @@
 /*
  * Auswertungen (UI-30): Filter und Kennzahlen oben, Ergebnistabelle mit Zahlen als Schaltflächen (Einzelwerte in der
- * Schublade). Farben nur aus den Tokens (hell und dunkel); auf dem Telefon untereinander und waagrecht scrollbar.
+ * Schublade). Die Steuerleiste liegt im scrollenden Bereich (`.body`), sonst überdeckt sie bei schmaler Breite die
+ * Tabelle. Farben nur aus den Tokens (hell und dunkel); auf dem Telefon untereinander und waagrecht scrollbar.
  */
 .aw-steuer{padding:12px 22px;border-bottom:1px solid var(--line);display:grid;gap:10px}
 .aw-filter{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}

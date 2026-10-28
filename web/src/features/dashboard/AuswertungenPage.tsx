@@ -108,43 +108,43 @@ export function AuswertungenPage({ search, setSearch }: { search: AuswertungenSe
           <button type="button" className="btn" disabled={exportLaeuft} onClick={() => void exp('einzelwerte')}><Icon name="download" />{TA.exportEinzelwerte}</button>
         </>
       ) : null} />
-      <div className="aw-steuer" role="search" aria-label={TA.filter.titel}>
-        <div className="aw-filter">
-          <Auswahl label={TA.filter.portfolio} wert={search.portfolio} alle={TA.filter.allePortfolios} optionen={portfolios} onChange={v => setSearch({ portfolio: v, o: undefined })} />
-          <Auswahl label={TA.filter.phase} wert={search.phase} alle={TA.filter.allePhasen} optionen={PHASEN.map(p => ({ wert: p, label: p }))} onChange={v => setSearch({ phase: v, o: undefined })} />
-          <Auswahl label={TA.filter.lebenszyklus} wert={search.lebenszyklus} alle={TA.lebenszyklen.aktiv!} optionen={optionen(LEBENSZYKLEN.filter(l => l !== 'aktiv'), TA.lebenszyklen)} onChange={v => setSearch({ lebenszyklus: v, o: undefined })} />
-          <Auswahl label={TA.filter.status} wert={search.status} alle={TA.filter.alleStatus} optionen={optionen(STATUS, TA.status)} onChange={v => setSearch({ status: v, o: undefined })} />
-          <Auswahl label={TA.filter.handlungsfeld} wert={search.handlungsfeld} alle={TA.filter.alleHandlungsfelder} optionen={handlungsfelder} onChange={v => setSearch({ handlungsfeld: v, o: undefined })} />
-          <label className="aw-feld">
-            <span>{TA.filter.periode}</span>
-            <input type="month" value={search.periode ?? d?.periode ?? ''} title={TA.filter.periodeHilfe}
-              onChange={e => setSearch({ periode: /^\d{4}-\d{2}$/.test(e.target.value) ? e.target.value : undefined, o: undefined }, { replace: true })} />
-          </label>
-          <Auswahl label={TA.gruppierung} wert={search.gruppierung === 'portfolio' ? undefined : search.gruppierung} alle={TA.gruppierungen.portfolio!}
-            optionen={optionen(GRUPPIERUNGEN.filter(g => g !== 'portfolio'), TA.gruppierungen)} onChange={v => setSearch({ gruppierung: v, o: undefined })} />
-        </div>
-        <fieldset className="aw-kennzahlen">
-          <legend>{TA.kennzahlen}</legend>
-          {KENNZAHLEN.filter(k => finanzen || !FINANZ.includes(k)).map(k => (
-            <label key={k} className="aw-check">
-              <input type="checkbox" checked={gewaehlt.includes(k)} disabled={gewaehlt.length === 1 && gewaehlt.includes(k)} onChange={e => setzeKennzahl(k, e.target.checked)} />
-              {KENNZAHL_LABEL[k]}{FINANZ.includes(k) ? ' (CHF)' : ''}
-            </label>
-          ))}
-        </fieldset>
-        {aktiv.length ? (
-          <div className="aw-chips">
-            {aktiv.map(f => (
-              <span key={f} className="chip">
-                <span className="v"><b>{filterName[f]}:</b> {chipLabel[f]!(search[f]!)}</span>
-                <button type="button" className="x" aria-label={TA.filter.entfernen(filterName[f]!)} onClick={() => setSearch({ [f]: undefined, o: undefined })}><Icon name="x" /></button>
-              </span>
-            ))}
-            <button type="button" className="btn sm ghost" onClick={() => setSearch({ ...ohneFilter, o: undefined })}>{TA.filter.zuruecksetzen}</button>
-          </div>
-        ) : null}
-      </div>
       <div className="body">
+        <div className="aw-steuer" role="search" aria-label={TA.filter.titel}>
+          <div className="aw-filter">
+            <Auswahl label={TA.filter.portfolio} wert={search.portfolio} alle={TA.filter.allePortfolios} optionen={portfolios} onChange={v => setSearch({ portfolio: v, o: undefined })} />
+            <Auswahl label={TA.filter.phase} wert={search.phase} alle={TA.filter.allePhasen} optionen={PHASEN.map(p => ({ wert: p, label: p }))} onChange={v => setSearch({ phase: v, o: undefined })} />
+            <Auswahl label={TA.filter.lebenszyklus} wert={search.lebenszyklus} alle={TA.lebenszyklen.aktiv!} optionen={optionen(LEBENSZYKLEN.filter(l => l !== 'aktiv'), TA.lebenszyklen)} onChange={v => setSearch({ lebenszyklus: v, o: undefined })} />
+            <Auswahl label={TA.filter.status} wert={search.status} alle={TA.filter.alleStatus} optionen={optionen(STATUS, TA.status)} onChange={v => setSearch({ status: v, o: undefined })} />
+            <Auswahl label={TA.filter.handlungsfeld} wert={search.handlungsfeld} alle={TA.filter.alleHandlungsfelder} optionen={handlungsfelder} onChange={v => setSearch({ handlungsfeld: v, o: undefined })} />
+            <label className="aw-feld">
+              <span>{TA.filter.periode}</span>
+              <input type="month" value={search.periode ?? d?.periode ?? ''} title={TA.filter.periodeHilfe}
+                onChange={e => setSearch({ periode: /^\d{4}-\d{2}$/.test(e.target.value) ? e.target.value : undefined, o: undefined }, { replace: true })} />
+            </label>
+            <Auswahl label={TA.gruppierung} wert={search.gruppierung === 'portfolio' ? undefined : search.gruppierung} alle={TA.gruppierungen.portfolio!}
+              optionen={optionen(GRUPPIERUNGEN.filter(g => g !== 'portfolio'), TA.gruppierungen)} onChange={v => setSearch({ gruppierung: v, o: undefined })} />
+          </div>
+          <fieldset className="aw-kennzahlen">
+            <legend>{TA.kennzahlen}</legend>
+            {KENNZAHLEN.filter(k => finanzen || !FINANZ.includes(k)).map(k => (
+              <label key={k} className="aw-check">
+                <input type="checkbox" checked={gewaehlt.includes(k)} disabled={gewaehlt.length === 1 && gewaehlt.includes(k)} onChange={e => setzeKennzahl(k, e.target.checked)} />
+                {KENNZAHL_LABEL[k]}{FINANZ.includes(k) ? ' (CHF)' : ''}
+              </label>
+            ))}
+          </fieldset>
+          {aktiv.length ? (
+            <div className="aw-chips">
+              {aktiv.map(f => (
+                <span key={f} className="chip">
+                  <span className="v"><b>{filterName[f]}:</b> {chipLabel[f]!(search[f]!)}</span>
+                  <button type="button" className="x" aria-label={TA.filter.entfernen(filterName[f]!)} onClick={() => setSearch({ [f]: undefined, o: undefined })}><Icon name="x" /></button>
+                </span>
+              ))}
+              <button type="button" className="btn sm ghost" onClick={() => setSearch({ ...ohneFilter, o: undefined })}>{TA.filter.zuruecksetzen}</button>
+            </div>
+          ) : null}
+        </div>
         {q.isPending ? (
           <div aria-busy="true"><span className="sr" role="status">{TA.title}</span>{skelett ? <Skelett /> : null}</div>
         ) : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : d && !einzelwerte.length ? (

@@ -79,6 +79,7 @@ Features nutzen keine anderen Features (`feature-nur-gemeinsame-bausteine`); gem
 |---|---|---|---|---|---|
 | `eingang` | Eingang | UI-01 | `eingang` (+ Kopfdaten der Module) | alle | AP-E0-8 |
 | `konto` | Kontomenü › Profil, Stellvertretung | UI-43 | `eingang` | – | AP-E0-8 |
+| `zugang` | Administration › Zugänge, Neubesetzung | UI-42 (Teil Zugang entziehen) | `eingang` (`neubesetzung*`) | – | AP-E7-8 |
 | `projekt` | Projekte (Meine Projekte), Projekt › Übersicht; Rahmen der Projektakte (Kopf, Reiter) | UI-05, UI-06 | `projekt`, `projektdaten` | K1, K2 | AP-E0-4 |
 | `bericht` | Projekte › Projekt › Bericht | UI-13 | `statusbericht` | K1 | AP-E1-1 |
 | `monatsabschluss` | Portfolio › Monatsabschluss (+ Termine) | UI-15, UI-16 | `statusbericht` | K1 | AP-E1-2 |

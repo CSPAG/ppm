@@ -37,13 +37,20 @@ export interface BereichEintrag {
   muster?: RegExp;
 }
 
-/** Häufige Aktion für die Befehlspalette (I-N4), sichtbar mit dem Recht an der Organisation. */
-export interface AktionEintrag { id: string; label: string; icon: IconName; pfad: string; recht: AppPermission }
+/**
+ * Häufige Aktion für die Befehlspalette (I-N4), sichtbar mit dem Recht an der Organisation (`irgendwo`: mit dem Recht
+ * irgendwo, z. B. an einem Gremium). `ziel` bestimmt die Adresse erst beim Ausführen (z. B. «Nächste Sitzung öffnen»);
+ * ohne Ergebnis gilt `pfad`.
+ */
+export interface AktionEintrag {
+  id: string; label: string; icon: IconName; pfad: string; recht: AppPermission; irgendwo?: boolean;
+  ziel?(signal: AbortSignal): Promise<string | null>;
+}
 
 export interface Treffer { id: string; label: string; detail?: string; icon: IconName; pfad: string }
 
-/** Suche nach Objekten für die Befehlspalette, nur mit dem Recht irgendwo; die Antwort der API filtert je Objekt. */
-export interface SucheEintrag { id: string; recht: AppPermission; suchen(q: string, signal: AbortSignal): Promise<Treffer[]> }
+/** Suche nach Objekten für die Befehlspalette, nur mit dem Recht irgendwo (eines genügt); die Antwort der API filtert je Objekt. */
+export interface SucheEintrag { id: string; recht: AppPermission | readonly AppPermission[]; suchen(q: string, signal: AbortSignal): Promise<Treffer[]> }
 
 /**
  * Zähler an einem Arbeitsraum (I-N3: offene Aufgaben an «Eingang»), sichtbar mit dem Recht irgendwo. `queryKey` teilt
@@ -90,11 +97,16 @@ export function sichtbareRaeume(
   });
 }
 
-/** Aufteilung für das Telefon: unten höchstens drei, der Rest unter «Mehr» (Reihenfolge wie in der Leiste). */
+/**
+ * Aufteilung für das Telefon: unten höchstens drei, der Rest unter «Mehr» (Reihenfolge wie in der Leiste). Hat das
+ * Portfolio nur einen Bereich, heisst es unten wie dieser (IA «Navigation»: Antragstellende sehen unten «Eingang» und
+ * «Ideen»).
+ */
 export function aufteilenUnten(raeume: SichtbarerRaum[]): { unten: SichtbarerRaum[]; mehr: SichtbarerRaum[] } {
   const ids = UNTEN_VORRANG.filter(id => raeume.some(r => r.id === id)).slice(0, UNTEN_ANZAHL);
+  const kurz = (r: SichtbarerRaum) => (r.id === 'portfolio' && r.bereiche.length === 1 ? { ...r, label: r.bereiche[0]!.label } : r);
   return {
-    unten: ids.map(id => raeume.find(r => r.id === id)!),
+    unten: ids.map(id => kurz(raeume.find(r => r.id === id)!)),
     mehr: raeume.filter(r => !ids.includes(r.id)),
   };
 }
@@ -105,8 +117,8 @@ export function useNavigation(reg: NavRegistrierung, path: string) {
   const verwalten = useIamNav();
   return useMemo(() => ({
     raeume: sichtbareRaeume(reg, canSomewhere, path, verwalten),
-    aktionen: reg.aktionen.filter(a => can(a.recht)),
-    suchen: reg.suchen.filter(s => canSomewhere(s.recht)),
+    aktionen: reg.aktionen.filter(a => (a.irgendwo ? canSomewhere(a.recht) : can(a.recht))),
+    suchen: reg.suchen.filter(s => (typeof s.recht === 'string' ? [s.recht] : s.recht).some(canSomewhere)),
   }), [reg, can, canSomewhere, path, verwalten]);
 }
 

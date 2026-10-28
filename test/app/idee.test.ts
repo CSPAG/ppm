@@ -133,6 +133,12 @@ describe('Projektidee einreichen', { skip }, () => {
     const meine = (await call('GET', '/v1/ideen?eigene=true', as1)).json().items as { id: string; stand: string }[];
     assert.equal(meine.find(x => x.id === e.id)?.stand, 'eingereicht');
     assert.ok((await call('GET', '/v1/ideen', as2)).json().items.every((x: { eigene: boolean }) => x.eigene), 'nur eigene');
+    // Suche für die Befehlspalette (I-N4): Titel als Teilstring, Nummer genau; nach Recht wie die Liste
+    const suche = async (q: string, h: Record<string, string>) => ((await call('GET', `/v1/ideen?q=${encodeURIComponent(q)}`, h)).json().items as { id: string }[]).map(x => x.id);
+    assert.ok((await suche('nur ein tit', ue)).includes(e.id));
+    assert.ok((await suche(String(e.nummer), ue)).includes(e.id));
+    assert.ok(!(await suche('nur ein tit', as2)).includes(e.id), 'fremde Idee nicht für andere Antragstellende');
+    assert.deepEqual(await suche('100%_', ue), []);
 
     // nach dem Einreichen nicht mehr änderbar, nicht verwerfbar, nicht erneut einreichbar
     assert.equal((await call('PATCH', `/v1/ideen/${e.id}`, mit(as1, 3), { titel: 'später' })).statusCode, 409);

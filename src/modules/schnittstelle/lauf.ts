@@ -15,7 +15,7 @@ import { abrufen, liefern, TransportFehler, type Optionen } from './transport.ts
 export type TxRunner = <T>(fn: (tx: Tx) => Promise<T>) => Promise<T>;
 
 export const TIMEOUT_MS = 30_000;
-export const LINK = '/admin/schnittstellen';
+export const LINK = '/administration/schnittstellen';
 
 export class LaeuftSchon extends Error {}
 

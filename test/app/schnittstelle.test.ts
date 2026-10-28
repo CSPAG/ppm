@@ -90,7 +90,7 @@ describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
     assert.equal(r.json().stand, 'fehlgeschlagen');
     assert.match(r.json().fehler, /Ist-Kosten je Kostenträger und Monat» ist noch nicht verfügbar/);
     const a = await aufgaben();
-    assert.deepEqual(a.map(x => [x.bezug_id, x.stand, x.link]), [[erp, 'offen', `/admin/schnittstellen?o=${erp}`]]);
+    assert.deepEqual(a.map(x => [x.bezug_id, x.stand, x.link]), [[erp, 'offen', `/administration/schnittstellen?o=${erp}`]]);
     assert.match(a[0]!.titel, /Schnittstelle «ERP · Ist-Kosten je Kostenträger und Monat» prüfen/);
   });
 

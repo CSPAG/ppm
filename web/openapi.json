@@ -27224,6 +27224,397 @@
           }
         }
       },
+      "Jahresauswertung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zielerreichung",
+          "vorhaben"
+        ],
+        "properties": {
+          "zielerreichung": {
+            "additionalProperties": false,
+            "description": "Zielerreichung des Jahres: je Ziel der letzte Stand bis Q4 (UC-012).",
+            "type": "object",
+            "required": [
+              "gesamt",
+              "mitStand",
+              "ziele"
+            ],
+            "properties": {
+              "gesamt": {
+                "type": "integer"
+              },
+              "mitStand": {
+                "description": "Ziele mit einem Stand im Jahr.",
+                "type": "integer"
+              },
+              "ziele": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "typ",
+                    "id",
+                    "nummer",
+                    "text",
+                    "metrik",
+                    "zielwert",
+                    "stand",
+                    "beurteilung",
+                    "quartal"
+                  ],
+                  "properties": {
+                    "typ": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "strategisch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "jahresziel"
+                          ]
+                        }
+                      ]
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "metrik": {
+                      "type": "string"
+                    },
+                    "zielwert": {
+                      "type": "string"
+                    },
+                    "stand": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "beurteilung": {
+                      "type": "string"
+                    },
+                    "quartal": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "vorhaben": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "abgeschlossen",
+              "abgebrochen",
+              "laufend"
+            ],
+            "properties": {
+              "abgeschlossen": {
+                "description": "Im Jahr abgeschlossen.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name",
+                    "portfolio",
+                    "phase",
+                    "lebenszyklus",
+                    "seit"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "portfolio": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "lebenszyklus": {
+                      "description": "`aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`.",
+                      "type": "string"
+                    },
+                    "seit": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "abgebrochen": {
+                "description": "Im Jahr abgebrochen.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name",
+                    "portfolio",
+                    "phase",
+                    "lebenszyklus",
+                    "seit"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "portfolio": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "lebenszyklus": {
+                      "description": "`aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`.",
+                      "type": "string"
+                    },
+                    "seit": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "laufend": {
+                "description": "Aktive und sistierte Vorhaben.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name",
+                    "portfolio",
+                    "phase",
+                    "lebenszyklus",
+                    "seit"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "portfolio": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "lebenszyklus": {
+                      "description": "`aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`.",
+                      "type": "string"
+                    },
+                    "seit": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Jahresrueckblick": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "stand",
+          "erkenntnisse",
+          "massnahmen",
+          "rueckmeldung",
+          "traktandiertAt",
+          "ausgewertetAt",
+          "version",
+          "auswertung",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "stand": {
+            "description": "`offen` (noch nichts erfasst), `in_arbeit` (UE stellt zusammen), `traktandiert` (beim PRAT), `ausgewertet` («Verabschiedet»).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "offen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "in_arbeit"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "traktandiert"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "ausgewertet"
+                ]
+              }
+            ]
+          },
+          "erkenntnisse": {
+            "type": "string"
+          },
+          "massnahmen": {
+            "type": "string"
+          },
+          "rueckmeldung": {
+            "description": "Rückmeldung des PRAT bei «Anpassungen verlangt».",
+            "type": "string"
+          },
+          "traktandiertAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ausgewertetAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "description": "0, solange nichts gespeichert ist (If-Match W/\"0\" beim ersten Speichern).",
+            "type": "integer"
+          },
+          "auswertung": {
+            "$ref": "#/components/schemas/Jahresauswertung"
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "bearbeiten",
+              "traktandieren"
+            ],
+            "properties": {
+              "bearbeiten": {
+                "type": "boolean"
+              },
+              "traktandieren": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "JahresrueckblickPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "erkenntnisse",
+          "massnahmen"
+        ],
+        "properties": {
+          "erkenntnisse": {
+            "maxLength": 8000,
+            "type": "string"
+          },
+          "massnahmen": {
+            "maxLength": 8000,
+            "type": "string"
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -76901,6 +77292,362 @@
         }
       }
     },
+    "/v1/jahresrueckblicke/{jahr}": {
+      "get": {
+        "summary": "Jahresrückblick",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`. ETag = Fassung (W/\"0\", solange nichts gespeichert ist).",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Jahresrueckblick"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Erkenntnisse und Massnahmen erfassen",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Legt den Jahresrückblick an bzw. erfasst Erkenntnisse und Massnahmen für den nächsten Zielzyklus (UC-013 Schritt 4); nicht während der Traktandierung (409). Bestehend nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JahresrueckblickPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Jahresrueckblick"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jahresrueckblicke/{jahr}/traktandieren": {
+      "post": {
+        "summary": "Jahresrückblick traktandieren",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Hält die Jahresauswertung fest und schlägt sie dem PRAT vor (entscheidendes Gremium des Portfolios der Kategorie A; UC-013 Schritt 3, UC-006). Ohne gespeicherten Jahresrückblick 404, bereits traktandiert oder ausgewertet 409. Recht `quartalsbericht:write`.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Jahresrueckblick"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -78190,6 +78937,10 @@
     {
       "name": "Lessons Learned",
       "description": "Lessons Learned je Projekt für künftige Vorhaben und den Jahresrückblick (PS.04.03)."
+    },
+    {
+      "name": "Jahresrückblick",
+      "description": "Jahresrückblick: Jahresauswertung aus Zielerreichung und Vorhaben, Traktandierung im PRAT, Erkenntnisse und Massnahmen für den nächsten Zielzyklus."
     },
     {
       "name": "Webhooks",

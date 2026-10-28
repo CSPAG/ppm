@@ -12,6 +12,7 @@ import { auswertungModule } from './modules/auswertung/index.ts';
 import { eingangIamHaken, eingangModule } from './modules/eingang/index.ts';
 import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { ideeModule } from './modules/idee/index.ts';
+import { jahresrueckblickModule } from './modules/jahresrueckblick/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
 import { priorisierungModule } from './modules/priorisierung/index.ts';
@@ -50,6 +51,7 @@ export const app = defineApp({
     ressourceModule,
     priorisierungModule,
     abschlussModule,
+    jahresrueckblickModule,
     webhooksModule,
     schnittstelleModule,
   ],

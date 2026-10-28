@@ -42954,6 +42954,118 @@
         }
       }
     },
+    "/v1/eingang/aufgaben/{id}/wieder-oeffnen": {
+      "post": {
+        "summary": "Von Hand erledigte Aufgabe wieder öffnen",
+        "tags": [
+          "Eingang"
+        ],
+        "description": "«Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat, sonst 404. Ist inzwischen dieselbe Aufgabe wieder offen, 409.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Aufgabe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/mitteilungen": {
       "get": {
         "summary": "Mitteilungen",

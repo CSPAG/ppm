@@ -29161,6 +29161,369 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/vertragsversionen/{id}/gate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gate-Modus der Version
+         * @description Gate in die Zielphase mit Gremienweg (PRAT, GLPA, via SNS-VR), Leitfragen je Wertestrom mit Antworten und Fortschritt, Standard-Lieferergebnisse der laufenden Phase mit Stand, ab dem Gate P2–P3 die Nutzenprüfung (UC-003 Schritte 1, 4, A2) und nach dem Entscheid dessen Ergebnis. Nur Versionen mit Gate (erster Vertrag oder Gate); eine Änderung: 409.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragGate"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/gate/leitfragen/{leitfrageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Leitfrage beantworten
+         * @description Antwort der Projektleitung (UC-003 Schritt 4, PS.02.01), automatisch gespeichert; leer entfernt die Antwort. «Trifft nicht zu» mit Begründung (`zutreffend: false`). Nur am Entwurf «in Arbeit», mit `vertrag:write`. `If-Match` = Stand der Antwort, `W/"0"` für eine neue.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                    leitfrageId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragLeitfrageAntwortIn"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragLeitfrage"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/gate/nutzen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Nutzenprüfung erfassen
+         * @description Erreichte Werte je KPI und Beurteilung am Gate ab P3 (UC-003 A2, PC.03.02) durch Projektleitung (`vertrag:write`) oder Sponsor (`vertrag:decide`). Nur am Entwurf «in Arbeit»; KPIs aus dem Register des Projekts. `If-Match` = `nutzen.version`, `W/"0"` beim ersten Erfassen.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragNutzenIn"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragGate"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ideen": {
         parameters: {
             query?: never;
@@ -37602,6 +37965,140 @@ export interface components {
             ergebnis: "unterzeichnet" | "verweigert";
             /** @description Pflicht beim Verweigern: Die Projektleitung erfährt sonst nicht, was zu ändern ist. */
             begruendung?: string;
+        };
+        VertragLeitfrage: {
+            /** Format: uuid */
+            id: string;
+            /** @description Schlüssel des Werts in der Codetabelle «Werteströme» (Nutzen, Projekt, Klinik, ICT, Infrastruktur). */
+            wertestrom: string;
+            text: string;
+            antwort: {
+                text: string;
+                zutreffend: boolean;
+                version: number;
+                /** Format: date-time */
+                updatedAt: string;
+                updatedBy: string | null;
+            } | null;
+        };
+        VertragGate: {
+            /** Format: uuid */
+            versionId: string;
+            nummer: string;
+            /**
+             * @description Bearbeitungsstand der Version.
+             * @enum {string}
+             */
+            stand: "in_arbeit" | "in_pruefung" | "zur_unterzeichnung" | "unterzeichnet" | "traktandiert" | "abgenommen" | "abgelehnt" | "verworfen" | "zurueckgezogen";
+            gate: {
+                /**
+                 * @description Gate in die Zielphase.
+                 * @enum {string}
+                 */
+                code: "P0_P1" | "P1_P2" | "P2_P3" | "P3_P4";
+                /** @description «P1–P2» */
+                label: string;
+                /**
+                 * @description Phase P0 bis P4.
+                 * @enum {string}
+                 */
+                von: "P0" | "P1" | "P2" | "P3" | "P4";
+                /**
+                 * @description Phase P0 bis P4.
+                 * @enum {string}
+                 */
+                nach: "P0" | "P1" | "P2" | "P3" | "P4";
+            };
+            gremienweg: {
+                gremium: {
+                    kuerzel: string;
+                    name: string;
+                };
+                zusaetzlich: {
+                    kuerzel: string;
+                    name: string;
+                } | null;
+                /** @description Das Gate läuft zusätzlich über den SNS-VR (UC-006 A1). */
+                viaSns: boolean;
+            } | null;
+            /** @description Leitfragen des Gates je Wertestrom in der Version des Phasenmodells ab diesem Gate (A-13). */
+            leitfragen: components["schemas"]["VertragLeitfrage"][];
+            /** @description «18 von 25 beantwortet» (K2 Schritt 2). */
+            fortschritt: {
+                beantwortet: number;
+                gesamt: number;
+            };
+            /** @description Standard-Lieferergebnisse der laufenden Phase mit Stand aus dem Register (UC-003 Schritt 1). */
+            lieferergebnisse: {
+                /**
+                 * @description Phase P0 bis P4.
+                 * @enum {string}
+                 */
+                phase: "P0" | "P1" | "P2" | "P3" | "P4";
+                /**
+                 * @description Art.
+                 * @enum {string}
+                 */
+                art: "lieferergebnis" | "meilenstein";
+                text: string;
+                erreichtAm: string | null;
+            }[];
+            nutzen: {
+                beurteilung: string;
+                werte: {
+                    /** Format: uuid */
+                    kpiId: string;
+                    /** @description Erreichter Wert, z. B. «62 %». */
+                    wert: string;
+                    bemerkung: string;
+                }[];
+                kpis: {
+                    /** Format: uuid */
+                    id: string;
+                    text: string;
+                    einheit: string;
+                    zielwert: string | null;
+                }[];
+                /** @description Stand für If-Match; 0 = noch nicht erfasst. */
+                version: number;
+            } | null;
+            entscheid: {
+                /**
+                 * @description Entscheid des Gremiums.
+                 * @enum {string}
+                 */
+                ergebnis: "freigegeben" | "mit_auflagen" | "zurueckgestellt" | "abgelehnt";
+                begruendung: string;
+                /** Format: date-time */
+                at: string;
+            } | null;
+            can: {
+                /** @description Leitfragen beantworten (PL, Entwurf in Arbeit). */
+                antworten: boolean;
+                /** @description Nutzenprüfung erfassen (PL oder SP, Entwurf in Arbeit). */
+                nutzen: boolean;
+            };
+        };
+        VertragLeitfrageAntwortIn: {
+            /** @description Antwort als Text; leer = Antwort entfernen. Bei «trifft nicht zu» die Begründung (K2 «Regeln»). */
+            antwort: string;
+            /**
+             * @description false = «trifft nicht zu» mit Begründung in `antwort`.
+             * @default true
+             */
+            zutreffend: boolean;
+        };
+        VertragNutzenIn: {
+            /** @description Beurteilung durch Projektleitung und Sponsor (UC-003 A2.2). */
+            beurteilung: string;
+            /** @description Erreichte Werte je KPI des Registers. */
+            werte: {
+                /** Format: uuid */
+                kpiId: string;
+                /** @description Erreichter Wert, z. B. «62 %». */
+                wert: string;
+                bemerkung: string;
+            }[];
         };
         IdeeRueckfrage: {
             /** Format: uuid */

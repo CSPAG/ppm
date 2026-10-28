@@ -9,7 +9,8 @@ const PROBE = "(SELECT id FROM ppm.projekt WHERE nummer = '2026-001')";
 const ueberEltern = (tabelle: string) => [
   `ppm.${tabelle}.${tabelle}_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -`,
   `ppm.${tabelle}.${tabelle}_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id)`,
-  `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) CHECK app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id)`,
+  // ab 190_vertrag_gate auch die Folge des Gate-Entscheids (`app.vertrag_intern`, AP-E3-3)
+  `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text)) CHECK (app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text))`,
 ];
 
 export const matrix: Matrix = {

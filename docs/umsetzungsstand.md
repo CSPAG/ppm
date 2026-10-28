@@ -30,7 +30,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E2-4 | Eskalation und Meilensteinabnahme | 160–169 | umgesetzt (160, `statusbericht/eskalation*`, `abnahme*`: Arten `eskalation` und `meilenstein` in der Registry, Folge des Entscheids in dessen Transaktion; Entscheid über die Route mit AP-E2-2) | #65 | A-30, A-46; Vorschlag ohne entscheidendes Gremium entfällt, die Aufgabe «Eskalation behandeln» bleibt; «Nicht abgenommen» ändert das Register nicht, eine erteilte Abnahme bleibt bei Korrektur (Zurücknehmen bietet `projektdaten` nicht); Abnahme als System, solange `EntscheidFolge` keinen Akteur trägt; Frist der Aufgabe offen |
 | AP-E3-1 | Projektakte mit Kapiteln und Pflichtangaben | 170–179 | in Arbeit (PR 1: 170, Modul `vertrag` mit Versionen, Kapiteln 1–13, Pflichtangaben, Einreichen, Baseline mit Register-Übernahme und Zuordnung zum Ziel, MCP `get_vertrag`; PR 2 Oberfläche Reiter «Vertrag» der Projektakte) | #43, #48 | A-04 (Koalition als Liste in Kap. 8), A-12 (Pflichtangaben aus dem Phasenmodell; ab Gate P1–P2 Personal in FTE und Kosten bis P4), A-19 (Business Case als Text, Kosten aus Kap. 9), A-29; erster Vertrag eines übernommenen Projekts gilt für die laufende Phase; Register-Übernahme erst bei der Baseline; Beilagen ohne Datei |
 | AP-E3-2 | Quality-Check und Unterzeichnen | 180–189 | in Arbeit (PR 1: 180, `pruefung*` im Modul `vertrag`: Quality-Check mit Kommentar je Kapitel, Unterschriften SP/PL/CTL mit Stellvertretung, Verweigern mit Begründung, Aufgaben; PR 2: Oberfläche UI-12 `/projekte/<nr>/vertrag/pruefen` und `…/unterzeichnen`, Aufgabe «Quality-Check» verweist auf die Prüfansicht) | #64, #75 | A-04, A-31 |
-| AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | offen | – | – |
+| AP-E3-3 | Gate-Modus und Gate-Entscheid | 190–199 | in Arbeit (PR 1: 190, `gate*` im Modul `vertrag`: Anlass `gate` aus der Baseline, Gate-Antrag mit Leitfragen je Wertestrom, Nutzenprüfung ab P3, Traktandum nach der dritten Unterschrift beim Gremium des Gremienwegs, Art `gate` mit Gate Review Packet und Folge Baseline/Phase/Phasenmodell samt Rücknahme bei Korrektur, Aufgabe «Gate vorbereiten»; PR 2: Oberfläche UI-08) | PR 1 | A-02, A-13, A-27, A-30; geplantes Gate = eingeplante Sitzung oder erster Sitzungstermin ab Phasenexit (Kap. 7.2) |
 | AP-E3-4 | Versionsvergleich und Änderungsantrag | 200–209 | offen | – | – |
 | AP-E3-5 | Dokumentausgabe Projektvertrag | 210–219 | in Arbeit (Modul `vorlage` mit Grundbestand Projektvertrag nach Q7 und Ausgabe PDF/Word ohne Fremdbibliothek, `GET /v1/vorlagen`; `GET /v1/vertragsversionen/:id/dokument?format=pdf|docx`; Baustein `DokumentAusgabe` im Kopf der Projektakte › Vertrag, nachgeladen mit der Seite) | – | Format PDF und Word (Vorschlag K2, «Format offen»); Grundbestand als Vorlage im Code, ohne Tabelle `vorlage` (Hochladen, Fassungen und Feldzuordnung mit AP-E7-7, Migration 210–219 ungenutzt); Beträge ohne `finanzen:read` «nicht verfügbar» (A-33); Unterschriften in Kap. 12 «noch keine» bis AP-E3-2; Export im Audit (`vertrag.exported`) |
 | AP-E4-1 | Projektidee einreichen | 220–229 | umgesetzt (220, Modul `idee`, `list_ideen`, `get_idee`; Assistent, Meine Ideen, Ansicht, Rückfragen beantworten); offen: Kopfkarte «Ideen» auf der Startseite (Eintrag über Feature-Grenze), E2E bis CI läuft | #36, #50 | A-46; Pflichtfelder beim Einreichen: Titel, Ausgangslage, Zielsetzung, Handlungsfeld, Nutzen, Aufwand, Relevanz (Ziel, Bereiche, Herkunft freiwillig); Auswahl des Strategiebezugs über `GET /v1/ideen/auswahl` mit voller Sicht, weil Antragstellende kein `ziel:read` haben; Entwürfe sieht nur, wer sie erfasst; Rückfrage mit betroffenem Feld (`idee_rueckfrage.feld`) |
@@ -78,7 +78,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | in Arbeit (Kapitel bearbeiten, API) | – |
 | DM.02.04 | Projektvertrag zurückziehen | 002 | E3 | AP-E3-1 | offen | – |
 | DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API, Prüfansicht UI-12) | – |
-| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | – |
+| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium über die Art `gate`, AP-E3-3 PR 1) | – |
 | DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | in Arbeit (API; «Als Dokument herunterladen» im Kopf der Projektakte › Vertrag) | – |
 | PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | umgesetzt | #71, #79 |
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | umgesetzt (Budgetrahmen je Portfolio, A-18) | #71, #79 |
@@ -100,11 +100,11 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
 | PS.01.03 | Ausstehende Statusberichte nachverfolgen | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
 | PS.01.04 | Terminabweichungen analysieren | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
-| PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | offen | – |
-| PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | in Arbeit (Entscheid im Gremium umgesetzt #42, #45; Folge über die Art `gate` mit AP-E3-3) | #42, #45 |
+| PS.02.01 | Phasenfreigabe beantragen | 003 | E3 | AP-E3-3 | in Arbeit (Leitfragen je Wertestrom, Traktandum nach der dritten Unterschrift, API) | – |
+| PS.02.02 | Phasenfreigabe entscheiden | 003, 006 | E2, E3 | AP-E2-2, AP-E3-3 | in Arbeit (Entscheid im Gremium umgesetzt #42, #45; Folge über die Art `gate`: Baseline, Phase, Phasenmodell, AP-E3-3 PR 1) | #42, #45 |
 | PS.02.03 | Meilenstein abnehmen | 006 | E2 | AP-E2-4 | umgesetzt (UC-006 Schritt 7) | #65 |
 | PS.02.04 | Meilensteinplan pflegen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
-| PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | offen | – |
+| PS.02.05 | Projektvertrag fortschreiben | 003 | E3 | AP-E3-3 | in Arbeit (Gate-Entwurf «n.0» aus der Baseline mit Standard-Ergebnissen der Zielphase, API) | – |
 | PS.03.01 | Änderung am Projektvertrag beantragen | 007 | E3 | AP-E3-4 | offen | – |
 | PS.03.02 | Änderung am Projektvertrag entscheiden | 007 | E3 | AP-E3-4 | offen | – |
 | PS.03.03 | Eskalation behandeln | 004, 006 | E2 | AP-E2-4 | umgesetzt (UC-004 A2.2, UC-006 Schritt 7) | #65 |
@@ -125,7 +125,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.02.03 | Risikomassnahme verfolgen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht, UI-13) | #58 |
 | PC.02.04 | Projektrisiko erfassen | 002, 004 | E0, E1 | AP-E0-6, AP-E1-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PC.03.01 | Projekt-KPIs festlegen | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
-| PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
+| PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | in Arbeit (Nutzenprüfung am Gate ab P3 je KPI, API; Exit mit AP-E7-1) | – |
 | PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht ab P2, UI-13) | #58 |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | in Arbeit (API) | – |
@@ -137,7 +137,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | RK.02.02 | Ressourcen zuteilen | 009 | E7 | AP-E7-2 | umgesetzt | #69, #77 |
 | RK.02.03 | Ressourcenkonflikt auflösen | 009 | E7 | AP-E7-2 | umgesetzt | #69, #77 |
 | RK.02.04 | Auslastung analysieren | 008, 009 | E5 | AP-E5-4 | umgesetzt (auch je Szenario über die Schnittstelle für AP-E5-3) | #35, #40 |
-| RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | offen | – |
+| RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | in Arbeit (Gate-Entwurf übernimmt Personal aus der Baseline; FTE ab Gate P1–P2 als Pflichtangabe AP-E3-1) | – |
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | offen | – |
 | AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | offen | – |
@@ -173,7 +173,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K2-2 | Quality-Checks ohne Rückmeldung | ≥ 70 % | Betrieb | AP-E3-2 | offen |
 | K2-3 | Eingereicht → unterzeichnet | Median ≤ 5 Arbeitstage | Betrieb | AP-E3-2 | offen |
 | K2-4 | Fehlende Pflichtangaben auffinden | 1 Klick, 100 % | Test | AP-E3-1 | API mit Sprungziel je Angabe getestet (`vertrag.test.ts`); Oberfläche in PR 2 |
-| K2-5 | Gate Review Packet ohne Dateien (PPM-4) | 0 Dateien | Aufgabentest, Betrieb | AP-E3-3 | offen |
+| K2-5 | Gate Review Packet ohne Dateien (PPM-4) | 0 Dateien | Aufgabentest, Betrieb | AP-E3-3 | Packet aus dem System (Unterlage der Art `gate`, Test); beim Aufgabentest zu bestätigen |
 | K3-1 | Unterlagen ≥ 5 Arbeitstage vorher | 100 % | Betrieb (Versandprotokoll) | AP-E2-1 | offen |
 | K3-2 | Traktandenliste versandbereit | ≤ 30 Min. | Aufgabentest | AP-E2-1 | offen |
 | K3-3 | Entscheid erfassen | ≤ 60 s je Traktandum | Test (Messung im Sitzungsmodus) | AP-E2-2 | gemessen im E2E (`sitzungsmodus.spec.ts`, Zeit bis zur Bestätigung als Annotation); Aufgabentest mit Personen offen |

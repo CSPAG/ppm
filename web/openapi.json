@@ -25151,6 +25151,1111 @@
           }
         }
       },
+      "SzenarioVergleich": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolioId",
+          "projekte",
+          "szenarien",
+          "hinweise"
+        ],
+        "properties": {
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projekte": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "nummer",
+                "name",
+                "unterschiedlich"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "unterschiedlich": {
+                  "description": "Liegt nicht in allen Szenarien auf derselben Seite der Wasserlinie.",
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "szenarien": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "stand",
+                "kosten",
+                "budget",
+                "nutzen",
+                "risiko",
+                "strategiebeitrag",
+                "ueber",
+                "unter",
+                "wasserlinie",
+                "engpaesse"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stand": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "entwurf"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "beantragt"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "entschieden"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "verworfen"
+                      ]
+                    }
+                  ]
+                },
+                "kosten": {
+                  "anyOf": [
+                    {
+                      "description": "Kosten der Projekte über der Wasserlinie.",
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "budget": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "rahmen",
+                    "bedarf"
+                  ],
+                  "properties": {
+                    "rahmen": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "bedarf": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "nutzen": {
+                  "additionalProperties": false,
+                  "description": "Projekte über der Wasserlinie nach Nutzen (Matrix, A-39; ohne Score, A-01).",
+                  "type": "object",
+                  "required": [
+                    "hoch",
+                    "tief",
+                    "grenze",
+                    "offen"
+                  ],
+                  "properties": {
+                    "hoch": {
+                      "type": "integer"
+                    },
+                    "tief": {
+                      "type": "integer"
+                    },
+                    "grenze": {
+                      "type": "integer"
+                    },
+                    "offen": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "risiko": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "hoch",
+                    "tief",
+                    "grenze",
+                    "offen"
+                  ],
+                  "properties": {
+                    "hoch": {
+                      "type": "integer"
+                    },
+                    "tief": {
+                      "type": "integer"
+                    },
+                    "grenze": {
+                      "type": "integer"
+                    },
+                    "offen": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "strategiebeitrag": {
+                  "additionalProperties": false,
+                  "description": "Einschätzung «Strategiebeitrag» der Projekte über der Wasserlinie.",
+                  "type": "object",
+                  "required": [
+                    "hoch",
+                    "mittel",
+                    "tief",
+                    "offen"
+                  ],
+                  "properties": {
+                    "hoch": {
+                      "type": "integer"
+                    },
+                    "mittel": {
+                      "type": "integer"
+                    },
+                    "tief": {
+                      "type": "integer"
+                    },
+                    "offen": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "ueber": {
+                  "type": "array",
+                  "items": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "unter": {
+                  "type": "array",
+                  "items": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "wasserlinie": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "beiRang",
+                    "grund",
+                    "text"
+                  ],
+                  "properties": {
+                    "beiRang": {
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "grund": {
+                      "anyOf": [
+                        {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "budget"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "kapazitaet"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "text": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "engpaesse": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "rolle",
+                      "quartal",
+                      "monat",
+                      "bedarf",
+                      "angebot",
+                      "projekte"
+                    ],
+                    "properties": {
+                      "rolle": {
+                        "type": "string"
+                      },
+                      "quartal": {
+                        "description": "«JJJJ-Qn»",
+                        "type": "string"
+                      },
+                      "monat": {
+                        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                        "description": "Monat «JJJJ-MM».",
+                        "type": "string"
+                      },
+                      "bedarf": {
+                        "description": "FTE im Monat der grössten Überbuchung.",
+                        "type": "number"
+                      },
+                      "angebot": {
+                        "type": "number"
+                      },
+                      "projekte": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "hinweise": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Szenario": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "portfolioId",
+          "name",
+          "stand",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "beantragtAt",
+          "modell",
+          "kostenSichtbar",
+          "positionen",
+          "rechnung",
+          "vorlage",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "beantragt"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "entschieden"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "verworfen"
+                ]
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "beantragtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "modell": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "nummer"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nummer": {
+                    "type": "integer"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kostenSichtbar": {
+            "type": "boolean"
+          },
+          "positionen": {
+            "description": "Nach Rang.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "nummer",
+                "name",
+                "phase",
+                "rang",
+                "aktiv",
+                "startMonat",
+                "startGeplant",
+                "kosten",
+                "kostenKumuliert",
+                "fteMonate",
+                "groesse",
+                "nutzen",
+                "risiko",
+                "strategiebeitrag",
+                "bewertet",
+                "ueberWasserlinie",
+                "neu",
+                "warnungen"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "phase": {
+                  "type": "string"
+                },
+                "rang": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "aktiv": {
+                  "description": "Im Szenario enthalten (sonst zählt das Projekt nicht und liegt ausserhalb der Wasserlinie).",
+                  "type": "boolean"
+                },
+                "startMonat": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                      "description": "Start im Szenario (JJJJ-MM); null = wie geplant.",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "startGeplant": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                      "description": "Frühester Monat des Ressourcenbedarfs (geplanter Start).",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kosten": {
+                  "anyOf": [
+                    {
+                      "description": "Summe der Prognose (sonst Baseline) in CHF; null ohne finanzen:read.",
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kostenKumuliert": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fteMonate": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "groesse": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "S"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "M"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "L"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "nutzen": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "grenze"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "risiko": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "grenze"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "strategiebeitrag": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "hoch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "mittel"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "tief"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bewertet": {
+                  "description": "Mindestens ein Kriterium nach dem Modell in Kraft bewertet.",
+                  "type": "boolean"
+                },
+                "ueberWasserlinie": {
+                  "anyOf": [
+                    {
+                      "description": "null, wenn das Projekt nicht enthalten ist.",
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "neu": {
+                  "description": "Aktives Projekt des Portfolios, das seit Anlage des Szenarios dazugekommen ist (am Ende eingereiht).",
+                  "type": "boolean"
+                },
+                "warnungen": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "art",
+                      "text"
+                    ],
+                    "properties": {
+                      "art": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "abhaengigkeit"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "bedarf_geaendert"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "nur_groesse"
+                            ]
+                          }
+                        ]
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "rechnung": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "wasserlinie",
+              "budget",
+              "engpaesse",
+              "unter",
+              "hinweise"
+            ],
+            "properties": {
+              "wasserlinie": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "beiRang",
+                  "grund",
+                  "text"
+                ],
+                "properties": {
+                  "beiRang": {
+                    "anyOf": [
+                      {
+                        "description": "Rang des ersten Projekts unter der Wasserlinie; null = alle darüber.",
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "grund": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "budget"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "kapazitaet"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "text": {
+                    "anyOf": [
+                      {
+                        "description": "Regel mit Ist-Wert (K5 Regeln), z. B. «Budget: CHF 14,2 Mio. statt höchstens 12,0 Mio. …».",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "budget": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "rahmen",
+                  "bedarf"
+                ],
+                "properties": {
+                  "rahmen": {
+                    "anyOf": [
+                      {
+                        "description": "Budgetrahmen des Portfolios nach dem Modell in Kraft (A-18); null = keiner.",
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "bedarf": {
+                    "anyOf": [
+                      {
+                        "description": "Summe der Kosten der enthaltenen Projekte; null ohne finanzen:read oder bei fehlenden Kosten.",
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "engpaesse": {
+                "description": "Engpässe je Quartal und Rolle aus der Auslastung nach Szenario (UC-009 Schritt 5).",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "rolle",
+                    "quartal",
+                    "monat",
+                    "bedarf",
+                    "angebot",
+                    "projekte"
+                  ],
+                  "properties": {
+                    "rolle": {
+                      "type": "string"
+                    },
+                    "quartal": {
+                      "description": "«JJJJ-Qn»",
+                      "type": "string"
+                    },
+                    "monat": {
+                      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                      "description": "Monat «JJJJ-MM».",
+                      "type": "string"
+                    },
+                    "bedarf": {
+                      "description": "FTE im Monat der grössten Überbuchung.",
+                      "type": "number"
+                    },
+                    "angebot": {
+                      "type": "number"
+                    },
+                    "projekte": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "unter": {
+                "description": "Enthaltene Projekte unter der Wasserlinie.",
+                "type": "integer"
+              },
+              "hinweise": {
+                "type": "array",
+                "items": {
+                  "description": "Zustand Z4 (teilweise), z. B. ohne Budgetrahmen.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "vorlage": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Entscheidungsvorlage, Stand bei «Als Antrag wählen» (K5 Schritt 6).",
+                "type": "object",
+                "required": [
+                  "erstelltAt",
+                  "vergleich",
+                  "nichtBewertet"
+                ],
+                "properties": {
+                  "erstelltAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "vergleich": {
+                    "$ref": "#/components/schemas/SzenarioVergleich"
+                  },
+                  "nichtBewertet": {
+                    "description": "Nummern der Projekte ohne Bewertung; in der Vorlage «nicht bewertet».",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SzenarioListe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "can"
+        ],
+        "properties": {
+          "items": {
+            "description": "Ohne verworfene, nach Anlage.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "stand",
+                "version",
+                "createdAt",
+                "updatedAt",
+                "beantragtAt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stand": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "entwurf"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "beantragt"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "entschieden"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "verworfen"
+                      ]
+                    }
+                  ]
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "beantragtAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SzenarioCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "z. B. «B: Plattform vorziehen».",
+            "type": "string"
+          }
+        }
+      },
+      "SzenarioPatch": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "maxLength": 100,
+            "type": "string"
+          }
+        }
+      },
+      "SzenarioPositionenPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "positionen"
+        ],
+        "properties": {
+          "positionen": {
+            "maxItems": 500,
+            "description": "Alle Projekte in der Reihenfolge Rang 1, 2, … (aktive Projekte des Portfolios, jedes einmal).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "aktiv": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "startMonat": {
+                  "anyOf": [
+                    {
+                      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                      "description": "Monat «JJJJ-MM».",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "SzenarioBeantragen": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "vergleich": {
+            "maxItems": 2,
+            "uniqueItems": true,
+            "description": "Weitere verglichene Szenarien desselben Portfolios (bis drei mit diesem).",
+            "type": "array",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -72433,6 +73538,985 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Rangfolge"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolios/{id}/szenarien": {
+      "get": {
+        "summary": "Szenarien des Portfolios",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Szenarien ohne verworfene, nach Anlage (K5 Z2: leer, solange keines angelegt ist).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioListe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Szenario anlegen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Kopie des Ist-Stands (UC-008 Schritt 5): aktive Projekte in der entschiedenen Rangfolge (danach der Entwurf, danach nach Nummer), Start wie geplant. Der Ist-Stand des Portfolios ändert sich nicht.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SzenarioCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/vergleich": {
+      "get": {
+        "summary": "Szenarien vergleichen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Bis drei Szenarien desselben Portfolios nebeneinander (UC-008 Schritt 6): Kosten, Nutzen, Risiko und Strategiebeitrag der Projekte über der Wasserlinie, Projekte darunter und Engpässe; `unterschiedlich` markiert Projekte, die nicht überall auf derselben Seite liegen.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "ids",
+            "required": true,
+            "description": "IDs, mit Komma getrennt (1–3)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioVergleich"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}": {
+      "get": {
+        "summary": "Szenario mit Wasserlinie",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Positionen nach Rang mit Wasserlinie gegen Budgetrahmen und Kapazität, Engpässen je Quartal und Rolle und Warnungen am Projekt (Abhängigkeit verletzt, Bedarf geändert, Bedarf nur als Grösse). Gerechnet mit dem aktuellen Bedarf (K5 Z7).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Szenario umbenennen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Nur im Entwurf, mit `If-Match` (412).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SzenarioPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/positionen": {
+      "put": {
+        "summary": "Reihenfolge und Start setzen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Ersetzt die Positionen (Rang = Reihenfolge, Startmonat, enthalten) und liefert die neu gerechnete Wasserlinie (K5-1). Nur aktive Projekte des Portfolios, jedes einmal (422); nicht genannte aktive Projekte kommen ans Ende. Nur im Entwurf, mit `If-Match` (412). Der Ist-Stand ändert sich nicht.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SzenarioPositionenPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/verwerfen": {
+      "post": {
+        "summary": "Szenario verwerfen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Entwurf oder Antrag verwerfen; der Ist-Stand des Portfolios bleibt unverändert. Mit `If-Match` (412).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/beantragen": {
+      "post": {
+        "summary": "Als Antrag wählen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Wählt das Szenario als Antrag und hält die Entscheidungsvorlage mit allen verglichenen Szenarien fest (UC-008 Schritt 6, K5 Schritt 6). Ein bisheriger Antrag des Portfolios wird wieder Entwurf. `nichtBewertet` nennt Projekte ohne Bewertung (Warnung, keine Sperre). Traktandiert wird mit AP-E5-5. Mit `If-Match` (412).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SzenarioBeantragen"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Szenario"
                 }
               }
             }

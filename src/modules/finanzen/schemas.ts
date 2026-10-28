@@ -10,7 +10,7 @@ export const KostentraegerNummer = Type.String({ pattern: '^[A-Za-z0-9][A-Za-z0-
 const Abweichung = Type.Object({
   betrag: Betrag('Prognose minus Budget in CHF; null ohne Budget.'),
   prozent: Betrag('Abweichung in Prozent des Budgets.'),
-  wesentlich: Type.Boolean({ description: 'Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie.' }),
+  wesentlich: Type.Boolean({ description: 'Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie.' }),
 }, { additionalProperties: false });
 
 const Begruendung = Type.Object({ periode: Monat, text: Type.String(), version: Type.Integer({ minimum: 1 }), geaendertAt: DateTime }, { additionalProperties: false });

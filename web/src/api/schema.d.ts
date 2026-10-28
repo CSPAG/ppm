@@ -51158,7 +51158,7 @@ export interface components {
             abweichung: {
                 betrag: number | null;
                 prozent: number | null;
-                /** @description Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie. */
+                /** @description Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie. */
                 wesentlich: boolean;
             };
             toleranzProzent: number | null;

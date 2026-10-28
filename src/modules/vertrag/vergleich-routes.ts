@@ -49,7 +49,7 @@ export function registerVergleichRoutes(app: FastifyInstance, _deps: Deps): void
     const { v, p } = await req.tx(tx => sichtbar(tx, id));
     await req.need('projekt:read', projektOrt(p.id));
     const mitId = mit ?? v.basis_version_id;
-    if (!mitId) throw conflict(`Version ${v.nummer} hat keine Basisversion. Wählen Sie eine Version zum Vergleich.`, { reason: 'basis' });
+    if (!mitId) throw conflict(`Version ${v.nummer} hat keine Basisversion. Wähle eine Version zum Vergleich.`, { reason: 'basis' });
     const betraege = await req.can('finanzen:read', projektOrt(p.id));
     return req.tx(async tx => {
       const andere = await store.version(tx, mitId);
@@ -87,7 +87,7 @@ export function registerVergleichRoutes(app: FastifyInstance, _deps: Deps): void
     await req.need('vertrag:write', projektOrt(p.id));
     const body = req.body as HauptaenderungenPutIn;
     const betraege = await req.can('finanzen:read', projektOrt(p.id));
-    if (!betraege && body.rubriken.ressourcen_budget !== undefined) throw forbidden('Die Rubrik Ressourcen/Budget nennt Beträge; ohne Recht auf Beträge können Sie sie nicht umformulieren.');
+    if (!betraege && body.rubriken.ressourcen_budget !== undefined) throw forbidden('Die Rubrik Ressourcen/Budget nennt Beträge; ohne Recht auf Beträge kannst du sie nicht umformulieren.');
     const who = actorOf(req);
     const out = await req.tx(async tx => {
       if (!aenderbar(v, p)) throw conflict(`Version ${v.nummer} ist ${STAND_TEXT[v.stand]}; die Hauptänderungen können nicht mehr geändert werden.`, { reason: 'stand', stand: v.stand });

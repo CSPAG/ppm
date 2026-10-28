@@ -178,11 +178,11 @@ describe('Zugang entziehen und Neubesetzung', { skip }, () => {
     assert.equal(setzen.statusCode, 200, setzen.body);
     const nach1 = await texte();
     assert.equal(nach1.length, 1, JSON.stringify(nach1));
-    assert.match(nach1[0], /^Sie haben die Rolle «.+» in der Organisation erhalten\.$/);
+    assert.match(nach1[0], /^Du hast die Rolle «.+» in der Organisation erhalten\.$/);
     assert.equal((await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['leser'] })).statusCode, 200);
     const nach2 = await texte();
     assert.equal(nach2.length, 2);
-    assert.ok(nach2.some((t: string) => /^Ihre Rolle «.+» in der Organisation wurde entzogen\.$/.test(t)), JSON.stringify(nach2));
+    assert.ok(nach2.some((t: string) => /^Deine Rolle «.+» in der Organisation wurde entzogen\.$/.test(t)), JSON.stringify(nach2));
     // Die Administration erhält für ihre eigenen Änderungen an anderen keine Mitteilung
     const eigene = await sys(async tx => (await tx.query("SELECT count(*)::int AS n FROM ppm.mitteilung WHERE empfaenger_person = $1 AND bezug_typ = 'rolle'", [adm.id])).rows[0].n);
     assert.equal(eigene, 0);

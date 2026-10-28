@@ -1376,7 +1376,7 @@
             }
           },
           "empfaenger": {
-            "description": "`person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
+            "description": "`person`: an dich persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
             "anyOf": [
               {
                 "type": "string",
@@ -1396,7 +1396,7 @@
             "anyOf": [
               {
                 "additionalProperties": false,
-                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die Sie heute vertreten (UC-016 Schritt 4).",
+                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die du heute vertrittst (UC-016 Schritt 4).",
                 "type": "object",
                 "required": [
                   "person",
@@ -1689,7 +1689,7 @@
             "type": "boolean"
           },
           "richtung": {
-            "description": "`eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten.",
+            "description": "`eigene`: du wirst vertreten; `fuer_andere`: du vertrittst.",
             "anyOf": [
               {
                 "type": "string",
@@ -26353,6 +26353,891 @@
           }
         }
       },
+      "AbschlussKpiWert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kpiId",
+          "wert",
+          "bemerkung"
+        ],
+        "properties": {
+          "kpiId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "wert": {
+            "maxLength": 200,
+            "description": "Erreichter Wert am Abschluss, z. B. «62 %».",
+            "type": "string"
+          },
+          "bemerkung": {
+            "maxLength": 1000,
+            "description": "Bemerkung zum Wert.",
+            "type": "string"
+          }
+        }
+      },
+      "AbschlussOffenerPunkt": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "verantwortlich",
+          "termin"
+        ],
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Offener Punkt.",
+            "type": "string"
+          },
+          "verantwortlich": {
+            "maxLength": 200,
+            "description": "Verantwortliche Person oder Stelle in der Linie.",
+            "type": "string"
+          },
+          "termin": {
+            "anyOf": [
+              {
+                "format": "date",
+                "description": "Termin (JJJJ-MM-TT).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AbschlussIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektstand",
+          "zielerreichung",
+          "kpiWerte",
+          "businessCase",
+          "uebergabe",
+          "offenePunkte"
+        ],
+        "properties": {
+          "projektstand": {
+            "maxLength": 10000,
+            "description": "Stand des Vorhabens bei Sistierung oder Abbruch (UC-015 A1.1).",
+            "type": "string"
+          },
+          "zielerreichung": {
+            "maxLength": 10000,
+            "description": "Zielerreichung (UC-015 Schritt 2).",
+            "type": "string"
+          },
+          "kpiWerte": {
+            "maxItems": 200,
+            "description": "Erreichte Werte je KPI des Registers.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbschlussKpiWert"
+            }
+          },
+          "businessCase": {
+            "maxLength": 10000,
+            "description": "Business Case Abschluss P4 mit Kosten und Nutzen (UC-015 Schritt 2, PC.03.04).",
+            "type": "string"
+          },
+          "uebergabe": {
+            "maxLength": 10000,
+            "description": "Übergabe an Betrieb und Linie (UC-015 Schritt 4).",
+            "type": "string"
+          },
+          "offenePunkte": {
+            "maxItems": 200,
+            "description": "Offene Punkte mit Verantwortlichen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbschlussOffenerPunkt"
+            }
+          }
+        }
+      },
+      "AbschlussNutzenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rolle",
+          "beurteilung"
+        ],
+        "properties": {
+          "rolle": {
+            "type": "string",
+            "enum": [
+              "sp",
+              "ue"
+            ],
+            "description": "Beurteilung als Sponsor (`vertrag:decide` am Projekt) oder als UE (`vertrag:review`)."
+          },
+          "beurteilung": {
+            "maxLength": 5000,
+            "description": "Beurteilung der Nutzenrealisierung (UC-015 Schritt 3, PC.03.02); leer entfernt sie.",
+            "type": "string"
+          }
+        }
+      },
+      "AbschlussWiederaufnahmeIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "begruendung"
+        ],
+        "properties": {
+          "begruendung": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Antrag an das Gremium: warum das Vorhaben weitergeführt werden soll.",
+            "type": "string"
+          }
+        }
+      },
+      "AbschlussBericht": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "art",
+          "stand",
+          "projektstand",
+          "zielerreichung",
+          "kpiWerte",
+          "businessCase",
+          "uebergabe",
+          "offenePunkte",
+          "nutzen",
+          "eingereichtAt",
+          "abgenommenAt",
+          "version",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "abschluss",
+              "sistierung",
+              "abbruch"
+            ],
+            "description": "Abschluss am Exit-Gate P4, Sistierung oder Abbruch."
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "entwurf",
+              "eingereicht",
+              "traktandiert",
+              "abgenommen",
+              "nacharbeit"
+            ],
+            "description": "Bearbeitungsstand (fachmodell.md 2.13)."
+          },
+          "projektstand": {
+            "type": "string"
+          },
+          "zielerreichung": {
+            "type": "string"
+          },
+          "kpiWerte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbschlussKpiWert"
+            }
+          },
+          "businessCase": {
+            "type": "string"
+          },
+          "uebergabe": {
+            "type": "string"
+          },
+          "offenePunkte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbschlussOffenerPunkt"
+            }
+          },
+          "nutzen": {
+            "description": "Beurteilung der Nutzenrealisierung (nur Abschluss).",
+            "type": "object",
+            "required": [
+              "sp",
+              "ue"
+            ],
+            "properties": {
+              "sp": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "text",
+                      "at",
+                      "von"
+                    ],
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      },
+                      "at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "von": {
+                        "description": "Name der Person.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ue": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "text",
+                      "at",
+                      "von"
+                    ],
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      },
+                      "at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "von": {
+                        "description": "Name der Person.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "abgenommenAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AbschlussLessonLearned": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "projekt",
+          "text",
+          "kategorie",
+          "jahr",
+          "version",
+          "createdAt",
+          "von",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projekt": {
+            "type": "object",
+            "required": [
+              "id",
+              "nummer",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nummer": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "text": {
+            "type": "string"
+          },
+          "kategorie": {
+            "description": "Freier Begriff zur Gruppierung; leer = ohne Kategorie.",
+            "type": "string"
+          },
+          "jahr": {
+            "description": "Jahr der Erfassung (Jahresrückblick, UC-013).",
+            "type": "integer"
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "von": {
+            "description": "Name der erfassenden Person.",
+            "type": "string"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Ändern und löschen (projekt:write am Projekt).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "Abschluss": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projekt",
+          "lage",
+          "bericht",
+          "berichte",
+          "grundlagen",
+          "lessonsLearned",
+          "entscheid",
+          "can"
+        ],
+        "properties": {
+          "projekt": {
+            "type": "object",
+            "required": [
+              "id",
+              "nummer",
+              "name",
+              "phase",
+              "lebenszyklus"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nummer": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "lebenszyklus": {
+                "type": "string",
+                "enum": [
+                  "aktiv",
+                  "sistiert",
+                  "abgebrochen",
+                  "abgeschlossen",
+                  "zurueckgezogen"
+                ],
+                "description": "Lebenszyklus des Projekts (fachmodell.md 2.5)."
+              }
+            }
+          },
+          "lage": {
+            "type": "string",
+            "enum": [
+              "abschluss",
+              "sistierung",
+              "abbruch",
+              "abgeschlossen",
+              "keine"
+            ],
+            "description": "Was die Projektakte zeigt: Abschluss in P4, Bericht nach Sistierung bzw. Abbruch, abgeschlossenes Projekt (lesend) oder noch kein Abschluss."
+          },
+          "bericht": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AbschlussBericht"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "berichte": {
+            "description": "Alle Berichte des Projekts, neueste zuerst.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "art",
+                "stand",
+                "eingereichtAt",
+                "abgenommenAt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "art": {
+                  "type": "string",
+                  "enum": [
+                    "abschluss",
+                    "sistierung",
+                    "abbruch"
+                  ],
+                  "description": "Art."
+                },
+                "stand": {
+                  "type": "string",
+                  "enum": [
+                    "entwurf",
+                    "eingereicht",
+                    "traktandiert",
+                    "abgenommen",
+                    "nacharbeit"
+                  ],
+                  "description": "Stand."
+                },
+                "eingereichtAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "abgenommenAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "grundlagen": {
+            "description": "Was das System zum Abschluss zeigt (UC-015 Schritt 1).",
+            "type": "object",
+            "required": [
+              "baseline",
+              "ziele",
+              "nutzen",
+              "businessCase",
+              "kpis",
+              "kosten",
+              "offeneMeilensteine",
+              "nutzenpruefung"
+            ],
+            "properties": {
+              "baseline": {
+                "anyOf": [
+                  {
+                    "description": "Nummer der Baseline des Projektvertrags.",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ziele": {
+                "description": "Ziele aus Kap. 3 der Baseline.",
+                "type": "string"
+              },
+              "nutzen": {
+                "description": "Nutzenbeitrag aus Kap. 3 der Baseline.",
+                "type": "string"
+              },
+              "businessCase": {
+                "description": "Business Case aus Kap. 3 der Baseline.",
+                "type": "string"
+              },
+              "kpis": {
+                "description": "KPIs des Registers mit Zielwert und letztem Ist-Wert.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "art",
+                    "text",
+                    "einheit",
+                    "zielwert",
+                    "ist"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "art": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "einheit": {
+                      "type": "string"
+                    },
+                    "zielwert": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "ist": {
+                      "anyOf": [
+                        {
+                          "description": "Letzter nachgeführter Wert (PC.03.03).",
+                          "type": "object",
+                          "required": [
+                            "periode",
+                            "wert"
+                          ],
+                          "properties": {
+                            "periode": {
+                              "type": "string"
+                            },
+                            "wert": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "kosten": {
+                "anyOf": [
+                  {
+                    "description": "Summen der Kostenpositionen; null ohne Recht auf Beträge (A-33, «nicht verfügbar»).",
+                    "type": "object",
+                    "required": [
+                      "budgetBaseline",
+                      "prognose",
+                      "ist"
+                    ],
+                    "properties": {
+                      "budgetBaseline": {
+                        "type": "number"
+                      },
+                      "prognose": {
+                        "type": "number"
+                      },
+                      "ist": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "offeneMeilensteine": {
+                "description": "Meilensteine und Lieferergebnisse ohne «erreicht am».",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "phase",
+                    "art",
+                    "text",
+                    "terminBaseline",
+                    "terminAktuell"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "art": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "terminBaseline": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "terminAktuell": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "nutzenpruefung": {
+                "anyOf": [
+                  {
+                    "description": "Letzte Nutzenprüfung aus dem Gate-Modus (UC-003 A2), Grundlage der Beurteilung am Abschluss; null ohne.",
+                    "type": "object",
+                    "required": [
+                      "version",
+                      "beurteilung",
+                      "werte"
+                    ],
+                    "properties": {
+                      "version": {
+                        "description": "Vertragsversion des Gates.",
+                        "type": "string"
+                      },
+                      "beurteilung": {
+                        "type": "string"
+                      },
+                      "werte": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/AbschlussKpiWert"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "lessonsLearned": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbschlussLessonLearned"
+            }
+          },
+          "entscheid": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "ergebnis",
+                  "at"
+                ],
+                "properties": {
+                  "ergebnis": {
+                    "type": "string",
+                    "enum": [
+                      "abgeschlossen",
+                      "nacharbeiten",
+                      "sistiert",
+                      "abgebrochen",
+                      "weiterfuehren"
+                    ],
+                    "description": "Letzter Entscheid des Gremiums zu Abschluss, Sistierung, Abbruch oder Wiederaufnahme."
+                  },
+                  "at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "bearbeiten",
+              "einreichen",
+              "nutzenSp",
+              "nutzenUe",
+              "wiederaufnahme",
+              "lessons",
+              "dokument"
+            ],
+            "properties": {
+              "bearbeiten": {
+                "description": "Bericht erfassen (PL, Entwurf oder Nacharbeit).",
+                "type": "boolean"
+              },
+              "einreichen": {
+                "description": "Bericht einreichen (PL); Pflichtangaben prüft die Route.",
+                "type": "boolean"
+              },
+              "nutzenSp": {
+                "description": "Nutzenrealisierung als Sponsor beurteilen.",
+                "type": "boolean"
+              },
+              "nutzenUe": {
+                "description": "Nutzenrealisierung als UE beurteilen.",
+                "type": "boolean"
+              },
+              "wiederaufnahme": {
+                "description": "Wiederaufnahme beim Gremium beantragen (sistiertes Projekt).",
+                "type": "boolean"
+              },
+              "lessons": {
+                "description": "Lessons Learned erfassen (projekt:write am Projekt).",
+                "type": "boolean"
+              },
+              "dokument": {
+                "description": "Bericht als Dokument herunterladen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "AbschlussLessonIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "maxLength": 5000,
+            "description": "Erkenntnis für künftige Vorhaben.",
+            "type": "string"
+          },
+          "kategorie": {
+            "maxLength": 100,
+            "description": "Freier Begriff zur Gruppierung, z. B. «Beschaffung».",
+            "type": "string"
+          }
+        }
+      },
+      "AbschlussLessonPatch": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "kategorie": {
+            "maxLength": 100,
+            "description": "Kategorie.",
+            "type": "string"
+          }
+        }
+      },
+      "AbschlussLessonList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor",
+          "kategorien"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbschlussLessonLearned"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kategorien": {
+            "description": "Kategorien in Gebrauch (Filter).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "WebhookSubscription": {
         "additionalProperties": false,
         "type": "object",
@@ -39322,7 +40207,7 @@
         "tags": [
           "Stellvertretungen"
         ],
-        "description": "Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.",
+        "description": "Laufende und künftige Stellvertretungen: wer dich vertritt und wen du vertrittst.",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -41589,7 +42474,7 @@
         "tags": [
           "Stammdaten"
         ],
-        "description": "Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Sie erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.",
+        "description": "Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Deaktivierte Werte erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.",
         "parameters": [
           {
             "schema": {
@@ -62447,7 +63332,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»). Sie erhält im Eingang «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».",
+        "description": "Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»); im Eingang erhält sie «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».",
         "requestBody": {
           "required": true,
           "content": {
@@ -74855,6 +75740,1325 @@
         }
       }
     },
+    "/v1/projekte/{id}/abschluss": {
+      "get": {
+        "summary": "Abschluss des Projekts",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "Lage (Abschluss in P4, Sistierung, Abbruch, abgeschlossen), offener bzw. letzter Bericht, Grundlagen zum Abschluss (Ziele und Business Case der Baseline, KPIs mit Ziel- und Ist-Wert, Kosten nur mit `finanzen:read`, offene Meilensteine; UC-015 Schritt 1), Lessons Learned des Projekts und der letzte Entscheid des Gremiums. ETag = Stand des Berichts (`W/\"0\"` ohne Bericht).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Abschluss"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Bericht erfassen",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "Abschlussbericht (P4: Zielerreichung mit Werten je KPI, Business Case Abschluss, Übergabe, offene Punkte; UC-015 Schritte 2, 4) bzw. Bericht zu Sistierung oder Abbruch (Stand, offene Punkte; A1.1), automatisch gespeichert. Nur die Projektleitung (`projekt:write`), nur in Arbeit oder Nacharbeit. `If-Match` = Stand des Berichts, `W/\"0\"` legt den Abschlussbericht in P4 an. Ausserhalb von P4 ohne Entscheid: 409.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AbschlussIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Abschluss"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/abschluss/nutzen": {
+      "put": {
+        "summary": "Nutzenrealisierung beurteilen",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "Beurteilung am Abschlussbericht (UC-015 Schritt 3, PC.03.02): als Sponsor mit `vertrag:decide` am Projekt, als UE mit `vertrag:review`; bis zum Entscheid am Exit-Gate. `If-Match` = Stand des Berichts.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AbschlussNutzenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Abschluss"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/abschluss/einreichen": {
+      "post": {
+        "summary": "Bericht einreichen",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "Abschlussbericht: zum Exit-Gate P4 beim entscheidenden Gremium des Portfolios vorgeschlagen (Art `abschluss`, UC-015 Schritt 5), Stand «traktandiert»; ohne Gremium «eingereicht» (die UE plant ein). Bericht zu Sistierung oder Abbruch: «eingereicht» (A1). Erledigt «Abschlussbericht erstellen». Fehlende Angaben: 422 mit je einem Fehler. `If-Match` Pflicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Abschluss"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/wiederaufnahme": {
+      "post": {
+        "summary": "Wiederaufnahme beantragen",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "Antrag an das entscheidende Gremium, ein sistiertes Vorhaben weiterzuführen (A-09, K10): Traktandum der Art `abschluss`. Mit «Weiterführen» ist das Projekt wieder aktiv, der Vertrag wird über ein Gate fortgeschrieben (UC-003). Nur sistierte Projekte (sonst 409), `projekt:write`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AbschlussWiederaufnahmeIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Abschluss"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/abschluss/dokument": {
+      "get": {
+        "summary": "Bericht als Dokument herunterladen",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "Offener bzw. letzter Bericht (Abschluss, Sistierung, Abbruch) im Layout der Vorlage «Abschlussbericht» mit Lessons Learned; Kopfzeile «Intern · enthält Personendaten» (G12). Beträge ohne `finanzen:read` als «nicht verfügbar» (A-33). Ohne Bericht 404.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pdf"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "docx"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Dateiformat: `pdf` (Standard) oder `docx` (Word)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dokument als Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "description": "PDF",
+                  "type": "string"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "format": "binary",
+                  "description": "Word",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/lessons-learned": {
+      "get": {
+        "summary": "Lessons Learned auflisten",
+        "tags": [
+          "Lessons Learned"
+        ],
+        "description": "Alle Lessons Learned der sichtbaren Projekte, neueste zuerst, mit Filter Jahr, Projekt, Kategorie und Suche; Cursor (UI-32, UC-013 Schritt 1).",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "jahr",
+            "required": false,
+            "description": "Jahr der Erfassung."
+          },
+          {
+            "schema": {
+              "maxLength": 20,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "projekt",
+            "required": false,
+            "description": "Projektnummer, z. B. «2026-014»."
+          },
+          {
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "kategorie",
+            "required": false,
+            "description": "Kategorie; leer = ohne Kategorie."
+          },
+          {
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "description": "Suche in Text, Projektname und -nummer."
+          },
+          {
+            "schema": {
+              "maxLength": 500,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbschlussLessonList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/lessons-learned": {
+      "post": {
+        "summary": "Lesson Learned erfassen",
+        "tags": [
+          "Lessons Learned"
+        ],
+        "description": "Erkenntnis zum Projekt (PS.04.03) mit Jahr der Erfassung; auch nach Abschluss, Sistierung oder Abbruch (UC-013 A1). `projekt:write` am Projekt.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AbschlussLessonIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbschlussLessonLearned"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/lessons-learned/{id}": {
+      "patch": {
+        "summary": "Lesson Learned ändern",
+        "tags": [
+          "Lessons Learned"
+        ],
+        "description": "Nur mit `If-Match`; `projekt:write` am Projekt.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AbschlussLessonPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbschlussLessonLearned"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Lesson Learned löschen",
+        "tags": [
+          "Lessons Learned"
+        ],
+        "description": "Nur mit `If-Match`; `projekt:write` am Projekt.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Gelöscht"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks": {
       "get": {
         "summary": "Webhooks auflisten",
@@ -76136,6 +78340,14 @@
     {
       "name": "Priorisierung",
       "description": "Bewertungsmodell mit Kriterien und Budgetrahmen (Entwurf, in Kraft), Bewertung der Projekte je Kriterium; ab AP-E5-2 Matrix, Rangfolge und Szenarien."
+    },
+    {
+      "name": "Abschluss",
+      "description": "Abschlussbericht mit Nutzenprüfung und Exit-Gate P4, Bericht zu Sistierung und Abbruch, Wiederaufnahme (UC-015, A-09)."
+    },
+    {
+      "name": "Lessons Learned",
+      "description": "Lessons Learned je Projekt für künftige Vorhaben und den Jahresrückblick (PS.04.03)."
     },
     {
       "name": "Webhooks",

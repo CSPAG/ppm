@@ -43,7 +43,7 @@ test('Auswertung nach Phase mit Einzelwerten und Export; barrierefrei', async ({
   await expect(schublade).toBeHidden();
 
   const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Exportieren (CSV)' }).click();
+  await page.getByRole('button', { name: 'Exportieren (CSV)', exact: true }).click();
   expect((await download).suggestedFilename()).toMatch(/^auswertung-\d{4}-\d{2}\.csv$/);
 
   await page.emulateMedia({ colorScheme: 'dark' });

@@ -50,7 +50,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E7-3 | Schnittstellen und Änderungsprotokoll | 360–369 | offen | – | – |
 | AP-E7-4 | Finanzen | 370–379 | offen | – | – |
 | AP-E7-5 | Jahresrückblick | 380–389 | offen | – | – |
-| AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | in Arbeit (PR 1 API: `GET /v1/auswertungen` mit Filter, Kennzahlen, Gruppierung, Einzelwerten, CSV; keine Migration; PR 2 Oberfläche UI-30 folgt) | #PR | Kennzahlen nur aus vorhandenen Modulen (Projekte, Status des letzten Berichts bis zur Stichperiode, offene Eskalationen, offene Meilensteine, Risiken, Beträge der Kostenpositionen); Beträge nur mit `finanzen:read` an der Organisation; ohne Angabe nur aktive Projekte; CSV mit Semikolon und BOM |
+| AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | in Arbeit (PR 1 API: `GET /v1/auswertungen` mit Filter, Kennzahlen, Gruppierung, Einzelwerten, CSV; keine Migration; PR 2 Oberfläche UI-30 folgt) | #97 | Kennzahlen nur aus vorhandenen Modulen (Projekte, Status des letzten Berichts bis zur Stichperiode, offene Eskalationen, offene Meilensteine, Risiken, Beträge der Kostenpositionen); Beträge nur mit `finanzen:read` an der Organisation; ohne Angabe nur aktive Projekte; CSV mit Semikolon und BOM |
 | AP-E7-7 | Vorlagen mit Feldzuordnung | 400–409 | offen | – | – |
 | AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | offen | – | – |
 
@@ -130,7 +130,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
 | PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | in Arbeit (API) | – |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
-| PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | in Arbeit (UC-014 A2.1, API) | #PR |
+| PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | in Arbeit (UC-014 A2.1, API) | #97 |
 | RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |
 | RK.01.02 | Personal- und Abwesenheitsdaten übernehmen | 009 | E7 | AP-E7-2 | offen | – |
 | RK.02.01 | Ressourcenbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |

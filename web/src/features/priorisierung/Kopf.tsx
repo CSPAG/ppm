@@ -1,6 +1,6 @@
 /**
  * Kopf des Bereichs «Priorisierung» (Portfolio › Priorisierung, K5): Titel und Reiter (I-N6: Arbeitsraum › Bereich ›
- * Ansicht). «Modell» nur mit `priorisierung:read` an der Organisation; Matrix und Szenarien kommen mit AP-E5-2 und AP-E5-3.
+ * Ansicht). «Modell» nur mit `priorisierung:read` an der Organisation; Matrix (AP-E5-2) mit dem gewählten Portfolio; Szenarien folgen mit AP-E5-3.
  */
 import type { MouseEvent, ReactNode } from 'react';
 import { Icon } from '../../ui/index.ts';
@@ -33,7 +33,7 @@ export function Kopf({ reiter, sub, reiterSichtbar, navigieren, aktionen, query 
       {reiterSichtbar.length > 1 ? (
         <nav className="tabs" aria-label={TP.title}>
           {reiterSichtbar.map(r => {
-            const href = `${PFAD[r]}${r === 'bewertung' && query ? `?${query}` : ''}`;
+            const href = `${PFAD[r]}${r !== 'modell' && query ? `?${query}` : ''}`;
             return <a key={r} className={`tab${r === reiter ? ' on' : ''}`} href={href} aria-current={r === reiter ? 'page' : undefined} onClick={klick(href)}>{TP.tabs[r]}</a>;
           })}
         </nav>

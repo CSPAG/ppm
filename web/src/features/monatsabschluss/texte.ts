@@ -72,6 +72,8 @@ export const TM = {
       auff ? `${auff} mit Auffälligkeit übersprungen` : '',
       stand ? `${stand} in anderem Stand übersprungen` : '',
     ].filter(Boolean).join(', ') + '.',
+    sammelZurueckgenommen: (ok: number, nicht: number) =>
+      `Bestätigung von ${n(ok, 'Bericht', 'Berichten')} zurückgenommen${nicht ? `, ${nicht} inzwischen geändert und nicht zurückgenommen` : ''}.`,
     eingefordert: (ok: number, stand: number) => `${n(ok, 'Bericht', 'Berichte')} eingefordert${stand ? `, ${stand} übersprungen` : ''}.`,
     abgeschlossen: (p: string) => `${p} ist abgeschlossen.`,
   },
@@ -83,6 +85,16 @@ export const TM = {
   tasten: 'Tastatur: ↑/↓ Zeile wechseln · B bestätigen · R Rückfrage · E einfordern · Leertaste auswählen · Enter öffnen',
   konflikt: 'Der Bericht wurde inzwischen geändert. Die Liste ist neu geladen; prüfe ihn nochmals.',
   keinRecht: 'Den Monatsabschluss sieht die Unternehmensentwicklung.',
+  // Vorschau vor Sammelbestätigung und Einfordern (K1 Prüfen Schritt 3, A1; I-R1 Stufe 3)
+  vorschau: {
+    bestaetigenTitel: (k: number) => (k ? `${n(k, 'Bericht', 'Berichte')} bestätigen?` : 'Keinen Bericht bestätigen'),
+    bestaetigenWirkung: (k: number) => `${k === 1 ? 'Dieser Bericht erhält' : `Diese ${k} Berichte erhalten`} den Stand «geprüft». Danach kannst du die Bestätigung rückgängig machen, solange die Periode offen ist.`,
+    keinerOhneAuffaelligkeit: 'Jeder ausgewählte Bericht hat eine Auffälligkeit oder ist nicht eingereicht. Prüfe ihn einzeln.',
+    uebersprungenAuffaellig: (k: number) => `Übersprungen, mit Auffälligkeit (${k}): Prüfe ${k === 1 ? 'ihn' : 'sie'} einzeln.`,
+    uebersprungenStand: (k: number) => `Übersprungen, nicht eingereicht (${k}):`,
+    einfordernTitel: (nr: string | null, k: number) => (nr ? `Bericht ${nr} einfordern?` : `${n(k, 'Bericht', 'Berichte')} einfordern?`),
+    einfordernWirkung: (k: number) => `${k === 1 ? 'Die Projektleitung erhält' : `Die Projektleitungen von ${k} Projekten erhalten`} eine Erinnerung im Eingang und als Benachrichtigung. Eine versendete Erinnerung lässt sich nicht zurückholen.`,
+  },
   // Periode abschliessen (K1 Prüfen Schritt 5; I-R1 Stufe 3)
   abschluss: {
     titel: (p: string) => `${p} abschliessen?`,

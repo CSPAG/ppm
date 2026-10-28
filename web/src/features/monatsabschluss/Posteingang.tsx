@@ -17,7 +17,9 @@ export interface PosteingangProps {
   oeffnen(z: Zeile): void;
   bestaetigen(z: Zeile): void;
   rueckfrage(z: Zeile, text: string, fertig: () => void): void;
+  /** Öffnet die Vorschau der Wirkung (I-R1 Stufe 3), auch für eine Zeile (E). */
   einfordern(z: Zeile[]): void;
+  /** Öffnet die Vorschau: was bestätigt, was übersprungen wird. */
   sammelBestaetigen(z: Zeile[]): void;
   /** Eine Aktion läuft (Schaltflächen gesperrt, I-R2 bestätigt). */
   beschaeftigt: boolean;
@@ -72,7 +74,7 @@ export function Posteingang(p: PosteingangProps) {
         <div className="ma-sammel" role="region" aria-label={TM.auswahl(gewaehlt.length)}>
           <span className="ma-sammel-n">{TM.auswahl(gewaehlt.length)}</span>
           {zumBestaetigen.length ? (
-            <button type="button" className="btn primary sm" disabled={p.beschaeftigt} onClick={() => p.sammelBestaetigen(gewaehlt.filter(z => z.stand === 'eingereicht'))}>
+            <button type="button" className="btn primary sm" disabled={p.beschaeftigt} onClick={() => p.sammelBestaetigen(gewaehlt)}>
               <Icon name="check" />{TM.aktion.sammelBestaetigen(zumBestaetigen.length)}
             </button>
           ) : null}

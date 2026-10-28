@@ -18,6 +18,9 @@ import {
 } from './schemas.ts';
 import * as store from './store.ts';
 
+/** Höchstens so viele Einträge je Export (sonst 422 mit Ausweg). */
+const EXPORT_MAX = 10_000;
+
 export const TAG = 'Schnittstellen';
 export const TAG_PROTOKOLL = 'Änderungsprotokoll';
 
@@ -179,12 +182,21 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   app.get('/v1/aenderungsprotokoll', {
     schema: {
       tags: [TAG_PROTOKOLL], summary: 'Änderungsprotokoll', querystring: ProtokollQuery, response: { 200: Type.Ref('AenderungsprotokollList') },
-      description: 'Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5).',
+      description: 'Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5). Mit `format=csv` als Export aller Einträge zum Filter (eine Zeile je geändertes Feld, höchstens 10 000 Einträge, sonst 422).',
     },
-  }, async req => {
+  }, async (req, reply) => {
     await req.need('audit:read');
-    const q = req.query as { objekt?: string; objektId?: string; von?: string; bis?: string; cursor?: string; limit?: number };
+    const q = req.query as { objekt?: string; objektId?: string; von?: string; bis?: string; cursor?: string; limit?: number; format?: 'csv' };
     if (q.von && q.bis && q.von > q.bis) throw invalid('«von» liegt nach «bis».');
+    if (q.format === 'csv') {
+      // Export (Seitentyp Bericht): alle Einträge zum Filter, eine Zeile je geändertes Feld
+      const rows = await req.tx(tx => protokoll.liste(tx, { objekt: q.objekt, objektId: q.objektId, von: q.von, bis: q.bis, limit: EXPORT_MAX + 1 }));
+      if (rows.length > EXPORT_MAX) throw invalid(`Mehr als ${EXPORT_MAX.toLocaleString('de-CH')} Einträge. Grenze Objekt oder Zeitraum ein, um zu exportieren.`);
+      return reply
+        .header('content-type', 'text/csv; charset=utf-8')
+        .header('content-disposition', `attachment; filename="aenderungsprotokoll${q.von ? `-${q.von}` : ''}${q.bis ? `-${q.bis}` : ''}.csv"`)
+        .send(protokoll.alsCsv(rows));
+    }
     const limit = q.limit ?? 50;
     const filter = `${q.objekt ?? ''}|${q.objektId ?? ''}|${q.von ?? ''}|${q.bis ?? ''}`;
     const after = decodeCursor<{ n: string; f: string }>(q.cursor, v => typeof v.n === 'string' && /^\d+$/.test(v.n) && v.f === filter);

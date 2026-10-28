@@ -180,6 +180,41 @@ describe('Änderungsprotokoll (UI-50)', () => {
     expect(await screen.findByText(TX.p.vonNachBis)).toBeInTheDocument();
   });
 
+  it('Export (Seitentyp Bericht): alle Einträge zum Filter als CSV über den Client, Datei gespeichert', async () => {
+    const abfragen: string[] = [];
+    stub({
+      'GET /v1/aenderungsprotokoll': (req: Request) => {
+        const q = new URL(req.url).searchParams;
+        abfragen.push(q.toString());
+        if (q.get('format') === 'csv') return new Response('﻿Zeitpunkt;Quelle\r\n', { headers: { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': 'attachment; filename="aenderungsprotokoll-2026-10-01.csv"' } });
+        return json({ items: [eintrag()], nextCursor: 'weiter' });
+      },
+      'GET /v1/aenderungsprotokoll/objekte': () => json({ items: ['schnittstelle'] }),
+    });
+    const url = vi.fn(() => 'blob:protokoll');
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: url, revokeObjectURL: vi.fn() }));
+    const klick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    renderWithIam(<Protokoll initial={{ objekt: 'schnittstelle', von: '2026-10-01' }} />, UE);
+    await userEvent.click(await screen.findByRole('button', { name: TX.p.exportieren }));
+    expect(await screen.findByText(TX.p.exportiert('aenderungsprotokoll-2026-10-01.csv'))).toBeInTheDocument();
+    const exp = abfragen.find(a => a.includes('format=csv'))!;
+    expect(exp).toContain('objekt=schnittstelle');
+    expect(exp).toContain('von=2026-10-01');
+    expect(exp).not.toContain('cursor');
+    expect(klick).toHaveBeenCalledOnce();
+
+    // Kennung im Feld: ungültig sperrt den Export; gültig gilt auch ohne Verlassen des Felds
+    const feld = screen.getByLabelText(TX.p.objektId);
+    await userEvent.type(feld, 'abc');
+    expect(screen.getByRole('button', { name: TX.p.exportieren })).toBeDisabled();
+    await userEvent.clear(feld);
+    await userEvent.type(feld, S1);
+    await userEvent.click(screen.getByRole('button', { name: TX.p.exportieren }));
+    await waitFor(() => expect(abfragen.filter(a => a.includes('format=csv'))).toHaveLength(2));
+    expect(abfragen.filter(a => a.includes('format=csv')).at(-1)).toContain(`objektId=${S1}`);
+    klick.mockRestore();
+  });
+
   it('leer durch Filter: «Filter zurücksetzen» (Z3)', async () => {
     stub({
       'GET /v1/aenderungsprotokoll': () => json({ items: [], nextCursor: null }),

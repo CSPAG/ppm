@@ -1,5 +1,5 @@
 /** Abfragen und Änderungen der Schnittstellen und des Änderungsprotokolls (TanStack Query über den typisierten Client). */
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ifMatch, type Schemas } from '../../api/index.ts';
 import type { ProtokollSearch } from './search.ts';
 
@@ -71,6 +71,8 @@ export function useSchnittstellenMutationen() {
 export function useProtokoll(f: ProtokollSearch) {
   return useInfiniteQuery({
     queryKey: schnittstellenKeys.protokoll(f),
+    // beim Ändern der Filter bleibt das letzte Ergebnis stehen (kein Springen der Seite, Export bleibt erreichbar)
+    placeholderData: keepPreviousData,
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam, signal }) => (await api.GET('/v1/aenderungsprotokoll', { params: { query: { ...f, cursor: pageParam, limit: 50 } }, signal })).data!,
     getNextPageParam: last => last.nextCursor ?? undefined,

@@ -56,10 +56,12 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
   const kennungUebernehmen = () => { if (!kennungFalsch) setSearch({ objektId: kennung.trim().toLowerCase() || undefined }, { replace: true }); };
   const toast = useToast();
   const [exportLaeuft, setExportLaeuft] = useState(false);
-  // Export aller Einträge zum Filter (Seitentyp Bericht), nicht nur der geladenen Seiten
+  // Export aller Einträge zum Filter (Seitentyp Bericht), nicht nur der geladenen Seiten; die Kennung so, wie sie im Feld
+  // steht (beim Klick ist sie noch nicht übernommen), bei ungültiger Kennung gesperrt
   const exportieren = () => {
+    if (kennungFalsch) return;
     setExportLaeuft(true);
-    protokollExportieren(search).then(name => toast.show(TX.p.exportiert(name)), e => toast.error(e)).finally(() => setExportLaeuft(false));
+    protokollExportieren({ ...search, objektId: kennung.trim().toLowerCase() || undefined }).then(name => toast.show(TX.p.exportiert(name)), e => toast.error(e)).finally(() => setExportLaeuft(false));
   };
 
   return (
@@ -75,7 +77,7 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
           </div>
           {items.length ? (
             <div className="acts">
-              <button type="button" className="btn" onClick={exportieren} disabled={exportLaeuft || zeitraumFalsch} aria-busy={exportLaeuft || undefined}>
+              <button type="button" className="btn" onClick={exportieren} disabled={exportLaeuft || zeitraumFalsch || kennungFalsch} aria-busy={exportLaeuft || undefined}>
                 <Icon name="download" />{TX.p.exportieren}
               </button>
             </div>

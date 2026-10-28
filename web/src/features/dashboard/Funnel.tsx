@@ -1,15 +1,28 @@
 /**
- * Funnel nach Phase (UC-014 Schritt 1, UI-17): je Phase ein Balken mit Anteil im Plan, kritisch und nicht gemeldet;
- * dieselben Werte stehen in der Tabelle darunter (Alternative zum Diagramm, Q-B5). Ein Klick auf eine Phase zeigt ihre
- * Projekte in der Liste.
+ * Funnel nach Phase (UC-014 Schritt 1, UI-17): je Phase ein Balken mit Anteil im Plan, kritisch und ohne Status;
+ * dieselben Werte stehen in der Tabelle darunter (Alternative zum Diagramm, Q-B5). Jede Zahl führt zu ihren Einzelwerten
+ * (Seitentyp Bericht): ein Klick zeigt die Projekte der Phase mit dieser Auswahl in der Liste. Gezählt wird mit denselben
+ * Bedingungen wie der Filter (`auswahl.ts`).
  */
 import { fmtPhase, type Phase } from '../../ui/index.ts';
-import type { FunnelStufe } from './api.ts';
+import type { DashboardZeile } from './api.ts';
+import { anzahl, type Auswahl } from './auswahl.ts';
 import { TD } from './texte.ts';
 
-export function Funnel({ stufen, phaseWaehlen }: { stufen: FunnelStufe[]; phaseWaehlen(phase: Phase): void }) {
+const PHASEN: readonly Phase[] = ['P0', 'P1', 'P2', 'P3', 'P4'];
+const SPALTEN: readonly Auswahl[] = ['im_plan', 'kritisch', 'offen', 'ohne_status'];
+
+export function Funnel({ items, waehlen }: { items: readonly DashboardZeile[]; waehlen(phase: Phase, auswahl?: Auswahl): void }) {
+  const stufen = PHASEN.map(phase => {
+    const z = items.filter(i => i.phase === phase);
+    return { phase, z, anzahl: z.length };
+  });
   const max = Math.max(1, ...stufen.map(s => s.anzahl));
   const anteil = (n: number) => `${(n / max) * 100}%`;
+  const zahl = (phase: Phase, n: number, auswahl?: Auswahl) => (
+    <button type="button" className="linkbtn db-zahl" onClick={() => waehlen(phase, auswahl)} disabled={!n}
+      aria-label={TD.funnel.zelle(fmtPhase(phase), auswahl ? TD.auswahl[auswahl]! : TD.funnel.spalte.anzahl, n)}>{n}</button>
+  );
   return (
     <section className="db-funnel" aria-labelledby="db-funnel-h">
       <h2 id="db-funnel-h" className="grp-h">{TD.funnel.titel}</h2>
@@ -19,9 +32,9 @@ export function Funnel({ stufen, phaseWaehlen }: { stufen: FunnelStufe[]; phaseW
           <li key={s.phase}>
             <span className="db-stufe-l">{s.phase}</span>
             <span className="db-stufe-b">
-              <span className="db-ok" style={{ width: anteil(s.imPlan) }} />
-              <span className="db-krit" style={{ width: anteil(s.kritisch) }} />
-              <span className="db-ohne" style={{ width: anteil(s.ohneStatus) }} />
+              <span className="db-ok" style={{ width: anteil(anzahl(s.z, 'im_plan')) }} />
+              <span className="db-krit" style={{ width: anteil(anzahl(s.z, 'kritisch')) }} />
+              <span className="db-ohne" style={{ width: anteil(anzahl(s.z, 'ohne_status')) }} />
             </span>
             <span className="db-stufe-n">{s.anzahl}</span>
           </li>
@@ -43,13 +56,10 @@ export function Funnel({ stufen, phaseWaehlen }: { stufen: FunnelStufe[]; phaseW
           {stufen.map(s => (
             <tr key={s.phase}>
               <th scope="row">
-                <button type="button" className="linkbtn db-phase" onClick={() => phaseWaehlen(s.phase)} aria-label={TD.funnel.filtern(fmtPhase(s.phase))}>{fmtPhase(s.phase)}</button>
+                <button type="button" className="linkbtn db-phase" onClick={() => waehlen(s.phase)} aria-label={TD.funnel.filtern(fmtPhase(s.phase))}>{fmtPhase(s.phase)}</button>
               </th>
-              <td className="num">{s.anzahl}</td>
-              <td className="num">{s.imPlan}</td>
-              <td className="num">{s.kritisch}</td>
-              <td className="num">{s.nichtGemeldet}</td>
-              <td className="num">{s.ohneStatus}</td>
+              <td className="num">{zahl(s.phase, s.anzahl)}</td>
+              {SPALTEN.map(a => <td key={a} className="num">{zahl(s.phase, anzahl(s.z, a), a)}</td>)}
             </tr>
           ))}
         </tbody>

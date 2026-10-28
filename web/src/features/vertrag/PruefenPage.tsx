@@ -14,6 +14,7 @@ import { usePflichtangaben, useProjekt, useVertrag, type Version } from './api.t
 import { KAPITEL } from './felder.ts';
 import { usePruefung, usePruefungMutations, type PruefungLoaded } from './PruefenApi.ts';
 import { TP } from './PruefenTexte.ts';
+import { useNeuLaden } from './neuLaden.ts';
 import { TV } from './texte.ts';
 import './Pruefen.css';
 
@@ -26,11 +27,12 @@ export function PruefenPage({ nummer }: { nummer: string }) {
   if (projekt.isPending || vertrag.isPending || (entwurf && pruefung.isPending)) {
     return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={6} /> : null}</div>;
   }
+  // ein gescheitertes Neuladen behält den geladenen Stand (und die Eingaben); nur ohne Daten der Fehler (Z5)
   const fehler = projekt.error ?? vertrag.error ?? pruefung.error;
-  if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
+  if (fehler && !(projekt.data && vertrag.data && (!entwurf || pruefung.data))) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
   const version = vertrag.data?.versionen.find(v => v.id === entwurf);
   if (!projekt.data || !version || !pruefung.data) return <Empty>{TP.keinEntwurf}</Empty>;
-  return <Pruefansicht nummer={nummer} projektId={projekt.data.id} version={version} geladen={pruefung.data} />;
+  return <Pruefansicht nummer={nummer} projektId={projekt.data.id} version={version} geladen={pruefung.data} neuLaden={() => pruefung.refetch()} />;
 }
 
 const entwurfSchluessel = (versionId: string) => `ppm.qc.kommentare.${versionId}`;
@@ -51,10 +53,11 @@ function entwurfSchreiben(versionId: string, k: Record<number, string>): void {
   } catch { /* ohne Speicher bleibt der Entwurf nur auf der Seite */ }
 }
 
-function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string; projektId: string; version: Version; geladen: PruefungLoaded }) {
+function Pruefansicht({ nummer, projektId, version, geladen, neuLaden }: { nummer: string; projektId: string; version: Version; geladen: PruefungLoaded; neuLaden(): Promise<{ error: unknown }> }) {
   const id = useId();
   const toast = useToast();
   const { qualityCheck } = usePruefungMutations(projektId);
+  const laden = useNeuLaden(neuLaden, () => qualityCheck.reset());
   const pflicht = usePflichtangaben(version.id);
   const { router: { Link } } = useIamConfig();
   const [kommentare, setKommentare] = useState<Record<number, string>>(() => entwurfLesen(geladen.pruefung.versionId));
@@ -127,17 +130,19 @@ function Pruefansicht({ nummer, projektId, version, geladen }: { nummer: string;
 
           {darf ? (
             <div className="qc-aktion">
-              {isConflict(qualityCheck.error) ? <Hinweis stufe="warnung" live>{TP.konflikt}</Hinweis> : null}
+              {isConflict(qualityCheck.error) ? (
+                <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laden.laedt} onClick={() => void laden.laden()}>{TP.neuLaden}</button>}>{TP.konflikt}</Hinweis>
+              ) : null}
               {serverFehler ? <Hinweis stufe="sperre" live>{statusOf(qualityCheck.error) === 409 && serverFehler.detail?.includes('Projektorganisation') ? `${serverFehler.detail} ${TP.organisationFehlt}` : serverFehler.detail ?? serverFehler.title}</Hinweis> : null}
               <p className="small" role="status">{TP.kommentareAnzahl(liste.length)}</p>
               {liste.length ? <p className="muted small">{TP.entwurfBleibt}</p> : null}
               <p className="small" id={`${id}-wb`}>{TP.bestaetigenWirkung}</p>
-              <button type="button" className="btn primary" aria-describedby={`${id}-wb`} disabled={qualityCheck.isPending} onClick={() => senden('bestaetigt')}>
+              <button type="button" className="btn primary" aria-describedby={`${id}-wb`} disabled={qualityCheck.isPending || isConflict(qualityCheck.error)} onClick={() => senden('bestaetigt')}>
                 <Icon name="check" />{TP.bestaetigen}
               </button>
               <p className="small" id={`${id}-wz`}>{TP.zurueckgebenWirkung}</p>
               {ohneKommentar ? <Hinweis stufe="sperre" live>{TP.zurueckgebenFehlt}</Hinweis> : null}
-              <button type="button" className="btn" aria-describedby={`${id}-wz`} disabled={qualityCheck.isPending} onClick={() => senden('rueckmeldung')}>
+              <button type="button" className="btn" aria-describedby={`${id}-wz`} disabled={qualityCheck.isPending || isConflict(qualityCheck.error)} onClick={() => senden('rueckmeldung')}>
                 <Icon name="reply" />{TP.zurueckgeben}
               </button>
             </div>

@@ -23,7 +23,7 @@ const V = '00000000-0000-4000-8000-0000000000c1';
 const projekt = { id: P, nummer: '2026-014', name: 'Digitale Patientenaufnahme', phase: 'P0', lebenszyklus: 'aktiv' };
 const version = (o: Record<string, unknown> = {}) => ({
   id: V, projektId: P, nummer: '0.1', anlass: 'initial', zielphase: 'P1', stand: 'in_arbeit', baseline: false, baselineAt: null, basisVersionId: null,
-  begruendung: '', eingereichtAt: null, version: 1, createdAt: '2026-10-20T08:00:00Z', updatedAt: '2026-10-20T08:00:00Z', can: { write: true, einreichen: true }, ...o,
+  begruendung: '', eingereichtAt: null, version: 1, createdAt: '2026-10-20T08:00:00Z', updatedAt: '2026-10-20T08:00:00Z', can: { write: true, einreichen: true, zurueckziehen: false }, ...o,
 });
 
 /** Leerer Inhalt eines Kapitels wie die API ihn anlegt. */
@@ -227,6 +227,40 @@ describe('Projektvertrag (UI-07)', () => {
     expect(await screen.findByText('Patientenpfade')).toBeInTheDocument();
     await waitFor(() => expect(puts.length).toBe(1), { timeout: 3000 });
     expect(puts[0]).toMatchObject({ strategischesZielId: Z, handlungsfeldId: H, jahreszielId: null });
+  });
+
+  it('Projekt zurückziehen (UC-002 A4): nur mit Recht, Wirkung davor, Begründung Pflicht, If-Match', async () => {
+    let body: unknown = null;
+    const api2 = stub({
+      v: { stand: 'in_pruefung', eingereichtAt: '2026-10-21T08:00:00Z', can: { write: false, einreichen: false, zurueckziehen: true } }, kapitelRo: true,
+      routes: {
+        [`POST /v1/vertragsversionen/${V}/zurueckziehen`]: async req => {
+          body = await req.json();
+          return mitEtag({ version: version({ stand: 'zurueckgezogen', version: 2, can: { write: false, einreichen: false, zurueckziehen: false } }), kapitel: kopf() }, 2);
+        },
+      },
+    });
+    const { container } = renderWithIam(<Page />, PL as never);
+    await userEvent.click(await screen.findByRole('button', { name: TV.zurueckziehen }));
+    const dialog = await screen.findByRole('dialog', { name: TV.zurueckziehenFrage('Digitale Patientenaufnahme') });
+    expect(within(dialog).getByText(TV.zurueckziehenWirkung)).toBeInTheDocument();
+    await expectNoAxe(container);
+    // ohne Begründung: Sperre am Feld, kein Aufruf (K2 «Regeln»)
+    await userEvent.click(within(dialog).getByRole('button', { name: TV.zurueckziehen }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(TV.zurueckziehenBegruendungFehlt);
+    expect(api2.calls.some(c => c.url.includes('/zurueckziehen'))).toBe(false);
+    await userEvent.type(within(dialog).getByLabelText(TV.zurueckziehenBegruendung), ' Strategie geändert ');
+    await userEvent.click(within(dialog).getByRole('button', { name: TV.zurueckziehen }));
+    await waitFor(() => expect(body).toEqual({ begruendung: 'Strategie geändert' }));
+    expect(api2.calls.find(c => c.url.includes('/zurueckziehen'))!.headers.get('if-match')).toBe('W/"1"');
+    expect(await screen.findByText(TV.zurueckgezogen)).toBeInTheDocument();
+  });
+
+  it('ohne Recht kein «Projekt zurückziehen»', async () => {
+    stub({ v: { stand: 'in_pruefung', can: { write: false, einreichen: false, zurueckziehen: false } }, kapitelRo: true });
+    renderWithIam(<Page />, PL as never);
+    await screen.findByRole('heading', { level: 3, name: '1 Ausgangslage / Problembeschreibung' });
+    expect(screen.queryByRole('button', { name: TV.zurueckziehen })).toBeNull();
   });
 
   it('Kap. 7: Toleranzen je Dimension erfassen (A-10), doppelte Dimension vor dem Speichern gemeldet', async () => {

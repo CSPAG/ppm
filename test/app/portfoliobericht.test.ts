@@ -102,6 +102,18 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.deepEqual([g.portfolios.map((x: { schluessel: string }) => x.schluessel), g.risiken.length], [['transformation'], 4]);
     assert.equal((await call('GET', '/v1/dashboard/risiken?portfolio=dir-med', gremium)).statusCode, 404);
     assert.equal((await call('GET', '/v1/dashboard/risiken', pl)).statusCode, 403);
+
+    // Export (Seitentyp Bericht): die Risiken wie die Tabelle, nach Feld der Matrix bzw. offener Massnahme
+    const x = await call('GET', '/v1/dashboard/risiken?portfolio=transformation&format=csv', ue);
+    assert.equal(x.statusCode, 200, x.body);
+    assert.match(x.headers['content-disposition'] as string, /filename="risikolage-transformation\.csv"/);
+    const zeilen = (q: string) => (async () => (await call('GET', `/v1/dashboard/risiken?portfolio=transformation&format=csv${q}`, ue)).body.replace(/^\uFEFF/, '').trim().split('\r\n'))();
+    const alle = x.body.replace(/^\uFEFF/, '').trim().split('\r\n');
+    assert.equal(alle[0], 'Ebene;Nummer;Projekt;Risiko;Wahrscheinlichkeit;Auswirkung;Massnahme;Stand der Massnahme;Verantwortlich');
+    assert.equal(alle.length - 1, 4);
+    assert.equal((await zeilen('&w=hoch&a=hoch')).length - 1, feld('hoch', 'hoch'));
+    assert.equal((await zeilen('&w=tief&a=tief')).length - 1, 0);
+    assert.equal((await call('GET', '/v1/dashboard/risiken?w=hoch', ue)).statusCode, 422, '`w` nur für den Export');
   });
 
   let id = '';

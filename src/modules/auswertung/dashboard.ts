@@ -4,8 +4,9 @@
  * und Funnel nach Phase.
  */
 import type { Tx } from '@vollholz/platform';
+import { csv } from '../../platform.ts';
 import { eskalationen } from '../statusbericht/index.ts';
-import type { DashboardZeileOut, Meldung } from './schemas.ts';
+import type { Auswahl, DashboardZeileOut, Meldung } from './schemas.ts';
 import type * as store from './store.ts';
 
 const PHASEN = ['P0', 'P1', 'P2', 'P3', 'P4'] as const;
@@ -53,4 +54,34 @@ export function funnel(items: DashboardZeileOut[]) {
       nichtGemeldet: z.filter(i => i.meldung === 'nicht_gemeldet' || i.meldung === 'ausstehend').length,
     };
   });
+}
+
+/**
+ * Projekte hinter einer Zahl des Dashboards (UI-17; dieselben Bedingungen wie `web/src/features/dashboard/auswahl.ts`):
+ * «nicht gemeldet» trägt den Status der Vorperiode (A-11) und zählt nicht zu im Plan, kritisch oder ohne Status.
+ */
+const gemeldet = (z: DashboardZeileOut) => z.meldung !== 'nicht_gemeldet';
+export const PASST: Record<Auswahl, (z: DashboardZeileOut) => boolean> = {
+  im_plan: z => z.status === 'im_plan' && gemeldet(z),
+  kritisch: z => z.status === 'kritisch' && gemeldet(z),
+  ohne_status: z => !z.status && gemeldet(z),
+  offen: z => z.meldung === 'nicht_gemeldet' || z.meldung === 'ausstehend',
+  nicht_gemeldet: z => z.meldung === 'nicht_gemeldet',
+  ausstehend: z => z.meldung === 'ausstehend',
+  eskalation: z => z.merkmale.includes('eskalation'),
+};
+
+const STATUS_LABEL: Record<string, string> = { im_plan: 'im Plan', kritisch: 'kritisch' };
+const MELDUNG_LABEL: Record<Meldung, string> = { gemeldet: 'gemeldet', ausstehend: 'ausstehend', nicht_gemeldet: 'nicht gemeldet', ohne_pflicht: 'ohne Berichtspflicht' };
+
+/** Export (Seitentyp Bericht): eine Zeile je Projekt in der Reihenfolge der Liste. */
+export function alsCsv(items: readonly DashboardZeileOut[]): string {
+  return csv([
+    ['Nummer', 'Projekt', 'Portfolio', 'Handlungsfeld', 'Projektleitung', 'Phase', 'Abschluss per', 'Nächster Meilenstein', 'Termin', 'Status', 'Status Vorperiode', 'Trend', 'Meldung', 'Werte aus', 'Eskalation'],
+    ...items.map(z => [
+      z.nummer, z.name, z.portfolio, z.handlungsfeld, z.projektleitung, z.phase, z.abschlussPer, z.naechsterMeilenstein?.text ?? null, z.naechsterMeilenstein?.termin ?? null,
+      z.status ? STATUS_LABEL[z.status] ?? z.status : null, z.statusVorperiode ? STATUS_LABEL[z.statusVorperiode] ?? z.statusVorperiode : null, z.trend,
+      MELDUNG_LABEL[z.meldung], z.werteAus, z.merkmale.includes('eskalation') ? 'ja' : 'nein',
+    ]),
+  ]);
 }

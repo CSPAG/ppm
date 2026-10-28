@@ -23,3 +23,8 @@
   .pb-abschnitt,.pb-aktionen{padding-left:14px;padding-right:14px}
   .pb-tab .pb-opt{display:none}
 }
+/* Feld der Matrix als Schaltfläche zu seinen Risiken (UI-18, Seitentyp Bericht) */
+.pb-zahl{background:none;border:0;padding:4px 8px;font:inherit;color:inherit;cursor:pointer;border-radius:4px;text-decoration:underline;text-underline-offset:2px}
+.pb-zahl:disabled{text-decoration:none;cursor:default}
+.pb-zahl:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pb-auswahl{margin:0 0 8px}

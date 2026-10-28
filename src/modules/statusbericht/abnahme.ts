@@ -6,7 +6,7 @@
  */
 import { systemActor, type Actor, type Tx } from '@vollholz/platform';
 import { projektdaten } from '../projektdaten/index.ts';
-import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../sitzung/index.ts';
+import { registriereTraktandenart, traktandum, type EntscheidFolge, type FolgeKontext } from '../sitzung/index.ts';
 import * as store from './store.ts';
 
 /** Gremium nimmt ab oder nicht (K3 Schritt 8, Art «Meilensteinabnahme»). */
@@ -48,13 +48,13 @@ export async function beimEinreichen(tx: Tx, r: store.Row, _who: Actor): Promise
  * Schweiz). Die Abnahme zurückzunehmen bietet `projektdaten` nicht an; eine Korrektur auf «Nicht abgenommen» bleibt
  * darum im Entscheid sichtbar, das Datum im Register bleibt (Folgearbeit).
  */
-export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
+export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   if (f.ergebnis !== 'abgenommen' || f.bezug.typ !== 'meilenstein' || !f.bezug.projektId) return;
   const m = await meilenstein(tx, f.bezug.projektId, f.bezug.id);
   if (!m || m.abgenommenAm) return;
   const heute = (await tx.query<{ d: string }>("SELECT to_char(now() AT TIME ZONE 'Europe/Zurich', 'YYYY-MM-DD') AS d")).rows[0]!.d;
-  // die Person, die den Entscheid erfasst, steht im Audit des Entscheids (Modul sitzung); hier die Folge als System
-  await projektdaten.meilensteinAbnehmen(tx, systemActor('system'), m.id, heute);
+  // Abnahme durch das Gremium (PS.02.03): im Audit des Meilensteins die Person, die den Entscheid erfasst (UE)
+  await projektdaten.meilensteinAbnehmen(tx, k?.akteur ?? systemActor('system'), m.id, heute);
 }
 
 /** Art `meilenstein` in der Registry der Sitzung (fachmodell.md 2.9; `projektdaten` liegt unter `sitzung`). */

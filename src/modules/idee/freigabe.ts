@@ -5,24 +5,20 @@
  * Projekt in Phase P0 mit den Angaben der Idee (`projekt.herkunft`) an, setzt Sponsor und Projektleitung (A-05),
  * informiert die Antragstellenden und legt der Projektleitung «Projektvertrag erstellen» in den Eingang (UC-002).
  */
-import type { TupleStore } from '@vollholz/iam';
 import { invalid, systemActor, type Actor, type Db, type Deps, type Tx } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
 import { projekt } from '../projekt/index.ts';
-import { registriereTraktandenart, type EntscheidFolge, type Ergebnis } from '../sitzung/index.ts';
+import { registriereTraktandenart, type EntscheidFolge, type Ergebnis, type FolgeKontext } from '../sitzung/index.ts';
 import * as fs from './freigabe-store.ts';
 import * as ps from './pruefung-store.ts';
 import * as store from './store.ts';
 
-/** Was die Folge der Freigabe ausser der Transaktion braucht: Datenbank (Nummer des Projekts) und Tupel (Rollen am Projekt). */
-interface Umgebung { db: Db; tuples: TupleStore }
-let umgebung: Umgebung | null = null;
-
-/** Beim Registrieren des Moduls gesetzt; die Folge des Entscheids (`beiEntscheid`) erhält nur die Transaktion. */
-export function freigabeUmgebung(deps: Deps): void {
-  umgebung = { db: deps.db, tuples: deps.iam.tuples };
-}
+/**
+ * Was die Freigabe ausser der Transaktion braucht: Datenbank (Nummer des Projekts) und Tupel (Rollen am Projekt). Die
+ * Route gibt `deps`, die Folge des Entscheids den Kontext der Sitzung (`FolgeKontext`).
+ */
+export interface Zugang { db: Db; tuples: Deps['iam']['tuples'] }
 
 export const link = (nummer: number) => `/portfolio/ideen/${nummer}`;
 export const titelVon = (r: Pick<store.Row, 'titel' | 'nummer'>) => r.titel || `Idee ${r.nummer}`;
@@ -52,13 +48,12 @@ export async function pruefePersonen(tx: Tx, sponsor: string | null, projektleit
  * Vorbelegung des Projektvertrags, UC-002 Schritt 1); Sponsor und Projektleitung als Projektorganisation mit Rollen.
  * Liefert das Projekt. Rechte prüft der Aufrufer; `principalId` ist die entscheidende Person (Tupel «erstellt von»).
  */
-export async function initialisieren(tx: Tx, who: Actor, principalId: string, r: store.Row, o: { sponsor: string; projektleitung: string; begruendung: string }): Promise<{ id: string; nummer: string; name: string }> {
-  if (!umgebung) throw new Error('Modul idee ist nicht registriert (freigabeUmgebung fehlt).');
+export async function initialisieren(tx: Tx, zugang: Zugang, who: Actor, principalId: string, r: store.Row, o: { sponsor: string; projektleitung: string; begruendung: string }): Promise<{ id: string; nummer: string; name: string }> {
   const a = (await fs.angaben(tx, r.id))!;
   if (!a.portfolio_id) throw invalid('Die Idee hat kein Portfolio.', [{ path: '/kategorie', message: 'Ordnen Sie zuerst die Kategorie zu.' }]);
   const pf = await fs.portfolio(tx, a.portfolio_id);
   const tenantId = (await tx.query<{ t: string }>('SELECT app.tenant_id() AS t')).rows[0]!.t;
-  const p = await projekt.anlegen(tx, { db: umgebung.db, tenantId }, who, {
+  const p = await projekt.anlegen(tx, { db: zugang.db, tenantId }, who, {
     name: titelVon(r).slice(0, 200), portfolioId: a.portfolio_id, phase: 'P0', handlungsfeldId: r.handlungsfeld_id,
     orgEinheitId: pf?.kategorie === 'C' ? pf.org_einheit_id : null,
     herkunft: {
@@ -67,7 +62,7 @@ export async function initialisieren(tx: Tx, who: Actor, principalId: string, r:
       nutzen: r.nutzen_text, aufwand: r.aufwand_text, relevanz: r.relevanz_text, herkunft: r.herkunft, kategorie: a.kategorie,
     },
   });
-  await projekt.organisationFestlegen(tx, { tuples: umgebung.tuples, who, principalId }, p.id, 0, [
+  await projekt.organisationFestlegen(tx, { tuples: zugang.tuples, who, principalId }, p.id, 0, [
     { personId: o.sponsor, funktion: 'sp', akv: '' },
     { personId: o.projektleitung, funktion: 'pl', akv: '' },
   ]);
@@ -126,11 +121,12 @@ export async function nichtFreigeben(tx: Tx, who: Actor, r: store.Row, stand: 'z
  * idempotent: gleicht die Idee dem zuletzt erfassten Ergebnis an (Korrektur, A-30). Für die Freigabe müssen Sponsor und
  * Projektleitung bei der Idee erfasst sein (A-05), sonst scheitert der Entscheid mit 422.
  */
-export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
+export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   if (f.bezug.typ !== 'idee') return;
   const r = await store.get(tx, f.bezug.id);
   if (!r) return;
-  const who = systemActor('system');
+  // die Person, die den Entscheid erfasst (UE), steht im Audit der Idee und als «erstellt von» am neuen Projekt
+  const who = k?.akteur ?? systemActor('system');
   if (FREIGEGEBEN.has(f.ergebnis)) {
     const a = (await fs.angaben(tx, r.id))!;
     if (a.projekt_id && r.stand === 'freigegeben') return;
@@ -140,9 +136,8 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
       throw invalid(`Für die Freigabe von «${titelVon(r)}» fehlen Sponsor oder Projektleitung. Erfassen Sie beide bei der Idee (Portfolio › Ideen ${r.nummer}) und erfassen Sie den Entscheid erneut.`,
         [{ path: '/ergebnis', message: 'Sponsor und Projektleitung fehlen (A-05).' }]);
     }
-    const principal = (await tx.query<{ p: string | null }>('SELECT app.principal_id() AS p')).rows[0]!.p;
-    if (!principal) throw new Error('Entscheid ohne Person');
-    await initialisieren(tx, who, principal, r, { sponsor: a.sponsor!, projektleitung: a.projektleitung!, begruendung: f.begruendung });
+    if (!k) throw new Error('Folge der Freigabe ohne Kontext der Sitzung (FolgeKontext)');
+    await initialisieren(tx, k, who, k.principalId, r, { sponsor: a.sponsor!, projektleitung: a.projektleitung!, begruendung: f.begruendung });
     return;
   }
   await nichtFreigeben(tx, who, r, f.ergebnis === 'zurueckgestellt' ? 'zurueckgestellt' : 'zurueckgewiesen', f.begruendung);

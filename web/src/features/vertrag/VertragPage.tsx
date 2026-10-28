@@ -17,6 +17,7 @@ import {
   kapitelLaden, useKapitel, usePflichtangaben, useProjekt, useVersion, useVertrag, useVertragMutations, type Angabe, type Inhalt, type KapitelLoaded,
   type Version, type VersionLoaded,
 } from './api.ts';
+import { AenderungBeantragen, aenderungBanner, AenderungPanel } from './AenderungPanel.tsx';
 import { DokumentAusgabe } from './DokumentAusgabe.tsx';
 import { feldId, KAPITEL, pruefeLokal } from './felder.ts';
 import { KapitelEditor } from './KapitelEditor.tsx';
@@ -57,20 +58,20 @@ export function VertragPage({ nummer, search, setSearch }: { nummer: string; sea
   if (!v || !projekt.data) return null;
   if (ohneVersion) return <Empty>{TV.leer}</Empty>;
   const versionId = search.version === 'baseline' ? v.baseline ?? v.entwurf : v.entwurf ?? v.baseline;
-  return <Akte projektId={projekt.data.id} versionId={versionId!} search={search} setSearch={setSearch} />;
+  return <Akte nummer={nummer} projektId={projekt.data.id} versionId={versionId!} search={search} setSearch={setSearch} />;
 }
 
-function Akte({ projektId, versionId, search, setSearch }: { projektId: string; versionId: string; search: VertragSearch; setSearch: SetVertragSearch }) {
+function Akte({ nummer, projektId, versionId, search, setSearch }: { nummer: string; projektId: string; versionId: string; search: VertragSearch; setSearch: SetVertragSearch }) {
   const version = useVersion(versionId);
   const pflicht = usePflichtangaben(versionId);
   const skelett = useVerzoegert(version.isPending);
   if (version.isPending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={6} /> : null}</div>;
   if (version.error) return <ErrorState error={version.error} onRetry={() => void version.refetch()} />;
-  return <Arbeitsflaeche projektId={projektId} loaded={version.data} angaben={pflicht.data?.angaben ?? []} search={search} setSearch={setSearch} />;
+  return <Arbeitsflaeche nummer={nummer} projektId={projektId} loaded={version.data} angaben={pflicht.data?.angaben ?? []} search={search} setSearch={setSearch} />;
 }
 
-function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
-  projektId: string; loaded: VersionLoaded; angaben: Angabe[]; search: VertragSearch; setSearch: SetVertragSearch;
+function Arbeitsflaeche({ nummer, projektId, loaded, angaben, search, setSearch }: {
+  nummer: string; projektId: string; loaded: VersionLoaded; angaben: Angabe[]; search: VertragSearch; setSearch: SetVertragSearch;
 }) {
   const toast = useToast();
   const v = loaded.detail.version;
@@ -134,9 +135,9 @@ function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
   const serverSperre = statusOf(einreichen.error) === 422 ? describeError(einreichen.error).detail : null;
   const k = loaded.detail.kapitel.find(x => x.kapitel === nr);
   const ro = !v.can.write;
-  const banner = v.stand === 'in_pruefung' ? TV.inPruefung(v.eingereichtAt ? fmtDatum(v.eingereichtAt) : '')
+  const banner = aenderungBanner(v, v.eingereichtAt ? fmtDatum(v.eingereichtAt) : '') ?? (v.stand === 'in_pruefung' ? TV.inPruefung(v.eingereichtAt ? fmtDatum(v.eingereichtAt) : '')
     : v.baseline && v.baselineAt ? TV.baselineSeit(v.nummer, fmtDatum(v.baselineAt))
-      : v.stand !== 'in_arbeit' ? TV.gesperrt(TV.stand[v.stand]) : ro ? TV.nurLesen : null;
+      : v.stand !== 'in_arbeit' ? TV.gesperrt(TV.stand[v.stand]) : ro ? TV.nurLesen : null);
 
   return (
     <div className="vt-wrap">
@@ -145,6 +146,8 @@ function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
         <Stand familie={FAMILIE[v.stand]} label={v.baseline ? TV.baseline : TV.stand[v.stand]} />
         {/* Als Dokument herunterladen (K2 Schritt 11, AP-E3-5) */}
         <DokumentAusgabe versionId={v.id} nummer={v.nummer} />
+        {/* Änderung beantragen (UC-007 Schritt 1, AP-E3-4) */}
+        <AenderungBeantragen projektId={projektId} onAngelegt={() => setSearch({ version: 'entwurf', kapitel: undefined, feld: undefined })} />
       </div>
       {banner ? <div className="vt-banner"><Hinweis stufe="hinweis">{banner}</Hinweis></div> : null}
       <div className="vt-flaeche">
@@ -205,6 +208,7 @@ function Arbeitsflaeche({ projektId, loaded, angaben, search, setSearch }: {
               <button type="button" className="btn primary" onClick={() => void einreichenStart()}><Icon name="send" />{TV.einreichen}</button>
             </div>
           ) : null}
+          {v.anlass === 'aenderung' ? <AenderungPanel projektId={projektId} nummer={nummer} version={v} speichern={() => speichernRef.current()} /> : null}
         </aside>
       </div>
       {dialog ? (

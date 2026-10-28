@@ -38,11 +38,13 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 | `get_periode` | `GET /v1/perioden/{periode}[/terminabweichungen]` | `statusbericht:review` | `readOnlyHint`; Monatsabschluss bzw. Terminabweichungen |
 | `get_dashboard` | `GET /v1/dashboard` | `auswertung:read` | `readOnlyHint`; optional `portfolio` (Schlüssel), `periode` |
 | `get_auslastung` | `GET /v1/auslastung` | `ressource:read` | `readOnlyHint`; Zeitraum `von`/`bis`, optional `szenario` |
+| `get_matrix` | `GET /v1/portfolios/{id}/matrix` | `priorisierung:read` | `readOnlyHint`; Kosten nur mit `finanzen:read` |
 | `list_bedarfe` | `GET /v1/bedarfe` | `ressource:read` | `readOnlyHint`; Filter `stand`, `rolle`, `von`/`bis` |
 | `list_sitzungen` | `GET /v1/gremien/{kuerzel}/sitzungen` | `sitzung:read` | `readOnlyHint` |
 | `get_sitzung` | `GET /v1/sitzungen/{id}` | `sitzung:read` | `readOnlyHint` |
 | `list_entscheide` | `GET /v1/entscheide` | `sitzung:read` | `readOnlyHint` |
 | `get_vertrag` | `GET /v1/projekte/{id}/vertrag`, Kapitel und Pflichtangaben einer Version | `projekt:read` | `readOnlyHint`; Beträge `null` ohne `finanzen:read` |
+| `compare_vertrag` | `GET /v1/vertragsversionen/{id}/vergleich` und `…/hauptaenderungen` | `projekt:read` | `readOnlyHint`; Standard Entwurf gegen Basis; ohne `finanzen:read` ohne Beträge |
 
 Neues Werkzeug: im Modell unter `mcpTools` eintragen (Titel, Recht, `readOnly`), in `mcp/tools.ts` als Aufruf der
 REST-API umsetzen; nie direkt auf Module oder die Datenbank zugreifen.

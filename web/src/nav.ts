@@ -13,6 +13,7 @@ import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
 import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
+import { dashboardTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
@@ -30,6 +31,8 @@ export const navigation: NavRegistrierung = {
     { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read' },
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
     { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
+    // Arbeitsraum «Portfolio» › Dashboard (UI-17, PC.04.01; AP-E1-3): erster Bereich des Portfolios (IA)
+    { raum: 'portfolio', pfad: '/portfolio/dashboard', label: dashboardTexte.bereich, recht: 'auswertung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
     { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: ['idee:create', 'idee:read'] },
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite

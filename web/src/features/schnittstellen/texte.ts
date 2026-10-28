@@ -38,6 +38,7 @@ export const TX = {
   },
   p: {
     title: 'Änderungsprotokoll', sub: 'Wer hat wann was geändert: alter und neuer Wert, nach Objekt und Zeitraum.',
+    exportieren: 'Exportieren (CSV)', exportiert: (name: string) => `${name} gespeichert.`,
     tabelle: 'Änderungen', filter: 'Filter', objekt: 'Objekt', objektAlle: 'alle Objekte', objektId: 'Kennung des Objekts',
     objektIdHint: 'optional, z. B. aus der Adresse des Objekts', von: 'von', bis: 'bis', zeitraum: 'Zeitraum',
     spalte: { zeit: 'Zeitpunkt', person: 'Person', objekt: 'Objekt', aktion: 'Aktion', aenderungen: 'Änderungen' },
@@ -49,5 +50,11 @@ export const TX = {
     keineAenderung: 'ohne Feldänderung', leerWert: 'leer', ja: 'ja', nein: 'nein',
     vonNachBis: '«von» liegt nach «bis». Wähle einen gültigen Zeitraum.',
     objektIdUngueltig: 'Die Kennung hat das Format 8-4-4-4-12 (z. B. aus der Adresse).',
+  },
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», ADM): nur bei fehlgeschlagenem Lauf
+  kopfkarte: {
+    titel: 'Schnittstellen',
+    fehler: (n: number) => (n === 1 ? '1 Lauf fehlgeschlagen' : `${n} Läufe fehlgeschlagen`),
+    lauf: (name: string) => `Lauf «${name}» fehlgeschlagen`,
   },
 };

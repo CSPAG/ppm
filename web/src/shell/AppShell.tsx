@@ -1,7 +1,7 @@
 /**
  * Werkbank wie in vollholz/assets: Topbar (Marke mit Organisation, Suche als Befehlspalette, Farbschema, Kontomenü),
  * Navigation nach Arbeitsräumen (links ab 768 px, unten auf dem Telefon; `nav.ts`), Arbeitsfläche als «Karte»,
- * Schubladen rechts. Strg/⌘ K öffnet die Befehlspalette.
+ * Schubladen rechts. Strg/⌘ K öffnet die Befehlspalette, «/» die Suche der Liste, «?» die Übersicht der Kürzel.
  */
 import { useRouterState } from '@tanstack/react-router';
 import { AccountMenu, BreakGlassBanner, initials, MyRightsDialog, useIam, useIamConfig } from '@vollholz/iam-web';
@@ -9,6 +9,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { applyTheme, avatarColor, Icon, T } from '../ui/index.ts';
 import { BottomNav, MehrBlatt } from './BottomNav.tsx';
 import { CommandPalette } from './CommandPalette.tsx';
+import { kuerzelTaste, KuerzelUebersicht } from './Kuerzel.tsx';
 import { useShell } from './context.ts';
 import { aufteilenUnten, useNavigation, useZaehler } from './nav.ts';
 import { BereichLeiste, Rail } from './Rail.tsx';
@@ -26,12 +27,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { unten, mehr } = aufteilenUnten(raeume);
   const [palette, setPalette] = useState(false);
   const [rechte, setRechte] = useState(false);
+  const [kuerzel, setKuerzel] = useState(false);
   // «Mehr» offen nur für die Seite, auf der es geöffnet wurde (Wechsel der Seite schliesst es)
   const [mehrAt, setMehrAt] = useState<string | null>(null);
   const mehrOffen = mehrAt === path;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette(o => !o); }
+      else if (kuerzelTaste(e, () => setKuerzel(true))) e.preventDefault();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -77,6 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <BottomNav unten={unten} mehr={mehr} mehrOffen={mehrOffen} onMehr={() => setMehrAt(mehrOffen ? null : path)} zaehler={zaehler} />
       </div>
+      {kuerzel ? <KuerzelUebersicht onClose={() => setKuerzel(false)} /> : null}
       {palette ? <CommandPalette raeume={raeume} aktionen={aktionen} suchen={suchen} onClose={() => setPalette(false)} /> : null}
       {mehrOffen ? <MehrBlatt raeume={mehr} konto={konto} zaehler={zaehler} onClose={() => setMehrAt(null)} onRechte={() => { setMehrAt(null); setRechte(true); }} /> : null}
       {rechte ? <MyRightsDialog onClose={() => setRechte(false)} /> : null}

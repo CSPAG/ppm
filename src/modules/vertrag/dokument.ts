@@ -11,7 +11,7 @@ import { STAND_TEXT } from './entwurf.ts';
 import type { Static, TSchema } from '@sinclair/typebox';
 import type {
   AbhaengigkeitPlan, BeilagePlan, Kapitel1, Kapitel12, Kapitel2, Kapitel3, Kapitel4, Kapitel5, Kapitel6, Kapitel7, KommunikationPlan, KostenPlan, KpiPlan,
-  MeilensteinPlan, MitgliedPlan, PersonalPlan, Phase, RisikoPlan, StakeholderPlan,
+  MeilensteinPlan, MitgliedPlan, PersonalPlan, Phase, RisikoPlan, StakeholderPlan, ToleranzPlan,
 } from './kapitel.ts';
 import type { VersionRow } from './store.ts';
 
@@ -29,7 +29,7 @@ type S<T extends TSchema> = Static<T>;
 export interface VertragInhalt {
   1: S<typeof Kapitel1>; 2: S<typeof Kapitel2>; 3: Omit<S<typeof Kapitel3>, 'kpis'> & { kpis: S<typeof KpiPlan>[] };
   4: S<typeof Kapitel4>; 5: S<typeof Kapitel5>; 6: Omit<S<typeof Kapitel6>, 'abhaengigkeiten'> & { abhaengigkeiten: S<typeof AbhaengigkeitPlan>[] };
-  7: Omit<S<typeof Kapitel7>, 'meilensteine'> & { meilensteine: S<typeof MeilensteinPlan>[] }; 8: { mitglieder: S<typeof MitgliedPlan>[] };
+  7: Omit<S<typeof Kapitel7>, 'meilensteine' | 'toleranzen'> & { meilensteine: S<typeof MeilensteinPlan>[]; toleranzen?: S<typeof ToleranzPlan>[] }; 8: { mitglieder: S<typeof MitgliedPlan>[] };
   9: { kosten: S<typeof KostenPlan>[]; personal: S<typeof PersonalPlan>[] }; 10: { risiken: S<typeof RisikoPlan>[] };
   11: { stakeholder: S<typeof StakeholderPlan>[]; kommunikation: S<typeof KommunikationPlan>[] }; 12: S<typeof Kapitel12>;
   13: { beilagen: S<typeof BeilagePlan>[] };
@@ -59,6 +59,24 @@ export interface DokumentDaten {
   bez: Bezeichnungen;
   /** Recht auf Beträge (A-33). */
   betraege: boolean;
+  /** Standard des Phasenmodells des Projekts je Dimension (A-10, A-13); gilt, wo Kap. 7 keine Toleranz nennt. */
+  standardToleranzen: readonly { dimension: string; wert: number | null; einheit: string }[];
+}
+
+const DIMENSION_TOLERANZ: Record<string, string> = { termin: 'Termin', kosten: 'Kosten', umfang: 'Umfang' };
+const EINHEIT_TOLERANZ: Record<string, string> = { prozent: '%', kalendertage: 'Kalendertage', arbeitstage: 'Arbeitstage' };
+const zahl = (n: number) => new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(n);
+const toleranzText = (t: { wert: number | null; einheit: string } | undefined) => (t && t.wert !== null ? `${zahl(t.wert)} ${EINHEIT_TOLERANZ[t.einheit] ?? t.einheit}` : null);
+
+/**
+ * Toleranzen in Kap. 7.2 (A-10, K11; seit #155 im Vertrag): je Dimension der Wert des Vertrags, sonst «Standard des
+ * Phasenmodells: …» (ohne Standard «keiner»; dann gibt es keine Warnung «wesentlich»).
+ */
+export function toleranzZeilen(d: Pick<DokumentDaten, 'inhalt' | 'standardToleranzen'>): [string, string][] {
+  return Object.keys(DIMENSION_TOLERANZ).map(dim => {
+    const eigen = toleranzText((d.inhalt[7].toleranzen ?? []).find(t => t.dimension === dim));
+    return [`Toleranz ${DIMENSION_TOLERANZ[dim]}`, eigen ?? `Standard des Phasenmodells: ${toleranzText(d.standardToleranzen.find(t => t.dimension === dim)) ?? 'keiner'}`];
+  });
 }
 
 /** Dateiname «Projektvertrag-2026-014-v0.1.pdf». */
@@ -132,6 +150,7 @@ export function vertragDokument(d: DokumentDaten, v: Vorlage = vorlage.aktuell('
       ['Projektstart', datum(i[7].termine.projektStart)], ['Start der Phase', datum(i[7].termine.phasenStart)],
       ['Exit der Phase', datum(i[7].termine.phasenExit)], ['Erwarteter Projektabschluss', datum(i[7].termine.projektabschluss)],
     ], felder: ['kap7.projektStart', 'kap7.phasenStart', 'kap7.phasenExit', 'kap7.projektabschluss'] },
+    { art: 'felder', zeilen: toleranzZeilen(d), felder: ['kap7.toleranzTermin', 'kap7.toleranzKosten', 'kap7.toleranzUmfang'] },
 
     h1('8'),
     tab(['Rolle', 'Person', 'Aufgaben, Kompetenzen, Verantwortung'], i[8].mitglieder.map(m => [FUNKTION_TEXT[m.funktion] ?? m.funktion, person(m.personId), m.akv]), [3, 3, 6], 'kap8.mitglieder'),

@@ -31,4 +31,12 @@ export const TD = {
     spalte: { phase: 'Phase', anzahl: 'Projekte', imPlan: 'im Plan', kritisch: 'kritisch', nichtGemeldet: 'nicht gemeldet bzw. ausstehend', ohneStatus: 'ohne Status' },
     filtern: (phase: string) => `Projekte in ${phase} anzeigen`,
   },
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle»: PRAT, GLPA Gesamtstatus; DIR Projekte der Direktion)
+  kopfkarte: {
+    titel: (periode: string) => `Portfolio ${periode}`,
+    imPlan: (n: number) => `${n} im Plan`,
+    kritisch: (n: number) => `${n} kritisch`,
+    ohneStatus: (n: number) => `${n} ohne Status`,
+    eskalationen: (n: number) => (n === 1 ? '1 Eskalation' : `${n} Eskalationen`),
+  },
 };

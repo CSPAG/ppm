@@ -193,7 +193,10 @@ function Termine({ gremium }: { gremium: Gremium }) {
               <dd>{gremium.can.admin ? (
                 <button type="button" className="iconbtn" aria-label={TP.terminEntfernen(fmtDatum(t.datum))} disabled={terminEntfernen.isPending}
                   onClick={() => terminEntfernen.mutate({ id: gremium.id, datum: t.datum }, {
-                    onSuccess: () => toast.show(TP.terminEntfernt(fmtDatum(t.datum))),
+                    // umkehrbar (I-R1 Stufe 1): «Rückgängig» plant denselben Termin wieder ein
+                    onSuccess: () => toast.show(TP.terminEntfernt(fmtDatum(t.datum)), {
+                      action: { label: TP.rueckgaengig, run: () => termin.mutate({ id: gremium.id, datum: t.datum, key: newIdempotencyKey() }, { onError: e => toast.error(e) }) },
+                    }),
                     onError: e => toast.error(e),
                   })}><Icon name="x" /></button>
               ) : null}</dd>

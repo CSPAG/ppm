@@ -14213,6 +14213,826 @@
           }
         }
       },
+      "RisikolageRisiko": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "ebene",
+          "projekt",
+          "portfolioId",
+          "text",
+          "wahrscheinlichkeit",
+          "auswirkung",
+          "massnahme",
+          "massnahmeStand",
+          "verantwortlich"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "ebene": {
+            "description": "Projektrisiko (PC.02.04) oder Portfoliorisiko (PC.02.01).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "projekt"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "portfolio"
+                ]
+              }
+            ]
+          },
+          "projekt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "nummer",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nummer": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "wahrscheinlichkeit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "hoch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "mittel"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "tief"
+                ]
+              }
+            ]
+          },
+          "auswirkung": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "hoch"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "mittel"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "tief"
+                ]
+              }
+            ]
+          },
+          "massnahme": {
+            "type": "string"
+          },
+          "massnahmeStand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "offen"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "umgesetzt"
+                ]
+              }
+            ]
+          },
+          "verantwortlich": {
+            "type": "string"
+          }
+        }
+      },
+      "Risikolage": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolios",
+          "portfolio",
+          "stand",
+          "risiken",
+          "matrix",
+          "abhaengigkeiten",
+          "eskalationen"
+        ],
+        "properties": {
+          "portfolios": {
+            "description": "Portfolios, deren Risikolage die Person sieht (`auswertung:read`).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "schluessel",
+                "name",
+                "kategorie"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "schluessel": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "kategorie": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "description": "Gewähltes Portfolio (Schlüssel) oder null für alle sichtbaren.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stand": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "risiken": {
+            "description": "Projekt- und Portfoliorisiken der aktiven Projekte bzw. der Portfolios; höchste Auswirkung und Wahrscheinlichkeit zuerst, offene Massnahmen vor umgesetzten.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RisikolageRisiko"
+            }
+          },
+          "matrix": {
+            "description": "Anzahl Risiken je Feld (Wahrscheinlichkeit × Auswirkung), alle neun Felder.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "wahrscheinlichkeit",
+                "auswirkung",
+                "anzahl"
+              ],
+              "properties": {
+                "wahrscheinlichkeit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "hoch"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "mittel"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "tief"
+                      ]
+                    }
+                  ]
+                },
+                "auswirkung": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "hoch"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "mittel"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "tief"
+                      ]
+                    }
+                  ]
+                },
+                "anzahl": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "abhaengigkeiten": {
+            "description": "Abhängigkeiten zwischen den aktiven Projekten (PP.02.03); «von» hängt von «zu» ab.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "von",
+                "zu",
+                "text"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "von": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "zu": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "eskalationen": {
+            "description": "Offene Eskalationen aus dem Statusbericht (UC-004 A2, AP-E2-4).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "projekt",
+                "periode",
+                "grund",
+                "massnahme",
+                "stand"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "projekt": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "periode": {
+                  "type": "string"
+                },
+                "grund": {
+                  "type": "string"
+                },
+                "massnahme": {
+                  "type": "string"
+                },
+                "stand": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "offen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "traktandiert"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "PortfolioberichtKurz": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "portfolio",
+          "periode",
+          "stand",
+          "erzeugtAt",
+          "bereitgestelltAt",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolio": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "schluessel",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "schluessel": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "periode": {
+            "type": "string"
+          },
+          "stand": {
+            "description": "«Entwurf» (die UE ergänzt den Kommentar, erzeugt neu) oder «bereitgestellt» (fest, Unterlage des Gremiums).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "bereitgestellt"
+                ]
+              }
+            ]
+          },
+          "erzeugtAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "bereitgestelltAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      },
+      "Portfoliobericht": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "portfolio",
+          "periode",
+          "stand",
+          "erzeugtAt",
+          "bereitgestelltAt",
+          "version",
+          "kommentar",
+          "dashboard",
+          "risikolage",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "portfolio": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "schluessel",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "schluessel": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "periode": {
+            "type": "string"
+          },
+          "stand": {
+            "description": "«Entwurf» (die UE ergänzt den Kommentar, erzeugt neu) oder «bereitgestellt» (fest, Unterlage des Gremiums).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "bereitgestellt"
+                ]
+              }
+            ]
+          },
+          "erzeugtAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "bereitgestelltAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer"
+          },
+          "kommentar": {
+            "description": "Kommentar der UE («Bericht der Programmleitung», K3 Schritt 4).",
+            "type": "string"
+          },
+          "dashboard": {
+            "additionalProperties": false,
+            "description": "Abgeschlossenes Dashboard der Periode bei Erzeugung.",
+            "type": "object",
+            "required": [
+              "abgeschlossenAt",
+              "items",
+              "funnel"
+            ],
+            "properties": {
+              "abgeschlossenAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DashboardZeile"
+                }
+              },
+              "funnel": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FunnelStufe"
+                }
+              }
+            }
+          },
+          "risikolage": {
+            "additionalProperties": false,
+            "description": "Risikolage bei Erzeugung.",
+            "type": "object",
+            "required": [
+              "risiken",
+              "matrix",
+              "abhaengigkeiten",
+              "eskalationen"
+            ],
+            "properties": {
+              "risiken": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RisikolageRisiko"
+                }
+              },
+              "matrix": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "wahrscheinlichkeit",
+                    "auswirkung",
+                    "anzahl"
+                  ],
+                  "properties": {
+                    "wahrscheinlichkeit": {
+                      "type": "string"
+                    },
+                    "auswirkung": {
+                      "type": "string"
+                    },
+                    "anzahl": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "abhaengigkeiten": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "von",
+                    "zu",
+                    "text"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "von": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "nummer",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nummer": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "zu": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "nummer",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nummer": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "eskalationen": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "projekt",
+                    "periode",
+                    "grund",
+                    "massnahme",
+                    "stand"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "projekt": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "nummer",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nummer": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "periode": {
+                      "type": "string"
+                    },
+                    "grund": {
+                      "type": "string"
+                    },
+                    "massnahme": {
+                      "type": "string"
+                    },
+                    "stand": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "bearbeiten",
+              "bereitstellen"
+            ],
+            "properties": {
+              "bearbeiten": {
+                "type": "boolean"
+              },
+              "bereitstellen": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "PortfolioberichtListe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "description": "Neueste Periode zuerst.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortfolioberichtKurz"
+            }
+          }
+        }
+      },
+      "PortfolioberichtCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolio",
+          "periode"
+        ],
+        "properties": {
+          "portfolio": {
+            "pattern": "^[a-z0-9_-]{1,40}$",
+            "description": "Schlüssel des Portfolios.",
+            "type": "string"
+          },
+          "periode": {
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Abgeschlossene Periode.",
+            "type": "string"
+          }
+        }
+      },
+      "PortfolioberichtPatch": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kommentar"
+        ],
+        "properties": {
+          "kommentar": {
+            "maxLength": 8000,
+            "type": "string"
+          }
+        }
+      },
       "VorlageGrundbestand": {
         "additionalProperties": false,
         "description": "Mitgelieferte Vorlage; gilt ohne aktive eigene Version.",
@@ -55564,6 +56384,806 @@
         }
       }
     },
+    "/v1/dashboard/risiken": {
+      "get": {
+        "summary": "Risikolage des Portfolios",
+        "tags": [
+          "Risikolage"
+        ],
+        "description": "Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Recht `auswertung:read` an der Organisation oder am Portfolio.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9_-]{1,40}$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false,
+            "description": "Schlüssel des Portfolios (I-N5), z. B. `transformation`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Risikolage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolioberichte": {
+      "get": {
+        "summary": "Portfolioberichte",
+        "tags": [
+          "Portfoliobericht"
+        ],
+        "description": "Portfolioberichte, neueste Periode zuerst; die UE sieht auch Entwürfe, Gremien und Direktionen nur bereitgestellte Berichte ihres Portfolios.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9_-]{1,40}$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false,
+            "description": "Schlüssel des Portfolios."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioberichtListe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Portfoliobericht erzeugen",
+        "tags": [
+          "Portfoliobericht"
+        ],
+        "description": "Erzeugt den Bericht des Portfolios aus dem abgeschlossenen Dashboard der Periode und der Risikolage (UC-014 Schritt 3, K3 Schritt 4; PPM-4). Besteht der Bericht als Entwurf, wird er neu erzeugt (der Kommentar bleibt, 200); bereitgestellt ist er fest (409). Offene Periode: 409. Recht `auswertung:write`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioberichtCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfoliobericht"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfoliobericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolioberichte/{id}": {
+      "get": {
+        "summary": "Portfoliobericht",
+        "tags": [
+          "Portfoliobericht"
+        ],
+        "description": "Bericht mit Kommentar, Dashboard und Risikolage im Stand bei Erzeugung; ETag = Fassung.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfoliobericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Kommentar ergänzen",
+        "tags": [
+          "Portfoliobericht"
+        ],
+        "description": "Kommentar der UE («Bericht der Programmleitung») im Entwurf; nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioberichtPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfoliobericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolioberichte/{id}/bereitstellen": {
+      "post": {
+        "summary": "Portfoliobericht bereitstellen",
+        "tags": [
+          "Portfoliobericht"
+        ],
+        "description": "Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio und Unterlage des Traktandums «Bericht der Programmleitung»; nur mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfoliobericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolioberichte/{id}/dokument": {
+      "get": {
+        "summary": "Portfoliobericht als Dokument",
+        "tags": [
+          "Portfoliobericht"
+        ],
+        "description": "Bericht als PDF oder Word über die Dokumentausgabe (Modul `vorlage`); Kopfzeile «Intern · enthält Personendaten» (G12). Der Export ist protokolliert.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pdf"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "docx"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Dateiformat: `pdf` (Standard) oder `docx` (Word)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dokument als Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "description": "PDF",
+                  "type": "string"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "format": "binary",
+                  "description": "Word",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/vorlagen": {
       "get": {
         "summary": "Vorlagen auflisten",
@@ -64774,6 +66394,14 @@
     {
       "name": "Dashboard",
       "description": "Dashboard der Periode: Projekte der sichtbaren Portfolios mit Status, Trend, Phase und Meldung, Funnel nach Phase."
+    },
+    {
+      "name": "Risikolage",
+      "description": "Risikolage: Projekt- und Portfoliorisiken mit Bewertung und Massnahmen, Abhängigkeiten und offene Eskalationen."
+    },
+    {
+      "name": "Portfoliobericht",
+      "description": "Portfoliobericht der Periode aus dem abgeschlossenen Dashboard und der Risikolage, mit Kommentar der UE, als PDF oder Word."
     },
     {
       "name": "Vorlagen",

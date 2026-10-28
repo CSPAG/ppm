@@ -31,6 +31,8 @@ export function EntscheidePage({ search, setSearch }: { search: EntscheideSearch
   const erfuellen = useAuflageErfuellen();
   // «Erledigt melden» lässt sich nicht zurücknehmen: Rückfrage mit der Auflage und der Wirkung (I-R1 Stufe 2)
   const [frage, setFrage] = useState<Auflage | null>(null);
+  // Läuft die Meldung, schliesst nichts den Dialog: sonst sähe Abbrechen nach Abbruch aus, obwohl sie ankommt
+  const frageSchliessen = () => { if (!erfuellen.isPending) setFrage(null); };
   const items = q.data?.items;
   const offen = search.e ? items?.find(x => x.id === search.e) : search.auflage ? items?.find(x => x.auflagen.some(a => a.id === search.auflage)) : undefined;
   const gefiltert = !!(search.gremium || search.auflagen || search.vr);
@@ -97,8 +99,8 @@ export function EntscheidePage({ search, setSearch }: { search: EntscheideSearch
         </Drawer>
       ) : null}
       {frage ? (
-        <Dialog title={TM.erfuellenFrage(frage.text)} onClose={() => setFrage(null)} footer={<>
-          <button type="button" className="btn" onClick={() => setFrage(null)} data-autofocus>{T.common.cancel}</button>
+        <Dialog title={TM.erfuellenFrage(frage.text)} onClose={frageSchliessen} footer={<>
+          <button type="button" className="btn" onClick={frageSchliessen} disabled={erfuellen.isPending} data-autofocus>{T.common.cancel}</button>
           <button type="button" className="btn primary" disabled={erfuellen.isPending}
             onClick={() => erfuellen.mutate(frage, { onSuccess: () => { setFrage(null); toast.show(TM.erfuelltOk); }, onError: x => { setFrage(null); toast.error(x); } })}>
             {TM.erfuellen}

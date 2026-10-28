@@ -10,7 +10,6 @@ export const Z = {
   sub: 'Zugang entziehen, wenn jemand die Organisation verlässt – mit den Rollen und Aufgaben, die neu zu besetzen sind.',
   entziehen: 'Zugang entziehen',
   aktionEntziehen: 'Zugang entziehen …',
-  hinweisBaukasten: 'Entziehen Sie Zugänge hier statt unter «Benutzer und Rollen»: Nur so bleiben die Rollen in Projekten und Portfolios festgehalten, die neu zu besetzen sind.',
   filter: { titel: 'Anzeige', alle: 'Alle', offen: 'Nur offene' },
   liste: {
     titel: 'Entzogene Zugänge',

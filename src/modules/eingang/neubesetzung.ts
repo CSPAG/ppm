@@ -1,13 +1,15 @@
 /**
  * Zugang entziehen mit Neubesetzung (AM.01.01, AM.01.02; UC-016 A1, Fachmodell 4.2): Vor dem Entfernen der Person im
- * Baukasten (Mitgliedschaft und alle Tupel) hält das Modul ihre Rollen an Projekten, Portfolios und anderen Orten fest.
+ * Baukasten (Mitgliedschaft und alle Tupel; Haken `member.removing`) hält das Modul ihre Rollen an Projekten, Portfolios
+ * und anderen Orten fest, nach dem Entfernen (`member.removed`) schliesst es ab.
  * Danach liegt bei der Administration die Aufgabe «Rollen von ‹Person› neu besetzen»; offene Aufgaben der Person zeigt
  * die Neubesetzung live aus `aufgabe`. Neu besetzt werden die Rollen dort, wo sie vergeben werden (z. B. in der
  * Projektorganisation); ob eine Rolle wieder besetzt ist, ergibt sich aus den Tupeln.
  */
-import type { Tx } from '@vollholz/platform';
-import { platform, SCHEMA } from '../../platform.ts';
-import { aufgabe, intern } from './aufgabe.ts';
+import type { IamEvent, IamEvents } from '@vollholz/iam';
+import type { Actor, Tx } from '@vollholz/platform';
+import { platform, record, SCHEMA } from '../../platform.ts';
+import { aufgabe, intern, mitteilung } from './aufgabe.ts';
 import { tuples } from './stellvertretung.ts';
 
 const N = `${SCHEMA}.neubesetzung`;
@@ -58,19 +60,19 @@ export async function offeneAufgaben(tx: Tx, personId: string): Promise<AufgabeR
       ORDER BY frist NULLS LAST, created_at, id`, [personId])).rows);
 }
 
-/** Läuft für die Person ein abgebrochenes Entziehen (Rollen festgehalten, noch nicht abgeschlossen)? */
-export async function laeuft(tx: Tx, personId: string): Promise<boolean> {
-  return (await tx.query(`SELECT 1 FROM ${N} WHERE person = $1 AND stand = 'vorbereitet'`, [personId])).rowCount === 1;
+/** Neubesetzung, die für die Person gerade entsteht (Haken `member.removing` bis `member.removed`), sonst null. */
+async function laufend(tx: Tx, personId: string): Promise<string | null> {
+  return (await tx.query<{ id: string }>(`SELECT id FROM ${N} WHERE person = $1 AND stand = 'vorbereitet' FOR UPDATE`, [personId])).rows[0]?.id ?? null;
 }
 
 /**
- * Entziehen vorbereiten: Neubesetzung (`vorbereitet`) mit den Rollen anlegen oder eine abgebrochene wieder aufnehmen;
- * Rollen, die schon festgehalten sind, bleiben (der Baukasten hat sie vielleicht schon entfernt).
+ * Vor dem Entfernen (Haken `member.removing`): Neubesetzung (`vorbereitet`) mit den unbefristeten Rollen an Orten
+ * anlegen, solange die Tupel noch bestehen. Eine liegengebliebene (abgebrochenes Entfernen) wird wieder verwendet.
  */
-export async function vorbereiten(tx: Tx, personId: string, liste: Rolle[]): Promise<string> {
-  const id = (await tx.query<{ id: string }>(`SELECT id FROM ${N} WHERE person = $1 AND stand = 'vorbereitet' FOR UPDATE`, [personId])).rows[0]?.id
-    ?? (await tx.query<{ id: string }>(`INSERT INTO ${N} (tenant_id, person) VALUES (app.tenant_id(), $1) RETURNING id`, [personId])).rows[0]!.id;
-  for (const r of liste) {
+async function vorbereiten(tx: Tx, personId: string, von: string | null): Promise<string> {
+  const id = (await laufend(tx, personId))
+    ?? (await tx.query<{ id: string }>(`INSERT INTO ${N} (tenant_id, person, created_by) VALUES (app.tenant_id(), $1, $2) RETURNING id`, [personId, von])).rows[0]!.id;
+  for (const r of await rollen(tx, personId)) {
     await tx.query(
       `INSERT INTO ${R} (tenant_id, neubesetzung_id, ort_typ, ort_id, rolle) VALUES (app.tenant_id(), $1, $2, $3, $4)
        ON CONFLICT (tenant_id, neubesetzung_id, ort_typ, ort_id, rolle) DO NOTHING`, [id, r.ortTyp, r.ortId, r.rolle]);
@@ -79,10 +81,11 @@ export async function vorbereiten(tx: Tx, personId: string, liste: Rolle[]): Pro
 }
 
 /**
- * Entziehen abschliessen (Zugang im Baukasten gesperrt): Stand `entzogen`; gibt es Rollen oder offene Aufgaben, erhält
- * die Administration die Aufgabe «Rollen von ‹Person› neu besetzen» (von Hand erledigbar, sobald alles neu besetzt ist).
+ * Nach dem Entfernen (Haken `member.removed`, dieselbe Transaktion): Stand `entzogen`; gibt es Rollen oder offene
+ * Aufgaben, erhält die Administration die Aufgabe «Rollen von ‹Person› neu besetzen» (von Hand erledigbar, sobald alles
+ * neu besetzt ist).
  */
-export async function abschliessen(tx: Tx, id: string, p: { id: string; name: string | null }): Promise<{ rollen: number; aufgaben: number }> {
+async function abschliessen(tx: Tx, id: string, p: { id: string; name: string | null }, who: Actor): Promise<void> {
   await tx.query(`UPDATE ${N} SET stand = 'entzogen', entzogen_at = now() WHERE id = $1 AND stand = 'vorbereitet'`, [id]);
   const n = (await tx.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${R} WHERE neubesetzung_id = $1`, [id])).rows[0]!.n;
   const a = (await offeneAufgaben(tx, p.id)).length;
@@ -94,8 +97,59 @@ export async function abschliessen(tx: Tx, id: string, p: { id: string; name: st
       link: `/administration/neubesetzungen/${id}`, manuell: true,
     });
   }
-  return { rollen: n, aufgaben: a };
+  await record(tx, who, { action: 'neubesetzung.created', resourceType: 'neubesetzung', resourceId: id, data: { person: p.id, rollen: n, aufgaben: a }, event: { id, person: p.id, rollen: n, aufgaben: a } });
 }
+
+/** Zuletzt entzogener Zugang der Person (Antwort der Route «Zugang entziehen»). */
+export async function zuletzt(tx: Tx, personId: string): Promise<{ id: string; rollen: number; aufgaben: number } | null> {
+  const r = (await intern(tx, async () => tx.query<{ id: string; rollen: number }>(
+    `SELECT n.id, (SELECT count(*)::int FROM ${R} r WHERE r.neubesetzung_id = n.id) AS rollen FROM ${N} n
+      WHERE n.person = $1 AND n.stand = 'entzogen' ORDER BY n.entzogen_at DESC, n.id DESC LIMIT 1`, [personId]))).rows[0];
+  return r ? { ...r, aufgaben: (await offeneAufgaben(tx, personId)).length } : null;
+}
+
+/**
+ * Rollenänderung als Mitteilung an die Person (UC-016 Schritt 3, «informiert den Benutzer»; Annahme: im Eingang, E-Mail
+ * folgt mit A-44). Nur unbefristete Rollen einer Person, die jemand vergeben oder entzogen hat; nicht beim Ablauf, nicht
+ * für die befristeten Rollen der Stellvertretung, nicht für die eigene Person und nicht, solange die Person entfernt wird.
+ */
+async function rolleMitteilen(tx: Tx, e: IamEvent<'access.granted' | 'access.revoked'>): Promise<void> {
+  const d = e.data;
+  const pid = d.subject.startsWith('user:') ? d.subject.slice(5) : null;
+  const von = e.actor.principal?.principalId ?? null;
+  if (!pid || !von || von === pid || d.expiresAt || d.previousExpiresAt) return;
+  if (await intern(tx, () => laufend(tx, pid))) return;
+  const ort = d.type === 'org' ? 'in der Organisation' : `(${platform.model.types.get(d.type)?.label ?? d.type})`;
+  await mitteilung.senden(tx, {
+    an: pid, bezug: { typ: 'rolle', id: d.tupleId },
+    text: e.type === 'access.granted' ? `Sie haben die Rolle «${rolleName(d.relation)}» ${ort} erhalten.` : `Ihre Rolle «${rolleName(d.relation)}» ${ort} wurde entzogen.`,
+  });
+}
+
+/**
+ * Haken am Baukasten (`AppSpec.iamEvents`): Neubesetzung beim Entfernen eines Mitglieds – über PPM, die Seite
+ * «Benutzer und Rollen» des Baukastens oder die Plattform-Administration – und Mitteilung bei Rollenänderungen. Beide
+ * laufen in der Transaktion des Baukastens unter der Sperre der Organisation: kurz, ohne Aufrufe nach aussen.
+ */
+export const iamHaken: IamEvents = {
+  async before(tx, e) {
+    if (e.type !== 'member.removing' || !e.data.principalId || e.data.invitation) return;
+    const pid = e.data.principalId;
+    await intern(tx, () => vorbereiten(tx, pid, e.actor.principal?.principalId ?? null));
+  },
+  async after(tx, e) {
+    if (e.type === 'member.removed' && e.data.principalId && !e.data.invitation) {
+      const pid = e.data.principalId;
+      await intern(tx, async () => {
+        const id = await laufend(tx, pid);
+        const p = await person(tx, pid);
+        if (id && p) await abschliessen(tx, id, p, e.actor);
+      });
+    } else if (e.type === 'access.granted' || e.type === 'access.revoked') {
+      await rolleMitteilen(tx, e);
+    }
+  },
+};
 
 export interface Row {
   id: string; created_key: string; person: string; person_name: string | null; stand: 'vorbereitet' | 'entzogen'; entzogen_at: Date | null;

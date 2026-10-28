@@ -30,6 +30,16 @@ const FROM = `${E} e JOIN ${SCHEMA}.statusbericht b ON b.tenant_id = e.tenant_id
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * Berichte aus der Liste mit einer Eskalation, die noch nicht erledigt ist (offen oder für die Folgesitzung
+ * traktandiert); für den Badge «Eskalation» im Dashboard (AP-E1-3). Lesesicht der Person.
+ */
+export async function offenZuBerichten(tx: Tx, berichtIds: string[]): Promise<Set<string>> {
+  if (!berichtIds.length) return new Set();
+  return new Set((await tx.query<{ statusbericht_id: string }>(
+    `SELECT e.statusbericht_id FROM ${E} e WHERE e.statusbericht_id = ANY ($1::uuid[]) AND e.stand <> 'erledigt'`, [berichtIds])).rows.map(r => r.statusbericht_id));
+}
+
 export async function lesen(tx: Tx, id: string): Promise<EskalationRow | null> {
   if (!UUID.test(id)) return null;
   return (await tx.query<EskalationRow>(`SELECT ${COLS} FROM ${FROM} WHERE e.id = $1`, [id])).rows[0] ?? null;

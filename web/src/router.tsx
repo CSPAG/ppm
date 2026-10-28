@@ -14,7 +14,7 @@ import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch } from './features/priorisierung/index.ts';
-import type { SetDashboardSearch } from './features/dashboard/index.ts';
+import type { SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -40,6 +40,8 @@ const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx'), 'MatrixPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
+const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
+const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
@@ -346,6 +348,34 @@ function DashboardRoute() {
   return <DashboardPage search={search} setSearch={setSearch} />;
 }
 
+// Portfolio › Dashboard › Risiken (UI-18; PC.02.02, UC-014 Schritt 2; AP-E2-3)
+const risikenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/dashboard/risiken', validateSearch: searchOf.risiken, component: RisikenRoute,
+});
+
+function RisikenRoute() {
+  const search = risikenRoute.useSearch();
+  const navigate = useNavigate({ from: risikenRoute.fullPath });
+  const setSearch = useCallback<SetRisikenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <RisikenPage search={search} setSearch={setSearch} />;
+}
+
+// Portfolio › Auswertungen › Portfoliobericht (UI-29; PC.04.02, UC-014 Schritt 3, K3 Schritt 4; AP-E2-3)
+const portfolioberichtRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/auswertungen/portfoliobericht', validateSearch: searchOf.portfoliobericht, component: PortfolioberichtRoute,
+});
+
+function PortfolioberichtRoute() {
+  const search = portfolioberichtRoute.useSearch();
+  const navigate = useNavigate({ from: portfolioberichtRoute.fullPath });
+  const setSearch = useCallback<SetPortfolioberichtSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <PortfolioberichtPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
 const monatsabschlussRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/monatsabschluss', validateSearch: searchOf.monatsabschluss, component: MonatsabschlussRoute,
@@ -508,6 +538,8 @@ const routeTree = rootRoute.addChildren([
   zielerreichungStartRoute,
   zielerreichungRoute,
   dashboardRoute,
+  risikenRoute,
+  portfolioberichtRoute,
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,

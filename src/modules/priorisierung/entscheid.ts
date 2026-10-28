@@ -35,7 +35,7 @@ export async function unterWasserlinie(tx: Tx, s: sz.SzenarioRow, g?: Gerechnet)
 }
 
 const fehltText = (nummern: string[]) =>
-  `Folgeentscheid fehlt: ${nummern.length === 1 ? '1 laufendes Projekt liegt' : `${nummern.length} laufende Projekte liegen`} unter der Wasserlinie ohne Antrag zurückstellen, sistieren oder abbrechen (${nummern.join(', ')}). Ergänzen Sie den Folgeentscheid im Szenario.`;
+  `Folgeentscheid fehlt: ${nummern.length === 1 ? '1 laufendes Projekt liegt' : `${nummern.length} laufende Projekte liegen`} unter der Wasserlinie ohne Antrag zurückstellen, sistieren oder abbrechen (${nummern.join(', ')}). Ergänze den Folgeentscheid im Szenario.`;
 
 /** Sperre (I-P1): ohne Folgeentscheid für jedes laufende Projekt unter der Wasserlinie kein Traktandum und kein Entscheid. */
 export function pruefeFolgen(offen: Awaited<ReturnType<typeof unterWasserlinie>>): void {
@@ -52,7 +52,7 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
   const s = await sz.lesen(tx, f.bezug.id);
   if (!s) return;
   if (s.stand !== 'beantragt' && s.stand !== 'entschieden') {
-    throw conflict(`Das Szenario «${s.name}» ist nicht als Antrag gewählt (${s.stand}). Wählen Sie es als Antrag und erfassen Sie den Entscheid erneut.`, { reason: 'stand', stand: s.stand });
+    throw conflict(`Das Szenario «${s.name}» ist nicht als Antrag gewählt (${s.stand}). Wähle es als Antrag und erfasse den Entscheid erneut.`, { reason: 'stand', stand: s.stand });
   }
   const erneut = s.stand === 'entschieden';
   const g = await szenarioRechnen(tx, s, await es.kostenSichtbar(tx, s.portfolio_id));

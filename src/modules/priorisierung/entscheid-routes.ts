@@ -20,7 +20,7 @@ async function lade(tx: Tx, s: sz.SzenarioRow, write: boolean): Promise<Szenario
   const unter = await unterWasserlinie(tx, s);
   const pruefung: string[] = [];
   try { pruefeFolgen(unter); } catch (e) { pruefung.push((e as Error).message); }
-  if (s.stand !== 'beantragt') pruefung.push(`Antrag: Szenario «${s.name}» ist nicht als Antrag gewählt. Wählen Sie es im Vergleich als Antrag.`);
+  if (s.stand !== 'beantragt') pruefung.push(`Antrag: Szenario «${s.name}» ist nicht als Antrag gewählt. Wähle es im Vergleich als Antrag.`);
   return {
     szenarioId: s.id, stand: s.stand,
     unterWasserlinie: unter.map(u => ({ projektId: u.projektId, nummer: u.nummer, name: u.name, phase: u.phase, folge: u.folge?.folge ?? null, begruendung: u.folge?.begruendung ?? '' })),
@@ -106,7 +106,7 @@ export function registerEntscheidRoutes(app: FastifyInstance, _deps: Deps): void
       const s = await sz.lesen(tx, id);
       if (!s) throw notFound('Szenario');
       if (s.version !== version) throw preconditionFailed(s.version);
-      if (s.stand !== 'beantragt') throw conflict(`Das Szenario «${s.name}» ist nicht als Antrag gewählt. Wählen Sie es im Vergleich als Antrag.`, { reason: 'stand', stand: s.stand });
+      if (s.stand !== 'beantragt') throw conflict(`Das Szenario «${s.name}» ist nicht als Antrag gewählt. Wähle es im Vergleich als Antrag.`, { reason: 'stand', stand: s.stand });
       pruefeFolgen(await unterWasserlinie(tx, s));
       const z = await zusammenfassung(tx, s);
       const traktandumId = await traktandum.vorschlagen(tx, { art: 'priorisierung', bezug: { typ: 'szenario', id: s.id }, portfolioId: s.portfolio_id, titel: z.titel, antrag: z.antrag });

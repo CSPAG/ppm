@@ -41,6 +41,9 @@ export const TQR = {
   kommentarVon: (a: string) => `Kommentar zu ${a}`,
   kommentareSpeichern: 'Kommentare speichern',
   gespeichert: 'Gespeichert.',
+  speichert: 'Wird gespeichert …',
+  ungespeichert: 'Noch nicht gespeichert',
+  gespeichertVor: (sek: number) => (sek < 5 ? 'Gespeichert' : sek < 60 ? `Gespeichert vor ${Math.floor(sek / 5) * 5} s` : `Gespeichert vor ${Math.floor(sek / 60)} min`),
   keinKommentar: 'Kein Kommentar.',
 
   portfolio: 'Portfolio', periode: 'Periode', projekte: 'Projekte', imPlan: 'Im Plan', kritisch: 'Kritisch', nichtGemeldet: 'Nicht gemeldet', bericht: 'Portfoliobericht',

@@ -7,7 +7,7 @@
  * lesen, Z9 traktandiert/verabschiedet. «Neu erstellen» und «Im PRAT traktandieren» fragen vorher mit der Wirkung (I-R1).
  */
 import { describeError, PersonPick } from '@vollholz/iam-web';
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { isConflict, statusOf } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Dialog, Empty, ErrorState, fmtDatum, fmtPeriode, fmtQuartal, Hinweis, Icon, Skelett, useToast, useVerzoegert } from '../../ui/index.ts';
@@ -78,7 +78,8 @@ export function QuartalsreportingPage({ jahr, quartal, setQuartal }: Quartalsrep
             neuLaden={() => void q.refetch()}
             erzeugen={fertig => m.erzeugen.mutate(undefined, { onSuccess: () => { fertig(); toast.show(TQR.neuErstellt); }, onError: e => { fertig(); fehler(e); } })}
             speichern={(kommentare, r) => m.kommentare.mutate({ etag: l!.etag, kommentare }, {
-              onSuccess: () => { r.ok(); toast.show(TQR.gespeichert); },
+              // Automatisch gespeichert (I-R3) meldet die Statuszeile, von Hand gespeichert zusätzlich der Toast
+              onSuccess: () => { r.ok(); if (r.manuell) toast.show(TQR.gespeichert); },
               // Z7: Kommentare nicht verwerfen; der Bericht zeigt den Konflikt und lädt erst auf Wunsch neu
               onError: e => (isConflict(e) ? r.konflikt() : toast.error(e)),
             })}
@@ -91,11 +92,14 @@ export function QuartalsreportingPage({ jahr, quartal, setQuartal }: Quartalsrep
   );
 }
 
+/** Pause nach der letzten Eingabe, bevor die Kommentare automatisch gespeichert werden (I-R3). */
+const PAUSE_MS = 3000;
+
 const ABSCHNITTE_KOMMENTAR: readonly Abschnitt[] = ['gesamtstatus', 'entwicklungen', 'risiken', 'abhaengigkeiten', 'auswirkungen', 'weiterleitungen'];
 
 function Bericht({ l, busy, neuLaden, erzeugen, speichern, traktandieren, vrSpeichern, auftragErfassen }: {
   l: QuartalsberichtLoaded; busy: boolean; neuLaden(): void; erzeugen(fertig: () => void): void;
-  speichern(k: Partial<Kommentare>, r: { ok(): void; konflikt(): void }): void; traktandieren(fertig: () => void): void;
+  speichern(k: Partial<Kommentare>, r: { manuell: boolean; ok(): void; konflikt(): void }): void; traktandieren(fertig: () => void): void;
   vrSpeichern(t: string): void; auftragErfassen(a: { text: string; verantwortlich: string; termin: string | null }, ok: () => void): void;
 }) {
   const b = l.item;
@@ -111,7 +115,43 @@ function Bericht({ l, busy, neuLaden, erzeugen, speichern, traktandieren, vrSpei
   const kommentar = (a: Abschnitt) => (
     <KommentarFeld abschnitt={a} wert={wert(a)} darf={b.can.bearbeiten} onChange={v => setEntwurf(k => ({ ...k, [a]: v }))} />
   );
-  const sichern = () => speichern(Object.fromEntries(offen.map(a => [a, wert(a)])), { ok: () => { setEntwurf({}); setKonflikt(false); }, konflikt: () => setKonflikt(true) });
+  const [gespeichertAt, setGespeichertAt] = useState<number | null>(null);
+  const [jetzt, setJetzt] = useState(() => Date.now());
+  const sichern = (manuell: boolean) => {
+    const gesendet: Partial<Kommentare> = Object.fromEntries(offen.map(a => [a, wert(a)]));
+    speichern(gesendet, {
+      manuell,
+      // Nur verwerfen, was gesendet wurde: was während des Speicherns getippt wurde, bleibt offen
+      ok: () => {
+        setEntwurf(e => Object.fromEntries(Object.entries(e).filter(([a, v]) => v !== gesendet[a as Abschnitt])));
+        setKonflikt(false);
+        setGespeichertAt(Date.now());
+        setJetzt(Date.now());
+      },
+      konflikt: () => setKonflikt(true),
+    });
+  };
+  // Automatisch speichern nach einer Pause (I-R3); nicht im Konflikt, dort entscheidet die Person (Z7)
+  useEffect(() => {
+    if (!geaendert || konflikt || busy) return;
+    const t = setTimeout(() => sichern(false), PAUSE_MS);
+    return () => clearTimeout(t);
+  }, [entwurf, geaendert, konflikt, busy]); // eslint-disable-line react-hooks/exhaustive-deps -- sichern liest den Stand dieser Darstellung
+  // Eingaben gehen nicht verloren (I-F7): beim Verlassen nachfragen, solange etwas offen ist
+  useEffect(() => {
+    if (!geaendert) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [geaendert]);
+  // «Gespeichert vor 5 s»: Anzeige alle 5 Sekunden nachführen
+  useEffect(() => {
+    if (!gespeichertAt) return;
+    const t = setInterval(() => setJetzt(Date.now()), 5000);
+    return () => clearInterval(t);
+  }, [gespeichertAt]);
+  const statusText = busy && geaendert ? TQR.speichert : geaendert ? TQR.ungespeichert
+    : gespeichertAt ? TQR.gespeichertVor(Math.max(0, Math.round((jetzt - gespeichertAt) / 1000))) : '';
   return (
     <>
       {konflikt ? (
@@ -209,7 +249,8 @@ function Bericht({ l, busy, neuLaden, erzeugen, speichern, traktandieren, vrSpei
 
       {b.can.bearbeiten ? (
         <div className="qr-speichern">
-          <button type="button" className="btn primary" aria-busy={busy} disabled={busy || !geaendert} onClick={sichern}>{TQR.kommentareSpeichern}</button>
+          <span className="muted small" role="status">{statusText}</span>
+          <button type="button" className="btn primary" aria-busy={busy} disabled={busy || !geaendert} onClick={() => sichern(true)}>{TQR.kommentareSpeichern}</button>
         </div>
       ) : null}
 

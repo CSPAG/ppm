@@ -129,6 +129,21 @@ describe('Quartalsreporting', () => {
     expect((await zweiter.json()).kommentare).toEqual({ gesamtstatus: 'Auf Kurs' });
   });
 
+  it('speichert Kommentare nach einer Pause automatisch (I-R3)', async () => {
+    let b = bericht();
+    const api = stub({
+      [`GET ${URL_Q}`]: () => json(b, 200, { ETag: `W/"${b.version}"` }),
+      [`PATCH ${URL_Q}`]: () => { b = bericht({ version: 3, kommentare: { ...b.kommentare, entwicklungen: 'Neu' } }); return json(b, 200, { ETag: 'W/"3"' }); },
+    });
+    renderWithIam(zeigen(), UE);
+    await userEvent.type(await screen.findByLabelText(TQR.kommentarVon('Wesentliche Entwicklungen')), 'Neu');
+    expect(screen.getByText(TQR.ungespeichert)).toBeInTheDocument();
+    await waitFor(() => expect(api.calls.some(c => c.method === 'PATCH')).toBe(true), { timeout: 6000 });
+    expect((await api.calls.find(c => c.method === 'PATCH')!.json()).kommentare).toEqual({ entwicklungen: 'Neu' });
+    expect(await screen.findByText(TQR.gespeichertVor(0))).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: TQR.kommentareSpeichern })).toBeDisabled();
+  }, 10_000);
+
   it('«Neu erstellen» fragt vorher und behält ungespeicherte Kommentare', async () => {
     let b = bericht();
     const api = stub({

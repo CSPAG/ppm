@@ -157,7 +157,8 @@ describe('Jahresrückblick', { skip }, () => {
     const pl = await login(api, 'demo', 'u-pl', null);
     await sys(tx => tx.query("INSERT INTO ppm.projekt_person (tenant_id, projekt_id, person_id, funktion) VALUES ($1, $2, $3, 'pl')", [tenantId, projekt['2020-901'], pl.principalId]));
     assert.equal((await call('POST', `${url}/lessons-learned/anfordern`, gl)).statusCode, 403);
-    assert.deepEqual((await ok('POST', `${url}/lessons-learned/anfordern`, ue)).json(), { vorhaben: 1, aufgaben: 1 });
+    // 2020-901 und das oben abgeschlossene 2020-904 ohne Lessons Learned; nur 2020-901 hat eine PL
+    assert.deepEqual((await ok('POST', `${url}/lessons-learned/anfordern`, ue)).json(), { vorhaben: 2, aufgaben: 1 });
     await ok('POST', `${url}/lessons-learned/anfordern`, ue);
     const aufgaben = () => sys(async tx => (await tx.query<{ bezug_id: string; empfaenger_person: string; stand: string; link: string }>(
       "SELECT bezug_id, empfaenger_person, stand, link FROM ppm.aufgabe WHERE art = 'lessons_learned.erfassen' ORDER BY created_at")).rows);

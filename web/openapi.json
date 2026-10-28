@@ -27281,7 +27281,8 @@
         "type": "object",
         "required": [
           "zielerreichung",
-          "vorhaben"
+          "vorhaben",
+          "lessonsLearned"
         ],
         "properties": {
           "zielerreichung": {
@@ -27491,6 +27492,115 @@
               },
               "laufend": {
                 "description": "Aktive und sistierte Vorhaben.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name",
+                    "portfolio",
+                    "phase",
+                    "lebenszyklus",
+                    "seit"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "portfolio": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "lebenszyklus": {
+                      "description": "`aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`.",
+                      "type": "string"
+                    },
+                    "seit": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "lessonsLearned": {
+            "additionalProperties": false,
+            "description": "Lessons Learned des Jahres (UC-013 Schritte 1–2).",
+            "type": "object",
+            "required": [
+              "eintraege",
+              "ohne"
+            ],
+            "properties": {
+              "eintraege": {
+                "description": "Im Jahr erfasst (PS.04.03), neueste zuerst.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "projekt",
+                    "text",
+                    "kategorie"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "projekt": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "nummer",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nummer": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "kategorie": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "ohne": {
+                "description": "Im Jahr abgeschlossene Vorhaben ohne Lessons Learned (UC-013 Schritt 2, A1).",
                 "type": "array",
                 "items": {
                   "additionalProperties": false,
@@ -79709,6 +79819,266 @@
           },
           "409": {
             "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jahresrueckblicke/{jahr}/lessons-learned/anfordern": {
+      "post": {
+        "summary": "Lessons Learned anfordern",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Legt den Projektleitungen der im Jahr abgeschlossenen Vorhaben ohne Lessons Learned die Aufgabe «Lessons Learned erfassen» in den Eingang (UC-013 A1); idempotent je Projekt und Person, erledigt mit der ersten erfassten Lesson Learned. Legt den Jahresrückblick an, falls noch keiner gespeichert ist. Recht `quartalsbericht:write`.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "vorhaben",
+                    "aufgaben"
+                  ],
+                  "properties": {
+                    "vorhaben": {
+                      "description": "Im Jahr abgeschlossene Vorhaben ohne Lessons Learned.",
+                      "type": "integer"
+                    },
+                    "aufgaben": {
+                      "description": "Geöffnete oder nachgeführte Aufgaben an die Projektleitungen.",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jahresrueckblicke/{jahr}/dokument": {
+      "get": {
+        "summary": "Jahresrückblick als Dokument",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Jahresauswertung mit Erkenntnissen und Massnahmen als PDF oder Word über die Dokumentausgabe (Modul `vorlage`), in der Lesesicht der Person; Kopfzeile «Intern · enthält Personendaten» (G12). Ohne gespeicherten Jahresrückblick 404. Der Export ist protokolliert. Recht `ziel:read` oder `quartalsbericht:write`.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pdf"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "docx"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Standard PDF."
+          },
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dokument als Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
             "content": {
               "application/problem+json": {
                 "schema": {

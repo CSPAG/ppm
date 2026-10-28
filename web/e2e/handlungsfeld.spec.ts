@@ -59,7 +59,7 @@ test('zweite Organisation sieht das Handlungsfeld nicht', async ({ page, browser
   await expect(b.getByText(/Kein Handlungsfeld passt/)).toBeVisible();
   // Direkter Zugriff über die ID: nicht gefunden (404), nie «kein Recht» mit Inhalt
   await b.goto(`/ziele/handlungsfelder?o=${id}`);
-  await expect(b.getByText(/gibt es nicht mehr, oder Sie sehen es nicht/)).toBeVisible();
+  await expect(b.getByText(/gibt es nicht mehr, oder du siehst es nicht/)).toBeVisible();
   const res = await b.request.get(`/v1/handlungsfelder/${id}`);
   expect(res.status()).toBe(404);
 });

@@ -1,5 +1,5 @@
 /**
- * Texte der Oberfläche auf Deutsch (Schweiz): Anrede «Sie» (docs/ux/README.md, UX-E7, bis zur Klärung von UX-OF-1),
+ * Texte der Oberfläche auf Deutsch (Schweiz): Anrede «Du» (docs/ux/README.md, UX-E7, UX-OF-1),
  * Schweizer Rechtschreibung ohne Eszett, «Organisation» statt Mandant, Begriffe aus dem Glossar der UX-Schicht
  * (docs/ux/README.md, I-X4). `texte.test.ts` prüft diese Regeln über alle Quelldateien. Eine weitere Sprache ist eine
  * Datei daneben mit demselben Typ (`Texte`, UX-OF-2).
@@ -25,7 +25,7 @@ export const deCH = {
   palette: {
     title: 'Befehle', placeholder: 'Seite, Aktion oder Objekt suchen …', empty: 'Nichts gefunden.', hint: 'Strg+K',
     seiten: 'Seiten', aktionen: 'Aktionen', treffer: 'Treffer', darstellung: 'Darstellung', sucht: 'Suche läuft …',
-    fehler: 'Die Suche ist gerade nicht möglich. Seiten und Aktionen finden Sie trotzdem.',
+    fehler: 'Die Suche ist gerade nicht möglich. Seiten und Aktionen findest du trotzdem.',
     anzahl: (n: number) => (n === 1 ? '1 Eintrag' : `${n} Einträge`),
   },
   common: {
@@ -34,7 +34,7 @@ export const deCH = {
   },
   // Zustände einer Liste (docs/ux/rahmen/interaktion.md, Abschnitt 6)
   liste: {
-    leerGefiltert: 'Nichts passt zu Ihrer Suche.', filterZuruecksetzen: 'Filter zurücksetzen', oeffnen: (name: string) => `${name} öffnen`,
+    leerGefiltert: 'Nichts passt zu deiner Suche.', filterZuruecksetzen: 'Filter zurücksetzen', oeffnen: (name: string) => `${name} öffnen`,
   },
   // Formate nach docs/ux/darstellung.md (de-CH, Q-S2)
   format: {
@@ -75,11 +75,11 @@ export const deCH = {
     stufe: { hinweis: 'Hinweis', warnung: 'Warnung', sperre: 'Sperre' },
     statt: 'statt', quelle: 'Quelle der Regel',
   },
-  notFound: { title: 'Seite nicht gefunden', text: 'Diese Seite gibt es nicht (mehr). Prüfen Sie die Adresse oder kehren Sie zur Übersicht zurück.', back: 'Zur Übersicht' },
+  notFound: { title: 'Seite nicht gefunden', text: 'Diese Seite gibt es nicht (mehr). Prüfe die Adresse oder kehre zur Übersicht zurück.', back: 'Zur Übersicht' },
   // Administration › Phasenmodell (UI-46, BC AM.02.03, UC-017 Schritte 3 und 5)
   phasenmodell: {
     title: 'Phasenmodell', sub: 'Phasen, Gates mit Leitfragen je Wertestrom, Standard-Ergebnisse, Pflichtangaben, Fristen und Toleranzen nach dem PM-Handbuch.',
-    leer: 'Noch kein Phasenmodell. Laden Sie die Vorgabe des PM-Handbuchs als Entwurf und passen Sie sie an.',
+    leer: 'Noch kein Phasenmodell. Lade die Vorgabe des PM-Handbuchs als Entwurf und passe sie an.',
     leerLesen: 'Noch kein Phasenmodell in Kraft. Die Unternehmensentwicklung legt es fest.',
     vorgabeLaden: 'Vorgabe des PM-Handbuchs laden', entwurfAnlegen: 'Entwurf anlegen', entwurfOeffnen: 'Entwurf öffnen',
     verwerfen: 'Entwurf verwerfen', inKraftSetzen: 'In Kraft setzen', weiterBearbeiten: 'Weiter bearbeiten',
@@ -91,18 +91,18 @@ export const deCH = {
     angelegt: 'Entwurf angelegt.', verworfen: 'Entwurf verworfen.', inKraft: (n: number) => `Version ${n} ist in Kraft.`,
     gespeichert: 'Gespeichert', speichert: 'Wird gespeichert …', ungespeichert: 'Nicht gespeichert: Angaben prüfen',
     gespeichertVor: (sek: number) => (sek < 5 ? 'Gespeichert' : sek < 60 ? `Gespeichert vor ${sek} s` : `Gespeichert vor ${Math.floor(sek / 60)} min`),
-    fehlerSpeichern: 'Speichern fehlgeschlagen. Ihre Änderungen sind noch hier.', erneutSpeichern: 'Erneut speichern',
+    fehlerSpeichern: 'Speichern fehlgeschlagen. Deine Änderungen sind noch hier.', erneutSpeichern: 'Erneut speichern',
     rueckgaengig: 'Rückgängig', rueckgaengigTitel: 'Rückgängig (Strg+Z)', wiederholen: 'Wiederholen', wiederholenTitel: 'Wiederholen (Strg+Umschalt+Z)',
-    gesperrt: (n: number) => `Version ${n} ist in Kraft und unveränderlich. Änderungen machen Sie in einem Entwurf; er gilt erst, wenn er in Kraft gesetzt ist.`,
+    gesperrt: (n: number) => `Version ${n} ist in Kraft und unveränderlich. Änderungen machst du in einem Entwurf; er gilt erst, wenn er in Kraft gesetzt ist.`,
     abgeloestBanner: (n: number) => `Version ${n} ist abgelöst und dient nur noch der Nachvollziehbarkeit.`,
-    nurLesen: 'Sie können das Phasenmodell nur ansehen. Die Unternehmensentwicklung pflegt es, Administratorinnen und Administratoren setzen es in Kraft.',
+    nurLesen: 'Du kannst das Phasenmodell nur ansehen. Die Unternehmensentwicklung pflegt es, Administratorinnen und Administratoren setzen es in Kraft.',
     entwurfBesteht: (n: number) => `Es besteht ein Entwurf (Version ${n}).`,
-    konflikt: 'Jemand anderes hat diesen Entwurf inzwischen geändert. Ihre Änderungen sind noch hier.',
+    konflikt: 'Jemand anderes hat diesen Entwurf inzwischen geändert. Deine Änderungen sind noch hier.',
     konfliktMeine: 'Meine Fassung speichern', konfliktAndere: 'Fassung der anderen laden',
     nichtMehrEntwurf: 'Dieser Entwurf ist nicht mehr bearbeitbar (in Kraft gesetzt oder verworfen).',
     elemente: 'Inhalt des Phasenmodells', element: 'Abschnitt',
     uebersicht: 'Version', fristenToleranzen: 'Fristen und Toleranzen', wirkung: 'Kapitelwirkung',
-    phase: 'Phase', gate: 'Gate', name: 'Bezeichnung', nameFehlt: 'Geben Sie eine Bezeichnung ein.',
+    phase: 'Phase', gate: 'Gate', name: 'Bezeichnung', nameFehlt: 'Gib eine Bezeichnung ein.',
     lieferergebnisse: 'Standard-Lieferergebnisse', meilensteine: 'Standard-Meilensteine',
     ergebnisseHint: 'Schlägt PPM beim Planen der Phase im Projektvertrag vor (UC-002 Schritt 6).',
     leitfragen: 'Leitfragen je Wertestrom', leitfragenHint: 'Beantwortet die Projektleitung im Gate-Antrag; das Gremium beurteilt damit die Gate-Reife.',
@@ -141,7 +141,7 @@ export const deCH = {
     inKraftWarnungen: (n: number) => (n === 1 ? 'Der Prüfbericht enthält 1 Warnung.' : `Der Prüfbericht enthält ${n} Warnungen.`),
     verwerfenFrage: (n: number) => `Entwurf (Version ${n}) verwerfen?`,
     verwerfenText: 'Alle Änderungen dieses Entwurfs gehen verloren. Die Version in Kraft bleibt unverändert.',
-    gone: 'Diese Version gibt es nicht (mehr), oder Sie sehen sie nicht.',
+    gone: 'Diese Version gibt es nicht (mehr), oder du siehst sie nicht.',
   },
   handlungsfeld: {
     title: 'Handlungsfelder', sub: 'Strategische Handlungsfelder mit Leitsatz und Stossrichtungen, oberste Ordnung für Ziele und Vorhaben.', one: 'Handlungsfeld', create: 'Neues Handlungsfeld', search: 'Handlungsfelder durchsuchen',
@@ -151,11 +151,11 @@ export const deCH = {
     stossrichtungenHint: 'Eine Stossrichtung je Zeile.', noLeitsatz: 'kein Leitsatz', noStossrichtungen: 'keine Stossrichtungen',
     created: 'Handlungsfeld angelegt.', saved: 'Änderungen gespeichert.', deleted: 'Handlungsfeld gelöscht.',
     confirmDelete: (label: string) => `«${label}» wirklich löschen? Der Verlauf bleibt im Protokoll erhalten.`,
-    conflict: 'Dieses Handlungsfeld wurde inzwischen geändert. Laden Sie es neu und übernehmen Sie Ihre Änderungen danach nochmals.',
-    gone: 'Dieses Handlungsfeld gibt es nicht mehr, oder Sie sehen es nicht.',
+    conflict: 'Dieses Handlungsfeld wurde inzwischen geändert. Lade es neu und übernimm deine Änderungen danach nochmals.',
+    gone: 'Dieses Handlungsfeld gibt es nicht mehr, oder du siehst es nicht.',
     history: 'Verlauf', version: (v: number) => `Fassung ${v}`,
     actions: { created: 'angelegt', updated: 'geändert', deleted: 'gelöscht' } as Record<string, string>,
-    noRight: 'Sie können Handlungsfelder nur ansehen.',
-    labelMissing: 'Geben Sie eine Bezeichnung ein.', tooMany: 'Höchstens 20 Stossrichtungen.', positionInvalid: 'Ganze Zahl von 0 bis 999.',
+    noRight: 'Du kannst Handlungsfelder nur ansehen.',
+    labelMissing: 'Gib eine Bezeichnung ein.', tooMany: 'Höchstens 20 Stossrichtungen.', positionInvalid: 'Ganze Zahl von 0 bis 999.',
   },
 };

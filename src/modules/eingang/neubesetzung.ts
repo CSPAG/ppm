@@ -122,7 +122,7 @@ async function rolleMitteilen(tx: Tx, e: IamEvent<'access.granted' | 'access.rev
   const ort = d.type === 'org' ? 'in der Organisation' : `(${platform.model.types.get(d.type)?.label ?? d.type})`;
   await mitteilung.senden(tx, {
     an: pid, bezug: { typ: 'rolle', id: d.tupleId },
-    text: e.type === 'access.granted' ? `Sie haben die Rolle «${rolleName(d.relation)}» ${ort} erhalten.` : `Ihre Rolle «${rolleName(d.relation)}» ${ort} wurde entzogen.`,
+    text: e.type === 'access.granted' ? `Du hast die Rolle «${rolleName(d.relation)}» ${ort} erhalten.` : `Deine Rolle «${rolleName(d.relation)}» ${ort} wurde entzogen.`,
   });
 }
 

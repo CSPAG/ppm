@@ -37,11 +37,11 @@ test('Stellvertretung erfassen und beenden; die Vertretung erhält eine Mitteilu
   await expectAccessible(page);
   await dlg.getByRole('button', { name: 'Stellvertretung erfassen' }).click();
   await expect(page.getByText('Stellvertretung erfasst.')).toBeVisible();
-  await expect(page.getByText(/vertritt Sie/).first()).toBeVisible();
+  await expect(page.getByText(/vertritt dich/).first()).toBeVisible();
 
   // Bruno sieht die Mitteilung im Eingang
   await bruno.reload();
-  await expect(bruno.getByText(/hat Sie als Stellvertretung erfasst/).first()).toBeVisible();
+  await expect(bruno.getByText(/hat dich als Stellvertretung erfasst/).first()).toBeVisible();
   await ctx.close();
 
   await page.getByRole('button', { name: /^Stellvertretung durch .* beenden$/ }).first().click();

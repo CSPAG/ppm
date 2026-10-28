@@ -9091,7 +9091,7 @@ export interface paths {
         };
         /**
          * Stellvertretungen
-         * @description Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.
+         * @description Laufende und künftige Stellvertretungen: wer dich vertritt und wen du vertrittst.
          */
         get: {
             parameters: {
@@ -10946,7 +10946,7 @@ export interface paths {
         put?: never;
         /**
          * Codewert deaktivieren
-         * @description Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Sie erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.
+         * @description Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Deaktivierte Werte erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.
          */
         post: {
             parameters: {
@@ -41342,7 +41342,7 @@ export interface components {
                 typ: string;
                 id: string;
             };
-            /** @description `person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort. */
+            /** @description `person`: an dich persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort. */
             empfaenger: "person" | "recht";
             vertretung: {
                 person: {
@@ -41421,7 +41421,7 @@ export interface components {
             unterschriften: boolean;
             /** @description Heute im Zeitraum. */
             aktiv: boolean;
-            /** @description `eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten. */
+            /** @description `eigene`: du wirst vertreten; `fuer_andere`: du vertrittst. */
             richtung: "eigene" | "fuer_andere";
             /** Format: date-time */
             createdAt: string;

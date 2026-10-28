@@ -44,8 +44,12 @@ describe('Kopfkarten je Rolle', () => {
       'GET /v1/statusberichte/kopf': () => json({ pruefen: { periode: '2026-10', eingereicht: 12, zurueckgegeben: 2, geprueft: 15, ausstehend: 2, auffaellig: 3, projekte: 31, stichtag: '2026-10-25', abschlussBis: '2026-10-31' } }),
       'GET /v1/projekte/kopf': () => json({ projekte: [projekt(4, { rollen: ['sp', 'ctl'], lebenszyklus: 'sistiert' }), ...[1, 2, 3, 5, 6].map(n => projekt(n))], anzahl: 6 }),
       'GET /v1/statusberichte/stand': () => json({ items: [
-        { projektId: uuid(1), letzter: { periode: '2026-09', status: 'im_plan', trend: 'aufwaerts', begruendung: '' }, laufend: { periode: '2026-10', stand: 'entwurf', stichtag: tag(3) } },
-        { projektId: uuid(3), letzter: { periode: '2026-09', status: 'kritisch', trend: 'abwaerts', begruendung: 'Lieferverzug Hauptsystem' }, laufend: { periode: '2026-10', stand: 'eingereicht', stichtag: tag(3) } },
+        { projektId: uuid(1), letzter: { periode: '2026-09', status: 'im_plan', trend: 'aufwaerts', begruendung: '', naechsterMeilenstein: 'Go-live Pilot' }, laufend: { periode: '2026-10', stand: 'entwurf', stichtag: tag(3) } },
+        { projektId: uuid(3), letzter: { periode: '2026-09', status: 'kritisch', trend: 'abwaerts', begruendung: 'Lieferverzug Hauptsystem', naechsterMeilenstein: '' }, laufend: { periode: '2026-10', stand: 'eingereicht', stichtag: tag(3) } },
+      ] }),
+      'GET /v1/traktanden/naechste': () => json({ items: [
+        { projektId: uuid(1), traktandumId: uuid(301), art: 'gate', artLabel: 'Gate', titel: 'Gate P1–P2', sitzung: { id: uuid(201), datum: tag(10), gremium: prat } },
+        { projektId: uuid(4), traktandumId: uuid(302), art: 'aenderung', artLabel: 'Änderung', titel: 'Änderung', sitzung: { id: uuid(201), datum: tag(10), gremium: prat } },
       ] }),
       'GET /v1/sitzungen/kopf': () => json({ sitzungen: [sitzung(1, prat, tag(10)), sitzung(2, glpa, tag(12), { stand: 'versendet' }), sitzung(3, gremium('dir', 3), tag(20)), sitzung(4, gremium('gl', 4), tag(40))] }),
     });
@@ -68,6 +72,11 @@ describe('Kopfkarten je Rolle', () => {
     expect(within(p1).getByText('Im Plan')).toBeInTheDocument();
     expect(within(p1).getByText('Trend aufwärts')).toBeInTheDocument();
     expect(within(p1).getByRole('link', { name: /^Statusbericht Oktober fällig / })).toHaveAttribute('href', '/projekte/2026-011/bericht?periode=2026-10');
+    // Nächster Meilenstein und nächstes Geschäft im Gremium; als CTL «Du stellst am … vor»
+    expect(within(p1).getByText('Nächster Meilenstein: Go-live Pilot')).toBeInTheDocument();
+    expect(within(p1).getByRole('link', { name: /^Gate im PRAT / })).toHaveAttribute('href', `/gremien/prat/sitzungen/${tag(10)}`);
+    const p4 = pz.find(z => within(z).queryByRole('link', { name: '2026-014 Projekt 4' }))!;
+    expect(within(p4).getByRole('link', { name: /^Du stellst am .* im PRAT vor$/ })).toBeInTheDocument();
     expect(within(projekte).getByRole('link', { name: '2026-014 Projekt 4' })).toHaveAttribute('href', '/projekte/2026-014');
     expect(within(projekte).getByText('P1 Konzept und Planung · sistiert · Sponsor, CTL')).toBeInTheDocument();
     expect(within(projekte).getByRole('link', { name: 'Alle 6 Projekte' })).toHaveAttribute('href', '/projekte');

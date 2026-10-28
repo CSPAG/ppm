@@ -170,6 +170,12 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     r = await ok('POST', `/v1/traktanden/${geplant.id}/entfernen`, ue);
     assert.equal(r.traktanden.length, 4);
     sitzung = { id: s.id, version: r.version };
+
+    // Kopfkarte «Meine Projekte»: je Projekt das nächste traktandierte Geschäft mit Gremium und Datum
+    const n = await ok('GET', `/v1/traktanden/naechste?projektId=${p1.id}&projektId=${p2.id}&projektId=${randomUUID()}`, ue);
+    const fuerP1 = n.items.find((x: { projektId: string }) => x.projektId === p1.id);
+    assert.deepEqual([fuerP1.art, fuerP1.sitzung.id, fuerP1.sitzung.datum, fuerP1.sitzung.gremium.kuerzel], ['gate', s.id, s.datum, 'prat']);
+    assert.equal(new Set(n.items.map((x: { projektId: string }) => x.projektId)).size, n.items.length, 'je Projekt höchstens eines');
   });
 
   test('Unterlagen fehlen: Warnung, mit einem Klick auf die nächste Sitzung, rückgängig (UC-006 A2, K3 Abnahme 4)', async () => {

@@ -179,4 +179,16 @@ export const Kopf = Type.Object({
   }, { additionalProperties: false })),
 }, { $id: 'SitzungKopf', additionalProperties: false });
 
+/** Nächstes Traktandum je Projekt für die Kopfkarte «Meine Projekte» (informationsarchitektur.md «Startseite je Rolle»). */
+export const NaechsteQuery = Type.Object({
+  projektId: Type.Array(Uuid, { minItems: 1, maxItems: 20, description: 'Projekte (mehrfach, höchstens 20).' }),
+}, { additionalProperties: false });
+
+export const NaechsteTraktanden = Type.Object({
+  items: Type.Array(Type.Object({
+    projektId: Uuid, traktandumId: Uuid, art: ArtT, artLabel: Type.String(), titel: Type.String(),
+    sitzung: Type.Object({ id: Uuid, datum: Datum, gremium: GremiumKurz }, { additionalProperties: false }),
+  }, { additionalProperties: false })),
+}, { $id: 'NaechsteTraktanden', additionalProperties: false, description: 'Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»).' });
+
 export const TraktandumParams = Type.Object({ id: Uuid }, { additionalProperties: false });

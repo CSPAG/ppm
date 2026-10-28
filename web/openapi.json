@@ -11069,6 +11069,107 @@
           }
         }
       },
+      "NaechsteTraktanden": {
+        "additionalProperties": false,
+        "description": "Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»).",
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "traktandumId",
+                "art",
+                "artLabel",
+                "titel",
+                "sitzung"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "traktandumId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "art": {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht",
+                    "gate",
+                    "aenderung",
+                    "meilenstein",
+                    "eskalation",
+                    "idee",
+                    "priorisierung",
+                    "quartalsreporting",
+                    "abschluss",
+                    "jahresrueckblick"
+                  ],
+                  "description": "Art des Traktandums (fachmodell.md 2.9)."
+                },
+                "artLabel": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "sitzung": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "datum",
+                    "gremium"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "datum": {
+                      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                      "description": "Datum (JJJJ-MM-TT).",
+                      "examples": [
+                        "2026-11-12"
+                      ],
+                      "type": "string"
+                    },
+                    "gremium": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "kuerzel",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kuerzel": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "Versandfrist": {
         "additionalProperties": false,
         "type": "object",
@@ -13624,7 +13725,8 @@
                         "periode",
                         "status",
                         "trend",
-                        "begruendung"
+                        "begruendung",
+                        "naechsterMeilenstein"
                       ],
                       "properties": {
                         "periode": {
@@ -13666,6 +13768,10 @@
                         },
                         "begruendung": {
                           "description": "Begründung des Status (Pflicht bei «kritisch»).",
+                          "type": "string"
+                        },
+                        "naechsterMeilenstein": {
+                          "description": "Nächster Meilenstein laut Bericht (Freitext, leer ohne Angabe).",
                           "type": "string"
                         }
                       }
@@ -61533,6 +61639,104 @@
           },
           "404": {
             "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traktanden/naechste": {
+      "get": {
+        "summary": "Nächstes Traktandum je Projekt",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», CTL «Du stellst am … vor»): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.",
+        "parameters": [
+          {
+            "schema": {
+              "minItems": 1,
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "projektId",
+            "required": true,
+            "description": "Projekte (mehrfach, höchstens 20)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NaechsteTraktanden"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
             "content": {
               "application/problem+json": {
                 "schema": {

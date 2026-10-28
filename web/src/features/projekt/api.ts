@@ -34,6 +34,15 @@ export function useBerichtStand(ids: readonly string[]) {
   });
 }
 
+/** Nächstes traktandiertes Geschäft je Projekt (Gremium und Datum) für die Kopfkarte. */
+export function useNaechsteTraktanden(ids: readonly string[]) {
+  return useQuery({
+    queryKey: [...projektKeys.kopf, 'traktanden', ids] as const,
+    enabled: ids.length > 0,
+    queryFn: async ({ signal }) => (await api.GET('/v1/traktanden/naechste', { params: { query: { projektId: [...ids] } }, signal })).data!.items,
+  });
+}
+
 export function useProjektList(f: ListFilter) {
   return useInfiniteQuery({
     queryKey: projektKeys.list(f),

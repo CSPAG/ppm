@@ -29,12 +29,14 @@ test('Zielzyklus: starten, Jahresziel mit Metrik und Hauptaktivität; Baum mit T
   // Z2 und Start
   await page.goto(`/ziele/${j}`);
   await expect(page.getByRole('heading', { name: `Zielzyklus ${j}`, level: 1 })).toBeVisible();
+  // erst nach dem Laden entscheiden: leerer Zyklus (Z2, «Zielzyklus starten») oder schon gestartet (Baum)
   const starten = page.getByRole('button', { name: 'Zielzyklus starten' });
+  const baum = page.getByRole('tree', { name: 'Zielhierarchie' });
+  await expect(starten.or(baum)).toBeVisible();
   if (await starten.isVisible()) {
     await expectAccessible(page);
     await starten.click();
   }
-  const baum = page.getByRole('tree', { name: 'Zielhierarchie' });
   await expect(baum).toBeVisible();
 
   // strategisches Ziel wählen, Jahresziel ohne Metrik hinzufügen

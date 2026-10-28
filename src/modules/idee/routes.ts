@@ -157,9 +157,9 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   });
 
   app.get('/v1/ideen/auswahl', {
-    schema: { tags: [TAG], summary: 'Auswahl für den Assistenten', description: 'Handlungsfelder mit Leitsatz und ihren strategischen Zielen, aktive Bereiche und Herkunft (K4 Schritt 2) – mit `idee:create`, auch ohne Leserecht auf Ziele.', response: { 200: Type.Ref('IdeeAuswahl') } },
+    schema: { tags: [TAG], summary: 'Auswahl für den Assistenten', description: 'Handlungsfelder mit Leitsatz und ihren strategischen Zielen, aktive Bereiche und Herkunft (K4 Schritt 2) – mit `idee:create` oder `idee:read` (Pool und Prüfung), auch ohne Leserecht auf Ziele.', response: { 200: Type.Ref('IdeeAuswahl') } },
   }, async req => {
-    await req.need('idee:create');
+    await needLesen(req);
     const ctx = { db: deps.db, tenantId: req.requirePrincipal().tenantId };
     return req.tx(tx => store.auswahl(tx, ctx));
   });

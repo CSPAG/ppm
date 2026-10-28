@@ -7,6 +7,7 @@
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
 import { ideeTools } from './mcp.ts';
+import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
 export const ideeModule = defineModule({
@@ -14,6 +15,7 @@ export const ideeModule = defineModule({
   tags: [{ name: TAG, description: 'Projektideen nach Vorlage: Assistent für Antragstellende, eigene Ideen mit Stand, Rückfragen beantworten; ab AP-E4-2 Ideenpool und Prüfung.' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerPruefungRoutes(app, deps);
   },
   mcpTools: { ...ideeTools },
 });

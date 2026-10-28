@@ -160,7 +160,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 
 | Regel (Quelle) | Zeitpunkt | Stufe | Text | Ausweg |
 |---|---|---|---|---|
-| Pflichtangaben der Phase (UC-002 A3, UC-003 A3; Pflichtfelder offen K13) | *vorher* Symbol am Kapitel und Liste im Seitenpanel, *dabei* beim Einreichen | Sperre | «Angaben für Phase P2 fehlen: Personal in FTE (Kap. 9.2), Kosten P2–P4 (Kap. 10). Ergänzen Sie sie, um einzureichen.» | Sprung zur Angabe |
+| Pflichtangaben der Phase (UC-002 A3, UC-003 A3; Pflichtfelder offen K13) | *vorher* Symbol am Kapitel und Liste im Seitenpanel, *dabei* beim Einreichen | Sperre | «Angaben für Phase P2 fehlen: Personal in FTE (Kap. 9.2), Kosten P2–P4 (Kap. 9.1). Ergänzen Sie sie, um einzureichen.» | Sprung zur Angabe |
 | Personal in FTE ab Gate P1–P2 (UC-003 A1) | *vorher* im Kapitel Ressourcen | Sperre (als Pflichtangabe) | «Gate P1–P2: Personal in FTE und Monaten je Rolle und Phase statt Grösse M. Die Ressourcenplanung braucht die Werte ab der Implementierung.» | Raster ausfüllen |
 | Unbeantwortete Leitfragen (UC-003 Schritt 4) | *vorher* im Seitenpanel, *dabei* beim Einreichen | Warnung | «Leitfragen: 3 von 25 unbeantwortet (Klinik 2, Infrastruktur 1). Beantworten Sie sie oder begründen Sie, warum sie nicht zutreffen.» | beantworten oder «trifft nicht zu» mit Begründung |
 | Wesentliche Abweichung zur Baseline (UC-003 Schritt 3; Schwelle K11) | *dabei* am Feld | Hinweis | «Budget P2: CHF 2,40 Mio. statt 2,10 Mio. (+14 %). Erscheint in den Hauptänderungen.» | – |

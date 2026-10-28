@@ -31,3 +31,6 @@ export function Verweis({ pfad, gehe, className, children }: { pfad: string; geh
 }
 
 export const ideePfad = (nummer: number, schritt?: number) => `/portfolio/ideen/${nummer}${schritt ? `?schritt=${schritt}` : ''}`;
+
+/** «Meine Ideen» auch für Personen, die unter Portfolio › Ideen den Pool sehen (Ansicht in der Adresse, G8). */
+export const MEINE_IDEEN = '/portfolio/ideen?ansicht=meine';

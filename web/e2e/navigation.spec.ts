@@ -12,10 +12,25 @@ const navigation = (page: Page) => page.getByRole('navigation', { name: 'Navigat
 test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) => {
   await login(page, ANNA);
   const nav = navigation(page);
-  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
-  // In der Leiste trägt bei mehreren Bereichen der aktive Bereich aria-current, unten auf dem Telefon der Arbeitsraum
-  const aktuell = telefon(page) ? nav.getByRole('link', { name: 'Ziele', exact: true }) : nav.getByRole('link', { name: 'Handlungsfelder', exact: true });
-  await expect(aktuell).toHaveAttribute('aria-current', 'page');
+  if (telefon(page)) {
+    // Unten stehen höchstens drei Arbeitsräume nach Vorrang (Eingang, Projekte, Gremien); sind es mehr, liegt «Ziele»
+    // unter «Mehr» und trägt dort aria-current (IA «Navigation»)
+    const unten = nav.getByRole('link', { name: 'Ziele', exact: true });
+    if (await unten.count()) {
+      await expect(unten).toHaveAttribute('aria-current', 'page');
+    } else {
+      await nav.getByRole('button', { name: 'Mehr' }).click();
+      const blatt = page.getByRole('dialog', { name: 'Mehr' });
+      await expect(blatt.getByRole('link', { name: 'Ziele', exact: true })).toHaveAttribute('aria-current', 'page');
+      await expectAccessible(page);
+      await page.keyboard.press('Escape');
+      await expect(blatt).toHaveCount(0);
+    }
+  } else {
+    // In der Leiste trägt bei mehreren Bereichen der aktive Bereich aria-current
+    await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Handlungsfelder', exact: true })).toHaveAttribute('aria-current', 'page');
+  }
   await expectAccessible(page);
   await expectNoOverflow(page);
 
@@ -26,8 +41,8 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
     const admin = nav.getByRole('link', { name: 'Administration' });
     await tabTo(page, admin);
     await page.keyboard.press('Enter');
-    // erster Bereich der Administration: Organisation (UI-44), danach die Verwalten-Seiten des Baukastens
-    await expect(page).toHaveURL(/\/administration\/organisation/);
+    // erster Bereich der Administration: Benutzer und Rollen (Verwalten des Baukastens, IA), danach Organisation (UI-44)
+    await expect(page).toHaveURL(/\/verwalten\/mitglieder/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expectAccessible(page);
     await expectNoOverflow(page);
@@ -55,6 +70,8 @@ test('Telefon: Leiste unten mit «Mehr» als Blatt mit Konto', async ({ page }) 
   const blatt = page.getByRole('dialog', { name: 'Mehr' });
   await expect(blatt).toBeVisible();
   await expect(blatt.getByRole('button', { name: 'Abmelden' })).toBeVisible();
+  // Persönliches im Konto: Profil und Stellvertretung (UI-43)
+  await expect(blatt.getByRole('link', { name: 'Profil und Stellvertretung' })).toHaveAttribute('href', '/konto/stellvertretung');
   await expectAccessible(page);
   await expectNoOverflow(page);
   await page.keyboard.press('Escape');

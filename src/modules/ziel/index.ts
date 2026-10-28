@@ -10,6 +10,9 @@ import { registerRoutes } from './routes.ts';
 import { registerZyklusRoutes } from './zyklus-routes.ts';
 import { registerErreichungRoutes } from './erreichung-routes.ts';
 import { zielerreichungTask } from './erreichung-aufgabe.ts';
+import { registerFreigabeRoutes } from './freigabe-routes.ts';
+import { roadmapTools } from './roadmap-mcp.ts';
+import { registerRoadmapRoutes } from './roadmap-routes.ts';
 
 /** Zuordnung Projekt ↔ Ziel für obere Module (Vertrag Kap. 2 bei der Baseline, PP.02.05; AP-E6-1). */
 export { projektZuordnen, type ZielAngabe } from './zyklus-zuordnung.ts';
@@ -21,7 +24,9 @@ export const zielModule = defineModule({
     registerRoutes(app, deps);
     registerZyklusRoutes(app, deps); // Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung der Projekte (AP-E6-1)
     registerErreichungRoutes(app, deps); // Zielerreichung je Quartal (AP-E6-3)
+    registerFreigabeRoutes(app, deps); // Vorlage an den VR und Freigabe der Jahresziele (AP-E6-2)
+    registerRoadmapRoutes(app, deps); // Portfolio-Roadmap (AP-E6-2)
   },
   tasks: [zielerreichungTask], // Aufgabe «Zielerreichung erfassen» nach Quartalsende (AP-E6-3)
-  mcpTools: { ...zielTools },
+  mcpTools: { ...zielTools, ...roadmapTools },
 });

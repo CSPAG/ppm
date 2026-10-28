@@ -59,6 +59,8 @@ function server(start: ReturnType<typeof idee> | null, liste: ReturnType<typeof 
     'GET /v1/ideen': (req: Request) => {
       const u = new URL(req.url);
       if (u.searchParams.get('nummer')) return json({ items: cur ? [zeile(cur)] : [], nextCursor: null });
+      // Entwürfe: auch der eben angelegte (der Assistent darf sich davon nicht unterbrechen lassen)
+      if (u.searchParams.get('stand') === 'entwurf') return json({ items: cur?.stand === 'entwurf' ? [zeile(cur)] : [], nextCursor: null });
       return json({ items: liste.map(i => zeile(i)), nextCursor: null });
     },
     [`GET /v1/ideen/${ID}`]: () => json(cur, 200, { ETag: `W/"${cur!.version}"` }),

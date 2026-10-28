@@ -133,6 +133,11 @@ describe('Projektvertrag', { skip }, () => {
     assert.equal((await call('kt', 'GET', url)).json().can.write, false);
     assert.equal((await call('kt', 'PUT', url, { inhalt: { loesungsansatz: 'x', annahmen: '' } }, { 'if-match': ok.headers.etag as string })).statusCode, 403);
 
+    // Zielauswahl für Kap. 2: die Projektleitung sieht die Ziele auch ohne ziel:read an der Organisation; Kernteam nicht
+    const auswahl = await call('pl', 'GET', `/v1/projekte/${projekt.p0}/vertrag/ziele`);
+    assert.equal(auswahl.statusCode, 200, auswahl.body);
+    assert.deepEqual(auswahl.json().ziele, [{ id: ziel, nummer: '2.1', text: 'Digitale Aufnahme', handlungsfeldId: handlungsfeld, handlungsfeld: 'Patientenpfade' }]);
+    assert.equal((await call('kt', 'GET', `/v1/projekte/${projekt.p0}/vertrag/ziele`)).statusCode, 403);
     // Strategisches Ziel muss es geben, das Handlungsfeld folgt ihm
     const k2 = await speichern('pl', entwurf, 2, i => { i.strategischesZielId = '00000000-0000-4000-8000-000000000000'; });
     assert.equal(k2.statusCode, 422, k2.body);
@@ -202,7 +207,7 @@ describe('Projektvertrag', { skip }, () => {
     // Die UE erhält den Quality-Check (Sammelaufgabe über das Recht vertrag:review)
     const aufgaben = await full(api.t.runtime, T, async tx => (await tx.query<{ titel: string; empfaenger_recht: string; link: string }>(
       "SELECT titel, empfaenger_recht, link FROM ppm.aufgabe WHERE art = 'vertrag.quality_check' AND stand = 'offen' AND bezug_id = $1", [entwurf])).rows);
-    assert.deepEqual(aufgaben, [{ titel: 'Quality-Check Projektvertrag 2026-001', empfaenger_recht: 'vertrag:review', link: '/projekte/2026-001/vertrag?version=entwurf' }]);
+    assert.deepEqual(aufgaben, [{ titel: 'Quality-Check Projektvertrag 2026-001', empfaenger_recht: 'vertrag:review', link: '/projekte/2026-001/vertrag/pruefen' }]);
   });
 
   test('Gate P1–P2: nicht mit Grösse S/M/L, Kosten bis P4 (UC-003 A1, Vorgabe A-12)', async () => {

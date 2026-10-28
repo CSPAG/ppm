@@ -63,6 +63,9 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
 .bereiche{display:none;gap:2px;padding:6px 14px 0;border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
 .bereiche .tab{text-decoration:none;white-space:nowrap}
 .bnav{display:none}
+/* Zähler an einem Arbeitsraum (I-N3, shell/Zahl.tsx): Akzent mit Kontrast in hell und dunkel; schmal am Symbol */
+.zahl{flex:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--accent-fg);font:600 11px/18px var(--f-mono);font-variant-numeric:tabular-nums;text-align:center}
+.bn{position:relative}
 .top-konto{display:flex;align-items:center;gap:12px}
 /* Kopf der Seite: Aktionen brechen unter den Titel, statt ihn zu quetschen (360 px) */
 .mh-title{flex:1 1 220px}
@@ -73,6 +76,8 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
   .rail .nav.raum .ico{width:20px;height:20px}
   .rail .nav.raum .lbl{flex:none;max-width:100%;white-space:normal;overflow-wrap:anywhere}
   .rail-sub{display:none}
+  .rail .nav.raum{position:relative}
+  .rail .nav.raum .zahl,.bn .zahl{position:absolute;top:4px;left:calc(50% + 6px)}
   .bereiche{display:flex}
 }
 @media (max-width:767px){

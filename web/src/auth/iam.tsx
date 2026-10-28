@@ -10,7 +10,8 @@ import { useMemo, type ReactNode } from 'react';
 import './permissions.ts';
 
 export const features: IamFeatures = { entra: true, platform: true };
-export const paths = { home: '/ziele/handlungsfelder' };
+// Startseite jeder Rolle ist der Eingang (UX-E3), auch nach Anmeldung und Wechsel der Organisation
+export const paths = { home: '/eingang' };
 
 /** Wiederholen nur bei Netz- und Serverfehlern; 4xx (z. B. 404 «gibt es nicht mehr») sofort anzeigen statt nach drei Versuchen. */
 export function retryQuery(failureCount: number, error: unknown): boolean {

@@ -37,6 +37,7 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 | `src/features/monatsabschluss/` | Arbeitsraum «Portfolio» › Monatsabschluss (`/portfolio/monatsabschluss?periode=2026-10`), UI-15, UI-16, K1: Posteingang der Periode (auffällige zuerst, Auswahl mit Sammelbestätigung und Einfordern, Tastatur ↑/↓ B R E Leertaste Enter, Rückfrage in der Zeile), Bericht im Vergleich zur Vorperiode in der Schublade (`?o=bericht:<nummer>`), Ansicht «Termine» (`?ansicht=termine`), «Periode abschliessen» mit Wirkungsvorschau; Bereich sichtbar mit `statusbericht:review` |
 | `src/features/phasenmodell/` | Arbeitsraum «Administration» › Phasenmodell (`/administration/phasenmodell`, UI-46): Arbeitsfläche mit Version (`?v=`) und Abschnitt (`?e=`), automatischem Speichern, Rückgängig/Wiederholen, Prüfbericht, Entwurf anlegen, verwerfen und in Kraft setzen |
 | `src/features/bericht/` | Projekte › Projekt › Bericht (`/projekte/<nr>/bericht?periode=2026-10`, UI-13, K1): Arbeitsfläche mit Vorbelegung aus Vorperiode und Registern, Meilensteine, Kosten, Risiken, Kommunikation, KPIs (ab P2) und Beurteilung, automatischem Speichern, Seitenpanel «Bereit zum Einreichen», Einreichen mit Rückgängig (10 s); Befehlspalette «Statusbericht erstellen» mit Projektwahl |
+| `src/features/vertrag/` | Projektakte › Vertrag (`/projekte/<nr>/vertrag?kapitel=&version=&feld=`, UI-07, K2): Arbeitsfläche mit den Kapiteln 1–13, automatischem Speichern je Kapitel, Rückgängig/Wiederholen, Konflikt (412), Seitenpanel mit Pflichtangaben (Sprung mit einem Klick, Alt+N) und «Zur Prüfung einreichen»; erster Entwurf ohne Rückfrage |
 | `src/styles/`, `src/test/`, `e2e/` | Tokens und Layout; Testhilfen; Playwright-Tests |
 
 ## Regeln
@@ -50,17 +51,33 @@ Die Webapp ist ein eigenes npm-Paket unter `web/`. Sie wird gebaut (`npm run web
 - **Barrierefreiheit:** alles per Tastatur, Fokus in Dialogen gefangen und zurückgegeben, hell und dunkel, ab 360 px
   Breite; axe in jedem E2E-Test.
 
+- **Start-Bundle (Q-L6, ≤ 250 kB gzip, `npm run web:size`):** Der Router lädt die Seiten der Features als eigene Chunks
+  nach (`src/routes/seite.ts`: `seite(() => import('./features/<x>/<Seite>.tsx'), '<Seite>')`). Die `index.ts` eines
+  Features exportiert deshalb **keine Seiten**, nur Suchparameter, Texte, Pfade und Suchen für Navigation und Router;
+  sonst zieht der statische Import aus `nav.ts` oder `search.ts` die Seite ins Start-Bundle.
+
 ## Navigation
 
 Nach Arbeitsräumen ([ux/informationsarchitektur.md](ux/informationsarchitektur.md#navigation), UX-E2): Eingang, Projekte,
 Portfolio, Gremien, Ziele, Administration, in dieser Reihenfolge (`src/shell/nav.ts`). Ein Arbeitsraum erscheint nur, wenn die
-Person mindestens einen seiner Bereiche sehen darf (I-N2); leere Arbeitsräume gibt es nicht.
+Person mindestens einen seiner Bereiche sehen darf (I-N2); leere Arbeitsräume gibt es nicht. In der Administration stehen
+die Verwalten-Seiten des Baukastens («Benutzer und Rollen») zuerst, dann die Bereiche der App (IA «Arbeitsräume»).
+
+- **Zähler (I-N3):** `zaehler` in `src/nav.ts` setzt einen Zähler an einen Arbeitsraum (heute: offene Aufgaben an
+  «Eingang» aus `GET /v1/eingang/anzahl`); sichtbar als Zahl, für Bildschirmleser im Namen des Links; neu geladen jede
+  Minute und nach jeder Änderung im Eingang.
+- **Bereiche mit Parametern:** `muster` an einem Bereich (z. B. `/ziele/2026`, `/ziele/2026/zielerreichung`) bestimmt, wann
+  er aktiv ist; ohne `muster` gilt der Pfad und alles darunter.
+- **Kopfkarten des Eingangs:** `src/kopfkarten.ts` meldet je Modul Recht und Karte an (Karte als eigener Chunk); der Router
+  gibt die Liste an die Startseite, kein Feature importiert aus `features/eingang`.
+- **Konto:** `konto` in `src/nav.ts` setzt persönliche Seiten ins Kontomenü und unter «Mehr» (heute: Profil und
+  Stellvertretung, UI-43).
 
 | Breite | Darstellung |
 |---|---|
 | ab 1024 px | Leiste links mit Namen, darunter die Bereiche des aktiven Arbeitsraums |
 | 768–1023 px | schmale Leiste mit Symbol und Name; Bereiche als Leiste über der Arbeitsfläche |
-| unter 768 px | Leiste unten mit den ersten drei sichtbaren aus Eingang, Projekte, Gremien (sonst die nächsten), dazu «Mehr» als Blatt von unten mit den übrigen Arbeitsräumen und dem Konto (Person, Organisation, Farbschema, Meine Rollen und Rechte, Organisation wechseln, Abmelden) |
+| unter 768 px | Leiste unten mit den ersten drei sichtbaren aus Eingang, Projekte, Gremien (sonst die nächsten), dazu «Mehr» als Blatt von unten mit den übrigen Arbeitsräumen und dem Konto (Person, Organisation, Farbschema, Profil und Stellvertretung, Meine Rollen und Rechte, Organisation wechseln, Abmelden) |
 
 **Ein Feature trägt sich in `src/nav.ts` ein**, die Shell kennt keine Features:
 

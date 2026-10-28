@@ -12,10 +12,10 @@
  * - Gate «Gestoppt» (UC-002 Ende, UC-003 A6, K2: «weiter in UC-015») über `gateEntscheid.registrieren` des Moduls
  *   vertrag: das Projekt ist abgebrochen. Gate P3–P4 freigegeben: Phase P4 erreicht, Aufgabe an die Projektleitung.
  */
-import { conflict, invalid, systemActor, type Tx } from '@vollholz/platform';
+import { conflict, invalid, systemActor, type Actor, type Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
 import { projekt as projektAktion } from '../projekt/index.ts';
-import { registriereTraktandenart, type EntscheidFolge, type Unterlage } from '../sitzung/index.ts';
+import { registriereTraktandenart, type EntscheidFolge, type FolgeKontext, type Unterlage } from '../sitzung/index.ts';
 import { gateEntscheid, type GateEntscheid } from '../vertrag/index.ts';
 import * as store from './store.ts';
 
@@ -87,9 +87,9 @@ function pruefeErgebnis(lage: store.Kontext, ergebnis: store.Ergebnis): void {
 
 const kurz = (t: string, n = 140) => { const s = t.trim().replace(/\s+/g, ' '); return s.length > n ? `${s.slice(0, n - 1)}…` : s; };
 
-/** Wechsel des Lebenszyklus mit Grund (Audit beim Projekt). */
-async function wechseln(tx: Tx, p: store.ProjektKopf, ziel: 'aktiv' | 'sistiert' | 'abgebrochen' | 'abgeschlossen', grund: Record<string, unknown>): Promise<void> {
-  await projektAktion.lebenszyklusWechseln(tx, systemActor('system'), p.id, ziel, grund);
+/** Wechsel des Lebenszyklus mit Grund (Audit beim Projekt, Akteur = Person, die den Entscheid erfasst). */
+async function wechseln(tx: Tx, who: Actor, p: store.ProjektKopf, ziel: 'aktiv' | 'sistiert' | 'abgebrochen' | 'abgeschlossen', grund: Record<string, unknown>): Promise<void> {
+  await projektAktion.lebenszyklusWechseln(tx, who, p.id, ziel, grund);
 }
 
 interface Folge { berichtId: string | null; artVorher: store.Art | null }
@@ -114,14 +114,14 @@ async function exitBericht(tx: Tx, p: store.ProjektKopf): Promise<store.BerichtR
 }
 
 /** Folge des Ergebnisses anwenden (in der Lage des Traktandums). */
-async function anwenden(tx: Tx, p: store.ProjektKopf, lage: store.Kontext, ergebnis: store.Ergebnis, grund: Record<string, unknown>, begruendung: string): Promise<Folge> {
+async function anwenden(tx: Tx, who: Actor, p: store.ProjektKopf, lage: store.Kontext, ergebnis: store.Ergebnis, grund: Record<string, unknown>, begruendung: string): Promise<Folge> {
   const keine: Folge = { berichtId: null, artVorher: null };
   switch (ergebnis) {
     case 'abgeschlossen': {
       // UC-015 Schritt 6: Abschlussbericht abgenommen, Vorhaben abgeschlossen, Projektakte lesend
       const b = await exitBericht(tx, p);
       await store.standSetzen(tx, b.id, ['eingereicht', 'traktandiert'], 'abgenommen');
-      await wechseln(tx, p, 'abgeschlossen', grund);
+      await wechseln(tx, who, p, 'abgeschlossen', grund);
       await erstellenErledigen(tx, p);
       return { berichtId: b.id, artVorher: null };
     }
@@ -135,15 +135,15 @@ async function anwenden(tx: Tx, p: store.ProjektKopf, lage: store.Kontext, ergeb
     }
     case 'sistiert': {
       if (lage === 'sistiert') return keine; // Wiederaufnahme abgelehnt: bleibt sistiert
-      await wechseln(tx, p, 'sistiert', grund);
+      await wechseln(tx, who, p, 'sistiert', grund);
       const f = await berichtFuer(tx, p, 'sistierung');
       await erstellenOeffnen(tx, p, 'sistierung');
       return f;
     }
     case 'abgebrochen': {
       // Ein sistiertes Vorhaben wird über «aktiv» beendet (Übergänge im Modul projekt, fachmodell.md 2.5)
-      if (p.lebenszyklus === 'sistiert') await wechseln(tx, p, 'aktiv', { ...grund, zwischenschritt: 'abbruch' });
-      await wechseln(tx, p, 'abgebrochen', grund);
+      if (p.lebenszyklus === 'sistiert') await wechseln(tx, who, p, 'aktiv', { ...grund, zwischenschritt: 'abbruch' });
+      await wechseln(tx, who, p, 'abgebrochen', grund);
       const f = await berichtFuer(tx, p, 'abbruch');
       await erstellenOeffnen(tx, p, 'abbruch');
       return f;
@@ -151,7 +151,7 @@ async function anwenden(tx: Tx, p: store.ProjektKopf, lage: store.Kontext, ergeb
     case 'weiterfuehren': {
       if (lage !== 'sistiert') return keine;
       // Wiederaufnahme (A-09): aktiv; der Vertrag wird über ein Gate fortgeschrieben (UC-003)
-      await wechseln(tx, p, 'aktiv', grund);
+      await wechseln(tx, who, p, 'aktiv', grund);
       for (const an of await store.spUndPl(tx, p.id)) {
         await mitteilung.senden(tx, {
           an, bezug: bezugVon(p), link: `/projekte/${p.nummer}/vertrag`,
@@ -164,7 +164,7 @@ async function anwenden(tx: Tx, p: store.ProjektKopf, lage: store.Kontext, ergeb
 }
 
 /** Vorige Folge zurücknehmen (Korrektur in der Sitzung, A-30); Endzustände nicht (409). */
-async function zuruecknehmen(tx: Tx, e: store.EntscheidRow, p: store.ProjektKopf): Promise<void> {
+async function zuruecknehmen(tx: Tx, who: Actor, e: store.EntscheidRow, p: store.ProjektKopf): Promise<void> {
   const grund = { korrektur: true, ergebnis: e.ergebnis };
   switch (e.ergebnis) {
     case 'abgeschlossen':
@@ -179,7 +179,7 @@ async function zuruecknehmen(tx: Tx, e: store.EntscheidRow, p: store.ProjektKopf
     }
     case 'sistiert': {
       if (e.kontext === 'sistiert') return;
-      if (p.lebenszyklus === 'sistiert') await wechseln(tx, p, 'aktiv', grund);
+      if (p.lebenszyklus === 'sistiert') await wechseln(tx, who, p, 'aktiv', grund);
       if (e.bericht_id) {
         if (e.bericht_art_vorher) await store.artSetzen(tx, e.bericht_id, e.bericht_art_vorher);
         else await store.entwurfEntfernen(tx, e.bericht_id);
@@ -188,7 +188,7 @@ async function zuruecknehmen(tx: Tx, e: store.EntscheidRow, p: store.ProjektKopf
       return;
     }
     case 'weiterfuehren':
-      if (e.kontext === 'sistiert' && p.lebenszyklus === 'aktiv') await wechseln(tx, p, 'sistiert', grund);
+      if (e.kontext === 'sistiert' && p.lebenszyklus === 'aktiv') await wechseln(tx, who, p, 'sistiert', grund);
   }
 }
 
@@ -196,8 +196,9 @@ async function zuruecknehmen(tx: Tx, e: store.EntscheidRow, p: store.ProjektKopf
  * Folge des Entscheids der Art `abschluss` (fachmodell.md 2.9) in der Transaktion des Entscheids; idempotent und
  * angeglichen an das zuletzt übergebene Ergebnis (sitzung/README.md).
  */
-export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
+export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   if (f.bezug.typ !== 'projekt') return;
+  const who = k?.akteur ?? systemActor('system');
   await store.intern(tx, async () => {
     let p = await store.projekt(tx, f.bezug.id);
     if (!p) return;
@@ -207,11 +208,11 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
     const lage = vorher?.kontext ?? await lageVon(tx, p);
     pruefeErgebnis(lage, ergebnis);
     if (vorher) {
-      await zuruecknehmen(tx, vorher, p);
+      await zuruecknehmen(tx, who, vorher, p);
       p = (await store.projekt(tx, p.id))!;
     }
     const vorherLz = p.lebenszyklus as 'aktiv' | 'sistiert';
-    const folge = await anwenden(tx, p, lage, ergebnis, { traktandumId: f.traktandumId, ergebnis }, f.begruendung);
+    const folge = await anwenden(tx, who, p, lage, ergebnis, { traktandumId: f.traktandumId, ergebnis }, f.begruendung);
     await store.entscheidSetzen(tx, {
       projekt_id: p.id, quelle: 'traktandum', quelle_id: f.traktandumId, kontext: lage, ergebnis, vorher_lebenszyklus: vorherLz,
       bericht_id: folge.berichtId, bericht_art_vorher: folge.artVorher,
@@ -221,20 +222,22 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
 
 /** Gate-Entscheid (Modul vertrag): «Gestoppt» bricht ab, P3–P4 freigegeben öffnet den Abschluss. */
 export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
+  // der Gate-Entscheid übergibt keine Person; die Person steht im Audit des Entscheids (sitzung)
+  const who = systemActor('system');
   await store.intern(tx, async () => {
     const p = await store.projekt(tx, g.projektId);
     if (!p) return;
     const vorher = await store.entscheid(tx, 'gate', g.versionId);
     if (g.ergebnis === 'abgelehnt') {
       if (vorher?.ergebnis === 'abgebrochen' || p.lebenszyklus !== 'aktiv') return;
-      const folge = await anwenden(tx, p, 'aktiv', 'abgebrochen', { gate: g.gate, versionId: g.versionId, ergebnis: 'gestoppt' }, g.begruendung);
+      const folge = await anwenden(tx, who, p, 'aktiv', 'abgebrochen', { gate: g.gate, versionId: g.versionId, ergebnis: 'gestoppt' }, g.begruendung);
       await store.entscheidSetzen(tx, {
         projekt_id: p.id, quelle: 'gate', quelle_id: g.versionId, kontext: 'aktiv', ergebnis: 'abgebrochen', vorher_lebenszyklus: 'aktiv',
         bericht_id: folge.berichtId, bericht_art_vorher: folge.artVorher,
       });
       return;
     }
-    if (vorher?.ergebnis === 'abgebrochen') await zuruecknehmen(tx, vorher, p); // 409: beendet
+    if (vorher?.ergebnis === 'abgebrochen') await zuruecknehmen(tx, who, vorher, p); // 409: beendet
     if (g.gate !== 'P3_P4') return;
     if (g.ergebnis === 'freigegeben' && p.phase === 'P4' && p.lebenszyklus === 'aktiv') await erstellenOeffnen(tx, p, 'abschluss');
     else if (!(await store.offenerBericht(tx, p.id))) await erstellenEntfallen(tx, p);

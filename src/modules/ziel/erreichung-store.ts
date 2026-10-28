@@ -84,3 +84,16 @@ export async function ziel(tx: Tx, typ: ZielTypOut, id: string): Promise<{ jahr:
     : `SELECT jahr FROM ${SCHEMA}.jahresziel WHERE id = $1`;
   return (await tx.query<{ jahr: number | null }>(sql, [id])).rows[0] ?? null;
 }
+
+/**
+ * Zielerreichung eines Jahres für obere Module (Jahresrückblick, UC-013 Schritt 1; AP-E7-5): je Ziel des Jahres
+ * (strategische Ziele und Jahresziele) der letzte Stand bis und mit Q4.
+ */
+export async function desJahres(tx: Tx, jahr: number): Promise<(ZielRow & { stand: string | null; beurteilung: string; quartal: string | null })[]> {
+  const letzte = new Map((await letzteEintraege(tx, `${jahr + 1}-Q1`)).filter(e => e.quartal.startsWith(`${jahr}-`))
+    .map(e => [`${e.ziel_typ}:${e.ziel_id}`, e]));
+  return (await ziele(tx, jahr)).map(z => {
+    const e = letzte.get(`${z.typ}:${z.id}`);
+    return { ...z, stand: e?.stand ?? null, beurteilung: e?.beurteilung ?? '', quartal: e?.quartal ?? null };
+  });
+}

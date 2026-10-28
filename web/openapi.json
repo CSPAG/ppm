@@ -19372,6 +19372,491 @@
           }
         }
       },
+      "VertragLeitfrage": {
+        "type": "object",
+        "required": [
+          "id",
+          "wertestrom",
+          "text",
+          "antwort"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "wertestrom": {
+            "description": "Schlüssel des Werts in der Codetabelle «Werteströme» (Nutzen, Projekt, Klinik, ICT, Infrastruktur).",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "antwort": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "text",
+                  "zutreffend",
+                  "version",
+                  "updatedAt",
+                  "updatedBy"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "zutreffend": {
+                    "type": "boolean"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updatedBy": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "VertragGate": {
+        "type": "object",
+        "required": [
+          "versionId",
+          "nummer",
+          "stand",
+          "gate",
+          "gremienweg",
+          "leitfragen",
+          "fortschritt",
+          "lieferergebnisse",
+          "nutzen",
+          "entscheid",
+          "can"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "in_arbeit",
+              "in_pruefung",
+              "zur_unterzeichnung",
+              "unterzeichnet",
+              "traktandiert",
+              "abgenommen",
+              "abgelehnt",
+              "verworfen",
+              "zurueckgezogen"
+            ],
+            "description": "Bearbeitungsstand der Version."
+          },
+          "gate": {
+            "type": "object",
+            "required": [
+              "code",
+              "label",
+              "von",
+              "nach"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "P0_P1",
+                  "P1_P2",
+                  "P2_P3",
+                  "P3_P4"
+                ],
+                "description": "Gate in die Zielphase."
+              },
+              "label": {
+                "description": "«P1–P2»",
+                "type": "string"
+              },
+              "von": {
+                "type": "string",
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3",
+                  "P4"
+                ],
+                "description": "Phase P0 bis P4."
+              },
+              "nach": {
+                "type": "string",
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3",
+                  "P4"
+                ],
+                "description": "Phase P0 bis P4."
+              }
+            }
+          },
+          "gremienweg": {
+            "anyOf": [
+              {
+                "description": "Gremium aus dem Gremienweg des Portfolios; null ohne Pflicht-Gates (Kategorie C, A-08).",
+                "type": "object",
+                "required": [
+                  "gremium",
+                  "zusaetzlich",
+                  "viaSns"
+                ],
+                "properties": {
+                  "gremium": {
+                    "type": "object",
+                    "required": [
+                      "kuerzel",
+                      "name"
+                    ],
+                    "properties": {
+                      "kuerzel": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "zusaetzlich": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "kuerzel",
+                          "name"
+                        ],
+                        "properties": {
+                          "kuerzel": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "viaSns": {
+                    "description": "Das Gate läuft zusätzlich über den SNS-VR (UC-006 A1).",
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "leitfragen": {
+            "description": "Leitfragen des Gates je Wertestrom in der Version des Phasenmodells ab diesem Gate (A-13).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VertragLeitfrage"
+            }
+          },
+          "fortschritt": {
+            "description": "«18 von 25 beantwortet» (K2 Schritt 2).",
+            "type": "object",
+            "required": [
+              "beantwortet",
+              "gesamt"
+            ],
+            "properties": {
+              "beantwortet": {
+                "type": "integer"
+              },
+              "gesamt": {
+                "type": "integer"
+              }
+            }
+          },
+          "lieferergebnisse": {
+            "description": "Standard-Lieferergebnisse der laufenden Phase mit Stand aus dem Register (UC-003 Schritt 1).",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "phase",
+                "art",
+                "text",
+                "erreichtAm"
+              ],
+              "properties": {
+                "phase": {
+                  "type": "string",
+                  "enum": [
+                    "P0",
+                    "P1",
+                    "P2",
+                    "P3",
+                    "P4"
+                  ],
+                  "description": "Phase P0 bis P4."
+                },
+                "art": {
+                  "type": "string",
+                  "enum": [
+                    "lieferergebnis",
+                    "meilenstein"
+                  ],
+                  "description": "Art."
+                },
+                "text": {
+                  "type": "string"
+                },
+                "erreichtAm": {
+                  "anyOf": [
+                    {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "nutzen": {
+            "anyOf": [
+              {
+                "description": "Nutzenprüfung am Gate ab P3 (UC-003 A2); sonst null.",
+                "type": "object",
+                "required": [
+                  "beurteilung",
+                  "werte",
+                  "kpis",
+                  "version"
+                ],
+                "properties": {
+                  "beurteilung": {
+                    "type": "string"
+                  },
+                  "werte": {
+                    "type": "array",
+                    "items": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "kpiId",
+                        "wert",
+                        "bemerkung"
+                      ],
+                      "properties": {
+                        "kpiId": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "wert": {
+                          "maxLength": 200,
+                          "description": "Erreichter Wert, z. B. «62 %».",
+                          "type": "string"
+                        },
+                        "bemerkung": {
+                          "maxLength": 1000,
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "kpis": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "text",
+                        "einheit",
+                        "zielwert"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "einheit": {
+                          "type": "string"
+                        },
+                        "zielwert": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "version": {
+                    "minimum": 0,
+                    "description": "Stand für If-Match; 0 = noch nicht erfasst.",
+                    "type": "integer"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entscheid": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "ergebnis",
+                  "begruendung",
+                  "at"
+                ],
+                "properties": {
+                  "ergebnis": {
+                    "type": "string",
+                    "enum": [
+                      "freigegeben",
+                      "mit_auflagen",
+                      "zurueckgestellt",
+                      "abgelehnt"
+                    ],
+                    "description": "Entscheid des Gremiums."
+                  },
+                  "begruendung": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "antworten",
+              "nutzen"
+            ],
+            "properties": {
+              "antworten": {
+                "description": "Leitfragen beantworten (PL, Entwurf in Arbeit).",
+                "type": "boolean"
+              },
+              "nutzen": {
+                "description": "Nutzenprüfung erfassen (PL oder SP, Entwurf in Arbeit).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "VertragLeitfrageAntwortIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "antwort"
+        ],
+        "properties": {
+          "antwort": {
+            "maxLength": 5000,
+            "description": "Antwort als Text; leer = Antwort entfernen. Bei «trifft nicht zu» die Begründung (K2 «Regeln»).",
+            "type": "string"
+          },
+          "zutreffend": {
+            "description": "false = «trifft nicht zu» mit Begründung in `antwort`.",
+            "default": true,
+            "type": "boolean"
+          }
+        }
+      },
+      "VertragNutzenIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "beurteilung",
+          "werte"
+        ],
+        "properties": {
+          "beurteilung": {
+            "maxLength": 5000,
+            "description": "Beurteilung durch Projektleitung und Sponsor (UC-003 A2.2).",
+            "type": "string"
+          },
+          "werte": {
+            "maxItems": 200,
+            "description": "Erreichte Werte je KPI des Registers.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kpiId",
+                "wert",
+                "bemerkung"
+              ],
+              "properties": {
+                "kpiId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "wert": {
+                  "maxLength": 200,
+                  "description": "Erreichter Wert, z. B. «62 %».",
+                  "type": "string"
+                },
+                "bemerkung": {
+                  "maxLength": 1000,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
       "VertragUnterschied": {
         "additionalProperties": false,
         "type": "object",
@@ -64825,6 +65310,399 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/gate": {
+      "get": {
+        "summary": "Gate-Modus der Version",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Gate in die Zielphase mit Gremienweg (PRAT, GLPA, via SNS-VR), Leitfragen je Wertestrom mit Antworten und Fortschritt, Standard-Lieferergebnisse der laufenden Phase mit Stand, ab dem Gate P2–P3 die Nutzenprüfung (UC-003 Schritte 1, 4, A2) und nach dem Entscheid dessen Ergebnis. Nur Versionen mit Gate (erster Vertrag oder Gate); eine Änderung: 409.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragGate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/gate/leitfragen/{leitfrageId}": {
+      "put": {
+        "summary": "Leitfrage beantworten",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Antwort der Projektleitung (UC-003 Schritt 4, PS.02.01), automatisch gespeichert; leer entfernt die Antwort. «Trifft nicht zu» mit Begründung (`zutreffend: false`). Nur am Entwurf «in Arbeit», mit `vertrag:write`. `If-Match` = Stand der Antwort, `W/\"0\"` für eine neue.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragLeitfrageAntwortIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "leitfrageId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragLeitfrage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/gate/nutzen": {
+      "put": {
+        "summary": "Nutzenprüfung erfassen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Erreichte Werte je KPI und Beurteilung am Gate ab P3 (UC-003 A2, PC.03.02) durch Projektleitung (`vertrag:write`) oder Sponsor (`vertrag:decide`). Nur am Entwurf «in Arbeit»; KPIs aus dem Register des Projekts. `If-Match` = `nutzen.version`, `W/\"0\"` beim ersten Erfassen.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragNutzenIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragGate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
                 }
               }
             }

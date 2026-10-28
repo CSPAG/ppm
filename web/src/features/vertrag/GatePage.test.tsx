@@ -124,13 +124,11 @@ describe('Gate-Modus', () => {
   });
 
   it('Nutzenprüfung am Gate P2–P3: Werte je KPI und Beurteilung (UC-003 A2)', async () => {
-    const g = gate({
-      gate: { code: 'P2_P3', label: 'P2–P3', von: 'P2', nach: 'P3' }, can: { antworten: true, nutzen: true },
-      nutzen: { beurteilung: '', werte: [], version: 0, kpis: [{ id: K1, text: 'Wartezeit Aufnahme', einheit: 'min', zielwert: '15' }] },
-    });
+    const nutzen = { beurteilung: '', werte: [], version: 0, kpis: [{ id: K1, text: 'Wartezeit Aufnahme', einheit: 'min', zielwert: '15' }] };
+    const g = gate({ gate: { code: 'P2_P3', label: 'P2–P3', von: 'P2', nach: 'P3' }, can: { antworten: true, nutzen: true }, nutzen });
     const api = stub({
       [`GET /v1/vertragsversionen/${V}/gate`]: () => json(g),
-      [`PUT /v1/vertragsversionen/${V}/gate/nutzen`]: () => json({ ...g, nutzen: { ...g.nutzen, version: 1 } }, 200, { ETag: 'W/"1"' }),
+      [`PUT /v1/vertragsversionen/${V}/gate/nutzen`]: () => json({ ...g, nutzen: { ...nutzen, version: 1 } }, 200, { ETag: 'W/"1"' }),
     });
     const { container } = renderWithIam(<GatePage nummer="2026-014" />);
     await userEvent.type(await screen.findByLabelText(`${TG.erreichterWert}: Wartezeit Aufnahme`), '18');

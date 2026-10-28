@@ -1,8 +1,9 @@
 # Umsetzungsstand
 
-Stand der Umsetzung nach dem Bauplan [fachmodell.md](fachmodell.md). Jedes Arbeitspaket führt nur seine Zeilen nach: «in
-Arbeit» beim ersten Push, «umgesetzt» mit PR-Nummer beim Merge, Annahmen (`A-nn`, [fachmodell.md Abschnitt
-8](fachmodell.md#8-annahmen)) in der Spalte des Pakets.
+Stand der Umsetzung nach dem Bauplan [fachmodell.md](fachmodell.md). Diese Datei führt nur die Master-Session,
+übergreifend in eigenen Doku-PRs ([fachmodell.md 7.1](fachmodell.md#71-regeln-für-alle-pakete)): Die Pakete ändern sie
+nicht, sondern melden mit jedem Merge einen Block «STAND:» mit ihren Zeilen («in Arbeit», «umgesetzt» mit PR-Nummer,
+Annahmen `A-nn` aus [fachmodell.md Abschnitt 8](fachmodell.md#8-annahmen)).
 
 Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunktion umgesetzt, Rest in späterem Paket).
 
@@ -75,10 +76,10 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
 | DM.02.01 | Projektvertrag erstellen | 002 | E3 | AP-E3-1 | umgesetzt (API und Reiter «Vertrag») | #43, #48 |
 | DM.02.02 | Projektvertrag zur Prüfung einreichen | 002 | E3 | AP-E3-1 | umgesetzt (API und Reiter «Vertrag») | #43, #48 |
-| DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | in Arbeit (Kapitel bearbeiten in API und Oberfläche #43, #48; Rückmeldungen AP-E3-2) | – |
+| DM.02.03 | Projektvertrag überarbeiten | 002, 003 | E3 | AP-E3-1, AP-E3-2 | umgesetzt (Kapitel bearbeiten #43, #48; Rückmeldungen aus dem Quality-Check #64, #75) | #43, #48, #64, #75 |
 | DM.02.04 | Projektvertrag zurückziehen | 002 | E3 | AP-E3-1 | offen | – |
-| DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | in Arbeit (API, Prüfansicht UI-12) | – |
-| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | in Arbeit (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | – |
+| DM.02.05 | Quality Review durchführen | 002, 003 | E3 | AP-E3-2 | umgesetzt (API, Prüfansicht UI-12) | #64, #75 |
+| DM.02.06 | Projektvertrag freigeben | 002, 003 | E3 | AP-E3-2, AP-E3-3 | teilweise (Unterschriften, API und Oberfläche UI-12; Entscheid im Gremium AP-E3-3) | #64, #75 |
 | DM.02.07 | Projektvertrag als Dokument ausgeben | 002 | E3 | AP-E3-5 | umgesetzt (PDF und Word; Word mit aktiver eigener Vorlage ab AP-E7-7) | #73 |
 | PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | umgesetzt | #71, #79 |
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | umgesetzt (Budgetrahmen je Portfolio, A-18) | #71, #79 |
@@ -128,7 +129,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PC.03.02 | Nutzenrealisierung überprüfen | 003, 015 | E3, E7 | AP-E3-3, AP-E7-1 | offen | – |
 | PC.03.03 | KPI-Werte nachführen | 004 | E1 | AP-E1-1 | umgesetzt (im Bericht ab P2, UI-13) | #58 |
 | PC.03.04 | Business Case fortschreiben | 002, 003, 015 | E3, E7 | AP-E3-1, AP-E3-3, AP-E7-1 | in Arbeit (Business Case P0 in Kap. 3, A-19) | – |
-| PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | in Arbeit (API) | – |
+| PC.04.01 | Portfolio-Dashboard einsehen | 014 | E1 | AP-E1-3 | umgesetzt (API, MCP `get_dashboard`, Oberfläche UI-17) | #66, #84 |
 | PC.04.02 | Portfoliobericht erstellen | 012, 014 | E2, E6 | AP-E2-3, AP-E6-4 | offen | – |
 | PC.04.03 | Ad-hoc-Auswertung erstellen | 014 | E7 | AP-E7-6 | offen | – |
 | RK.01.01 | Kapazitätsangebot planen | 009 | E5 | AP-E5-4 | umgesetzt (Grundfunktion: Angebot je Rolle und Monat; HR-Übernahme RK.01.02 mit AP-E7-2) | #35, #40 |

@@ -5,15 +5,15 @@
  */
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 interface Ziel { typ: string; id: string; nummer: string; eintrag: { id: string; stand: string; beurteilung: string; version: number; erfasstVon: { name: string | null } | null } | null; letzter: { quartal: string; stand: string } | null }
 
-describe('Zielerreichung', { skip }, () => {
+describe('Zielerreichung', () => {
   let api: TestApi;
   let gl: Record<string, string>, leser: Record<string, string>, ue: Record<string, string>;
   let tenantId: string;

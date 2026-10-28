@@ -4,10 +4,11 @@
  * nur mit finanzen:read (A-33), Abhängigkeiten als Linien, Rangfolge als Entwurf mit If-Match, Rechte.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { achse, feld, ressourcen } from '../../src/modules/priorisierung/matrix.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
 describe('Einordnung in die Matrix (ohne Datenbank)', () => {
   const b = (o: Record<string, 'hoch' | 'mittel' | 'tief'>) => new Map(Object.entries(o));
@@ -33,9 +34,10 @@ describe('Einordnung in die Matrix (ohne Datenbank)', () => {
   });
 });
 
-const skip = await skipDb();
+// Tests mit Datenbank: ohne Konfiguration einzeln übersprungen, konfiguriert und nicht erreichbar scheitert der Lauf
+const db = dbTests(await postgresSkip());
 
-describe('Matrix und Rangfolge (API)', { skip }, () => {
+db.describe('Matrix und Rangfolge (API)', () => {
   let api: TestApi;
   let T: string;
   let pf: string, pfB: string;
@@ -50,7 +52,7 @@ describe('Matrix und Rangfolge (API)', { skip }, () => {
   const call = (who: string, method: string, url: string, payload?: unknown, headers: Record<string, string> = {}) =>
     api.app.inject({ method: method as 'GET', url, headers: { ...h[who], ...headers }, ...(payload !== undefined ? { payload: payload as Record<string, unknown> } : {}) });
 
-  before(async () => {
+  db.before(async () => {
     api = await testApi();
     T = await tenant(api.t.runtime, 'acme');
     await full(api.t.runtime, T, async tx => {
@@ -87,9 +89,9 @@ describe('Matrix und Rangfolge (API)', { skip }, () => {
     ] });
     assert.equal(r.statusCode, 200, r.body);
   });
-  after(async () => { await api?.close(); });
+  db.after(async () => { await api?.close(); });
 
-  test('Matrix (PP.03.04): Nutzen und Risiko nach Zuordnung, Felder, Ressourcen, Kosten, Abhängigkeiten', async () => {
+  db.test('Matrix (PP.03.04): Nutzen und Risiko nach Zuordnung, Felder, Ressourcen, Kosten, Abhängigkeiten', async () => {
     const r = await call('ue', 'GET', `/v1/portfolios/${pf}/matrix`);
     assert.equal(r.statusCode, 200, r.body);
     const m = r.json();
@@ -109,7 +111,7 @@ describe('Matrix und Rangfolge (API)', { skip }, () => {
     assert.equal(x['2026-001'].rang, null);
   });
 
-  test('Rangfolge (PP.02.02): Entwurf mit Begründung, If-Match, nur aktive Projekte des Portfolios; Rang in der Matrix', async () => {
+  db.test('Rangfolge (PP.02.02): Entwurf mit Begründung, If-Match, nur aktive Projekte des Portfolios; Rang in der Matrix', async () => {
     const leer = await call('ue', 'GET', `/v1/portfolios/${pf}/rangfolge`);
     assert.deepEqual([leer.json().version, leer.json().entwurf, leer.json().can.write, leer.headers.etag], [0, [], true, 'W/"0"']);
     const put = (body: unknown, v: string) => call('ue', 'PUT', `/v1/portfolios/${pf}/rangfolge`, body, { 'if-match': v });
@@ -130,7 +132,7 @@ describe('Matrix und Rangfolge (API)', { skip }, () => {
     assert.deepEqual(audit, ['rangfolge.drafted', 'rangfolge.drafted']);
   });
 
-  test('Rechte: Gremium liest Matrix und Rangfolge seines Portfolios, ändert nichts; RM sieht die Priorisierung nicht', async () => {
+  db.test('Rechte: Gremium liest Matrix und Rangfolge seines Portfolios, ändert nichts; RM sieht die Priorisierung nicht', async () => {
     const m = await call('gremium', 'GET', `/v1/portfolios/${pf}/matrix`);
     assert.equal(m.statusCode, 200, m.body);
     assert.equal(m.json().modell.nummer, 1, 'Modell lesbar mit Recht am Portfolio');

@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.5.4) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.4 sync
+# Verwaltet von identity-kit (create-iam-app 0.5.6) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.6 sync
 #
 # Konformität mit dem Identity-Kit (iam-conformity-test, Spezifikation 14.1):
 #   pull_request, push auf main: Ebene Repository – Manifest, verwaltete Dateien unverändert, Versionen im

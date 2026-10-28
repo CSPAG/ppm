@@ -4,12 +4,12 @@
  * vertrauliche Projekte nur mit `projekt:vertraulich` (Lesesicht).
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
 import { csvFeld } from '../../src/modules/auswertung/adhoc.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const PERIODE = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }).slice(0, 7);
 const VORPERIODE = (() => { const [j, m] = PERIODE.split('-').map(Number) as [number, number]; return m === 1 ? `${j - 1}-12` : `${j}-${String(m - 1).padStart(2, '0')}`; })();
@@ -21,7 +21,7 @@ interface Antwort {
   optionen: { portfolios: { schluessel: string }[]; handlungsfelder: { id: string; label: string }[]; finanzen: boolean };
 }
 
-describe('Ad-hoc-Auswertungen', { skip }, () => {
+describe('Ad-hoc-Auswertungen', () => {
   let api: TestApi;
   let T = '';
   let ue: Record<string, string>, fi: Record<string, string>, gremium: Record<string, string>, gl: Record<string, string>;

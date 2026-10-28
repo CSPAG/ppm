@@ -5,20 +5,20 @@
  * Datenquelle, ungültige Dateien, Rechte, Audit.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { entpacken } from '../../src/modules/vorlage/zip.ts';
 import { wordVorlage } from './fixtures/word.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
 const b64 = (b: Buffer) => b.toString('base64');
 const dokumentText = (docx: Buffer) => entpacken(docx).find(e => e.name === 'word/document.xml')!.daten.toString('utf8');
 
-describe('Vorlagen', { skip }, () => {
+describe('Vorlagen', () => {
   let api: TestApi;
   let T: string;
   let projekt = '', version = '';

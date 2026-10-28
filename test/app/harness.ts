@@ -3,38 +3,25 @@
  * wie in Produktion. Verbindungen laufen als Superuser mit gesetzter Rolle (`options=-c role=<rolle>`), so braucht es
  * keine Passwörter; RLS gilt für die gesetzte Rolle.
  *
- * Umgebung: `TEST_POSTGRES_URL` oder `POSTGRES_SUPERUSER_PASSWORD` (+ `POSTGRES_PORT`, Standard 5433). Ohne erreichbare
- * Datenbank überspringen sich die Tests (`skipDb`); in CI ist sie immer da.
+ * Umgebung: `TEST_POSTGRES_URL` oder `POSTGRES_SUPERUSER_PASSWORD` (+ `POSTGRES_PORT`, Standard 5433). Testdateien mit
+ * Datenbank nehmen `describe`, `test` und Hooks aus `dbTests(await postgresSkip())` (Test-Kit): ohne Konfiguration zählt
+ * jeder Test als übersprungen, konfiguriert, aber nicht erreichbar, scheitert der Lauf.
  */
 import pg from 'pg';
-import { testDatabases, type TestDb } from '@vollholz/iam-testkit';
+import { superuserUrlFrom, testDatabases, type TestDb } from '@vollholz/iam-testkit';
 import type { Tx } from '@vollholz/platform';
 import { app } from '../../src/app.ts';
 import { fullTx } from '../../src/platform.ts';
 
 export const P = 'ppm';
 
-export const superuser = process.env.TEST_POSTGRES_URL
-  ?? (process.env.POSTGRES_SUPERUSER_PASSWORD ? `postgres://postgres:${encodeURIComponent(process.env.POSTGRES_SUPERUSER_PASSWORD)}@localhost:${process.env.POSTGRES_PORT ?? '5433'}/postgres` : null);
+export const superuser = superuserUrlFrom();
 
 /** Adresse des Superusers mit gesetzter Rolle. */
 export function asRole(url: string, role: string): string {
   const u = new URL(url);
   u.searchParams.set('options', `-c role=${role}`);
   return u.toString();
-}
-
-async function reachable(): Promise<boolean> {
-  if (!superuser) return false;
-  const c = new pg.Client({ connectionString: superuser, connectionTimeoutMillis: 1500 });
-  try { await c.connect(); await c.end(); return true; } catch { return false; }
-}
-
-/** Grund zum Überspringen (false: Datenbank da). In CI (`CI=true`) ist eine fehlende Datenbank ein Fehler. */
-export async function skipDb(): Promise<false | string> {
-  if (await reachable()) return false;
-  if (process.env.CI) throw new Error('PostgreSQL in CI nicht erreichbar (POSTGRES_SUPERUSER_PASSWORD, POSTGRES_PORT)');
-  return 'PostgreSQL nicht erreichbar (POSTGRES_SUPERUSER_PASSWORD, POSTGRES_PORT)';
 }
 
 /** Rollen nach Spezifikation 5.3 (clusterweit, idempotent, auch bei parallelen Testdateien). */

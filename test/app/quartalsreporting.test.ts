@@ -7,14 +7,14 @@
  * Quartalsende.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 import { letztePeriode, letztesQuartal, zeitraum } from '../../src/modules/ziel/quartal.ts';
 import { quartalPruefen } from '../../src/modules/ziel/quartal-lauf.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
@@ -24,7 +24,7 @@ function mittwochIn(n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-describe('Quartalsreporting an den VR', { skip }, () => {
+describe('Quartalsreporting an den VR', () => {
   let api: TestApi;
   let tenantId = '';
   let ue: H, gl: H, leser: H, verantwortlich: H, mitglied: H, fremd: H;

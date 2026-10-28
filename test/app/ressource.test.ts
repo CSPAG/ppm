@@ -4,11 +4,12 @@
  * Engpässe je Quartal, Sichtbarkeit nach Lesesicht, Rechte, Auslastung je Szenario (Schnittstelle für AP-E5-3).
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { auslastung as auslastungModul } from '../../src/modules/ressource/index.ts';
 import { auslastung, monate, nachSzenario, type Bedarf } from '../../src/modules/ressource/rechnung.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
 const b = (projektId: string, rolle: string, fte: number, vonMonat: string, bisMonat: string, phase = 'P2'): Bedarf =>
   ({ id: `${projektId}-${rolle}-${phase}`, projektId, phase, rolle, fte, vonMonat, bisMonat, gedeckt: false });
@@ -49,9 +50,10 @@ describe('Auslastung rechnen (ohne Datenbank)', () => {
   });
 });
 
-const skip = await skipDb();
+// Tests mit Datenbank: ohne Konfiguration einzeln übersprungen, konfiguriert und nicht erreichbar scheitert der Lauf
+const db = dbTests(await postgresSkip());
 
-describe('Kapazität und Auslastung (API)', { skip }, () => {
+db.describe('Kapazität und Auslastung (API)', () => {
   let api: TestApi;
   let T: string;
   let pf: string;
@@ -66,7 +68,7 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
   const call = (who: string, method: string, url: string, payload?: unknown) =>
     api.app.inject({ method: method as 'GET', url, headers: h[who], ...(payload !== undefined ? { payload: payload as Record<string, unknown> } : {}) });
 
-  before(async () => {
+  db.before(async () => {
     api = await testApi();
     T = await tenant(api.t.runtime, 'acme');
     await full(api.t.runtime, T, async tx => {
@@ -91,9 +93,9 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
     h.pl = await person('pl', 'pl', { type: 'projekt', id: projekt.x });
     h.admin = await person('admin', 'org-admin');
   });
-  after(async () => { await api?.close(); });
+  db.after(async () => { await api?.close(); });
 
-  test('Angebot festlegen (UC-009 Schritt 2): Raster mit Version je Zelle, entfernen, Rolle aus der Codetabelle', async () => {
+  db.test('Angebot festlegen (UC-009 Schritt 2): Raster mit Version je Zelle, entfernen, Rolle aus der Codetabelle', async () => {
     const leer = await call('rm', 'GET', '/v1/kapazitaet?von=2027-04&bis=2027-06');
     assert.equal(leer.statusCode, 200, leer.body);
     assert.deepEqual(leer.json(), { von: '2027-04', bis: '2027-06', zellen: [], can: { write: true } });
@@ -135,7 +137,7 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
     assert.deepEqual(audit, ['kapazitaet.created', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated', 'kapazitaet.deleted', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated']);
   });
 
-  test('Rechte: lesen mit ressource:read (RM, UE), pflegen nur mit ressource:write (RM)', async () => {
+  db.test('Rechte: lesen mit ressource:read (RM, UE), pflegen nur mit ressource:write (RM)', async () => {
     assert.equal((await call('ue', 'GET', '/v1/kapazitaet')).json().can.write, false);
     assert.equal((await call('ue', 'PUT', '/v1/kapazitaet', { zellen: [{ rolle: 'ctl', monat: '2027-08', fte: 1 }] })).statusCode, 403);
     for (const who of ['gl', 'pl']) {
@@ -144,7 +146,7 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
     }
   });
 
-  test('Auslastung (UC-009 Schritt 5): Angebot gegen Bedarf je Rolle und Monat, Engpässe, Beiträge, Lesesicht', async () => {
+  db.test('Auslastung (UC-009 Schritt 5): Angebot gegen Bedarf je Rolle und Monat, Engpässe, Beiträge, Lesesicht', async () => {
     const r = await call('rm', 'GET', '/v1/auslastung?von=2027-04&bis=2027-06');
     assert.equal(r.statusCode, 200, r.body);
     const a = r.json();
@@ -166,7 +168,7 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
     assert.equal((await call('rm', 'GET', '/v1/auslastung')).json().monate.length, 12);
   });
 
-  test('Auslastung je Szenario: Quelle der Priorisierung (AP-E5-3), unbekanntes Szenario 404', async () => {
+  db.test('Auslastung je Szenario: Quelle der Priorisierung (AP-E5-3), unbekanntes Szenario 404', async () => {
     const id = '00000000-0000-4000-8000-000000000001';
     assert.equal((await call('rm', 'GET', `/v1/auslastung?szenario=${id}`)).statusCode, 404);
     auslastungModul.szenarioQuelleSetzen(async (_tx, sid) => (sid === id

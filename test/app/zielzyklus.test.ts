@@ -5,13 +5,13 @@
  */
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Zielzyklus', { skip }, () => {
+describe('Zielzyklus', () => {
   let api: TestApi;
   let gl: Record<string, string>, leser: Record<string, string>, ue: Record<string, string>;
   let tenantId: string;
@@ -56,6 +56,10 @@ describe('Zielzyklus', { skip }, () => {
     const p = await call('PATCH', '/v1/ziele/2027', { ...gl, 'if-match': 'W/"1"' }, { vorlageBis: '2026-11-20' });
     assert.equal(p.statusCode, 200, p.body);
     assert.equal(p.json().vorlageBis, '2026-11-20');
+    // Nullable (platform 0.7.0): "" und ungültige Daten 422 statt null; die Webapp schickt für «leer» null (ZielzyklusPage)
+    for (const vorlageBis of ['', '2026-13-40', 0]) {
+      assert.equal((await call('PATCH', '/v1/ziele/2027', { ...gl, 'if-match': 'W/"2"' }, { vorlageBis })).statusCode, 422, JSON.stringify(vorlageBis));
+    }
     // Aufgabe «Jahresziele vervollständigen» im Eingang aller mit ziel:write, Frist = geplante Vorlage (Fachmodell 4.2)
     const eingang = (h: Record<string, string>) => call('GET', '/v1/eingang', h).then(r => (r.json().items as { titel: string; kontext: string | null; link: string; frist: string | null }[])
       .filter(a => a.titel === 'Jahresziele 2027 vervollständigen'));

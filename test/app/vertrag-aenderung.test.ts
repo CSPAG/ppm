@@ -6,14 +6,14 @@
  * (Folge in der Transaktion der UE) oder der SP lehnt mit Begründung ab (A2).
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { systemActor } from '@vollholz/platform';
 import { vertrag } from '../../src/modules/vertrag/index.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 /** Datum n Kalendertage nach heute, auf den nächsten Mittwoch gelegt (Sitzungstag). */
@@ -23,7 +23,7 @@ function mittwochIn(n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () => {
+describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
   let api: TestApi;
   let T = '';
   const h: Record<string, H> = {};

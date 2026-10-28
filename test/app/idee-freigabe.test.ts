@@ -6,12 +6,12 @@
  * zurück (A-30), Zurückweisen durch die Direktion.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
@@ -21,7 +21,7 @@ function mittwochIn(n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-describe('Freigabe der Initialisierung', { skip }, () => {
+describe('Freigabe der Initialisierung', () => {
   let api: TestApi;
   let tenantId = '';
   let as1: H, ue: H, adm: H, direktion: H, fremdeDirektion: H;

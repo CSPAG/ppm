@@ -4,16 +4,16 @@
  * lesend (UC-015 Schritt 6), Ressourcenbedarf (A-20), KPI-Werte ab P2 (PC.03.03), Meldung (A-22), Portfoliorisiken.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import type { Principal } from '@vollholz/iam';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type Ort = { type: 'org' } | { type: 'portfolio' | 'projekt'; id: string };
 
-describe('Projektdaten', { skip }, () => {
+describe('Projektdaten', () => {
   let api: TestApi;
   let T: string;
   let pf: string, pfC: string;

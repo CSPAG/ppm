@@ -312,9 +312,6 @@
               {
                 "description": "Tupel-ID; null bei Zuständigkeit (`scope`, `data`)",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -375,9 +372,6 @@
                     "items": {
                       "type": "string"
                     }
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -406,9 +400,6 @@
                   },
                   {
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -470,9 +461,6 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -539,9 +527,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -555,9 +540,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -571,9 +553,6 @@
               {
                 "description": "Name",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -646,9 +625,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -700,9 +676,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -720,9 +693,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -736,9 +706,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -752,9 +719,6 @@
               {
                 "description": "Nur offene Einladung aus Microsoft Entra ID: Pfad der Anmeldung über Microsoft, zum Weitergeben als Link",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -767,9 +731,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -786,9 +747,6 @@
                 "items": {
                   "type": "string"
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -802,9 +760,6 @@
               {
                 "description": "Nur Clients: Beschreibung der Freigabe",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -842,9 +797,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -886,9 +838,6 @@
                     "format": "date-time"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -942,9 +891,6 @@
               {
                 "description": "Anwendungs-ID der eigenen App (nur `own`); das Geheimnis gibt die API nie aus",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -958,9 +904,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1008,9 +951,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1023,9 +963,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1039,9 +976,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1054,9 +988,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1081,9 +1012,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1194,9 +1122,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1210,9 +1135,6 @@
               {
                 "description": "Person, die bei Microsoft zugestimmt hat",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1237,9 +1159,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -1320,9 +1239,6 @@
               {
                 "description": "Wer freigegeben hat (Name)",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1336,9 +1252,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1355,9 +1268,6 @@
                 "items": {
                   "type": "string"
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -1401,9 +1311,6 @@
               {
                 "description": "Nur für angemeldete Personen und Verwaltende, sonst `null`",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1417,9 +1324,6 @@
               {
                 "description": "Client-ID bei Maschinen-Clients",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1433,9 +1337,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -1532,9 +1433,6 @@
               {
                 "description": "Projekt und Rolle, z. B. «2026-014 · als PL».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1556,9 +1454,6 @@
                   "2026-10-25"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1585,9 +1480,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1666,9 +1558,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1715,9 +1604,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -1755,9 +1641,6 @@
                   "2026-10-25"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -1791,9 +1674,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1823,9 +1703,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -1860,9 +1737,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2162,9 +2036,6 @@
                     },
                     {
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -2182,9 +2053,6 @@
                     {
                       "format": "date",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -2210,9 +2078,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -2319,9 +2184,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2364,9 +2226,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -2465,9 +2324,6 @@
                     },
                     {
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -2485,9 +2341,6 @@
                     {
                       "format": "date",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -2513,9 +2366,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -2556,9 +2406,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2606,9 +2453,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2626,9 +2470,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2675,9 +2516,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2748,9 +2586,6 @@
                 "format": "uuid",
                 "description": "Übergeordnete Einheit; null = oberste Ebene.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2809,9 +2644,6 @@
                 "format": "uuid",
                 "description": "Übergeordnete Einheit; null = oberste Ebene.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2946,9 +2778,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -2966,9 +2795,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3011,9 +2837,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3130,9 +2953,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3150,9 +2970,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3199,9 +3016,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3324,9 +3138,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3344,9 +3155,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3392,9 +3200,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -3468,9 +3273,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -3637,9 +3439,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3653,9 +3452,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3678,9 +3474,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3698,9 +3491,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -3981,9 +3771,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -4217,9 +4004,6 @@
                       "minimum": 0,
                       "maximum": 9999999,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -4335,9 +4119,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -4430,9 +4211,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -4446,9 +4224,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -4471,9 +4246,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -4491,9 +4263,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -4524,9 +4293,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -4995,9 +4761,6 @@
                       "minimum": 0,
                       "maximum": 9999999,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -5093,9 +4856,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5117,9 +4877,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5137,9 +4894,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5181,9 +4935,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -5243,9 +4994,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -5273,9 +5021,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -5352,9 +5097,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5372,9 +5114,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5416,9 +5155,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -5643,9 +5379,6 @@
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5768,9 +5501,6 @@
                     {
                       "format": "uuid",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -5820,9 +5550,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -5949,9 +5676,6 @@
                     "description": "Kategorie des Portfolios."
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5965,9 +5689,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5981,9 +5702,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -5997,9 +5715,6 @@
               {
                 "description": "Bezeichnung des Handlungsfelds, falls die Person es sehen darf.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6024,9 +5739,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6055,9 +5767,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6071,9 +5780,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6087,9 +5793,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6162,9 +5865,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -6212,9 +5912,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6228,9 +5925,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6263,9 +5957,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6279,9 +5970,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6740,9 +6428,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6757,9 +6442,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6782,9 +6464,6 @@
                 "format": "date",
                 "description": "Termin der Baseline (aus dem abgenommenen Projektvertrag).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6799,9 +6478,6 @@
                 "format": "date",
                 "description": "Abnahme durch das Gremium (PS.02.03).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -6832,9 +6508,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6910,9 +6583,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6927,9 +6597,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6997,9 +6664,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7014,9 +6678,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7132,9 +6793,6 @@
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7151,9 +6809,6 @@
                 "multipleOf": 0.01,
                 "description": "Budget der Baseline (aus dem abgenommenen Projektvertrag).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7170,9 +6825,6 @@
                 "multipleOf": 0.01,
                 "description": "Ist-Kosten (Modul finanzen, A-16); null = noch nicht verfügbar.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -7203,9 +6855,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7282,9 +6931,6 @@
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -7345,9 +6991,6 @@
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -7386,9 +7029,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7471,9 +7111,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Portfoliorisiko (PC.02.01): Portfolio statt Projekt."
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -7504,9 +7141,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7732,9 +7366,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -7922,9 +7553,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8107,9 +7735,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -8140,9 +7765,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8289,9 +7911,6 @@
                   "L"
                 ],
                 "description": "Grösse S/M/L bis Gate P1–P2 (RK.02.01)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8308,9 +7927,6 @@
                 "multipleOf": 0.01,
                 "description": "FTE je Monat ab Gate P1–P2 (RK.02.05).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8328,9 +7944,6 @@
                   "2026-11"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8348,9 +7961,6 @@
                   "2026-11"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8371,9 +7981,6 @@
                 "minimum": 1,
                 "description": "Anzahl Monate von bis (einschliesslich).",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8408,9 +8015,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8467,9 +8071,6 @@
                   "L"
                 ],
                 "description": "Grösse S/M/L bis Gate P1–P2 (RK.02.01)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8486,9 +8087,6 @@
                 "multipleOf": 0.01,
                 "description": "FTE je Monat ab Gate P1–P2 (RK.02.05).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8506,9 +8104,6 @@
                   "2026-11"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8526,9 +8121,6 @@
                   "2026-11"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8576,9 +8168,6 @@
                   "L"
                 ],
                 "description": "Grösse S/M/L bis Gate P1–P2 (RK.02.01)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8595,9 +8184,6 @@
                 "multipleOf": 0.01,
                 "description": "FTE je Monat ab Gate P1–P2 (RK.02.05).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8615,9 +8201,6 @@
                   "2026-11"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8635,9 +8218,6 @@
                   "2026-11"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8728,9 +8308,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8813,9 +8390,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -8847,9 +8421,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8951,9 +8522,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -8971,9 +8539,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9015,9 +8580,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -9097,9 +8659,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -9259,9 +8818,6 @@
                 "format": "date",
                 "description": "Geplante Vorlage an den VR.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9275,9 +8831,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9291,9 +8844,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9344,9 +8894,6 @@
                   "2026-11-30"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -9373,9 +8920,6 @@
                   "2026-11-30"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -9403,9 +8947,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -9469,9 +9010,6 @@
               },
               {
                 "$ref": "#/components/schemas/Zieljahr"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9583,9 +9121,6 @@
                                 },
                                 {
                                   "$ref": "#/components/schemas/ZielPerson"
-                                },
-                                {
-                                  "type": "null"
                                 }
                               ]
                             },
@@ -9747,9 +9282,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9767,9 +9299,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9886,9 +9415,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -9929,9 +9455,6 @@
               },
               {
                 "$ref": "#/components/schemas/ZielPerson"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -9991,9 +9514,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10025,9 +9545,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10125,9 +9642,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10247,9 +9761,6 @@
               },
               {
                 "$ref": "#/components/schemas/ZielPerson"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10320,9 +9831,6 @@
               },
               {
                 "$ref": "#/components/schemas/ZielerreichungEintrag"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10335,9 +9843,6 @@
               },
               {
                 "$ref": "#/components/schemas/ZielerreichungEintrag"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -10522,9 +10027,6 @@
               {
                 "description": "Jahresziele des Vorjahres; null ohne Zielzyklus im Vorjahr.",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10554,9 +10056,6 @@
                     {
                       "description": "Bezeichnung, falls die Person das Handlungsfeld sehen darf.",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -10801,9 +10300,6 @@
                                       {
                                         "description": "Name der verantwortlichen Person.",
                                         "type": "string"
-                                      },
-                                      {
-                                        "type": "null"
                                       }
                                     ]
                                   }
@@ -10878,9 +10374,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10980,9 +10473,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -10996,9 +10486,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -11111,9 +10598,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -11130,9 +10614,6 @@
                         {
                           "description": "Quartal des Stands; ein früheres, wenn im Quartal nicht nachgeführt.",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -11185,9 +10666,6 @@
                     {
                       "format": "uuid",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -11240,9 +10718,6 @@
                           },
                           {
                             "type": "string"
-                          },
-                          {
-                            "type": "null"
                           }
                         ]
                       }
@@ -11288,9 +10763,6 @@
                           },
                           {
                             "type": "string"
-                          },
-                          {
-                            "type": "null"
                           }
                         ]
                       }
@@ -11332,9 +10804,6 @@
                                 "type": "string"
                               }
                             }
-                          },
-                          {
-                            "type": "null"
                           }
                         ]
                       },
@@ -11493,9 +10962,6 @@
                       "format": "date",
                       "description": "Schon ausserhalb des Quartalsreportings an den VR weitergeleitet (A-03).",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -11536,9 +11002,6 @@
               {
                 "format": "date",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -11552,9 +11015,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -11624,9 +11084,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -11640,9 +11097,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -11709,9 +11163,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -11812,9 +11263,6 @@
                     {
                       "type": "string",
                       "format": "date-time"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -11903,9 +11351,6 @@
               {
                 "format": "date",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -11951,9 +11396,6 @@
               {
                 "format": "date",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12222,9 +11664,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12279,9 +11718,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12353,9 +11789,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12375,9 +11808,6 @@
               },
               {
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12391,9 +11821,6 @@
               {
                 "description": "Zeitbedarf in Minuten.",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12562,9 +11989,6 @@
                   "14:00"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12578,9 +12002,6 @@
               {
                 "description": "Sitzungsdauer in Minuten.",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12609,9 +12030,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12625,9 +12043,6 @@
               {
                 "description": "Arbeitstage zwischen Versand und Sitzung (Versandprotokoll, K3-1).",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12690,9 +12105,6 @@
                   "14:00"
                 ],
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12707,9 +12119,6 @@
                 "minimum": 15,
                 "maximum": 720,
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12775,9 +12184,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -12830,9 +12236,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -12967,9 +12370,6 @@
                   {
                     "format": "uuid",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -13032,9 +12432,6 @@
                 "minimum": 1,
                 "maximum": 480,
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -13277,9 +12674,6 @@
                         "2026-11-12"
                       ],
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -13354,9 +12748,6 @@
                   },
                   {
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -13388,9 +12779,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -13506,9 +12894,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -13563,9 +12948,6 @@
                     },
                     {
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -13582,9 +12964,6 @@
                     },
                     {
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -13758,9 +13137,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -13801,9 +13177,6 @@
                     },
                     {
                       "type": "integer"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -13859,9 +13232,6 @@
                           "type": "string"
                         }
                       }
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -13887,9 +13257,6 @@
                     },
                     {
                       "$ref": "#/components/schemas/Entscheid"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -14053,9 +13420,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -14142,9 +13506,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -14213,9 +13574,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -14346,9 +13704,6 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -14393,9 +13748,6 @@
                         },
                         {
                           "type": "integer"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -14446,9 +13798,6 @@
                               "type": "string"
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -14524,9 +13873,6 @@
                                       },
                                       {
                                         "type": "string"
-                                      },
-                                      {
-                                        "type": "null"
                                       }
                                     ]
                                   },
@@ -14542,9 +13888,6 @@
                               }
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -14573,9 +13916,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -14675,9 +14015,6 @@
                     },
                     {
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -14716,9 +14053,6 @@
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -14747,9 +14081,6 @@
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -14778,9 +14109,6 @@
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -14809,9 +14137,6 @@
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -14890,9 +14215,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -14905,9 +14227,6 @@
                             },
                             {
                               "type": "string"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -14920,9 +14239,6 @@
                           "type": "string"
                         }
                       }
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -14980,9 +14296,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -14997,16 +14310,10 @@
                               "format": "date",
                               "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
                               "type": "string"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         }
                       }
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -15096,9 +14403,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15202,9 +14506,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15219,9 +14520,6 @@
                 "pattern": "^[a-z0-9_]{1,40}$",
                 "description": "Schlüssel aus der Codetabelle `trend` (Vorgabe aufwaerts, gleichbleibend, abwaerts).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15236,9 +14534,6 @@
                 "format": "date",
                 "description": "Geplanter Abschluss des Projekts.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15315,9 +14610,6 @@
                             ]
                           }
                         ]
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -15330,9 +14622,6 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -15340,9 +14629,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15363,9 +14649,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15379,9 +14662,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15395,9 +14675,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15416,9 +14693,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15492,9 +14766,6 @@
                     "format": "date-time"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15616,9 +14887,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15631,9 +14899,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15650,9 +14915,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15719,9 +14981,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15736,9 +14995,6 @@
                 "pattern": "^[a-z0-9_]{1,40}$",
                 "description": "Schlüssel aus der Codetabelle `trend` (Vorgabe aufwaerts, gleichbleibend, abwaerts).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -15753,9 +15009,6 @@
                 "format": "date",
                 "description": "Geplanter Abschluss des Projekts.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16021,9 +15274,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16036,9 +15286,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16052,9 +15299,6 @@
               {
                 "format": "date",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16102,9 +15346,6 @@
                             ]
                           }
                         ]
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -16117,16 +15358,10 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16162,9 +15397,6 @@
                     "format": "date-time"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16178,9 +15410,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16194,9 +15423,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16210,9 +15436,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16292,9 +15515,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16321,9 +15541,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16388,9 +15605,6 @@
                     "format": "date",
                     "description": "Tag der Berichtsaufgabe (A-26); null ohne Phasenmodell in Kraft.",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -16405,9 +15619,6 @@
                     "format": "date",
                     "description": "Stichtag der Berichte (Q8 Kap. 8.4); null ohne Phasenmodell in Kraft.",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -16444,9 +15655,6 @@
                   {
                     "description": "Warum der Abschluss gesperrt ist (Text der Regel).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -16504,9 +15712,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -16638,9 +15843,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16667,9 +15869,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16687,9 +15886,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -16797,9 +15993,6 @@
                     "type": "integer"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -16974,16 +16167,10 @@
                         "format": "date",
                         "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -17039,9 +16226,6 @@
               {
                 "description": "Nur mit `handlungsfeld:read`.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17054,9 +16238,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17104,9 +16285,6 @@
               {
                 "format": "date",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17136,9 +16314,6 @@
                       {
                         "format": "date",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -17146,9 +16321,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17174,9 +16346,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17202,9 +16371,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17217,9 +16383,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17261,9 +16424,6 @@
               {
                 "description": "Periode, aus der Status und Trend stammen (bei «nicht gemeldet» bzw. «ausstehend» eine frühere).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17387,9 +16547,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17465,9 +16622,6 @@
               {
                 "description": "Gewähltes Portfolio (Schlüssel) oder null für alle sichtbaren.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17550,9 +16704,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17683,9 +16834,6 @@
               {
                 "description": "Gewähltes Portfolio (Schlüssel) oder null für alle sichtbaren.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -17969,9 +17117,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -18056,9 +17201,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -18089,9 +17231,6 @@
                   {
                     "type": "string",
                     "format": "date-time"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -18413,9 +17552,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -18428,9 +17564,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -18912,9 +18045,6 @@
                 },
                 {
                   "type": "string"
-                },
-                {
-                  "type": "null"
                 }
               ]
             }
@@ -18936,9 +18066,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -18974,16 +18101,10 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19104,9 +18225,6 @@
               },
               {
                 "$ref": "#/components/schemas/VorlageGrundbestand"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19120,9 +18238,6 @@
               {
                 "description": "Aktive eigene Version; null = Grundbestand bzw. keine Vorlage.",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19237,9 +18352,6 @@
               },
               {
                 "$ref": "#/components/schemas/VorlageGrundbestand"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19256,9 +18368,6 @@
                 "items": {
                   "$ref": "#/components/schemas/VorlageFeld"
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19320,9 +18429,6 @@
                   "maxLength": 100,
                   "description": "Schlüssel eines Datenfelds aus dem Feldkatalog der Art.",
                   "type": "string"
-                },
-                {
-                  "type": "null"
                 }
               ]
             }
@@ -19355,9 +18461,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19423,9 +18526,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19469,9 +18569,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19544,9 +18641,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -19695,9 +18789,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19781,9 +18872,6 @@
                 "maximum": 999999999999.99,
                 "description": "Betrag in CHF inkl. MwSt.; nur mit Recht auf Beträge sichtbar (A-33).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -19814,9 +18902,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19889,9 +18974,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19907,9 +18989,6 @@
                 "maximum": 1000,
                 "description": "FTE (auf zwei Stellen gerundet).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19924,9 +19003,6 @@
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19941,9 +19017,6 @@
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -19977,9 +19050,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20069,9 +19139,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20121,9 +19188,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20189,9 +19253,6 @@
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -20285,9 +19346,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Strategisches Handlungsfeld."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20302,9 +19360,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Strategisches Ziel, zu dessen Erfüllung das Projekt beiträgt (nur Ziele in Kraft)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20319,9 +19374,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Jahresziel (optional) zum gewählten strategischen Ziel."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20479,9 +19531,6 @@
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -20496,9 +19545,6 @@
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -20513,9 +19559,6 @@
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -20530,9 +19573,6 @@
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ],
                 "description": "Erwarteter Projektabschluss (ab Phase 2)."
@@ -20754,9 +19794,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20771,9 +19808,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Version, aus der der Entwurf entstand (Baseline)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20791,9 +19825,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20924,9 +19955,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Entwurf (höchstens einer, UX-E5)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -20941,9 +19969,6 @@
                 "format": "uuid",
                 "type": "string",
                 "description": "Baseline (verbindliche Version)."
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -21038,9 +20063,6 @@
                 "description": "Inhalt desselben Kapitels in der Basisversion (Abweichung zur Baseline am Feld, K2 Schritt 3).",
                 "type": "object",
                 "properties": {}
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -21172,9 +20194,6 @@
                     {
                       "description": "Warum die Angabe fehlt.",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -21468,9 +20487,6 @@
                                     {
                                       "format": "uuid",
                                       "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
                                     }
                                   ]
                                 },
@@ -21490,9 +20506,6 @@
                                   "format": "date-time"
                                 }
                               }
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         }
@@ -21500,9 +20513,6 @@
                     }
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -21548,9 +20558,6 @@
                         {
                           "format": "uuid",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -21689,16 +20696,10 @@
                       {
                         "format": "uuid",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -21841,9 +20842,6 @@
                             "type": "string"
                           }
                         }
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -21852,9 +20850,6 @@
                     "type": "boolean"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -21925,9 +20920,6 @@
                     {
                       "format": "date",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -22011,9 +21003,6 @@
                             },
                             {
                               "type": "string"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         }
@@ -22026,9 +21015,6 @@
                     "type": "integer"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22065,9 +21051,6 @@
                     "format": "date-time"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22185,9 +21168,6 @@
               {
                 "description": "Listeneintrag (Bezeichnung); null bei einem Feld des Kapitels.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22201,9 +21181,6 @@
               {
                 "description": "Geändertes Feld im Listeneintrag (z. B. `termin`).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22232,9 +21209,6 @@
               {
                 "description": "neu − alt bei Zahlen (Beträge, FTE).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -22330,9 +21304,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22379,9 +21350,6 @@
                     {
                       "description": "Umformulierung der Projektleitung; ersetzt die erzeugten Sätze in der Anzeige.",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -22434,9 +21402,6 @@
                   {
                     "maxLength": 5000,
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -22450,9 +21415,6 @@
                   {
                     "maxLength": 5000,
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -22466,9 +21428,6 @@
                   {
                     "maxLength": 5000,
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -22482,9 +21441,6 @@
                   {
                     "maxLength": 5000,
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -22498,9 +21454,6 @@
                   {
                     "maxLength": 5000,
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -22551,9 +21504,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22567,9 +21517,6 @@
               {
                 "description": "Nummer der Baseline, aus der der Antrag entstand.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22602,9 +21549,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22653,9 +21597,6 @@
                   {
                     "description": "Hinweis für den Sponsor (K2 Regel «Änderung an Scope, Budget oder Ressourcen»).",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -22704,16 +21645,10 @@
                       {
                         "format": "uuid",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -22832,9 +21767,6 @@
                     {
                       "description": "Ab dieser Abweichung gilt sie als wesentlich; null: keine Warnung «wesentlich».",
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -22866,9 +21798,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -22895,9 +21824,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -22992,9 +21918,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23010,9 +21933,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23030,9 +21950,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -23153,9 +22070,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23192,9 +22106,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23208,9 +22119,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23252,9 +22160,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23290,9 +22195,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23328,9 +22230,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23349,9 +22248,6 @@
                 "maxLength": 100,
                 "description": "Schlüssel der Codetabelle «Herkunft der Idee».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23365,9 +22261,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23518,9 +22411,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23537,9 +22427,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23578,9 +22465,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -23614,9 +22498,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23630,9 +22511,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23674,9 +22552,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23712,9 +22587,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23750,9 +22622,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23771,9 +22640,6 @@
                 "maxLength": 100,
                 "description": "Schlüssel der Codetabelle «Herkunft der Idee».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -23809,9 +22675,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23825,9 +22688,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23869,9 +22729,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23907,9 +22764,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23945,9 +22799,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -23966,9 +22817,6 @@
                 "maxLength": 100,
                 "description": "Schlüssel der Codetabelle «Herkunft der Idee».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -24080,9 +22928,6 @@
                     {
                       "format": "uuid",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -24154,9 +22999,6 @@
                 "minimum": 0,
                 "description": "Eingereichte Ideen im Pool (nur mit `idee:write`).",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -24263,9 +23105,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24283,9 +23122,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24305,9 +23141,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24339,9 +23172,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24375,9 +23205,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -24476,9 +23303,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -24571,9 +23395,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24649,9 +23470,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -24711,9 +23529,6 @@
                     "type": "integer"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24745,9 +23560,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24764,9 +23576,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24793,9 +23602,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -24859,9 +23665,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -24947,9 +23750,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -25085,9 +23885,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -25165,9 +23962,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25181,9 +23975,6 @@
               {
                 "description": "Gremium (Kürzel und Name) bzw. Portfolio der Direktion.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25197,9 +23988,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25213,9 +24001,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25229,9 +24014,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25245,9 +24027,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25278,9 +24057,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25327,9 +24103,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25343,9 +24116,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -25412,9 +24182,6 @@
               {
                 "description": "Angebot in FTE; null = kein Angebot erfasst (bzw. eben entfernt).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25429,9 +24196,6 @@
                 "minimum": 1,
                 "description": "Version der Zelle für `version` beim Ändern; null ohne Angebot.",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -25522,9 +24286,6 @@
                       "maximum": 1000,
                       "description": "Neues Angebot in FTE (gespeichert mit zwei Nachkommastellen); null entfernt das Angebot der Zelle.",
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -25579,9 +24340,6 @@
               {
                 "description": "Angebot in FTE; null ohne Erfassung.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25707,9 +24465,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25830,9 +24585,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -25888,9 +24640,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25958,9 +24707,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -25973,9 +24719,6 @@
               },
               {
                 "$ref": "#/components/schemas/Luecke"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -26007,9 +24750,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26150,9 +24890,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26282,9 +25019,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26301,9 +25035,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26342,9 +25073,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -26385,9 +25113,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26400,9 +25125,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26415,9 +25137,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26653,9 +25372,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -26704,9 +25420,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26800,9 +25513,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26816,9 +25526,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26902,9 +25609,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -26918,9 +25622,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -27087,9 +25788,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -27254,9 +25952,6 @@
                       {
                         "type": "string",
                         "format": "date-time"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -27270,9 +25965,6 @@
                       {
                         "format": "uuid",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -27295,9 +25987,6 @@
                     }
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -27388,9 +26077,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -27407,9 +26093,6 @@
                     {
                       "minimum": 1,
                       "type": "integer"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -27505,9 +26188,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -27581,9 +26261,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -27600,9 +26277,6 @@
                     {
                       "minimum": 1,
                       "type": "integer"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -27680,9 +26354,6 @@
                       {
                         "type": "string",
                         "format": "date-time"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -27725,9 +26396,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         }
@@ -27735,9 +26403,6 @@
                     }
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -27799,9 +26464,6 @@
                         {
                           "description": "Durchschnitt der Einschätzungen der zugeordneten Kriterien (tief 1, mittel 2, hoch 3).",
                           "type": "number"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -27833,9 +26495,6 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -27869,9 +26528,6 @@
                         {
                           "description": "Durchschnitt der Einschätzungen der zugeordneten Kriterien (tief 1, mittel 2, hoch 3).",
                           "type": "number"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -27903,9 +26559,6 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -27953,9 +26606,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -27977,9 +26627,6 @@
                         {
                           "description": "Summe FTE × Monate des Ressourcenbedarfs (RK.02.05).",
                           "type": "number"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -28012,9 +26659,6 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -28030,9 +26674,6 @@
                     {
                       "description": "Summe der Prognose (sonst Baseline) der Kostenpositionen in CHF; null ohne finanzen:read.",
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28046,9 +26687,6 @@
                     {
                       "description": "Entschiedener Rang (bisherige Rangfolge, UC-008 Schritt 1).",
                       "type": "integer"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28061,9 +26699,6 @@
                     },
                     {
                       "type": "integer"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28158,9 +26793,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -28318,9 +26950,6 @@
                     {
                       "description": "Kosten der Projekte über der Wasserlinie.",
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28341,9 +26970,6 @@
                         },
                         {
                           "type": "number"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -28356,9 +26982,6 @@
                         },
                         {
                           "type": "number"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -28471,9 +27094,6 @@
                         },
                         {
                           "type": "integer"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -28499,9 +27119,6 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -28514,9 +27131,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -28556,9 +27170,6 @@
                               "type": "integer"
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -28695,9 +27306,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -28724,9 +27332,6 @@
                     "type": "integer"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -28793,9 +27398,6 @@
                       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                       "description": "Start im Szenario (JJJJ-MM); null = wie geplant.",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28810,9 +27412,6 @@
                       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                       "description": "Frühester Monat des Ressourcenbedarfs (geplanter Start).",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28826,9 +27425,6 @@
                     {
                       "description": "Summe der Prognose (sonst Baseline) in CHF; null ohne finanzen:read.",
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28841,9 +27437,6 @@
                     },
                     {
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28856,9 +27449,6 @@
                     },
                     {
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28890,9 +27480,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28924,9 +27511,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28958,9 +27542,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -28992,9 +27573,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -29012,9 +27590,6 @@
                     {
                       "description": "null, wenn das Projekt nicht enthalten ist.",
                       "type": "boolean"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -29094,9 +27669,6 @@
                       {
                         "description": "Rang des ersten Projekts unter der Wasserlinie; null = alle darüber.",
                         "type": "integer"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -29122,9 +27694,6 @@
                             ]
                           }
                         ]
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -29138,9 +27707,6 @@
                       {
                         "description": "Regel mit Ist-Wert (K5 Regeln), z. B. «Budget: CHF 14,2 Mio. statt höchstens 12,0 Mio. …».",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -29182,9 +27748,6 @@
                             "type": "integer"
                           }
                         }
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -29208,9 +27771,6 @@
                       {
                         "description": "Budgetrahmen des Portfolios nach dem Modell in Kraft (A-18); null = keiner.",
                         "type": "number"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -29224,9 +27784,6 @@
                       {
                         "description": "Summe der Kosten der enthaltenen Projekte; null ohne finanzen:read oder bei fehlenden Kosten.",
                         "type": "number"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -29317,9 +27874,6 @@
                     }
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -29417,9 +27971,6 @@
                     {
                       "type": "string",
                       "format": "date-time"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -29506,9 +28057,6 @@
                       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                       "description": "Monat «JJJJ-MM».",
                       "type": "string"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -29614,9 +28162,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -29783,9 +28328,6 @@
                 "format": "date",
                 "description": "Termin (JJJJ-MM-TT).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -29982,9 +28524,6 @@
                         "type": "string"
                       }
                     }
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -30015,9 +28554,6 @@
                         "type": "string"
                       }
                     }
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -30033,9 +28569,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -30049,9 +28582,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -30211,9 +28741,6 @@
               },
               {
                 "$ref": "#/components/schemas/AbschlussBericht"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -30264,9 +28791,6 @@
                     {
                       "type": "string",
                       "format": "date-time"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -30280,9 +28804,6 @@
                     {
                       "type": "string",
                       "format": "date-time"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -30313,9 +28834,6 @@
                   {
                     "description": "Nummer der Baseline des Projektvertrags.",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -30367,9 +28885,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -30395,9 +28910,6 @@
                               "type": "number"
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -30430,9 +28942,6 @@
                         "type": "number"
                       }
                     }
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -30473,9 +28982,6 @@
                         {
                           "format": "date",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -30489,9 +28995,6 @@
                         {
                           "format": "date",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -30528,9 +29031,6 @@
                         }
                       }
                     }
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -30572,9 +29072,6 @@
                     "format": "date-time"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -30682,9 +29179,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -30781,9 +29275,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -30799,9 +29290,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -30866,9 +29354,6 @@
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -30922,9 +29407,6 @@
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -30978,9 +29460,6 @@
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -31092,9 +29571,6 @@
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -31173,9 +29649,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31189,9 +29662,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31284,9 +29754,6 @@
               {
                 "format": "uuid",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -31436,9 +29903,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31453,9 +29917,6 @@
                 "minimum": 0,
                 "description": "Übertragene Datensätze.",
                 "type": "integer"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31468,9 +29929,6 @@
               },
               {
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31503,16 +29961,10 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -31587,9 +30039,6 @@
               },
               {
                 "$ref": "#/components/schemas/SchnittstelleLauf"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31646,9 +30095,6 @@
               },
               {
                 "$ref": "#/components/schemas/SchnittstelleLauf"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -31746,9 +30192,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -31802,9 +30245,6 @@
                       {
                         "format": "uuid",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -31817,9 +30257,6 @@
                       },
                       {
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -31828,9 +30265,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -31868,9 +30302,6 @@
                   },
                   {
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -31884,9 +30315,6 @@
                   {
                     "format": "uuid",
                     "type": "string"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -31938,9 +30366,6 @@
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -32011,9 +30436,6 @@
                 "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,39}$",
                 "description": "Kostenträger im ERP (A-16).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32027,9 +30449,6 @@
               {
                 "description": "Summe der Budget-Baseline (CHF).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32043,9 +30462,6 @@
               {
                 "description": "Summe der Prognose, ohne Prognose das Budget (CHF).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32059,9 +30475,6 @@
               {
                 "description": "Summe der Ist-Kosten aus dem ERP; null, solange keine geliefert sind («noch nicht verfügbar»).",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32076,9 +30489,6 @@
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32099,9 +30509,6 @@
                   },
                   {
                     "type": "number"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -32114,9 +30521,6 @@
                   },
                   {
                     "type": "number"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               }
@@ -32141,9 +30545,6 @@
                   {
                     "description": "Prognose minus Budget in CHF; null ohne Budget.",
                     "type": "number"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -32157,9 +30558,6 @@
                   {
                     "description": "Abweichung in Prozent des Budgets.",
                     "type": "number"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -32179,9 +30577,6 @@
               {
                 "description": "Toleranz «Kosten» in Prozent (A-10); null ohne Wert.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32225,9 +30620,6 @@
                     },
                     {
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -32240,9 +30632,6 @@
                     },
                     {
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 }
@@ -32309,9 +30698,6 @@
                     "format": "date-time"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -32360,9 +30746,6 @@
                     "type": "string"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32397,9 +30780,6 @@
                   },
                   {
                     "type": "number"
-                  },
-                  {
-                    "type": "null"
                   }
                 ]
               },
@@ -32419,9 +30799,6 @@
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32484,9 +30861,6 @@
                 "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,39}$",
                 "description": "Kostenträger im ERP (A-16).",
                 "type": "string"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -32616,9 +30990,6 @@
               {
                 "type": "string",
                 "format": "date-time"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32693,9 +31064,6 @@
                             },
                             {
                               "type": "number"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -32708,9 +31076,6 @@
                             },
                             {
                               "type": "number"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -32718,9 +31083,6 @@
                           "type": "string"
                         }
                       }
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -32778,9 +31140,6 @@
                     "type": "number"
                   }
                 }
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -32848,9 +31207,6 @@
                       "minimum": 0,
                       "maximum": 100000000000,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -32865,9 +31221,6 @@
                       "minimum": 0,
                       "maximum": 100000000000,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -32934,9 +31287,6 @@
                             },
                             {
                               "type": "string"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -33394,9 +31744,6 @@
                             },
                             {
                               "type": "string"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -33409,9 +31756,6 @@
                             },
                             {
                               "type": "string"
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         }
@@ -33476,9 +31820,6 @@
                         {
                           "format": "date-time",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -33948,9 +32289,6 @@
                                   "portfolio",
                                   "projekt"
                                 ]
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -34241,9 +32579,6 @@
                               {
                                 "description": "Scope, den das Recht im Token braucht; null beim Standard-Scope `ppm:read`",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -34391,9 +32726,6 @@
                                 },
                                 {
                                   "type": "string"
-                                },
-                                {
-                                  "type": "null"
                                 }
                               ]
                             }
@@ -34427,9 +32759,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "type": "null"
                             }
                           ]
                         },
@@ -34575,9 +32904,6 @@
                       {
                         "format": "uuid",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -34592,9 +32918,6 @@
                         "format": "date-time",
                         "description": "Ablauf (ISO 8601 mit Zeitzone); null ohne Ablauf",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -34841,9 +33164,6 @@
                                   },
                                   {
                                     "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
                                   }
                                 ]
                               }
@@ -34858,9 +33178,6 @@
                               },
                               {
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -34899,9 +33216,6 @@
                                       },
                                       {
                                         "type": "string"
-                                      },
-                                      {
-                                        "type": "null"
                                       }
                                     ]
                                   }
@@ -35045,9 +33359,6 @@
                                 },
                                 {
                                   "type": "string"
-                                },
-                                {
-                                  "type": "null"
                                 }
                               ]
                             }
@@ -35280,9 +33591,6 @@
                         "format": "date-time",
                         "description": "Ablauf (ISO 8601 mit Zeitzone); null ohne Ablauf",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -35534,9 +33842,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -37658,9 +35963,6 @@
                       {
                         "maxLength": 1000,
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   },
@@ -38334,9 +36636,6 @@
                               },
                               {
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -38349,9 +36648,6 @@
                               },
                               {
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -38368,9 +36664,6 @@
                               {
                                 "description": "Warum nicht wählbar (Gast, deaktiviert, Domäne nicht gebunden, schon Mitglied oder eingeladen)",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           }
@@ -38677,9 +36970,6 @@
                               },
                               {
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -38692,9 +36982,6 @@
                               },
                               {
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -38711,9 +36998,6 @@
                               {
                                 "description": "Warum nicht wählbar (Gast, deaktiviert, Domäne nicht gebunden, schon Mitglied oder eingeladen)",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           }
@@ -39009,9 +37293,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -39042,9 +37323,6 @@
                         {
                           "description": "Warum die eigene App nicht geht (z. B. ENCRYPTION_KEYS fehlt)",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -39102,9 +37380,6 @@
                               }
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -39125,9 +37400,6 @@
                         },
                         {
                           "$ref": "#/components/schemas/EntraConnection"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -39488,9 +37760,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -39635,9 +37904,6 @@
                         "format": "date-time",
                         "description": "Ablauf des Geheimnisses, falls er in der Registrierung nicht zu finden ist (Graph liest ihn sonst selbst)",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -39694,9 +37960,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -39842,9 +38105,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -39990,9 +38250,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -40178,9 +38435,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -40331,9 +38585,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -40479,9 +38730,6 @@
                         },
                         {
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -40512,9 +38760,6 @@
                         {
                           "description": "Warum die eigene App nicht geht (z. B. ENCRYPTION_KEYS fehlt)",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -40572,9 +38817,6 @@
                               }
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     },
@@ -40595,9 +38837,6 @@
                         },
                         {
                           "$ref": "#/components/schemas/EntraConnection"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -41037,9 +39276,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -41194,9 +39430,6 @@
                         "format": "date-time",
                         "description": "Ablauf des Geheimnisses, falls er in der Registrierung nicht zu finden ist (Graph liest ihn sonst selbst)",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -41266,9 +39499,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -41437,9 +39667,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -41618,9 +39845,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -41829,9 +40053,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -42005,9 +40226,6 @@
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
                               }
                             ]
                           },
@@ -43006,9 +41224,6 @@
                               }
                             }
                           }
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }
@@ -43405,9 +41620,6 @@
                         "format": "date-time",
                         "description": "Ablauf des Geheimnisses, falls er in der Registrierung nicht zu finden ist (Graph liest ihn sonst selbst)",
                         "type": "string"
-                      },
-                      {
-                        "type": "null"
                       }
                     ]
                   }
@@ -44739,9 +42951,6 @@
                         {
                           "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                           "type": "string"
-                        },
-                        {
-                          "type": "null"
                         }
                       ]
                     }

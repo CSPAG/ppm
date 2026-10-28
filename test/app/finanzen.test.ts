@@ -6,13 +6,14 @@
  */
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
-import { after, before, describe, test } from 'node:test';
+import { describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { abweichungenPruefen } from '../../src/modules/finanzen/aufgaben.ts';
 import { buchungenLesen } from '../../src/modules/finanzen/erp.ts';
 import { abweichung, anteilImJahr, jahresbedarf, periode, phasenZeitraeume, summen } from '../../src/modules/finanzen/rechnen.ts';
 import * as store from '../../src/modules/finanzen/store.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
 describe('Rechnungen der Finanzen (ohne Datenbank)', () => {
   const pos = (phase: string, art: 'capex' | 'opex', budgetBaseline: number | null, prognose: number | null) => ({ phase, art, budgetBaseline, prognose });
@@ -50,9 +51,10 @@ describe('Rechnungen der Finanzen (ohne Datenbank)', () => {
   });
 });
 
-const skip = await skipDb();
+// Tests mit Datenbank: ohne Konfiguration einzeln übersprungen, konfiguriert und nicht erreichbar scheitert der Lauf
+const db = dbTests(await postgresSkip());
 
-describe('Finanzen (API)', { skip }, () => {
+db.describe('Finanzen (API)', () => {
   let api: TestApi;
   let T: string;
   let pf: string;
@@ -68,7 +70,7 @@ describe('Finanzen (API)', { skip }, () => {
   const aufgaben = (art: string) => full(api.t.runtime, T, async tx =>
     (await tx.query<{ bezug_id: string; stand: string; titel: string; link: string }>('SELECT bezug_id, stand, titel, link FROM ppm.aufgabe WHERE art = $1 ORDER BY created_at', [art])).rows);
 
-  before(async () => {
+  db.before(async () => {
     server = createServer((req, res) => {
       let body = '';
       req.on('data', c => { body += c; });
@@ -108,12 +110,12 @@ describe('Finanzen (API)', { skip }, () => {
     const k = await call('adm', 'POST', `/v1/phasenmodelle/${m.json().id}/in-kraft-setzen`, undefined, { 'if-match': e.headers.etag as string });
     assert.equal(k.statusCode, 200, k.body);
   });
-  after(async () => {
+  db.after(async () => {
     await api?.close();
     await new Promise(r => server.close(r));
   });
 
-  test('Ist-Kosten über die Schnittstelle ERP (A-16); Kostenträger zuordnen (A1.1); Übersicht mit Toleranz (UC-010 Schritt 2)', async () => {
+  db.test('Ist-Kosten über die Schnittstelle ERP (A-16); Kostenträger zuordnen (A1.1); Übersicht mit Toleranz (UC-010 Schritt 2)', async () => {
     erpAntwort = JSON.stringify([
       { kostentraeger: 'KT-1', monat: '2026-09', art: 'capex', betrag: 30000 }, { kostentraeger: 'KT-1', monat: '2026-09', art: 'capex', betrag: 5000 },
       { kostentraeger: 'KT-1', monat: '2026-10', art: 'opex', betrag: 1200 }, { kostentraeger: 'KT-9', monat: '2026-10', art: 'opex', betrag: 99 },
@@ -154,7 +156,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.deepEqual([neu.ist, neu.istJeArt], [36500, { capex: 35000, opex: 1500 }]);
   });
 
-  test('Abweichungen (Schritt 3), Aufgabe «Abweichung klären» und Begründung durch die PL (Schritt 4)', async () => {
+  db.test('Abweichungen (Schritt 3), Aufgabe «Abweichung klären» und Begründung durch die PL (Schritt 4)', async () => {
     const ab = (await call('ue', 'GET', `/v1/finanzen/abweichungen?portfolio=${pf}`)).json();
     assert.deepEqual(ab.projekte.map((x: { nummer: string }) => x.nummer), ['2026-001', '2026-002'], 'wesentliche zuerst');
     assert.deepEqual([ab.can.write, ab.ohneProjekt], [false, []], 'UE sieht, pflegt aber nicht');
@@ -187,7 +189,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.deepEqual(audit, ['kostentraeger.assigned', 'kostentraeger.assigned', 'abweichung.justified', 'abweichung.justification_changed']);
   });
 
-  test('Jahresbedarf mit Korrektur durch FI (A-17), Übergabe an den Budgetprozess (Schritte 5–6)', async () => {
+  db.test('Jahresbedarf mit Korrektur durch FI (A-17), Übergabe an den Budgetprozess (Schritte 5–6)', async () => {
     // Vertrauliches Projekt: GL und FI sehen es nicht; es zählt als Summe ohne Namen (OPEX 2027 ganz im Jahr)
     await full(api.t.runtime, T, async tx => {
       p.c = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase, vertraulich) VALUES ($1, '2026-003', 'Reorganisation', $2, 'P1', true) RETURNING id", [T, pf])).rows[0]!.id;
@@ -232,7 +234,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.deepEqual([geliefert.jahr, geliefert.summe, geliefert.positionen.length], [2027, { capex: 0, opex: 82794.52 }, 2]);
   });
 
-  test('Aufgabe «Abweichung klären»: keine für vertrauliche Projekte; entfällt, wenn das Projekt nicht mehr aktiv ist', async () => {
+  db.test('Aufgabe «Abweichung klären»: keine für vertrauliche Projekte; entfällt, wenn das Projekt nicht mehr aktiv ist', async () => {
     const pruefen = () => full(api.t.runtime, T, async tx => abweichungenPruefen(tx, await store.projekte(tx, { alle: true })));
     await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.kosten SET prognose = 20000 WHERE text = 'Beratung'"));
     await pruefen();
@@ -243,7 +245,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.deepEqual(await stand(), [[p.a, 'erledigt'], [p.b, 'entfallen']]);
   });
 
-  test('Rechte: Beträge nur mit finanzen:read (A-33); Gremium am Portfolio liest; Leser nicht', async () => {
+  db.test('Rechte: Beträge nur mit finanzen:read (A-33); Gremium am Portfolio liest; Leser nicht', async () => {
     assert.equal((await call('leser', 'GET', `/v1/finanzen?portfolio=${pf}`)).statusCode, 403);
     assert.equal((await call('leser', 'GET', '/v1/budgetuebergaben/2027')).statusCode, 403);
     const g = await call('gremium', 'GET', `/v1/finanzen?portfolio=${pf}`);
@@ -253,7 +255,7 @@ describe('Finanzen (API)', { skip }, () => {
     assert.equal((await call('fi', 'GET', '/v1/finanzen?portfolio=00000000-0000-4000-8000-000000000099')).statusCode, 404);
   });
 
-  test('Toleranz aus dem Projektvertrag (A-10): die Baseline übersteuert den Standard; die PL sieht sie ohne phasenmodell:read', async () => {
+  db.test('Toleranz aus dem Projektvertrag (A-10): die Baseline übersteuert den Standard; die PL sieht sie ohne phasenmodell:read', async () => {
     const tol = async (who: string) => (await call(who, 'GET', '/v1/finanzen')).json().projekte
       .filter((x: { id: string }) => x.id === p.a).map((x: { toleranzProzent: number | null; abweichung: { wesentlich: boolean } }) => [x.toleranzProzent, x.abweichung.wesentlich]);
     assert.deepEqual(await tol('pl'), [[10, true]], 'Standard des Phasenmodells, auch ohne phasenmodell:read');

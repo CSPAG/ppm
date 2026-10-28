@@ -136,7 +136,7 @@ export function BewertungPage({ search, setSearch, navigieren }: { search: Bewer
     if (w !== undefined && darf) { e.preventDefault(); setzen(key, w); }
   };
 
-  const reiter: Reiter[] = orgLesen ? ['bewertung', 'matrix', 'modell'] : ['bewertung', 'matrix'];
+  const reiter: Reiter[] = orgLesen ? ['bewertung', 'matrix', 'szenarien', 'modell'] : ['bewertung', 'matrix', 'szenarien'];
   const anzahlFertig = r ? vollstaendig(r, wert) : 0;
   const query = new URLSearchParams(pf ? { portfolio: pf.schluessel } : {}).toString();
   const status = speichern.isPending ? TP.speichert : offen.length ? TP.ungespeichert(offen.length) : gespeichertAt ? <>{TP.gespeichert} <Vor at={gespeichertAt} /></> : null;

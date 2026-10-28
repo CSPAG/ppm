@@ -13,7 +13,7 @@ import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
-import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch } from './features/priorisierung/index.ts';
+import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch, type SetSzenarioSearch } from './features/priorisierung/index.ts';
 import type { SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -42,6 +42,7 @@ const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), '
 const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx'), 'MatrixPage');
+const SzenarioPage = seite(() => import('./features/priorisierung/SzenarioPage.tsx'), 'SzenarioPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
 const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
 const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
@@ -369,6 +370,20 @@ function ModellRoute() {
   return <ModellPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Priorisierung › Szenarien mit Wasserlinie (UI-22; BC PP.03.01–03, UC-008 Schritte 5–6; AP-E5-3)
+const szenarienRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.szenarien, validateSearch: searchOf.szenarien, component: SzenarienRoute,
+});
+
+function SzenarienRoute() {
+  const search = szenarienRoute.useSearch();
+  const navigate = useNavigate({ from: szenarienRoute.fullPath });
+  const setSearch = useCallback<SetSzenarioSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SzenarioPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Dashboard (UI-17; PC.04.01, UC-014 Schritt 1; AP-E1-3)
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/dashboard', validateSearch: searchOf.dashboard, component: DashboardRoute,
@@ -660,6 +675,7 @@ const routeTree = rootRoute.addChildren([
   bewertungRoute,
   matrixRoute,
   modellRoute,
+  szenarienRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

@@ -41,8 +41,8 @@ Tests mit Datenbank brauchen `POSTGRES_SUPERUSER_PASSWORD` (und `POSTGRES_PORT`,
 - **Oberfläche:** vor einem Feature den Kernablauf in `docs/ux/ablaeufe/` lesen (oder anlegen); Seitentyp, Zustände und
   Regeln aus `docs/ux/rahmen/interaktion.md`; jeder PR mit Oberfläche erfüllt die UX-Definition of Done
   (`docs/ux/rahmen/pruefung.md`). `docs/ux/rahmen/` ist projektneutral: nicht projektbezogen ändern.
-- **Sprache:** Kommentare, Doku und Oberfläche Deutsch, Schweizer Rechtschreibung ohne ß; Oberfläche mit Anrede «Sie»
-  (UX-E7, bis zur Klärung von UX-OF-1); in sichtbaren Texten «Organisation», nie «Mandant»/«Tenant».
+- **Sprache:** Kommentare, Doku und Oberfläche Deutsch, Schweizer Rechtschreibung ohne ß; Oberfläche mit Anrede «Du»
+  (UX-E7, UX-OF-1 entschieden 28.10.2026); in sichtbaren Texten «Organisation», nie «Mandant»/«Tenant».
 - **Versionen exakt**, ohne `^`/`~`. `@vollholz/*` nur gemeinsam anheben (Renovate-Gruppe «identity-kit»).
 - **Netz:** ausgehende Aufrufe nur in den Netz-Adaptern aus `scripts/check-network.ts` (mit Begründung), mit
   SSRF-Schutz (`safeRequest` aus `@vollholz/platform`). Die Webapp spricht nur same-origin.

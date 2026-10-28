@@ -13,6 +13,7 @@ import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { ideeModule } from './modules/idee/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
+import { finanzenModule } from './modules/finanzen/index.ts';
 import { priorisierungModule } from './modules/priorisierung/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
@@ -50,6 +51,7 @@ export const app = defineApp({
     priorisierungModule,
     webhooksModule,
     schnittstelleModule,
+    finanzenModule,
   ],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4);
   // mit `projekt:read` auch für Clients mit Lese-Scope (Namen der Projektorganisation, PP.04.04)

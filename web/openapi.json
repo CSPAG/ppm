@@ -22274,6 +22274,775 @@
             }
           }
         }
+      },
+      "FinanzProjekt": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nummer",
+          "name",
+          "phase",
+          "portfolioId",
+          "kostentraeger",
+          "budget",
+          "prognose",
+          "ist",
+          "istBis",
+          "istJeArt",
+          "abweichung",
+          "toleranzProzent",
+          "phasen",
+          "verlauf",
+          "begruendung"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          },
+          "portfolioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kostentraeger": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,39}$",
+                "description": "Kostenträger im ERP (A-16).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "budget": {
+            "anyOf": [
+              {
+                "description": "Summe der Budget-Baseline (CHF).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "prognose": {
+            "anyOf": [
+              {
+                "description": "Summe der Prognose, ohne Prognose das Budget (CHF).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ist": {
+            "anyOf": [
+              {
+                "description": "Summe der Ist-Kosten aus dem ERP; null, solange keine geliefert sind («noch nicht verfügbar»).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "istBis": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                "description": "Monat «JJJJ-MM».",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "istJeArt": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "capex",
+              "opex"
+            ],
+            "properties": {
+              "capex": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "opex": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "abweichung": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "betrag",
+              "prozent",
+              "wesentlich"
+            ],
+            "properties": {
+              "betrag": {
+                "anyOf": [
+                  {
+                    "description": "Prognose minus Budget in CHF; null ohne Budget.",
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "prozent": {
+                "anyOf": [
+                  {
+                    "description": "Abweichung in Prozent des Budgets.",
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "wesentlich": {
+                "description": "Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie.",
+                "type": "boolean"
+              }
+            }
+          },
+          "toleranzProzent": {
+            "anyOf": [
+              {
+                "description": "Toleranz «Kosten» in Prozent (A-10); null ohne Wert.",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phasen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "phase",
+                "art",
+                "budget",
+                "prognose"
+              ],
+              "properties": {
+                "phase": {
+                  "type": "string"
+                },
+                "art": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "capex"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "opex"
+                      ]
+                    }
+                  ]
+                },
+                "budget": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "prognose": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "verlauf": {
+            "description": "Ist-Kosten je Monat (UC-010 Schritt 3).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "monat",
+                "capex",
+                "opex"
+              ],
+              "properties": {
+                "monat": {
+                  "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                  "description": "Monat «JJJJ-MM».",
+                  "type": "string"
+                },
+                "capex": {
+                  "type": "number"
+                },
+                "opex": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "begruendung": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "periode",
+                  "text",
+                  "version",
+                  "geaendertAt"
+                ],
+                "properties": {
+                  "periode": {
+                    "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                    "description": "Monat «JJJJ-MM».",
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "geaendertAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Finanzuebersicht": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "portfolio",
+          "projekte",
+          "summe",
+          "istStand",
+          "ohneProjekt",
+          "can"
+        ],
+        "properties": {
+          "portfolio": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "schluessel",
+                  "name",
+                  "kategorie"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "schluessel": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "kategorie": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projekte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FinanzProjekt"
+            }
+          },
+          "summe": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "budget",
+              "prognose",
+              "ist",
+              "abweichung"
+            ],
+            "properties": {
+              "budget": {
+                "type": "number"
+              },
+              "prognose": {
+                "type": "number"
+              },
+              "ist": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "abweichung": {
+                "type": "number"
+              }
+            }
+          },
+          "istStand": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                "description": "Monat «JJJJ-MM».",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ohneProjekt": {
+            "description": "Ist-Kosten von Kostenträgern ohne zugeordnetes Projekt (UC-010 A1); nur mit finanzen:write.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kostentraeger",
+                "betrag",
+                "bis"
+              ],
+              "properties": {
+                "kostentraeger": {
+                  "type": "string"
+                },
+                "betrag": {
+                  "type": "number"
+                },
+                "bis": {
+                  "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                  "description": "Monat «JJJJ-MM».",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "finanzen:write: Kostenträger zuordnen, Budgetübergabe.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "KostentraegerPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nummer"
+        ],
+        "properties": {
+          "nummer": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,39}$",
+                "description": "Kostenträger im ERP (A-16).",
+                "type": "string"
+              }
+            ]
+          }
+        }
+      },
+      "Begruendung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "periode",
+          "text",
+          "version",
+          "geaendertAt"
+        ],
+        "properties": {
+          "periode": {
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Monat «JJJJ-MM».",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "geaendertAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BegruendungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "can"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Begruendung"
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BegruendungPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
+      "Budgetuebergabe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "jahr",
+          "stand",
+          "version",
+          "uebergebenAt",
+          "positionen",
+          "summe",
+          "can"
+        ],
+        "properties": {
+          "jahr": {
+            "type": "integer"
+          },
+          "stand": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "neu"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "uebergeben"
+                ]
+              }
+            ]
+          },
+          "version": {
+            "minimum": 0,
+            "description": "0, solange nichts gespeichert ist (If-Match W/\"0\").",
+            "type": "integer"
+          },
+          "uebergebenAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "positionen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "nummer",
+                "name",
+                "portfolioId",
+                "berechnet",
+                "korrektur",
+                "wert",
+                "ohneTermine"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "portfolioId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "berechnet": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "capex",
+                    "opex"
+                  ],
+                  "properties": {
+                    "capex": {
+                      "type": "number"
+                    },
+                    "opex": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "korrektur": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "capex",
+                        "opex",
+                        "bemerkung"
+                      ],
+                      "properties": {
+                        "capex": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "opex": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "bemerkung": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "wert": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "capex",
+                    "opex"
+                  ],
+                  "properties": {
+                    "capex": {
+                      "type": "number"
+                    },
+                    "opex": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "ohneTermine": {
+                  "description": "Phasen mit Kosten, aber ohne Termine (zählen nicht, A-17).",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "summe": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "capex",
+              "opex"
+            ],
+            "properties": {
+              "capex": {
+                "type": "number"
+              },
+              "opex": {
+                "type": "number"
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BudgetuebergabePut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "korrekturen"
+        ],
+        "properties": {
+          "korrekturen": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "capex",
+                "opex"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "capex": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "minimum": 0,
+                      "maximum": 100000000000,
+                      "type": "number"
+                    }
+                  ]
+                },
+                "opex": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "minimum": 0,
+                      "maximum": 100000000000,
+                      "type": "number"
+                    }
+                  ]
+                },
+                "bemerkung": {
+                  "maxLength": 500,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -66146,6 +66915,958 @@
           }
         }
       }
+    },
+    "/v1/finanzen": {
+      "get": {
+        "summary": "Finanzübersicht",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Je Projekt Budget und Prognose (Register Kosten, je Phase und CAPEX/OPEX), Ist-Kosten aus dem ERP über den Kostenträger (A-16), Abweichung mit Toleranz (A-10) und letzte Begründung; Summe des Portfolios (UC-010 Schritt 2). Mit `portfolio` finanzen:read am Portfolio, sonst an der Organisation.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "alle",
+            "required": false,
+            "description": "Auch nicht aktive Projekte (abgeschlossen, sistiert …)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Finanzuebersicht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/finanzen/abweichungen": {
+      "get": {
+        "summary": "Budgetabweichungen",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Projekte mit Abweichung der Prognose vom Budget, wesentliche zuerst, mit Verlauf der Ist-Kosten je Monat und Begründung (UC-010 Schritt 3, PC.01.04).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "alle",
+            "required": false,
+            "description": "Auch nicht aktive Projekte (abgeschlossen, sistiert …)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Finanzuebersicht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/kostentraeger": {
+      "put": {
+        "summary": "Kostenträger zuordnen",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Kostenträger des Projekts im ERP (A-16, UC-010 A1.1); `null` hebt die Zuordnung auf. Schon vergeben → 409. Die Ist-Kosten des Kostenträgers erscheinen ohne neuen Lauf.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KostentraegerPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinanzProjekt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/abweichungsbegruendungen": {
+      "get": {
+        "summary": "Begründungen der Abweichungen",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Begründungen je Periode, neueste zuerst (UC-010 Schritt 4).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BegruendungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/abweichungsbegruendungen/{periode}": {
+      "put": {
+        "summary": "Abweichung begründen",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Begründung der Abweichung für die Periode festhalten bzw. ändern (UC-010 Schritt 4): PL des Projekts (projekt:write) oder FI. `If-Match` mit der gelesenen Version (`W/\"0\"` beim ersten Festhalten). Erledigt die Aufgabe «Abweichung klären» der laufenden Periode.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BegruendungPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Monat «JJJJ-MM»."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Begruendung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/budgetuebergaben/{jahr}": {
+      "get": {
+        "summary": "Jahresbedarf für den Budgetprozess",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Jahresbedarf CAPEX und OPEX je aktivem Projekt, zeitanteilig aus Prognose je Phase und Phasenterminen (A-17), mit den Korrekturen von FI; nach der Übergabe der übergebene Inhalt (UC-010 Schritt 5). finanzen:read an der Organisation.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Budgetuebergabe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Jahresbedarf korrigieren",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Korrekturen von FI je Projekt (A-17: «durch FI korrigierbar»); `null` übernimmt den berechneten Wert. Ganze Liste, `If-Match` mit der gelesenen Version (beim ersten Speichern ohne oder `W/\"0\"`). Öffnet die Aufgabe «Jahresbedarf übergeben».",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BudgetuebergabePut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Budgetuebergabe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/budgetuebergaben/{jahr}/export": {
+      "post": {
+        "summary": "Jahresbedarf übergeben (Export)",
+        "tags": [
+          "Finanzen"
+        ],
+        "description": "Hält den Jahresbedarf mit den Korrekturen fest, protokolliert die Übergabe und liefert den Inhalt für den Budgetprozess (UC-010 Schritt 6). Danach unveränderlich; die ausgehende Schnittstelle «Budgetprozess · Jahresbedarf» liefert diesen Inhalt. `If-Match` mit der gelesenen Version (ohne gespeicherten Entwurf ohne oder `W/\"0\"`).",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Budgetuebergabe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [
@@ -66241,6 +67962,10 @@
     {
       "name": "Änderungsprotokoll",
       "description": "Wer wann was geändert hat: Einträge des Audits mit altem und neuem Wert, nach Objekt und Zeitraum."
+    },
+    {
+      "name": "Finanzen",
+      "description": "Ist-Kosten aus dem ERP, Finanzübersicht und Budgetabweichungen mit Begründung, Jahresbedarf und Übergabe an den Budgetprozess."
     },
     {
       "name": "Konto",

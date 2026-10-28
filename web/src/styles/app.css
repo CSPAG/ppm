@@ -219,6 +219,9 @@ th.num{text-align:right}
   .btn,.btn.sm,.chip{height:auto}
   .iconbtn{width:44px;height:44px;min-width:44px}
   .chip .x{width:44px;height:44px}
+  /* Die Seite rollt als Ganzes: Mit den grösseren Zielen bliebe unter Kopf und Werkzeugleiste sonst nur ein schmaler Bildlauf im Inhalt. */
+  .main{overflow-y:auto}
+  .main > section{flex:1 0 auto}
   label:has(> input[type="checkbox"]),label:has(> input[type="radio"]){min-height:44px;display:inline-flex;align-items:center;gap:8px}
 }
 /* Galerie (nur Entwicklungsbuild) */

@@ -27,7 +27,8 @@ function Page({ initial = {} }: { initial?: BudgetSearch }) {
   return <><BudgetprozessPage search={search} setSearch={setSearch} navigieren={() => {}} heute={new Date('2026-10-28T10:00:00Z')} /><output data-testid="s">{JSON.stringify(search)}</output></>;
 }
 
-function server(write = true) {
+function server(write = true, o: { konfliktEinmal?: boolean } = {}) {
+  let konflikt = o.konfliktEinmal ?? false;
   let stand: 'neu' | 'entwurf' | 'uebergeben' = 'neu';
   let version = 0;
   let korr: Record<string, { capex: number | null; opex: number | null; bemerkung: string }> = {};
@@ -48,6 +49,14 @@ function server(write = true) {
     'PUT /v1/budgetuebergaben/2027': async req => {
       const body = await req.json() as { korrekturen: { projektId: string; capex: number | null; opex: number | null; bemerkung: string }[] };
       aufrufe.push({ methode: 'PUT', ifMatch: req.headers.get('if-match'), body });
+      if (konflikt) {
+        // dazwischen korrigiert jemand anderes Projekt 1
+        konflikt = false;
+        korr = { [A]: { capex: 5000, opex: null, bemerkung: 'Von Paula' } };
+        stand = 'entwurf';
+        version += 1;
+        return json({ title: 'Inzwischen geändert', status: 412 }, 412);
+      }
       korr = Object.fromEntries(body.korrekturen.filter(k => k.capex !== null || k.opex !== null).map(k => [k.projektId, { capex: k.capex, opex: k.opex, bemerkung: k.bemerkung }]));
       stand = 'entwurf';
       version += 1;
@@ -99,6 +108,25 @@ describe('Budgetprozess', () => {
     expect(await screen.findByText(/Übergeben am/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Übergeben' })).toBeNull();
     expect(screen.getByRole('button', { name: /Als CSV herunterladen/ })).toBeInTheDocument();
+  });
+
+  it('Konflikt (412): «Neu laden» behält die eigenen Korrekturen und übernimmt die der anderen (Z7)', async () => {
+    const s = server(true, { konfliktEinmal: true });
+    renderWithIam(<Page initial={{ jahr: '2027', schritt: '2' }} />, FI);
+    const opexB = await screen.findByRole('textbox', { name: 'Korrektur OPEX für 2026-002 Projekt 2' });
+    await userEvent.type(opexB, '8000');
+    await userEvent.click(screen.getByRole('button', { name: 'Korrekturen speichern' }));
+    expect(await screen.findByText(/Lade neu und speichere danach nochmals; deine Korrekturen bleiben erhalten/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Weiter' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Neu laden' }));
+    await waitFor(() => expect(screen.queryByText(/deine Korrekturen bleiben erhalten/)).toBeNull());
+    expect(screen.getByRole('textbox', { name: 'Korrektur OPEX für 2026-002 Projekt 2' })).toHaveValue('8000');
+    expect(screen.getByRole('textbox', { name: 'Korrektur CAPEX für 2026-001 Projekt 1' })).toHaveValue('5000');
+    await userEvent.click(screen.getByRole('button', { name: 'Korrekturen speichern' }));
+    await waitFor(() => expect(s.aufrufe).toHaveLength(2));
+    expect(s.aufrufe[1]).toEqual({ methode: 'PUT', ifMatch: 'W/"1"', body: { korrekturen: [
+      { projektId: A, capex: 5000, opex: null, bemerkung: 'Von Paula' }, { projektId: B, capex: null, opex: 8000, bemerkung: '' },
+    ] } });
   });
 
   it('GL liest den Jahresbedarf ohne Eingaben; ohne Recht an der Organisation kein Inhalt', async () => {

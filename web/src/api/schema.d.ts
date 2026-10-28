@@ -24833,7 +24833,7 @@ export interface paths {
         };
         /**
          * Kopf im Eingang
-         * @description Nächste Sitzungen, die die Person sieht, mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).
+         * @description Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).
          */
         get: {
             parameters: {

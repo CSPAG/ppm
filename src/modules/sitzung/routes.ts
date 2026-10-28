@@ -180,7 +180,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   // --- Sitzung --------------------------------------------------------------------------------------------------------
 
   app.get('/v1/sitzungen/kopf', {
-    schema: { tags: [TAG], summary: 'Kopf im Eingang', description: 'Nächste Sitzungen, die die Person sieht, mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).', response: { 200: Type.Ref('SitzungKopf') } },
+    schema: { tags: [TAG], summary: 'Kopf im Eingang', description: 'Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).', response: { 200: Type.Ref('SitzungKopf') } },
   }, async req => {
     await req.needSomewhere('sitzung:read');
     const items = await req.tx(async tx => Promise.all((await store.naechsteSitzungen(tx, heute(), 5)).map(async s => {

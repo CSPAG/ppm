@@ -24,7 +24,7 @@ const eingang = {
   'GET /v1/ideen/kopf': () => json({ eigene: { entwurf: 0, inErgaenzung: 0, laufend: 0 }, zuPruefen: 0 }),
 };
 const projekt = (n: number, o: Record<string, unknown> = {}) => ({ id: uuid(n), nummer: `2026-0${10 + n}`, name: `Projekt ${n}`, phase: 'P1', lebenszyklus: 'aktiv', rollen: ['pl'], ...o });
-const gremium = (kuerzel: string, n: number) => ({ id: uuid(100 + n), kuerzel, name: kuerzel === 'prat' ? 'Projektrat' : 'GL Projektausschuss' });
+const gremium = (kuerzel: string, n: number) => ({ id: uuid(100 + n), kuerzel, name: kuerzel.toUpperCase() });
 const sitzung = (n: number, g: ReturnType<typeof gremium>, datum: string, o: Record<string, unknown> = {}) => ({ id: uuid(200 + n), gremium: g, datum, stand: 'in_vorbereitung', traktanden: 6, versandBis: tag(3), unterlagenBereit: 4, ...o });
 
 function stub(routes: Parameters<typeof mockIamApi>[0]) {
@@ -37,13 +37,13 @@ const UE: AppPermission[] = ['tenant:read', 'statusbericht:review', 'projekt:rea
 const page = () => <EingangPage search={{}} setSearch={() => {}} gehe={() => {}} kopfkarten={kopfkarten} />;
 
 describe('Kopfkarten je Rolle', () => {
-  it('Monatszyklus, eigene Projekte und nächste Sitzung je Gremium, je mit Direktaktion', async () => {
+  it('Monatszyklus, eigene Projekte und nächste Sitzung je Gremium (höchstens drei), je mit Direktaktion', async () => {
     const prat = gremium('prat', 1);
     const glpa = gremium('glpa', 2);
     stub({
       'GET /v1/statusberichte/kopf': () => json({ pruefen: { periode: '2026-10', eingereicht: 12, zurueckgegeben: 2, geprueft: 15, ausstehend: 2, auffaellig: 3, projekte: 31, stichtag: '2026-10-25', abschlussBis: '2026-10-31' } }),
       'GET /v1/projekte/kopf': () => json({ projekte: [projekt(4, { rollen: ['sp', 'ctl'], lebenszyklus: 'sistiert' }), ...[1, 2, 3, 5, 6].map(n => projekt(n))], anzahl: 6 }),
-      'GET /v1/sitzungen/kopf': () => json({ sitzungen: [sitzung(1, prat, tag(10)), sitzung(2, glpa, tag(12), { stand: 'versendet' }), sitzung(3, prat, tag(40))] }),
+      'GET /v1/sitzungen/kopf': () => json({ sitzungen: [sitzung(1, prat, tag(10)), sitzung(2, glpa, tag(12), { stand: 'versendet' }), sitzung(3, gremium('dir', 3), tag(20)), sitzung(4, gremium('gl', 4), tag(40))] }),
     });
     const { container } = renderWithIam(page(), { permissions: UE });
 
@@ -60,7 +60,7 @@ describe('Kopfkarten je Rolle', () => {
 
     const sitzungen = (await screen.findByRole('heading', { name: 'Nächste Sitzungen' })).closest('article')!;
     const zeilen = within(sitzungen).getAllByRole('listitem');
-    expect(zeilen).toHaveLength(2);
+    expect(zeilen).toHaveLength(3);
     expect(within(zeilen[0]!).getByRole('link', { name: /^PRAT / })).toHaveAttribute('href', `/gremien/prat/sitzungen/${tag(10)}`);
     expect(within(zeilen[0]!).getByText(/^6 Traktanden · 4 von 6 mit Unterlagen · Versand bis /)).toBeInTheDocument();
     expect(within(zeilen[1]!).getByText('6 Traktanden · Unterlagen versendet')).toBeInTheDocument();

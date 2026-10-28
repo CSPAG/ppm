@@ -16,8 +16,8 @@ export function SitzungKopfKarte() {
   const q = useSitzungKopf();
   if (q.isPending) return <span className="sk" aria-hidden="true" />;
   if (q.error) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
-  // Die API liefert nach Datum; die erste je Gremium ist dessen nächste Sitzung
-  const naechste = q.data.filter((s, i, a) => a.findIndex(x => x.gremium.id === s.gremium.id) === i).slice(0, MAX);
+  // Die API liefert je Gremium die nächste Sitzung, nach Datum
+  const naechste = q.data.slice(0, MAX);
   if (!naechste.length) return null;
   return (
     <>

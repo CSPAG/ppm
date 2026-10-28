@@ -75,3 +75,16 @@ Klären mit: UE
 | Nr | Frage | Fundstelle | Vorschlag CSP |
 |---|---|---|---|
 | K25 | Wofür stehen AeD, DPF, DLF, DMS, DP, DTI, DIB bzw. DBI, PFLE, DRC, «CP» in Phase 1 und «Streams»? | Q6 F1, F2, F6, F7; Q8 Abb. 1, 4 | Liste der Direktionen mit Kürzeln anfordern; «CP» und «Streams» erfragen. |
+
+## H Aus der Umsetzung
+
+Klären mit: UE. Fragen, die beim Bau aufgefallen sind; bis zur Antwort gilt die genannte Annahme aus [fachmodell.md](../fachmodell.md#8-annahmen).
+
+| Nr | Frage | Fundstelle | Vorschlag CSP |
+|---|---|---|---|
+| K26 | Welche Richtwerte gelten für die Grössen S, M und L, in FTE × Monate je Rolle? | K5 Z4; PP.03.02; A-52, A-57 | Richtwerte je Grösse festlegen; heute schätzt die Matrix (1/6, 1/2, 5/6 der Achse), die Szenarien rechnen die Grösse nicht in der Kapazität. |
+| K27 | Was geschieht mit offenen Aufgaben einer Person, deren Zugang entzogen wird? | UC-016 A1; A-50 | Aufgaben an die Stellvertretung bzw. an die neu besetzte Rolle übertragen; heute bleiben sie an die Person adressiert. |
+| K28 | Soll die UE bei einem Änderungsantrag mit Wirkung informiert werden («PL und UE informiert»)? | K2; UC-007; A-53 | Mitteilung an alle mit dem Recht der UE am Portfolio; heute nur an die PL. |
+| K29 | Ist das ERP nur im internen Netz erreichbar? | A-16; A-54 | Falls ja: Anschluss über einen freigegebenen Weg (z. B. Push aus dem ERP); private Adressen in Produktion bleiben gesperrt. |
+| K30 | Darf «mit Auflagen freigegeben» bei der Initialisierung anders wirken als «freigegeben»? | UC-001 Schritt 7; A-51 | Wirkt heute wie «freigegeben», die Auflagen werden Aufgaben. |
+

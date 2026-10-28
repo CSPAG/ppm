@@ -168,7 +168,6 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', { skip }, () => {
   });
 
   test('Gate-Entwurf P1–P2 aus der Baseline mit Leitfragen; Entscheid «mit Auflagen»: in Arbeit, Baseline und Phase bleiben (UC-003, A6)', async () => {
-    assert.equal((await call('pl', 'POST', `/v1/projekte/${projekt.id}/vertrag/entwuerfe`, { anlass: 'aenderung', begruendung: 'x' })).statusCode, 409, 'Änderung ist ein anderes Paket');
     const e = await ok('pl', 'POST', `/v1/projekte/${projekt.id}/vertrag/entwuerfe`, { anlass: 'gate' }, {}, 201);
     id.v2 = e.body.version.id;
     const v = (await versionen()).find(x => x.id === id.v2)!;

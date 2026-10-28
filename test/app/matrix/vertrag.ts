@@ -1,4 +1,4 @@
-/** Modul vertrag (170_vertrag; AP-E3-1): Versionen und Kapitel des Projektvertrags. */
+/** Modul vertrag (170_vertrag; AP-E3-1, AP-E3-4 200_vertrag_aenderung): Versionen und Kapitel des Projektvertrags. */
 import assert from 'node:assert/strict';
 import { full, tenant } from '../harness.ts';
 import type { Matrix } from './typ.ts';
@@ -6,11 +6,12 @@ import type { Matrix } from './typ.ts';
 /** Projekt «Probe» (2026-001) aus matrix/projekt.ts. */
 const PROBE = "(SELECT id FROM ppm.projekt WHERE nummer = '2026-001')";
 
+/** Schreiben mit `vertrag:write` oder als Folge eines Gremiumsentscheids (`app.vertrag_intern`, 200_vertrag_aenderung). */
+const SCHREIBEN = "(app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text))";
 const ueberEltern = (tabelle: string) => [
   `ppm.${tabelle}.${tabelle}_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -`,
   `ppm.${tabelle}.${tabelle}_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id)`,
-  // ab 190_vertrag_gate auch die Folge des Gate-Entscheids (`app.vertrag_intern`, AP-E3-3)
-  `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text)) CHECK (app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text))`,
+  `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING ${SCHREIBEN} CHECK ${SCHREIBEN}`,
 ];
 
 export const matrix: Matrix = {
@@ -55,6 +56,13 @@ export const matrix: Matrix = {
       'PUT /v1/vertragsversionen/:id/kapitel/:nr': f('PUT', i => `${v(i)}/kapitel/4`, { body: { inhalt: { loesungsansatz: 'gehackt', annahmen: '' } }, ifMatch: true }),
       'GET /v1/vertragsversionen/:id/pflichtangaben': f('GET', i => `${v(i)}/pflichtangaben`),
       'POST /v1/vertragsversionen/:id/einreichen': f('POST', i => `${v(i)}/einreichen`, { ifMatch: true }),
+      // Versionsvergleich, Hauptänderungen und Änderungsantrag (AP-E3-4)
+      'GET /v1/vertragsversionen/:id/vergleich': f('GET', i => `${v(i)}/vergleich`),
+      'GET /v1/vertragsversionen/:id/hauptaenderungen': f('GET', i => `${v(i)}/hauptaenderungen`),
+      'PUT /v1/vertragsversionen/:id/hauptaenderungen': f('PUT', i => `${v(i)}/hauptaenderungen`, { body: { rubriken: { scope: 'gehackt' }, andere: 'gehackt' }, ifMatch: true }),
+      'GET /v1/vertragsversionen/:id/aenderung': f('GET', i => `${v(i)}/aenderung`),
+      'POST /v1/vertragsversionen/:id/aenderung/einreichen': f('POST', i => `${v(i)}/aenderung/einreichen`, { ifMatch: true }),
+      'POST /v1/vertragsversionen/:id/aenderung/entscheiden': f('POST', i => `${v(i)}/aenderung/entscheiden`, { body: { ergebnis: 'abgelehnt', begruendung: 'gehackt' }, ifMatch: true }),
     };
   })(),
   unchanged: async (api, _a, mark) => {

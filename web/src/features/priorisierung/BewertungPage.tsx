@@ -11,6 +11,7 @@ import { isConflict } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Empty, ErrorState, fmtDatum, Hinweis, Icon, Skelett, useVerzoegert } from '../../ui/index.ts';
 import { priorisierungKeys, useBewertungSpeichern, useModelle, usePortfolios, useRaster, type BewertungAenderung, type Bewertungsraster } from './api.ts';
+import { useBreit } from './breite.ts';
 import { Kopf, PFAD, type Reiter } from './Kopf.tsx';
 import { ProjektDrawer } from './ProjektDrawer.tsx';
 import { k, naechster, vollstaendig, wertAusTaste, type Wert } from './raster.ts';
@@ -22,20 +23,6 @@ const SPEICHERN_NACH = 600;
 
 interface Zelle { e: Wert; kommentar: string }
 interface Schritt { key: string; vorher: Wert; nachher: Wert }
-
-/** Breite ab 1024 px (Bewerten nur dort, K5 «Mobil»); ohne Angabe der Umgebung (Tests) breit. */
-function useBreit(): boolean {
-  const schmal = '(max-width: 1023.98px)';
-  const [breit, setBreit] = useState(() => !(typeof window !== 'undefined' && window.matchMedia?.(schmal).matches));
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mq = window.matchMedia(schmal);
-    const f = () => setBreit(!mq.matches);
-    mq.addEventListener('change', f);
-    return () => mq.removeEventListener('change', f);
-  }, []);
-  return breit;
-}
 
 export function BewertungPage({ search, setSearch, navigieren }: { search: BewertungSearch; setSearch: SetBewertungSearch; navigieren(pfad: string): void }) {
   const { can } = useSession();
@@ -149,7 +136,7 @@ export function BewertungPage({ search, setSearch, navigieren }: { search: Bewer
     if (w !== undefined && darf) { e.preventDefault(); setzen(key, w); }
   };
 
-  const reiter: Reiter[] = orgLesen ? ['bewertung', 'modell'] : ['bewertung'];
+  const reiter: Reiter[] = orgLesen ? ['bewertung', 'matrix', 'modell'] : ['bewertung', 'matrix'];
   const anzahlFertig = r ? vollstaendig(r, wert) : 0;
   const query = new URLSearchParams(pf ? { portfolio: pf.schluessel } : {}).toString();
   const status = speichern.isPending ? TP.speichert : offen.length ? TP.ungespeichert(offen.length) : gespeichertAt ? <>{TP.gespeichert} <Vor at={gespeichertAt} /></> : null;

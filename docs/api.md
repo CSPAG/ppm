@@ -234,13 +234,19 @@ DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5,
 (ohne: Beträge `null`, Speichern 403; A-33). Endzustände des Projekts sind lesend (409).
 
 | `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
-| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `gate` (AP-E3-3: Kopie der Baseline als «n.0» für die Phase Pn, Standard-Ergebnisse der Zielphase in Kap. 7; nur mit Baseline, P0–P3); `aenderung` folgt mit AP-E3-4 (bis dahin 409); besteht ein Entwurf: 409 mit `entwurf` |
+| `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `aenderung` (nur mit Baseline, Begründung Pflicht: nächste Unternummer, alle Kapitel aus der Baseline); `gate` (AP-E3-3: Kopie der Baseline als «n.0» für die Phase Pn, Standard-Ergebnisse der Zielphase in Kap. 7; nur mit Baseline, P0–P3); besteht ein Entwurf: 409 mit `entwurf` |
 | `GET /v1/projekte/{id}/vertrag/ziele` | `projekt:write` | Ziele zur Wahl in Kap. 2: strategische Ziele mit Handlungsfeld, Jahresziele ab dem laufenden Jahr (in voller Sicht gelesen, auch ohne `ziel:read` an der Organisation) |
 | `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
 | `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
 | `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |
 | `GET /v1/vertragsversionen/{id}/pflichtangaben` | `projekt:read` | Angaben des Gates in die Zielphase und der Zielphase (Phasenmodell, K13, A-12) mit `erfuellt`, `grund` und Sprungziel `kapitel`/`feld` (K2-4) |
-| `POST /v1/vertragsversionen/{id}/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung», `If-Match` Pflicht; fehlen Pflichtangaben: 422 mit `/kapitel/<nr>/<feld>` je Angabe; Aufgabe `vertrag.quality_check` an `vertrag:review` |
+| `POST /v1/vertragsversionen/{id}/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung», `If-Match` Pflicht; fehlen Pflichtangaben: 422 mit `/kapitel/<nr>/<feld>` je Angabe; Aufgabe `vertrag.quality_check` an `vertrag:review`; nicht für eine Änderung (409) |
+| `GET /v1/vertragsversionen/{id}/vergleich?mit=` | `projekt:read` | Unterschiede je Kapitel zu `mit` (Standard: Basisversion; PS.03.04): Felder alt/neu, Listeneinträge `neu`/`entfernt`/`geaendert` (gepaart über `registerId`, sonst Schlüssel), `differenz` bei Zahlen; Beträge nur mit `finanzen:read` |
+| `GET /v1/vertragsversionen/{id}/hauptaenderungen` | `projekt:read` | Rubriken Scope, Zeitplan, Ressourcen/Budget, Annahmen, Key-Risiken mit erzeugten Sätzen (Budget je Phase alt und neu, nur mit `finanzen:read`) und Umformulierung `text`, dazu `andere`; `ETag` der Version |
+| `PUT /v1/vertragsversionen/{id}/hauptaenderungen` | `vertrag:write` | Umformulierung je Rubrik (null = erzeugte Sätze) und `andere`, nur «in Arbeit», `If-Match` der Version; Ressourcen/Budget nur mit `finanzen:read` (403) |
+| `GET /v1/vertragsversionen/{id}/aenderung` | `projekt:read` | Änderungsantrag (UC-007): Begründung, Baseline, `wirkung` (geänderte Kapitel mit Wirkung auf Scope, Budget, Ressourcen nach `kapitel_wirkung` → `prat`), `entscheid`, `can`; 404 für andere Anlässe |
+| `POST /v1/vertragsversionen/{id}/aenderung/einreichen` | `vertrag:write` | «in Arbeit» → «in Prüfung» beim Sponsor (kein Quality-Check); Pflichtangaben der Phase (422), mindestens ein Kapitel geändert und ein Sponsor (409); Aufgabe `aenderung.entscheiden` an den SP |
+| `POST /v1/vertragsversionen/{id}/aenderung/entscheiden` | `vertrag:decide` | `ergebnis` `freigegeben` (Baseline mit Register; mit Wirkung 409 `prat`), `an_prat` (Traktandum `aenderung` beim entscheidenden Gremium, nur mit Wirkung), `abgelehnt` (Begründung Pflicht); PL per Mitteilung informiert; `If-Match` |
 | `GET /v1/vertragsversionen/{id}/gate` | `projekt:read` | Gate-Modus (AP-E3-3, UC-003 Schritt 1): Gate in die Zielphase, Gremienweg (PRAT/GLPA, via SNS-VR), Leitfragen je Wertestrom mit Antworten und Fortschritt, Standard-Lieferergebnisse der laufenden Phase mit Stand, ab Gate P2–P3 die Nutzenprüfung, nach dem Entscheid dessen Ergebnis; Änderung ohne Gate: 409 |
 | `PUT /v1/vertragsversionen/{id}/gate/leitfragen/{leitfrageId}` | `vertrag:write` | Antwort (UC-003 Schritt 4), leer entfernt sie; `zutreffend: false` = «trifft nicht zu» mit Begründung (sonst 422); nur «in Arbeit»; `If-Match` = Stand der Antwort (`W/"0"` neu) |
 | `PUT /v1/vertragsversionen/{id}/gate/nutzen` | `vertrag:write` oder `vertrag:decide` | Nutzenprüfung ab Gate P2–P3 (UC-003 A2, PC.03.02): erreichte Werte je KPI des Registers und Beurteilung; sonst 409; `If-Match` = `nutzen.version` (`W/"0"` neu) |
@@ -250,6 +256,8 @@ Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategis
 Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
 `baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
 über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
+Die Traktandenart `aenderung` (Ergebnisse «Freigegeben», «Abgelehnt») registriert `vertrag`; ihre Folge setzt die
+Baseline bzw. lehnt den Entwurf ab und läuft in der Transaktion der UE mit `app.vertrag_intern` (200_vertrag_aenderung).
 
 Gate (AP-E3-3): Nach der dritten Unterschrift schlägt `vertrag` das Gate-Review als Traktandum der Art `gate` mit Bezug
 `projekt` beim Gremium des Gremienwegs vor (ein von der UE eingeplantes Gate-Review bleibt dasselbe Traktandum); die

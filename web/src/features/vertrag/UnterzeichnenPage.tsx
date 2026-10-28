@@ -11,6 +11,7 @@ import { Dialog, Empty, ErrorState, fmtDateTime, fmtPhase, Hinweis, Icon, Skelet
 import { useProjekt, useVertrag, type Version } from './api.ts';
 import { usePruefung, usePruefungMutations, type Funktion, type Pruefung, type PruefungLoaded } from './PruefenApi.ts';
 import { TP } from './PruefenTexte.ts';
+import { useNeuLaden } from './neuLaden.ts';
 import { TV } from './texte.ts';
 import './Pruefen.css';
 
@@ -23,11 +24,12 @@ export function UnterzeichnenPage({ nummer }: { nummer: string }) {
   if (projekt.isPending || vertrag.isPending || (entwurf && pruefung.isPending)) {
     return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={5} /> : null}</div>;
   }
+  // ein gescheitertes Neuladen behält den geladenen Stand (und die Eingaben); nur ohne Daten der Fehler (Z5)
   const fehler = projekt.error ?? vertrag.error ?? pruefung.error;
-  if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
+  if (fehler && !(projekt.data && vertrag.data && (!entwurf || pruefung.data))) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void pruefung.refetch(); }} />;
   const version = vertrag.data?.versionen.find(v => v.id === entwurf);
   if (!projekt.data || !version || !pruefung.data) return <Empty>{TP.keinEntwurf}</Empty>;
-  return <Zusammenfassung nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={pruefung.data} neuLaden={() => void pruefung.refetch()} />;
+  return <Zusammenfassung nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={pruefung.data} neuLaden={() => pruefung.refetch()} />;
 }
 
 /** Funktionen ohne Unterschrift als Text («Lea Brunner (CTL)» geht nur mit Namen; hier die Funktion). */
@@ -35,11 +37,13 @@ const fehlendText = (p: Pruefung, ohne: readonly Funktion[]) =>
   (p.unterzeichnung?.funktionen ?? []).filter(f => !f.unterschrift && !ohne.includes(f.funktion)).map(f => TP.funktion[f.funktion]).join(', ');
 
 function Zusammenfassung({ nummer, projektId, projektName, version, geladen, neuLaden }: {
-  nummer: string; projektId: string; projektName: string; version: Version; geladen: PruefungLoaded; neuLaden(): void;
+  nummer: string; projektId: string; projektName: string; version: Version; geladen: PruefungLoaded; neuLaden(): Promise<{ error: unknown }>;
 }) {
   const id = useId();
   const toast = useToast();
   const { unterschrift } = usePruefungMutations(projektId);
+  const laden = useNeuLaden(neuLaden, () => unterschrift.reset());
+  const konflikt = isConflict(unterschrift.error);
   const [nicht, setNicht] = useState(false);
   const p = geladen.pruefung;
   const offen = p.can.unterzeichnen;
@@ -94,13 +98,13 @@ function Zusammenfassung({ nummer, projektId, projektName, version, geladen, neu
 
       {unterschrift.error && !isConflict(unterschrift.error) ? <ErrorState error={unterschrift.error} /> : null}
       {isConflict(unterschrift.error) ? (
-        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { unterschrift.reset(); neuLaden(); }}>{TP.neuLaden}</button>}>{TP.konfliktUnterzeichnen}</Hinweis>
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laden.laedt} onClick={() => void laden.laden()}>{TP.neuLaden}</button>}>{TP.konfliktUnterzeichnen}</Hinweis>
       ) : null}
 
       {offen.length ? (
         <div className="uz-aktion">
           <p className="uz-wirkung" id={`${id}-w`}>{rest ? TP.wirkungWeitere(rest) : TP.wirkungLetzte}</p>
-          <button type="button" className="btn primary uz-gross" aria-describedby={`${id}-w`} onClick={unterzeichnen} disabled={unterschrift.isPending}>
+          <button type="button" className="btn primary uz-gross" aria-describedby={`${id}-w`} onClick={unterzeichnen} disabled={unterschrift.isPending || konflikt}>
             <Icon name="check" />{unterschrift.isPending ? T.common.loading : TP.unterzeichnen}
           </button>
           <button type="button" className="btn" onClick={() => setNicht(true)} disabled={unterschrift.isPending}>{TP.nichtUnterzeichnen}</button>
@@ -108,7 +112,7 @@ function Zusammenfassung({ nummer, projektId, projektName, version, geladen, neu
       ) : p.stand === 'unterzeichnet' ? <Hinweis stufe="hinweis">{TP.vollstaendig}</Hinweis>
         : p.stand === 'zur_unterzeichnung' ? <p className="muted">{TP.keineOffene}</p> : null}
 
-      {nicht ? <NichtDialog onClose={() => setNicht(false)} busy={unterschrift.isPending} fehler={unterschrift.error}
+      {nicht ? <NichtDialog onClose={() => setNicht(false)} busy={unterschrift.isPending || laden.laedt} fehler={unterschrift.error} onNeuLaden={() => void laden.laden()}
         onSenden={begruendung => unterschrift.mutate({ id: p.versionId, etag: geladen.etag, body: { ergebnis: 'verweigert', begruendung } }, {
           onSuccess: () => { setNicht(false); toast.show(TP.toastNicht); },
         })} /> : null}
@@ -116,7 +120,7 @@ function Zusammenfassung({ nummer, projektId, projektName, version, geladen, neu
   );
 }
 
-function NichtDialog({ onClose, onSenden, busy, fehler }: { onClose(): void; onSenden(b: string): void; busy: boolean; fehler: unknown }) {
+function NichtDialog({ onClose, onSenden, onNeuLaden, busy, fehler }: { onClose(): void; onSenden(b: string): void; onNeuLaden(): void; busy: boolean; fehler: unknown }) {
   const id = useId();
   const [text, setText] = useState('');
   const [versucht, setVersucht] = useState(false);
@@ -126,9 +130,13 @@ function NichtDialog({ onClose, onSenden, busy, fehler }: { onClose(): void; onS
   return (
     <Dialog title={TP.nichtFrage} onClose={onClose} footer={<>
       <button type="button" className="btn" onClick={onClose}>{TP.abbrechen}</button>
-      <button type="submit" form={`${id}-f`} className="btn primary" disabled={busy}>{TP.nichtUnterzeichnen}</button>
+      <button type="submit" form={`${id}-f`} className="btn primary" disabled={busy || isConflict(fehler)}>{TP.nichtUnterzeichnen}</button>
     </>}>
       <p>{TP.nichtWirkung}</p>
+      {/* Konflikt im Dialog selbst, nicht verdeckt dahinter; die Begründung bleibt (Z7) */}
+      {isConflict(fehler) ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={busy} onClick={onNeuLaden}>{TP.neuLaden}</button>}>{TP.konfliktUnterzeichnen}</Hinweis>
+      ) : null}
       <form id={`${id}-f`} className="form" noValidate onSubmit={e => { e.preventDefault(); setVersucht(true); if (!leer) onSenden(text.trim()); }}>
         <div className="field">
           <label htmlFor={`${id}-b`}>{TP.begruendung}</label>

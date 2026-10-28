@@ -12,6 +12,7 @@ import { Dialog, Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, 
 import { useAenderung, useAenderungMutations, useHauptaenderungen, type AenderungLoaded } from './AenderungApi.ts';
 import { HauptaenderungenBlock } from './AenderungPanel.tsx';
 import { TA } from './AenderungTexte.ts';
+import { useNeuLaden } from './neuLaden.ts';
 import { useProjekt, useVertrag, type Version } from './api.ts';
 import { TV } from './texte.ts';
 import './Aenderung.css';
@@ -28,20 +29,23 @@ export function AenderungPage({ nummer }: { nummer: string }) {
   const pending = projekt.isPending || vertrag.isPending || (!!version && antrag.isPending);
   const skelett = useVerzoegert(pending);
   if (pending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={5} /> : null}</div>;
+  // ein gescheitertes Neuladen behält den geladenen Stand (und die Eingaben); nur ohne Daten der Fehler (Z5)
   const fehler = projekt.error ?? vertrag.error ?? antrag.error;
-  if (fehler) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void antrag.refetch(); }} />;
+  if (fehler && !(projekt.data && vertrag.data && (!version || antrag.data))) return <ErrorState error={fehler} onRetry={() => { void projekt.refetch(); void vertrag.refetch(); void antrag.refetch(); }} />;
   if (!projekt.data || !version || !antrag.data) return <Empty>{TA.keinAntrag}</Empty>;
-  return <Entscheid nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={antrag.data} neuLaden={() => void antrag.refetch()} />;
+  return <Entscheid nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={antrag.data} neuLaden={() => antrag.refetch()} />;
 }
 
 function Entscheid({ nummer, projektId, projektName, version, geladen, neuLaden }: {
-  nummer: string; projektId: string; projektName: string; version: Version; geladen: AenderungLoaded; neuLaden(): void;
+  nummer: string; projektId: string; projektName: string; version: Version; geladen: AenderungLoaded; neuLaden(): Promise<{ error: unknown }>;
 }) {
   const id = useId();
   const toast = useToast();
   const a = geladen.aenderung;
   const haupt = useHauptaenderungen(a.versionId);
   const { entscheiden } = useAenderungMutations(projektId);
+  const laden = useNeuLaden(neuLaden, () => entscheiden.reset());
+  const konflikt = isConflict(entscheiden.error);
   const [ablehnen, setAblehnen] = useState(false);
   const phase = fmtPhase(version.zielphase as Phase);
   const kannEntscheiden = a.can.freigeben || a.can.anPrat || a.can.ablehnen;
@@ -82,7 +86,7 @@ function Entscheid({ nummer, projektId, projektName, version, geladen, neuLaden 
       </p>
 
       {isConflict(entscheiden.error) ? (
-        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { entscheiden.reset(); neuLaden(); }}>{TA.neuLaden}</button>}>{TA.konflikt}</Hinweis>
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laden.laedt} onClick={() => void laden.laden()}>{TA.neuLaden}</button>}>{TA.konflikt}</Hinweis>
       ) : null}
       {statusOf(entscheiden.error) === 409 ? <Hinweis stufe="sperre" live>{describeError(entscheiden.error).detail}</Hinweis> : null}
       {fehlerText ? <ErrorState error={fehlerText} /> : null}
@@ -92,12 +96,12 @@ function Entscheid({ nummer, projektId, projektName, version, geladen, neuLaden 
           {a.wirkung.prat ? <Hinweis stufe="sperre">{a.wirkung.hinweis}</Hinweis> : null}
           <p className="uz-wirkung" id={`${id}-w`}>{a.can.anPrat ? TA.anPratWirkung : TA.freigebenWirkung(a.nummer)}</p>
           {a.can.freigeben ? (
-            <button type="button" className="btn primary uz-gross" aria-describedby={`${id}-w`} onClick={() => senden('freigegeben')} disabled={entscheiden.isPending}>
+            <button type="button" className="btn primary uz-gross" aria-describedby={`${id}-w`} onClick={() => senden('freigegeben')} disabled={entscheiden.isPending || konflikt}>
               <Icon name="check" />{entscheiden.isPending ? T.common.loading : TA.freigeben}
             </button>
           ) : null}
           {a.can.anPrat ? (
-            <button type="button" className="btn primary uz-gross" aria-describedby={`${id}-w`} onClick={() => senden('an_prat')} disabled={entscheiden.isPending}>
+            <button type="button" className="btn primary uz-gross" aria-describedby={`${id}-w`} onClick={() => senden('an_prat')} disabled={entscheiden.isPending || konflikt}>
               <Icon name="gavel" />{entscheiden.isPending ? T.common.loading : TA.anPrat}
             </button>
           ) : null}
@@ -105,8 +109,8 @@ function Entscheid({ nummer, projektId, projektName, version, geladen, neuLaden 
         </div>
       ) : a.stand === 'in_pruefung' ? <p className="muted">{TA.nurSponsor}</p> : null}
 
-      {ablehnen ? <AblehnenDialog onClose={() => setAblehnen(false)} busy={entscheiden.isPending} fehler={entscheiden.error} onSenden={b => senden('abgelehnt', b)}
-        onNeuLaden={() => { entscheiden.reset(); neuLaden(); }} /> : null}
+      {ablehnen ? <AblehnenDialog onClose={() => setAblehnen(false)} busy={entscheiden.isPending || laden.laedt} fehler={entscheiden.error} onSenden={b => senden('abgelehnt', b)}
+        onNeuLaden={() => void laden.laden()} /> : null}
     </section>
   );
 }
@@ -121,11 +125,11 @@ function AblehnenDialog({ onClose, onSenden, onNeuLaden, busy, fehler }: { onClo
   return (
     <Dialog title={TA.ablehnenFrage} onClose={onClose} footer={<>
       <button type="button" className="btn" onClick={onClose}>{TA.abbrechen}</button>
-      <button type="submit" form={`${id}-f`} className="btn primary" disabled={busy}>{TA.ablehnen}</button>
+      <button type="submit" form={`${id}-f`} className="btn primary" disabled={busy || isConflict(fehler)}>{TA.ablehnen}</button>
     </>}>
       <p>{TA.ablehnenWirkung}</p>
       {isConflict(fehler) ? (
-        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={onNeuLaden}>{TA.neuLaden}</button>}>{TA.konflikt}</Hinweis>
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={busy} onClick={onNeuLaden}>{TA.neuLaden}</button>}>{TA.konflikt}</Hinweis>
       ) : null}
       <form id={`${id}-f`} className="form" noValidate onSubmit={e => { e.preventDefault(); setVersucht(true); if (!leer) onSenden(text.trim()); }}>
         <div className="field">

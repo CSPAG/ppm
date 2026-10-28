@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Finanzen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte des Features «Finanzen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-OF-1), Schweizer
  * Rechtschreibung; Begriffe aus UC-010 und darstellung.md «Kosten» (Prognose, Budget, Ist in dieser Reihenfolge).
  */
 import { NAV } from './pfade.ts';
@@ -12,8 +12,8 @@ export const TF = {
   portfolio: 'Portfolio',
   allePortfolios: 'Alle Portfolios',
   alle: 'Auch nicht aktive Projekte',
-  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder Sie sehen es nicht.',
-  keineProjekte: 'Keine Projekte mit Beträgen, die Sie sehen.',
+  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder du siehst es nicht.',
+  keineProjekte: 'Keine Projekte mit Beträgen, die du siehst.',
   keineAbweichungen: 'Keine Abweichungen: Die Prognose aller Projekte entspricht dem Budget.',
   // Kennzahlen und Spalten (Reihenfolge Prognose, Budget, Ist)
   prognose: 'Prognose', budget: 'Budget', ist: 'Ist', abweichung: 'Abweichung', toleranz: 'Toleranz', projekt: 'Projekt', phase: 'Phase',
@@ -34,7 +34,7 @@ export const TF = {
   balken: (p: string, prognose: string, budget: string) => `${p}: Prognose ${prognose}, Budget ${budget}`,
   export: 'Als CSV exportieren',
   ohneProjekt: (n: number) => (n === 1 ? '1 Kostenträger mit Ist-Kosten ist keinem Projekt zugeordnet' : `${n} Kostenträger mit Ist-Kosten sind keinem Projekt zugeordnet`),
-  ohneProjektHilfe: 'Ordnen Sie den Kostenträger im Projekt zu (Schublade «Kostenträger»); die Kosten erscheinen dann ohne neuen Lauf.',
+  ohneProjektHilfe: 'Ordne den Kostenträger im Projekt zu (Schublade «Kostenträger»); die Kosten erscheinen dann ohne neuen Lauf.',
   begruendungFehlt: 'fehlt',
   // Schublade Projekt
   jePhase: 'Je Phase',
@@ -55,7 +55,7 @@ export const TF = {
   begruendungPflicht: 'Die Begründung fehlt.',
   festhalten: 'Begründung festhalten', aendern: 'Begründung ändern', speichern: 'Speichern', abbrechen: 'Abbrechen',
   festgehalten: 'Begründung festgehalten.',
-  konflikt: 'Die Begründung wurde inzwischen geändert. Laden Sie neu und übernehmen Sie Ihre Änderung danach.',
+  konflikt: 'Die Begründung wurde inzwischen geändert. Lade neu und übernimm deine Änderung danach.',
   neuLaden: 'Neu laden',
   projektUnbekannt: 'Dieses Projekt ist nicht in der Liste.',
   // Budgetprozess (UI-28, Assistent)
@@ -72,7 +72,7 @@ export const TF = {
   bemerkungFuer: (projekt: string) => `Bemerkung zur Korrektur für ${projekt}`,
   korrekturHilfe: 'Leer = berechneter Wert. Korrekturen gelten nur für diese Übergabe.',
   ohneTermine: (phasen: string) => `ohne Termine: ${phasen} (zählt nicht)`,
-  ohneTermineHinweis: (n: number) => (n === 1 ? '1 Projekt hat Kosten in Phasen ohne Termine; diese zählen nicht zum Jahresbedarf. Korrigieren Sie den Wert bei Bedarf.' : `${n} Projekte haben Kosten in Phasen ohne Termine; diese zählen nicht zum Jahresbedarf. Korrigieren Sie die Werte bei Bedarf.`),
+  ohneTermineHinweis: (n: number) => (n === 1 ? '1 Projekt hat Kosten in Phasen ohne Termine; diese zählen nicht zum Jahresbedarf. Korrigiere den Wert bei Bedarf.' : `${n} Projekte haben Kosten in Phasen ohne Termine; diese zählen nicht zum Jahresbedarf. Korrigiere die Werte bei Bedarf.`),
   korrekturUngueltig: 'Betrag in CHF, 0 oder mehr.',
   entwurfSpeichern: 'Korrekturen speichern',
   entwurfGespeichert: 'Korrekturen gespeichert.',
@@ -87,7 +87,7 @@ export const TF = {
   uebergebenToast: 'Jahresbedarf übergeben.',
   uebergebenAm: (datum: string) => `Übergeben am ${datum}.`,
   herunterladen: 'Als CSV herunterladen',
-  nurLesen: 'Sie können den Jahresbedarf nur ansehen; übergeben wird er von Finanzen (FI).',
+  nurLesen: 'Du kannst den Jahresbedarf nur ansehen; übergeben wird er von Finanzen (FI).',
   keinRecht: 'Den Jahresbedarf aller Projekte sehen Personen mit Recht auf die Beträge der Organisation (FI, GL, UE).',
-  budgetKonflikt: 'Der Jahresbedarf wurde inzwischen geändert. Laden Sie neu; Ihre Korrekturen gehen dabei verloren.',
+  budgetKonflikt: 'Der Jahresbedarf wurde inzwischen geändert. Lade neu; deine Korrekturen gehen dabei verloren.',
 };

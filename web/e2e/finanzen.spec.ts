@@ -12,7 +12,7 @@ test('Finanzen: Übersicht, Abweichungen, Budgetprozess, barrierefrei', async ({
   await expect(page.getByRole('heading', { name: 'Finanzen', level: 1 })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Übersicht' })).toHaveAttribute('aria-current', 'page');
   const tabelle = page.getByRole('table', { name: 'Projekte mit Prognose, Budget und Ist' });
-  await expect(tabelle.or(page.getByText('Keine Projekte mit Beträgen, die Sie sehen.'))).toBeVisible();
+  await expect(tabelle.or(page.getByText('Keine Projekte mit Beträgen, die du siehst.'))).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 

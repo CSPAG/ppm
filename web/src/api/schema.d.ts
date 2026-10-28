@@ -30480,7 +30480,7 @@ export interface paths {
         };
         /**
          * Dashboard der Periode
-         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Mit `format=csv` als Export der Projekte (optional nach `phase` und `auswahl`, wie die Liste der Oberfläche). Recht `auswertung:read` an der Organisation oder am Portfolio.
          */
         get: {
             parameters: {
@@ -30491,6 +30491,12 @@ export interface paths {
                     periode?: string;
                     /** @description Darstellung der Oberfläche; die Antwort enthält Liste und Funnel. */
                     ansicht?: "liste" | "funnel";
+                    /** @description Nur für den Export: Projekte dieser Phase. */
+                    phase?: "P0" | "P1" | "P2" | "P3" | "P4";
+                    /** @description Nur für den Export: Projekte hinter einer Zahl (wie die Oberfläche, `dashboard.ts`). */
+                    auswahl?: "im_plan" | "kritisch" | "ohne_status" | "offen" | "nicht_gemeldet" | "ausstehend" | "eskalation";
+                    /** @description Export der Projekte als CSV (mit `phase` und `auswahl`). */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;

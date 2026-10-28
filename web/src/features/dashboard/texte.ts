@@ -24,11 +24,23 @@ export const TD = {
   keinStatus: 'kein Status',
   oeffnen: (nr: string, name: string) => `Projekt ${nr} ${name} öffnen`,
   leer: 'In dieser Periode gibt es keine Projekte in deinen Portfolios.',
+  leerFilter: 'Keine Projekte für diese Auswahl.',
+  zuruecksetzen: 'Filter zurücksetzen',
+  zeigen: (was: string) => `Projekte anzeigen: ${was}`,
+  auswahl: {
+    im_plan: 'im Plan', kritisch: 'kritisch', ohne_status: 'ohne Status', offen: 'nicht gemeldet bzw. ausstehend',
+    nicht_gemeldet: 'nicht gemeldet', ausstehend: 'ausstehend', eskalation: 'Eskalation',
+  } as Record<string, string>,
+  auswahlEntfernen: (was: string) => `Auswahl ${was} entfernen`,
+  phaseEntfernen: (phase: string) => `Phase ${phase} entfernen`,
+  auswahlLabel: 'Auswahl',
+  exportieren: 'Exportieren (CSV)', exportiert: (name: string) => `${name} gespeichert.`,
   keinRecht: 'Das Dashboard sehen Gremien, Direktionen, Geschäftsleitung, Finanzen, Ressourcen und die Unternehmensentwicklung.',
   funnel: {
     titel: 'Funnel nach Phase',
     beschreibung: 'Projekte je Phase mit Status; die Tabelle darunter zeigt dieselben Werte.',
     spalte: { phase: 'Phase', anzahl: 'Projekte', imPlan: 'im Plan', kritisch: 'kritisch', nichtGemeldet: 'nicht gemeldet bzw. ausstehend', ohneStatus: 'ohne Status' },
     filtern: (phase: string) => `Projekte in ${phase} anzeigen`,
+    zelle: (phase: string, was: string, n: number) => `Projekte in ${phase} anzeigen: ${n} ${was}`,
   },
 };

@@ -69,7 +69,8 @@ describe('Dashboard', () => {
     expect(screen.getByText('Eskalation offen')).toBeInTheDocument();
     expect(screen.getByText('Nicht gemeldet · Vorperiode Kritisch')).toBeInTheDocument();
     expect(screen.getByText('Im Plan → Kritisch')).toBeInTheDocument();
-    expect(screen.getByText('3 Projekte · 1 im Plan · 1 kritisch · 1 nicht gemeldet · 1 Eskalation')).toBeInTheDocument();
+    const kennzahlen = within(document.querySelector('.db-kennzahlen') as HTMLElement).getAllByRole('listitem').map(li => li.textContent);
+    expect(kennzahlen).toEqual(['3 Projekte', '1 im Plan', '1 kritisch', '1 nicht gemeldet', '1 Eskalation']);
     expect(screen.queryByText(/ist noch offen/)).not.toBeInTheDocument();
     await expectNoAxe(container);
   });
@@ -84,6 +85,45 @@ describe('Dashboard', () => {
     await userEvent.click(within(tab).getByRole('button', { name: TD.funnel.filtern('P1 Konzept und Planung') }));
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"phase":"P1"}'));
     expect(screen.getAllByRole('link').map(a => a.textContent)).toEqual(['2026-002 Vorhaben 2']);
+  });
+
+  it('jede Zahl führt zu ihren Einzelwerten: Kennzahl und Funnel-Zelle filtern die Liste (Adresse); Z3 mit «Filter zurücksetzen»', async () => {
+    stub(antwort(ITEMS));
+    renderWithIam(<Page />, GREMIUM);
+    await userEvent.click(await screen.findByRole('button', { name: TD.zeigen('1 kritisch') }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"auswahl":"kritisch"}'));
+    expect(screen.getAllByRole('link').map(a => a.textContent)).toEqual(['2026-001 Vorhaben 1'], 'das nicht gemeldete (Vorperiode kritisch) zählt nicht');
+    expect(screen.getByText(TD.auswahl.kritisch!, { selector: '.chip .v *, .chip .v' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TD.auswahlEntfernen(TD.auswahl.kritisch!) }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{}'));
+
+    await userEvent.click(screen.getByRole('button', { name: TD.ansicht.funnel }));
+    const tab = await screen.findByRole('table', { name: TD.funnel.titel });
+    await userEvent.click(within(tab).getByRole('button', { name: TD.funnel.zelle('P1 Konzept und Planung', TD.auswahl.offen!, 1) }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"phase":"P1","auswahl":"offen"}'));
+    expect(screen.getAllByRole('link').map(a => a.textContent)).toEqual(['2026-002 Vorhaben 2']);
+    // Ohne Projekte keine Schaltfläche zum Leeren: «0 im Plan» in P1 ist gesperrt
+    await userEvent.click(screen.getByRole('button', { name: TD.auswahlEntfernen(TD.auswahl.offen!) }));
+    expect(await screen.findByRole('button', { name: TD.zeigen('0 im Plan') })).toBeDisabled();
+    expect(validateDashboardSearch({ phase: 'P1', auswahl: 'im_plan' })).toEqual({ phase: 'P1', auswahl: 'im_plan' });
+  });
+
+  it('Z3: leer durch Filter mit «Filter zurücksetzen»; Export als CSV mit Phase und Auswahl', async () => {
+    const api = stub(antwort(ITEMS));
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:dashboard'), revokeObjectURL: vi.fn() }));
+    const klick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    renderWithIam(<Page initial={{ phase: 'P1', auswahl: 'im_plan' }} />, GREMIUM);
+    expect(await screen.findByText(TD.leerFilter)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: TD.exportieren })).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: TD.zuruecksetzen }));
+    await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{}'));
+
+    await userEvent.click(screen.getByRole('button', { name: TD.exportieren }));
+    expect(await screen.findByText(TD.exportiert('dashboard-2026-10.csv'))).toBeInTheDocument();
+    const exp = api.calls.find(c => c.url.includes('format=csv'))!;
+    expect(exp.url).toContain('periode=2026-10');
+    expect(klick).toHaveBeenCalledOnce();
+    klick.mockRestore();
   });
 
   it('offene Periode: Hinweis, Werte vorläufig; Filter in der Adresse', async () => {

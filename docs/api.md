@@ -166,7 +166,7 @@ Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/mod
 
 | Methode und Pfad | Recht | Hinweis |
 |---|---|---|
-| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
+| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel&format=&phase=&auswahl=` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase; `format=csv` (mit `phase` und `auswahl` `im_plan`, `kritisch`, `ohne_status`, `offen`, `nicht_gemeldet`, `ausstehend`, `eskalation`): Export der Projekte wie die Liste der Oberfläche |
 
 ## Risikolage und Portfoliobericht
 

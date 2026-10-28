@@ -5,9 +5,9 @@
  */
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance } from 'fastify';
-import { forbidden, notFound, type Deps } from '@vollholz/platform';
-import { funnel, zeilen } from './dashboard.ts';
-import { Dashboard, DashboardQuery, DashboardZeile, FunnelStufe, type DashboardOut, type DashboardQueryIn } from './schemas.ts';
+import { forbidden, invalid, notFound, type Deps } from '@vollholz/platform';
+import { alsCsv, funnel, PASST, zeilen } from './dashboard.ts';
+import { Dashboard, DashboardQuery, DashboardZeile, FunnelStufe, type DashboardOut, type DashboardQueryIn, type DashboardZeileOut } from './schemas.ts';
 import * as store from './store.ts';
 
 export const TAG = 'Dashboard';
@@ -19,15 +19,16 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   app.get('/v1/dashboard', {
     schema: {
       tags: [TAG], summary: 'Dashboard der Periode',
-      description: 'Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.',
+      description: 'Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Mit `format=csv` als Export der Projekte (optional nach `phase` und `auswahl`, wie die Liste der Oberfläche). Recht `auswertung:read` an der Organisation oder am Portfolio.',
       querystring: DashboardQuery, response: { 200: Type.Ref('Dashboard') },
     },
-  }, async (req): Promise<DashboardOut> => {
+  }, async (req, reply) => {
     const q = req.query as DashboardQueryIn;
     const p = req.requirePrincipal();
     if (!(await deps.iam.access.canSomewhere(p, RECHT))) throw forbidden('Das Dashboard sehen Gremien, Direktionen und die Unternehmensentwicklung.');
     const orgweit = await req.can(RECHT);
-    return req.tx(async tx => {
+    if ((q.phase || q.auswahl) && q.format !== 'csv') throw invalid('`phase` und `auswahl` gelten nur für den Export.', [{ path: q.phase ? '/phase' : '/auswahl', message: 'nur mit format=csv' }]);
+    const out = await req.tx(async (tx): Promise<DashboardOut> => {
       const alle = await store.portfolios(tx);
       const sichtbar: store.PortfolioRow[] = [];
       for (const pf of alle) if (orgweit || (await req.can(RECHT, { type: 'portfolio', id: pf.id }))) sichtbar.push(pf);
@@ -54,5 +55,12 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
         items, funnel: funnel(items),
       };
     });
+    if (q.format !== 'csv') return out;
+    // Export (Seitentyp Bericht): die Projekte wie in der Liste, nach Phase und Auswahl
+    const items = (out.items as DashboardZeileOut[]).filter(z => (!q.phase || z.phase === q.phase) && (!q.auswahl || PASST[q.auswahl](z)));
+    return reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="dashboard-${out.periode}${out.portfolio ? `-${out.portfolio}` : ''}.csv"`)
+      .send(alsCsv(items));
   });
 }

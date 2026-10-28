@@ -66936,7 +66936,7 @@
         "tags": [
           "Dashboard"
         ],
-        "description": "Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.",
+        "description": "Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Mit `format=csv` als Export der Projekte (optional nach `phase` und `auswahl`, wie die Liste der Oberfläche). Recht `auswertung:read` an der Organisation oder am Portfolio.",
         "parameters": [
           {
             "schema": {
@@ -66979,6 +66979,110 @@
             "name": "ansicht",
             "required": false,
             "description": "Darstellung der Oberfläche; die Antwort enthält Liste und Funnel."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "P0"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P1"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P2"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P3"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "P4"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "phase",
+            "required": false,
+            "description": "Nur für den Export: Projekte dieser Phase."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "im_plan"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "kritisch"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ohne_status"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "offen"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "nicht_gemeldet"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ausstehend"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "eskalation"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "auswahl",
+            "required": false,
+            "description": "Nur für den Export: Projekte hinter einer Zahl (wie die Oberfläche, `dashboard.ts`)."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export der Projekte als CSV (mit `phase` und `auswahl`)."
           }
         ],
         "responses": {

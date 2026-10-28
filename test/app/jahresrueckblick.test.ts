@@ -152,4 +152,19 @@ describe('Jahresrückblick', { skip }, () => {
     const audit = await sys(async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action LIKE 'jahresrueckblick.%' ORDER BY id")).rows.map(x => x.action));
     assert.deepEqual(audit, ['jahresrueckblick.created', 'jahresrueckblick.updated', 'jahresrueckblick.scheduled', 'jahresrueckblick.updated']);
   });
+
+  test('Lessons Learned anfordern (A1): Aufgabe an die PL, erledigt mit der ersten Lesson Learned', async () => {
+    const pl = await login(api, 'demo', 'u-pl', null);
+    await sys(tx => tx.query("INSERT INTO ppm.projekt_person (tenant_id, projekt_id, person_id, funktion) VALUES ($1, $2, $3, 'pl')", [tenantId, projekt['2020-901'], pl.principalId]));
+    assert.equal((await call('POST', `${url}/lessons-learned/anfordern`, gl)).statusCode, 403);
+    assert.deepEqual((await ok('POST', `${url}/lessons-learned/anfordern`, ue)).json(), { vorhaben: 1, aufgaben: 1 });
+    await ok('POST', `${url}/lessons-learned/anfordern`, ue);
+    const aufgaben = () => sys(async tx => (await tx.query<{ bezug_id: string; empfaenger_person: string; stand: string; link: string }>(
+      "SELECT bezug_id, empfaenger_person, stand, link FROM ppm.aufgabe WHERE art = 'lessons_learned.erfassen' ORDER BY created_at")).rows);
+    assert.deepEqual((await aufgaben()).map(a => [a.bezug_id, a.empfaenger_person, a.stand, a.link]),
+      [[projekt['2020-901'], pl.principalId, 'offen', '/projekte/2020-901/abschluss']], 'idempotent');
+    // A1.2: erfasst eine Person mit projekt:write die Lesson Learned, ist die Aufgabe erledigt
+    await ok('POST', `/v1/projekte/${projekt['2020-901']}/lessons-learned`, ue, { text: 'Abnahme früher planen' }, 201);
+    assert.deepEqual((await aufgaben()).map(a => a.stand), ['erledigt']);
+  });
 });

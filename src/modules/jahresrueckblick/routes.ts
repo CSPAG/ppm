@@ -7,6 +7,7 @@ import { Type } from '@sinclair/typebox';
 import type { FastifyInstance } from 'fastify';
 import { actorOf, conflict, etag, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
 import { record } from '../../platform.ts';
+import { anfordern } from './lessons.ts';
 import { antwort, traktandieren } from './rueckblick.ts';
 import { Jahresauswertung, JahrParams, Jahresrueckblick, JahresrueckblickPut, type JahresrueckblickOut, type JahresrueckblickPutIn } from './schemas.ts';
 import * as store from './store.ts';
@@ -76,5 +77,28 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     });
     reply.header('etag', etag(out.version));
     return out;
+  });
+
+  app.post('/v1/jahresrueckblicke/:jahr/lessons-learned/anfordern', {
+    schema: {
+      tags: [TAG], summary: 'Lessons Learned anfordern', params: JahrParams,
+      response: { 200: Type.Object({
+        vorhaben: Type.Integer({ description: 'Im Jahr abgeschlossene Vorhaben ohne Lessons Learned.' }),
+        aufgaben: Type.Integer({ description: 'Geöffnete oder nachgeführte Aufgaben an die Projektleitungen.' }),
+      }, { additionalProperties: false }) },
+      description: 'Legt den Projektleitungen der im Jahr abgeschlossenen Vorhaben ohne Lessons Learned die Aufgabe «Lessons Learned erfassen» in den Eingang (UC-013 A1); idempotent je Projekt und Person, erledigt mit der ersten erfassten Lesson Learned. Legt den Jahresrückblick an, falls noch keiner gespeichert ist. Recht `quartalsbericht:write`.',
+    },
+  }, async (req) => {
+    const { jahr } = req.params as { jahr: number };
+    await req.need(SCHREIBEN);
+    const who = actorOf(req);
+    return req.tx(async tx => {
+      // Anfordern gehört zur Arbeit am Rückblick (UC-013 Schritt 2): ohne gespeicherten Rückblick wird er angelegt
+      const leer = { erkenntnisse: '', massnahmen: '' };
+      const id = (await store.lesen(tx, jahr))?.id ?? (await store.anlegen(tx, jahr, leer)) ?? (await store.lesen(tx, jahr))!.id;
+      const n = await anfordern(tx, jahr);
+      await record(tx, who, { action: 'jahresrueckblick.lessons_requested', resourceType: 'jahresrueckblick', resourceId: id, data: { jahr, ...n } });
+      return n;
+    });
   });
 }

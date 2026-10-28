@@ -34598,6 +34598,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/{id}/toleranzen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gültige Toleranzen des Projekts
+         * @description Je Dimension die Toleranz aus Kap. 7 der Baseline des Projektvertrags, sonst der Standard des Phasenmodells (A-10). Ohne Wert keine Warnung «wesentlich». Lesen mit `projekt:read` am Projekt.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GueltigeToleranzen"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ideen": {
         parameters: {
             query?: never;
@@ -48649,6 +48753,14 @@ export interface components {
             text: string;
             termin: string | null;
         };
+        ToleranzPlan: {
+            /** @description Termin, Kosten oder Umfang. */
+            dimension: "termin" | "kosten" | "umfang";
+            /** @description Ab dieser Abweichung gilt sie als wesentlich. */
+            wert: number;
+            /** @description Prozent, Kalendertage oder Arbeitstage. */
+            einheit: "prozent" | "kalendertage" | "arbeitstage";
+        };
         MitgliedPlan: {
             /**
              * Format: uuid
@@ -48798,6 +48910,8 @@ export interface components {
                 /** @description Erwarteter Projektabschluss (ab Phase 2). */
                 projektabschluss: string | null;
             };
+            /** @description Toleranzen des Projekts je Dimension; übersteuern ab der Baseline den Standard des Phasenmodells (A-10). */
+            toleranzen?: components["schemas"]["ToleranzPlan"][];
         };
         /** Projektstruktur und Organisation */
         Kapitel8: {
@@ -49342,6 +49456,17 @@ export interface components {
             ergebnis: "freigegeben" | "abgelehnt" | "an_prat";
             /** @description Begründung (Pflicht beim Ablehnen, UC-007 A2). */
             begruendung?: string;
+        };
+        GueltigeToleranzen: {
+            /** Format: uuid */
+            projektId: string;
+            /** @description Termin, Kosten und Umfang in dieser Reihenfolge. */
+            toleranzen: {
+                dimension: "termin" | "kosten" | "umfang";
+                wert: number | null;
+                einheit: ("prozent" | "kalendertage" | "arbeitstage") | null;
+                quelle: ("vertrag" | "phasenmodell") | null;
+            }[];
         };
         IdeeRueckfrage: {
             /** Format: uuid */

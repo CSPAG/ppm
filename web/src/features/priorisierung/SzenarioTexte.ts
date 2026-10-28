@@ -77,7 +77,7 @@ export const TS = {
   alsAntragFrage: (name: string) => `Szenario «${name}» als Antrag wählen?`,
   alsAntragWirkung: (n: number) => `Die Entscheidungsvorlage enthält ${n === 1 ? 'dieses Szenario' : `alle ${n} verglichenen Szenarien`}. Ein bisheriger Antrag dieses Portfolios wird wieder Entwurf. Traktandiert wird danach mit «Für das Gremium traktandieren».`,
   antragGewaehlt: (name: string) => `Szenario «${name}» als Antrag gewählt.`,
-  nichtBewertet: (nummern: string[]) => `Bewertung: ${projekte(nummern.length)} ohne Bewertung (${nummern.join(', ')}). Sie erscheinen in der Vorlage als «nicht bewertet».`,
+  nichtBewertet: (nummern: string[]) => `Bewertung: ${projekte(nummern.length)} ohne Bewertung (${nummern.join(', ')}); diese erscheinen in der Vorlage als «nicht bewertet».`,
   bewerten: 'Zur Bewertung',
   vorlage: 'Entscheidungsvorlage (Vorschau)',
   vorlageSeit: (d: string) => `Stand ${d}`,

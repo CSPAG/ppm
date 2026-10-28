@@ -124,6 +124,8 @@ export function useVertragMutations(projektId: string | undefined) {
       // «geändert» und «Angaben fehlen» in der Navigation, Pflichtangaben im Seitenpanel
       await qc.invalidateQueries({ queryKey: vertragKeys.version(id) });
       await qc.invalidateQueries({ queryKey: vertragKeys.pflicht(id) });
+      // Wirkung, Hauptänderungen und Vergleich des Änderungsantrags leiten sich aus den Kapiteln ab (AP-E3-4)
+      for (const k of ['aenderung', 'hauptaenderungen', 'vergleich']) await qc.invalidateQueries({ queryKey: ['vertrag', k, id] });
     },
   });
   const einreichen = useMutation({

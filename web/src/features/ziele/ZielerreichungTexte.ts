@@ -1,11 +1,11 @@
 /**
- * Texte der Seite «Zielerreichung» (UI-40; Kernablauf K6 Schritt 10, Regeln und Texte): Anrede «Sie» (UX-E7),
+ * Texte der Seite «Zielerreichung» (UI-40; Kernablauf K6 Schritt 10, Regeln und Texte): Anrede «Du» (UX-E7),
  * Schweizer Rechtschreibung, Ebenen aus dem Glossar («Strategisches Ziel», «Jahresziel»).
  */
 export const TZE = {
   bereich: 'Zielerreichung',
   title: (q: string) => `Zielerreichung ${q}`,
-  sub: 'Führen Sie je Ziel den Stand der Metrik mit Kommentar nach. Jeder Stand wird mit Datum und Person gespeichert, sobald Sie die Zeile verlassen.',
+  sub: 'Führe je Ziel den Stand der Metrik mit Kommentar nach. Jeder Stand wird mit Datum und Person gespeichert, sobald du die Zeile verlässt.',
   vorher: 'Vorheriges Quartal', nachher: 'Nächstes Quartal',
   quartalWaehlen: 'Quartal',
   fortschritt: (n: number, g: number) => `${n} von ${g} ${g === 1 ? 'Ziel' : 'Zielen'} nachgeführt`,
@@ -22,9 +22,9 @@ export const TZE = {
   entfernt: 'Stand entfernt',
   gespeichertAnsage: (nummer: string) => `Stand ${nummer} gespeichert.`,
   entferntAnsage: (nummer: string) => `Stand ${nummer} entfernt.`,
-  standFehlt: 'Geben Sie den Stand ein; ein Kommentar allein wird nicht gespeichert.',
-  konflikt: 'Dieser Stand wurde inzwischen von einer anderen Person geändert. Laden Sie neu; Ihre Eingabe bleibt im Feld.',
-  nurLesen: 'Sie können die Zielerreichung nur ansehen. Erfassen können die Geschäftsleitung und die Unternehmensentwicklung.',
-  leer: 'Noch keine Ziele erfasst. Hier führen Sie je Quartal den Stand der strategischen Ziele und Jahresziele nach.',
+  standFehlt: 'Gib den Stand ein; ein Kommentar allein wird nicht gespeichert.',
+  konflikt: 'Dieser Stand wurde inzwischen von einer anderen Person geändert. Lade neu; deine Eingabe bleibt im Feld.',
+  nurLesen: 'Du kannst die Zielerreichung nur ansehen. Erfassen können die Geschäftsleitung und die Unternehmensentwicklung.',
+  leer: 'Noch keine Ziele erfasst. Hier führst du je Quartal den Stand der strategischen Ziele und Jahresziele nach.',
   zuZielen: 'Strategische Ziele öffnen',
 };

@@ -1,12 +1,12 @@
 /**
  * Texte der Matrix (UI-21, K5 Schritte 3–4): Felder nach Q6 F9, Regel der Einordnung (A-39), Rangfolge, Abhängigkeiten
- * und Portfoliorisiken; Anrede «Sie», Schweizer Rechtschreibung.
+ * und Portfoliorisiken; Anrede «Du», Schweizer Rechtschreibung.
  */
 export const TM = {
   sub: 'Nutzen und Risiko der aktiven Projekte aus der Bewertung; Rangfolge als Entwurf für das Gremium.',
   portfolio: 'Portfolio',
-  keinPortfolio: 'Es gibt noch kein Portfolio, das Sie sehen.',
-  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder Sie sehen es nicht.',
+  keinPortfolio: 'Es gibt noch kein Portfolio, das du siehst.',
+  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder du siehst es nicht.',
   ansicht: 'Ansicht',
   ansichten: { risiko: 'Nutzen × Risiko', ressourcen: 'Ressourcen × Nutzen' },
   alsTabelle: 'Als Tabelle', alsMatrix: 'Als Matrix',
@@ -23,13 +23,13 @@ export const TM = {
   feldText: (f: string) => `Feld ${f}`,
   geschaetzt: 'geschätzt',
   kreisKosten: 'Kreisgrösse = Kosten (Prognose, sonst Budget).',
-  kreisOhneKosten: 'Kosten sehen Sie nicht; alle Kreise sind gleich gross.',
+  kreisOhneKosten: 'Kosten siehst du nicht; alle Kreise sind gleich gross.',
   nichtEingeordnet: (n: number) => (n === 1 ? '1 Projekt ist nicht eingeordnet' : `${n} Projekte sind nicht eingeordnet`),
   nichtEingeordnetGrund: 'Eine Achse ist nicht bewertet oder liegt genau auf der Grenze; das Gremium beurteilt diese Projekte.',
   ohneRessourcen: 'ohne Ressourcenbedarf',
   keinModell: 'Es ist noch kein Bewertungsmodell in Kraft; ohne Bewertung gibt es keine Matrix.',
-  keineProjekte: 'Dieses Portfolio hat keine aktiven Projekte, die Sie sehen.',
-  ohneZuordnung: 'Im Modell in Kraft ist kein Kriterium Nutzen und Risiko zugeordnet. Ordnen Sie die Kriterien im nächsten Modell zu.',
+  keineProjekte: 'Dieses Portfolio hat keine aktiven Projekte, die du siehst.',
+  ohneZuordnung: 'Im Modell in Kraft ist kein Kriterium Nutzen und Risiko zugeordnet. Ordne die Kriterien im nächsten Modell zu.',
   spalten: { rang: 'Rang', projekt: 'Projekt', phase: 'Phase', nutzen: 'Nutzen', risiko: 'Risiko', feld: 'Feld', ressourcen: 'Ressourcen', kosten: 'Kosten' },
   tabelle: 'Projekte der Matrix',
   // Regel (A-39, ohne Score A-01)
@@ -64,10 +64,10 @@ export const TM = {
   verwerfen: 'Änderungen verwerfen',
   gespeichert: 'Rangfolge gespeichert.',
   ungespeichert: 'Ungespeicherte Änderungen an der Rangfolge',
-  konflikt: 'Jemand anderes hat die Rangfolge inzwischen geändert. Laden Sie neu und ordnen Sie danach nochmals.',
+  konflikt: 'Jemand anderes hat die Rangfolge inzwischen geändert. Lade neu und ordne danach nochmals.',
   neuLaden: 'Neu laden',
-  nurLesen: 'Sie können die Rangfolge nur ansehen; sie pflegt die Unternehmensentwicklung.',
-  schmal: 'Umordnen geht ab einer Breite von 1024 px; hier sehen Sie die Rangfolge nur.',
+  nurLesen: 'Du kannst die Rangfolge nur ansehen; sie pflegt die Unternehmensentwicklung.',
+  schmal: 'Umordnen geht ab einer Breite von 1024 px; hier siehst du die Rangfolge nur.',
   abhaengigkeitVerletzt: (a: string, b: string) => `Abhängigkeit: ${a} braucht ${b}, liegt aber vor ${b}.`,
   // Schublade Projekt (Schritt 3)
   lageTitel: 'Lage in der Matrix',
@@ -75,7 +75,7 @@ export const TM = {
   abhaengigkeitenLeer: 'Keine Abhängigkeiten erfasst.',
   braucht: 'braucht',
   wirdGebraucht: 'wird gebraucht von',
-  ausserhalb: 'Projekt, das Sie nicht sehen',
+  ausserhalb: 'Projekt, das du nicht siehst',
   abhaengigkeitHinzufuegen: 'Abhängigkeit hinzufügen',
   zuProjekt: 'Dieses Projekt braucht',
   artAbhaengigkeit: 'Art der Abhängigkeit',

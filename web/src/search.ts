@@ -13,7 +13,7 @@ import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.
 import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { type PortfoliosSearch, validatePortfoliosSearch } from './features/portfolios/index.ts';
 import { type BudgetSearch, type FinanzenSearch, validateBudgetSearch, validateFinanzenSearch } from './features/finanzen/index.ts';
-import { type BewertungSearch, type MatrixSearch, type ModellSearch, validateBewertungSearch, validateMatrixSearch, validateModellSearch } from './features/priorisierung/index.ts';
+import { type BewertungSearch, type MatrixSearch, type ModellSearch, validateBewertungSearch, validateMatrixSearch, validateModellSearch, validateSzenarioSearch } from './features/priorisierung/index.ts';
 import { type EntscheideSearch, type SitzungSearch, validateEntscheideSearch, validateSitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
@@ -29,6 +29,7 @@ export const searchOf = {
   matrix: validateMatrixSearch,
   finanzen: validateFinanzenSearch,
   budgetprozess: validateBudgetSearch,
+  szenarien: validateSzenarioSearch,
   eingang: validateEingangSearch,
   stellvertretung: validateKontoSearch,
   handlungsfelder: validateHandlungsfeldSearch,

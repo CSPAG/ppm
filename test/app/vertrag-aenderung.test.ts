@@ -65,6 +65,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
     api = await testApi();
     const u = await login(api, 'demo', 'u-ue', 'ue');
     T = u.tenantId;
+    id.ue = u.principalId;
     h.ue = { authorization: u.authorization };
     h.adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
     // Phasenmodell nach der Vorgabe: Kapitelwirkung Kap. 5 Scope, Kap. 9 Budget und Ressourcen (PM-Handbuch)
@@ -232,6 +233,10 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
     await ok('ue', 'PUT', `/v1/traktanden/${vorschlag}/entscheid`, { ergebnis: 'freigegeben', begruendung: 'Mehrkosten durch Nutzen gedeckt' });
 
     assert.equal(await baseline(), v2);
+    // Akteur der Folge ist die UE, die den Entscheid erfasst (FolgeKontext), nicht das System
+    const audit = await sys(async tx => (await tx.query<{ action: string; actor_kind: string; actor_id: string | null }>(
+      "SELECT action, actor_kind, actor_id FROM ppm.audit_log WHERE resource_id = $1 AND action IN ('vertrag.change_decided', 'vertrag.baselined') ORDER BY seq", [v2])).rows);
+    assert.deepEqual(audit.slice(-2).map(a => [a.action, a.actor_id]), [['vertrag.baselined', id.ue], ['vertrag.change_decided', id.ue]]);
     const kosten = (await ok('pl', 'GET', `/v1/projekte/${projekt.id}/kosten`)).json().items as { text: string; budgetBaseline: number }[];
     assert.deepEqual(kosten.map(k => [k.text, k.budgetBaseline]).sort(), [['Konzept', 100000], ['Lizenzen', 2400000]]);
     const ms = (await ok('pl', 'GET', `/v1/projekte/${projekt.id}/meilensteine`)).json().items as { text: string; terminBaseline: string }[];

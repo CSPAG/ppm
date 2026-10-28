@@ -14,7 +14,7 @@ import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { finanzenPfad, type SetBudgetSearch, type SetFinanzenSearch } from './features/finanzen/index.ts';
-import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch } from './features/priorisierung/index.ts';
+import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch, type SetSzenarioSearch } from './features/priorisierung/index.ts';
 import type { SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -46,6 +46,7 @@ const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx')
 const FinanzenPage = seite(() => import('./features/finanzen/FinanzenPage.tsx'), 'FinanzenPage');
 const AbweichungenPage = seite(() => import('./features/finanzen/FinanzenPage.tsx'), 'AbweichungenPage');
 const BudgetprozessPage = seite(() => import('./features/finanzen/BudgetprozessPage.tsx'), 'BudgetprozessPage');
+const SzenarioPage = seite(() => import('./features/priorisierung/SzenarioPage.tsx'), 'SzenarioPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
 const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
 const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
@@ -70,6 +71,7 @@ const ZielzyklusPage = seite(() => import('./features/ziele/ZielzyklusPage.tsx')
 const FreigabePage = seite(() => import('./features/ziele/FreigabePage.tsx'), 'FreigabePage');
 const RoadmapPage = seite(() => import('./features/ziele/RoadmapPage.tsx'), 'RoadmapPage');
 const ZielerreichungPage = seite(() => import('./features/ziele/ZielerreichungPage.tsx'), 'ZielerreichungPage');
+const QuartalsreportingPage = seite(() => import('./features/ziele/QuartalsreportingPage.tsx'), 'QuartalsreportingPage');
 
 const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
 
@@ -253,6 +255,32 @@ function ZielerreichungRoute() {
   return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
 }
 
+// Quartalsreporting an den VR (UI-41, BC ZM.03.02, AP-E6-4): /ziele/2026/quartalsreporting?quartal=q3; ohne Jahr und
+// Quartal das zuletzt abgeschlossene
+const quartalsreportingStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/quartalsreporting',
+  beforeLoad: () => {
+    const q = abgeschlossenesQuartal();
+    throw redirect({ to: '/ziele/$jahr/quartalsreporting', params: { jahr: String(q.jahr) }, search: { quartal: `q${q.quartal}` }, replace: true });
+  },
+});
+
+const quartalsreportingRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/quartalsreporting', validateSearch: searchOf.zielerreichung, component: QuartalsreportingRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function QuartalsreportingRoute() {
+  const { jahr } = quartalsreportingRoute.useParams();
+  const search = quartalsreportingRoute.useSearch();
+  const navigate = useNavigate({ from: quartalsreportingRoute.fullPath });
+  const quartal = Number((search.quartal ?? `q${abgeschlossenesQuartal().quartal}`).slice(1)) as QuartalNr;
+  const setQuartal = useCallback((j: number, q: QuartalNr) => {
+    void navigate({ to: '/ziele/$jahr/quartalsreporting', params: { jahr: String(j) }, search: { quartal: `q${q}` } });
+  }, [navigate]);
+  return <QuartalsreportingPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} />;
+}
+
 // Arbeitsraum «Portfolio» › Ressourcen: Auslastung (UI-23) und Kapazität (UI-24) (BC RK.01.01, RK.02.04, AP-E5-4)
 const ressourcenRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/ressourcen',
@@ -344,6 +372,20 @@ function ModellRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   return <ModellPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+// Priorisierung › Szenarien mit Wasserlinie (UI-22; BC PP.03.01–03, UC-008 Schritte 5–6; AP-E5-3)
+const szenarienRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.szenarien, validateSearch: searchOf.szenarien, component: SzenarienRoute,
+});
+
+function SzenarienRoute() {
+  const search = szenarienRoute.useSearch();
+  const navigate = useNavigate({ from: szenarienRoute.fullPath });
+  const setSearch = useCallback<SetSzenarioSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SzenarioPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
 // Arbeitsraum «Portfolio» › Dashboard (UI-17; PC.04.01, UC-014 Schritt 1; AP-E1-3)
@@ -647,6 +689,8 @@ const routeTree = rootRoute.addChildren([
   ideeRoute,
   zielerreichungStartRoute,
   zielerreichungRoute,
+  quartalsreportingStartRoute,
+  quartalsreportingRoute,
   dashboardRoute,
   risikenRoute,
   portfolioberichtRoute,
@@ -671,6 +715,7 @@ const routeTree = rootRoute.addChildren([
   abweichungenRoute,
   budgetprozessRoute,
   modellRoute,
+  szenarienRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

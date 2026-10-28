@@ -55,7 +55,8 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     return req.tx(async tx => {
       const pf = q.portfolio ? await portfolioKopf(tx, q.portfolio) : null;
       if (q.portfolio && !pf) throw notFound('Portfolio');
-      let ps = await finanzen(tx, await store.projekte(tx, { ...(q.portfolio ? { portfolioId: q.portfolio } : {}), alle: !!q.alle }));
+      const projekte = await store.projekte(tx, { ...(q.portfolio ? { portfolioId: q.portfolio } : {}), alle: !!q.alle });
+      let ps = await voll(req)(v => finanzen(tx, projekte, v));
       if (nurAbweichungen) {
         ps = ps.filter(p => (p.abweichung.betrag ?? 0) !== 0 || p.abweichung.wesentlich)
           .sort((a, b) => Number(b.abweichung.wesentlich) - Number(a.abweichung.wesentlich) || (b.abweichung.betrag ?? 0) - (a.abweichung.betrag ?? 0));
@@ -97,7 +98,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       if (!p) throw notFound('Projekt');
       if (!(await store.kostentraegerSetzen(tx, id, nummer))) throw conflict(`Der Kostenträger ${nummer} ist schon einem anderen Projekt zugeordnet.`);
       await record(tx, who, { action: 'kostentraeger.assigned', resourceType: 'projekt', resourceId: id, data: { kostentraeger: nummer }, event: { projektId: id, kostentraeger: nummer } });
-      return (await finanzen(tx, [p]))[0]!;
+      return (await voll(req)(v => finanzen(tx, [p], v)))[0]!;
     });
   });
 
@@ -141,14 +142,14 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       const neu = await store.begruendungSetzen(tx, id, per, text, alt ? version : null);
       if (!neu) throw preconditionFailed((await store.begruendung(tx, id, per))?.version ?? 0);
       await record(tx, who, { action: alt ? 'abweichung.justification_changed' : 'abweichung.justified', resourceType: 'projekt', resourceId: id, data: { periode: per, text: neu.text }, event: { projektId: id, periode: per } });
-      await abweichungenPruefen(tx, [p]);
+      await voll(req)(v => abweichungenPruefen(tx, [p], new Date(), v));
       return neu;
     });
     reply.header('etag', etag(b.version));
     return begr(b);
   });
 
-  /** Volle Sicht der Organisation (nur für die Summe der vertraulichen Projekte, ohne Namen). */
+  /** Volle Sicht der Organisation (Summe der vertraulichen Projekte ohne Namen; gültige Toleranz, A-10). */
   const voll = (req: FastifyRequest): Voll => fn => fullTx(deps.db, req.requirePrincipal().tenantId, fn);
 
   /**

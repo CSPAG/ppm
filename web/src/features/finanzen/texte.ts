@@ -23,7 +23,7 @@ export const TF = {
   keinBudget: 'kein Budget',
   wesentlich: 'wesentlich',
   wesentlichLang: (t: number) => `über der Toleranz von ${t} %`,
-  ohneToleranz: 'Ohne Toleranz im Phasenmodell gibt es keine Warnung «wesentlich».',
+  ohneToleranz: 'Ohne Toleranz im Projektvertrag oder im Phasenmodell gibt es keine Warnung «wesentlich».',
   istBis: (monat: string) => `Ist-Kosten bis ${monat}`,
   istNochNicht: 'Ist-Kosten aus dem ERP noch nicht verfügbar',
   ueberToleranz: 'Über der Toleranz',

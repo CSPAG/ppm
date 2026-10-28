@@ -10,7 +10,7 @@
 import { describeError } from '@vollholz/iam-web';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { api, ApiError, isConflict } from '../../api/index.ts';
-import { Dialog, Empty, ErrorState, fmtBetragKurz, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
+import { Confirm, Dialog, Empty, ErrorState, fmtBetragKurz, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
 import {
   newIdempotencyKey, useAbschluss, useEinreichen, useLessonMutations, useNutzen, useProjekt, useSpeichern, useWiederaufnahme,
   type Abschluss, type AbschlussIn, type Geladen, type OffenerPunkt,
@@ -394,6 +394,8 @@ function LessonsAbschnitt({ a, projektId }: { a: Abschluss; projektId: string })
   const [text, setText] = useState('');
   const [kategorie, setKategorie] = useState('');
   const [key, setKey] = useState(newIdempotencyKey);
+  // Löschen wirkt auf alle, die die Erkenntnis in «Lessons Learned» finden, und ist endgültig: Rückfrage (I-R1 Stufe 2)
+  const [frage, setFrage] = useState<Abschluss['lessonsLearned'][number] | null>(null);
   const erfassen = () => anlegen.mutate({ text: text.trim(), kategorie: kategorie.trim(), key }, {
     onSuccess: () => { setText(''); setKategorie(''); setKey(newIdempotencyKey()); toast.show(TA.lessons.erfasst); },
     onError: e => toast.error(e),
@@ -409,13 +411,17 @@ function LessonsAbschnitt({ a, projektId }: { a: Abschluss; projektId: string })
                 <div className="muted small">{TA.lessons.von(l.von, l.jahr)}</div>
               </div>
               {l.can.write ? (
-                <button type="button" className="iconbtn" aria-label={TA.lessons.loeschen(l.text)}
-                  onClick={() => loeschen.mutate(l, { onSuccess: () => toast.show(TA.lessons.geloescht), onError: e => toast.error(e) })}><Icon name="trash" /></button>
+                <button type="button" className="iconbtn" aria-label={TA.lessons.loeschen(l.text)} onClick={() => setFrage(l)}><Icon name="trash" /></button>
               ) : null}
             </li>
           ))}
         </ul>
       ) : <p className="empty">{TA.lessons.leer}</p>}
+      {frage ? (
+        <Confirm title={TA.lessons.loeschenFrage(frage.text.slice(0, 60))} text={TA.lessons.loeschenWirkung} confirm={TA.lessons.loeschenJa} busy={loeschen.isPending}
+          onClose={() => setFrage(null)}
+          onConfirm={() => loeschen.mutate(frage, { onSuccess: () => { setFrage(null); toast.show(TA.lessons.geloescht); }, onError: e => { setFrage(null); toast.error(e); } })} />
+      ) : null}
       {a.can.lessons ? (
         <form className="ab-lesson-neu" onSubmit={e => { e.preventDefault(); if (text.trim()) erfassen(); }}>
           <div className="field">
@@ -469,11 +475,13 @@ function Wiederaufnahme({ projektId }: { projektId: string }) {
 
 /** Bericht als Dokument (PDF, Word) über die Vorlage «Abschlussbericht»; Hinweis auf Personendaten (G12). */
 function Dokument({ projektId, nummer }: { projektId: string; nummer: string }) {
+  const hinweisId = useId();
   const [laeuft, setLaeuft] = useState(false);
-  const [meldung, setMeldung] = useState('');
+  // Ergebnis sichtbar neben den Schaltflächen, ein Fehler als Fehler (Z5), nicht nur für den Bildschirmleser
+  const [meldung, setMeldung] = useState<{ text: string; fehler: boolean } | null>(null);
   const laden = async (format: 'pdf' | 'docx') => {
     setLaeuft(true);
-    setMeldung('');
+    setMeldung(null);
     try {
       const { data, response } = await api.GET('/v1/projekte/{id}/abschluss/dokument', { params: { path: { id: projektId }, query: { format } }, parseAs: 'blob' });
       const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') ?? '')?.[1] ?? `Abschlussbericht-${nummer}.${format}`;
@@ -482,20 +490,21 @@ function Dokument({ projektId, nummer }: { projektId: string; nummer: string }) 
       el.href = url; el.download = name;
       document.body.append(el); el.click(); el.remove();
       setTimeout(() => URL.revokeObjectURL(url), 0);
-      setMeldung(TA.dokument.bereit(name));
+      setMeldung({ text: TA.dokument.bereit(name), fehler: false });
     } catch (e) {
       const d = describeError(e);
-      setMeldung(d.detail || d.title);
+      setMeldung({ text: TA.dokument.fehler(d.detail || d.title), fehler: true });
     } finally {
       setLaeuft(false);
     }
   };
   return (
-    <span className="ab-dok" role="group" aria-label={`${TA.dokument.aktion}. ${TA.dokument.personendaten}`}>
+    <span className="ab-dok" role="group" aria-label={TA.dokument.aktion} aria-describedby={`${hinweisId}`}>
       <Icon name="download" />
       <button type="button" className="btn sm" disabled={laeuft} onClick={() => void laden('pdf')}>{TA.dokument.pdf}</button>
       <button type="button" className="btn sm" disabled={laeuft} onClick={() => void laden('docx')}>{TA.dokument.word}</button>
-      <span className="sr" role="status">{meldung}</span>
+      <span id={hinweisId} className="muted small">{TA.dokument.personendaten}</span>
+      <span className={meldung?.fehler ? 'ab-dok-fehler small' : 'muted small'} role={meldung?.fehler ? 'alert' : 'status'}>{meldung?.text}</span>
     </span>
   );
 }

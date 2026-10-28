@@ -12,6 +12,7 @@ import { AbschlussDialog } from './AbschlussDialog.tsx';
 import { useKopf, useMonatsabschlussAktionen, usePeriode, type Zeile } from './api.ts';
 import { BerichtDrawer } from './BerichtDrawer.tsx';
 import { Posteingang } from './Posteingang.tsx';
+import { SammelDialog, type Vorschau } from './SammelDialog.tsx';
 import { berichtO, nummerAusO, periodePlus, type MonatsabschlussSearch, type SetMonatsabschlussSearch, type ZeilenStand } from './search.ts';
 import { Termine } from './Termine.tsx';
 import { TM } from './texte.ts';
@@ -78,11 +79,12 @@ function Periode({ periode, search, setSearch, heute, darfAbschliessen }: { peri
   const m = useMonatsabschlussAktionen(periode);
   const [ansage, setAnsage] = useState('');
   const [dialog, setDialog] = useState(false);
+  const [vorschau, setVorschau] = useState<Vorschau | null>(null);
   const kopf = q.data?.kopf;
   const alle = useMemo(() => q.data?.items ?? [], [q.data]);
   const zeilen = useMemo(() => filtern(alle, search), [alle, search]);
   const portfolios = useMemo(() => [...new Map(alle.map(z => [z.portfolioId, z.portfolioName])).entries()], [alle]);
-  const beschaeftigt = m.bestaetigen.isPending || m.zuruecknehmen.isPending || m.rueckfrage.isPending || m.sammelBestaetigen.isPending || m.einfordern.isPending || m.abschliessen.isPending;
+  const beschaeftigt = m.bestaetigen.isPending || m.zuruecknehmen.isPending || m.rueckfrage.isPending || m.sammelBestaetigen.isPending || m.sammelZuruecknehmen.isPending || m.einfordern.isPending || m.abschliessen.isPending;
   const offenZ = search.o ? alle.find(z => z.projektNummer === nummerAusO(search.o!)) : undefined;
   const pLabel = fmtPeriode(periode);
   const melden = (text: string, o?: Parameters<typeof toast.show>[1]) => { setAnsage(text); toast.show(text, o); };
@@ -97,13 +99,26 @@ function Periode({ periode, search, setSearch, heute, darfAbschliessen }: { peri
     }),
     zuruecknehmen: (z: Zeile) => m.zuruecknehmen.mutate(z, { onSuccess: () => melden(TM.toast.zurueckgenommen(z.projektNummer)), onError: fehler }),
     rueckfrage: (z: Zeile, text: string, fertig: () => void) => m.rueckfrage.mutate({ z, text }, { onSuccess: () => { fertig(); melden(TM.toast.rueckfrage(z.projektNummer)); }, onError: fehler }),
-    einfordern: (zs: Zeile[]) => m.einfordern.mutate(zs.map(z => z.projektId), {
-      onSuccess: r => melden(TM.toast.eingefordert(r.erledigt.length, r.uebersprungen.length)), onError: fehler,
-    }),
-    sammelBestaetigen: (zs: Zeile[]) => m.sammelBestaetigen.mutate(zs.map(z => z.projektId), {
-      onSuccess: r => melden(TM.toast.sammel(r.erledigt.length, r.uebersprungen.filter(u => u.grund === 'auffaellig').length, r.uebersprungen.filter(u => u.grund === 'stand').length)),
-      onError: fehler,
-    }),
+    // Wirkt auf andere: erst Vorschau, dann bewusster Klick (I-R1 Stufe 3)
+    einfordern: (zs: Zeile[]) => setVorschau({ art: 'einfordern', zeilen: zs }),
+    sammelBestaetigen: (zs: Zeile[]) => setVorschau({ art: 'bestaetigen', zeilen: zs }),
+  };
+  const ausfuehren = (v: Vorschau, zs: Zeile[]) => {
+    const ids = zs.map(z => z.projektId);
+    if (v.art === 'einfordern') {
+      m.einfordern.mutate(ids, { onSuccess: r => { setVorschau(null); melden(TM.toast.eingefordert(r.erledigt.length, r.uebersprungen.length)); }, onError: e => { setVorschau(null); fehler(e); } });
+      return;
+    }
+    m.sammelBestaetigen.mutate(ids, {
+      onSuccess: r => {
+        setVorschau(null);
+        const text = TM.toast.sammel(r.erledigt.length, r.uebersprungen.filter(u => u.grund === 'auffaellig').length, r.uebersprungen.filter(u => u.grund === 'stand').length);
+        melden(text, r.erledigt.length ? {
+          action: { label: TM.aktion.zuruecknehmen, run: () => m.sammelZuruecknehmen.mutate(r.erledigt, { onSuccess: x => melden(TM.toast.sammelZurueckgenommen(x.ok, x.nicht)), onError: fehler }) },
+        } : undefined);
+      },
+      onError: e => { setVorschau(null); fehler(e); },
+    });
   };
 
   const unter = kopf ? [
@@ -197,6 +212,7 @@ function Periode({ periode, search, setSearch, heute, darfAbschliessen }: { peri
         <BerichtDrawer z={offenZ} periode={periode} onClose={() => setSearch({ o: undefined })} beschaeftigt={beschaeftigt}
           bestaetigen={aktionen.bestaetigen} zuruecknehmen={aktionen.zuruecknehmen} rueckfrage={aktionen.rueckfrage} einfordern={z => aktionen.einfordern([z])} />
       ) : null}
+      {vorschau ? <SammelDialog vorschau={vorschau} onClose={() => setVorschau(null)} beschaeftigt={beschaeftigt} ausfuehren={zs => ausfuehren(vorschau, zs)} /> : null}
       {dialog && kopf ? (
         <AbschlussDialog kopf={kopf} onClose={() => setDialog(false)} beschaeftigt={beschaeftigt}
           eingereichteZeigen={() => { setDialog(false); setSearch({ stand: 'eingereicht', auffaellig: undefined, portfolio: undefined, ansicht: undefined }); }}

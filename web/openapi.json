@@ -13592,6 +13592,163 @@
           }
         }
       },
+      "BerichtStandList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "letzter",
+                "laufend"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "letzter": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "Letzter eingereichter Bericht (auch zurückgegeben oder geprüft).",
+                      "type": "object",
+                      "required": [
+                        "periode",
+                        "status",
+                        "trend",
+                        "begruendung"
+                      ],
+                      "properties": {
+                        "periode": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "anyOf": [
+                            {
+                              "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "im_plan"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "kritisch"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "trend": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "begruendung": {
+                          "description": "Begründung des Status (Pflicht bei «kritisch»).",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "laufend": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "Bericht der laufenden Periode, solange das Projekt berichtet (aktiv, P0–P3); `stand` null ohne gespeicherten Bericht.",
+                      "type": "object",
+                      "required": [
+                        "periode",
+                        "stand",
+                        "stichtag"
+                      ],
+                      "properties": {
+                        "periode": {
+                          "type": "string"
+                        },
+                        "stand": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "entwurf"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "eingereicht"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "zurueckgegeben"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "geprueft"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "stichtag": {
+                          "anyOf": [
+                            {
+                              "format": "date",
+                              "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "StatusberichtEskalationNeu": {
         "additionalProperties": false,
         "type": "object",
@@ -27785,7 +27942,8 @@
         "type": "object",
         "required": [
           "zielerreichung",
-          "vorhaben"
+          "vorhaben",
+          "lessonsLearned"
         ],
         "properties": {
           "zielerreichung": {
@@ -27995,6 +28153,115 @@
               },
               "laufend": {
                 "description": "Aktive und sistierte Vorhaben.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "nummer",
+                    "name",
+                    "portfolio",
+                    "phase",
+                    "lebenszyklus",
+                    "seit"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "portfolio": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "lebenszyklus": {
+                      "description": "`aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`.",
+                      "type": "string"
+                    },
+                    "seit": {
+                      "anyOf": [
+                        {
+                          "format": "date",
+                          "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "lessonsLearned": {
+            "additionalProperties": false,
+            "description": "Lessons Learned des Jahres (UC-013 Schritte 1–2).",
+            "type": "object",
+            "required": [
+              "eintraege",
+              "ohne"
+            ],
+            "properties": {
+              "eintraege": {
+                "description": "Im Jahr erfasst (PS.04.03), neueste zuerst.",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "projekt",
+                    "text",
+                    "kategorie"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "projekt": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "nummer",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nummer": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "kategorie": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "ohne": {
+                "description": "Im Jahr abgeschlossene Vorhaben ohne Lessons Learned (UC-013 Schritt 2, A1).",
                 "type": "array",
                 "items": {
                   "additionalProperties": false,
@@ -28977,7 +29244,7 @@
                 ]
               },
               "wesentlich": {
-                "description": "Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie.",
+                "description": "Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie.",
                 "type": "boolean"
               }
             }
@@ -64564,6 +64831,104 @@
         }
       }
     },
+    "/v1/statusberichte/stand": {
+      "get": {
+        "summary": "Stand der Berichte mehrerer Projekte",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»): je Projekt der letzte eingereichte Bericht mit Status, Trend und Begründung und der Bericht der laufenden Periode mit Stichtag. Projekte ohne Leserecht entfallen.",
+        "parameters": [
+          {
+            "schema": {
+              "minItems": 1,
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "projektId",
+            "required": true,
+            "description": "Projekte (mehrfach, höchstens 20)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BerichtStandList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/projekte/{id}/berichte": {
       "get": {
         "summary": "Statusberichte eines Projekts",
@@ -80956,6 +81321,266 @@
           },
           "409": {
             "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jahresrueckblicke/{jahr}/lessons-learned/anfordern": {
+      "post": {
+        "summary": "Lessons Learned anfordern",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Legt den Projektleitungen der im Jahr abgeschlossenen Vorhaben ohne Lessons Learned die Aufgabe «Lessons Learned erfassen» in den Eingang (UC-013 A1); idempotent je Projekt und Person, erledigt mit der ersten erfassten Lesson Learned. Legt den Jahresrückblick an, falls noch keiner gespeichert ist. Recht `quartalsbericht:write`.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "vorhaben",
+                    "aufgaben"
+                  ],
+                  "properties": {
+                    "vorhaben": {
+                      "description": "Im Jahr abgeschlossene Vorhaben ohne Lessons Learned.",
+                      "type": "integer"
+                    },
+                    "aufgaben": {
+                      "description": "Geöffnete oder nachgeführte Aufgaben an die Projektleitungen.",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jahresrueckblicke/{jahr}/dokument": {
+      "get": {
+        "summary": "Jahresrückblick als Dokument",
+        "tags": [
+          "Jahresrückblick"
+        ],
+        "description": "Jahresauswertung mit Erkenntnissen und Massnahmen als PDF oder Word über die Dokumentausgabe (Modul `vorlage`), in der Lesesicht der Person; Kopfzeile «Intern · enthält Personendaten» (G12). Ohne gespeicherten Jahresrückblick 404. Der Export ist protokolliert. Recht `ziel:read` oder `quartalsbericht:write`.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pdf"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "docx"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Standard PDF."
+          },
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dokument als Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
             "content": {
               "application/problem+json": {
                 "schema": {

@@ -10,6 +10,7 @@ import {
   type Deps, type Tx,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
+import { erfasst } from './lessons-haken.ts';
 import { LessonQuery, type LessonInT, type LessonOut, type LessonPatchT } from './schemas.ts';
 import * as store from './store.ts';
 
@@ -83,6 +84,8 @@ export function registerLessonsRoutes(app: FastifyInstance, _deps: Deps): void {
       pruefeProjekt(p);
       const neu = (await store.lesson(tx, await store.lessonAnlegen(tx, p.id, body.text, body.kategorie ?? '')))!;
       await record(tx, who, { action: 'lessons_learned.created', resourceType: 'lessons_learned', resourceId: neu.id, data: { ...snapshot(neu), text: neu.text }, event: snapshot(neu) });
+      // obere Module (Jahresrückblick) in derselben Transaktion, z. B. Aufgabe «Lessons Learned erfassen» erledigt
+      await erfasst(tx, { id: neu.id, projektId: neu.projekt_id, jahr: neu.jahr });
       return { l: neu, personen: await store.personen(tx, neu.created_by ? [neu.created_by] : []) };
     });
     return reply.code(201).header('etag', etag(l.version)).send(lessonOut(l, personen, { write: true }));

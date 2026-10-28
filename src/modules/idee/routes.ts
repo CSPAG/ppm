@@ -29,13 +29,13 @@ const BEARBEITBAR: readonly Stand[] = ['entwurf', 'in_ergaenzung'];
  * Bereiche und Herkunft sind freiwillig, damit Personen ohne Kenntnis der Strategie einreichen können (K4-1).
  */
 const PFLICHT: readonly { feld: keyof Felder; fehlt: (r: store.Row) => boolean; text: string }[] = [
-  { feld: 'titel', fehlt: r => !r.titel, text: 'Titel fehlt: Geben Sie der Idee einen kurzen Namen, unter dem sie im Ideenpool erscheint.' },
-  { feld: 'ausgangslage', fehlt: r => !r.ausgangslage, text: 'Ausgangslage fehlt: Beschreiben Sie, was heute ist und was daran stört.' },
-  { feld: 'zielsetzung', fehlt: r => !r.zielsetzung, text: 'Zielsetzung fehlt: Ohne Ziel kann die Unternehmensentwicklung die Idee nicht einordnen. Beschreiben Sie in zwei, drei Sätzen, was erreicht werden soll.' },
-  { feld: 'handlungsfeldId', fehlt: r => !r.handlungsfeld_id, text: 'Handlungsfeld fehlt: Wählen Sie das Handlungsfeld, zu dem die Idee am besten passt.' },
-  { feld: 'nutzen', fehlt: r => !r.nutzen, text: 'Nutzen fehlt: Schätzen Sie den Nutzen als hoch, mittel oder tief ein.' },
-  { feld: 'aufwand', fehlt: r => !r.aufwand, text: 'Aufwand fehlt: Schätzen Sie den Aufwand als hoch, mittel oder tief ein.' },
-  { feld: 'relevanz', fehlt: r => !r.relevanz, text: 'Relevanz fehlt: Schätzen Sie die Relevanz als hoch, mittel oder tief ein.' },
+  { feld: 'titel', fehlt: r => !r.titel, text: 'Titel fehlt: Gib der Idee einen kurzen Namen, unter dem sie im Ideenpool erscheint.' },
+  { feld: 'ausgangslage', fehlt: r => !r.ausgangslage, text: 'Ausgangslage fehlt: Beschreibe, was heute ist und was daran stört.' },
+  { feld: 'zielsetzung', fehlt: r => !r.zielsetzung, text: 'Zielsetzung fehlt: Ohne Ziel kann die Unternehmensentwicklung die Idee nicht einordnen. Beschreibe in zwei, drei Sätzen, was erreicht werden soll.' },
+  { feld: 'handlungsfeldId', fehlt: r => !r.handlungsfeld_id, text: 'Handlungsfeld fehlt: Wähle das Handlungsfeld, zu dem die Idee am besten passt.' },
+  { feld: 'nutzen', fehlt: r => !r.nutzen, text: 'Nutzen fehlt: Schätze den Nutzen als hoch, mittel oder tief ein.' },
+  { feld: 'aufwand', fehlt: r => !r.aufwand, text: 'Aufwand fehlt: Schätze den Aufwand als hoch, mittel oder tief ein.' },
+  { feld: 'relevanz', fehlt: r => !r.relevanz, text: 'Relevanz fehlt: Schätze die Relevanz als hoch, mittel oder tief ein.' },
 ];
 
 interface Ctx { me: string; create: boolean }
@@ -125,7 +125,7 @@ async function eigeneBearbeitbar(tx: Tx, id: string, me: string, version: number
   const r = await store.get(tx, id);
   if (!r) throw notFound('Idee');
   if (r.erfasst_von !== me) throw forbidden('Nur die Person, die die Idee erfasst hat, kann sie bearbeiten.');
-  if (!BEARBEITBAR.includes(r.stand)) throw conflict('Die Idee ist eingereicht. Ändern können Sie sie erst, wenn die Unternehmensentwicklung Rückfragen stellt.');
+  if (!BEARBEITBAR.includes(r.stand)) throw conflict('Die Idee ist eingereicht. Ändern kannst du sie erst, wenn die Unternehmensentwicklung Rückfragen stellt.');
   if (version !== null && r.version !== version) throw preconditionFailed(r.version);
   return r;
 }

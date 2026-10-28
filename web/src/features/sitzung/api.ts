@@ -17,7 +17,13 @@ export const sitzungKeys = {
   eine: (kuerzel: string, datum: string) => ['sitzung', 'eine', kuerzel, datum] as const,
   vorschlaege: (id: string) => ['sitzung', 'vorschlaege', id] as const,
   versand: (id: string) => ['sitzung', 'versand', id] as const,
+  kopf: ['sitzung', 'kopf'] as const,
 };
+
+/** Nächste Sitzungen, die die Person sieht, für die Kopfkarte im Eingang (`GET /v1/sitzungen/kopf`). */
+export function useSitzungKopf() {
+  return useQuery({ queryKey: sitzungKeys.kopf, queryFn: async ({ signal }) => (await api.GET('/v1/sitzungen/kopf', { signal })).data!.sitzungen });
+}
 
 /** Adresse der nächsten Sitzung, die die Person sieht (Befehlspalette «Nächste Sitzung öffnen», I-N4); null ohne Sitzung. */
 export async function naechsteSitzungPfad(signal: AbortSignal): Promise<string | null> {

@@ -231,6 +231,8 @@ export const model = defineModel({
     // priorisierung
     get_matrix: { title: 'Portfolio-Matrix lesen', permission: 'priorisierung:read', readOnly: true },
     compare_szenarien: { title: 'Szenarien vergleichen', permission: 'priorisierung:read', readOnly: true },
+    // finanzen
+    get_finanzen: { title: 'Finanzübersicht lesen', permission: 'finanzen:read', readOnly: true },
     list_bedarfe: { title: 'Bedarfsliste mit Deckung', permission: 'ressource:read', readOnly: true },
     // idee
     list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },

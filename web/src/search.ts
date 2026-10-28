@@ -2,6 +2,7 @@
  * Typisierte Suchparameter je Seite (TanStack Router `validateSearch`). Jede Seite beschreibt ihre Parameter in ihrem
  * Feature; hier werden sie den Routen zugeordnet.
  */
+import { validateLessonsSearch } from './features/abschluss/index.ts';
 import { validateBerichtSearch } from './features/bericht/index.ts';
 import { validateEingangSearch } from './features/eingang/index.ts';
 import { type HandlungsfeldSearch, validateHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
@@ -12,7 +13,7 @@ import { validateDashboardSearch, validatePortfolioberichtSearch, validateRisike
 import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { type PortfoliosSearch, validatePortfoliosSearch } from './features/portfolios/index.ts';
-import { type BewertungSearch, type MatrixSearch, type ModellSearch, validateBewertungSearch, validateMatrixSearch, validateModellSearch } from './features/priorisierung/index.ts';
+import { type BewertungSearch, type MatrixSearch, type ModellSearch, validateBewertungSearch, validateMatrixSearch, validateModellSearch, validateSzenarioSearch } from './features/priorisierung/index.ts';
 import { type EntscheideSearch, type SitzungSearch, validateEntscheideSearch, validateSitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
@@ -26,6 +27,7 @@ export const searchOf = {
   bewertung: validateBewertungSearch,
   bewertungsmodell: validateModellSearch,
   matrix: validateMatrixSearch,
+  szenarien: validateSzenarioSearch,
   eingang: validateEingangSearch,
   stellvertretung: validateKontoSearch,
   handlungsfelder: validateHandlungsfeldSearch,
@@ -44,6 +46,7 @@ export const searchOf = {
   dashboard: validateDashboardSearch,
   risiken: validateRisikenSearch,
   portfoliobericht: validatePortfolioberichtSearch,
+  lessonsLearned: validateLessonsSearch,
   monatsabschluss: validateMonatsabschlussSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,

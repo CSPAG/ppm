@@ -82,7 +82,7 @@ async function traktandumMitSitzung(req: FastifyRequest, tx: Tx, id: string): Pr
   const t = await store.getTraktandum(tx, id);
   if (!t) throw notFound('Traktandum');
   await req.need('sitzung:write', ort(t.portfolio_id));
-  if (!t.sitzung_id) throw conflict('Das Traktandum ist ein Vorschlag ohne Sitzung. Nehmen Sie es zuerst in eine Sitzung auf.');
+  if (!t.sitzung_id) throw conflict('Das Traktandum ist ein Vorschlag ohne Sitzung. Nimm es zuerst in eine Sitzung auf.');
   return { t, s: await lesen(tx, t.sitzung_id) };
 }
 
@@ -180,13 +180,17 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   // --- Sitzung --------------------------------------------------------------------------------------------------------
 
   app.get('/v1/sitzungen/kopf', {
-    schema: { tags: [TAG], summary: 'Kopf im Eingang', description: 'Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).', response: { 200: Type.Ref('SitzungKopf') } },
+    schema: { tags: [TAG], summary: 'Kopf im Eingang', description: 'Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).', response: { 200: Type.Ref('SitzungKopf') } },
   }, async req => {
     await req.needSomewhere('sitzung:read');
-    const items = await req.tx(async tx => Promise.all((await store.naechsteSitzungen(tx, heute(), 5)).map(async s => ({
-      id: s.id, gremium: { id: s.gremium_id, kuerzel: s.gremium_kuerzel, name: s.gremium_name }, datum: s.datum, stand: s.stand,
-      traktanden: s.traktanden, versandBis: (await versandfrist(tx, s)).bis,
-    }))));
+    const items = await req.tx(async tx => Promise.all((await store.naechsteSitzungen(tx, heute(), 5)).map(async s => {
+      const stand = await unterlagenstand(tx, s, await store.traktanden(tx, s.id));
+      return {
+        id: s.id, gremium: { id: s.gremium_id, kuerzel: s.gremium_kuerzel, name: s.gremium_name }, datum: s.datum, stand: s.stand,
+        traktanden: s.traktanden, versandBis: (await versandfrist(tx, s)).bis,
+        unterlagenBereit: [...stand.values()].filter(u => u.stand === 'bereit' || u.stand === 'keine').length,
+      };
+    })));
     return { sitzungen: items };
   });
 

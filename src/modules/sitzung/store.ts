@@ -306,9 +306,12 @@ export async function unterlageAnlegen(tx: Tx, traktandumId: string, u: { art: U
     [traktandumId, u.art, u.titel, u.standOk, u.hinweis, JSON.stringify(u.inhalt)]);
 }
 
-/** Nächste Sitzungen der Person mit Versand oder Vorbereitung (Kopf im Eingang). */
+/** Je Gremium die nächste Sitzung, die die Person sieht, nach Datum (Kopf im Eingang). */
 export async function naechsteSitzungen(tx: Tx, ab: string, limit: number): Promise<(SitzungRow & { traktanden: number })[]> {
   return (await tx.query<SitzungRow & { traktanden: number }>(
-    `SELECT ${SCOLS}, (SELECT count(*)::int FROM ${T} t WHERE t.sitzung_id = s.id AND t.stand IN ('traktandiert', 'entschieden')) AS traktanden
-       FROM ${SFROM} WHERE s.datum >= $1::date ORDER BY s.datum, g.kuerzel LIMIT $2`, [ab, limit])).rows;
+    `SELECT * FROM (
+       SELECT DISTINCT ON (s.gremium_id) ${SCOLS}, g.kuerzel AS sort_kuerzel,
+              (SELECT count(*)::int FROM ${T} t WHERE t.sitzung_id = s.id AND t.stand IN ('traktandiert', 'entschieden')) AS traktanden
+         FROM ${SFROM} WHERE s.datum >= $1::date ORDER BY s.gremium_id, s.datum
+     ) n ORDER BY n.datum, n.sort_kuerzel LIMIT $2`, [ab, limit])).rows;
 }

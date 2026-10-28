@@ -14,10 +14,16 @@ export const projektKeys = {
   list: (f: ListFilter) => ['projekt', 'list', f] as const,
   nummer: (nr: string) => ['projekt', 'nummer', nr] as const,
   organisation: (id: string) => ['projekt', 'organisation', id] as const,
+  kopf: ['projekt', 'kopf'] as const,
 };
 
 export const LAUFEND: Lebenszyklus[] = ['aktiv', 'sistiert'];
 export const BEENDET: Lebenszyklus[] = ['abgebrochen', 'abgeschlossen', 'zurueckgezogen'];
+
+/** Laufende Projekte mit eigener Funktion für die Kopfkarte im Eingang (`GET /v1/projekte/kopf`). */
+export function useProjektKopf() {
+  return useQuery({ queryKey: projektKeys.kopf, queryFn: async ({ signal }) => (await api.GET('/v1/projekte/kopf', { signal })).data! });
+}
 
 export function useProjektList(f: ListFilter) {
   return useInfiniteQuery({

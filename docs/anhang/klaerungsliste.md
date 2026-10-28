@@ -87,4 +87,6 @@ Klären mit: UE. Fragen, die beim Bau aufgefallen sind; bis zur Antwort gilt die
 | K28 | Soll die UE bei einem Änderungsantrag mit Wirkung informiert werden («PL und UE informiert»)? | K2; UC-007; A-53 | Mitteilung an alle mit dem Recht der UE am Portfolio; heute nur an die PL. |
 | K29 | Ist das ERP nur im internen Netz erreichbar? | A-16; A-54 | Falls ja: Anschluss über einen freigegebenen Weg (z. B. Push aus dem ERP); private Adressen in Produktion bleiben gesperrt. |
 | K30 | Darf «mit Auflagen freigegeben» bei der Initialisierung anders wirken als «freigegeben»? | UC-001 Schritt 7; A-51 | Wirkt heute wie «freigegeben», die Auflagen werden Aufgaben. |
+| K31 | Erzeugt das System eine Aufgabe «Jahresrückblick vorbereiten», und an wen? | UC-013 Schritt 1; fachmodell 4.2; A-61 | Aufgabe an die UE zu Beginn des neuen Jahres; heute keine automatische Aufgabe. |
+| K32 | Zählt eine Zuteilung zu einem Projekt, das die lesende Person nicht sieht (z. B. vertraulich), in deren Auslastung? | UC-015 Schritt 6; A-63; A-33 | Lebenszyklus unabhängig von der Sicht prüfen; heute zählt sie weiter, wenn das Projekt nicht sichtbar ist. |
 

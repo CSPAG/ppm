@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Priorisierung» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte des Features «Priorisierung» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung; Begriffe aus K5 und UC-008 (Bewertungsmodell, Kriterium, Budgetrahmen, Einschätzung).
  */
 import { NAV } from './pfade.ts';
@@ -8,7 +8,7 @@ export const TP = {
   ...NAV,
   title: 'Priorisierung',
   sub: 'Projekte nach dem Bewertungsmodell bewerten; Modell und Budgetrahmen festlegen.',
-  tabs: { bewertung: 'Bewertung', matrix: 'Matrix', modell: 'Modell' },
+  tabs: { bewertung: 'Bewertung', matrix: 'Matrix', szenarien: 'Szenarien', modell: 'Modell' },
   // Bewertung (UI-20)
   portfolio: 'Portfolio',
   modellVersion: 'Modell',
@@ -27,14 +27,14 @@ export const TP = {
   dimension: { nutzen: 'Nutzen', risiko: 'Risiko' } as Record<string, string>,
   ohneDimension: 'ohne Zuordnung',
   tastatur: 'Pfeiltasten wechseln die Zelle; 1 = tief, 2 = mittel, 3 = hoch, Entf entfernt; Strg+Z macht rückgängig. Eingabetaste öffnet das Projekt mit Kommentaren.',
-  keinModell: 'Es ist noch kein Bewertungsmodell in Kraft. Legen Sie unter «Modell» die Kriterien fest und setzen Sie das Modell mit dem Entscheid des Gremiums in Kraft.',
+  keinModell: 'Es ist noch kein Bewertungsmodell in Kraft. Lege unter «Modell» die Kriterien fest und setze das Modell mit dem Entscheid des Gremiums in Kraft.',
   keinModellAktion: 'Zum Modell',
-  keineProjekte: 'Dieses Portfolio hat keine aktiven Projekte, die Sie sehen.',
-  keinPortfolio: 'Es gibt noch kein Portfolio, das Sie sehen.',
-  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder Sie sehen es nicht.',
-  nurLesen: 'Sie können die Bewertung nur ansehen; sie pflegt die Unternehmensentwicklung.',
+  keineProjekte: 'Dieses Portfolio hat keine aktiven Projekte, die du siehst.',
+  keinPortfolio: 'Es gibt noch kein Portfolio, das du siehst.',
+  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder du siehst es nicht.',
+  nurLesen: 'Du kannst die Bewertung nur ansehen; sie pflegt die Unternehmensentwicklung.',
   frueherLesen: (n: number) => `Bewertung nach dem früheren Modell ${n}; bewertet wird nach dem Modell in Kraft.`,
-  schmal: 'Bewerten geht ab einer Breite von 1024 px; hier sehen Sie die Bewertung nur.',
+  schmal: 'Bewerten geht ab einer Breite von 1024 px; hier siehst du die Bewertung nur.',
   speichert: 'Wird gespeichert …',
   gespeichert: 'Gespeichert',
   gerade: 'gerade eben',
@@ -42,14 +42,14 @@ export const TP = {
   vorMinuten: (m: number) => `vor ${m} Min.`,
   ungespeichert: (n: number) => (n === 1 ? '1 Änderung noch nicht gespeichert' : `${n} Änderungen noch nicht gespeichert`),
   rueckgaengig: 'Rückgängig', wiederholen: 'Wiederholen',
-  konflikt: 'Jemand anderes hat die Bewertung inzwischen geändert. Laden Sie neu; Ihre Änderungen bleiben erhalten und werden danach gespeichert.',
+  konflikt: 'Jemand anderes hat die Bewertung inzwischen geändert. Lade neu; deine Änderungen bleiben erhalten und werden danach gespeichert.',
   neuLaden: 'Neu laden',
   fehlerSpeichern: 'Die Bewertung konnte nicht gespeichert werden.',
   erneut: 'Erneut versuchen',
   // Schublade Projekt
   kommentar: 'Kommentar',
-  kommentarHinweis: 'optional; wird gespeichert, sobald Sie das Feld verlassen',
-  ohneBewertungKommentar: 'Bewerten Sie das Kriterium zuerst; der Kommentar gehört zur Einschätzung.',
+  kommentarHinweis: 'optional; wird gespeichert, sobald du das Feld verlässt',
+  ohneBewertungKommentar: 'Bewerte das Kriterium zuerst; der Kommentar gehört zur Einschätzung.',
   projektUnbekannt: 'Dieses Projekt ist nicht im Raster.',
   phase: 'Phase',
   // Modell (UI-19)
@@ -76,13 +76,13 @@ export const TP = {
   inKraftWirkung: 'Ab dann werden die Projekte nach diesem Modell bewertet. Frühere Bewertungen bleiben mit ihrem Modell lesbar. Ein Modell in Kraft lässt sich nicht mehr ändern.',
   beschlussLabel: 'Entscheid des Gremiums',
   beschlussHinweis: 'z. B. «PRAT 12.11.2026, Traktandum 4»',
-  beschlussFehlt: 'Nennen Sie den Entscheid des Gremiums.',
+  beschlussFehlt: 'Nenne den Entscheid des Gremiums.',
   verwerfen: 'Entwurf verwerfen',
   verwerfenFrage: (n: number) => `Entwurf Modell ${n} verwerfen? Kriterien und Budgetrahmen des Entwurfs gehen verloren.`,
   angelegt: 'Entwurf angelegt.', gespeichertToast: 'Änderungen gespeichert.', inKraftToast: 'Modell in Kraft gesetzt.', verworfen: 'Entwurf verworfen.',
-  modellKonflikt: 'Dieser Entwurf wurde inzwischen geändert. Laden Sie ihn neu und übernehmen Sie Ihre Änderungen danach nochmals.',
-  modellUnbekannt: 'Diese Version gibt es nicht, oder Sie sehen sie nicht.',
-  modellNurLesen: 'Ein Modell in Kraft ist unveränderlich. Für Änderungen legen Sie einen Entwurf an.',
+  modellKonflikt: 'Dieser Entwurf wurde inzwischen geändert. Lade ihn neu und übernimm deine Änderungen danach nochmals.',
+  modellUnbekannt: 'Diese Version gibt es nicht, oder du siehst sie nicht.',
+  modellNurLesen: 'Ein Modell in Kraft ist unveränderlich. Für Änderungen legst du einen Entwurf an.',
   textFehlt: 'Bezeichnung fehlt.',
   betragUngueltig: 'Betrag in CHF, 0 oder mehr.',
   stufe: { sperre: 'Sperre', hinweis: 'Hinweis' } as Record<string, string>,

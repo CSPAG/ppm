@@ -52,6 +52,21 @@ const Vorperiode = Type.Object({
   periode: Type.String(), status: Nullable(Status), trend: Nullable(Type.String()), stand: Type.String(),
 }, { additionalProperties: false });
 
+/** Eskalation zum Bericht (PS.03.03; UC-004 A1.2 aus der Warnung «wesentliche Abweichung», A2.2 aus «kritisch»). */
+const EskalationKurz = Type.Object({
+  id: Uuid,
+  anlass: Type.Union([Type.Literal('kritisch'), Type.Literal('abweichung')], { description: '`kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet.' }),
+  stand: Type.Union([Type.Literal('offen'), Type.Literal('traktandiert'), Type.Literal('erledigt')]),
+  vorgeschlagen: Type.Boolean({ description: 'Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand.' }),
+  angelegtAt: DateTime,
+}, { additionalProperties: false });
+
+export const EskalationNeu = Type.Object({
+  grund: Type.String({ minLength: 1, maxLength: 4000, description: 'Worum es geht, z. B. die wesentliche Abweichung zur Baseline.' }),
+  massnahme: Type.Optional(Type.String({ maxLength: 4000, description: 'Vorgeschlagene Massnahme; leer: das Gremium entscheidet über das weitere Vorgehen.' })),
+}, { $id: 'StatusberichtEskalationNeu', additionalProperties: false });
+export type EskalationNeuIn = Static<typeof EskalationNeu>;
+
 export const Fehlend = Type.Object({
   feld: Type.String({ description: 'Feld im Bericht, z. B. `status` oder `abweichung.budget`.' }),
   text: Type.String(),
@@ -74,10 +89,12 @@ export const Statusbericht = Type.Object({
   geprueftAt: Nullable(DateTime),
   version: Type.Integer({ minimum: 0, description: '0: noch nicht gespeichert; mit `If-Match: W/"0"` anlegen.' }),
   updatedAt: Nullable(DateTime),
+  eskalation: Nullable(EskalationKurz),
   can: Type.Object({
     write: Type.Boolean({ description: 'Entwurf speichern.' }),
     einreichen: Type.Boolean(),
     zurueckziehen: Type.Boolean({ description: 'Rückgängig innert 10 s nach dem Einreichen.' }),
+    eskalieren: Type.Boolean({ description: 'Eskalation aus der Warnung «wesentliche Abweichung» starten (UC-004 A1.2): bearbeitbar und noch ohne Eskalation.' }),
   }),
 }, { $id: 'Statusbericht', additionalProperties: false });
 export type StatusberichtOut = Static<typeof Statusbericht>;

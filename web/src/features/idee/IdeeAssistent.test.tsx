@@ -67,7 +67,7 @@ function server(start: ReturnType<typeof idee> | null, liste: ReturnType<typeof 
     'POST /v1/ideen': async (req: Request) => { cur = idee({ ...(await req.json()) }); return json(cur, 201, { ETag: 'W/"1"' }); },
     [`PATCH /v1/ideen/${ID}`]: async (req: Request) => { cur = idee({ ...cur, ...(await req.json()), version: cur!.version + 1 }); return json(cur, 200, { ETag: `W/"${cur.version}"` }); },
     [`POST /v1/ideen/${ID}/einreichen`]: () => { cur = idee({ ...cur, stand: 'eingereicht', version: cur!.version + 1, can: { bearbeiten: false, einreichen: false, loeschen: false } }); return json(cur, 200, { ETag: `W/"${cur.version}"` }); },
-    [`PUT /v1/ideen/${ID}/rueckfragen/${RF}`]: async (req: Request) => json({ id: RF, feld: 'zielsetzung', text: 'Woran messen Sie den Erfolg?', antwort: (await req.json()).antwort, gestelltAt: '2026-10-07T08:00:00Z', beantwortetAt: '2026-10-08T08:00:00Z' }),
+    [`PUT /v1/ideen/${ID}/rueckfragen/${RF}`]: async (req: Request) => json({ id: RF, feld: 'zielsetzung', text: 'Woran misst du den Erfolg?', antwort: (await req.json()).antwort, gestelltAt: '2026-10-07T08:00:00Z', beantwortetAt: '2026-10-08T08:00:00Z' }),
   });
   return api;
 }
@@ -156,12 +156,12 @@ describe('Assistent Projektidee', () => {
   it('zeigt Rückfragen über dem Feld, speichert die Antwort und reicht erneut ein (UC-001 A2.2)', async () => {
     const e = idee({
       stand: 'in_ergaenzung', titel: 'Aufnahme', ausgangslage: 'Papier', zielsetzung: 'Ohne Papier', handlungsfeldId: HF, nutzen: 'hoch', aufwand: 'mittel', relevanz: 'tief',
-      rueckfragen: [{ id: RF, feld: 'zielsetzung', text: 'Woran messen Sie den Erfolg?', antwort: null, gestelltAt: '2026-10-07T08:00:00Z', beantwortetAt: null }],
+      rueckfragen: [{ id: RF, feld: 'zielsetzung', text: 'Woran misst du den Erfolg?', antwort: null, gestelltAt: '2026-10-07T08:00:00Z', beantwortetAt: null }],
       can: { bearbeiten: true, einreichen: true, loeschen: false },
     });
     const api = server(e);
     const { container } = renderWithIam(<IdeePage nummer={7} search={{}} setSearch={vi.fn()} gehe={gehe} />, ALS_AS);
-    expect(await screen.findByText('Woran messen Sie den Erfolg?')).toBeInTheDocument();
+    expect(await screen.findByText('Woran misst du den Erfolg?')).toBeInTheDocument();
     expect(screen.getByText(TI.rueckfragenBanner(1))).toBeInTheDocument();
     await expectNoAxe(container);
     await userEvent.type(screen.getByLabelText(TI.antwort), 'Aufnahmezeit unter 10 Minuten');

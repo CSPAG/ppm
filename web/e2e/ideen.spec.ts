@@ -45,11 +45,11 @@ test('Projektidee in vier Schritten einreichen und unter «Meine Ideen» verfolg
   await page.getByRole('button', { name: 'Weiter' }).click();
 
   await expect(page.getByRole('heading', { name: 'Schritt 4 von 4: Zusammenfassung' })).toBeVisible();
-  await expect(page.getByText('Die Unternehmensentwicklung erhält Ihre Idee zur Prüfung.', { exact: false })).toBeVisible();
+  await expect(page.getByText('Die Unternehmensentwicklung erhält deine Idee zur Prüfung.', { exact: false })).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
   await page.getByRole('button', { name: 'Projektidee einreichen' }).click();
-  await expect(page.getByRole('heading', { name: 'Ihre Idee ist eingereicht.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deine Idee ist eingereicht.' })).toBeVisible();
 
   await page.getByRole('link', { name: 'Zu «Meine Ideen»' }).click();
   await expect(page.getByRole('heading', { name: 'Meine Ideen', level: 1 })).toBeVisible();

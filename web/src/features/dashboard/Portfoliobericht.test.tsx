@@ -67,6 +67,7 @@ function server(start: Bericht[] = []) {
       const b = berichte.get(new URL(req.url).pathname.split('/').pop()!)!;
       const body = await req.json() as { kommentar: string };
       calls.push({ method: 'PATCH', pfad: 'kommentar', ifMatch: req.headers.get('if-match'), body });
+      if (req.headers.get('if-match') !== `W/"${b.version}"`) return json({ title: 'Inzwischen geändert', status: 412 }, 412);
       Object.assign(b, { kommentar: body.kommentar.trim(), version: b.version + 1 });
       return json(b);
     }],
@@ -134,6 +135,23 @@ describe('Portfoliobericht', () => {
     expect(await screen.findByText('bereitgestellt')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.getByText('Lage stabil')).toBeInTheDocument();
+  });
+
+  it('Kommentar mit Konflikt (412): der eigene Text bleibt, der inzwischen gespeicherte steht daneben (Z7)', async () => {
+    const s = server();
+    renderWithIam(<Bericht />, UE);
+    await userEvent.click(await screen.findByRole('button', { name: TP.aktion.erzeugen }));
+    const feld = await screen.findByRole('textbox', { name: TP.kommentar.label });
+    await userEvent.type(feld, 'Meins');
+    Object.assign(s.berichte.get(id(50))!, { kommentar: 'Von Paula', version: 2 }); // jemand anderes speichert dazwischen
+    await userEvent.click(screen.getByRole('button', { name: TP.aktion.speichern }));
+    expect(await screen.findByText(/Dein Kommentar ist noch da/)).toBeInTheDocument(); // Toast: «TP.konflikt: Titel»
+    expect(await screen.findByText(TP.kommentar.andere('Von Paula'))).toBeInTheDocument();
+    expect(feld).toHaveValue('Meins');
+    await userEvent.click(screen.getByRole('button', { name: TP.aktion.speichern }));
+    await waitFor(() => expect(s.calls.filter(c => c.pfad === 'kommentar').at(-1)).toMatchObject({ ifMatch: 'W/"2"', body: { kommentar: 'Meins' } }));
+    await waitFor(() => expect(screen.queryByText(TP.kommentar.andere('Von Paula'))).toBeNull());
+    expect(feld).toHaveValue('Meins');
   });
 
   it('Gremium ohne bereitgestellten Bericht: Erklärung, keine Aktion; offene Periode: Hinweis', async () => {

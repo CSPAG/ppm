@@ -31,6 +31,12 @@ export async function naechsteSitzungPfad(signal: AbortSignal): Promise<string |
   return s ? sitzungPfad(s.gremium.kuerzel, s.datum) : null;
 }
 
+/** Sitzungen nach Gremium, Datum oder Traktandentitel für die Befehlspalette (I-N4); nach Recht und Lesesicht der API. */
+export async function sucheSitzungen(q: string, signal: AbortSignal): Promise<Schemas['SitzungSuche']['items']> {
+  const { data } = await api.GET('/v1/sitzungen', { params: { query: { q, limit: 5 } }, signal });
+  return data!.items;
+}
+
 /** Entscheidende Gremien, deren Sitzungen die Person sieht (externe wie der SNS-VR haben keine Sitzungen im System). */
 export function useGremien() {
   return useQuery({

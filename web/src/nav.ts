@@ -10,7 +10,7 @@ import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosNav } from './features/portfolios/index.ts';
 import { suchePersonen, zugangNav } from './features/zugang/index.ts';
 import { projektNav, sucheProjekte, sucheProjektPersonen } from './features/projekt/index.ts';
-import { naechsteSitzungPfad, sitzungNav } from './features/sitzung/index.ts';
+import { naechsteSitzungPfad, sitzungNav, sitzungPfad, sucheSitzungen } from './features/sitzung/index.ts';
 import { jahresrueckblickNav } from './features/jahresrueckblick/index.ts';
 import { ideeNav, ideeNeuPfad, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
@@ -25,7 +25,7 @@ import { kontoNav } from './features/konto/index.ts';
 import { schnittstellenNav as TX } from './features/schnittstellen/index.ts';
 import { sucheZiele, zieleNav, zielO } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
-import { T } from './ui/index.ts';
+import { fmtDatum, T } from './ui/index.ts';
 
 export const navigation: NavRegistrierung = {
   bereiche: [
@@ -144,6 +144,14 @@ export const navigation: NavRegistrierung = {
       id: 'ideen', recht: ['idee:create', 'idee:read'],
       suchen: async (q, signal) => (await sucheIdeen(q, signal)).map(i => ({
         id: `idee:${i.id}`, label: `${i.nummer} ${i.titel}`, detail: ideeNav.bereich, icon: 'doc', pfad: `/portfolio/ideen/${i.nummer}`,
+      })),
+    },
+    // Sitzungen nach Gremium, Datum oder Traktandentitel (I-N4); Sitzungen und Traktanden nach Lesesicht
+    {
+      id: 'sitzungen', recht: 'sitzung:read',
+      suchen: async (q, signal) => (await sucheSitzungen(q, signal)).map(x => ({
+        id: `sitzung:${x.id}`, label: `${x.gremium.kuerzel.toUpperCase()} · ${fmtDatum(x.datum)}`, detail: x.traktandum ?? `${x.gremium.name} · ${sitzungNav.bereich}`,
+        icon: 'calendar', pfad: sitzungPfad(x.gremium.kuerzel, x.datum),
       })),
     },
     // Personen nach Name oder E-Mail (I-N4): nur für die Administration (members:admin), Treffer in Verwalten › Mitglieder

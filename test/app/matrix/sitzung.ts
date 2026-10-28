@@ -67,6 +67,7 @@ export const matrix: Matrix = {
     'POST /v1/gremien/:kuerzel/sitzungen': () => ({ method: 'POST', url: '/v1/gremien/gremium-a/sitzungen', body: { datum: '2027-01-13' }, kind: 'foreign' }),
     'GET /v1/gremien/:kuerzel/sitzungen/:datum': () => ({ method: 'GET', url: '/v1/gremien/gremium-a/sitzungen/2026-12-02', kind: 'foreign' }),
     'GET /v1/sitzungen/kopf': () => ({ method: 'GET', url: '/v1/sitzungen/kopf', kind: 'list' }),
+    'GET /v1/sitzungen': () => ({ method: 'GET', url: '/v1/sitzungen?q=probe', kind: 'list' }),
     // Kopfkarte «Meine Projekte»: fremde Projekte ergeben nichts (Liste ohne IDs von A)
     'GET /v1/traktanden/naechste': i => ({ method: 'GET', url: `/v1/traktanden/naechste?projektId=${i.berichtProjekt}`, kind: 'list' }),
     'GET /v1/sitzungen/:id': i => ({ method: 'GET', url: `/v1/sitzungen/${i.sitzung}`, kind: 'foreign' }),

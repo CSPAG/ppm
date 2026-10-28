@@ -15,11 +15,13 @@ import { fristenTask } from './fristen.ts';
 import { sitzungTools } from './mcp.ts';
 import { registerProtokollRoutes } from './protokoll-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
+import { registerSucheRoutes } from './suche-routes.ts';
 
 const ROUTEN: ((app: FastifyInstance, deps: Deps) => void)[] = [
   registerRoutes,
   registerEntscheidRoutes,
   registerProtokollRoutes,
+  registerSucheRoutes,
 ];
 
 export const sitzungModule = defineModule({

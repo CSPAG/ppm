@@ -29,7 +29,7 @@ describe('Navigation der Antragstellenden', () => {
     // Projektleitung: Statusbericht erstellen, Änderung beantragen, Stellvertretung erfassen
     expect(ids(['tenant:read', 'projekt:read', 'statusbericht:write', 'vertrag:write'])).toEqual(expect.arrayContaining(['statusbericht', 'aenderung', 'stellvertretung-erfassen', 'projekte']));
     // Gremium: nächste Sitzung und Dashboard
-    expect(ids(['tenant:read', 'sitzung:read', 'auswertung:read'])).toEqual(expect.arrayContaining(['naechste-sitzung', 'dashboard']));
+    expect(ids(['tenant:read', 'sitzung:read', 'auswertung:read'])).toEqual(expect.arrayContaining(['naechste-sitzung', 'dashboard', 'sitzungen']));
     expect(navigation.aktionen.find(a => a.id === 'naechste-sitzung')).toMatchObject({ irgendwo: true, pfad: '/gremien/sitzungen' });
     // Personensuche nur für die Administration (members:admin)
     expect(ids(['tenant:read', 'members:admin'])).toContain('personen');
@@ -50,5 +50,25 @@ describe('Navigation der Antragstellenden', () => {
     const t = await suche.suchen('sab', new AbortController().signal);
     expect(t).toEqual([{ id: 'projekt-person:p1', label: 'Sabine Sponsorin', detail: 'Sponsor · 2026-014, Kernteam · 2026-020', icon: 'user', pfad: '/projekte/2026-014' }]);
     expect(new URL(api.calls[0]!.url).searchParams.get('q')).toBe('sab');
+  });
+
+  it('Suche nach Sitzungen (I-N4): Gremium und Datum, Fundstelle im Traktandum, Ziel ist die Sitzung', async () => {
+    const api = mockIamApi({
+      'GET /v1/sitzungen': req => {
+        expect(new URL(req.url).searchParams.get('q')).toBe('prat');
+        return json({ items: [
+          { id: 's1', gremium: { id: 'g1', kuerzel: 'prat', name: 'Programmausschuss' }, datum: '2026-11-18', stand: 'versendet', traktandum: null },
+          { id: 's2', gremium: { id: 'g1', kuerzel: 'prat', name: 'Programmausschuss' }, datum: '2026-12-16', stand: 'vorbereitung', traktandum: 'Priorisierung Transformation' },
+        ] });
+      },
+    });
+    vi.stubGlobal('fetch', api.fetch);
+    const treffer = await navigation.suchen.find(x => x.id === 'sitzungen')!.suchen('prat', new AbortController().signal);
+    expect(treffer.map(t => [t.pfad, t.detail])).toEqual([
+      ['/gremien/prat/sitzungen/2026-11-18', 'Programmausschuss · Sitzungen'],
+      ['/gremien/prat/sitzungen/2026-12-16', 'Priorisierung Transformation'],
+    ]);
+    expect(treffer[0]!.label).toMatch(/^PRAT · \S+ 18\.11\./);
+    vi.unstubAllGlobals();
   });
 });

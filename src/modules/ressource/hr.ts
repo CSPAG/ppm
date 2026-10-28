@@ -44,13 +44,14 @@ export function personalLesen(antwort: string): HrZelle[] {
     if (typeof abwesend !== 'number' || !Number.isFinite(abwesend) || abwesend < 0 || abwesend > fte) throw new Error(`Eintrag ${i + 1}: Abwesenheit (FTE) liegt nicht zwischen 0 und dem Pensum`);
     const key = `${rolle}|${monat}`;
     const z = summe.get(key) ?? { rolle, monat, fte: 0, abwesend: 0, personen: 0, nummern: new Set<string>() };
-    z.fte = rund(z.fte + fte - abwesend);
-    z.abwesend = rund(z.abwesend + abwesend);
+    // ungerundet summieren, je Zelle einmal runden (sonst häuft sich der Rundungsfehler)
+    z.fte += fte - abwesend;
+    z.abwesend += abwesend;
     z.nummern.add(nr);
     z.personen = z.nummern.size;
     summe.set(key, z);
   });
-  return [...summe.values()].map(({ nummern: _n, ...z }) => z);
+  return [...summe.values()].map(({ nummern: _n, ...z }) => ({ ...z, fte: rund(z.fte), abwesend: rund(z.abwesend) }));
 }
 
 /** Gelieferte Monate ersetzen (je Monat alle Rollen: eine Rolle ohne Personen im Monat entfällt). */

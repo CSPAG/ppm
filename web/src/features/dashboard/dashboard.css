@@ -1,0 +1,33 @@
+/*
+ * Dashboard (UI-17): virtualisierte Projekttabelle mit fester Zeilenhöhe, Funnel nach Phase mit Balken und Tabelle.
+ * Farben nur aus den Tokens (hell und dunkel). Auf dem Telefon nur Projekt, Phase und Status (I-L6).
+ */
+.db-select select{height:30px;border:1px solid var(--line-2);border-radius:7px;padding:0 24px 0 8px;background-color:var(--surface);color:var(--fg)}
+.db-select select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.db-hinweis{padding:12px 22px 0}
+.db-kennzahlen{margin:0;padding:12px 22px;color:var(--fg-2);border-bottom:1px solid var(--line)}
+.db-tab td,.db-tab th{padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.db-tab tbody tr{height:52px}
+.db-tab tbody td{border-bottom:1px solid var(--line)}
+.db-tab tr.db-platz td{padding:0;border:0}
+.db-link{color:var(--fg);text-decoration:none;font-weight:500}
+.db-link:hover{text-decoration:underline}
+.db-link:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.db-meldung{margin-left:6px;font-size:12px;color:var(--fg-2)}
+.db-funnel{padding:12px 22px}
+.db-stufen{list-style:none;margin:12px 0;padding:0;display:grid;gap:6px}
+.db-stufen li{display:grid;grid-template-columns:32px 1fr 40px;align-items:center;gap:8px}
+.db-stufe-l{font:500 12.5px/1 var(--f-mono)}
+.db-stufe-b{display:flex;height:16px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.db-stufe-b span{display:block;height:100%}
+.db-ok{background:var(--ok)}
+.db-krit{background:var(--bad)}
+.db-ohne{background:var(--fg-3)}
+.db-stufe-n{text-align:right;font-variant-numeric:tabular-nums}
+.db-funnel-tab th,.db-funnel-tab td{padding:6px 8px;border-bottom:1px solid var(--line)}
+.db-phase{font-size:13px}
+@media (max-width:767px){
+  .db-hinweis,.db-kennzahlen,.db-funnel{padding-left:14px;padding-right:14px}
+  .db-tab .db-opt{display:none}
+  .db-tab td,.db-tab th{max-width:none;white-space:normal}
+}

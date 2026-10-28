@@ -9,6 +9,7 @@ import { actorOf, IdParams, notFound, type Deps } from '@vollholz/platform';
 import { fullTx, record } from '../../platform.ts';
 import { FORMATE, MIME, vorlage, type Format } from '../vorlage/index.ts';
 import { dateiname, vertragDokument, type VertragInhalt } from './dokument.ts';
+import { VERTRAG_FELDER } from './dokument-felder.ts';
 import * as dok from './dokument-store.ts';
 import { ohneBetraege } from './kapitel.ts';
 import { TAG } from './routes.ts';
@@ -21,6 +22,9 @@ const DokumentQuery = Type.Object({
 const binaer = (beschreibung: string) => ({ schema: Type.String({ format: 'binary', description: beschreibung }) });
 
 export function registerDokumentRoutes(app: FastifyInstance, deps: Deps): void {
+  // Feldkatalog für eigene Word-Vorlagen des Projektvertrags (AP-E7-7, UC-018 Schritt 2)
+  vorlage.felderRegistrieren('projektvertrag', VERTRAG_FELDER);
+
   app.get('/v1/vertragsversionen/:id/dokument', {
     schema: {
       tags: [TAG], summary: 'Version als Dokument herunterladen', params: IdParams, querystring: DokumentQuery,
@@ -56,7 +60,9 @@ export function registerDokumentRoutes(app: FastifyInstance, deps: Deps): void {
     const k2 = daten.inhalt[2];
     const bez = await fullTx(deps.db, req.requirePrincipal().tenantId, tx => dok.bezeichnungen(tx, { portfolioId: daten.kopf.portfolio_id, handlungsfeldId: k2.handlungsfeldId, zielId: k2.strategischesZielId, jahreszielId: k2.jahreszielId }));
 
-    const datei = vorlage.setzen(vertragDokument({ version: v, ...daten, bez, betraege }), format);
+    // Word mit der aktiven eigenen Vorlage, sonst und für PDF der Grundbestand (AP-E7-7); Vorlage in voller Sicht
+    const dokument = vertragDokument({ version: v, ...daten, bez, betraege });
+    const { datei } = await fullTx(deps.db, req.requirePrincipal().tenantId, tx => vorlage.ausgeben(tx, { art: 'projektvertrag', format, dokument }));
     const name = dateiname(daten.kopf.nummer, v.nummer, format);
     return reply
       .header('content-type', MIME[format])

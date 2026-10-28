@@ -36,7 +36,9 @@ bundle() {
         }' "$tmp/secrets"
   cp "$root/deploy/compose.prod.yaml" "$tmp/" && cp -R "$root/deploy/caddy" "$tmp/caddy"
   # prod.env: Vorlage aus dem Repository, ergänzt um ACME_EMAIL (keine Geheimnisse)
-  { cat "$root/deploy/prod.env.example"; echo "ACME_EMAIL=${ACME_EMAIL:?ACME_EMAIL fehlt}"; } > "$tmp/prod.env"
+  # CADDY_CONFIG_HASH: Prüfsumme von caddy/, damit «up -d» Caddy bei geänderter Konfiguration neu erstellt
+  caddy_hash="$(cd "$tmp" && find caddy -type f | LC_ALL=C sort | xargs sha256sum | sha256sum | cut -c1-16)"
+  { cat "$root/deploy/prod.env.example"; echo "ACME_EMAIL=${ACME_EMAIL:?ACME_EMAIL fehlt}"; echo "CADDY_CONFIG_HASH=$caddy_hash"; } > "$tmp/prod.env"
   tar -C "$tmp" -czf - compose.prod.yaml prod.env caddy secrets
 }
 

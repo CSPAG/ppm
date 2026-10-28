@@ -93,6 +93,9 @@ describe('Idee prüfen', () => {
     [`GET /v1/ideen/${ID}`]: () => json(i(), 200, { ETag: `W/"${i().version}"` }),
     [`GET /v1/ideen/${ID}/pruefung`]: () => json(p(), 200, { ETag: `W/"${i().version}"` }),
     [`GET /v1/ideen/${ID}/aehnliche`]: () => json({ items: [{ idee: zeile({ id: ID2, nummer: 8, titel: 'Ähnlich' }), gleichesHandlungsfeld: true, gemeinsameBereiche: 0 }] }),
+    // Freigabe (AP-E4-3): ohne Kategorie noch kein Weg
+    [`GET /v1/ideen/${ID}/freigabe`]: () => json({ weg: null, zustaendig: null, vorgesehenerSponsor: null, sponsor: null, projektleitung: null, freigegebenAt: null, projekt: null,
+      can: { traktandieren: false, angaben: false, entscheiden: false } }, 200, { ETag: `W/"${i().version}"` }),
   });
 
   it('Raster mit Vorschlag, Hinweis bei abweichender Kategorie, Zuordnen mit If-Match', async () => {

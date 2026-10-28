@@ -13,7 +13,7 @@ import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
-import { priorisierungPfad, type SetBewertungSearch, type SetModellSearch } from './features/priorisierung/index.ts';
+import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch } from './features/priorisierung/index.ts';
 import type { SetDashboardSearch } from './features/dashboard/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
@@ -38,6 +38,7 @@ const KapazitaetPage = seite(() => import('./features/ressourcen/KapazitaetPage.
 const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), 'BedarfPage');
 const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
+const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx'), 'MatrixPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
@@ -304,6 +305,20 @@ function BewertungRoute() {
   return <BewertungPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Matrix (UI-21; BC PP.03.04, PP.02.02, PC.02.01, AP-E5-2)
+const matrixRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.matrix, validateSearch: searchOf.matrix, component: MatrixRoute,
+});
+
+function MatrixRoute() {
+  const search = matrixRoute.useSearch();
+  const navigate = useNavigate({ from: matrixRoute.fullPath });
+  const setSearch = useCallback<SetMatrixSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <MatrixPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 const modellRoute = createRoute({
   getParentRoute: () => rootRoute, path: priorisierungPfad.modell, validateSearch: searchOf.bewertungsmodell, component: ModellRoute,
 });
@@ -504,6 +519,7 @@ const routeTree = rootRoute.addChildren([
   bedarfRoute,
   priorisierungRoute,
   bewertungRoute,
+  matrixRoute,
   modellRoute,
   ...iamRoutes,
   ...devRoutes,

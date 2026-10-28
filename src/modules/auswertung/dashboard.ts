@@ -1,7 +1,10 @@
 /**
  * Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1; Kernablauf K1, K3; AP-E1-3): Zeilen je Projekt mit Meldung
- * («gemeldet», «ausstehend», «nicht gemeldet», A-11), Badge «Eskalation», Reihenfolge und Funnel nach Phase.
+ * («gemeldet», «ausstehend», «nicht gemeldet», A-11), Badge «Eskalation» (offene Eskalation aus AP-E2-4), Reihenfolge
+ * und Funnel nach Phase.
  */
+import type { Tx } from '@vollholz/platform';
+import { eskalationen } from '../statusbericht/index.ts';
 import type { DashboardZeileOut, Meldung } from './schemas.ts';
 import type * as store from './store.ts';
 
@@ -15,18 +18,25 @@ export function meldung(z: store.ZeileRow): Meldung {
   return z.pflichtig ? 'ausstehend' : 'ohne_pflicht';
 }
 
-export function zeile(z: store.ZeileRow, portfolio: string): DashboardZeileOut {
+/** Zeile des Dashboards; `eskaliert`: Eskalation zum Bericht der Zeile, noch nicht erledigt (AP-E2-4). */
+export function zeile(z: store.ZeileRow, portfolio: string, eskaliert: boolean): DashboardZeileOut {
   const phase = istPhase(z.phase) ? z.phase : istPhase(z.projekt_phase) ? z.projekt_phase : 'P0';
   return {
     projektId: z.projekt_id, nummer: z.nummer, name: z.name, portfolioId: z.portfolio_id, portfolio,
     handlungsfeld: z.handlungsfeld, projektleitung: z.projektleitung, phase, abschlussPer: z.abschluss_per,
     naechsterMeilenstein: z.ms_text ? { termin: z.ms_termin, text: z.ms_text } : z.naechster_meilenstein ? { termin: null, text: z.naechster_meilenstein } : null,
     status: z.status, statusVorperiode: z.status_vorperiode, trend: z.trend, meldung: meldung(z), werteAus: z.werte_aus,
-    merkmale: z.gemeldet && z.entscheid_noetig ? ['eskalation'] : [],
+    merkmale: eskaliert ? ['eskalation'] : [],
   };
 }
 
 /** Kritische zuerst, dann nicht gemeldete bzw. ausstehende, sonst nach Nummer (I-L5: dringend zuerst). */
+/** Zeilen mit Badge «Eskalation» aus der Tabelle `eskalation` (über `statusbericht`, Lesesicht der Person). */
+export async function zeilen(tx: Tx, rows: store.ZeileRow[], portfolio: (r: store.ZeileRow) => string): Promise<DashboardZeileOut[]> {
+  const offen = await eskalationen.offenZuBerichten(tx, rows.flatMap(r => (r.statusbericht_id ? [r.statusbericht_id] : [])));
+  return sortieren(rows.map(r => zeile(r, portfolio(r), !!r.statusbericht_id && offen.has(r.statusbericht_id))));
+}
+
 export function sortieren(items: DashboardZeileOut[]): DashboardZeileOut[] {
   const rang = (z: DashboardZeileOut) => (z.status === 'kritisch' ? 0 : z.meldung === 'nicht_gemeldet' || z.meldung === 'ausstehend' ? 1 : 2);
   return [...items].sort((a, b) => rang(a) - rang(b) || a.nummer.localeCompare(b.nummer));

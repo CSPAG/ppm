@@ -46,4 +46,6 @@ folgen.beimEinreichen(abnahme.beimEinreichen);
 abnahme.registriereAbnahme();
 
 export { folgen, type Folge } from './folgen.ts';
+/** Lesen für obere Module (Dashboard, Badge «Eskalation»; Lesesicht der Person). */
+export const eskalationen = { offenZuBerichten: eskalation.offenZuBerichten };
 export { PERIODE_MUSTER, type Stand } from './schemas.ts';

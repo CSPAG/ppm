@@ -66,7 +66,7 @@ export function AbschlussPage({ nummer }: { nummer: string }) {
   return <Arbeitsflaeche key={p.id} projektId={p.id} geladen={q.data!} refetch={() => q.refetch()} />;
 }
 
-function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; geladen: Geladen; refetch(): Promise<{ data?: Geladen }> }) {
+function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; geladen: Geladen; refetch(): Promise<{ data?: Geladen; error?: unknown }> }) {
   const a = geladen.abschluss;
   const b = a.bericht;
   const toast = useToast();
@@ -87,9 +87,7 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
   const art = b?.art ?? (a.lage === 'sistierung' ? 'sistierung' : a.lage === 'abbruch' ? 'abbruch' : 'abschluss');
 
   // Neue Fassung vom Server (Einreichen, Entscheid, Neuladen) übernehmen, solange nichts offen ist
-  const geladenRef = useRef(geladen);
   useEffect(() => {
-    geladenRef.current = geladen;
     etag.current = geladen.etag;
     if (!offen.current) { const neu = felderVon(geladen.abschluss.bericht); aktuell.current = neu; setF(neu); }
   }, [geladen]);
@@ -107,6 +105,7 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
       try {
         const l = await speichern.mutateAsync({ etag: etag.current, body: body(aktuell.current) });
         etag.current = l.etag;
+        if (!offen.current) geaendert.current.clear();
         setZustand(offen.current ? 'ungespeichert' : 'gespeichert');
         return true;
       } catch (e) {
@@ -125,7 +124,10 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
   const sichernRef = useRef(sichern);
   useEffect(() => { sichernRef.current = sichern; }, [sichern]);
 
+  // Felder, die die Person seit dem letzten Speichern geändert hat: nur sie gehen bei «behalten» über den neuen Stand (Z7)
+  const geaendert = useRef(new Set<keyof Felder>());
   const setze = useCallback((patch: Partial<Felder>) => {
+    for (const k of Object.keys(patch) as (keyof Felder)[]) geaendert.current.add(k);
     const neu = { ...aktuell.current, ...patch };
     aktuell.current = neu;
     setF(neu);
@@ -142,13 +144,26 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
   }, []);
 
   const konfliktLoesen = async (behalten: boolean) => {
-    const neuer = (await refetch()).data ?? geladenRef.current;
+    const r = await refetch();
+    if (!r.data || r.error) return; // Laden gescheitert: Konflikt bleibt, erneut versuchen
+    const neuer = r.data;
     etag.current = neuer.etag;
     konfliktRef.current = false;
     setKonflikt(false);
-    if (behalten) { offen.current = true; void sichern(); return; }
+    const stand = felderVon(neuer.abschluss.bericht);
+    if (behalten) {
+      // nur die eigenen Änderungen über den neuen Stand legen; die übrigen Felder der anderen bleiben
+      const eigene = Object.fromEntries([...geaendert.current].map(k => [k, aktuell.current[k]])) as Partial<Felder>;
+      const neu = { ...stand, ...eigene };
+      aktuell.current = neu;
+      setF(neu);
+      offen.current = true;
+      void sichern();
+      return;
+    }
     offen.current = false;
-    const neu = felderVon(neuer.abschluss.bericht);
+    geaendert.current.clear();
+    const neu = stand;
     aktuell.current = neu;
     setF(neu);
     setZustand('gespeichert');

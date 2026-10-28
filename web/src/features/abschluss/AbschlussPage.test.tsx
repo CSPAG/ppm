@@ -120,7 +120,7 @@ describe('Abschluss (UI-14)', () => {
     let n = 0;
     const puts: { etag: string | null; body: Record<string, unknown> }[] = [];
     stub({
-      [`GET ${URL_A}`]: () => (n ? json(abschluss({}, { zielerreichung: 'Von Paula', version: 5 }), 200, { etag: 'W/"5"' }) : json(abschluss(), 200, { etag: 'W/"1"' })),
+      [`GET ${URL_A}`]: () => (n ? json(abschluss({}, { zielerreichung: 'Von Paula', businessCase: 'BC von Paula', version: 5 }), 200, { etag: 'W/"5"' }) : json(abschluss(), 200, { etag: 'W/"1"' })),
       [`PUT ${URL_A}`]: async req => {
         puts.push({ etag: req.headers.get('If-Match'), body: await req.json() as Record<string, unknown> });
         if (n++ === 0) return json({ title: 'Inzwischen geändert', status: 412 }, 412);
@@ -136,7 +136,8 @@ describe('Abschluss (UI-14)', () => {
     expect(puts).toHaveLength(1); // kein weiteres Speichern, solange der Konflikt offen ist
     await userEvent.click(screen.getByRole('button', { name: TA.konfliktBehalten }));
     await waitFor(() => expect(puts).toHaveLength(2));
-    expect([puts[1]!.etag, puts[1]!.body.zielerreichung]).toEqual(['W/"5"', 'Meins']);
+    // eigene Änderung über den neuen Stand, das andere Feld der anderen bleibt
+    expect([puts[1]!.etag, puts[1]!.body.zielerreichung, puts[1]!.body.businessCase]).toEqual(['W/"5"', 'Meins', 'BC von Paula']);
     expect(screen.queryByText(TA.konflikt)).toBeNull();
   });
 

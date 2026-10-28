@@ -188,9 +188,15 @@ export async function packet(tx: Tx, projektId: string): Promise<Unterlage[]> {
 export interface GateEntscheid { projektId: string; versionId: string; gate: gs.GateCode; ergebnis: gs.Ergebnis; begruendung: string }
 type BeiGateEntscheid = (tx: Tx, e: GateEntscheid) => Promise<void>;
 const nachEntscheid: BeiGateEntscheid[] = [];
+const vorEntscheid: BeiGateEntscheid[] = [];
 export const gateEntscheid = {
   /** Verhalten in der Transaktion des Gate-Entscheids (nach der Folge dieses Pakets). */
   registrieren(fn: BeiGateEntscheid) { nachEntscheid.push(fn); },
+  /**
+   * Verhalten in der Transaktion des Gate-Entscheids vor der Folge dieses Pakets, mit dem neuen Ergebnis: z. B. bei
+   * einer Korrektur von «Gestoppt» (A-30) den Abbruch zurücknehmen, bevor die Freigabe die Phase setzt (AP-E7-1).
+   */
+  vorFolgeRegistrieren(fn: BeiGateEntscheid) { vorEntscheid.push(fn); },
 };
 
 /** Aufgabe «Projektvertrag überarbeiten» an die Projektleitung (fachmodell.md 4.2, UC-003 A6). */
@@ -238,6 +244,11 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
     }
     if (v.stand !== 'traktandiert') return;
     const ergebnis = f.ergebnis as gs.Ergebnis;
+    const e: GateEntscheid = { projektId: p.id, versionId: v.id, gate: a0.gate_code, ergebnis, begruendung: f.begruendung };
+    if (vorEntscheid.length) {
+      for (const fn of vorEntscheid) await fn(tx, e);
+      p = (await store.projekt(tx, p.id))!;
+    }
     const pg = (await gs.projektGate(tx, p.id))!;
     const vorherBaseline = (await store.versionen(tx, p.id)).find(x => x.baseline)?.id ?? null;
     const who = systemActor('system');
@@ -259,7 +270,7 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
       ergebnis, begruendung: f.begruendung, sitzungId: null,
       vorherBaselineId: ergebnis === 'freigegeben' ? vorherBaseline : null, vorherPhase: pg.phase, vorherPhasenmodellId: pg.phasenmodell_id,
     });
-    for (const fn of nachEntscheid) await fn(tx, { projektId: p.id, versionId: v.id, gate: a0.gate_code, ergebnis, begruendung: f.begruendung });
+    for (const fn of nachEntscheid) await fn(tx, e);
   });
 }
 

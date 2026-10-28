@@ -9,5 +9,5 @@
 .qr-hinweise { margin: var(--s1, 4px) 0 0; padding-left: 1.2em; }
 .qr-dokument { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2, 8px); }
 .qr-dokument > p, .qr-dokument > div[role="status"] { flex-basis: 100%; margin: 0; }
-.qr-speichern { display: flex; justify-content: flex-end; }
+.qr-speichern { display: flex; justify-content: flex-end; align-items: center; gap: var(--s3, 12px); }
 .qr-auftraege { margin: 0; padding-left: 1.2em; }

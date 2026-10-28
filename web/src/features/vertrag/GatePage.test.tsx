@@ -92,6 +92,19 @@ describe('Gate-Modus', () => {
     expect(screen.getByText(TG.leitfragenFortschritt(1, 2))).toBeInTheDocument();
   });
 
+  it('Fehler der Pflichtangaben erscheint als Fehler mit «Erneut versuchen», nicht als «vollständig» (Z5)', async () => {
+    let ok = false;
+    stub({ [`GET /v1/vertragsversionen/${V}/pflichtangaben`]: () => ok
+      ? json({ versionId: V, zielphase: 'P2', vollstaendig: true, angaben: [] })
+      : json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' }) });
+    renderWithIam(<GatePage nummer="2026-014" />);
+    expect(await screen.findByText(`${TG.angaben} konnte nicht geladen werden.`)).toBeInTheDocument();
+    expect(screen.queryByText(TG.angabenVollstaendig)).toBeNull();
+    ok = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Erneut versuchen' }));
+    expect(await screen.findByText(TG.angabenVollstaendig)).toBeInTheDocument();
+  });
+
   it('«trifft nicht zu» nur mit Begründung', async () => {
     const api = stub();
     renderWithIam(<GatePage nummer="2026-014" />);

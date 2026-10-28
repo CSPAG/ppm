@@ -72,5 +72,8 @@ export const TP = {
   kopfkarte: {
     titel: 'Meine Projekte',
     alle: (n: number) => `Alle ${n} Projekte`,
+    berichtFaellig: (monat: string, frist: string) => `Statusbericht ${monat} fällig ${frist}`,
+    berichtOffen: (monat: string) => `Statusbericht ${monat} offen`,
+    kritischGrund: (grund: string) => `Grund: ${grund}`,
   },
 };

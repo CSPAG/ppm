@@ -96,6 +96,18 @@ export const MeilensteinPlan = Type.Object({
   text: pflichttext(500, 'Tätigkeit, Lieferergebnis bzw. Meilenstein.'),
   termin: Datum,
 }, { $id: 'MeilensteinPlan', additionalProperties: false });
+/**
+ * Toleranz des Projekts je Dimension (A-10, K11; fachmodell.md 2.x `toleranz`: «Vertrag kann übersteuern»): übersteuert
+ * den Standard des Phasenmodells ab der Baseline. Q7 hat kein Kapitel dafür; bis zur Klärung steht sie bei der
+ * Zusammenfassung der Projektplanung (7.2, Annahme). Dimensionen und Einheiten wie im Phasenmodell.
+ */
+export const DIMENSIONEN_TOLERANZ = ['termin', 'kosten', 'umfang'] as const;
+export const EINHEITEN_TOLERANZ = ['prozent', 'kalendertage', 'arbeitstage'] as const;
+export const ToleranzPlan = Type.Object({
+  dimension: enumOf(DIMENSIONEN_TOLERANZ, 'Termin, Kosten oder Umfang.'),
+  wert: Type.Number({ minimum: 0, maximum: 9_999_999, description: 'Ab dieser Abweichung gilt sie als wesentlich.' }),
+  einheit: enumOf(EINHEITEN_TOLERANZ, 'Prozent, Kalendertage oder Arbeitstage.'),
+}, { $id: 'ToleranzPlan', additionalProperties: false });
 export const Kapitel7 = objekt('Kapitel7', 'Projektplanung und Lieferergebnisse', {
   vorgehen: Lang('Tätigkeiten je Phase (7.1).'),
   meilensteine: liste(Type.Ref('MeilensteinPlan'), 'Lieferergebnisse und Meilensteine je Phase mit Termin (7.1).', 500),
@@ -105,6 +117,8 @@ export const Kapitel7 = objekt('Kapitel7', 'Projektplanung und Lieferergebnisse'
     phasenExit: Datum,
     projektabschluss: { ...Datum, description: 'Erwarteter Projektabschluss (ab Phase 2).' },
   }, { additionalProperties: false, description: 'Zusammenfassung Projektplanung (7.2).' }),
+  // Optional: Kapitel, die vor der Übersteuerung gespeichert wurden, haben das Feld nicht
+  toleranzen: Type.Optional(liste(Type.Ref('ToleranzPlan'), 'Toleranzen des Projekts je Dimension; übersteuern ab der Baseline den Standard des Phasenmodells (A-10).', DIMENSIONEN_TOLERANZ.length)),
 });
 
 /** 8 Projektstruktur und Organisation (PP.04.04, UC-002 Schritt 2): Rollen mit AKV; die Sponsoren-Koalition als Liste (A-04). */
@@ -192,7 +206,7 @@ export const Kapitel13 = objekt('Kapitel13', 'Beilagen', {
   beilagen: liste(Type.Ref('BeilagePlan'), 'Beilagen zum Vertrag.'),
 });
 
-export const LISTEN_SCHEMAS = [KpiPlan, AbhaengigkeitPlan, MeilensteinPlan, MitgliedPlan, KostenPlan, PersonalPlan, RisikoPlan, StakeholderPlan, KommunikationPlan, BeilagePlan];
+export const LISTEN_SCHEMAS = [KpiPlan, AbhaengigkeitPlan, MeilensteinPlan, ToleranzPlan, MitgliedPlan, KostenPlan, PersonalPlan, RisikoPlan, StakeholderPlan, KommunikationPlan, BeilagePlan];
 
 /** Schema, Titel und leerer Inhalt je Kapitel (Reihenfolge = Nummer). */
 export const KAPITEL = [Kapitel1, Kapitel2, Kapitel3, Kapitel4, Kapitel5, Kapitel6, Kapitel7, Kapitel8, Kapitel9, Kapitel10, Kapitel11, Kapitel12, Kapitel13] as const;
@@ -201,7 +215,7 @@ export const ANZAHL_KAPITEL = KAPITEL.length;
 export type Inhalt = {
   1: Static<typeof Kapitel1>; 2: Static<typeof Kapitel2>; 3: Static<typeof Kapitel3> & { kpis: Static<typeof KpiPlan>[] };
   4: Static<typeof Kapitel4>; 5: Static<typeof Kapitel5>; 6: Static<typeof Kapitel6> & { abhaengigkeiten: Static<typeof AbhaengigkeitPlan>[] };
-  7: Static<typeof Kapitel7> & { meilensteine: Static<typeof MeilensteinPlan>[] }; 8: Static<typeof Kapitel8> & { mitglieder: Static<typeof MitgliedPlan>[] };
+  7: Static<typeof Kapitel7> & { meilensteine: Static<typeof MeilensteinPlan>[]; toleranzen?: Static<typeof ToleranzPlan>[] }; 8: Static<typeof Kapitel8> & { mitglieder: Static<typeof MitgliedPlan>[] };
   9: { kosten: Static<typeof KostenPlan>[]; personal: Static<typeof PersonalPlan>[] }; 10: { risiken: Static<typeof RisikoPlan>[] };
   11: { stakeholder: Static<typeof StakeholderPlan>[]; kommunikation: Static<typeof KommunikationPlan>[] }; 12: Static<typeof Kapitel12>;
   13: { beilagen: Static<typeof BeilagePlan>[] };

@@ -61,6 +61,16 @@ services:
   api:
     <<: *app
     command: ["api"]
+    # Der Start dauert derzeit 30–80 s (Serializer von Fastify, Fix im Baukasten folgt). Mit dem HEALTHCHECK des Images
+    # (start-period 20s, danach 3 × 15s) wäre der Container nach rund 65 s «unhealthy» und «up --wait» bräche ab.
+    # Test, Intervall, Timeout und Versuche wie im Image (Dockerfile, HEALTHCHECK), hier ausgeschrieben.
+    healthcheck: &healthcheck
+      test: ["CMD", "/usr/local/bin/docker-entrypoint.sh", "healthcheck"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 120s
+      start_interval: 5s
     secrets: [database_url, database_ca, session_secret, encryption_keys, oidc_bff_private_key, keycloak_mgmt_private_key]
     environment:
       NODE_EXTRA_CA_CERTS: /run/secrets/database_ca
@@ -90,6 +100,7 @@ services:
   mcp:
     <<: *app
     command: ["mcp"]
+    healthcheck: *healthcheck # Start wie bei api
     # Kein Datenbank-Login: der MCP-Dienst ist ein Client der REST-API
     secrets: [mcp_private_key, mcp_dpop_key]
     environment:

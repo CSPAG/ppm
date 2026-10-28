@@ -77,6 +77,16 @@ describe('Ideenpool', () => {
     await expectNoAxe(funnel.container);
   });
 
+  it('Fehler beim Funnel: Fehler mit «Erneut versuchen» statt leerer Ansicht (Z5)', async () => {
+    stub({
+      'GET /v1/ideen/pool': () => json({ items: [], nextCursor: null }),
+      'GET /v1/ideen/pool/funnel': () => json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' }),
+    });
+    renderWithIam(<IdeenBereich search={{ ansicht: 'funnel' }} setSearch={vi.fn()} gehe={gehe} />, ALS_UE);
+    expect(await screen.findByText(`${TP.funnelTitel} konnte nicht geladen werden.`)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Erneut versuchen' })).toBeInTheDocument();
+  });
+
   it('leer: «Keine Ideen zu prüfen.» mit Datum der letzten Einreichung', async () => {
     stub({
       'GET /v1/ideen/pool': () => json({ items: [], nextCursor: null }),
@@ -120,6 +130,13 @@ describe('Idee prüfen', () => {
     await waitFor(() => expect(api.calls.some(c => c.url.endsWith('/kategorie'))).toBe(true));
     expect(await screen.findByText(TP.wirkung('B', 'GLPA'), { exact: false })).toBeInTheDocument();
     expect(api.calls.find(c => c.url.endsWith('/kategorie'))!.headers.get('If-Match')).toBe('W/"4"');
+  });
+
+  it('Fehler bei den ähnlichen Ideen erscheint als Fehler, nicht als «keine ähnlichen» (Z5)', async () => {
+    stub({ ...lesen(() => idee(), () => pruefung()), [`GET /v1/ideen/${ID}/aehnliche`]: () => json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' }) });
+    renderWithIam(<IdeePage nummer={7} search={{}} setSearch={vi.fn()} gehe={gehe} />, ALS_UE);
+    expect(await screen.findByText(`${TP.aehnliche} konnte nicht geladen werden.`)).toBeInTheDocument();
+    expect(screen.queryByText(TP.keineAehnlichen)).toBeNull();
   });
 
   it('Zurückweisen sperrt ohne Begründung und sendet sie danach', async () => {

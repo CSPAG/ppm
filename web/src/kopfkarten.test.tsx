@@ -43,6 +43,10 @@ describe('Kopfkarten je Rolle', () => {
     stub({
       'GET /v1/statusberichte/kopf': () => json({ pruefen: { periode: '2026-10', eingereicht: 12, zurueckgegeben: 2, geprueft: 15, ausstehend: 2, auffaellig: 3, projekte: 31, stichtag: '2026-10-25', abschlussBis: '2026-10-31' } }),
       'GET /v1/projekte/kopf': () => json({ projekte: [projekt(4, { rollen: ['sp', 'ctl'], lebenszyklus: 'sistiert' }), ...[1, 2, 3, 5, 6].map(n => projekt(n))], anzahl: 6 }),
+      'GET /v1/statusberichte/stand': () => json({ items: [
+        { projektId: uuid(1), letzter: { periode: '2026-09', status: 'im_plan', trend: 'aufwaerts', begruendung: '' }, laufend: { periode: '2026-10', stand: 'entwurf', stichtag: tag(3) } },
+        { projektId: uuid(3), letzter: { periode: '2026-09', status: 'kritisch', trend: 'abwaerts', begruendung: 'Lieferverzug Hauptsystem' }, laufend: { periode: '2026-10', stand: 'eingereicht', stichtag: tag(3) } },
+      ] }),
       'GET /v1/sitzungen/kopf': () => json({ sitzungen: [sitzung(1, prat, tag(10)), sitzung(2, glpa, tag(12), { stand: 'versendet' }), sitzung(3, gremium('dir', 3), tag(20)), sitzung(4, gremium('gl', 4), tag(40))] }),
     });
     const { container } = renderWithIam(page(), { permissions: UE });
@@ -53,7 +57,17 @@ describe('Kopfkarten je Rolle', () => {
     expect(within(monat).getByRole('link', { name: '12 Berichte prüfen' })).toHaveAttribute('href', '/portfolio/monatsabschluss?periode=2026-10&stand=eingereicht');
 
     const projekte = (await screen.findByRole('heading', { name: 'Meine Projekte' })).closest('article')!;
-    expect(within(projekte).getAllByRole('listitem')).toHaveLength(5);
+    // Kritische zuerst mit Grund (SP); Status mit Trend; ausstehender Bericht mit Frist und Sprung zum Bericht (K1)
+    await within(projekte).findByText(/Grund: Lieferverzug Hauptsystem/);
+    const pz = within(projekte).getAllByRole('listitem');
+    expect(pz).toHaveLength(5);
+    expect(within(pz[0]!).getByRole('link', { name: '2026-013 Projekt 3' })).toBeInTheDocument();
+    expect(within(pz[0]!).getByText('Kritisch')).toBeInTheDocument();
+    expect(within(pz[0]!).queryByText(/^Statusbericht /)).toBeNull();
+    const p1 = pz.find(z => within(z).queryByRole('link', { name: '2026-011 Projekt 1' }))!;
+    expect(within(p1).getByText('Im Plan')).toBeInTheDocument();
+    expect(within(p1).getByText('Trend aufwärts')).toBeInTheDocument();
+    expect(within(p1).getByRole('link', { name: /^Statusbericht Oktober fällig / })).toHaveAttribute('href', '/projekte/2026-011/bericht?periode=2026-10');
     expect(within(projekte).getByRole('link', { name: '2026-014 Projekt 4' })).toHaveAttribute('href', '/projekte/2026-014');
     expect(within(projekte).getByText('P1 Konzept und Planung · sistiert · Sponsor, CTL')).toBeInTheDocument();
     expect(within(projekte).getByRole('link', { name: 'Alle 6 Projekte' })).toHaveAttribute('href', '/projekte');

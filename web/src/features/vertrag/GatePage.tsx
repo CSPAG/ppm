@@ -10,7 +10,7 @@ import { describeError } from '@vollholz/iam-web';
 import { useQueryClient } from '@tanstack/react-query';
 import { useId, useState } from 'react';
 import { isConflict, statusOf } from '../../api/index.ts';
-import { Empty, ErrorState, fmtDatum, fmtGate, fmtPhase, Hinweis, Icon, Skelett, Stand, T, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
+import { Empty, ErrorState, fmtDatum, fmtGate, fmtPhase, Hinweis, Icon, Skelett, Stand, T, TeilFehler, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
 import { usePflichtangaben, useProjekt, useVertrag, type Version } from './api.ts';
 import { gateKey, useGate, useGateMutations, useWertestroeme, type Gate, type Leitfrage } from './GateApi.ts';
 import { TG } from './GateTexte.ts';
@@ -128,7 +128,8 @@ function GateModus({ nummer, projektId, version }: { nummer: string; projektId: 
           </section>
           <section aria-labelledby={`${id}-a`} className="gm-block">
             <h3 id={`${id}-a`} className="grp-h">{TG.angaben}</h3>
-            {pflicht.isPending ? <p className="muted">{T.common.loading}</p> : fehlend.length ? (
+            {pflicht.error ? <TeilFehler was={TG.angaben} error={pflicht.error} onRetry={() => void pflicht.refetch()} />
+              : pflicht.isPending ? <p className="muted">{T.common.loading}</p> : fehlend.length ? (
               <ul className="gm-liste">
                 {fehlend.map(a => <li key={`${a.kapitel}-${a.feld}`}><Icon name="warn" /><a href={kapitelLink(nummer, a.kapitel)}>{TG.zurAngabe(a.text, a.kapitel)}</a></li>)}
               </ul>

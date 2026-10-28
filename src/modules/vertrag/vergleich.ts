@@ -52,7 +52,7 @@ const LABEL: Record<string, string> = {
   kpis: 'KPIs', loesungsansatz: 'Lösungsansatz', annahmen: 'Annahmen', bearbeitet: 'Im Projekt bearbeitet',
   nichtBearbeitet: 'Nicht bearbeitet', abhaengigkeiten: 'Abhängigkeiten', schnittstellen: 'Schnittstellen', vorgehen: 'Vorgehen',
   meilensteine: 'Meilensteine und Lieferergebnisse', 'termine.projektStart': 'Projektstart', 'termine.phasenStart': 'Phasenstart',
-  'termine.phasenExit': 'Phasenexit', 'termine.projektabschluss': 'Projektabschluss', mitglieder: 'Projektorganisation',
+  'termine.phasenExit': 'Phasenexit', 'termine.projektabschluss': 'Projektabschluss', toleranzen: 'Toleranzen', mitglieder: 'Projektorganisation',
   kosten: 'Kosten', personal: 'Personal', risiken: 'Risiken', stakeholder: 'Stakeholder', kommunikation: 'Kommunikation',
   bemerkung: 'Bemerkung', beilagen: 'Beilagen',
   // Felder in Listeneinträgen
@@ -61,16 +61,17 @@ const LABEL: Record<string, string> = {
   massnahme: 'Massnahme', verantwortlich: 'Verantwortlich', einheit: 'Einheit', zielwert: 'Zielwert', zuProjektId: 'Projekt',
   ansprechperson: 'Ansprechperson', personId: 'Person', funktion: 'Funktion', akv: 'AKV', gruppe: 'Stakeholder',
   interesse: 'Interesse', einfluss: 'Einfluss', massnahmen: 'Massnahmen', adressat: 'Adressat', ziel: 'Ziel',
-  bezeichnung: 'Bezeichnung', version: 'Version', inhalt: 'Inhalt',
+  bezeichnung: 'Bezeichnung', version: 'Version', inhalt: 'Inhalt', dimension: 'Dimension', wert: 'Wert',
 };
 const label = (feld: string) => LABEL[feld] ?? feld;
+const TOLERANZ: Record<string, string> = { termin: 'Termin', kosten: 'Kosten', umfang: 'Umfang' };
 
 /** Wie Einträge einer Liste ohne `registerId` wiedergefunden werden (natürlicher Schlüssel). */
 const SCHLUESSEL: Record<string, (e: Obj) => string> = {
   kpis: e => String(e.text), abhaengigkeiten: e => String(e.zuProjektId), meilensteine: e => `${e.phase}:${e.text}`,
   mitglieder: e => `${e.funktion}:${e.personId}`, kosten: e => `${e.phase}:${e.art}:${e.text}`, personal: e => `${e.phase}:${e.rolle}`,
   risiken: e => String(e.text), stakeholder: e => String(e.gruppe), kommunikation: e => `${e.phase}:${e.text}`,
-  beilagen: e => String(e.bezeichnung),
+  beilagen: e => String(e.bezeichnung), toleranzen: e => String(e.dimension),
 };
 
 /** Bezeichnung eines Listeneintrags für Vergleich und Hauptänderungen. */
@@ -79,6 +80,7 @@ function eintragText(liste: string, e: Obj): string {
   if (liste === 'kosten') return `${e.phase} ${e.text}`;
   if (liste === 'mitglieder') return `${String(e.funktion).toUpperCase()} ${e.personId}`;
   if (liste === 'abhaengigkeiten') return String(e.text);
+  if (liste === 'toleranzen') return `Toleranz ${TOLERANZ[String(e.dimension)] ?? e.dimension}`;
   return String(e.text ?? e.gruppe ?? e.bezeichnung ?? '');
 }
 

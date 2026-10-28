@@ -38,7 +38,7 @@ const leer = () => json({ items: [], nextCursor: null, can: { write: true } });
 
 const PL_ME: Partial<Me> = { roles: [], permissions: ['tenant:read'] };
 
-function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | Promise<Response>; kosten?: () => Response; meilensteine?: () => Response; einreichen?: () => Response; entwerfen?: string[]; eskalation?: (req: Request) => Response | Promise<Response> } = {}) {
+function stub(o: { toleranzen?: unknown[]; bericht?: () => Response; put?: (req: Request) => Response | Promise<Response>; kosten?: () => Response; meilensteine?: () => Response; einreichen?: () => Response; entwerfen?: string[]; eskalation?: (req: Request) => Response | Promise<Response> } = {}) {
   const api = mockIamApi({
     'GET /v1/projekte': () => json({ items: [projekt], nextCursor: null }),
     [`GET ${URL_B}`]: o.bericht ?? (() => json(bericht(), 200, { etag: 'W/"0"' })),
@@ -53,7 +53,12 @@ function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | 
     [`GET /v1/projekte/${ID}/kosten`]: o.kosten ?? leer,
     [`GET /v1/projekte/${ID}/risiken`]: leer,
     [`GET /v1/projekte/${ID}/vertrag`]: () => json({ versionen: [], entwurf: null, baseline: null, can: { entwerfen: o.entwerfen ?? [] } }),
-    'GET /v1/phasenmodelle/aktuell': () => json({ toleranzen: [{ dimension: 'termin', wert: 14, einheit: 'kalendertage' }, { dimension: 'kosten', wert: 10, einheit: 'prozent' }] }),
+    // Die PL hat kein phasenmodell:read; die gültige Toleranz liefert die Route am Projekt (A-10)
+    'GET /v1/phasenmodelle/aktuell': () => json({ type: 'about:blank', title: 'Verboten', status: 403 }, 403),
+    [`GET /v1/projekte/${ID}/toleranzen`]: () => json({ projektId: ID, toleranzen: o.toleranzen ?? [
+      { dimension: 'termin', wert: 14, einheit: 'kalendertage', quelle: 'phasenmodell' }, { dimension: 'kosten', wert: 10, einheit: 'prozent', quelle: 'phasenmodell' },
+      { dimension: 'umfang', wert: null, einheit: null, quelle: null },
+    ] }),
   }, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
   vi.stubGlobal('fetch', api.fetch);
   return api;
@@ -82,6 +87,18 @@ describe('Statusbericht erfassen (UI-13)', () => {
     expect(screen.getByText(/Konzept abgenommen neu .* statt .* laut Baseline/)).toBeInTheDocument();
     expect(await screen.findByText(TB.kosten.istFehlt)).toBeInTheDocument();
     expect(screen.getByText(/Prognose P2: CHF\s1,32\sMio\. · 6\s% über Budget/)).toBeInTheDocument();
+  });
+
+  it('PL ohne phasenmodell:read: Warnung aus der gültigen Toleranz des Projekts; die Toleranz im Vertrag gilt (A-10)', async () => {
+    const kosten = () => json({ items: [{ id: '00000000-0000-4000-8000-0000000000d1', projektId: ID, version: 1, createdAt: '', updatedAt: '', can: { write: true }, phase: 'P2', art: 'capex', text: 'Lizenzen', lieferant: '', offerte: '', prognose: 1_320_000, budgetBaseline: 1_250_000, ist: null }], nextCursor: null, can: { write: true } });
+    stub({ kosten, toleranzen: [
+      { dimension: 'termin', wert: 14, einheit: 'kalendertage', quelle: 'phasenmodell' }, { dimension: 'kosten', wert: 5, einheit: 'prozent', quelle: 'vertrag' },
+      { dimension: 'umfang', wert: null, einheit: null, quelle: null },
+    ] });
+    renderWithIam(<BerichtPage nummer="2026-014" periode={PERIODE} />, PL_ME);
+    // Termin +3 Wochen über 14 Tagen (Phasenmodell), Kosten 6 % über 5 % (Vertrag): beide Warnungen
+    expect(await screen.findByText(/Konzept abgenommen neu .* statt .* laut Baseline/)).toBeInTheDocument();
+    expect(await screen.findByText(TB.wesentlich.kosten('P2', '6 %'))).toBeInTheDocument();
   });
 
   it('Warnung «wesentlich»: «Änderung beantragen» öffnet den Vertrag mit dem Dialog, nur mit Recht (UC-004 A1 → UC-007)', async () => {

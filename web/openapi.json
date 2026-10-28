@@ -1775,6 +1775,453 @@
           }
         }
       },
+      "ZugangVorschau": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "person",
+          "orgRollen",
+          "rollen",
+          "aufgaben",
+          "can"
+        ],
+        "properties": {
+          "person": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "orgRollen": {
+            "description": "Rollen an der Organisation (Programmrollen, Administration); entfallen mit dem Zugang.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rolle",
+                "rolleName"
+              ],
+              "properties": {
+                "rolle": {
+                  "type": "string"
+                },
+                "rolleName": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "rollen": {
+            "description": "Rollen an Projekten, Portfolios und anderen Orten, die neu zu besetzen sind.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "ort",
+                "rolle",
+                "rolleName"
+              ],
+              "properties": {
+                "ort": {
+                  "additionalProperties": false,
+                  "description": "Den Namen des Orts löst die Oberfläche auf (wie im Baukasten).",
+                  "type": "object",
+                  "required": [
+                    "typ",
+                    "id"
+                  ],
+                  "properties": {
+                    "typ": {
+                      "description": "Typ des Orts aus dem Modell, z. B. `projekt` oder `portfolio`.",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  }
+                },
+                "rolle": {
+                  "description": "Rolle des Modells, z. B. `pl`.",
+                  "type": "string"
+                },
+                "rolleName": {
+                  "description": "Name der Rolle, z. B. «Projektleitung».",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "aufgaben": {
+            "description": "Offene Aufgaben an die Person persönlich.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "art",
+                "titel",
+                "kontext",
+                "link",
+                "frist",
+                "fristArt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "art": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "kontext": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "link": {
+                  "description": "Adresse der Aufgabe in der Oberfläche.",
+                  "type": "string"
+                },
+                "frist": {
+                  "anyOf": [
+                    {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fristArt": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "kalendertage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "arbeitstage"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "entziehen"
+            ],
+            "properties": {
+              "entziehen": {
+                "description": "Nicht für sich selbst.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ZugangEntzogen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "neubesetzung",
+          "rollen",
+          "aufgaben"
+        ],
+        "properties": {
+          "neubesetzung": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "rollen": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "aufgaben": {
+            "minimum": 0,
+            "description": "Offene Aufgaben der Person beim Entziehen.",
+            "type": "integer"
+          }
+        }
+      },
+      "Neubesetzung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "person",
+          "entzogenAt",
+          "entzogenVon",
+          "rollen",
+          "offeneRollen",
+          "erledigt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "entzogenAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entzogenVon": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rollen": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "offeneRollen": {
+            "minimum": 0,
+            "description": "Rollen, die am Ort noch niemand wieder hat.",
+            "type": "integer"
+          },
+          "erledigt": {
+            "description": "Keine offene Aufgabe «neu besetzen» (nichts zu tun oder von Hand erledigt).",
+            "type": "boolean"
+          }
+        }
+      },
+      "NeubesetzungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Neubesetzung"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "NeubesetzungDetail": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "neubesetzung",
+          "rollen",
+          "aufgaben"
+        ],
+        "properties": {
+          "neubesetzung": {
+            "$ref": "#/components/schemas/Neubesetzung"
+          },
+          "rollen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "ort",
+                "rolle",
+                "rolleName",
+                "besetzt"
+              ],
+              "properties": {
+                "ort": {
+                  "additionalProperties": false,
+                  "description": "Den Namen des Orts löst die Oberfläche auf (wie im Baukasten).",
+                  "type": "object",
+                  "required": [
+                    "typ",
+                    "id"
+                  ],
+                  "properties": {
+                    "typ": {
+                      "description": "Typ des Orts aus dem Modell, z. B. `projekt` oder `portfolio`.",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  }
+                },
+                "rolle": {
+                  "description": "Rolle des Modells, z. B. `pl`.",
+                  "type": "string"
+                },
+                "rolleName": {
+                  "description": "Name der Rolle, z. B. «Projektleitung».",
+                  "type": "string"
+                },
+                "besetzt": {
+                  "description": "Jemand hat die Rolle am Ort wieder.",
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "aufgaben": {
+            "description": "Offene Aufgaben, die noch an die Person gehen.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "art",
+                "titel",
+                "kontext",
+                "link",
+                "frist",
+                "fristArt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "art": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "kontext": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "link": {
+                  "description": "Adresse der Aufgabe in der Oberfläche.",
+                  "type": "string"
+                },
+                "frist": {
+                  "anyOf": [
+                    {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fristArt": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "kalendertage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "arbeitstage"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "OrgEinheit": {
         "additionalProperties": false,
         "type": "object",
@@ -36793,6 +37240,449 @@
         }
       }
     },
+    "/v1/zugaenge/{person}": {
+      "get": {
+        "summary": "Zugang: Vorschau vor dem Entziehen",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Was mit dem Zugang entfällt (UC-016 A1): Rollen an der Organisation, Rollen an Projekten, Portfolios und anderen Orten, die neu zu besetzen sind, und offene Aufgaben an die Person. Ändert nichts.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "person",
+            "required": true,
+            "description": "Person (Principal) der Organisation."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZugangVorschau"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/zugaenge/{person}/entziehen": {
+      "post": {
+        "summary": "Zugang entziehen",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Hält die Rollen der Person an Orten ausser der Organisation fest, entfernt sie dann im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration) und legt der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben. Ein abgebrochener Versuch wird beim nächsten Aufruf fortgesetzt.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "person",
+            "required": true,
+            "description": "Person (Principal) der Organisation."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZugangEntzogen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/neubesetzungen": {
+      "get": {
+        "summary": "Neubesetzungen",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Entzogene Zugänge mit der Zahl der festgehaltenen und noch nicht wieder besetzten Rollen, neueste zuerst.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "offen",
+            "required": false,
+            "description": "Nur mit offener Aufgabe «neu besetzen»."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeubesetzungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/neubesetzungen/{id}": {
+      "get": {
+        "summary": "Neubesetzung",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Festgehaltene Rollen mit Stand (wieder besetzt, sobald jemand die Rolle am Ort hat) und offene Aufgaben, die noch an die Person gehen. Neu besetzt wird dort, wo die Rolle vergeben wird (z. B. Projektorganisation); erledigt wird die Aufgabe im Eingang.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeubesetzungDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/org-einheiten": {
       "get": {
         "summary": "Organisationseinheiten auflisten",
@@ -69703,6 +70593,10 @@
     {
       "name": "Stellvertretungen",
       "description": "Stellvertretung mit Zeitraum: Aufgaben und befristete Rollen für die Vertretung."
+    },
+    {
+      "name": "Neubesetzung",
+      "description": "Zugang entziehen mit offenen Aufgaben und neu zu besetzenden Rollen (UC-016 A1)."
     },
     {
       "name": "Stammdaten",

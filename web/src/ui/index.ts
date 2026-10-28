@@ -1,7 +1,7 @@
 export { Icon } from './Icon.tsx';
 export type { IconName } from './icons.ts';
 export { Confirm, Dialog, Drawer, useFocusTrap } from './Overlay.tsx';
-export { Empty, ErrorState, Loading, TeilFehler } from './states.tsx';
+export { Empty, ErrorState, Loading, Skelett, TeilFehler, useVerzoegert } from './states.tsx';
 export { T, type Texte } from './texte/index.ts';
 export { useToast } from './toasts.ts';
 export { applyTheme, themeMode, type ThemeMode } from './theme.ts';
@@ -13,5 +13,5 @@ export {
 export { Status, statusText, TrendPfeil, type Projektstatus, type StatusProps, type Trend } from './Status.tsx';
 export { Stand, type StandFamilie, type StandProps } from './Stand.tsx';
 export { Hinweis, Regelmeldung, regelText, type HinweisProps, type Regel, type Stufe } from './Hinweis.tsx';
-export { Datenliste, Skelett, useVerzoegert, type DatenlisteProps, type Spalte } from './Datenliste.tsx';
+export { Datenliste, type DatenlisteProps, type Spalte } from './Datenliste.tsx';
 export { Merkmale, PhaseKurz, ProjektKlein, ProjektListe, projektSpalten, type ProjektKurz, type ProjektMerkmal } from './Projekt.tsx';

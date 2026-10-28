@@ -3852,16 +3852,12 @@
                   ]
                 },
                 "wert": {
-                  "anyOf": [
-                    {
-                      "type": "null"
-                    },
-                    {
-                      "minimum": 0,
-                      "maximum": 9999999,
-                      "type": "number"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "number"
+                  ],
+                  "minimum": 0,
+                  "maximum": 9999999
                 },
                 "einheit": {
                   "anyOf": [
@@ -4595,16 +4591,12 @@
                   ]
                 },
                 "wert": {
-                  "anyOf": [
-                    {
-                      "type": "null"
-                    },
-                    {
-                      "minimum": 0,
-                      "maximum": 9999999,
-                      "type": "number"
-                    }
-                  ]
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 9999999
                 },
                 "einheit": {
                   "anyOf": [
@@ -6555,17 +6547,13 @@
             "type": "string"
           },
           "prognose": {
-            "anyOf": [
-              {
-                "type": "null"
-              },
-              {
-                "minimum": 0,
-                "maximum": 999999999999.99,
-                "multipleOf": 0.01,
-                "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
-                "type": "number"
-              }
+            "minimum": 0,
+            "maximum": 999999999999.99,
+            "multipleOf": 0.01,
+            "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
+            "type": [
+              "null",
+              "number"
             ]
           },
           "budgetBaseline": {
@@ -6685,17 +6673,13 @@
             "type": "string"
           },
           "prognose": {
-            "anyOf": [
-              {
-                "type": "null"
-              },
-              {
-                "minimum": 0,
-                "maximum": 999999999999.99,
-                "multipleOf": 0.01,
-                "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
-                "type": "number"
-              }
+            "minimum": 0,
+            "maximum": 999999999999.99,
+            "multipleOf": 0.01,
+            "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
+            "type": [
+              "number",
+              "null"
             ]
           }
         }
@@ -6743,17 +6727,13 @@
             "type": "string"
           },
           "prognose": {
-            "anyOf": [
-              {
-                "type": "null"
-              },
-              {
-                "minimum": 0,
-                "maximum": 999999999999.99,
-                "multipleOf": 0.01,
-                "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
-                "type": "number"
-              }
+            "minimum": 0,
+            "maximum": 999999999999.99,
+            "multipleOf": 0.01,
+            "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
+            "type": [
+              "number",
+              "null"
             ]
           }
         }
@@ -82482,7 +82462,7 @@
         "tags": [
           "Änderungsprotokoll"
         ],
-        "description": "Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5).",
+        "description": "Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5). Mit `format=csv` als Export aller Einträge zum Filter (eine Zeile je geändertes Feld, höchstens 10 000 Einträge, sonst 422).",
         "parameters": [
           {
             "schema": {
@@ -82542,6 +82522,18 @@
             "name": "limit",
             "required": false,
             "description": "Seitengrösse (höchstens 200)."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export als CSV: alle Einträge zum Filter, eine Zeile je geändertes Feld."
           }
         ],
         "responses": {

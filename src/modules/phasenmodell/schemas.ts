@@ -57,8 +57,8 @@ const Frist = Type.Object({
 }, { additionalProperties: false });
 const Toleranz = Type.Object({
   dimension: lit(DIMENSIONEN_TOLERANZ),
-  // null zuerst: AJV wandelt mit coerceTypes sonst null in 0 um, bevor die Alternative null geprüft wird (A-10)
-  wert: Type.Union([Type.Null(), Type.Number({ minimum: 0, maximum: 9_999_999 })]),
+  // Typliste statt anyOf: AJV wandelt mit coerceTypes in anyOf null in 0 (Zahl zuerst) bzw. 0 in null (null zuerst) um (A-10)
+  wert: Type.Unsafe<number | null>({ type: ['number', 'null'], minimum: 0, maximum: 9_999_999 }),
   einheit: lit(EINHEITEN_TOLERANZ),
 }, { additionalProperties: false, description: 'Standard für Projekte; ohne Wert keine Warnung «wesentlich» (A-10).' });
 

@@ -6,11 +6,11 @@
 import type { Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
 
-export interface Kopf { nummer: string; name: string; vertraulich: boolean; portfolio_id: string }
+export interface Kopf { nummer: string; name: string; vertraulich: boolean; portfolio_id: string; phasenmodell_id: string | null }
 
 /** Projekt (Lesesicht); null = nicht sichtbar. */
 export async function kopf(tx: Tx, projektId: string): Promise<Kopf | null> {
-  return (await tx.query<Kopf>(`SELECT nummer, name, vertraulich, portfolio_id FROM ${SCHEMA}.projekt WHERE id = $1`, [projektId])).rows[0] ?? null;
+  return (await tx.query<Kopf>(`SELECT nummer, name, vertraulich, portfolio_id, phasenmodell_id FROM ${SCHEMA}.projekt WHERE id = $1`, [projektId])).rows[0] ?? null;
 }
 
 /** Anzeigenamen der Personen (Lesesicht). */

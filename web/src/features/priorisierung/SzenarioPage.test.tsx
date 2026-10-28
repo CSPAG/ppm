@@ -1,7 +1,9 @@
 /**
  * Seite «Szenarien» (UI-22, AP-E5-3; BC PP.03.01–03, UC-008 Schritte 5–6, K5) gegen die nachgebildete API: leer (Z2) mit
  * «Szenario anlegen», Rangliste mit Wasserlinie und Regeltext, Engpässe mit Rollenbezeichnung, Umordnen mit Alt+↓
- * (sichtbar sofort, K5-1) mit Ansage, nur lesen (Gremium), Vergleich und «Als Antrag wählen» mit Vorlage.
+ * (sichtbar sofort, K5-1) mit Ansage, nur lesen (Gremium), Vergleich und «Als Antrag wählen» mit Vorlage; Antrag ans
+ * Gremium (AP-E5-5, K5 Schritt 7): Folgeentscheid je laufendem Projekt unter der Wasserlinie, Sperre ohne Folgeentscheid,
+ * «Für das Gremium traktandieren».
  */
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -15,6 +17,7 @@ import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
 import { SzenarioPage } from './SzenarioPage.tsx';
 import type { SetSzenarioSearch, SzenarioSearch } from './SzenarioSearch.ts';
 import { TS } from './SzenarioTexte.ts';
+import { TE } from './EntscheidTexte.ts';
 
 const UE = { roles: ['ue'], permissions: ['tenant:read', 'stammdaten:read', 'portfolio:read', 'projekt:read', 'priorisierung:read', 'priorisierung:write', 'finanzen:read'] as AppPermission[] };
 const GREMIUM = { roles: ['gremium'], permissions: ['tenant:read', 'portfolio:read'] as AppPermission[], somewhere: ['priorisierung:read', 'projekt:read'] as AppPermission[] };
@@ -53,16 +56,30 @@ function rechnen(id: string, name: string, stand: string, reihe: { projektId: st
   };
 }
 
-function server(o: { leer?: boolean; write?: boolean } = {}) {
+function server(o: { leer?: boolean; write?: boolean; antragA?: boolean } = {}) {
   const write = o.write ?? true;
   const stand = new Map<string, { name: string; stand: string; version: number; reihe: { projektId: string; aktiv: boolean; startMonat: string | null }[]; vorlage: unknown }>();
   if (!o.leer) {
-    stand.set(SA, { name: 'A: Ist-Stand', stand: 'entwurf', version: 1, reihe: P.map(p => ({ projektId: p.id, aktiv: true, startMonat: null })), vorlage: null });
+    stand.set(SA, { name: 'A: Ist-Stand', stand: o.antragA ? 'beantragt' : 'entwurf', version: 1, reihe: P.map(p => ({ projektId: p.id, aktiv: true, startMonat: null })), vorlage: null });
     stand.set(SB, { name: 'B: ohne 2', stand: 'entwurf', version: 1, reihe: P.map(p => ({ projektId: p.id, aktiv: p.nummer !== '2026-002', startMonat: null })), vorlage: null });
   }
   const aus = (id: string) => { const x = stand.get(id)!; return { ...rechnen(id, x.name, x.stand, x.reihe, x.version, write), vorlage: x.vorlage }; };
   const puts: { ifMatch: string | null; body: { positionen: { projektId: string }[] } }[] = [];
   const posts: { url: string; body: unknown }[] = [];
+  const folgen = new Map<string, { folge: string; begruendung: string }>();
+  const ifMatches: (string | null)[] = [];
+  let traktandiert = false;
+  const entscheid = (id: string) => {
+    const x = stand.get(id)!;
+    const unter = aus(id).positionen.filter(p => p.ueberWasserlinie === false)
+      .map(p => ({ projektId: p.projektId, nummer: p.nummer, name: p.name, phase: p.phase, folge: folgen.get(p.projektId)?.folge ?? null, begruendung: folgen.get(p.projektId)?.begruendung ?? '' }));
+    const fehlt = unter.filter(u => !u.folge).map(u => u.nummer);
+    const pruefung = [
+      ...(fehlt.length ? [`Folgeentscheid fehlt: 1 laufendes Projekt liegt unter der Wasserlinie ohne Antrag zurückstellen, sistieren oder abbrechen (${fehlt.join(', ')}). Ergänze den Folgeentscheid im Szenario.`] : []),
+      ...(x.stand !== 'beantragt' ? ['Antrag: nicht gewählt.'] : []),
+    ];
+    return { szenarioId: id, stand: x.stand, traktandiert, unterWasserlinie: unter, traktandierbar: !pruefung.length, pruefung, can: { write: write && (x.stand === 'entwurf' || x.stand === 'beantragt') } };
+  };
   const vergleich = (ids: string[]) => ({
     portfolioId: PF.id,
     projekte: P.map(p => ({ id: p.id, nummer: p.nummer, name: p.name, unterschiedlich: p.nummer === '2026-002' })),
@@ -101,6 +118,24 @@ function server(o: { leer?: boolean; write?: boolean } = {}) {
       x.version++;
       return json(aus(SA));
     },
+    [`GET /v1/szenarien/${SA}/entscheid`]: () => json(entscheid(SA)),
+    [`GET /v1/szenarien/${SB}/entscheid`]: () => json(entscheid(SB)),
+    [`PUT /v1/szenarien/${SA}/folgen`]: async req => {
+      ifMatches.push(req.headers.get('if-match'));
+      const body = await req.json() as { folgen: { projektId: string; folge: string; begruendung?: string }[] };
+      posts.push({ url: req.url, body });
+      folgen.clear();
+      for (const f of body.folgen) folgen.set(f.projektId, { folge: f.folge, begruendung: f.begruendung ?? '' });
+      stand.get(SA)!.version++;
+      return json(entscheid(SA));
+    },
+    [`POST /v1/szenarien/${SA}/traktandieren`]: req => {
+      ifMatches.push(req.headers.get('if-match'));
+      posts.push({ url: req.url, body: null });
+      traktandiert = true;
+      stand.get(SA)!.version++;
+      return json({ traktandumId: '00000000-0000-4000-8000-0000000000e1', titel: 'Priorisierung Transformation: Szenario «A: Ist-Stand»', antrag: '…' });
+    },
     [`POST /v1/szenarien/${SB}/beantragen`]: async req => {
       const body = await req.json() as { vergleich: string[] };
       posts.push({ url: req.url, body });
@@ -111,7 +146,7 @@ function server(o: { leer?: boolean; write?: boolean } = {}) {
     },
   }, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
   vi.stubGlobal('fetch', api.fetch);
-  return { puts, posts };
+  return { puts, posts, ifMatches };
 }
 
 function Page({ initial = {} }: { initial?: SzenarioSearch }) {
@@ -204,5 +239,44 @@ describe('Szenarien', () => {
     expect(s.posts[0]!.body).toEqual({ vergleich: [SA] });
     expect(await screen.findByText(TS.nichtBewertet(['2026-003']))).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^Entscheidungsvorlage \(Vorschau\)/ })).toBeInTheDocument();
+  });
+
+  it('Antrag ans Gremium: Sperre ohne Folgeentscheid, Folgeentscheid speichern, traktandieren (axe ohne Befund)', async () => {
+    const s = server({ antragA: true });
+    const { container } = renderWithIam(<Page initial={{ s: SA }} />, UE);
+    const region = await screen.findByRole('region', { name: TE.folgenTitel });
+    const zeile = within(region).getByRole('row', { name: /2026-003/ });
+    expect(zeile).toHaveTextContent('P1');
+    expect(screen.getByText(/Folgeentscheid fehlt: .*\(2026-003\)\. Ergänze den Folgeentscheid im Szenario\./)).toBeInTheDocument();
+    const knopf = screen.getByRole('button', { name: TE.traktandieren });
+    expect(knopf).toBeDisabled();
+    await expectNoAxe(container);
+    const user = userEvent.setup();
+    await user.selectOptions(screen.getByLabelText(TE.folgeLabel('2026-003')), 'sistieren');
+    await user.type(screen.getByLabelText(TE.begruendungLabel('2026-003')), 'Budget');
+    expect(knopf).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: TE.speichern }));
+    await waitFor(() => expect(s.posts).toHaveLength(1));
+    expect(s.posts[0]!.body).toEqual({ folgen: [{ projektId: P[2]!.id, folge: 'sistieren', begruendung: 'Budget' }] });
+    expect(s.ifMatches[0]).toBe('W/"1"');
+    const neu = await screen.findByRole('button', { name: TE.traktandieren });
+    await waitFor(() => expect(neu).toBeEnabled());
+    expect(screen.queryByText(/Folgeentscheid fehlt/)).toBeNull();
+    await user.click(neu);
+    await waitFor(() => expect(s.posts).toHaveLength(2));
+    expect(s.ifMatches[1]).toBe('W/"2"');
+    expect(await screen.findByText(TE.traktandiert('Priorisierung Transformation: Szenario «A: Ist-Stand»'))).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: TE.aktualisieren })).toBeInTheDocument();
+    expect(screen.getByText(TE.istTraktandiert)).toBeInTheDocument();
+  });
+
+  it('Antrag ans Gremium nur lesen (Gremium): Folgeentscheid als Text, kein Traktandieren', async () => {
+    server({ write: false, antragA: true });
+    renderWithIam(<Page initial={{ s: SA }} />, GREMIUM);
+    const region = await screen.findByRole('region', { name: TE.folgenTitel });
+    expect(within(region).getByText(TE.offen)).toBeInTheDocument();
+    expect(screen.getByText(TE.nurLesen)).toBeInTheDocument();
+    expect(screen.queryByLabelText(TE.folgeLabel('2026-003'))).toBeNull();
+    expect(screen.queryByRole('button', { name: TE.traktandieren })).toBeNull();
   });
 });

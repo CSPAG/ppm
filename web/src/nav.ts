@@ -10,8 +10,8 @@ import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
 import { zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
-import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
-import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
+import { naechsteSitzungPfad, sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
+import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
 import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
@@ -19,6 +19,7 @@ import { dashboardTexte, portfolioberichtTexte, risikenTexte } from './features/
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { vorlagenTexte } from './features/vorlagen/index.ts';
+import { aenderungTexte } from './features/vertrag/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
 import { schnittstellenTexte as TX } from './features/schnittstellen/index.ts';
 import { quartalsreportingTexte, roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
@@ -89,6 +90,10 @@ export const navigation: NavRegistrierung = {
     { id: 'idee-einreichen', label: ideeTexte.einreichen, icon: 'plus', pfad: ideeNeuPfad(), recht: 'idee:create' },
     { id: 'einheit-anlegen', label: TS.aktion.einheitAnlegen, icon: 'plus', pfad: '/administration/organisation?o=neu', recht: 'stammdaten:write' },
     { id: 'feiertag-erfassen', label: TS.aktion.feiertagErfassen, icon: 'plus', pfad: '/administration/organisation?ansicht=feiertage&o=neu', recht: 'stammdaten:write' },
+    // «Nächste Sitzung öffnen» (IA «Navigation», K3): Mitglieder sehen Sitzungen über ihr Gremium (Recht irgendwo)
+    { id: 'naechste-sitzung', label: sitzungTexte.aktionNaechste, icon: 'gavel', pfad: '/gremien/sitzungen', recht: 'sitzung:read', irgendwo: true, ziel: naechsteSitzungPfad },
+    // «Dashboard öffnen» (IA «Navigation», UI-17)
+    { id: 'dashboard', label: dashboardTexte.aktionOeffnen, icon: 'grid', pfad: '/portfolio/dashboard', recht: 'auswertung:read', irgendwo: true },
     // Befehlspalette «Stellvertretung erfassen» (IA «Navigation», UC-016 Schritt 4)
     { id: 'stellvertretung-erfassen', label: kontoTexte.erfassen, icon: 'users', pfad: '/konto/stellvertretung?o=neu', recht: 'tenant:read' },
     { id: 'schnittstelle-einrichten', label: TX.aktion.einrichten, icon: 'plug', pfad: '/administration/schnittstellen?o=neu', recht: 'schnittstelle:admin' },
@@ -114,10 +119,25 @@ export const navigation: NavRegistrierung = {
         id: `statusbericht:${p.id}`, label: berichtTexte.palette(p.nummer, p.name), detail: berichtTexte.reiter, icon: 'doc', pfad: `/projekte/${p.nummer}/bericht?periode=${laufendePeriode()}`,
       })),
     },
+    // «Änderung beantragen» mit Projektwahl (IA «Navigation», K2 Einstieg; UC-007): Dialog im Reiter Vertrag, der
+    // prüft, ob eine Änderung möglich ist (`can.entwerfen`); laufende Projekte wie im Vertrag (aktiv oder sistiert)
+    {
+      id: 'aenderung', recht: 'vertrag:write',
+      suchen: async (q, signal) => (await sucheProjekte(q, signal)).filter(p => p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert').map(p => ({
+        id: `aenderung:${p.id}`, label: aenderungTexte.palette(p.nummer, p.name), detail: aenderungTexte.antrag, icon: 'edit', pfad: `/projekte/${encodeURIComponent(p.nummer)}/vertrag?aenderung=1`,
+      })),
+    },
     {
       id: 'projekte', recht: 'projekt:read',
       suchen: async (q, signal) => (await sucheProjekte(q, signal)).map(p => ({
         id: `projekt:${p.id}`, label: `${p.nummer} ${p.name}`, detail: projektTexte.palette.detail, icon: 'folder', pfad: `/projekte/${p.nummer}`,
+      })),
+    },
+    // Ideen nach Titel oder Nummer (I-N4): eigene für Antragstellende, eingereichte für den Ideenpool
+    {
+      id: 'ideen', recht: ['idee:create', 'idee:read'],
+      suchen: async (q, signal) => (await sucheIdeen(q, signal)).map(i => ({
+        id: `idee:${i.id}`, label: `${i.nummer} ${i.titel}`, detail: ideeTexte.bereich, icon: 'doc', pfad: `/portfolio/ideen/${i.nummer}`,
       })),
     },
     {

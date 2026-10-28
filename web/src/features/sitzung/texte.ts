@@ -11,6 +11,7 @@ export const TS = {
   spalten: { datum: 'Datum', stand: 'Stand', traktanden: 'Traktanden' },
   oeffnen: (g: string, d: string) => `Sitzung ${g} ${d} öffnen`,
   mehrLaden: 'Weitere Termine',
+  aktionNaechste: 'Nächste Sitzung öffnen',
 
   stand: {
     geplant: 'geplant', in_vorbereitung: 'in Vorbereitung', versendet: 'Unterlagen versendet', laufend: 'läuft',

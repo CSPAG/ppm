@@ -67,6 +67,12 @@ export function useAuswahl(enabled = true) {
   });
 }
 
+/** Suche für die Befehlspalette (I-N4): Titel oder Nummer, nach Recht wie die Liste. */
+export async function sucheIdeen(q: string, signal: AbortSignal): Promise<IdeeZeile[]> {
+  const { data } = await api.GET('/v1/ideen', { params: { query: { q, limit: 5 } }, signal });
+  return data!.items;
+}
+
 export function useIdeeKopf() {
   return useQuery({ queryKey: ideeKeys.kopf, queryFn: async ({ signal }) => (await api.GET('/v1/ideen/kopf', { signal })).data! });
 }

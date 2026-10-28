@@ -94,6 +94,7 @@ export const ListQuery = Type.Object({
   stand: Type.Optional(Type.Array(StandT, { description: 'Nur diese Stände (mehrfach).' })),
   eigene: Type.Optional(Type.Boolean({ description: 'Nur selbst erfasste Ideen («Meine Ideen»).' })),
   nummer: Type.Optional(Type.Integer({ minimum: 1, description: 'Genau diese Nummer (Schlüssel in der Oberfläche, I-N5).' })),
+  q: Type.Optional(Type.String({ minLength: 1, maxLength: 200, description: 'Suche im Titel (Teilstring) oder nach der Nummer (Befehlspalette, I-N4).' })),
   cursor: Type.Optional(Cursor),
   limit: Type.Optional(Limit),
 }, { additionalProperties: false });

@@ -67,6 +67,14 @@ export const KAPITEL: readonly { nr: number; titel: string; felder: readonly Fel
       { key: 'termin', label: 'Termin', art: 'datum', optional: true },
     ], neu: () => ({ registerId: null, phase: 'P1', art: 'meilenstein', text: '', termin: null }) },
     { key: 'termine', label: 'Zusammenfassung Projektplanung', art: 'termine' },
+    // Toleranzen des Projekts (A-10, K11): übersteuern ab der Baseline den Standard des Phasenmodells
+    { key: 'toleranzen', label: 'Toleranzen', art: 'liste', eintrag: 'Toleranz', optional: true,
+      hilfe: 'Ab welcher Abweichung PPM eine Abweichung als wesentlich meldet. Gilt ab der Baseline und ersetzt je Dimension den Standard des Phasenmodells; ohne Eintrag gilt der Standard.',
+      spalten: [
+        { key: 'dimension', label: 'Dimension', art: 'auswahl', optionen: [['termin', 'Termin'], ['kosten', 'Kosten'], ['umfang', 'Umfang']] },
+        { key: 'wert', label: 'Wert', art: 'zahl' },
+        { key: 'einheit', label: 'Einheit', art: 'auswahl', optionen: [['kalendertage', 'Kalendertage'], ['arbeitstage', 'Arbeitstage'], ['prozent', 'Prozent']] },
+      ], neu: () => ({ dimension: 'termin', wert: null, einheit: 'kalendertage' }) },
   ] },
   { nr: 8, titel: 'Projektstruktur und Organisation', felder: [
     { key: 'mitglieder', label: 'Rollen im Projekt', art: 'liste', eintrag: 'Rolle', hilfe: 'Sponsor, Projektleitung und CTL je höchstens eine Person; die Sponsoren-Koalition ist eine Liste (A-04).', spalten: [
@@ -146,6 +154,9 @@ export function pruefeLokal(nr: number, inhalt: Record<string, unknown>): Record
       for (const s of f.spalten ?? []) {
         const v = z[s.key];
         if (!s.optional && (v === '' || v === null || v === undefined)) fehler[`${f.key}/${i}/${s.key}`] = `${s.label}: Angabe fehlt.`;
+      }
+      if (nr === 7 && f.key === 'toleranzen' && ((inhalt[f.key] ?? []) as Record<string, unknown>[]).findIndex(x => x.dimension === z.dimension) !== i) {
+        fehler[`${f.key}/${i}/dimension`] = 'Für diese Dimension gibt es schon eine Toleranz.';
       }
       if (nr === 9 && f.key === 'personal') {
         const mitFte = z.fte !== null && !!z.vonMonat && !!z.bisMonat;

@@ -7,6 +7,7 @@ type Rubrik = 'scope' | 'zeitplan' | 'ressourcen_budget' | 'annahmen' | 'key_ris
 export const TA = {
   // Beantragen (UC-007 Schritt 1, K2 Einstieg «Projektakte»)
   beantragen: 'Änderung beantragen',
+  palette: (nr: string, name: string) => `Änderung beantragen: ${nr} ${name}`,
   beantragenFrage: 'Änderung am Projektvertrag beantragen?',
   beantragenWirkung: 'Es entsteht ein Entwurf aus der Baseline. Passe die betroffenen Kapitel an; der Sponsor entscheidet.',
   begruendung: 'Begründung',

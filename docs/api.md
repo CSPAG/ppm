@@ -261,6 +261,7 @@ DM.02.01–03, UC-002 Schritte 1–8). Höchstens ein Entwurf je Projekt (UX-E5,
 | `GET /v1/projekte/{id}/vertrag` | `projekt:read` | Versionen (neueste zuerst), `entwurf`, `baseline`, `can.entwerfen` (mögliche Anlässe) |
 | `POST /v1/projekte/{id}/vertrag/entwuerfe` | `vertrag:write` | `anlass` `initial` (Version 0.1, Vorbelegung aus `projekt.herkunft` und den Standard-Ergebnissen des Phasenmodells); `aenderung` (nur mit Baseline, Begründung Pflicht: nächste Unternummer, alle Kapitel aus der Baseline); `gate` (AP-E3-3: Kopie der Baseline als «n.0» für die Phase Pn, Standard-Ergebnisse der Zielphase in Kap. 7; nur mit Baseline, P0–P3); besteht ein Entwurf: 409 mit `entwurf` |
 | `GET /v1/projekte/{id}/vertrag/ziele` | `projekt:write` | Ziele zur Wahl in Kap. 2: strategische Ziele mit Handlungsfeld, Jahresziele ab dem laufenden Jahr (in voller Sicht gelesen, auch ohne `ziel:read` an der Organisation) |
+| `GET /v1/projekte/{id}/toleranzen` | `projekt:read` | Gültige Toleranz je Dimension (Termin, Kosten, Umfang; A-10): aus Kap. 7 der Baseline (`quelle` `vertrag`), sonst der Standard des Phasenmodells des Projekts bzw. in Kraft (`phasenmodell`, in voller Sicht gelesen); ohne Wert `null` = keine Warnung «wesentlich» |
 | `GET /v1/vertragsversionen/{id}` | `projekt:read` | Kopf und Kapitelnavigation (`geaendert`, `fehlend` je Kapitel); `ETag` der Version |
 | `GET /v1/vertragsversionen/{id}/kapitel/{nr}` | `projekt:read` | Inhalt nach Schema (`Kapitel1` … `Kapitel13`) mit `basis` (Inhalt der Basisversion); `ETag` des Kapitels |
 | `PUT /v1/vertragsversionen/{id}/kapitel/{nr}` | `vertrag:write` | nur Entwurf «in Arbeit», `If-Match` Pflicht (412 bei fremder Änderung); ganzer Inhalt, 422 mit Pfad `/inhalt/…` |
@@ -280,7 +281,10 @@ Pflichtangaben im Phasenmodell nennen das Feld klein mit Unterstrich (`strategis
 (`strategischesZielId`). Ab dem Gate P1–P2 verlangen `personal` FTE mit Monaten (nicht Grösse S/M/L) und `kosten` einen
 Betrag für jede Phase bis P4 (UC-003 A1). Obere Module nutzen `vertrag` aus `src/modules/vertrag/index.ts`:
 `baselineSetzen(tx, who, versionId)` (Version abgenommen und verbindlich; Listen der Kapitel 3, 6, 7, 9, 10, 11 gehen
-über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline) und `entwurfsanlass.registrieren`.
+über `projektdaten.uebernehmen` ins Register, Termine und Budget als Baseline), `entwurfsanlass.registrieren` und
+`toleranzen(tx, projektIds, voll)` (gültige Toleranz je Projekt und Dimension; `voll` liest den Standard des
+Phasenmodells in voller Sicht). Kap. 7 führt `toleranzen` (je Dimension höchstens eine, Einheit wie im Phasenmodell);
+sie übersteuern den Standard ab der Baseline.
 Die Traktandenart `aenderung` (Ergebnisse «Freigegeben», «Abgelehnt») registriert `vertrag`; ihre Folge setzt die
 Baseline bzw. lehnt den Entwurf ab und läuft in der Transaktion der UE mit `app.vertrag_intern` (200_vertrag_aenderung).
 

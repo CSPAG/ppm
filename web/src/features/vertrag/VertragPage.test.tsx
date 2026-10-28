@@ -248,6 +248,26 @@ describe('Projektvertrag (UI-07)', () => {
     expect(screen.queryByRole('button', { name: TV.zurueckziehen })).toBeNull();
   });
 
+  it('Kap. 7: Toleranzen je Dimension erfassen (A-10), doppelte Dimension vor dem Speichern gemeldet', async () => {
+    const puts: Record<string, unknown>[] = [];
+    stub({ routes: {
+      [`PUT /v1/vertragsversionen/${V}/kapitel/7`]: async req => { const b = await req.json(); puts.push(b.inhalt); return mitEtag(kapitel(7, b.inhalt, { version: 2 }), 2); },
+    } });
+    const { container } = renderWithIam(<Page initial={{ kapitel: 7 }} />, PL as never);
+    const gruppe = await screen.findByRole('group', { name: 'Toleranzen' });
+    expect(within(gruppe).getByText(/Gilt ab der Baseline und ersetzt je Dimension den Standard des Phasenmodells/)).toBeInTheDocument();
+    await userEvent.click(within(gruppe).getByRole('button', { name: 'Toleranz hinzufügen' }));
+    await userEvent.selectOptions(within(gruppe).getByLabelText(/^Dimension \(Toleranz 1\)/), 'kosten');
+    await userEvent.type(within(gruppe).getByLabelText(/^Wert \(Toleranz 1\)/), '5');
+    await userEvent.selectOptions(within(gruppe).getByLabelText(/^Einheit \(Toleranz 1\)/), 'prozent');
+    await waitFor(() => expect(puts.at(-1)?.toleranzen).toEqual([{ dimension: 'kosten', wert: 5, einheit: 'prozent' }]), { timeout: 3000 });
+    await expectNoAxe(container);
+
+    await userEvent.click(within(gruppe).getByRole('button', { name: 'Toleranz hinzufügen' }));
+    await userEvent.selectOptions(within(gruppe).getByLabelText(/^Dimension \(Toleranz 2\)/), 'kosten');
+    expect(await within(gruppe).findByText('Für diese Dimension gibt es schon eine Toleranz.')).toBeInTheDocument();
+  });
+
   it('Kapitelnavigation mit ↑/↓', async () => {
     stub();
     renderWithIam(<Page initial={{ kapitel: 3 }} />, PL as never);

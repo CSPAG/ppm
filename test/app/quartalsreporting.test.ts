@@ -184,7 +184,14 @@ describe('Quartalsreporting an den VR', () => {
     assert.equal((await ok('GET', '/v1/quartalsberichte', mitglied)).json().items.length, 1);
     assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}/dokument`, mitglied)).statusCode, 200);
     assert.equal((await call('GET', `/v1/quartalsberichte/${quartal}`, fremd)).statusCode, 403);
-    assert.equal((await call('GET', '/v1/quartalsberichte', fremd)).statusCode, 403);
+    assert.deepEqual((await ok('GET', '/v1/quartalsberichte', fremd)).json().items, [], 'die Lesesicht filtert');
+    // A-67: Ein neues Portfolio der Kategorie A sortiert vorne ein; das ursprüngliche PRAT liest weiter, das neue nicht
+    const vorne = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'aare', name: 'Aare' }, 201)).json().id;
+    const n = await login(api, 'demo', 'u-vorne', null);
+    await grant(api, tenantId, `user:${n.principalId}`, 'gremium', { type: 'portfolio', id: vorne });
+    assert.equal((await ok('GET', `/v1/quartalsberichte/${quartal}`, mitglied)).json().stand, 'traktandiert');
+    assert.notEqual((await call('GET', `/v1/quartalsberichte/${quartal}`, { authorization: n.authorization })).statusCode, 200);
+    assert.deepEqual((await ok('GET', '/v1/quartalsberichte', { authorization: n.authorization })).json().items, []);
     assert.equal((await call('PATCH', `/v1/quartalsberichte/${quartal}`, mit(ue, r.headers.etag as string), { kommentare: { risiken: 'x' } })).statusCode, 409);
     assert.equal((await aufgaben('quartalsreporting.erstellen')).find(x => x.bezug_id === quartal)!.stand, 'erledigt');
 

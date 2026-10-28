@@ -172,12 +172,20 @@ describe('Jahresrückblick', () => {
     assert.equal(r.json().stand, 'ausgewertet');
     assert.ok(r.json().ausgewertetAt);
     assert.deepEqual(r.json().can, { bearbeiten: true, traktandieren: false });
+    // A-67: Ein neues Portfolio der Kategorie A sortiert nach dem Traktandieren vorne ein. Das ursprüngliche PRAT liest
+    // weiter (festgehaltenes Portfolio), das Gremium des neuen nicht
+    const vorne = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'A', schluessel: 'aare', name: 'Aare' }, 201)).json().id;
+    const n = await login(api, 'demo', 'u-vorne', null);
+    await grant(api, tenantId, `user:${n.principalId}`, 'gremium', { type: 'portfolio', id: vorne });
+    assert.equal((await ok('GET', url, prat)).json().stand, 'ausgewertet');
+    assert.equal((await call('GET', `${url}/dokument`, prat)).statusCode, 200);
+    for (const u of [url, `${url}/dokument`]) assert.notEqual((await call('GET', u, { authorization: n.authorization })).statusCode, 200, u);
     // Erkenntnisse nach dem Entscheid des PRAT nachführen (UC-013 Schritt 4)
     r = await ok('PUT', url, mit(ue, r.headers.etag as string), { erkenntnisse: 'Zu viele Vorhaben parallel.', massnahmen: 'WIP-Limite 5 je Portfolio' });
     assert.deepEqual([r.json().stand, r.json().massnahmen], ['ausgewertet', 'WIP-Limite 5 je Portfolio']);
     const audit = await sys(async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action LIKE 'jahresrueckblick.%' ORDER BY id")).rows.map(x => x.action));
     // dazu der Export des Gremiums (A-67)
-    assert.deepEqual(audit, ['jahresrueckblick.created', 'jahresrueckblick.updated', 'jahresrueckblick.scheduled', 'jahresrueckblick.exported', 'jahresrueckblick.updated']);
+    assert.deepEqual(audit, ['jahresrueckblick.created', 'jahresrueckblick.updated', 'jahresrueckblick.scheduled', 'jahresrueckblick.exported', 'jahresrueckblick.exported', 'jahresrueckblick.updated']);
   });
 
   test('Lessons Learned anfordern (A1): Aufgabe an die PL, erledigt mit der ersten Lesson Learned', async () => {
@@ -205,6 +213,6 @@ describe('Jahresrückblick', () => {
     const docx = await ok('GET', `${url}/dokument?format=docx`, ue);
     assert.match(String(docx.headers['content-disposition']), new RegExp(`Jahresrueckblick_${jahr}\\.docx`));
     const n = await sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.audit_log WHERE action = 'jahresrueckblick.exported'")).rows[0]!.n);
-    assert.equal(n, 3, 'mit dem Export des Gremiums im Traktandieren-Test');
+    assert.equal(n, 4, 'mit den beiden Exporten des Gremiums im Traktandieren-Test');
   });
 });

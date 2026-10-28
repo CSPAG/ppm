@@ -32,14 +32,25 @@ const snap = (b: store.BerichtRow) => ({ id: b.id, quartal: b.quartal, stand: b.
 const kommentareVoll = (k: Partial<KommentareOut>): KommentareOut => Object.fromEntries(ABSCHNITTE.map(a => [a, k[a] ?? ''])) as KommentareOut;
 
 /**
- * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Mitglieder des
- * PRAT sehen den Bericht ab «traktandiert», welchen Stand, entscheidet die Lesesicht (331).
+ * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Welche Gremien
+ * den Bericht ab «traktandiert» sehen, entscheidet die Lesesicht (331) am festgehaltenen Portfolio des Traktandums.
+ * Liefert, ob die Person die Ziele der Organisation liest.
  */
-async function lesend(req: FastifyRequest, tx: Tx): Promise<void> {
-  if (await req.can('ziel:read') || await req.can(SCHREIBEN)) return;
-  // nur Mitglieder des PRAT; andere Gremien erhalten 403
+async function lesend(req: FastifyRequest): Promise<boolean> {
+  if (await req.can('ziel:read') || await req.can(SCHREIBEN)) return true;
+  await req.needSomewhere('sitzung:read');
+  return false;
+}
+
+/**
+ * Bericht nicht sichtbar: 404 für Lesende der Ziele und für Mitglieder des heutigen PRAT (noch nicht traktandiert),
+ * sonst 403. Entscheidet nur die Antwort, nie den Zugriff; den gibt allein das festgehaltene Portfolio (331).
+ */
+async function nichtSichtbar(req: FastifyRequest, tx: Tx, ziele: boolean): Promise<never> {
+  if (ziele) throw notFound('Quartalsreporting');
   const prat = await store.portfolioA(tx);
-  if (!prat || !(await req.can('sitzung:read', { type: 'portfolio', id: prat }))) throw forbidden();
+  if (prat && await req.can('sitzung:read', { type: 'portfolio', id: prat })) throw notFound('Quartalsreporting');
+  throw forbidden();
 }
 
 async function berichtOut(req: FastifyRequest, tx: Tx, b: store.BerichtRow): Promise<QuartalsberichtOut> {
@@ -78,7 +89,8 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
   app.get('/v1/quartalsberichte', {
     schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreportings', description: 'Erzeugte Quartalsreportings mit Stand, neuestes zuerst.', response: { 200: Type.Ref('QuartalsberichtListe') } },
   }, async req => {
-    const rows = await req.tx(async tx => { await lesend(req, tx); return store.liste(tx); });
+    await lesend(req);
+    const rows = await req.tx(tx => store.liste(tx));
     return { items: rows.map(r => ({ id: r.id, quartal: r.quartal, stand: r.stand, erzeugtAt: r.erzeugt_at.toISOString(), verabschiedetAt: r.verabschiedet_at?.toISOString() ?? null })) };
   });
 
@@ -86,9 +98,9 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
     schema: { tags: [TAG_QUARTAL], summary: 'Quartalsreporting eines Quartals', description: 'Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404.', params: QuartalsberichtParams, response: { 200: Type.Ref('Quartalsbericht') } },
   }, async (req, reply) => {
     const { quartal } = req.params as { quartal: string };
+    const ziele = await lesend(req);
     return req.tx(async tx => {
-      await lesend(req, tx);
-      if (!(await store.bericht(tx, quartal))) throw notFound('Quartalsreporting');
+      if (!(await store.bericht(tx, quartal))) await nichtSichtbar(req, tx, ziele);
       return antwort(req, reply, tx, quartal);
     });
   });
@@ -167,10 +179,10 @@ export function registerQuartalRoutes(app: FastifyInstance, _deps: Deps): void {
     const { quartal } = req.params as { quartal: string };
     const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
     const who = actorOf(req);
+    const ziele = await lesend(req);
     const b = await req.tx(async tx => {
-      await lesend(req, tx);
       const b = await store.bericht(tx, quartal);
-      if (!b) throw notFound('Quartalsreporting');
+      if (!b) return nichtSichtbar(req, tx, ziele);
       // Export eines Dokuments mit Personendaten im Audit (I-Z3); kein Ereignis
       await record(tx, who, { action: 'quartalsbericht.exported', resourceType: 'quartalsbericht', resourceId: b.id, data: { quartal, format } });
       return b;

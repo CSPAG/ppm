@@ -1,7 +1,7 @@
 /**
  * Abnahme AP-E4-2 (BC DM.01.02–04, PP.02.04; UC-001 Schritte 3–5, K4): Ideenpool als Liste und Funnel «Pre-P0» mit
  * Ansicht in der Adresse; eine eingereichte Idee öffnet die Prüfung mit Leitfragen, Kriterienraster und Kategorie;
- * axe hell, dunkel und 360 px.
+ * Abschnitt «Entscheid über die Initialisierung» (AP-E4-3); axe hell, dunkel und 360 px.
  */
 import { expect, test } from '@playwright/test';
 import { ANNA, expectAccessible, expectNoOverflow, login } from './support.ts';
@@ -48,6 +48,9 @@ test('Ideenpool, Funnel und Prüfung einer eingereichten Idee; barrierefrei', as
   await expect(page.getByRole('heading', { name: 'Kriterienraster' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Leitfragen zum Eintritt P0' })).toBeVisible();
   await page.getByRole('radiogroup', { name: 'Strategische Relevanz' }).getByLabel('hoch').check();
+  // Entscheid über die Initialisierung (AP-E4-3): ohne Kategorie noch kein Weg
+  await expect(page.getByRole('heading', { name: 'Entscheid über die Initialisierung' })).toBeVisible();
+  await expect(page.getByText('Ordnen Sie zuerst die Kategorie zu', { exact: false })).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 });

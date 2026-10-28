@@ -103,7 +103,7 @@ describe('Statusbericht erfassen (UI-13)', () => {
   });
 
   it('Warnung «wesentlich»: «Eskalieren» mit Wirkung davor, Grund vorbelegt; danach eskaliert vermerkt (UC-004 A1.2)', async () => {
-    const eskalation = { id: '00000000-0000-4000-8000-0000000000e1', anlass: 'abweichung', stand: 'offen', angelegtAt: '2026-10-28T09:00:00Z' };
+    const eskalation = { id: '00000000-0000-4000-8000-0000000000e1', anlass: 'abweichung', stand: 'offen', vorgeschlagen: true, angelegtAt: '2026-10-28T09:00:00Z' };
     const api = stub({
       bericht: () => json(bericht({ can: { write: true, einreichen: false, zurueckziehen: false, eskalieren: true }, eskalation: null }), 200, { etag: 'W/"0"' }),
       eskalation: () => json(bericht({ id: '00000000-0000-4000-8000-0000000000c1', version: 1, eskalation, can: { write: true, einreichen: true, zurueckziehen: false, eskalieren: false } }), 200, { etag: 'W/"1"' }),
@@ -123,7 +123,7 @@ describe('Statusbericht erfassen (UI-13)', () => {
     await userEvent.type(within(dialog).getByLabelText(TB.wesentlich.grund), 'Termin Konzept +3 Wochen');
     await userEvent.type(within(dialog).getByLabelText(TB.wesentlich.massnahme), 'Testwoche');
     await userEvent.click(within(dialog).getByRole('button', { name: TB.wesentlich.eskalieren }));
-    expect(await screen.findByText(TB.wesentlich.eskaliertOk)).toBeInTheDocument();
+    expect(await screen.findByText(TB.wesentlich.eskaliertOk(true))).toBeInTheDocument();
     const post = api.calls.find(c => c.url.endsWith('/eskalation'))!;
     expect(await post.clone().json()).toEqual({ grund: 'Termin Konzept +3 Wochen', massnahme: 'Testwoche' });
     expect(post.headers.get('idempotency-key')).toBeTruthy();

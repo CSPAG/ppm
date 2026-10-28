@@ -24,7 +24,7 @@ export interface EskalationLage {
 export function Eskalieren({ lage, grund }: { lage: EskalationLage; grund: string }) {
   const [offen, setOffen] = useState(false);
   const e = lage.eskalation;
-  if (e) return <span className="muted small">{TB.wesentlich.eskaliert(fmtDatum(e.angelegtAt.slice(0, 10)), TB.wesentlich.eskalationStand[e.stand] ?? e.stand)}</span>;
+  if (e) return <span className="muted small">{TB.wesentlich.eskaliert(fmtDatum(e.angelegtAt.slice(0, 10)), TB.wesentlich.eskalationStand(e.stand, e.vorgeschlagen))}</span>;
   if (!lage.kann) return null;
   return (
     <>
@@ -49,7 +49,7 @@ function EskalierenDialog({ lage, grund: vorbelegt, onClose }: { lage: Eskalatio
     setVersucht(true);
     if (leer || !(await lage.sichern())) return;
     eskalieren.mutate({ key: key.current, grund: grund.trim(), massnahme: massnahme.trim() }, {
-      onSuccess: () => { toast.show(TB.wesentlich.eskaliertOk); onClose(); },
+      onSuccess: l => { toast.show(TB.wesentlich.eskaliertOk(l.bericht.eskalation?.vorgeschlagen ?? true)); onClose(); },
     });
   };
   return (

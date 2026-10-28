@@ -57,6 +57,7 @@ const EskalationKurz = Type.Object({
   id: Uuid,
   anlass: Type.Union([Type.Literal('kritisch'), Type.Literal('abweichung')], { description: '`kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet.' }),
   stand: Type.Union([Type.Literal('offen'), Type.Literal('traktandiert'), Type.Literal('erledigt')]),
+  vorgeschlagen: Type.Boolean({ description: 'Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand.' }),
   angelegtAt: DateTime,
 }, { additionalProperties: false });
 

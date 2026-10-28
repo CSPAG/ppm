@@ -13896,6 +13896,7 @@
                   "id",
                   "anlass",
                   "stand",
+                  "vorgeschlagen",
                   "angelegtAt"
                 ],
                 "properties": {
@@ -13941,6 +13942,10 @@
                         ]
                       }
                     ]
+                  },
+                  "vorgeschlagen": {
+                    "description": "Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand.",
+                    "type": "boolean"
                   },
                   "angelegtAt": {
                     "type": "string",

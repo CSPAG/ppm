@@ -91,11 +91,14 @@ describe('Eskalation und Meilensteinabnahme', { skip }, () => {
 
   test('Zurückziehen nimmt Eskalation, Vorschläge und Aufgabe zurück (UC-004 A2.2, Rückgängig 10 s)', async () => {
     await ok('PUT', bericht(), { ...pl, 'if-match': 'W/"0"' }, VOLL);
-    await ok('POST', bericht('/einreichen'), { ...pl, 'if-match': 'W/"1"' });
+    const ein = (await ok('POST', bericht('/einreichen'), { ...pl, 'if-match': 'W/"1"' })).json();
     assert.equal((await eskalationen()).length, 1);
+    // die Antwort zeigt die eben angelegte Eskalation (Stand nach den Folgen)
+    assert.deepEqual([ein.eskalation?.anlass, ein.eskalation?.vorgeschlagen], ['kritisch', true]);
     assert.deepEqual((await vorschlaege()).map(v => v.art), ['eskalation', 'meilenstein']);
 
-    await ok('POST', bericht('/zurueckziehen'), { ...pl, 'if-match': 'W/"2"' });
+    const zu = (await ok('POST', bericht('/zurueckziehen'), { ...pl, 'if-match': 'W/"2"' })).json();
+    assert.equal(zu.eskalation, null);
     assert.deepEqual(await eskalationen(), []);
     assert.deepEqual((await vorschlaege()).map(v => v.art), ['meilenstein'], 'der Meilenstein bleibt erreicht und darum vorgeschlagen');
     assert.deepEqual((await aufgaben()).map(a => a.stand), ['entfallen']);
@@ -170,7 +173,8 @@ describe('Eskalation und Meilensteinabnahme', { skip }, () => {
     assert.equal((await call('POST', b2('/eskalation'), pl, { grund: '  ' })).statusCode, 422);
 
     const b = (await ok('POST', b2('/eskalation'), pl, { grund, massnahme: 'Zusätzliche Testwoche' })).json();
-    assert.deepEqual([b.stand, b.status, b.version, b.eskalation.anlass, b.eskalation.stand, b.can.eskalieren, b.can.write], ['entwurf', null, 1, 'abweichung', 'offen', false, true]);
+    assert.deepEqual([b.stand, b.status, b.version, b.eskalation.anlass, b.eskalation.stand, b.eskalation.vorgeschlagen, b.can.eskalieren, b.can.write],
+      ['entwurf', null, 1, 'abweichung', 'offen', true, false, true]);
     const [e] = await sys(async tx => (await tx.query<{ id: string; statusbericht_id: string; anlass: string; grund: string }>(
       'SELECT id, statusbericht_id, anlass, grund FROM ppm.eskalation WHERE projekt_id = $1', [p2.id])).rows);
     assert.deepEqual([e!.statusbericht_id, e!.anlass, e!.grund], [b.id, 'abweichung', grund]);
@@ -181,6 +185,9 @@ describe('Eskalation und Meilensteinabnahme', { skip }, () => {
     const a = (await aufgaben()).find(x => x.bezug_id === e!.id)!;
     assert.deepEqual([a.stand, a.titel], ['offen', `Eskalation ${p2.nummer} Neues Archiv traktandieren`]);
     assert.match(a.kontext, /mit wesentlicher Abweichung$/);
+    // Unterlage fürs Gremium: der Bericht ist nicht «kritisch», sondern weicht wesentlich ab
+    const u = await sys(tx => traktandenart('eskalation')!.unterlagen!(tx, { typ: 'eskalation', id: e!.id, projektId: p2.id }));
+    assert.deepEqual(u.map(x => x.hinweis), ['wesentliche Abweichung, eskaliert durch die Projektleitung']);
     // je Bericht eine Eskalation
     assert.equal((await call('POST', b2('/eskalation'), pl, { grund })).statusCode, 409);
 
@@ -190,5 +197,14 @@ describe('Eskalation und Meilensteinabnahme', { skip }, () => {
     const z = await ok('POST', b2('/zurueckziehen'), { ...pl, 'if-match': 'W/"3"' });
     assert.deepEqual([z.json().stand, z.json().eskalation?.id], ['entwurf', e!.id]);
     assert.equal((await sys(async tx => (await tx.query('SELECT 1 FROM ppm.traktandum WHERE bezug_id = $1', [e!.id])).rowCount)), 1);
+  });
+  test('ohne entscheidendes Gremium: Eskalation und Aufgabe der UE, kein Vorschlag, `vorgeschlagen` false (UC-004 A1.2)', async () => {
+    const pf = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'B', schluessel: 'ohne-gremium', name: 'Ohne Gremium' }, 201)).json().id;
+    const p3 = (await ok('POST', '/v1/projekte', ue, { name: 'Ohne Gremium', portfolioId: pf, phase: 'P2' }, 201)).json();
+    await ok('PUT', `/v1/projekte/${p3.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [{ personId: await person(api, T, 'u-pl'), funktion: 'pl', akv: '' }] });
+    const b = (await ok('POST', `/v1/projekte/${p3.id}/berichte/${PERIODE}/eskalation`, pl, { grund: 'Kosten P2 12 % über Budget' })).json();
+    assert.deepEqual([b.eskalation.stand, b.eskalation.vorgeschlagen], ['offen', false]);
+    assert.equal((await sys(async tx => (await tx.query('SELECT 1 FROM ppm.traktandum WHERE bezug_id = $1', [b.eskalation.id])).rowCount)), 0);
+    assert.equal((await aufgaben()).find(a => a.bezug_id === b.eskalation.id)?.stand, 'offen');
   });
 });

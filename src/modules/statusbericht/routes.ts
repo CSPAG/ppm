@@ -83,7 +83,7 @@ function out(l: Lage, schreiben: boolean, principalId: string | null): Statusber
     fehlend: fehlend(felder),
     eingereichtAt: r?.eingereicht_at ?? null, eingereichtBy: r?.eingereicht_by ?? null, geprueftAt: r?.geprueft_at ?? null,
     version: r?.version ?? 0, updatedAt: r?.updated_at ?? null,
-    eskalation: l.eskalation ? { id: l.eskalation.id, anlass: l.eskalation.anlass, stand: l.eskalation.stand, angelegtAt: l.eskalation.created_at.toISOString() } : null,
+    eskalation: l.eskalation ? { id: l.eskalation.id, anlass: l.eskalation.anlass, stand: l.eskalation.stand, vorgeschlagen: l.eskalation.vorgeschlagen, angelegtAt: l.eskalation.created_at.toISOString() } : null,
     can: {
       write: bearbeitbar,
       einreichen: bearbeitbar && !!r,
@@ -192,7 +192,8 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!r) throw preconditionFailed(vorher.bericht.version);
       await record(tx, who, { action: 'statusbericht.submitted', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       await nachEinreichen(tx, r, who);
-      return { ...vorher, bericht: r, sekunden: 0 };
+      // Eskalation nach den Folgen neu lesen («kritisch» mit Entscheidbedarf legt sie eben an)
+      return { ...vorher, bericht: r, sekunden: 0, eskalation: await eskalation.vonBericht(tx, r.id) };
     });
     reply.header('etag', etag(l.bericht!.version));
     return antwort(req, l);
@@ -223,7 +224,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
         await record(tx, who, { action: 'statusbericht.created', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       }
       const e = await eskalation.ausAbweichung(tx, r, { grund: body.grund, massnahme: body.massnahme ?? '' });
-      const daten = { statusbericht: r.id, projekt: vorher.projekt.nummer, periode, anlass: 'abweichung', vorgeschlagen: e.vorgeschlagen };
+      const daten = { statusbericht: r.id, projekt: vorher.projekt.nummer, periode, anlass: 'abweichung', vorgeschlagen: e.eskalation.vorgeschlagen };
       // im Audit; kein eigenes Ereignis (Traktandenvorschlag und Aufgabe sind die Wirkung)
       await record(tx, who, { action: 'eskalation.created', resourceType: 'eskalation', resourceId: e.eskalation.id, data: daten });
       return { ...vorher, bericht: r, eskalation: e.eskalation, periodeStand: 'offen' as const };
@@ -255,7 +256,8 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!r) throw preconditionFailed(vorher.bericht.version);
       await record(tx, who, { action: 'statusbericht.withdrawn', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       await nachZurueckziehen(tx, r, who);
-      return { ...vorher, bericht: r, sekunden: null };
+      // Eskalation nach den Folgen neu lesen (die aus dem Einreichen entfällt, die der PL bleibt)
+      return { ...vorher, bericht: r, sekunden: null, eskalation: await eskalation.vonBericht(tx, r.id) };
     });
     reply.header('etag', etag(l.bericht!.version));
     return antwort(req, l);

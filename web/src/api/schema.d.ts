@@ -45543,6 +45543,8 @@ export interface components {
                 /** @description `kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet. */
                 anlass: "kritisch" | "abweichung";
                 stand: "offen" | "traktandiert" | "erledigt";
+                /** @description Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand. */
+                vorgeschlagen: boolean;
                 /** Format: date-time */
                 angelegtAt: string;
             } | null;

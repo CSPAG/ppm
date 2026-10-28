@@ -36,12 +36,16 @@ export const TB = {
     beantragen: 'Änderung beantragen',
     eskalieren: 'Eskalieren',
     eskalierenTitel: 'Abweichung eskalieren?',
-    eskalierenWirkung: 'Die Eskalation erscheint als Traktandenvorschlag in der nächsten Sitzung des entscheidenden Gremiums; die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren. Dein Bericht bleibt ein Entwurf und ist mit der Eskalation verknüpft.',
+    eskalierenWirkung: 'Die Eskalation erscheint als Traktandenvorschlag in der nächsten Sitzung des entscheidenden Gremiums; die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren (ohne entscheidendes Gremium von Hand). Dein Bericht bleibt ein Entwurf und ist mit der Eskalation verknüpft.',
     grund: 'Grund', grundHint: 'Worum es geht; vorbelegt mit der Abweichung.', grundFehlt: 'Angaben fehlen: Der Grund ist leer. Beschreib, worum es geht.',
     massnahme: 'Vorgeschlagene Massnahme (optional)', massnahmeHint: 'Leer: Das Gremium entscheidet über das weitere Vorgehen.',
-    eskaliertOk: 'Eskaliert. Die Eskalation steht als Vorschlag für die nächste Sitzung des Gremiums.',
+    eskaliertOk: (vorgeschlagen: boolean) => (vorgeschlagen
+      ? 'Eskaliert. Die Eskalation steht als Vorschlag für die nächste Sitzung des Gremiums.'
+      : 'Eskaliert. Das Portfolio hat kein entscheidendes Gremium; die Unternehmensentwicklung traktandiert die Eskalation von Hand.'),
     eskaliert: (d: string, stand: string) => `Eskaliert am ${d} · ${stand}`,
-    eskalationStand: { offen: 'Vorschlag ans Gremium', traktandiert: 'vom Gremium zurückgestellt', erledigt: 'vom Gremium erledigt' } as Record<string, string>,
+    eskalationStand: (stand: string, vorgeschlagen: boolean) => (stand === 'offen'
+      ? (vorgeschlagen ? 'Vorschlag ans Gremium' : 'die Unternehmensentwicklung traktandiert sie')
+      : stand === 'traktandiert' ? 'vom Gremium zurückgestellt' : 'vom Gremium erledigt'),
     termin: (text: string, neu: string, alt: string, w: string) => `${TB_GRUND.termin(text, neu, alt, w)} ${NACHFUEHREN}`,
     kosten: (phase: string, p: string) => `${TB_GRUND.kosten(phase, p)} ${NACHFUEHREN}`,
     /** Abweichung allein, als Vorbelegung des Grunds der Eskalation. */

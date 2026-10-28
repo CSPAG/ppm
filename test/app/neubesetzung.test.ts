@@ -88,7 +88,7 @@ describe('Zugang entziehen und Neubesetzung', { skip }, () => {
     assert.ok(a, JSON.stringify(ein));
     assert.equal(a.titel, 'Rollen von u-pl neu besetzen');
     assert.equal(a.kontext, '2 Rollen · 1 offene Aufgabe');
-    assert.equal(a.link, `/verwalten/neubesetzungen/${id}`);
+    assert.equal(a.link, `/administration/neubesetzungen/${id}`);
     assert.equal(a.can.erledigen, true);
     assert.equal((await call('GET', '/v1/eingang', leser.h)).json().items.some((x: { art: string }) => x.art === 'zugang.neu_besetzen'), false);
 

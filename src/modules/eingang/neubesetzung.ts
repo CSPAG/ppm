@@ -91,7 +91,7 @@ export async function abschliessen(tx: Tx, id: string, p: { id: string; name: st
       art: ART, bezug: { typ: 'neubesetzung', id }, empfaenger: { recht: RECHT },
       titel: `Rollen von ${p.name ?? 'einer Person'} neu besetzen`,
       kontext: [n ? `${n} ${n === 1 ? 'Rolle' : 'Rollen'}` : null, a ? `${a} offene ${a === 1 ? 'Aufgabe' : 'Aufgaben'}` : null].filter(Boolean).join(' · '),
-      link: `/verwalten/neubesetzungen/${id}`, manuell: true,
+      link: `/administration/neubesetzungen/${id}`, manuell: true,
     });
   }
   return { rollen: n, aufgaben: a };

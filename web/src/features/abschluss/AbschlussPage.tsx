@@ -66,7 +66,7 @@ export function AbschlussPage({ nummer }: { nummer: string }) {
   return <Arbeitsflaeche key={p.id} projektId={p.id} geladen={q.data!} refetch={() => q.refetch()} />;
 }
 
-function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; geladen: Geladen; refetch(): Promise<unknown> }) {
+function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; geladen: Geladen; refetch(): Promise<{ data?: Geladen }> }) {
   const a = geladen.abschluss;
   const b = a.bericht;
   const toast = useToast();
@@ -80,11 +80,16 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
   const [zustand, setZustand] = useState<'gespeichert' | 'speichert' | 'ungespeichert'>('gespeichert');
   const [frage, setFrage] = useState(false);
   const [versucht, setVersucht] = useState(false);
+  // Konflikt (412, Z7): die Eingaben bleiben stehen, gespeichert wird erst nach der Wahl («behalten» oder «übernehmen»)
+  const [konflikt, setKonflikt] = useState(false);
+  const konfliktRef = useRef(false);
   const bearbeitbar = a.can.bearbeiten;
   const art = b?.art ?? (a.lage === 'sistierung' ? 'sistierung' : a.lage === 'abbruch' ? 'abbruch' : 'abschluss');
 
   // Neue Fassung vom Server (Einreichen, Entscheid, Neuladen) übernehmen, solange nichts offen ist
+  const geladenRef = useRef(geladen);
   useEffect(() => {
+    geladenRef.current = geladen;
     etag.current = geladen.etag;
     if (!offen.current) { const neu = felderVon(geladen.abschluss.bericht); aktuell.current = neu; setF(neu); }
   }, [geladen]);
@@ -94,6 +99,7 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
   const sichern = useCallback(async (): Promise<boolean> => {
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
     while (laufend.current) await laufend.current;
+    if (konfliktRef.current) return false;
     if (!offen.current) return true;
     const lauf = (async () => {
       offen.current = false;
@@ -105,8 +111,8 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
         return true;
       } catch (e) {
         setZustand('ungespeichert');
-        if (isConflict(e)) { toast.show(TA.konflikt, { tone: 'error' }); await refetch(); return false; }
         offen.current = true;
+        if (isConflict(e)) { konfliktRef.current = true; setKonflikt(true); void refetch(); return false; }
         toast.error(e);
         return false;
       } finally {
@@ -134,6 +140,19 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
     if (timer.current) clearTimeout(timer.current);
     if (offen.current) void sichernRef.current();
   }, []);
+
+  const konfliktLoesen = async (behalten: boolean) => {
+    const neuer = (await refetch()).data ?? geladenRef.current;
+    etag.current = neuer.etag;
+    konfliktRef.current = false;
+    setKonflikt(false);
+    if (behalten) { offen.current = true; void sichern(); return; }
+    offen.current = false;
+    const neu = felderVon(neuer.abschluss.bericht);
+    aktuell.current = neu;
+    setF(neu);
+    setZustand('gespeichert');
+  };
 
   const liste = useMemo(() => fehlend(art, f), [art, f]);
   const reichEin = async () => {
@@ -181,6 +200,14 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
         {a.can.dokument ? <Dokument projektId={projektId} nummer={a.projekt.nummer} /> : null}
       </div>
       {banner ? <div className="ab-banner"><Hinweis stufe="hinweis">{banner}</Hinweis></div> : null}
+      {konflikt ? (
+        <div className="ab-banner">
+          <Hinweis stufe="warnung" live aktion={<>
+            <button type="button" className="btn sm" onClick={() => void konfliktLoesen(true)}>{TA.konfliktBehalten}</button>
+            <button type="button" className="btn sm" onClick={() => void konfliktLoesen(false)}>{TA.konfliktUebernehmen}</button>
+          </>}>{TA.konflikt}</Hinweis>
+        </div>
+      ) : null}
       <div className="ab-flaeche">
         <div className="ab-haupt">
           {a.entscheid ? <p className="small muted">{TA.letzterEntscheid(TA.entscheid[a.entscheid.ergebnis] ?? a.entscheid.ergebnis, tag(a.entscheid.at))}</p> : null}

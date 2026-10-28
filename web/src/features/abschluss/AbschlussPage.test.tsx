@@ -116,6 +116,45 @@ describe('Abschluss (UI-14)', () => {
     expect(puts[2]!.body.uebergabe).toBe('X');
   });
 
+  it('Konflikt (412) beim automatischen Speichern: Eingabe bleibt, «behalten» speichert mit neuem Stand, «übernehmen» zeigt den anderen (Z7)', async () => {
+    let n = 0;
+    const puts: { etag: string | null; body: Record<string, unknown> }[] = [];
+    stub({
+      [`GET ${URL_A}`]: () => (n ? json(abschluss({}, { zielerreichung: 'Von Paula', version: 5 }), 200, { etag: 'W/"5"' }) : json(abschluss(), 200, { etag: 'W/"1"' })),
+      [`PUT ${URL_A}`]: async req => {
+        puts.push({ etag: req.headers.get('If-Match'), body: await req.json() as Record<string, unknown> });
+        if (n++ === 0) return json({ title: 'Inzwischen geändert', status: 412 }, 412);
+        return json(abschluss({}, { ...puts.at(-1)!.body, version: 6 }), 200, { etag: 'W/"6"' });
+      },
+    });
+    renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
+    const feld = await screen.findByRole('textbox', { name: TA.felder.zielerreichung });
+    await userEvent.type(feld, 'Meins');
+    expect(await screen.findByText(TA.konflikt, {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(feld).toHaveValue('Meins');
+    await new Promise(r => setTimeout(r, 900));
+    expect(puts).toHaveLength(1); // kein weiteres Speichern, solange der Konflikt offen ist
+    await userEvent.click(screen.getByRole('button', { name: TA.konfliktBehalten }));
+    await waitFor(() => expect(puts).toHaveLength(2));
+    expect([puts[1]!.etag, puts[1]!.body.zielerreichung]).toEqual(['W/"5"', 'Meins']);
+    expect(screen.queryByText(TA.konflikt)).toBeNull();
+  });
+
+  it('Konflikt (412): «Stand der anderen übernehmen» verwirft die eigene Eingabe ohne Speichern (Z7)', async () => {
+    let n = 0;
+    const api = stub({
+      [`GET ${URL_A}`]: () => (n ? json(abschluss({}, { zielerreichung: 'Von Paula', version: 5 }), 200, { etag: 'W/"5"' }) : json(abschluss(), 200, { etag: 'W/"1"' })),
+      [`PUT ${URL_A}`]: () => { n++; return json({ title: 'Inzwischen geändert', status: 412 }, 412); },
+    });
+    renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
+    const feld = await screen.findByRole('textbox', { name: TA.felder.zielerreichung });
+    await userEvent.type(feld, 'Meins');
+    await userEvent.click(await screen.findByRole('button', { name: TA.konfliktUebernehmen }, { timeout: 3000 }));
+    await waitFor(() => expect(feld).toHaveValue('Von Paula'));
+    expect(screen.queryByText(TA.konflikt)).toBeNull();
+    expect(api.calls.filter(c => c.method === 'PUT')).toHaveLength(1);
+  });
+
   it('Sponsor beurteilt die Nutzenrealisierung; Lessons Learned erfassen', async () => {
     let nutzen: Record<string, unknown> = {};
     let lesson: Record<string, unknown> = {};

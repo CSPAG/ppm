@@ -7,6 +7,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { isConflict, isGone, newIdempotencyKey } from '../../api/index.ts';
 import { Confirm, Drawer, Empty, ErrorState, fmtDatum, Icon, Loading, T, useToast } from '../../ui/index.ts';
 import { useFeiertag, useFeiertagMutations, type Feiertag, type Loaded } from './api.ts';
+import { geaendert, useFormStand } from './formStand.ts';
 import { TS } from './texte.ts';
 
 export function FeiertagDrawer({ id, jahr, onClose, onOpen }: { id: string; jahr: number; onClose(): void; onOpen(id: string, jahr: number): void }) {
@@ -74,7 +75,7 @@ function ViewDrawer({ loaded: { item, etag }, onClose, onEdit }: { loaded: Loade
   );
 }
 
-function EditDrawer({ loaded: { item, etag }, onDone, onReload }: { loaded: Loaded<Feiertag>; onDone(): void; onReload(): Promise<unknown> }) {
+function EditDrawer({ loaded: { item, etag }, onDone, onReload }: { loaded: Loaded<Feiertag>; onDone(): void; onReload(): Promise<{ error: unknown }> }) {
   const formId = useId();
   const toast = useToast();
   const { update } = useFeiertagMutations();
@@ -87,11 +88,17 @@ function EditDrawer({ loaded: { item, etag }, onDone, onReload }: { loaded: Load
       {conflict ? (
         <div className="notice" role="alert">
           <p>{TS.feiertag.conflict}</p>
-          <button type="button" className="btn" onClick={async () => { await onReload(); update.reset(); }}>{T.common.reload}</button>
+          <button type="button" className="btn" onClick={async () => { if (!(await onReload()).error) update.reset(); }}>{T.common.reload}</button>
         </div>
       ) : update.error ? <ErrorState error={update.error} /> : null}
-      <FeiertagForm key={item.version} formId={formId} initial={{ datum: item.datum, label: item.label }} busy={update.isPending} serverErrors={describeError(update.error).fields}
-        onSubmit={v => update.mutate({ id: item.id, etag, body: toInput(v) }, { onSuccess: () => { toast.show(TS.feiertag.saved); onDone(); } })} />
+      {/* ohne key: «Neu laden» (Z7) holt den neuen Stand für If-Match, die Eingaben im Formular bleiben */}
+      <FeiertagForm formId={formId} initial={{ datum: item.datum, label: item.label }} busy={update.isPending} serverErrors={describeError(update.error).fields}
+        onSubmit={v => {
+          // nur Geändertes senden: die Änderung einer anderen Person am anderen Feld bleibt (Z7)
+          const body = geaendert(toInput(v), toInput({ datum: item.datum, label: item.label }));
+          if (!Object.keys(body).length) { onDone(); return; }
+          update.mutate({ id: item.id, etag, body }, { onSuccess: () => { toast.show(TS.feiertag.saved); onDone(); } });
+        }} />
     </Drawer>
   );
 }
@@ -111,7 +118,7 @@ function FeiertagForm({ formId, initial, onSubmit, busy, serverErrors }: {
   formId: string; initial: FormValues; busy: boolean; onSubmit(v: FormValues): void; serverErrors?: { path: string; message: string }[];
 }) {
   const id = useId();
-  const [v, setV] = useState(initial);
+  const [v, setV] = useFormStand(initial);
   const [touched, setTouched] = useState(false);
   const errors = { ...Object.fromEntries((serverErrors ?? []).map(x => [x.path.replace(/^\//, '').split('/')[0], x.message])), ...(touched ? validate(v) : {}) } as Partial<Record<string, string>>;
   const submit = (e: FormEvent) => {

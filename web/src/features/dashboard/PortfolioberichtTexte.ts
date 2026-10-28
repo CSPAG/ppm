@@ -1,6 +1,6 @@
 /**
  * Texte der Risikolage (UI-18) und des Portfolioberichts (UI-29) im Feature «Dashboard» (Namensraum je Feature,
- * docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer Rechtschreibung, Wortlaut aus K3 («Portfoliobericht
+ * docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer Rechtschreibung, Wortlaut aus K3 («Portfoliobericht
  * erzeugen», «Bericht der Programmleitung»).
  */
 export const TR = {
@@ -49,20 +49,20 @@ export const TP = {
   keinBericht: (periode: string) => `Für ${periode} gibt es noch keinen Portfoliobericht.`,
   keinBerichtLeser: (periode: string) => `Für ${periode} ist noch kein Portfoliobericht bereitgestellt.`,
   periodeOffen: (periode: string) => `${periode} ist noch nicht abgeschlossen. Der Portfoliobericht entsteht aus dem abgeschlossenen Dashboard.`,
-  kommentar: { label: 'Bericht der Programmleitung', hinweis: 'Ihr Kommentar steht zuoberst im Bericht.', leer: 'Kein Kommentar.' },
+  kommentar: { label: 'Bericht der Programmleitung', hinweis: 'Dein Kommentar steht zuoberst im Bericht.', leer: 'Kein Kommentar.' },
   bereitstellenDialog: {
     titel: (p: string) => `Portfoliobericht ${p} bereitstellen?`,
-    text: (gremium: string) => `Der Bericht wird fest und ist für ${gremium} sichtbar. Das Gremium erhält das Traktandum «Bericht der Programmleitung» als Vorschlag für die nächste Sitzung. Danach ändern Sie ihn nicht mehr.`,
+    text: (gremium: string) => `Der Bericht wird fest und ist für ${gremium} sichtbar. Das Gremium erhält das Traktandum «Bericht der Programmleitung» als Vorschlag für die nächste Sitzung. Danach änderst du ihn nicht mehr.`,
     gremium: 'das Gremium des Portfolios',
   },
-  neuErzeugenHinweis: 'Neu erzeugen übernimmt den aktuellen Stand der Risikolage; Ihr Kommentar bleibt.',
+  neuErzeugenHinweis: 'Neu erzeugen übernimmt den aktuellen Stand der Risikolage; dein Kommentar bleibt.',
   toast: {
     erzeugt: (p: string) => `Portfoliobericht ${p} erzeugt.`,
     neu: (p: string) => `Portfoliobericht ${p} neu erzeugt.`,
     gespeichert: 'Kommentar gespeichert.',
     bereitgestellt: (p: string) => `Portfoliobericht ${p} bereitgestellt.`,
   },
-  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüfen Sie Ihren Kommentar.',
+  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüfe deinen Kommentar.',
   abschnitt: { uebersicht: 'Übersicht', funnel: 'Funnel nach Phase', projekte: 'Projekte', risiken: 'Risikolage' },
   keinRecht: 'Den Portfoliobericht sehen Gremien, Direktionen, Geschäftsleitung, Finanzen, Ressourcen und die Unternehmensentwicklung.',
 };

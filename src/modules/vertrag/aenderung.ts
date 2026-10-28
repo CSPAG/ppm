@@ -12,7 +12,7 @@
  */
 import { conflict, invalid, systemActor, type Actor, type Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
-import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../sitzung/index.ts';
+import { registriereTraktandenart, traktandum, type EntscheidFolge, type FolgeKontext } from '../sitzung/index.ts';
 import { record, SCHEMA } from '../../platform.ts';
 import { baselineSetzen } from './baseline.ts';
 import { entwurfsanlass, type Phasenmodell } from './entwurf.ts';
@@ -200,10 +200,11 @@ async function geschaeft(tx: Tx, bezug: { typ: string; id: string }): Promise<{ 
  * abgelehnt, Baseline bleibt). Benachrichtigungen schickt die Sitzung beim Schliessen. Ist die Folge schon eingetreten,
  * bleibt sie: Eine Korrektur des Entscheids (A-30) hebt eine gesetzte Baseline nicht wieder auf (Folgearbeit).
  */
-export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
+export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   const g = await geschaeft(tx, f.bezug);
   if (!g || g.v.stand !== 'traktandiert') return;
-  const who = systemActor('system');
+  // Baseline und Register im Audit mit der Person, die den Entscheid erfasst (UE)
+  const who = k?.akteur ?? systemActor('system');
   await intern(tx, async () => {
     if (f.ergebnis === 'freigegeben') await baselineSetzen(tx, who, g.v.id);
     else if (f.ergebnis === 'abgelehnt') await store.standSetzen(tx, g.v.id, null, ['traktandiert'], 'abgelehnt');

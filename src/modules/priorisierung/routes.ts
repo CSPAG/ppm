@@ -33,7 +33,7 @@ function kurz(r: store.ModellRow, aktuellId: string | null): BewertungsmodellKur
 /** Prüfbericht des Modells (I-P1): ohne Kriterien Sperre; fehlende Zuordnung zur Matrix (A-39) und fehlende Budgetrahmen (A-18) als Hinweis. */
 function pruefe(k: readonly store.KriteriumRow[], b: readonly store.BudgetRow[]): BewertungsmodellOut['pruefung'] {
   const out: BewertungsmodellOut['pruefung'] = [];
-  if (!k.length) out.push({ stufe: 'sperre', text: 'Kriterien: keines statt mindestens eines. Erfassen Sie die Kriterien der Bewertung.', pfad: '/kriterien' });
+  if (!k.length) out.push({ stufe: 'sperre', text: 'Kriterien: keines statt mindestens eines. Erfasse die Kriterien der Bewertung.', pfad: '/kriterien' });
   k.forEach((x, i) => {
     if (!x.dimension) out.push({ stufe: 'hinweis', text: `Kriterium «${x.text}»: weder Nutzen noch Risiko zugeordnet. Die Matrix berücksichtigt es nicht.`, pfad: `/kriterien/${i}/dimension` });
   });
@@ -62,8 +62,8 @@ async function db<T>(run: () => Promise<T>): Promise<T> {
     return await run();
   } catch (e) {
     const code = (e as { code?: string }).code;
-    if (code === '23505') throw conflict('Es gibt bereits einen Entwurf des Bewertungsmodells. Bearbeiten oder verwerfen Sie ihn.', { reason: 'entwurf' });
-    if (code === '23514') throw conflict('Ein Bewertungsmodell in Kraft lässt sich nicht ändern. Legen Sie einen Entwurf an.', { reason: 'in_kraft' });
+    if (code === '23505') throw conflict('Es gibt bereits einen Entwurf des Bewertungsmodells. Bearbeite oder verwirf ihn.', { reason: 'entwurf' });
+    if (code === '23514') throw conflict('Ein Bewertungsmodell in Kraft lässt sich nicht ändern. Lege einen Entwurf an.', { reason: 'in_kraft' });
     throw e;
   }
 }
@@ -163,7 +163,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const m = await db(() => req.tx(async tx => {
       const vorher = await store.modell(tx, id);
       if (!vorher) throw notFound(NAME);
-      if (vorher.stand !== 'entwurf') throw conflict('Ein Bewertungsmodell in Kraft lässt sich nicht ändern. Legen Sie einen Entwurf an.', { reason: 'in_kraft' });
+      if (vorher.stand !== 'entwurf') throw conflict('Ein Bewertungsmodell in Kraft lässt sich nicht ändern. Lege einen Entwurf an.', { reason: 'in_kraft' });
       if (vorher.version !== version) throw preconditionFailed(vorher.version);
       const alt = await lade(tx, vorher, true);
       if (kriterien) await store.kriterienSetzen(tx, id, kriterien);
@@ -211,7 +211,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const version = requireIfMatch(req);
     await req.need('priorisierung:write');
     const { beschluss } = req.body as { beschluss: string };
-    if (!beschluss.trim()) throw invalid('Nennen Sie den Entscheid des Gremiums.', [{ path: '/beschluss', message: 'fehlt' }]);
+    if (!beschluss.trim()) throw invalid('Nenne den Entscheid des Gremiums.', [{ path: '/beschluss', message: 'fehlt' }]);
     const who = actorOf(req);
     const m = await req.tx(async tx => {
       const vorher = await store.modell(tx, id);
@@ -281,7 +281,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const zellen = await req.tx(async tx => {
       if (!(await store.portfolio(tx, id))) throw notFound('Portfolio');
       const m = await store.aktuell(tx);
-      if (!m) throw conflict('Es ist noch kein Bewertungsmodell in Kraft. Legen Sie das Modell fest und setzen Sie es in Kraft.', { reason: 'kein_modell' });
+      if (!m) throw conflict('Es ist noch kein Bewertungsmodell in Kraft. Lege das Modell fest und setze es in Kraft.', { reason: 'kein_modell' });
       const kriterien = new Set((await store.kriterien(tx, m.id)).map(k => k.schluessel));
       const projekte = new Map((await store.projekte(tx, id, null)).map(p => [p.id, p]));
       const fehler: { path: string; message: string }[] = [];

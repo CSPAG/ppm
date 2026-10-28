@@ -30,7 +30,7 @@ test('Ideenpool, Funnel und Prüfung einer eingereichten Idee; barrierefrei', as
   for (const g of ['Nutzen', 'Aufwand', 'Relevanz']) await page.getByRole('radiogroup', { name: g }).getByLabel('hoch').check();
   await page.getByRole('button', { name: 'Weiter' }).click();
   await page.getByRole('button', { name: 'Projektidee einreichen' }).click();
-  await expect(page.getByRole('heading', { name: 'Ihre Idee ist eingereicht.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deine Idee ist eingereicht.' })).toBeVisible();
 
   // Ideenpool und Funnel
   await page.goto('/portfolio/ideen');
@@ -50,7 +50,7 @@ test('Ideenpool, Funnel und Prüfung einer eingereichten Idee; barrierefrei', as
   await page.getByRole('radiogroup', { name: 'Strategische Relevanz' }).getByLabel('hoch').check();
   // Entscheid über die Initialisierung (AP-E4-3): ohne Kategorie noch kein Weg
   await expect(page.getByRole('heading', { name: 'Entscheid über die Initialisierung' })).toBeVisible();
-  await expect(page.getByText('Ordnen Sie zuerst die Kategorie zu', { exact: false })).toBeVisible();
+  await expect(page.getByText('Ordne zuerst die Kategorie zu', { exact: false })).toBeVisible();
   await expectAccessible(page);
   await expectNoOverflow(page);
 });

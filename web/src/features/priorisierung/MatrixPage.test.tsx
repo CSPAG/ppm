@@ -108,7 +108,7 @@ describe('MatrixPage', () => {
     renderWithIam(<Page initial={{ ansicht: 'ressourcen' }} />, UE);
     expect(await screen.findByRole('button', { name: '2026-001 Projekt 1: Nutzen hoch, Ressourcenbedarf 6 FTE-Monate, Feld Priorisieren' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '2026-002 Projekt 2: Nutzen hoch, Ressourcenbedarf M (geschätzt), Feld Rasch umsetzen' })).toBeInTheDocument();
-    expect(screen.getByText('Kosten sehen Sie nicht; alle Kreise sind gleich gross.')).toBeInTheDocument();
+    expect(screen.getByText('Kosten siehst du nicht; alle Kreise sind gleich gross.')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /Als Tabelle/ }));
     const tabelle = await screen.findByRole('table', { name: 'Projekte der Matrix' });
     expect(within(tabelle).queryByRole('columnheader', { name: 'Kosten' })).toBeNull();
@@ -189,7 +189,7 @@ describe('MatrixPage', () => {
   it('Gremium (Z8): Matrix und Rangfolge nur lesen', async () => {
     server({ write: false });
     const { container } = renderWithIam(<Page />, GREMIUM);
-    expect(await screen.findByText('Sie können die Rangfolge nur ansehen; sie pflegt die Unternehmensentwicklung.')).toBeInTheDocument();
+    expect(await screen.findByText('Du kannst die Rangfolge nur ansehen; sie pflegt die Unternehmensentwicklung.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /nach oben/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Rangfolge speichern' })).toBeNull();
     await expectNoAxe(container);

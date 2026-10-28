@@ -3,7 +3,7 @@
  * (Z2) mit «Bericht erstellen», Entwurf mit Hinweisen (Z4), Weiterleitungen und Kommentaren (PATCH mit If-Match),
  * Traktandieren, nach der Verabschiedung Aufträge des VR mit Pflichtangaben, nur lesen (Z8).
  */
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { json, mockIamApi } from '@vollholz/iam-web/testing';
 import type { AuthzCatalog } from '@vollholz/iam-web';
@@ -84,9 +84,70 @@ describe('Quartalsreporting', () => {
     expect((await patch.json()).kommentare.gesamtstatus).toBe('Auf Kurs');
     await waitFor(() => expect(screen.getByRole('button', { name: TQR.traktandieren })).toBeEnabled());
     await userEvent.click(screen.getByRole('button', { name: TQR.traktandieren }));
+    // Wirkung vor dem Klick (I-R1 Stufe 3): noch nichts gesendet
+    const dlg = await screen.findByRole('dialog', { name: TQR.traktandierenFrage('Q3 2026') });
+    expect(within(dlg).getByText(TQR.kommentiert(1, 6))).toBeInTheDocument();
+    expect(within(dlg).getByText(TQR.traktandierenHinweise(1))).toBeInTheDocument();
+    expect(api.calls.some(c => c.url.endsWith('/traktandieren'))).toBe(false);
+    await expectNoAxe(dlg);
+    await userEvent.click(within(dlg).getByRole('button', { name: TQR.traktandieren }));
     await waitFor(() => expect(api.calls.some(c => c.url.endsWith('/traktandieren'))).toBe(true));
     expect(api.calls.find(c => c.url.endsWith('/traktandieren'))!.headers.get('If-Match')).toBe('W/"3"');
     expect(await screen.findByText(/Dem PRAT vorgelegt am/)).toBeInTheDocument();
+  });
+
+  it('Konflikt beim Speichern (Z7): Kommentar bleibt, «Neu laden» übernimmt ihn in den neuen Stand', async () => {
+    let b = bericht();
+    let patches = 0;
+    const api = stub({
+      [`GET ${URL_Q}`]: () => json(b, 200, { ETag: `W/"${b.version}"` }),
+      [`PATCH ${URL_Q}`]: () => {
+        patches += 1;
+        if (patches === 1) {
+          // inzwischen hat jemand anderes kommentiert
+          b = bericht({ version: 3, kommentare: { ...b.kommentare, risiken: 'Von Bruno' } });
+          return json({ title: 'Inzwischen geändert', status: 412 }, 412);
+        }
+        b = bericht({ version: 4, kommentare: { ...b.kommentare, gesamtstatus: 'Auf Kurs' } });
+        return json(b, 200, { ETag: 'W/"4"' });
+      },
+    });
+    renderWithIam(zeigen(), UE);
+    const feld = await screen.findByLabelText(TQR.kommentarVon('Gesamtstatus'));
+    await userEvent.type(feld, 'Auf Kurs');
+    await userEvent.click(screen.getByRole('button', { name: TQR.kommentareSpeichern }));
+    expect(await screen.findByText(TQR.konfliktKommentare(1))).toBeInTheDocument();
+    expect(screen.getByLabelText(TQR.kommentarVon('Gesamtstatus'))).toHaveValue('Auf Kurs');
+    await userEvent.click(screen.getByRole('button', { name: TQR.konfliktNeuLaden }));
+    await waitFor(() => expect(screen.getByLabelText(TQR.kommentarVon('Kritische Portfoliorisiken'))).toHaveValue('Von Bruno'));
+    expect(screen.getByLabelText(TQR.kommentarVon('Gesamtstatus'))).toHaveValue('Auf Kurs');
+    expect(screen.queryByText(TQR.konfliktKommentare(1))).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: TQR.kommentareSpeichern }));
+    await waitFor(() => expect(patches).toBe(2));
+    const zweiter = api.calls.filter(c => c.method === 'PATCH')[1]!;
+    expect(zweiter.headers.get('If-Match')).toBe('W/"3"');
+    expect((await zweiter.json()).kommentare).toEqual({ gesamtstatus: 'Auf Kurs' });
+  });
+
+  it('«Neu erstellen» fragt vorher und behält ungespeicherte Kommentare', async () => {
+    let b = bericht();
+    const api = stub({
+      [`GET ${URL_Q}`]: () => json(b, 200, { ETag: `W/"${b.version}"` }),
+      [`POST ${URL_Q}/erzeugen`]: () => { b = bericht({ version: 3, erzeugtAt: '2026-10-07T08:00:00Z' }); return json(b, 200, { ETag: 'W/"3"' }); },
+    });
+    renderWithIam(zeigen(), UE);
+    await userEvent.type(await screen.findByLabelText(TQR.kommentarVon('Gesamtstatus')), 'Entwurf');
+    await userEvent.click(screen.getByRole('button', { name: TQR.neuErstellen }));
+    let dlg = await screen.findByRole('dialog', { name: TQR.neuFrage('Q3 2026') });
+    expect(within(dlg).getByText(TQR.neuKommentareUngespeichert(1))).toBeInTheDocument();
+    await userEvent.click(within(dlg).getByRole('button', { name: TQR.abbrechen }));
+    expect(api.calls.some(c => c.url.endsWith('/erzeugen'))).toBe(false);
+    await userEvent.click(screen.getByRole('button', { name: TQR.neuErstellen }));
+    dlg = await screen.findByRole('dialog', { name: TQR.neuFrage('Q3 2026') });
+    await userEvent.click(within(dlg).getByRole('button', { name: TQR.neuErstellen }));
+    await waitFor(() => expect(api.calls.some(c => c.url.endsWith('/erzeugen'))).toBe(true));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByLabelText(TQR.kommentarVon('Gesamtstatus'))).toHaveValue('Entwurf');
   });
 
   it('verabschiedet: Auftrag des VR nur mit Text und verantwortlicher Person', async () => {

@@ -136,12 +136,12 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const rr = await rechte(req);
     const out = await req.tx(async tx => {
       const aktuell = await store.byStand(tx, 'in_kraft');
-      if (body.quelle === 'aktuell' && !aktuell) throw invalid('Es ist noch keine Version in Kraft. Legen Sie den Entwurf aus der Vorgabe des PM-Handbuchs an.', [{ path: '/quelle', message: 'keine Version in Kraft' }]);
+      if (body.quelle === 'aktuell' && !aktuell) throw invalid('Es ist noch keine Version in Kraft. Lege den Entwurf aus der Vorgabe des PM-Handbuchs an.', [{ path: '/quelle', message: 'keine Version in Kraft' }]);
       const quelle = body.quelle ?? (aktuell ? 'aktuell' : 'vorgabe');
       const r = await store.createEntwurf(tx, (body.beschreibung ?? '').trim());
       if (!r) {
         const e = await store.byStand(tx, 'entwurf');
-        throw conflict(`Es besteht bereits ein Entwurf (Version ${e?.nummer ?? '?'}). Bearbeiten Sie diesen oder verwerfen Sie ihn zuerst.`, { entwurf: e?.id ?? null });
+        throw conflict(`Es besteht bereits ein Entwurf (Version ${e?.nummer ?? '?'}). Bearbeite diesen oder verwirf ihn zuerst.`, { entwurf: e?.id ?? null });
       }
       await store.schreibeDokument(tx, r.id, quelle === 'aktuell' ? await store.dokument(tx, aktuell!.id) : VORGABE);
       await record(tx, who, { action: 'phasenmodell.created', resourceType: 'phasenmodell', resourceId: r.id, data: { ...snapshot(r), quelle, basis: quelle === 'aktuell' ? aktuell!.nummer : null }, event: snapshot(r) });
@@ -168,7 +168,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       const before = await store.get(tx, id);
       if (!before) throw notFound(NAME);
       if (before.version !== version) throw preconditionFailed(before.version);
-      if (before.stand !== 'entwurf') throw conflict(`Version ${before.nummer} ist ${before.stand === 'in_kraft' ? 'in Kraft' : 'abgelöst'} und unveränderlich. Legen Sie einen Entwurf an.`);
+      if (before.stand !== 'entwurf') throw conflict(`Version ${before.nummer} ist ${before.stand === 'in_kraft' ? 'in Kraft' : 'abgelöst'} und unveränderlich. Lege einen Entwurf an.`);
       for (const p of body.phasen ?? []) await store.ersetzePhase(tx, id, p);
       for (const g of body.gates ?? []) await store.ersetzeGate(tx, id, g);
       if (body.kapitelWirkung) await store.ersetzeWirkung(tx, id, body.kapitelWirkung);

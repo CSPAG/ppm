@@ -117,7 +117,7 @@ export async function qualityCheckErfassen(tx: Tx, o: {
   const fehlend = FUNKTIONEN.filter(f => !soll[f].length);
   if (o.ergebnis === 'bestaetigt' && fehlend.length) {
     throw conflict(`Die Projektorganisation ist unvollständig: Es fehlt ${fehlend.map(f => FUNKTION_TEXT[f]).join(', ')}. `
-      + 'Ohne diese Funktion kann der Vertrag nicht unterzeichnet werden; legen Sie die Projektorganisation fest.', { reason: 'organisation', fehlend });
+      + 'Ohne diese Funktion kann der Vertrag nicht unterzeichnet werden; lege die Projektorganisation fest.', { reason: 'organisation', fehlend });
   }
   const nach: store.Stand = o.ergebnis === 'bestaetigt' ? 'zur_unterzeichnung' : 'in_arbeit';
   if (!(await store.standSetzen(tx, v.id, o.erwartet, ['in_pruefung'], nach))) return { id: '', fehlend };
@@ -157,7 +157,7 @@ export async function unterzeichnen(tx: Tx, o: {
   const vorher = await unterschriften(tx, dg.id);
   const funktionen = await offeneFunktionen(tx, o.person, soll, vorher);
   if (!funktionen.length) {
-    throw conflict('Sie haben keine offene Unterschrift für diese Version: Sie haben bereits unterzeichnet, oder Sie sind weder Sponsor, Projektleitung noch CTL des Projekts.',
+    throw conflict('Du hast keine offene Unterschrift für diese Version: Du hast bereits unterzeichnet, oder du bist weder Sponsor, Projektleitung noch CTL des Projekts.',
       { reason: 'unterschrift' });
   }
   // Version ändert sich mit jeder Unterschrift (If-Match schützt vor gleichzeitigem Entscheid)

@@ -1,6 +1,6 @@
 /**
  * Texte für Zugang entziehen und Neubesetzung (UC-016 A1, AP-E7-8; Namensraum = Feature, fachmodell.md 7.2). Anrede
- * «Du» (UX-OF-1, ppm#121); sichtbar «Organisation», nie «Mandant».
+ * «Du»; sichtbar «Organisation», nie «Mandant».
  */
 const anzahl = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
 

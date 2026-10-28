@@ -11,7 +11,7 @@ import type * as pstore from './pruefung-store.ts';
 
 const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
-/** «Oktober» bzw. «Oktober 2026» für Titel von Aufgaben (Sie-Form, de-CH). */
+/** «Oktober» bzw. «Oktober 2026» für Titel von Aufgaben (Du-Form, de-CH). */
 export const monat = (periode: string, mitJahr = false) => `${MONATE[Number(periode.slice(5, 7)) - 1]}${mitJahr ? ` ${periode.slice(0, 4)}` : ''}`;
 
 /** Letzter Tag der Periode: Abschluss durch die UE bis Monatsende (UC-005 Schritt 5, docs/fachmodell.md 2.14). */
@@ -122,7 +122,7 @@ export function rang(z: Pick<PeriodeZeileOut, 'stand' | 'auffaelligkeiten'>): nu
 /** Sperre des Abschlusses (UC-005 Schritt 5, K1 Regel): eingereichte, nicht geprüfte Berichte. */
 export function abschlussSperre(eingereicht: number): string | null {
   if (!eingereicht) return null;
-  return `Abschluss: ${eingereicht} ${eingereicht === 1 ? 'Bericht ist' : 'Berichte sind'} eingereicht, aber nicht geprüft. Prüfen Sie ${eingereicht === 1 ? 'ihn' : 'diese'} zuerst.`;
+  return `Abschluss: ${eingereicht} ${eingereicht === 1 ? 'Bericht ist' : 'Berichte sind'} eingereicht, aber nicht geprüft. Prüfe ${eingereicht === 1 ? 'ihn' : 'diese'} zuerst.`;
 }
 
 export const PERIODE_ABGESCHLOSSEN = 'Die Periode ist abgeschlossen und gesperrt (Z9).';

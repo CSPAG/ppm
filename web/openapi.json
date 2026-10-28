@@ -1428,7 +1428,7 @@
             }
           },
           "empfaenger": {
-            "description": "`person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
+            "description": "`person`: an dich persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.",
             "anyOf": [
               {
                 "type": "string",
@@ -1448,7 +1448,7 @@
             "anyOf": [
               {
                 "additionalProperties": false,
-                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die Sie heute vertreten (UC-016 Schritt 4).",
+                "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die du heute vertrittst (UC-016 Schritt 4).",
                 "type": "object",
                 "required": [
                   "person",
@@ -1741,7 +1741,7 @@
             "type": "boolean"
           },
           "richtung": {
-            "description": "`eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten.",
+            "description": "`eigene`: du wirst vertreten; `fuer_andere`: du vertrittst.",
             "anyOf": [
               {
                 "type": "string",
@@ -40533,7 +40533,7 @@
         "tags": [
           "Stellvertretungen"
         ],
-        "description": "Laufende und künftige Stellvertretungen: wer Sie vertritt und wen Sie vertreten.",
+        "description": "Laufende und künftige Stellvertretungen: wer dich vertritt und wen du vertrittst.",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -42800,7 +42800,7 @@
         "tags": [
           "Stammdaten"
         ],
-        "description": "Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Sie erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.",
+        "description": "Nicht mehr verwendete Werte werden deaktiviert statt gelöscht (UC-017 Schritt 2): Deaktivierte Werte erscheinen nicht mehr zur Auswahl, gespeicherte Angaben behalten ihren Wert. Nur mit `If-Match`.",
         "parameters": [
           {
             "schema": {
@@ -63514,7 +63514,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»). Sie erhält im Eingang «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».",
+        "description": "Rückfrage (UC-005 A2): gibt den eingereichten oder geprüften Bericht mit der Frage an die Projektleitung zurück (Stand «zurückgegeben»); im Eingang erhält sie «Rückfrage zum Statusbericht beantworten»; mit dem erneuten Einreichen ist die Rückfrage beantwortet und der Bericht wieder «eingereicht».",
         "requestBody": {
           "required": true,
           "content": {

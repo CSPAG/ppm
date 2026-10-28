@@ -27,7 +27,7 @@ export interface EntwurfKontext {
   begruendung: string;
 }
 export type Anlassregel = {
-  /** Ob der Anlass jetzt möglich ist; sonst der Grund (Sie-Form). */
+  /** Ob der Anlass jetzt möglich ist; sonst der Grund (Du-Form). */
   moeglich: (k: Omit<EntwurfKontext, 'tx' | 'begruendung' | 'modell'>) => string | null;
   plan: (k: EntwurfKontext) => Promise<EntwurfPlan>;
 };
@@ -56,7 +56,7 @@ export async function anlegen(tx: Tx, who: Actor, projekt: store.ProjektKopf, an
   const versionen = await store.versionen(tx, projekt.id);
   const offen = entwurfVon(versionen);
   if (offen) {
-    throw conflict(`Es gibt bereits einen Entwurf (Version ${offen.nummer}, ${STAND_TEXT[offen.stand]}). Nehmen Sie die Änderung dort auf.`,
+    throw conflict(`Es gibt bereits einen Entwurf (Version ${offen.nummer}, ${STAND_TEXT[offen.stand]}). Nimm die Änderung dort auf.`,
       { reason: 'entwurf', entwurf: { id: offen.id, nummer: offen.nummer, anlass: offen.anlass, stand: offen.stand } });
   }
   const grund = regel.moeglich({ projekt, versionen });

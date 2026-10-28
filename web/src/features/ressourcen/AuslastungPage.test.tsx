@@ -57,8 +57,8 @@ describe('Auslastung', () => {
   it('zeigt Kennzahlen, Engpässe nach dem Mustertext und die Tabelle mit Symbol und Text (axe ohne Befund)', async () => {
     const api = stub({ 'GET /v1/auslastung': () => json(auslastung()) });
     const { container } = renderWithIam(<Page />, RM);
-    // «Kapazität Q2 2027: 5,5 FTE Projektleitung statt höchstens 5,0. Verschieben Sie …» (darstellung.md)
-    expect(await screen.findByText(/Kapazität Q2 2027: 5,5\sFTE Projektleitung statt höchstens 5,0\. Verschieben Sie den Start eines der 2 betroffenen Projekte/)).toBeInTheDocument();
+    // «Kapazität Q2 2027: 5,5 FTE Projektleitung statt höchstens 5,0. Verschiebe …» (darstellung.md)
+    expect(await screen.findByText(/Kapazität Q2 2027: 5,5\sFTE Projektleitung statt höchstens 5,0\. Verschiebe den Start eines der 2 betroffenen Projekte/)).toBeInTheDocument();
     expect(screen.getByText(/Kapazität Q2 2027: 1,0\sFTE CTL ohne erfasstes Angebot/)).toBeInTheDocument();
     const kpis = screen.getByRole('region', { name: TR.kennzahlen });
     expect(within(kpis).getByText(TR.engpaesse).parentElement).toHaveTextContent('2');

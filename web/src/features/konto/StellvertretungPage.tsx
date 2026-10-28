@@ -1,6 +1,6 @@
 /**
  * Profil mit Stellvertretung (UI-43, Seitentyp Liste + Schublade; BC AM.01.03, UC-016 Schritt 4): Profil der Person,
- * laufende und künftige Stellvertretungen (wer Sie vertritt, wen Sie vertreten), Erfassen in der Schublade (`?o=neu`)
+ * laufende und künftige Stellvertretungen (wer dich vertritt, wen du vertrittst), Erfassen in der Schublade (`?o=neu`)
  * mit Wirkung vor dem Absenden (I-F5), Beenden mit Rückfrage, weil es auf die Vertretung wirkt (I-R1).
  */
 import { describeError } from '@vollholz/iam-web';

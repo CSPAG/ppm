@@ -13,15 +13,21 @@ import { TA } from './AenderungTexte.ts';
 import { useVertrag, type Version } from './api.ts';
 import './Aenderung.css';
 
-/** «Änderung beantragen» (K2 Zustand «Kein Entwurf»): nur mit Baseline und ohne Entwurf, mit Pflichtbegründung. */
-export function AenderungBeantragen({ projektId, onAngelegt }: { projektId: string; onAngelegt(): void }) {
+/**
+ * «Änderung beantragen» (K2 Zustand «Kein Entwurf»): nur mit Baseline und ohne Entwurf, mit Pflichtbegründung. `oeffnen`:
+ * Dialog gleich offen (Sprung aus der Warnung im Statusbericht, UC-004 A1); `onGeschlossen` meldet das Schliessen.
+ */
+export function AenderungBeantragen({ projektId, oeffnen = false, onAngelegt, onGeschlossen }: {
+  projektId: string; oeffnen?: boolean; onAngelegt(): void; onGeschlossen?(): void;
+}) {
   const vertrag = useVertrag(projektId);
-  const [offen, setOffen] = useState(false);
+  const [offen, setOffen] = useState(oeffnen);
   if (!vertrag.data?.can.entwerfen.includes('aenderung')) return null;
+  const schliessen = () => { setOffen(false); onGeschlossen?.(); };
   return (
     <>
       <button type="button" className="btn" onClick={() => setOffen(true)}><Icon name="edit" />{TA.beantragen}</button>
-      {offen ? <BeantragenDialog projektId={projektId} onClose={() => setOffen(false)} onAngelegt={() => { setOffen(false); onAngelegt(); }} /> : null}
+      {offen ? <BeantragenDialog projektId={projektId} onClose={schliessen} onAngelegt={() => { setOffen(false); onAngelegt(); }} /> : null}
     </>
   );
 }

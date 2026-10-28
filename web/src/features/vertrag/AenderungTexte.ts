@@ -1,6 +1,6 @@
 /**
  * Texte für Änderungsantrag und Versionsvergleich (UI-09, UI-10; Kernablauf K2 Schritte 1, 5, 6 und 9, «Texte»,
- * «Regeln»): Anrede «Sie», Schweizer Rechtschreibung, Schaltflächen wie im Kernablauf.
+ * «Regeln»): Anrede «Du», Schweizer Rechtschreibung, Schaltflächen wie im Kernablauf.
  */
 type Rubrik = 'scope' | 'zeitplan' | 'ressourcen_budget' | 'annahmen' | 'key_risiken';
 
@@ -8,19 +8,19 @@ export const TA = {
   // Beantragen (UC-007 Schritt 1, K2 Einstieg «Projektakte»)
   beantragen: 'Änderung beantragen',
   beantragenFrage: 'Änderung am Projektvertrag beantragen?',
-  beantragenWirkung: 'Es entsteht ein Entwurf aus der Baseline. Passen Sie die betroffenen Kapitel an; der Sponsor entscheidet.',
+  beantragenWirkung: 'Es entsteht ein Entwurf aus der Baseline. Passe die betroffenen Kapitel an; der Sponsor entscheidet.',
   begruendung: 'Begründung',
   begruendungHint: 'Was ändert sich und warum? Der Sponsor liest sie zuerst.',
   begruendungFehlt: 'Begründung fehlt: Ohne Begründung kann der Sponsor die Änderung nicht beurteilen.',
   anlegen: 'Entwurf anlegen',
   abbrechen: 'Abbrechen',
-  entwurfVorhanden: (nummer: string, stand: string) => `Es gibt bereits einen Entwurf (Version ${nummer}, ${stand}). Nehmen Sie die Änderung dort auf.`,
+  entwurfVorhanden: (nummer: string, stand: string) => `Es gibt bereits einen Entwurf (Version ${nummer}, ${stand}). Nimm die Änderung dort auf.`,
   zumEntwurf: 'Zum Entwurf',
 
   // Seitenpanel der PL (K2 Schritt 5)
   antrag: 'Änderungsantrag',
   hauptaenderungen: 'Hauptänderungen',
-  hauptaenderungenHint: 'Das System erzeugt sie aus dem Vergleich zur Baseline. Sie können jede Rubrik umformulieren.',
+  hauptaenderungenHint: 'Das System erzeugt sie aus dem Vergleich zur Baseline. Du kannst jede Rubrik umformulieren.',
   rubrik: { scope: 'Scope', zeitplan: 'Zeitplan', ressourcen_budget: 'Ressourcen/Budget', annahmen: 'Annahmen', key_risiken: 'Key-Risiken' } satisfies Record<Rubrik, string>,
   keineAenderung: 'keine Änderung',
   andere: 'Andere',
@@ -36,7 +36,7 @@ export const TA = {
   eingereicht: 'Eingereicht. Der Sponsor entscheidet die Änderung.',
   beimSponsor: (datum: string) => `Beim Sponsor zum Entscheid seit ${datum}. Bis dahin ist der Entwurf gesperrt.`,
   weiterBearbeiten: 'Weiter bearbeiten',
-  unveraendert: 'Die Änderung enthält noch keine Anpassung gegenüber der Baseline. Passen Sie die betroffenen Kapitel an.',
+  unveraendert: 'Die Änderung enthält noch keine Anpassung gegenüber der Baseline. Passe die betroffenen Kapitel an.',
   wirkungPrat: 'Betrifft Scope, Budget oder Ressourcen: Der Sponsor kann die Änderung nur an den PRAT unterstützen.',
 
   // Entscheid des SP (K2 Schritt 9, UI-09)
@@ -51,11 +51,11 @@ export const TA = {
   anPratWirkung: 'Die Änderung kommt als Traktandum in die nächste Sitzung des PRAT. Entscheiden wird der PRAT.',
   ablehnen: 'Ablehnen',
   ablehnenFrage: 'Änderung ablehnen?',
-  ablehnenWirkung: 'Der Entwurf wird abgelehnt, die Baseline bleibt. Die Projektleitung erhält Ihre Begründung.',
+  ablehnenWirkung: 'Der Entwurf wird abgelehnt, die Baseline bleibt. Die Projektleitung erhält deine Begründung.',
   ablehnenFehlt: 'Begründung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist.',
   toastFreigegeben: (nummer: string) => `Freigegeben. Version ${nummer} ist Baseline.`,
   toastAnPrat: 'Unterstützt. Die Änderung ist für den PRAT vorgeschlagen.',
-  toastAbgelehnt: 'Abgelehnt. Die Projektleitung erhält Ihre Begründung.',
+  toastAbgelehnt: 'Abgelehnt. Die Projektleitung erhält deine Begründung.',
   keinAntrag: 'Für dieses Projekt gibt es keinen Änderungsantrag.',
   nurSponsor: 'Die Änderung entscheidet der Sponsor.',
   inArbeit: 'Die Projektleitung bearbeitet den Antrag noch; er ist nicht eingereicht.',
@@ -65,7 +65,7 @@ export const TA = {
     an_prat: (datum: string) => `Am ${datum} an den PRAT unterstützt.`,
   },
   traktandiert: 'Traktandiert für den PRAT. Der Entscheid fällt in der Sitzung.',
-  konflikt: 'Der Stand hat sich inzwischen geändert. Laden Sie neu und entscheiden Sie erneut.',
+  konflikt: 'Der Stand hat sich inzwischen geändert. Lade neu und entscheide erneut.',
 
   // Versionen und Vergleich (UI-10, UI-11)
   reiter: 'Versionen',
@@ -79,7 +79,7 @@ export const TA = {
   nurEine: 'Zum Vergleichen braucht es zwei Versionen.',
   gleich: 'Die beiden Versionen unterscheiden sich nicht.',
   unveraendertKapitel: (n: number) => (n === 1 ? '1 Kapitel unverändert' : `${n} Kapitel unverändert`),
-  ohneBetraege: 'Beträge sind nicht verglichen: Sie sehen sie nur mit Recht auf Beträge.',
+  ohneBetraege: 'Beträge sind nicht verglichen: Du siehst sie nur mit Recht auf Beträge.',
   art: { neu: 'neu', entfernt: 'entfernt', geaendert: 'geändert' } as const,
   bisher: 'vorher',
   jetzt: 'nachher',

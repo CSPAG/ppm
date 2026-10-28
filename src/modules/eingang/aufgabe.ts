@@ -19,7 +19,7 @@ export interface AufgabeOeffnen {
   art: string;
   bezug: Bezug;
   empfaenger: Empfaenger;
-  /** Was zu tun ist, mit Objekt («Statusbericht Oktober erstellen»); Sie-Form. */
+  /** Was zu tun ist, mit Objekt («Statusbericht Oktober erstellen»); Du-Form. */
   titel: string;
   /** Projekt und Rolle («2026-014 Neues KIS · als PL»), optional. */
   kontext?: string | null;
@@ -101,7 +101,7 @@ export interface MitteilungSenden {
   /** Person, die die Mitteilung erhält. */
   an: string;
   bezug: Bezug;
-  /** Wer, was, bis wann (I-B4), Sie-Form; ohne sensible Inhalte. */
+  /** Wer, was, bis wann (I-B4), Du-Form; ohne sensible Inhalte. */
   text: string;
   /** Adresse in der Oberfläche (I-B1), optional. */
   link?: string | null;

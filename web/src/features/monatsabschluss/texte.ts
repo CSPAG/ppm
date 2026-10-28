@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Monatsabschluss» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7),
+ * Texte des Features «Monatsabschluss» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7),
  * Schweizer Rechtschreibung, Wortlaut aus Kernablauf K1 (docs/ux/ablaeufe/K1-statusbericht.md, «Texte» und «Regeln»).
  */
 const n = (k: number, eins: string, viele: string) => `${k} ${k === 1 ? eins : viele}`;
@@ -55,8 +55,8 @@ export const TM = {
   auswahl: (k: number) => `${n(k, 'Bericht', 'Berichte')} ausgewählt`,
   rueckfrage: {
     label: 'Rückfrage an die Projektleitung',
-    platzhalter: 'Was ist unklar? Die Projektleitung sieht Ihre Frage zuoberst im Bericht.',
-    leer: 'Schreiben Sie, was unklar ist.',
+    platzhalter: 'Was ist unklar? Die Projektleitung sieht deine Frage zuoberst im Bericht.',
+    leer: 'Schreibe, was unklar ist.',
     offen: 'Offene Rückfrage',
     verlauf: 'Rückfragen',
     beantwortet: (d: string) => `beantwortet ${d}`,
@@ -81,7 +81,7 @@ export const TM = {
   leerFilter: 'Kein Bericht passt zum Filter.',
   gesperrt: (periode: string, wann: string, wer: string | null) => `${periode} ist abgeschlossen (${wann}${wer ? `, ${wer}` : ''}). Das Dashboard ist für die Gremien freigegeben.`,
   tasten: 'Tastatur: ↑/↓ Zeile wechseln · B bestätigen · R Rückfrage · E einfordern · Leertaste auswählen · Enter öffnen',
-  konflikt: 'Der Bericht wurde inzwischen geändert. Die Liste ist neu geladen; prüfen Sie ihn nochmals.',
+  konflikt: 'Der Bericht wurde inzwischen geändert. Die Liste ist neu geladen; prüfe ihn nochmals.',
   keinRecht: 'Den Monatsabschluss sieht die Unternehmensentwicklung.',
   // Periode abschliessen (K1 Prüfen Schritt 5; I-R1 Stufe 3)
   abschluss: {

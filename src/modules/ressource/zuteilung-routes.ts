@@ -146,7 +146,7 @@ export function registerZuteilungRoutes(app: FastifyInstance, _deps: Deps): void
       try {
         await zs.anlegen(tx, b.id, b.projektId, body.personId, ms, body.fte);
       } catch (e) {
-        if (e instanceof zs.Doppelt) throw conflict('Diese Person ist dem Bedarf in mindestens einem dieser Monate schon zugeteilt. Ändern Sie dort den Anteil.', { reason: 'doppelt' });
+        if (e instanceof zs.Doppelt) throw conflict('Diese Person ist dem Bedarf in mindestens einem dieser Monate schon zugeteilt. Ändere dort den Anteil.', { reason: 'doppelt' });
         throw e;
       }
       const neu = (await zs.list(tx, { bedarfIds: [b.id], personId: body.personId })).filter(z => ms.includes(z.monat));

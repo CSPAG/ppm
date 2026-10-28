@@ -205,7 +205,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
     const s = (await aenderung('sp', v2)).json();
     assert.deepEqual(s.wirkung, {
       prat: true, dimensionen: ['budget', 'ressourcen'], kapitel: [9],
-      hinweis: 'Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Sie können sie unterstützen; entscheiden wird der PRAT.',
+      hinweis: 'Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Du kannst sie unterstützen; entscheiden wird der PRAT.',
     });
     assert.deepEqual(s.can, { einreichen: false, freigeben: false, ablehnen: true, anPrat: true });
     const f = await entscheiden(v2, 'freigegeben');

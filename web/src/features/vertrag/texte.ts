@@ -7,6 +7,7 @@ type Anlass = 'initial' | 'gate' | 'aenderung';
 
 export const TV = {
   reiter: 'Vertrag',
+  reiterVersionen: 'Versionen',
   titel: 'Projektvertrag',
   kapitel: 'Kapitel',
   kapitelWahl: 'Kapitel wählen',

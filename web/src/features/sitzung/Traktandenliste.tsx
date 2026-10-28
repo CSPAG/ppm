@@ -2,7 +2,8 @@
  * Traktandenliste der Sitzung (K3 Schritte 2–3): Position, Geschäft mit Antrag, Zeitbedarf und Zeitfenster,
  * Unterlagenstand als Badge mit Symbol und Text, «via SNS-VR» (UC-006 A1), Eingeladene. Reihenfolge mit «Nach oben» /
  * «Nach unten» und Alt+↑ / Alt+↓ (I-M2, G9: Ziehen ist nur Abkürzung). Fehlen Unterlagen, steht die Warnung am
- * Traktandum mit dem Ausweg «Auf nächste Sitzung verschieben» (UC-006 A2).
+ * Traktandum mit dem Ausweg «Auf nächste Sitzung verschieben» (UC-006 A2). Das feste Traktandum 1 «Bericht der
+ * Programmleitung» (K3 Schritt 4) hat weder Griff noch Entfernen und trägt einen Hinweis; ohne Bericht ist es ein Platzhalter.
  */
 import type { KeyboardEvent } from 'react';
 import { Hinweis, Icon, Stand, fmtDatum, type StandFamilie } from '../../ui/index.ts';
@@ -37,7 +38,7 @@ export interface TraktandenlisteProps {
 
 export function Traktandenliste({ traktanden, bearbeiten, versandRest, busy, aktuell, onVerschieben, onEntfernen, onAufNaechste }: TraktandenlisteProps) {
   const taste = (e: KeyboardEvent, t: Traktandum) => {
-    if (!bearbeiten || !e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+    if (!bearbeiten || t.fest || !e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
     e.preventDefault();
     onVerschieben(t, e.key === 'ArrowUp' ? -1 : 1);
   };
@@ -46,10 +47,13 @@ export function Traktandenliste({ traktanden, bearbeiten, versandRest, busy, akt
       {traktanden.map((t, i) => {
         const name = t.projekt ? `${t.projekt.nummer} ${t.titel}` : t.titel;
         const u = t.unterlagen.stand;
+        const platzhalter = t.fest && t.bezug.typ === 'sitzung';
+        // über dem festen Traktandum 1 lässt sich nichts einordnen
+        const obenGesperrt = i === 0 || (i === 1 && !!traktanden[0]?.fest);
         return (
           <li key={t.id} className={`sz-tr${aktuell === t.position ? ' on' : ''}`} data-traktandum={t.position ?? undefined}>
             <div className="sz-tr-k">
-              {bearbeiten ? (
+              {bearbeiten && !t.fest ? (
                 // Griff: Alt+↑ / Alt+↓ ordnet um (I-M2), der Fokus folgt dem Traktandum
                 <button type="button" className="sz-nr sz-griff" data-griff={t.position ?? undefined} onKeyDown={e => taste(e, t)}
                   aria-label={TS.griff(t.position ?? 0, name)} aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">{t.position}</button>
@@ -71,15 +75,16 @@ export function Traktandenliste({ traktanden, bearbeiten, versandRest, busy, akt
                   {t.einladungen.length ? t.einladungen.map(e => `${e.name ?? '–'} (${TS.funktion[e.funktion] ?? e.funktion})`).join(', ') : TS.keineEinladung}
                 </p>
               </div>
-              {bearbeiten ? (
+              {bearbeiten && !t.fest ? (
                 <div className="sz-tr-a">
-                  <button type="button" className="iconbtn" disabled={busy || i === 0} onClick={() => onVerschieben(t, -1)} aria-label={TS.nachOben(name)}><Icon name="up" /></button>
+                  <button type="button" className="iconbtn" disabled={busy || obenGesperrt} onClick={() => onVerschieben(t, -1)} aria-label={TS.nachOben(name)}><Icon name="up" /></button>
                   <button type="button" className="iconbtn" disabled={busy || i === traktanden.length - 1} onClick={() => onVerschieben(t, 1)} aria-label={TS.nachUnten(name)}><Icon name="down" /></button>
                   <button type="button" className="iconbtn" disabled={busy} onClick={() => onEntfernen(t)} aria-label={`${TS.entfernen}: ${name}`} title={TS.entfernen}><Icon name="x" /></button>
                 </div>
               ) : null}
             </div>
-            {bearbeiten && (u === 'fehlt' || u === 'quality_check_offen') ? (
+            {bearbeiten && t.fest ? <Hinweis stufe="hinweis">{platzhalter ? `${TS.festHinweis} ${TS.festPlatzhalter}` : TS.festHinweis}</Hinweis> : null}
+            {bearbeiten && !t.fest && (u === 'fehlt' || u === 'quality_check_offen') ? (
               <Hinweis stufe="warnung" aktion={<button type="button" className="btn" disabled={busy} onClick={() => onAufNaechste(t)}><Icon name="calendar" />{TS.verschieben}</button>}>
                 {u === 'fehlt' ? TS.unterlagenWarnung(name, versandRest) : TS.qcWarnung(name)}
               </Hinweis>

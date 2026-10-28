@@ -10,9 +10,13 @@ import { files, lineOf, read, report, ROOT, stripComments } from './lib.ts';
 
 /**
  * Dateien, die das Netz direkt nutzen dürfen – jede mit Begründung. Die Netz-Adapter des Querschnitts (SSRF-Schutz
- * `safeRequest`, Betriebs-Endpunkt, HTTP- und MCP-Server) liegen in @vollholz/platform; die App selbst hat keine.
+ * `safeRequest`, Betriebs-Endpunkt, HTTP- und MCP-Server) liegen in @vollholz/platform; die App hat nur die folgenden.
  */
-export const NETWORK_ADAPTERS: Record<string, string> = {};
+export const NETWORK_ADAPTERS: Record<string, string> = {
+  // AP-E7-3 (BC AM.03.02, UC-018): Abruf bei und Lieferung an Umsysteme (ERP, HR-System, Budgetprozess) an der
+  // konfigurierten Adresse, nur über safeRequest (SSRF-Schutz, Zeit- und Grössenlimit, keine Weiterleitungen)
+  'src/modules/schnittstelle/transport.ts': 'Schnittstellen zu Umsystemen (UC-018 Schritte 3–4), über safeRequest',
+};
 
 const FORBIDDEN_IMPORT = /\bfrom\s+['"](node:)?(http|https|net|tls|http2|dgram|undici)['"]|import\(\s*['"](node:)?(http|https|net|tls|http2|dgram|undici)['"]\s*\)/g;
 const GLOBAL_FETCH = /(^|[^.\w])fetch\s*\(/g;

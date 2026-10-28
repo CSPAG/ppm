@@ -15,7 +15,7 @@ import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
 import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
-import { dashboardTexte, portfolioberichtTexte, risikenTexte } from './features/dashboard/index.ts';
+import { auswertungenTexte, dashboardTexte, portfolioberichtTexte, risikenTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { vorlagenTexte } from './features/vorlagen/index.ts';
@@ -64,6 +64,9 @@ export const navigation: NavRegistrierung = {
     // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
     // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): sichtbar wie die Auswertungen (auswertung:read; IA «Sichtbarkeit je
     // Rolle»: Portfolio nicht für Antragstellende und Leser:innen); lesen über die API dürfen alle Angemeldeten (A-35)
+    // Portfolio › Auswertungen (UI-30; PC.04.03, UC-014 A2; AP-E7-6): Ad-hoc-Auswertungen nur für UE und FI; aktiv nur auf
+    // der eigenen Adresse, nicht unter dem Portfoliobericht (`/portfolio/auswertungen/portfoliobericht`)
+    { raum: 'portfolio', pfad: '/portfolio/auswertungen', label: auswertungenTexte.bereich, recht: 'auswertung:write', muster: /^\/portfolio\/auswertungen\/?$/ },
     { raum: 'portfolio', pfad: '/portfolio/roadmap', label: roadmapTexte.bereich, recht: 'auswertung:read' },
     { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussTexte.bereich, recht: 'statusbericht:review' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:

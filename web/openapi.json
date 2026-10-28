@@ -4207,12 +4207,21 @@
                   ]
                 },
                 "wert": {
-                  "type": [
-                    "null",
-                    "number"
-                  ],
-                  "minimum": 0,
-                  "maximum": 9999999
+                  "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "einheit": {
                   "anyOf": [
@@ -4976,12 +4985,21 @@
                   ]
                 },
                 "wert": {
-                  "type": [
-                    "number",
-                    "null"
-                  ],
-                  "minimum": 0,
-                  "maximum": 9999999
+                  "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "einheit": {
                   "anyOf": [
@@ -7102,13 +7120,22 @@
             "type": "string"
           },
           "prognose": {
-            "minimum": 0,
-            "maximum": 999999999999.99,
-            "multipleOf": 0.01,
-            "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
-            "type": [
-              "null",
-              "number"
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "minimum": 0,
+                "maximum": 999999999999.99,
+                "multipleOf": 0.01,
+                "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "budgetBaseline": {
@@ -7243,13 +7270,22 @@
             "type": "string"
           },
           "prognose": {
-            "minimum": 0,
-            "maximum": 999999999999.99,
-            "multipleOf": 0.01,
-            "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
-            "type": [
-              "number",
-              "null"
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "minimum": 0,
+                "maximum": 999999999999.99,
+                "multipleOf": 0.01,
+                "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }
@@ -7297,13 +7333,22 @@
             "type": "string"
           },
           "prognose": {
-            "minimum": 0,
-            "maximum": 999999999999.99,
-            "multipleOf": 0.01,
-            "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
-            "type": [
-              "number",
-              "null"
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "minimum": 0,
+                "maximum": 999999999999.99,
+                "multipleOf": 0.01,
+                "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }
@@ -25355,16 +25400,20 @@
                   "type": "string"
                 },
                 "fte": {
-                  "description": "null entfernt das Angebot der Zelle.",
                   "anyOf": [
                     {
-                      "type": "null"
+                      "enum": [
+                        null
+                      ]
                     },
                     {
                       "minimum": 0,
                       "maximum": 1000,
-                      "description": "Neues Angebot in FTE (gespeichert mit zwei Nachkommastellen).",
+                      "description": "Neues Angebot in FTE (gespeichert mit zwei Nachkommastellen); null entfernt das Angebot der Zelle.",
                       "type": "number"
+                    },
+                    {
+                      "type": "null"
                     }
                   ]
                 },
@@ -27248,10 +27297,11 @@
                   "type": "string"
                 },
                 "einschaetzung": {
-                  "description": "null entfernt die Bewertung des Kriteriums.",
                   "anyOf": [
                     {
-                      "type": "null"
+                      "enum": [
+                        null
+                      ]
                     },
                     {
                       "description": "Einschätzung je Kriterium ohne Score (A-01).",
@@ -27275,6 +27325,9 @@
                           ]
                         }
                       ]
+                    },
+                    {
+                      "type": "null"
                     }
                   ]
                 },
@@ -32243,12 +32296,17 @@
           "nummer": {
             "anyOf": [
               {
-                "type": "null"
+                "enum": [
+                  null
+                ]
               },
               {
                 "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,39}$",
                 "description": "Kostenträger im ERP (A-16).",
                 "type": "string"
+              },
+              {
+                "type": "null"
               }
             ]
           }
@@ -32602,24 +32660,34 @@
                 "capex": {
                   "anyOf": [
                     {
-                      "type": "null"
+                      "enum": [
+                        null
+                      ]
                     },
                     {
                       "minimum": 0,
                       "maximum": 100000000000,
                       "type": "number"
+                    },
+                    {
+                      "type": "null"
                     }
                   ]
                 },
                 "opex": {
                   "anyOf": [
                     {
-                      "type": "null"
+                      "enum": [
+                        null
+                      ]
                     },
                     {
                       "minimum": 0,
                       "maximum": 100000000000,
                       "type": "number"
+                    },
+                    {
+                      "type": "null"
                     }
                   ]
                 },

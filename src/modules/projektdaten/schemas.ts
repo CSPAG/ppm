@@ -76,8 +76,7 @@ const kostenFelder = {
   text: text(500, 'Position.', 1),
   lieferant: text(200, 'Lieferant.'),
   offerte: text(200, 'Verweis auf Offerte bzw. Kostenkalkulation.'),
-  // Typliste statt anyOf: AJV wandelt mit coerceTypes in anyOf null in 0 (Zahl zuerst) bzw. 0 in null (null zuerst) um
-  prognose: Type.Unsafe<number | null>({ ...Betrag, type: ['number', 'null'], description: 'Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.' }),
+  prognose: Nullable(Type.Number({ ...Betrag, description: 'Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.' })),
 };
 export const Kosten = register('Kosten', {
   ...kostenFelder,

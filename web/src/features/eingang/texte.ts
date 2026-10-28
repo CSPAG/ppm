@@ -1,21 +1,21 @@
 /**
- * Texte des Eingangs (UI-01; Namensraum = Feature, fachmodell.md 7.2). Anrede «Sie», Begriffe aus dem Glossar
+ * Texte des Eingangs (UI-01; Namensraum = Feature, fachmodell.md 7.2). Anrede «Du», Begriffe aus dem Glossar
  * (docs/ux/README.md: Eingang, Zu tun, Mitteilung, Stellvertretung).
  */
 export const E = {
   titel: 'Eingang',
-  sub: 'Was jetzt gilt und zu tun ist – aus allen Ihren Rollen.',
+  sub: 'Was jetzt gilt und zu tun ist – aus allen deinen Rollen.',
   zaehler: (n: number) => (n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),
   kopf: {
-    titel: 'Ihre Aufgaben',
+    titel: 'Deine Aufgaben',
     offen: (n: number) => (n === 0 ? 'Keine offenen Aufgaben' : n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),
     ueberfaellig: (n: number) => (n === 1 ? '1 überfällig' : `${n} überfällig`),
     naechsteFrist: (frist: string) => `nächste Frist ${frist}`,
   },
   vertretung: {
-    sieVertreten: (name: string, bis: string) => `Sie vertreten ${name} bis ${bis}. Aufgaben dieser Person stehen in «Zu tun».`,
-    mitUnterschriften: 'Sie dürfen in Vertretung unterzeichnen.',
-    werdenVertreten: (name: string, von: string, bis: string) => `${name} vertritt Sie von ${von} bis ${bis}.`,
+    sieVertreten: (name: string, bis: string) => `Du vertrittst ${name} bis ${bis}. Aufgaben dieser Person stehen in «Zu tun».`,
+    mitUnterschriften: 'Du darfst in Vertretung unterzeichnen.',
+    werdenVertreten: (name: string, von: string, bis: string) => `${name} vertritt dich von ${von} bis ${bis}.`,
     verwalten: 'Stellvertretung verwalten',
   },
   zuTun: {
@@ -23,7 +23,7 @@ export const E = {
     nurFrist: 'Nur mit Frist',
     alle: 'Alle',
     filter: 'Aufgaben filtern',
-    leer: 'Keine offenen Aufgaben. Neue Aufgaben aus Ihren Rollen erscheinen hier, sobald etwas zu tun ist.',
+    leer: 'Keine offenen Aufgaben. Neue Aufgaben aus deinen Rollen erscheinen hier, sobald etwas zu tun ist.',
     leerFrist: 'Keine Aufgaben mit Frist.',
     oeffnen: 'Öffnen',
     oeffnenAria: (titel: string) => `${titel} öffnen`,

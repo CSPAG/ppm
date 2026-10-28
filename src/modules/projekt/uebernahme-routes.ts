@@ -79,7 +79,7 @@ export function registerUebernahmeRoutes(app: FastifyInstance, deps: Deps): void
       anzahl: { zeilen: e.zeilen.length, fehlerhaft: e.zeilen.filter(z => z.fehler.length).length },
     };
     if (body.speichern && !gespeichert) {
-      throw new HttpError(422, 'Übernahme nicht gespeichert', 'Die Datei enthält Fehler oder keine Zeilen. Korrigieren Sie die gemeldeten Zeilen und prüfen Sie erneut; gespeichert wird nur eine fehlerfreie Datei.', {}, out);
+      throw new HttpError(422, 'Übernahme nicht gespeichert', 'Die Datei enthält Fehler oder keine Zeilen. Korrigiere die gemeldeten Zeilen und prüfe erneut; gespeichert wird nur eine fehlerfreie Datei.', {}, out);
     }
     return out;
   });

@@ -41,7 +41,7 @@ export function registerAdhocRoutes(app: FastifyInstance, _deps: Deps): void {
       const sichtbar = await store.portfolios(tx);
       const schluessel = teile(q.portfolio);
       const unbekannt = (schluessel ?? []).filter(s => !sichtbar.some(p => p.schluessel === s));
-      if (unbekannt.length) throw invalid('Diese Portfolios gibt es nicht, oder sie sind nicht sichtbar.', [{ path: '/portfolio', message: unbekannt.join(', ') }]);
+      if (unbekannt.length) throw invalid('Diese Portfolios gibt es nicht, oder du siehst sie nicht.', [{ path: '/portfolio', message: unbekannt.join(', ') }]);
       const periode = q.periode ?? await store.laufendePeriode(tx);
       const rows = await projekte(tx, {
         periode, finanzen,

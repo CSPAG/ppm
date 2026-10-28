@@ -83,11 +83,11 @@ export function Galerie() {
         <dl className="attrs">{formate.map(([k, v]) => <div key={k} className="galerie-paar"><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
 
         <h2>Hinweis und Regelmeldung</h2>
-        <Regelmeldung stufe="hinweis" regel="Gremienweg" ist="via SNS-VR" wer="Gate P1–P2" vorschlag="Planen Sie die Vorlage an den SNS-VR ein." />
+        <Regelmeldung stufe="hinweis" regel="Gremienweg" ist="via SNS-VR" wer="Gate P1–P2" vorschlag="Plane die Vorlage an den SNS-VR ein." />
         <Regelmeldung stufe="warnung" regel="Unterlagen" ist="Versand 3" grenze="mindestens 5 Arbeitstage vor der Sitzung" wer="PRAT Mi 12.11."
-          vorschlag="Verschieben Sie das Traktandum oder versenden Sie mit Vermerk." quelle="PM-Handbuch Kapitel 8.1" />
+          vorschlag="Verschiebe das Traktandum oder versende mit Vermerk." quelle="PM-Handbuch Kapitel 8.1" />
         <Regelmeldung stufe="sperre" regel="Kapazität Q2 2027" ist="7,5 FTE Projektleitung" grenze="höchstens 5,0"
-          vorschlag="Verschieben Sie den Start eines der 3 betroffenen Projekte." aktion={<button type="button" className="btn sm">Projekte ansehen</button>} />
+          vorschlag="Verschiebe den Start eines der 3 betroffenen Projekte." aktion={<button type="button" className="btn sm">Projekte ansehen</button>} />
         <Hinweis stufe="hinweis">Freier Hinweis ohne Regel, z. B. für die Abweichung zur Baseline im Entwurf.</Hinweis>
 
         <h2>Datenliste mit Projekten</h2>
@@ -96,7 +96,7 @@ export function Galerie() {
         </div>
         <ProjektListe titel="Projekte" heute={HEUTE} zeilen={zustand === 'leer' || zustand === 'gefiltert' ? [] : PROJEKTE}
           laedt={zustand === 'laden'} fehler={zustand === 'fehler' ? new Error('Die Projekte konnten nicht geladen werden.') : undefined} erneut={() => setZustand('daten')}
-          leer="Noch keine Projekte. Erfassen Sie die laufenden Projekte, damit das Dashboard sie zeigt." leerAktion={<button type="button" className="btn primary">Projekt erfassen</button>}
+          leer="Noch keine Projekte. Erfasse die laufenden Projekte, damit das Dashboard sie zeigt." leerAktion={<button type="button" className="btn primary">Projekt erfassen</button>}
           gefiltert={zustand === 'gefiltert'} zuruecksetzen={() => setZustand('daten')}
           teilweise={zustand === 'teilweise' ? 'Status der Vorperiode wird berechnet …' : undefined}
           oeffnen={p => setOffen(p.nummer)} aktuell={offen} name={p => p.name} />

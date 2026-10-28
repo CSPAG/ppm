@@ -52,7 +52,7 @@ async function laden(tx: Tx, id: string, version: number, staende: readonly Stan
 async function beginnen(tx: Tx, r: store.Row): Promise<void> {
   if (r.stand !== 'eingereicht') return;
   await ps.setzen(tx, r.id, { stand: 'in_pruefung' });
-  await mitteilung.senden(tx, { an: r.erfasst_von, bezug: { typ: 'idee', id: r.id }, text: `Ihre Projektidee «${titelVon(r)}» ist in Prüfung bei der Unternehmensentwicklung.`, link: link(r.nummer) });
+  await mitteilung.senden(tx, { an: r.erfasst_von, bezug: { typ: 'idee', id: r.id }, text: `Deine Projektidee «${titelVon(r)}» ist in Prüfung bei der Unternehmensentwicklung.`, link: link(r.nummer) });
 }
 
 async function pruefungOut(req: FastifyRequest, tx: Tx, r: store.Row): Promise<PruefungOut> {
@@ -205,7 +205,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
       const portfolio = body.portfolioId ? portfolios.find(p => p.id === body.portfolioId) : portfolios.length === 1 ? portfolios[0] : undefined;
       if (!portfolio) {
         throw invalid('Das Portfolio der Kategorie ist nicht eindeutig.', [{
-          path: '/portfolioId', message: portfolios.length ? 'Wählen Sie das Portfolio (bei Kategorie C die Direktion).' : `Es gibt noch kein Portfolio der Kategorie ${body.kategorie}. Die UE erfasst es unter Administration › Portfolios.`,
+          path: '/portfolioId', message: portfolios.length ? 'Wähle das Portfolio (bei Kategorie C die Direktion).' : `Es gibt noch kein Portfolio der Kategorie ${body.kategorie}. Die UE erfasst es unter Administration › Portfolios.`,
         }]);
       }
       await ps.setzen(tx, id, { kategorie: body.kategorie, portfolio_id: portfolio.id, kategorie_begruendung: (body.begruendung ?? '').trim() });
@@ -216,7 +216,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
   });
 
   app.post('/v1/ideen/:id/rueckfragen', {
-    schema: { tags: [TAG], summary: 'Rückfrage stellen', description: 'Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu Ihrer Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.', params: IdParams, headers: Type.Composite([IfMatchHeaders, IdempotencyHeaders]), body: Type.Ref('IdeeRueckfragenIn'), response: { 200: Type.Ref('IdeePruefung') } },
+    schema: { tags: [TAG], summary: 'Rückfrage stellen', description: 'Rückfragen je Feld der Idee (UC-001 A2.1): Stand «in Ergänzung», Antragstellende erhalten «Rückfragen zu deiner Idee beantworten»; die Prüfaufgabe entfällt bis zum erneuten Einreichen. Nur mit `If-Match`.', params: IdParams, headers: Type.Composite([IfMatchHeaders, IdempotencyHeaders]), body: Type.Ref('IdeeRueckfragenIn'), response: { 200: Type.Ref('IdeePruefung') } },
   }, async (req, reply) => {
     const { id } = req.params as { id: string };
     const version = requireIfMatch(req);
@@ -230,7 +230,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
       await aufgabe.entfallen(tx, { art: 'idee.pruefen', bezug: { typ: 'idee', id } });
       await aufgabe.oeffnen(tx, {
         art: 'idee.ergaenzen', bezug: { typ: 'idee', id }, empfaenger: { person: r.erfasst_von },
-        titel: `Rückfragen zu Ihrer Idee beantworten · ${titelVon(r)}`, kontext: `Idee ${r.nummer}`, link: link(r.nummer),
+        titel: `Rückfragen zu deiner Idee beantworten · ${titelVon(r)}`, kontext: `Idee ${r.nummer}`, link: link(r.nummer),
       });
       await record(tx, who, { action: 'idee.questioned', resourceType: 'idee', resourceId: id, data: { ...snap(r), fragen: body.fragen }, event: { ...snap(r), stand: 'in_ergaenzung' } });
       return antwort(req, reply, tx, id);
@@ -252,7 +252,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
       await ps.setzen(tx, id, { stand: 'zurueckgewiesen', begruendung });
       await aufgabe.erledigen(tx, { art: 'idee.pruefen', bezug: { typ: 'idee', id } });
       await aufgabe.entfallen(tx, { art: 'idee.ergaenzen', bezug: { typ: 'idee', id } });
-      await mitteilung.senden(tx, { an: r.erfasst_von, bezug: { typ: 'idee', id }, text: `Ihre Projektidee «${titelVon(r)}» wird nicht weiterverfolgt. Die Begründung steht bei der Idee.`, link: link(r.nummer) });
+      await mitteilung.senden(tx, { an: r.erfasst_von, bezug: { typ: 'idee', id }, text: `Deine Projektidee «${titelVon(r)}» wird nicht weiterverfolgt. Die Begründung steht bei der Idee.`, link: link(r.nummer) });
       const portfolioId = (await ps.pruefAngaben(tx, id))!.portfolio_id;
       if (portfolioId) {
         for (const p of await ps.gremiumsmitglieder(ctx, portfolioId)) {
@@ -271,7 +271,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     const version = requireIfMatch(req);
     await req.need('idee:write');
     const { fuehrendeIdeeId } = req.body as { fuehrendeIdeeId: string };
-    if (fuehrendeIdeeId === id) throw invalid('Eine Idee lässt sich nicht mit sich selbst zusammenführen.', [{ path: '/fuehrendeIdeeId', message: 'Wählen Sie eine andere Idee.' }]);
+    if (fuehrendeIdeeId === id) throw invalid('Eine Idee lässt sich nicht mit sich selbst zusammenführen.', [{ path: '/fuehrendeIdeeId', message: 'Wähle eine andere Idee.' }]);
     const who = actorOf(req);
     return req.tx(async tx => {
       const r = await laden(tx, id, version, ABSCHLIESSBAR);

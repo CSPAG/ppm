@@ -1,5 +1,5 @@
 /**
- * Texte des Zielzyklus (UI-38, Kernablauf K6; Namensraum des Features «Ziele», eigene Datei von AP-E6-1): Anrede «Sie»
+ * Texte des Zielzyklus (UI-38, Kernablauf K6; Namensraum des Features «Ziele», eigene Datei von AP-E6-1): Anrede «Du»
  * (UX-E7), Schweizer Rechtschreibung, Ebenen aus dem Glossar («Handlungsfeld», «Strategisches Ziel», «Jahresziel»,
  * «Hauptaktivität», «Projekt»), Schaltflächen aus K6 «Texte».
  */
@@ -22,7 +22,7 @@ export const TZZ = {
   ohneHandlungsfeld: 'Handlungsfeld nicht sichtbar',
   // Zustände
   leerTitel: (jahr: number) => `Zielzyklus ${jahr} ist noch nicht gestartet.`,
-  leer: 'Starten Sie den Zielzyklus, um je strategischem Ziel die Jahresziele abzuleiten.',
+  leer: 'Starte den Zielzyklus, um je strategischem Ziel die Jahresziele abzuleiten.',
   leerNurLesen: 'Die Geschäftsleitung startet den Zielzyklus und leitet die Jahresziele ab.',
   starten: 'Zielzyklus starten',
   gestartet: (jahr: number) => `Zielzyklus ${jahr} gestartet.`,
@@ -30,13 +30,13 @@ export const TZZ = {
   zuStrategischenZielen: 'Zu den strategischen Zielen',
   zurFreigabe: (jahr: number, seit: string | null) => `Jahresziele ${jahr} liegen dem VR zur Freigabe vor${seit ? ` (seit ${fmtDatum(seit)})` : ''}. Ändern erst nach dem Entscheid.`,
   inKraft: (jahr: number, seit: string | null) => `Jahresziele ${jahr} in Kraft${seit ? ` seit ${fmtDatum(seit)}` : ''}.`,
-  nurLesen: 'Sie können die Ziele nur ansehen. Jahresziele pflegt die Geschäftsleitung.',
-  waehlen: 'Wählen Sie links ein strategisches Ziel oder ein Jahresziel.',
-  nichtGefunden: 'Dieses Ziel gibt es im Zielzyklus nicht, oder Sie sehen es nicht.',
+  nurLesen: 'Du kannst die Ziele nur ansehen. Jahresziele pflegt die Geschäftsleitung.',
+  waehlen: 'Wähle links ein strategisches Ziel oder ein Jahresziel.',
+  nichtGefunden: 'Dieses Ziel gibt es im Zielzyklus nicht, oder du siehst es nicht.',
   // Prüfbericht (K6 Regeln)
   pruefbericht: 'Prüfbericht',
   pruefungOk: 'Alle Jahresziele haben Metrik und Zielwert und eine Hauptaktivität oder ein Projekt.',
-  ohneMetrik: (n: number, nummern: string[]) => `Metrik fehlt: ${n === 1 ? '1 Jahresziel hat' : `${n} Jahresziele haben`} keine Metrik oder keinen Zielwert (${nummern.join(', ')}). Ergänzen Sie Metrik und Zielwert.`,
+  ohneMetrik: (n: number, nummern: string[]) => `Metrik fehlt: ${n === 1 ? '1 Jahresziel hat' : `${n} Jahresziele haben`} keine Metrik oder keinen Zielwert (${nummern.join(', ')}). Ergänze Metrik und Zielwert.`,
   ohneUmsetzung: (nummer: string) => `Jahresziel ${nummer} hat noch keine Hauptaktivität und kein Projekt.`,
   springen: (nummer: string) => `Zu Jahresziel ${nummer}`,
   metrikFehlt: 'Metrik fehlt',
@@ -44,7 +44,7 @@ export const TZZ = {
   text: 'Ziel', metrik: 'Metrik', zielwert: 'Zielwert', nummer: 'Nummer',
   metrikHint: 'Woran die Erreichung gemessen wird, z. B. «Anteil Eintritte mit Online-Anmeldung».',
   zielwertHint: 'Angestrebter Wert der Metrik für das Jahr, z. B. «≥ 60 %».',
-  textMissing: 'Formulieren Sie das Jahresziel.',
+  textMissing: 'Formuliere das Jahresziel.',
   gespeichert: 'Gespeichert',
   speichert: 'Wird gespeichert …',
   // Aktionen (K6 Texte)
@@ -72,7 +72,7 @@ export const TZZ = {
   zuordnungGeloest: (nr: string) => `Zuordnung von ${nr} gelöst.`,
   projektOeffnen: (nr: string, name: string) => `Projekt ${nr} ${name} öffnen`,
   projektideeAnstossen: 'Projektidee anstossen',
-  konflikt: 'Dieses Ziel wurde inzwischen geändert. Laden Sie den Zielzyklus neu; Ihre Eingabe bleibt im Feld.',
+  konflikt: 'Dieses Ziel wurde inzwischen geändert. Lade den Zielzyklus neu; deine Eingabe bleibt im Feld.',
   neuLaden: 'Neu laden',
   hinzufuegen: 'Hinzufügen',
   abbrechen: 'Abbrechen',

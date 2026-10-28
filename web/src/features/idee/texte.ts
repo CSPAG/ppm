@@ -1,13 +1,13 @@
 /**
- * Texte des Features «Ideen» (Namensraum je Feature, docs/fachmodell.md 7.2) nach Kernablauf K4: Anrede «Sie» (UX-E7),
+ * Texte des Features «Ideen» (Namensraum je Feature, docs/fachmodell.md 7.2) nach Kernablauf K4: Anrede «Du» (UX-E7),
  * Schweizer Rechtschreibung, Status für Antragstellende in Klartext, Sperren nach I-P2 (was fehlt, warum, was tun).
  */
 export const TI = {
   bereich: 'Ideen',
   titel: 'Meine Ideen',
-  sub: 'Ihre Projektideen und wo sie stehen. Die Unternehmensentwicklung prüft jede eingereichte Idee.',
+  sub: 'Deine Projektideen und wo sie stehen. Die Unternehmensentwicklung prüft jede eingereichte Idee.',
   einreichen: 'Projektidee einreichen',
-  leer: 'Sie haben noch keine Idee eingereicht. Ideen für Projekte nimmt die Unternehmensentwicklung jederzeit entgegen.',
+  leer: 'Du hast noch keine Idee eingereicht. Ideen für Projekte nimmt die Unternehmensentwicklung jederzeit entgegen.',
   spalten: { nummer: 'Nr.', titel: 'Idee', stand: 'Stand', geaendert: 'Zuletzt' },
   ohneTitel: 'Idee ohne Titel',
   weiter: 'Weiter bearbeiten',
@@ -30,7 +30,7 @@ export const TI = {
   weiterSchritt: 'Weiter',
   gespeichert: 'Entwurf gespeichert',
   speichert: 'wird gespeichert …',
-  nichtGespeichert: 'Entwurf nicht gespeichert. Ihre Eingaben bleiben hier; versuchen Sie es erneut.',
+  nichtGespeichert: 'Entwurf nicht gespeichert. Deine Eingaben bleiben hier; versuche es erneut.',
   erneutSpeichern: 'Erneut speichern',
   verwerfen: 'Entwurf verwerfen',
   verwerfenFrage: (titel: string) => `Entwurf «${titel}» verwerfen? Die Angaben gehen verloren.`,
@@ -38,7 +38,7 @@ export const TI = {
   optional: 'optional',
 
   // Entwurf anbieten (K4 Abnahme: abgebrochener Assistent bietet den Entwurf an)
-  entwurfVorhanden: 'Sie haben einen Entwurf, den Sie noch nicht eingereicht haben.',
+  entwurfVorhanden: 'Du hast einen Entwurf, den du noch nicht eingereicht hast.',
   entwurfFortsetzen: 'Entwurf fortsetzen',
   neuBeginnen: 'Neue Idee beginnen',
 
@@ -57,7 +57,7 @@ export const TI = {
   zielHilfe: 'Auf welches Ziel des Handlungsfelds zahlt die Idee ein?',
   keinZiel: 'Kein bestimmtes Ziel',
   keineZiele: 'Zu diesem Handlungsfeld sind keine strategischen Ziele erfasst.',
-  keineHandlungsfelder: 'Es sind noch keine Handlungsfelder erfasst. Speichern Sie Ihren Entwurf; einreichen können Sie, sobald die Unternehmensentwicklung die Handlungsfelder erfasst hat.',
+  keineHandlungsfelder: 'Es sind noch keine Handlungsfelder erfasst. Speichere deinen Entwurf; einreichen kannst du, sobald die Unternehmensentwicklung die Handlungsfelder erfasst hat.',
   bereiche: 'Betroffene Bereiche',
   bereicheHilfe: 'Welche Bereiche der Organisation sind betroffen? Mehrfachauswahl.',
   keineBereiche: 'Es sind noch keine Bereiche erfasst.',
@@ -67,14 +67,14 @@ export const TI = {
   // Schritt 3
   stufen: { hoch: 'hoch', mittel: 'mittel', tief: 'tief' } as Record<string, string>,
   nutzen: 'Nutzen', nutzenHilfe: 'Wie gross ist der Nutzen für Patientinnen, Patienten, Mitarbeitende oder die Organisation?',
-  aufwand: 'Aufwand', aufwandHilfe: 'Wie viel Aufwand erwarten Sie, grob geschätzt?',
+  aufwand: 'Aufwand', aufwandHilfe: 'Wie viel Aufwand erwartest du, grob geschätzt?',
   relevanz: 'Relevanz', relevanzHilfe: 'Wie wichtig ist die Idee für die Strategie und den Betrieb?',
   begruendung: 'Begründung in einem Satz',
 
   // Schritt 4
-  zusammenfassung: 'Prüfen Sie Ihre Angaben, bevor Sie die Idee einreichen.',
-  wirkung: 'Die Unternehmensentwicklung erhält Ihre Idee zur Prüfung. Sie sehen den Stand jederzeit unter «Meine Ideen».',
-  wirkungErneut: 'Die Unternehmensentwicklung erhält Ihre Ergänzungen und prüft die Idee erneut. Sie sehen den Stand jederzeit unter «Meine Ideen».',
+  zusammenfassung: 'Prüfe deine Angaben, bevor du die Idee einreichst.',
+  wirkung: 'Die Unternehmensentwicklung erhält deine Idee zur Prüfung. Du siehst den Stand jederzeit unter «Meine Ideen».',
+  wirkungErneut: 'Die Unternehmensentwicklung erhält deine Ergänzungen und prüft die Idee erneut. Du siehst den Stand jederzeit unter «Meine Ideen».',
   aendern: 'Ändern',
   leerWert: 'nicht angegeben',
   erneutEinreichen: 'Erneut einreichen',
@@ -82,29 +82,29 @@ export const TI = {
   zuSchritt: (n: number) => `Zu Schritt ${n}`,
 
   // Bestätigung
-  eingereicht: 'Ihre Idee ist eingereicht.',
-  bestaetigung: 'Ihre Idee ist eingereicht. Die Unternehmensentwicklung prüft sie und meldet sich bei Rückfragen. Den Stand sehen Sie unter «Meine Ideen».',
+  eingereicht: 'Deine Idee ist eingereicht.',
+  bestaetigung: 'Deine Idee ist eingereicht. Die Unternehmensentwicklung prüft sie und meldet sich bei Rückfragen. Den Stand siehst du unter «Meine Ideen».',
   zuMeinenIdeen: 'Zu «Meine Ideen»',
   weitereIdee: 'Weitere Idee einreichen',
 
   // Rückfragen (UC-001 A2.2)
   rueckfragenTitel: 'Rückfragen der Unternehmensentwicklung',
-  rueckfragenBanner: (n: number) => `Die Unternehmensentwicklung hat ${n === 1 ? 'eine Rückfrage' : `${n} Rückfragen`} zu Ihrer Idee. Ergänzen Sie die Angaben und reichen Sie die Idee erneut ein.`,
+  rueckfragenBanner: (n: number) => `Die Unternehmensentwicklung hat ${n === 1 ? 'eine Rückfrage' : `${n} Rückfragen`} zu deiner Idee. Ergänze die Angaben und reiche die Idee erneut ein.`,
   rueckfrage: 'Rückfrage',
-  antwort: 'Ihre Antwort',
+  antwort: 'Deine Antwort',
   antwortGespeichert: 'Antwort gespeichert.',
   beantwortet: 'beantwortet',
   allgemein: 'Zur Idee allgemein',
 
   // Ansicht (Z8 nur lesen)
-  nurLesen: 'Die Idee ist eingereicht. Ändern können Sie sie, wenn die Unternehmensentwicklung Rückfragen stellt.',
+  nurLesen: 'Die Idee ist eingereicht. Ändern kannst du sie, wenn die Unternehmensentwicklung Rückfragen stellt.',
   zusammengefuehrt: 'Diese Idee wurde mit einer anderen Idee zusammengeführt und wird dort weiterverfolgt.',
   zurueckgewiesen: 'Die Unternehmensentwicklung verfolgt diese Idee nicht weiter.',
   begruendungZurueckweisung: 'Begründung',
   eingereichtAm: 'Eingereicht',
-  nichtGefunden: 'Diese Idee gibt es nicht, oder Sie sehen sie nicht.',
+  nichtGefunden: 'Diese Idee gibt es nicht, oder du siehst sie nicht.',
   zurListe: 'Zu «Meine Ideen»',
-  konflikt: 'Die Idee wurde inzwischen an anderer Stelle geändert, zum Beispiel in einem zweiten Fenster. Laden Sie sie neu und übernehmen Sie Ihre letzten Änderungen danach nochmals.',
+  konflikt: 'Die Idee wurde inzwischen an anderer Stelle geändert, zum Beispiel in einem zweiten Fenster. Lade sie neu und übernimm deine letzten Änderungen danach nochmals.',
   neuLaden: 'Neu laden',
 
   // Kopfkarte im Eingang
@@ -113,16 +113,16 @@ export const TI = {
   kopfErgaenzung: (n: number) => `${n} in Ergänzung`,
   kopfLaufend: (n: number) => `${n} in Bearbeitung`,
   kopfZuPruefen: (n: number) => `${n} zu prüfen`,
-  kopfLeer: 'Haben Sie eine Idee für ein Projekt?',
+  kopfLeer: 'Hast du eine Idee für ein Projekt?',
 };
 
 /** Pflichtfelder je Schritt mit Text der Sperre (K4 «Regeln und Rückmeldungen»; verbindlich prüft der Server, I-P6). */
 export const PFLICHT = {
-  titel: 'Titel fehlt: Geben Sie der Idee einen kurzen Namen, unter dem sie im Ideenpool erscheint.',
-  ausgangslage: 'Ausgangslage fehlt: Beschreiben Sie, was heute ist und was daran stört.',
-  zielsetzung: 'Zielsetzung fehlt: Ohne Ziel kann die Unternehmensentwicklung die Idee nicht einordnen. Beschreiben Sie in zwei, drei Sätzen, was erreicht werden soll.',
-  handlungsfeldId: 'Handlungsfeld fehlt: Wählen Sie das Handlungsfeld, zu dem die Idee am besten passt.',
-  nutzen: 'Nutzen fehlt: Schätzen Sie den Nutzen als hoch, mittel oder tief ein.',
-  aufwand: 'Aufwand fehlt: Schätzen Sie den Aufwand als hoch, mittel oder tief ein.',
-  relevanz: 'Relevanz fehlt: Schätzen Sie die Relevanz als hoch, mittel oder tief ein.',
+  titel: 'Titel fehlt: Gib der Idee einen kurzen Namen, unter dem sie im Ideenpool erscheint.',
+  ausgangslage: 'Ausgangslage fehlt: Beschreibe, was heute ist und was daran stört.',
+  zielsetzung: 'Zielsetzung fehlt: Ohne Ziel kann die Unternehmensentwicklung die Idee nicht einordnen. Beschreibe in zwei, drei Sätzen, was erreicht werden soll.',
+  handlungsfeldId: 'Handlungsfeld fehlt: Wähle das Handlungsfeld, zu dem die Idee am besten passt.',
+  nutzen: 'Nutzen fehlt: Schätze den Nutzen als hoch, mittel oder tief ein.',
+  aufwand: 'Aufwand fehlt: Schätze den Aufwand als hoch, mittel oder tief ein.',
+  relevanz: 'Relevanz fehlt: Schätze die Relevanz als hoch, mittel oder tief ein.',
 } as const;

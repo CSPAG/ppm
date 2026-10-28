@@ -1,5 +1,5 @@
 /**
- * Texte der Register in der Projektübersicht (AP-E0-6, Namensraum des Features «Projekte»): Anrede «Sie», Schweizer
+ * Texte der Register in der Projektübersicht (AP-E0-6, Namensraum des Features «Projekte»): Anrede «Du», Schweizer
  * Rechtschreibung, Begriffe nach docs/ux/darstellung.md und der Vorlage Projektvertrag (Q7).
  */
 type Stufe = 'hoch' | 'mittel' | 'tief';
@@ -41,7 +41,7 @@ export const TR = {
     leer: 'Keine Abhängigkeiten zu anderen Projekten erfasst.',
     ausgehend: 'Dieses Projekt hängt ab von',
     eingehend: 'Von diesem Projekt hängt ab',
-    unsichtbar: 'ein Projekt, das Sie nicht sehen',
+    unsichtbar: 'ein Projekt, das du nicht siehst',
     ansprechperson: (p: string) => `Ansprechperson: ${p}`,
   },
   weitere: {

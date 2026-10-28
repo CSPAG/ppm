@@ -123,7 +123,7 @@ describe('Ideenpool und Prüfung', { skip }, () => {
 
   test('Rückfrage: «in Ergänzung», Aufgabe an die antragstellende Person, Prüfaufgabe entfällt', async () => {
     const i = await eingereicht(as1, 'Rückfrage');
-    const r = await call('POST', `/v1/ideen/${i.id}/rueckfragen`, mit(ue, i.etag), { fragen: [{ feld: 'zielsetzung', text: 'Woran messen Sie den Erfolg?' }] });
+    const r = await call('POST', `/v1/ideen/${i.id}/rueckfragen`, mit(ue, i.etag), { fragen: [{ feld: 'zielsetzung', text: 'Woran misst du den Erfolg?' }] });
     assert.equal(r.statusCode, 200, r.body);
     assert.equal(r.json().can.pruefen, false);
     const g = (await call('GET', `/v1/ideen/${i.id}`, as1)).json();

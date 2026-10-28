@@ -24,7 +24,7 @@ export function pruefe(d: Dokument): Pruefpunkt[] {
     if (fehlend.length) {
       out.push({
         stufe: 'warnung', regel: 'leitfragen_je_wertestrom', ort: { art: 'gate', code: g.code },
-        text: `Leitfragen je Wertestrom: ${g.name} hat keine Leitfrage für ${fehlend.join(', ')}. Ergänzen Sie sie, sonst fehlen sie im Gate-Antrag.`,
+        text: `Leitfragen je Wertestrom: ${g.name} hat keine Leitfrage für ${fehlend.join(', ')}. Ergänze sie, sonst fehlen sie im Gate-Antrag.`,
       });
     }
   }
@@ -41,7 +41,7 @@ export function pruefe(d: Dokument): Pruefpunkt[] {
   if (aufgabe && stichtag && aufgabe.wert >= stichtag.wert) {
     out.push({
       stufe: 'warnung', regel: 'bericht_aufgabe_vor_stichtag', ort: { art: 'frist', code: 'bericht_aufgabe' },
-      text: `Berichtsaufgabe: am ${aufgabe.wert}. statt vor dem Stichtag am ${stichtag.wert}. Setzen Sie die Aufgabe einige Tage vor den Stichtag.`,
+      text: `Berichtsaufgabe: am ${aufgabe.wert}. statt vor dem Stichtag am ${stichtag.wert}. Setze die Aufgabe einige Tage vor den Stichtag.`,
     });
   }
   for (const t of d.toleranzen) {

@@ -136,11 +136,13 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
       description: 'Posteingang der Unternehmensentwicklung (UC-005 Schritt 1, K1): je berichtspflichtigem Projekt Stand (eingereicht, zurückgegeben, geprüft, ausstehend; nach dem Abschluss geprüft oder nicht gemeldet), Status und Trend mit Vorperiode und Auffälligkeiten (Schritt 2). Standardsortierung «auffällig zuerst» (I-L5). Der Kopf zählt alle Projekte unabhängig vom Filter und zeigt die Wirkung des Abschlusses (I-R1). Recht `statusbericht:review` an der Organisation bzw. mit `portfolio` am Portfolio.',
       params: PeriodeParams, querystring: PeriodeQuery, response: { 200: Type.Ref('PeriodeUebersicht') },
     },
-  }, async req => {
+  }, async (req, reply) => {
     const { periode } = req.params as { periode: string };
     const q = req.query as PeriodeQueryIn;
     await req.need(REVIEW, q.portfolio ? { type: 'portfolio', id: q.portfolio } : undefined);
     const u = await req.tx(tx => uebersicht(tx, periode, rechteVon(req)));
+    // Version der Periode für `If-Match` beim Abschluss (wie die Antwort des Abschlusses)
+    reply.header('etag', etag(u.kopf.version));
     const alle = filtern(u.items, q);
     const start = decodeCursor<{ o: number }>(q.cursor, v => Number.isInteger(v.o) && (v.o as number) >= 0)?.o ?? 0;
     const limit = q.limit ?? 500;

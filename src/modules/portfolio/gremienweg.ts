@@ -35,8 +35,9 @@ export function schritte(weg: readonly store.GremienwegRow[], gremien: readonly 
 
 /** Gremienweg eines Portfolios für alle eingetragenen Gates (Lesesicht der aufrufenden Person). */
 export async function gremienwegVon(tx: Tx, portfolioId: string): Promise<Gremienschritt[]> {
-  const [weg, gremien] = await Promise.all([store.gremienweg(tx, portfolioId), store.listGremien(tx, { portfolioId })]);
-  return schritte(weg, gremien);
+  // nacheinander: eine Transaktion, eine Verbindung
+  const weg = await store.gremienweg(tx, portfolioId);
+  return schritte(weg, await store.listGremien(tx, { portfolioId }));
 }
 
 /** Gremienweg für ein Gate; null, wenn für das Gate kein Gremium eingetragen ist (z. B. Portfolio C ohne Pflicht-Gates, A-08). */

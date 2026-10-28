@@ -11,7 +11,7 @@ import {
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import {
-  aufnehmen, bezugVon, einplanen, entfernen, istFest, pruefeReihenfolge, pruefeVorbereitung, sitzungAnlegen, unterlagenstand, verschieben, versandfrist,
+  type TraktandumStandUnterlagen, aufnehmen, bezugVon, einplanen, entfernen, istFest, pruefeReihenfolge, pruefeVorbereitung, sitzungAnlegen, unterlagenstand, verschieben, versandfrist,
   versandvorschau, versenden, zeitfenster,
 } from './aktionen.ts';
 import { ARTEN, artLabel, type Art } from './arten.ts';
@@ -53,12 +53,15 @@ async function sitzungOut(req: FastifyRequest, tx: Tx, s: store.SitzungRow): Pro
   const ts = await store.traktanden(tx, s.id);
   const stand = await unterlagenstand(tx, s, ts);
   const zeit = zeitfenster(s, ts);
+  // nacheinander: eine Transaktion, eine Verbindung
+  const traktanden = [];
+  for (const t of ts) traktanden.push(await traktandumOut(tx, t, { stand, zeit }));
   return {
     id: s.id, gremium: { id: s.gremium_id, kuerzel: s.gremium_kuerzel, name: s.gremium_name }, portfolioId: s.portfolio_id,
     datum: s.datum, beginn: s.beginn, dauerMin: s.dauer_min, ort: s.ort, stand: s.stand, versendetAt: s.versendet_at, versandVorlauf: s.versand_vorlauf,
     frist: await versandfrist(tx, s),
     zeitbedarfMin: ts.reduce((n, t) => n + (t.dauer_min ?? 0), 0),
-    traktanden: await Promise.all(ts.map(t => traktandumOut(tx, t, { stand, zeit }))),
+    traktanden,
     version: s.version, createdAt: s.created_at, updatedAt: s.updated_at,
     can: { write: await kannSchreiben(req, s) },
   };
@@ -201,14 +204,19 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     schema: { tags: [TAG], summary: 'Kopf im Eingang', description: 'Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).', response: { 200: Type.Ref('SitzungKopf') } },
   }, async req => {
     await req.needSomewhere('sitzung:read');
-    const items = await req.tx(async tx => Promise.all((await store.naechsteSitzungen(tx, heute(), 5)).map(async s => {
-      const stand = await unterlagenstand(tx, s, await store.traktanden(tx, s.id));
-      return {
-        id: s.id, gremium: { id: s.gremium_id, kuerzel: s.gremium_kuerzel, name: s.gremium_name }, datum: s.datum, stand: s.stand,
-        traktanden: s.traktanden, versandBis: (await versandfrist(tx, s)).bis,
-        unterlagenBereit: [...stand.values()].filter(u => u.stand === 'bereit' || u.stand === 'keine').length,
-      };
-    })));
+    const items = await req.tx(async tx => {
+      // nacheinander: eine Transaktion, eine Verbindung
+      const out = [];
+      for (const s of await store.naechsteSitzungen(tx, heute(), 5)) {
+        const stand = await unterlagenstand(tx, s, await store.traktanden(tx, s.id));
+        out.push({
+          id: s.id, gremium: { id: s.gremium_id, kuerzel: s.gremium_kuerzel, name: s.gremium_name }, datum: s.datum, stand: s.stand,
+          traktanden: s.traktanden, versandBis: (await versandfrist(tx, s)).bis,
+          unterlagenBereit: [...stand.values()].filter(u => u.stand === 'bereit' || u.stand === 'keine').length,
+        });
+      }
+      return out;
+    });
     return { sitzungen: items };
   });
 
@@ -254,8 +262,11 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       const s = await lesen(tx, id);
       await req.need('sitzung:write', ort(s.portfolio_id));
       const vs = await store.vorschlaege(tx, s);
-      const stand = new Map((await Promise.all(vs.map(async t => [t.id, (await unterlagenstand(tx, { ...s, versendet_at: null }, [t])).get(t.id)!] as const))));
-      const out = await Promise.all(vs.map(t => traktandumOut(tx, t, { stand })));
+      // nacheinander: eine Transaktion, eine Verbindung
+      const stand = new Map<string, TraktandumStandUnterlagen>();
+      for (const t of vs) stand.set(t.id, (await unterlagenstand(tx, { ...s, versendet_at: null }, [t])).get(t.id)!);
+      const out: TraktandumOut[] = [];
+      for (const t of vs) out.push(await traktandumOut(tx, t, { stand }));
       return {
         gruppen: ARTEN.flatMap(art => {
           const ts = out.filter(t => t.art === art).sort((a, b) => Number(!a.verschobenVon) - Number(!b.verschobenVon));
@@ -448,7 +459,8 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (t.version !== version) throw preconditionFailed(t.version);
       pruefeVorbereitung(s);
       if (t.stand !== 'traktandiert') throw conflict('Eingeladen wird nur zu traktandierten Geschäften.');
-      const unbekannt = (await Promise.all(body.einladungen.map(async (e, i) => (await store.personBekannt(tx, e.personId)) ? null : i))).filter(i => i !== null);
+      const unbekannt: number[] = [];
+      for (const [i, e] of body.einladungen.entries()) if (!(await store.personBekannt(tx, e.personId))) unbekannt.push(i);
       if (unbekannt.length) throw invalid('Nicht jede Person gehört zur Organisation.', unbekannt.map(i => ({ path: `/einladungen/${i}/personId`, message: 'unbekannte Person' })));
       const vorher = await store.einladungen(tx, { traktandumId: id });
       await store.einladungenSetzen(tx, { id, sitzung_id: s.id, portfolio_id: t.portfolio_id }, body.einladungen);

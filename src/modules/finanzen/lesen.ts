@@ -45,7 +45,11 @@ export const positionen = async (tx: Tx, projektId: string): Promise<Position[]>
 /** Finanzen der Projekte unter der Lesesicht von `tx`; `voll` (volle Sicht) liest die gültige Toleranz. */
 export async function finanzen(tx: Tx, projekte: readonly store.ProjektRow[], voll: Tx = tx): Promise<ProjektFinanzen[]> {
   const ids = projekte.map(p => p.id);
-  const [kt, ist, begr, tol] = await Promise.all([store.kostentraeger(tx, ids), store.ist(tx, ids), store.begruendungen(tx, ids), toleranzen(voll, ids)]);
+  // nacheinander: eine Transaktion, eine Verbindung
+  const kt = await store.kostentraeger(tx, ids);
+  const ist = await store.ist(tx, ids);
+  const begr = await store.begruendungen(tx, ids);
+  const tol = await toleranzen(voll, ids);
   const out: ProjektFinanzen[] = [];
   for (const p of projekte) {
     const ps = await positionen(tx, p.id);

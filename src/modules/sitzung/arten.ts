@@ -4,7 +4,7 @@
  * Die Art liefert Titel und Antrag, den Stand der Unterlagen (UC-006 Schritt 3), den Zeitbedarf und die Ergebnisse des
  * Entscheids; `beiEntscheid` läuft in der Transaktion des Entscheids (AP-E2-2, UX-Rückfluss UC-006 7–8).
  */
-import type { Tx } from '@vollholz/platform';
+import type { Actor, Db, Deps, Tx } from '@vollholz/platform';
 
 /** Arten aus fachmodell.md 2.9 (CHECK in 130_sitzung.sql). */
 export const ARTEN = ['portfoliobericht', 'gate', 'aenderung', 'meilenstein', 'eskalation', 'idee', 'priorisierung',
@@ -50,6 +50,24 @@ export interface Ergebnis { schluessel: string; label: string }
 
 /** Entscheid, wie ihn AP-E2-2 an `beiEntscheid` übergibt. */
 export interface EntscheidFolge { traktandumId: string; bezug: Bezug; ergebnis: string; begruendung: string; viaSns: boolean }
+/**
+ * Kontext der Folge (dritter Parameter von `beiEntscheid`, abwärtskompatibel ergänzt): wer entscheidet, in welcher
+ * Sitzung, was vorher galt, und Zugang zu Datenbank und Tupeln wie `deps` beim Registrieren. Die Sitzung übergibt ihn
+ * immer; direkte Aufrufe (z. B. in Tests) dürfen ihn weglassen.
+ */
+export interface FolgeKontext {
+  /** Person, die den Entscheid erfasst (UE; auch den Entscheid des SNS-VR, A-02) – Akteur für Audit und Aufgaben */
+  akteur: Actor;
+  /** ID dieser Person (z. B. «erstellt von» eines neuen Projekts) */
+  principalId: string;
+  sitzungId: string;
+  traktandumId: string;
+  /** Korrektur in der laufenden Sitzung (A-30): das zuvor erfasste Ergebnis; sonst null (auch beim SNS-VR) */
+  vorher: { ergebnis: string; begruendung: string } | null;
+  /** Datenbank (z. B. Nummernkreis ausserhalb der Transaktion) und Tupel (Rollen am Projekt), wie `deps` */
+  db: Db;
+  tuples: Deps['iam']['tuples'];
+}
 
 export interface Traktandenart {
   art: Art;
@@ -65,8 +83,8 @@ export interface Traktandenart {
   unterlagen?(tx: Tx, bezug: Bezug): Promise<Unterlage[]>;
   /** Ergebnisse des Entscheids (AP-E2-2) */
   ergebnisse: readonly Ergebnis[];
-  /** Folge des Entscheids in derselben Transaktion (AP-E2-2) */
-  beiEntscheid?(tx: Tx, e: EntscheidFolge): Promise<void>;
+  /** Folge des Entscheids in derselben Transaktion (AP-E2-2); `k` mit Akteur, Sitzung, Vorher und Zugang (FolgeKontext) */
+  beiEntscheid?(tx: Tx, e: EntscheidFolge, k?: FolgeKontext): Promise<void>;
 }
 
 const registry = new Map<Art, Traktandenart>();

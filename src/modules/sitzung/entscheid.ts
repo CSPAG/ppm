@@ -8,7 +8,7 @@ import { conflict, invalid, type Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
 import { fristDatum } from '../phasenmodell/index.ts';
 import { sitzungLink } from './aktionen.ts';
-import { artLabel, traktandenart, type Art, type Ergebnis } from './arten.ts';
+import { artLabel, traktandenart, type Art, type Ergebnis, type FolgeKontext } from './arten.ts';
 import * as es from './entscheid-store.ts';
 import { kurzDatum } from './format.ts';
 import { protokollErzeugen } from './protokoll.ts';
@@ -96,7 +96,7 @@ async function pruefeEingabe(tx: Tx, art: Art, e: EntscheidEingabe, pfad = ''): 
  * (`beiEntscheid`) läuft sofort in dieser Transaktion, bei «via SNS-VR» erst mit dem Entscheid des SNS-VR (A1);
  * Benachrichtigungen und Aufgaben der Auflagen erst beim Schliessen (K3 Entscheide). Liefert den Entscheid und ob er neu ist.
  */
-export async function erfassen(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow, e: EntscheidEingabe, version: number | null): Promise<{ entscheid: es.EntscheidRow; neu: boolean; vorher: es.EntscheidRow | null }> {
+export async function erfassen(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow, e: EntscheidEingabe, version: number | null, u?: FolgeUmgebung): Promise<{ entscheid: es.EntscheidRow; neu: boolean; vorher: es.EntscheidRow | null }> {
   if (t.sitzung_id !== s.id || (t.stand !== 'traktandiert' && t.stand !== 'entschieden')) throw conflict('Das Traktandum steht nicht auf dieser Traktandenliste.');
   if (s.stand === 'versendet') throw conflict('Starten Sie zuerst die Sitzung.');
   if (s.stand !== 'laufend') {
@@ -117,30 +117,37 @@ export async function erfassen(tx: Tx, s: store.SitzungRow, t: store.TraktandumR
   }
   await es.auflagenSetzen(tx, id, (e.auflagen ?? []).map(a => ({ text: a.text, verantwortlich: a.verantwortlich, termin: a.termin })));
   await es.traktandumEntschieden(tx, t.id);
-  if (!t.via_sns) await folge(tx, t, e.ergebnis, e.begruendung, false);
+  if (!t.via_sns) await folge(tx, t, e.ergebnis, e.begruendung, false, u && { ...u, sitzungId: s.id, vorher: vorher ? { ergebnis: vorher.ergebnis, begruendung: vorher.begruendung } : null });
   await store.touchSitzung(tx, s.id);
   return { entscheid: (await es.getEntscheid(tx, id))!, neu: !vorher, vorher };
 }
 
-/** Folge der Art in der Transaktion des Entscheids (fachmodell.md 2.9); bei Korrektur erneut mit dem neuen Ergebnis. */
-async function folge(tx: Tx, t: store.TraktandumRow, ergebnis: string, begruendung: string, viaSns: boolean): Promise<void> {
+/** Was die Route der Folge mitgibt: entscheidende Person und Zugang wie `deps` (FolgeKontext ohne Sitzung und Vorher). */
+export type FolgeUmgebung = Pick<FolgeKontext, 'akteur' | 'principalId' | 'db' | 'tuples'>;
+
+/**
+ * Folge der Art in der Transaktion des Entscheids (fachmodell.md 2.9); bei Korrektur erneut mit dem neuen Ergebnis und
+ * dem vorherigen im Kontext (`k.vorher`, A-30).
+ */
+async function folge(tx: Tx, t: store.TraktandumRow, ergebnis: string, begruendung: string, viaSns: boolean,
+  k?: Omit<FolgeKontext, 'traktandumId'>): Promise<void> {
   await traktandenart(t.art)?.beiEntscheid?.(tx, {
     traktandumId: t.id, bezug: { typ: t.bezug_typ, id: t.bezug_id, projektId: t.projekt_id }, ergebnis, begruendung, viaSns,
-  });
+  }, k && { ...k, traktandumId: t.id });
 }
 
 /**
  * Entscheid des SNS-VR nachtragen (UC-006 A1; K02 Vorschlag, A-02: die UE erfasst ihn): erst nach dem Schliessen der
  * Sitzung, einmal. Jetzt läuft die Folge der Art (z. B. Phasenwechsel), PL und SP werden informiert.
  */
-export async function snsNachtragen(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow, e: { ergebnis: string; begruendung: string }, version: number): Promise<es.EntscheidRow> {
+export async function snsNachtragen(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow, e: { ergebnis: string; begruendung: string }, version: number, u?: FolgeUmgebung): Promise<es.EntscheidRow> {
   const ent = await es.entscheidVon(tx, t.id);
   if (!ent || !ent.stellungnahme) throw conflict('Das Traktandum läuft nicht über den SNS-VR.');
   if (ent.sns_ergebnis) throw conflict('Der Entscheid des SNS-VR ist bereits erfasst.');
   if (s.stand !== 'geschlossen' && s.stand !== 'protokoll_versendet') throw conflict('Schliessen Sie zuerst die Sitzung; danach erfassen Sie den Entscheid des SNS-VR.');
   await pruefeEingabe(tx, t.art, { ergebnis: e.ergebnis, begruendung: e.begruendung });
   if (!(await es.snsEintragen(tx, ent.id, version, e))) throw conflict('Der Entscheid wurde inzwischen geändert. Laden Sie ihn neu.');
-  await folge(tx, t, e.ergebnis, e.begruendung, true);
+  await folge(tx, t, e.ergebnis, e.begruendung, true, u && { ...u, sitzungId: s.id, vorher: null });
   if (t.projekt_id) {
     const text = `${t.titel}: Entscheid SNS-VR ${ergebnisLabel(t.art, e.ergebnis)}.`;
     for (const p of (await store.projektleitung(tx, t.projekt_id)).filter(x => x.funktion !== 'ctl')) {

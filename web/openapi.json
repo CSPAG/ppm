@@ -26519,6 +26519,195 @@
           }
         }
       },
+      "SzenarioEntscheid": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "szenarioId",
+          "stand",
+          "traktandiert",
+          "unterWasserlinie",
+          "traktandierbar",
+          "pruefung",
+          "can"
+        ],
+        "properties": {
+          "szenarioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "stand": {
+            "type": "string"
+          },
+          "traktandiert": {
+            "description": "Antrag traktandiert; geänderte Folgeentscheide nehmen das Traktandum zurück (versendet: 409).",
+            "type": "boolean"
+          },
+          "unterWasserlinie": {
+            "description": "Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "nummer",
+                "name",
+                "phase",
+                "folge",
+                "begruendung"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "phase": {
+                  "type": "string"
+                },
+                "folge": {
+                  "anyOf": [
+                    {
+                      "description": "Folgeentscheid (UC-008 A2); Sistieren und Abbrechen leiten UC-015 ein.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "zurueckstellen"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "sistieren"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "abbrechen"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "begruendung": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "traktandierbar": {
+            "description": "Antrag gewählt und Folgeentscheid für jedes laufende Projekt unter der Wasserlinie beantragt.",
+            "type": "boolean"
+          },
+          "pruefung": {
+            "type": "array",
+            "items": {
+              "description": "Sperre mit Regel, Ist-Wert und Ausweg (I-P2).",
+              "type": "string"
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SzenarioFolgenPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "folgen"
+        ],
+        "properties": {
+          "folgen": {
+            "maxItems": 500,
+            "description": "Folgeentscheid je laufendem Projekt unter der Wasserlinie (ersetzt die bisherigen).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "folge"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "folge": {
+                  "description": "Folgeentscheid (UC-008 A2); Sistieren und Abbrechen leiten UC-015 ein.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zurueckstellen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sistieren"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abbrechen"
+                      ]
+                    }
+                  ]
+                },
+                "begruendung": {
+                  "maxLength": 1000,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SzenarioTraktandiert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "traktandumId",
+          "titel",
+          "antrag"
+        ],
+        "properties": {
+          "traktandumId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "antrag": {
+            "type": "string"
+          }
+        }
+      },
       "AbschlussKpiWert": {
         "additionalProperties": false,
         "type": "object",
@@ -78250,6 +78439,380 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/entscheid": {
+      "get": {
+        "summary": "Entscheid vorbereiten",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid (UC-008 A2) und ob der Antrag traktandiert werden kann. ETag = Version des Szenarios.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioEntscheid"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/folgen": {
+      "put": {
+        "summary": "Folgeentscheide beantragen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Je laufendem Projekt unter der Wasserlinie «zurückstellen», «sistieren» oder «abbrechen» (UC-008 A2); ersetzt die bisherigen. Nur für laufende Projekte unter der Wasserlinie (422), im Entwurf oder Antrag, mit `If-Match` auf das Szenario (412).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SzenarioFolgenPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioEntscheid"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/traktandieren": {
+      "post": {
+        "summary": "Für das Gremium traktandieren",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Schlägt den Antrag als Traktandum der Art `priorisierung` dem entscheidenden Gremium des Portfolios vor (UC-008 Schritt 7, K5 Schritt 7); erneut aufgerufen, aktualisiert es Titel und Antrag. Nur für das als Antrag gewählte Szenario und mit Folgeentscheid für jedes laufende Projekt unter der Wasserlinie (409 `folge_fehlt`). Mit `If-Match` (412).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioTraktandiert"
                 }
               }
             }

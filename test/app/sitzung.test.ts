@@ -32,6 +32,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
   let portfolio: string, prat: string;
   let p1: { id: string; nummer: string }, p2: { id: string; nummer: string };
   let gateVorher: Traktandenart | undefined;
+  let abschlussVorher: Traktandenart | undefined;
   const termin1 = mittwochIn(28), termin2 = mittwochIn(56);
 
   const call = (method: string, url: string, headers: Record<string, string>, payload?: unknown) =>
@@ -94,9 +95,17 @@ describe('Sitzungen vorbereiten', { skip }, () => {
         return [{ art: 'packet', titel: 'Gate Review Packet', bereit: q === 'bestanden', qualityCheck: q, hinweis: q === 'bestanden' ? 'Quality-Check bestanden' : 'Quality-Check offen' }];
       },
     });
+    // abschluss statt der Art aus dem Modul abschluss (AP-E7-1, danach wiederhergestellt)
+    abschlussVorher = traktandenart('abschluss');
+    _abmelden('abschluss');
     registriereTraktandenart({ art: 'abschluss', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }] });
   });
-  after(async () => { _abmelden('gate'); _abmelden('abschluss'); if (gateVorher) registriereTraktandenart(gateVorher); await api?.close(); });
+  after(async () => {
+    _abmelden('gate'); _abmelden('abschluss');
+    if (gateVorher) registriereTraktandenart(gateVorher);
+    if (abschlussVorher) registriereTraktandenart(abschlussVorher);
+    await api?.close();
+  });
 
   let sitzung: { id: string; version: number };
 

@@ -34,6 +34,14 @@ export interface Loaded<T extends { version: number }> { item: T; etag: string }
 const loaded = <T extends { version: number }>(item: T, response: Response): Loaded<T> =>
   ({ item, etag: response.headers.get('ETag') ?? ifMatch(item.version)['If-Match']! });
 
+/** Ob die Organisation mindestens ein Portfolio hat (Kopfkarte «Organisation einrichten», Z2). */
+export function useGibtPortfolio() {
+  return useQuery({
+    queryKey: [...portfolioKeys.all, 'gibt-es'] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/portfolios', { params: { query: { limit: 1 } }, signal })).data!.items.length > 0,
+  });
+}
+
 export function usePortfolioList() {
   return useInfiniteQuery({
     queryKey: portfolioKeys.list,

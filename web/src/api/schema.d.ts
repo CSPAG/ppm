@@ -38933,6 +38933,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/kapazitaet/hr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kapazität laut HR-System lesen
+         * @description Summen der Schnittstelle «HR-System › Personal- und Abwesenheitsdaten» je Rolle und Monat (UC-009 Schritt 1): Pensum minus Abwesenheit und Anzahl Personen, ohne Personendaten. Wo die RM kein Angebot festgelegt hat, zählt dieser Wert in der Auslastung (Annahme AP-E7-2).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    von?: string;
+                    /**
+                     * @description Monat «JJJJ-MM».
+                     * @example 2027-04
+                     */
+                    bis?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["KapazitaetHr"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/bewertungsmodelle": {
         parameters: {
             query?: never;
@@ -50381,6 +50485,22 @@ export interface components {
         };
         PersonBelegungList: {
             items: components["schemas"]["PersonBelegung"][];
+        };
+        KapazitaetHr: {
+            von: string;
+            bis: string;
+            /** @description Je Rolle und Monat mit Lieferung des HR-Systems; Monate ohne Lieferung fehlen. */
+            zellen: {
+                rolle: string;
+                monat: string;
+                /** @description Pensum minus Abwesenheit der Personen der Rolle in FTE. */
+                fte: number;
+                /** @description Abwesenheit in FTE. */
+                abwesend: number;
+                /** @description Anzahl Personen der Rolle im Monat. */
+                personen: number;
+            }[];
+            uebernommenAt: string | null;
         };
         Kriterium: {
             schluessel: string;

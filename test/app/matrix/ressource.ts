@@ -1,4 +1,4 @@
-/** Modul ressource (270_ressource, BC RK.01.01, RK.02.04, AP-E5-4): Kapazitätsangebot je Rolle und Monat, Auslastung. */
+/** Modul ressource (270_ressource, 271_kapazitaet_hr; BC RK.01.01, RK.01.02, RK.02.04, AP-E5-4, AP-E7-2): Kapazitätsangebot je Rolle und Monat, Kapazität laut HR, Auslastung. */
 import assert from 'node:assert/strict';
 import type { Matrix } from './typ.ts';
 
@@ -8,6 +8,10 @@ export const matrix: Matrix = {
       await tx.query("INSERT INTO ppm.kapazitaet (tenant_id, rolle, monat, fte) VALUES ($1, 'probe', '2026-12', 1)", [t]);
       return "rolle = 'probe'";
     },
+    kapazitaet_hr: async (tx, t) => {
+      await tx.query("INSERT INTO ppm.kapazitaet_hr (tenant_id, rolle, monat, fte, personen) VALUES ($1, 'probe', '2026-12', 1, 1)", [t]);
+      return "rolle = 'probe'";
+    },
   },
   policies: [
     // Lesesicht nach Muster ORG (docs/fachmodell.md 3.4)
@@ -15,6 +19,11 @@ export const matrix: Matrix = {
     "ppm.kapazitaet.kapazitaet_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('ressource:write'::text)",
     "ppm.kapazitaet.kapazitaet_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('ressource:write'::text) CHECK app.has_permission('ressource:write'::text)",
     "ppm.kapazitaet.kapazitaet_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ressource:write'::text) CHECK -",
+    // Kapazität laut HR (RK.01.02): lesen wie das Angebot, schreiben der Lauf der Schnittstelle (volle Sicht)
+    "ppm.kapazitaet_hr.kapazitaet_hr_read RESTRICTIVE SELECT ppm_app USING app.has_permission('ressource:read'::text) CHECK -",
+    "ppm.kapazitaet_hr.kapazitaet_hr_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('ressource:write'::text)",
+    "ppm.kapazitaet_hr.kapazitaet_hr_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('ressource:write'::text) CHECK app.has_permission('ressource:write'::text)",
+    "ppm.kapazitaet_hr.kapazitaet_hr_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ressource:write'::text) CHECK -",
   ],
   tags: ['Ressourcen'],
   seed: async (api, a) => {
@@ -29,6 +38,7 @@ export const matrix: Matrix = {
     'GET /v1/kapazitaet': () => ({ method: 'GET', url: '/v1/kapazitaet?von=2026-11&bis=2027-03', kind: 'list' }),
     // B entfernt eine Zelle, die es bei B nicht gibt: keine Wirkung auf A
     'PUT /v1/kapazitaet': () => ({ method: 'PUT', url: '/v1/kapazitaet', body: { zellen: [{ rolle: 'pl', monat: '2026-12', fte: null }] }, kind: 'create' }),
+    'GET /v1/kapazitaet/hr': () => ({ method: 'GET', url: '/v1/kapazitaet/hr?von=2026-11&bis=2027-03', kind: 'list' }),
     'GET /v1/auslastung': () => ({ method: 'GET', url: '/v1/auslastung?von=2026-11&bis=2027-03', kind: 'list' }),
   },
   unchanged: async (api, a) => {

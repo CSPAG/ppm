@@ -17,8 +17,10 @@ on:
 permissions:
   contents: read
 
+# Pull Request: ein neuer Lauf bricht den alten ab. Push auf main/Tags: je Commit eine eigene Gruppe, damit jeder
+# Merge-Commit seinen Lauf zu Ende bringt (in einer gemeinsamen Gruppe verdrängt ein neuer wartender Lauf den älteren).
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
@@ -31,7 +33,7 @@ jobs:
   check:
     name: Backend (Typen, Grenzen, Tests)
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 40 # Testsuite mit Datenbank wächst mit jedem Paket
     permissions:
       contents: read
       packages: read

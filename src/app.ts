@@ -17,6 +17,7 @@ import { priorisierungModule } from './modules/priorisierung/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
 import { ressourceModule } from './modules/ressource/index.ts';
+import { schnittstelleModule } from './modules/schnittstelle/index.ts';
 import { sitzungModule } from './modules/sitzung/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { statusberichtModule } from './modules/statusbericht/index.ts';
@@ -48,6 +49,7 @@ export const app = defineApp({
     ressourceModule,
     priorisierungModule,
     webhooksModule,
+    schnittstelleModule,
   ],
   // Haken am Baukasten (API, Worker, Abgleich): Neubesetzung beim Entfernen, Mitteilung bei Rollenänderungen (UC-016)
   iamEvents: eingangIamHaken,

@@ -210,3 +210,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
   Stufe 3). Ob das rechtlich genügt, ist offen ([UX-OF-10](../fahrplan.md#offene-fragen)).
 - Offen: Pflichtangaben je Phase (K13), Struktur Business Case (K21), Sponsoren-Koalition (K05), Anbindung DTI/DBI (K24).
 - Offen: Zeitpunkt der Gate-Aufgabe ([UX-OF-5](../fahrplan.md#offene-fragen)); Dateiformat der Dokumentausgabe.
+- Umsetzung AP-E3-4: «Änderung freigeben» informiert die Projektleitung per Mitteilung; die Unternehmensentwicklung sieht
+  die neue Baseline im Projekt (Mitteilungen gehen nur an Personen, eine Mitteilung an ein Recht fehlt im Eingang). Ein
+  eingereichter Änderungsantrag steht «in Prüfung» mit dem Banner «Beim Sponsor zum Entscheid seit ‹Datum›». E2E folgt,
+  sobald eine Baseline über den Gate-Entscheid (AP-E3-3) entsteht.

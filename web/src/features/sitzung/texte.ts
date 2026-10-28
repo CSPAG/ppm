@@ -44,6 +44,9 @@ export const TS = {
   nachOben: (t: string) => `${t} nach oben`,
   nachUnten: (t: string) => `${t} nach unten`,
   entfernen: 'Aus der Liste nehmen',
+  // festes Traktandum 1 (K3 Schritt 4)
+  festHinweis: 'Dieses Traktandum ist in jeder Sitzung gesetzt und bleibt Traktandum 1; Sie können es weder entfernen noch verschieben.',
+  festPlatzhalter: 'Der Portfoliobericht ist noch nicht bereitgestellt. «Portfoliobericht erzeugen» im abgeschlossenen Dashboard füllt dieses Traktandum.',
   entfernt: 'Traktandum aus der Liste genommen.',
   verschieben: 'Auf nächste Sitzung verschieben',
   verschoben: (d: string) => `Traktandum auf ${d} verschoben.`,

@@ -8,7 +8,31 @@
     "entra": true,
     "m2m": true,
     "mcp": true,
-    "smtp": null
+    "smtp": {
+      "host": "mail.infomaniak.com",
+      "port": 587,
+      "starttls": true,
+      "ssl": false,
+      "from": "noreply@project-suite.ch",
+      "fromDisplayName": "PPM",
+      "user": "noreply@project-suite.ch"
+    },
+    "theme": "identity",
+    "themeTexts": "infra/keycloak/theme-texts.json",
+    "localization": "infra/keycloak/localization.json",
+    "entraDenyMessage": "Ihr Microsoft-Konto ist für diese Organisation nicht freigeschaltet. Bitte wenden Sie sich an die Administration Ihrer Organisation.",
+    "machineClients": {
+      "ppm-rauchtest": {
+        "name": "Rauchtest",
+        "description": "Rauchtest nach dem Rollout (scripts/smoke.ts); privater Schlüssel in infra/keycloak/keys/ppm-rauchtest.sops.yaml",
+        "organizations": [
+          "solutions"
+        ],
+        "scopes": [
+          "ppm:read"
+        ]
+      }
+    }
   },
   "paths": {
     "model": "src/authz/model.ts",

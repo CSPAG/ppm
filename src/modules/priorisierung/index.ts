@@ -9,6 +9,8 @@ import type { FastifyInstance } from 'fastify';
 import { matrixTools } from './matrix-mcp.ts';
 import { registerMatrixRoutes } from './matrix-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
+import { szenarioTools } from './szenario-mcp.ts';
+import { registerSzenarioRoutes } from './szenario-routes.ts';
 
 export const priorisierungModule = defineModule({
   name: 'priorisierung',
@@ -16,6 +18,7 @@ export const priorisierungModule = defineModule({
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
     registerMatrixRoutes(app, deps);
+    registerSzenarioRoutes(app, deps);
   },
-  mcpTools: { ...matrixTools },
+  mcpTools: { ...matrixTools, ...szenarioTools },
 });

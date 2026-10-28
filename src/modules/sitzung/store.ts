@@ -218,6 +218,26 @@ export async function aufnehmen(tx: Tx, id: string, sitzungId: string, o: { daue
       WHERE id = $1`, [id, sitzungId, o.dauerMin, o.viaSns]);
 }
 
+/** Traktandum löschen (Platzhalter des festen Traktandums, wenn der Bericht es ersetzt). */
+export async function loeschen(tx: Tx, id: string): Promise<void> {
+  await tx.query(`DELETE FROM ${E} WHERE traktandum_id = $1`, [id]);
+  await tx.query(`DELETE FROM ${T} WHERE id = $1`, [id]);
+}
+
+/** Nächste Sitzung des Gremiums in Vorbereitung mit dem Platzhalter der Art (Bezug die Sitzung selbst). */
+export async function sitzungMitPlatzhalter(tx: Tx, gremiumId: string, art: Art): Promise<SitzungRow | null> {
+  return (await tx.query<SitzungRow>(
+    `SELECT ${SCOLS} FROM ${SFROM}
+      WHERE s.gremium_id = $1 AND s.stand IN ('geplant', 'in_vorbereitung')
+        AND EXISTS (SELECT 1 FROM ${T} t WHERE t.sitzung_id = s.id AND t.art = $2 AND t.bezug_typ = 'sitzung' AND t.stand = 'traktandiert')
+      ORDER BY s.datum LIMIT 1`, [gremiumId, art])).rows[0] ?? null;
+}
+
+/** Darf die Person die Traktandenliste des Portfolios bearbeiten (wie die Lesesicht: sitzung:write)? */
+export async function darfTraktandenliste(tx: Tx, portfolioId: string): Promise<boolean> {
+  return (await tx.query<{ ok: boolean }>('SELECT ppm.gremium_recht($1, $2) AS ok', ['sitzung:write', portfolioId])).rows[0]!.ok;
+}
+
 /** Aus der Traktandenliste nehmen: wieder Vorschlag ohne Sitzung; Einladungen entfallen. */
 export async function entfernen(tx: Tx, id: string): Promise<void> {
   await tx.query(`DELETE FROM ${E} WHERE traktandum_id = $1`, [id]);

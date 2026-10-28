@@ -47,6 +47,10 @@ test('Sitzung durchführen: Entscheid in ≤ 60 s, schliessen, Protokoll versend
   await expectAccessible(page);
   await expectNoOverflow(page);
 
+  // Traktandum 1 ist der Bericht der Programmleitung (K3 Schritt 4, Kenntnisnahme); mit → zum Gate-Review
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('heading', { level: 2, name: new RegExp(`^2\\. ${projekt.nummer} `) })).toBeVisible();
+
   // K3-3: Entscheid ab Wortlaut erfassen, gemessen bis zur Bestätigung des Servers
   const start = Date.now();
   await page.keyboard.press('e');

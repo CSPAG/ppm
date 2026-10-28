@@ -5,14 +5,18 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
+import { registerAdhocRoutes, TAG_ADHOC } from './adhoc-routes.ts';
 import { registrierePortfoliobericht } from './bericht.ts';
 import { registerBerichtRoutes, TAG_BERICHT } from './bericht-routes.ts';
+import { registriereVorlage } from './bericht-vorlage.ts';
 import { auswertungTools } from './mcp.ts';
 import { registerRisikoRoutes, TAG_RISIKO } from './risiko-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
 // Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9; AP-E2-3)
 registrierePortfoliobericht();
+// Feldkatalog für eigene Word-Vorlagen des Portfolioberichts (AM.03.01, UC-018 Schritt 2)
+registriereVorlage();
 
 export const auswertungModule = defineModule({
   name: 'auswertung',
@@ -20,11 +24,13 @@ export const auswertungModule = defineModule({
     { name: TAG, description: 'Dashboard der Periode: Projekte der sichtbaren Portfolios mit Status, Trend, Phase und Meldung, Funnel nach Phase.' },
     { name: TAG_RISIKO, description: 'Risikolage: Projekt- und Portfoliorisiken mit Bewertung und Massnahmen, Abhängigkeiten und offene Eskalationen.' },
     { name: TAG_BERICHT, description: 'Portfoliobericht der Periode aus dem abgeschlossenen Dashboard und der Risikolage, mit Kommentar der UE, als PDF oder Word.' },
+    { name: TAG_ADHOC, description: 'Ad-hoc-Auswertungen (AP-E7-6): Filter, Kennzahlen, Gruppierung, Einzelwerte und Export als CSV.' },
   ],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
     registerRisikoRoutes(app, deps);
     registerBerichtRoutes(app, deps);
+    registerAdhocRoutes(app, deps);
   },
   mcpTools: { ...auswertungTools },
 });

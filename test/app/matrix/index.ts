@@ -30,5 +30,6 @@ export const MATRIX = sammle([
   (await import('./idee-pruefung.ts')).matrix,
   (await import('./priorisierung.ts')).matrix,
   (await import('./priorisierung-matrix.ts')).matrix,
+  (await import('./priorisierung-szenario.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
 ]);

@@ -151,7 +151,9 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
           ) : <div className="acts"><SitzungsmodusEinstieg kuerzel={kuerzel} datum={datum} stand={s.stand} gehe={gehe} /></div>}
         </div>
       </header>
-      <div className="body sz-body">
+      {/* scrollbarer Bereich mit der Tastatur erreichbar, auch nach dem Versand ohne Eingabefelder (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="body sz-body" tabIndex={0} role="region" aria-label={TS.inhalt}>
         {versendet ? (
           <div className="sz-banner"><Hinweis stufe="hinweis">{TS.versendetBanner(fmtZeitpunkt(s.versendetAt!))}</Hinweis></div>
         ) : null}

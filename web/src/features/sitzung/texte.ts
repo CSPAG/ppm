@@ -5,6 +5,7 @@
 export const TS = {
   bereich: 'Sitzungen',
   title: 'Sitzungen',
+  inhalt: 'Inhalt der Sitzung',
   sub: 'Sitzungen der Gremien vorbereiten: Traktandenliste aus Vorschlägen, Unterlagen prüfen und spätestens 5 Arbeitstage vorher versenden.',
   keineGremien: 'Sie sehen noch keine Sitzungen. Sitzungen entstehen aus den Sitzungsterminen der Gremien (Administration › Portfolios und Gremien).',
   keineTermine: 'Für dieses Gremium sind keine weiteren Sitzungstermine geplant.',

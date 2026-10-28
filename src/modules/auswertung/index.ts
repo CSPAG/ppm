@@ -34,3 +34,6 @@ export const auswertungModule = defineModule({
   },
   mcpTools: { ...auswertungTools },
 });
+
+/** Lese-Schnittstelle des Portfolioberichts für obere Module (Quartalsreporting, AP-E6-4). */
+export { portfoliobericht, type PortfolioberichtDaten } from './bericht-schnittstelle.ts';

@@ -4,6 +4,7 @@
  */
 import type { Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
+import type { Lebenszyklus } from '../projekt/index.ts';
 
 export interface ZelleRow { id: string; rolle: string; monat: string; fte: number; version: number }
 
@@ -38,4 +39,17 @@ export async function remove(tx: Tx, id: string, version: number): Promise<boole
 export async function projekte(tx: Tx, ids: readonly string[]): Promise<{ id: string; nummer: string; name: string }[]> {
   if (!ids.length) return [];
   return (await tx.query<{ id: string; nummer: string; name: string }>(`SELECT id, nummer, name FROM ${SCHEMA}.projekt WHERE id = ANY ($1::uuid[]) ORDER BY nummer`, [ids])).rows;
+}
+
+/**
+ * Zählt ein Projekt für Auslastung, Bedarf und Zuteilung (UC-015 Schritt 6, A1.2: «gibt Ressourcen frei»)? Nur im
+ * Lebenszyklus `aktiv`; sistierte, abgebrochene, abgeschlossene und zurückgezogene Projekte zählen nicht. Entschieden
+ * beim Lesen, nichts wird gelöscht: Bei einer Wiederaufnahme (`sistiert` → `aktiv`) zählen Bedarf und Zuteilungen wieder.
+ */
+export const AKTIV: Lebenszyklus = 'aktiv';
+
+/** Sichtbare Projekte unter `ids`, die nicht mehr aktiv sind (Spalte der Kerntabelle aus 010, wie `projekte`). */
+export async function inaktiv(tx: Tx, ids: readonly string[]): Promise<Set<string>> {
+  if (!ids.length) return new Set();
+  return new Set((await tx.query<{ id: string }>(`SELECT id FROM ${SCHEMA}.projekt WHERE id = ANY ($1::uuid[]) AND lebenszyklus <> $2`, [ids, AKTIV])).rows.map(r => r.id));
 }

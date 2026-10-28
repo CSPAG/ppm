@@ -2,7 +2,7 @@
  * Statusbericht erfassen (UI-13, K1) gegen die nachgebildete API: Vorbelegung ohne Status und Trend, Seitenpanel mit
  * fehlenden Angaben und Sprung zur Stelle, automatisches Speichern mit If-Match, «kritisch» mit Pflichtfeldern,
  * Einreichen mit Rückgängig, nur lesbar nach dem Einreichen (Z8), Abweichung zur Baseline an der Meilensteinzeile,
- * «Änderung beantragen» an der Warnung nur mit Recht (UC-004 A1), Ist-Kosten fehlen (Z4), K1-1 (≤ 15 Interaktionen ohne Änderung an Registern), axe ohne Befund.
+ * «Änderung beantragen» und «Eskalieren» an der Warnung nur mit Recht (UC-004 A1), Ist-Kosten fehlen (Z4), K1-1 (≤ 15 Interaktionen ohne Änderung an Registern), axe ohne Befund.
  */
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -38,7 +38,7 @@ const leer = () => json({ items: [], nextCursor: null, can: { write: true } });
 
 const PL_ME: Partial<Me> = { roles: [], permissions: ['tenant:read'] };
 
-function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | Promise<Response>; kosten?: () => Response; meilensteine?: () => Response; einreichen?: () => Response; entwerfen?: string[] } = {}) {
+function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | Promise<Response>; kosten?: () => Response; meilensteine?: () => Response; einreichen?: () => Response; entwerfen?: string[]; eskalation?: (req: Request) => Response | Promise<Response> } = {}) {
   const api = mockIamApi({
     'GET /v1/projekte': () => json({ items: [projekt], nextCursor: null }),
     [`GET ${URL_B}`]: o.bericht ?? (() => json(bericht(), 200, { etag: 'W/"0"' })),
@@ -47,6 +47,7 @@ function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | 
       return json(bericht({ ...body, id: '00000000-0000-4000-8000-0000000000c1', version: 1, can: { write: true, einreichen: true, zurueckziehen: false } }), 200, { etag: 'W/"1"' });
     }),
     [`POST ${URL_B}/einreichen`]: o.einreichen ?? (() => json(bericht({ id: '00000000-0000-4000-8000-0000000000c1', stand: 'eingereicht', status: 'im_plan', trend: 'gleichbleibend', version: 2, eingereichtAt: '2026-10-23T08:00:00Z', can: { write: false, einreichen: false, zurueckziehen: true } }), 200, { etag: 'W/"2"' })),
+    [`POST ${URL_B}/eskalation`]: o.eskalation ?? (() => json({}, 500)),
     [`POST ${URL_B}/zurueckziehen`]: () => json(bericht({ id: '00000000-0000-4000-8000-0000000000c1', status: 'im_plan', trend: 'gleichbleibend', version: 3, can: { write: true, einreichen: true, zurueckziehen: false } }), 200, { etag: 'W/"3"' }),
     [`GET /v1/projekte/${ID}/meilensteine`]: o.meilensteine ?? (() => json({ items: [meilenstein()], nextCursor: null, can: { write: true } })),
     [`GET /v1/projekte/${ID}/kosten`]: o.kosten ?? leer,
@@ -99,6 +100,43 @@ describe('Statusbericht erfassen (UI-13)', () => {
     await waitFor(() => expect(api.calls.some(c => c.url.endsWith(`/v1/projekte/${ID}/vertrag`))).toBe(true));
     await act(async () => { await new Promise(r => setTimeout(r, 20)); });
     expect(screen.queryByRole('link', { name: TB.wesentlich.beantragen })).toBeNull();
+  });
+
+  it('Warnung «wesentlich»: «Eskalieren» mit Wirkung davor, Grund vorbelegt; danach eskaliert vermerkt (UC-004 A1.2)', async () => {
+    const eskalation = { id: '00000000-0000-4000-8000-0000000000e1', anlass: 'abweichung', stand: 'offen', vorgeschlagen: true, angelegtAt: '2026-10-28T09:00:00Z' };
+    const api = stub({
+      bericht: () => json(bericht({ can: { write: true, einreichen: false, zurueckziehen: false, eskalieren: true }, eskalation: null }), 200, { etag: 'W/"0"' }),
+      eskalation: () => json(bericht({ id: '00000000-0000-4000-8000-0000000000c1', version: 1, eskalation, can: { write: true, einreichen: true, zurueckziehen: false, eskalieren: false } }), 200, { etag: 'W/"1"' }),
+    });
+    const { container } = renderWithIam(<BerichtPage nummer="2026-014" periode={PERIODE} />, PL_ME);
+    await userEvent.click(await screen.findByRole('button', { name: TB.wesentlich.eskalieren }));
+    const dialog = await screen.findByRole('dialog', { name: TB.wesentlich.eskalierenTitel });
+    expect(within(dialog).getByText(TB.wesentlich.eskalierenWirkung)).toBeInTheDocument();
+    expect((within(dialog).getByLabelText(TB.wesentlich.grund) as HTMLTextAreaElement).value).toMatch(/^Konzept abgenommen neu .* statt .* laut Baseline \(.*3.*Wochen\)\.$/);
+    await expectNoAxe(container);
+    // leerer Grund: Fehler am Feld, kein Aufruf
+    await userEvent.clear(within(dialog).getByLabelText(TB.wesentlich.grund));
+    await userEvent.click(within(dialog).getByRole('button', { name: TB.wesentlich.eskalieren }));
+    expect(await within(dialog).findByText(TB.wesentlich.grundFehlt)).toBeInTheDocument();
+    expect(api.calls.some(c => c.url.endsWith('/eskalation'))).toBe(false);
+
+    await userEvent.type(within(dialog).getByLabelText(TB.wesentlich.grund), 'Termin Konzept +3 Wochen');
+    await userEvent.type(within(dialog).getByLabelText(TB.wesentlich.massnahme), 'Testwoche');
+    await userEvent.click(within(dialog).getByRole('button', { name: TB.wesentlich.eskalieren }));
+    expect(await screen.findByText(TB.wesentlich.eskaliertOk(true))).toBeInTheDocument();
+    const post = api.calls.find(c => c.url.endsWith('/eskalation'))!;
+    expect(await post.clone().json()).toEqual({ grund: 'Termin Konzept +3 Wochen', massnahme: 'Testwoche' });
+    expect(post.headers.get('idempotency-key')).toBeTruthy();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByText(/^Eskaliert am .*28\.10\..* · Vorschlag ans Gremium$/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: TB.wesentlich.eskalieren })).toBeNull();
+  });
+
+  it('ohne Recht zu eskalieren: Warnung ohne «Eskalieren»', async () => {
+    stub();
+    renderWithIam(<BerichtPage nummer="2026-014" periode={PERIODE} />, PL_ME);
+    expect(await screen.findByText(/Konzept abgenommen neu .* statt .* laut Baseline/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: TB.wesentlich.eskalieren })).toBeNull();
   });
 
   it('«Kritisch» verlangt Begründung und Massnahme; Speichern mit If-Match, nur die geänderten Felder', async () => {

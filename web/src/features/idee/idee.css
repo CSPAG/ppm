@@ -38,7 +38,7 @@
 .idee-fertig-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .idee-zf .hinweis-b ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 .idee-kopf{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.idee-kopf h3,.idee-kopf p{margin:0}
+.idee-kopf h2,.idee-kopf p{margin:0}
 @media (max-width:600px){
   .idee-body{padding:12px 16px}
   .idee-attr{grid-template-columns:1fr auto}

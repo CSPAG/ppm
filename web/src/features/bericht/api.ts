@@ -83,6 +83,23 @@ export function useUebergang(id: string, periode: string, art: 'einreichen' | 'z
   });
 }
 
+/**
+ * Aus der Warnung «wesentliche Abweichung» eskalieren (UC-004 A1.2, K1 Schritt 2): legt die Eskalation zum Bericht an
+ * (fehlt der Entwurf, entsteht er); der Bericht bleibt Entwurf und kommt mit neuer Version zurück.
+ */
+export function useEskalieren(id: string, periode: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ key, grund, massnahme }: { key: string; grund: string; massnahme: string }) => {
+      const { data, response } = await api.POST('/v1/projekte/{id}/berichte/{periode}/eskalation', {
+        params: { path: { id, periode }, header: { 'idempotency-key': key } }, body: { grund, massnahme },
+      });
+      return geladen(data!, response);
+    },
+    onSuccess: l => { qc.setQueryData(berichtKeys.bericht(id, periode), l); },
+  });
+}
+
 /** Ohne Recht (Beträge, A-33) oder ohne Register bleibt die Liste leer; `gesperrt` meldet 403. */
 async function liste<T>(run: () => Promise<{ data?: { items: T[] } }>): Promise<{ items: T[]; gesperrt: boolean }> {
   try {

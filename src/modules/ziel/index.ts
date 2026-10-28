@@ -19,6 +19,8 @@ import { registerQuartalRoutes, TAG_QUARTAL } from './quartal-routes.ts';
 
 /** Zuordnung Projekt ↔ Ziel für obere Module (Vertrag Kap. 2 bei der Baseline, PP.02.05; AP-E6-1). */
 export { projektZuordnen, type ZielAngabe } from './zyklus-zuordnung.ts';
+/** Zielerreichung eines Jahres für obere Module (Jahresrückblick, UC-013 Schritt 1; AP-E7-5). */
+export { desJahres as zielerreichungDesJahres } from './erreichung-store.ts';
 
 export const zielModule = defineModule({
   name: 'ziel',

@@ -1,0 +1,37 @@
+/*
+ * Szenarien (UI-22): Rangliste mit Wasserlinie, darunter abgesetzte Projekte; Lage immer auch als Text (Q-B5), Bildlauf
+ * nur in der Tabelle (360 px); Vergleich mit hervorgehobenen Unterschieden.
+ */
+.sz-vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.sz-acts{display:flex;gap:8px;justify-content:flex-end}
+.sz-scroll{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:10px}
+.sz-liste,.sz-tab{width:100%;border-collapse:collapse;font-size:13px}
+.sz-liste th,.sz-liste td,.sz-tab th,.sz-tab td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.sz-liste thead th,.sz-tab thead th{color:var(--fg-2);font-weight:500;background:var(--surface-2);white-space:nowrap}
+.sz-liste .num,.sz-tab .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sz-rang{white-space:nowrap;width:1%}
+.sz-griff{display:inline-flex;gap:2px;margin-right:6px;vertical-align:middle}
+.sz-nr{font:600 13px/1 var(--f-mono)}
+.sz-projekt{font-weight:500;min-width:200px}
+.sz-merk{display:block;color:var(--fg-3);font-size:11.5px;font-weight:400}
+.sz-start{height:30px;border:1px solid var(--line-2);border-radius:6px;padding:0 6px;background:var(--surface);color:var(--fg)}
+.sz-start:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.sz-liste tr[draggable="true"]{cursor:grab}
+.sz-gezogen{opacity:.5}
+.sz-unter td,.sz-unter th{background:var(--off-soft);color:var(--fg-2)}
+.sz-aus td,.sz-aus th{color:var(--fg-3)}
+.sz-linie td{border-top:2px solid var(--warn);border-bottom:2px solid var(--warn);background:var(--warn-soft);padding:6px 10px}
+.sz-linie-l{font-weight:600;margin-right:10px}
+.sz-linie-t{color:var(--fg)}
+.sz-warn{list-style:none;margin:0;padding:0;color:var(--fg);font-size:12px}
+.sz-warn li{display:flex;gap:4px;align-items:flex-start}
+.sz-ok{margin:8px 10px;color:var(--fg-2);font-size:12.5px}
+.sz-engpaesse ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sz-engpaesse li{display:flex;gap:6px;align-items:flex-start}
+.sz-vorlage{display:flex;flex-direction:column;gap:10px}
+.sz-vergleich{display:flex;flex-direction:column;gap:12px}
+.sz-tab caption{caption-side:top;text-align:left;font-weight:600;padding:8px 10px}
+.sz-anders{background:var(--accent-soft)}
+.sz-kopf{margin-top:6px}
+.sz-auswahl{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.sz-auswahl legend{font-weight:500;padding:0;margin-bottom:6px;width:100%}

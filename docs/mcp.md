@@ -39,6 +39,7 @@ Aus dem Modell (`mcpTools` in `src/authz/model.ts`), umgesetzt in `src/modules/h
 | `get_dashboard` | `GET /v1/dashboard` | `auswertung:read` | `readOnlyHint`; optional `portfolio` (Schlüssel), `periode` |
 | `get_auslastung` | `GET /v1/auslastung` | `ressource:read` | `readOnlyHint`; Zeitraum `von`/`bis`, optional `szenario` |
 | `get_matrix` | `GET /v1/portfolios/{id}/matrix` | `priorisierung:read` | `readOnlyHint`; Kosten nur mit `finanzen:read` |
+| `get_finanzen` | `GET /v1/finanzen` | `finanzen:read` | `readOnlyHint`; nicht im Scope `ppm:read` |
 | `list_bedarfe` | `GET /v1/bedarfe` | `ressource:read` | `readOnlyHint`; Filter `stand`, `rolle`, `von`/`bis` |
 | `list_sitzungen` | `GET /v1/gremien/{kuerzel}/sitzungen` | `sitzung:read` | `readOnlyHint` |
 | `get_sitzung` | `GET /v1/sitzungen/{id}` | `sitzung:read` | `readOnlyHint` |

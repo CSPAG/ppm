@@ -376,7 +376,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
     link, frist: { datum: s.datum, art: 'kalendertage' }, manuell: true,
   });
 
-  // Einladungen gebündelt je Person (I-B3): «Sie stellen ‹Projekt› am Mi 12.11. im PRAT vor · ca. 14:20»
+  // Einladungen gebündelt je Person (I-B3): «Du stellst ‹Projekt› am Mi 12.11. im PRAT vor · ca. 14:20»
   const fenster = zeitfenster(s, ts);
   const einladungen = await store.einladungen(tx, { sitzungId: s.id });
   const jePerson = new Map<string, string[]>();
@@ -388,7 +388,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
     }
   }
   for (const [person, was] of jePerson) {
-    await mitteilung.senden(tx, { an: person, bezug, text: `Sie stellen am ${datum} im ${g} vor: ${was.join('; ')}.`, link });
+    await mitteilung.senden(tx, { an: person, bezug, text: `Du stellst am ${datum} im ${g} vor: ${was.join('; ')}.`, link });
   }
 
   // Verschobene Traktanden (A2): PL und SP informieren

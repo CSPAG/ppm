@@ -47,14 +47,14 @@ const ZURUECKGESTELLT = 'zurueckgestellt';
 /** Adresse der Entscheide und Auflagen (UI-36, Gremien › Entscheide). */
 export const entscheideLink = '/gremien/entscheide';
 
-const BEGRUENDUNG_FEHLT = 'Begründung fehlt: Sie erscheint im Protokoll und beim Projekt.';
+const BEGRUENDUNG_FEHLT = 'Begründung fehlt: Die Begründung erscheint im Protokoll und beim Projekt.';
 
 /** Sitzung starten (K3 Schritt 7): Sitzungsmodus, Entscheide lassen sich erfassen. */
 export async function starten(tx: Tx, s: store.SitzungRow, version: number): Promise<void> {
   if (s.stand === 'laufend') return;
-  if (s.stand === 'geplant' || s.stand === 'in_vorbereitung') throw conflict('Versenden Sie zuerst die Unterlagen; danach lässt sich die Sitzung starten.');
+  if (s.stand === 'geplant' || s.stand === 'in_vorbereitung') throw conflict('Versende zuerst die Unterlagen; danach lässt sich die Sitzung starten.');
   if (s.stand !== 'versendet') throw conflict('Die Sitzung ist geschlossen.');
-  if (!(await es.sitzungStarten(tx, s.id, version))) throw conflict('Die Sitzung wurde inzwischen geändert. Laden Sie sie neu.');
+  if (!(await es.sitzungStarten(tx, s.id, version))) throw conflict('Die Sitzung wurde inzwischen geändert. Lade sie neu.');
 }
 
 export interface EntscheidEingabe {
@@ -86,7 +86,7 @@ async function pruefeEingabe(tx: Tx, art: Art, e: EntscheidEingabe, pfad = ''): 
   }
   if (!fehler.length) return;
   const text = fehler.some(f => f.path.endsWith('/begruendung')) ? BEGRUENDUNG_FEHLT
-    : fehler.some(f => f.path.endsWith('/auflagen')) ? 'Auflagen fehlen: Erfassen Sie je Auflage Text, Termin und Verantwortliche.'
+    : fehler.some(f => f.path.endsWith('/auflagen')) ? 'Auflagen fehlen: Erfasse je Auflage Text, Termin und Verantwortliche.'
       : 'Der Entscheid ist unvollständig.';
   throw invalid(text, fehler);
 }
@@ -98,19 +98,19 @@ async function pruefeEingabe(tx: Tx, art: Art, e: EntscheidEingabe, pfad = ''): 
  */
 export async function erfassen(tx: Tx, s: store.SitzungRow, t: store.TraktandumRow, e: EntscheidEingabe, version: number | null, u?: FolgeUmgebung): Promise<{ entscheid: es.EntscheidRow; neu: boolean; vorher: es.EntscheidRow | null }> {
   if (t.sitzung_id !== s.id || (t.stand !== 'traktandiert' && t.stand !== 'entschieden')) throw conflict('Das Traktandum steht nicht auf dieser Traktandenliste.');
-  if (s.stand === 'versendet') throw conflict('Starten Sie zuerst die Sitzung.');
+  if (s.stand === 'versendet') throw conflict('Starte zuerst die Sitzung.');
   if (s.stand !== 'laufend') {
     throw conflict(s.stand === 'geschlossen' || s.stand === 'protokoll_versendet'
       ? 'Die Sitzung ist geschlossen. Ein Entscheid lässt sich nur noch über ein neues Traktandum ändern.'
-      : 'Versenden Sie zuerst die Unterlagen und starten Sie die Sitzung.');
+      : 'Versende zuerst die Unterlagen und starte die Sitzung.');
   }
   await pruefeEingabe(tx, t.art, e);
   const daten = { ergebnis: e.ergebnis, begruendung: e.begruendung, stellungnahme: t.via_sns, anVr: e.anVr ?? false };
   const vorher = await es.entscheidVon(tx, t.id);
   let id: string;
   if (vorher) {
-    if (version === null) throw conflict('Für dieses Traktandum ist bereits ein Entscheid erfasst. Laden Sie ihn neu, um ihn zu korrigieren.');
-    if (!(await es.entscheidKorrigieren(tx, vorher.id, version, daten))) throw conflict('Der Entscheid wurde inzwischen geändert. Laden Sie ihn neu.');
+    if (version === null) throw conflict('Für dieses Traktandum ist bereits ein Entscheid erfasst. Lade ihn neu, um ihn zu korrigieren.');
+    if (!(await es.entscheidKorrigieren(tx, vorher.id, version, daten))) throw conflict('Der Entscheid wurde inzwischen geändert. Lade ihn neu.');
     id = vorher.id;
   } else {
     id = await es.entscheidAnlegen(tx, { id: t.id, sitzung_id: s.id }, daten);
@@ -144,9 +144,9 @@ export async function snsNachtragen(tx: Tx, s: store.SitzungRow, t: store.Trakta
   const ent = await es.entscheidVon(tx, t.id);
   if (!ent || !ent.stellungnahme) throw conflict('Das Traktandum läuft nicht über den SNS-VR.');
   if (ent.sns_ergebnis) throw conflict('Der Entscheid des SNS-VR ist bereits erfasst.');
-  if (s.stand !== 'geschlossen' && s.stand !== 'protokoll_versendet') throw conflict('Schliessen Sie zuerst die Sitzung; danach erfassen Sie den Entscheid des SNS-VR.');
+  if (s.stand !== 'geschlossen' && s.stand !== 'protokoll_versendet') throw conflict('Schliesse zuerst die Sitzung; danach erfasst du den Entscheid des SNS-VR.');
   await pruefeEingabe(tx, t.art, { ergebnis: e.ergebnis, begruendung: e.begruendung });
-  if (!(await es.snsEintragen(tx, ent.id, version, e))) throw conflict('Der Entscheid wurde inzwischen geändert. Laden Sie ihn neu.');
+  if (!(await es.snsEintragen(tx, ent.id, version, e))) throw conflict('Der Entscheid wurde inzwischen geändert. Lade ihn neu.');
   await folge(tx, t, e.ergebnis, e.begruendung, true, u && { ...u, sitzungId: s.id, vorher: null });
   if (t.projekt_id) {
     const text = `${t.titel}: Entscheid SNS-VR ${ergebnisLabel(t.art, e.ergebnis)}.`;
@@ -211,7 +211,7 @@ export async function schliessen(tx: Tx, s: store.SitzungRow, version: number): 
     for (const p of await leitung(t)) melde(p.person_id, `${t.titel}: ${was}`);
   }
   if (nichtBehandelt) await store.positionenSchliessen(tx, s.id);
-  if (!(await es.sitzungSchliessen(tx, s.id, version))) throw conflict('Die Sitzung wurde inzwischen geändert. Laden Sie sie neu.');
+  if (!(await es.sitzungSchliessen(tx, s.id, version))) throw conflict('Die Sitzung wurde inzwischen geändert. Lade sie neu.');
 
   // Auflagen als Aufgaben (A3, fachmodell.md 4.2 `auflage.erfuellen`)
   const traktandumVon = new Map([...ent.values()].map(e => [e.id, ts.find(t => t.id === e.traktandum_id)!]));
@@ -246,6 +246,6 @@ export async function schliessen(tx: Tx, s: store.SitzungRow, version: number): 
 /** Auflage erledigt melden (fachmodell.md 4.2): verantwortliche Person, ihre Vertretung oder `sitzung:write`. */
 export async function auflageErfuellen(tx: Tx, a: es.AuflageRow): Promise<void> {
   if (a.stand === 'erfuellt') return;
-  if (!(await es.auflageErfuellen(tx, a.id))) throw conflict('Die Auflage wurde inzwischen geändert. Laden Sie sie neu.');
+  if (!(await es.auflageErfuellen(tx, a.id))) throw conflict('Die Auflage wurde inzwischen geändert. Lade sie neu.');
   await aufgabe.erledigen(tx, { art: 'auflage.erfuellen', bezug: { typ: 'auflage', id: a.id } });
 }

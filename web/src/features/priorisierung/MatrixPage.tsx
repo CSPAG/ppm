@@ -42,7 +42,7 @@ export function MatrixPage({ search, setSearch, navigieren }: { search: MatrixSe
   const skelett = useVerzoegert(portfolios.isPending || (!!pf && matrix.isPending));
   const ansicht: Ansicht = search.ansicht === 'ressourcen' ? 'ressourcen' : 'risiko';
   const gewaehlt = search.o ? m?.projekte.find(p => p.nummer === search.o) : undefined;
-  const reiter: Reiter[] = can('priorisierung:read') ? ['bewertung', 'matrix', 'modell'] : ['bewertung', 'matrix'];
+  const reiter: Reiter[] = can('priorisierung:read') ? ['bewertung', 'matrix', 'szenarien', 'modell'] : ['bewertung', 'matrix', 'szenarien'];
   const query = new URLSearchParams(pf ? { portfolio: pf.schluessel } : {}).toString();
   const oeffnen = (p: MatrixProjekt) => setSearch({ o: p.nummer });
 

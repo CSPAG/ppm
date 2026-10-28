@@ -6,6 +6,7 @@
  */
 import type { Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
+import { AKTIV } from './store.ts';
 
 export interface ZuteilungRow {
   id: string; ressourcenbedarf_id: string; projekt_id: string; person_id: string; person_name: string | null; monat: string; fte: number;
@@ -15,8 +16,13 @@ export interface ZuteilungRow {
 const Z = `${SCHEMA}.zuteilung`;
 const SPALTEN = `z.id, z.ressourcenbedarf_id, z.projekt_id, z.person_id, p.display_name AS person_name, z.monat, z.fte::float8 AS fte, z.version, z.updated_at`;
 const VON = `FROM ${Z} z LEFT JOIN ${SCHEMA}.principal p ON p.tenant_id = z.tenant_id AND p.id = z.person_id`;
+/**
+ * Zuteilung zählt (UC-015 Schritt 6, A1.2), wenn ihr Projekt nicht als «nicht aktiv» sichtbar ist. Die Zuteilung sieht
+ * auch, wer das Projekt nicht sieht (`ressource:read`); dann zählt sie weiter, ohne dass der Lebenszyklus durchsickert.
+ */
+const ZAEHLT = `NOT EXISTS (SELECT 1 FROM ${SCHEMA}.projekt pr WHERE pr.tenant_id = z.tenant_id AND pr.id = z.projekt_id AND pr.lebenszyklus <> '${AKTIV}')`;
 
-export interface ZuteilungFilter { bedarfIds?: readonly string[]; personId?: string; projektId?: string; von?: string; bis?: string }
+export interface ZuteilungFilter { bedarfIds?: readonly string[]; personId?: string; projektId?: string; von?: string; bis?: string; nurZaehlende?: boolean }
 
 export async function list(tx: Tx, f: ZuteilungFilter): Promise<ZuteilungRow[]> {
   const where: string[] = [];
@@ -27,6 +33,7 @@ export async function list(tx: Tx, f: ZuteilungFilter): Promise<ZuteilungRow[]> 
   if (f.projektId) where.push(`z.projekt_id = ${arg(f.projektId)}`);
   if (f.von) where.push(`z.monat >= ${arg(f.von)}`);
   if (f.bis) where.push(`z.monat <= ${arg(f.bis)}`);
+  if (f.nurZaehlende) where.push(ZAEHLT);
   return (await tx.query<ZuteilungRow>(
     `SELECT ${SPALTEN} ${VON} ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY p.display_name NULLS LAST, z.person_id, z.monat`, args)).rows;
 }
@@ -67,25 +74,25 @@ export async function summeJeMonat(tx: Tx, bedarfId: string): Promise<Map<string
 
 export interface Belegung { person_id: string; person_name: string | null; monat: string; fte: number }
 
-/** Personen mit ihrer Summe je Monat im Zeitraum (alle Bedarfe), nur sichtbare Zuteilungen. */
+/** Personen mit ihrer Summe je Monat im Zeitraum (alle Bedarfe), nur sichtbare Zuteilungen, die zählen. */
 export async function belegungJePerson(tx: Tx, von: string, bis: string, personIds?: readonly string[]): Promise<Belegung[]> {
   const args: unknown[] = [von, bis];
   let w = '';
   if (personIds) { args.push(personIds); w = ' AND z.person_id = ANY ($3::uuid[])'; }
   return (await tx.query<Belegung>(
     `SELECT z.person_id, max(p.display_name) AS person_name, z.monat, sum(z.fte)::float8 AS fte ${VON}
-      WHERE z.monat BETWEEN $1 AND $2${w} GROUP BY z.person_id, z.monat ORDER BY z.person_id, z.monat`, args)).rows;
+      WHERE z.monat BETWEEN $1 AND $2 AND ${ZAEHLT}${w} GROUP BY z.person_id, z.monat ORDER BY z.person_id, z.monat`, args)).rows;
 }
 
-/** Zugeteilte FTE je Rolle und Monat im Zeitraum (Rolle aus dem Bedarf). */
+/** Zugeteilte FTE je Rolle und Monat im Zeitraum (Rolle aus dem Bedarf), nur Zuteilungen, die zählen. */
 export async function belegungJeRolle(tx: Tx, von: string, bis: string): Promise<{ rolle: string; monat: string; fte: number }[]> {
   return (await tx.query<{ rolle: string; monat: string; fte: number }>(
     `SELECT b.rolle, z.monat, sum(z.fte)::float8 AS fte FROM ${Z} z
        JOIN ${SCHEMA}.ressourcenbedarf b ON b.tenant_id = z.tenant_id AND b.id = z.ressourcenbedarf_id
-      WHERE z.monat BETWEEN $1 AND $2 GROUP BY b.rolle, z.monat ORDER BY b.rolle, z.monat`, [von, bis])).rows;
+      WHERE z.monat BETWEEN $1 AND $2 AND ${ZAEHLT} GROUP BY b.rolle, z.monat ORDER BY b.rolle, z.monat`, [von, bis])).rows;
 }
 
-/** Zuteilungen einer Rolle bzw. einer Person in einem Monat, mit Projekt (Beteiligte eines Konflikts). */
+/** Zuteilungen einer Rolle bzw. einer Person in einem Monat, mit Projekt (Beteiligte eines Konflikts), nur die zählen. */
 export async function beteiligte(tx: Tx, monat: string, o: { personId?: string; rolle?: string }): Promise<(ZuteilungRow & { rolle: string })[]> {
   const args: unknown[] = [monat];
   let w = '';
@@ -94,7 +101,7 @@ export async function beteiligte(tx: Tx, monat: string, o: { personId?: string; 
   return (await tx.query<ZuteilungRow & { rolle: string }>(
     `SELECT ${SPALTEN}, b.rolle ${VON}
        JOIN ${SCHEMA}.ressourcenbedarf b ON b.tenant_id = z.tenant_id AND b.id = z.ressourcenbedarf_id
-      WHERE z.monat = $1${w} ORDER BY z.projekt_id, z.person_id`, args)).rows;
+      WHERE z.monat = $1 AND ${ZAEHLT}${w} ORDER BY z.projekt_id, z.person_id`, args)).rows;
 }
 
 // ---------------------------------------------------------------- Lücken (UC-009 A2)

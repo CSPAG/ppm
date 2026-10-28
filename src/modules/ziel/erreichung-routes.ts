@@ -14,6 +14,7 @@ import {
   EintragParams, QuartalParams, ZielerreichungCreate, ZielerreichungEintrag, ZielerreichungPatch, ZielerreichungQuartal, ZielerreichungZiel,
   type ZielerreichungEintragOut,
 } from './erreichung-schemas.ts';
+import { nachfuehren } from './erreichung-aufgabe.ts';
 import * as store from './erreichung-store.ts';
 
 const TAG = 'Ziele';
@@ -84,6 +85,8 @@ export function registerErreichungRoutes(app: FastifyInstance, _deps: Deps): voi
       }
       const r = (await store.getEintrag(tx, quartal, await store.createEintrag(tx, quartal, body)))!;
       await record(tx, who, { action: 'zielerreichung.created', resourceType: 'zielerreichung', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
+      // Aufgabe «Zielerreichung erfassen»: Fortschritt nachführen, erledigt mit dem letzten Ziel (fachmodell.md 4.2)
+      await nachfuehren(tx, quartal);
       return r;
     });
     return reply.code(201).header('location', `/v1/zielerreichung/${quartal}/${row.id}`).header('etag', etag(row.version)).send(eintragOut(row));
@@ -128,6 +131,7 @@ export function registerErreichungRoutes(app: FastifyInstance, _deps: Deps): voi
       if (!before) throw notFound('Stand');
       if (before.version !== version || !(await store.removeEintrag(tx, id, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: 'zielerreichung.deleted', resourceType: 'zielerreichung', resourceId: id, data: snapshot(before), event: { id } });
+      await nachfuehren(tx, quartal);
     });
     return reply.code(204).send();
   });

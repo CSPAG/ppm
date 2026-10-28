@@ -9,6 +9,7 @@ import { zielTools } from './mcp.ts';
 import { registerRoutes } from './routes.ts';
 import { registerZyklusRoutes } from './zyklus-routes.ts';
 import { registerErreichungRoutes } from './erreichung-routes.ts';
+import { zielerreichungTask } from './erreichung-aufgabe.ts';
 import { registerFreigabeRoutes } from './freigabe-routes.ts';
 import { roadmapTools } from './roadmap-mcp.ts';
 import { registerRoadmapRoutes } from './roadmap-routes.ts';
@@ -26,5 +27,6 @@ export const zielModule = defineModule({
     registerFreigabeRoutes(app, deps); // Vorlage an den VR und Freigabe der Jahresziele (AP-E6-2)
     registerRoadmapRoutes(app, deps); // Portfolio-Roadmap (AP-E6-2)
   },
+  tasks: [zielerreichungTask], // Aufgabe «Zielerreichung erfassen» nach Quartalsende (AP-E6-3)
   mcpTools: { ...zielTools, ...roadmapTools },
 });

@@ -1,0 +1,17 @@
+/* Vorlagen (UI-48): Versionen als Zeilen mit Stand, Zuordnung als Tabelle mit Auswahl je Platzhalter */
+.vl-h{margin:16px 0 6px;font:600 13px var(--f-body)}
+.vl-gilt{margin:8px 0}
+.vl-liste{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.vl-zeile{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;width:100%;min-height:44px;padding:8px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;text-align:left;cursor:pointer}
+.vl-zeile:hover{background:var(--surface-2)}
+.vl-zeile:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.vl-zeile > .ico:last-child{margin-left:auto;color:var(--fg-3)}
+.vl-nr{font-weight:600}
+.vl-meta{flex-basis:100%}
+.vl-warn{color:var(--warn);display:inline-flex}
+.vl-kopf{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:8px}
+.vl-tab tbody td{white-space:normal;max-width:none}
+.vl-tab select{height:32px;width:100%;min-width:0;border:1px solid var(--line-2);border-radius:7px;padding:0 8px;background-color:var(--surface);color:var(--fg)}
+.vl-tab select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.vl-tab select[aria-invalid="true"]{border-color:var(--bad)}
+.vl-zurueck{transform:rotate(180deg)}

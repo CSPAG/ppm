@@ -2,6 +2,9 @@
 import assert from 'node:assert/strict';
 import type { Matrix } from './typ.ts';
 
+/** Quartal der Testfälle (in der Vergangenheit). */
+const Q = '2025-Q3';
+
 export const matrix: Matrix = {
   tables: {
     // braucht das Jahresziel «Probe» aus matrix/ziel-zyklus.ts
@@ -18,22 +21,23 @@ export const matrix: Matrix = {
     "ppm.zielerreichung.zielerreichung_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('zielerreichung:write'::text) CHECK -",
   ],
   seed: async (api, a, mark) => {
-    // Jahresziel 2026 von A aus matrix/ziel-zyklus.ts (läuft vorher)
-    const jz = (await api.app.inject({ method: 'GET', url: '/v1/jahresziele?jahr=2026', headers: a })).json().items.find((j: { text: string }) => j.text === mark);
-    const r = await api.app.inject({ method: 'POST', url: '/v1/zielerreichung/2026-Q3', headers: a, payload: { zielTyp: 'jahresziel', zielId: jz.id, stand: mark } });
+    // Strategisches Ziel von A aus matrix/ziel.ts (läuft vorher); vergangenes Quartal, damit kein Stand die Aufgabe
+    // «Zielerreichung erfassen» des zuletzt abgeschlossenen Quartals öffnet (erreichung-aufgabe.ts)
+    const sz = (await api.app.inject({ method: 'GET', url: `/v1/strategische-ziele?q=${encodeURIComponent(mark)}`, headers: a })).json().items[0];
+    const r = await api.app.inject({ method: 'POST', url: `/v1/zielerreichung/${Q}`, headers: a, payload: { zielTyp: 'strategisch', zielId: sz.id, stand: mark } });
     assert.equal(r.statusCode, 201, r.body);
     return { zielerreichung: r.json().id };
   },
   cases: {
     // Quartal ist kein Geheimnis: B sieht seine eigenen Ziele ohne die Stände von A
-    'GET /v1/zielerreichung/:quartal': () => ({ method: 'GET', url: '/v1/zielerreichung/2026-Q3', kind: 'list' }),
+    'GET /v1/zielerreichung/:quartal': () => ({ method: 'GET', url: `/v1/zielerreichung/${Q}`, kind: 'list' }),
     // Jahresziel von A: für B unbekannt → 404
-    'POST /v1/zielerreichung/:quartal': i => ({ method: 'POST', url: '/v1/zielerreichung/2026-Q3', body: { zielTyp: 'jahresziel', zielId: i.jahresziel, stand: 'GEHEIM-A' }, kind: 'foreign' }),
-    'PATCH /v1/zielerreichung/:quartal/:id': i => ({ method: 'PATCH', url: `/v1/zielerreichung/2026-Q3/${i.zielerreichung}`, body: { stand: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
-    'DELETE /v1/zielerreichung/:quartal/:id': i => ({ method: 'DELETE', url: `/v1/zielerreichung/2026-Q3/${i.zielerreichung}`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
+    'POST /v1/zielerreichung/:quartal': i => ({ method: 'POST', url: `/v1/zielerreichung/${Q}`, body: { zielTyp: 'jahresziel', zielId: i.jahresziel, stand: 'GEHEIM-A' }, kind: 'foreign' }),
+    'PATCH /v1/zielerreichung/:quartal/:id': i => ({ method: 'PATCH', url: `/v1/zielerreichung/${Q}/${i.zielerreichung}`, body: { stand: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
+    'DELETE /v1/zielerreichung/:quartal/:id': i => ({ method: 'DELETE', url: `/v1/zielerreichung/${Q}/${i.zielerreichung}`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
   },
   unchanged: async (api, a, mark) => {
-    const q = (await api.app.inject({ method: 'GET', url: '/v1/zielerreichung/2026-Q3', headers: a })).json();
+    const q = (await api.app.inject({ method: 'GET', url: `/v1/zielerreichung/${Q}`, headers: a })).json();
     const e = q.ziele.filter((z: { eintrag: unknown }) => z.eintrag).map((z: { eintrag: { stand: string; version: number } }) => [z.eintrag.stand, z.eintrag.version]);
     assert.deepEqual(e, [[mark, 1]]);
   },

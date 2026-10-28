@@ -20,7 +20,9 @@ import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
 import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/index.ts';
 import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
+import type { SetVorlagenSearch } from './features/vorlagen/index.ts';
 import type { SetKontoSearch } from './features/konto/index.ts';
+import type { SetZugaengeSearch } from './features/zugang/index.ts';
 import { abgeschlossenesQuartal, type QuartalNr, type SetRoadmapSearch, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
 import { kopfkarten } from './kopfkarten.ts';
 import { seite } from './routes/seite.ts';
@@ -50,7 +52,10 @@ const ProtokollPage = seite(() => import('./features/sitzung/ProtokollPage.tsx')
 const EntscheidePage = seite(() => import('./features/sitzung/EntscheidePage.tsx'), 'EntscheidePage');
 const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
 const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
+const VorlagenPage = seite(() => import('./features/vorlagen/VorlagenPage.tsx'), 'VorlagenPage');
 const StellvertretungPage = seite(() => import('./features/konto/StellvertretungPage.tsx'), 'StellvertretungPage');
+const ZugaengePage = seite(() => import('./features/zugang/ZugaengePage.tsx'), 'ZugaengePage');
+const NeubesetzungPage = seite(() => import('./features/zugang/NeubesetzungPage.tsx'), 'NeubesetzungPage');
 const ZielePage = seite(() => import('./features/ziele/ZielePage.tsx'), 'ZielePage');
 const ZielzyklusPage = seite(() => import('./features/ziele/ZielzyklusPage.tsx'), 'ZielzyklusPage');
 const FreigabePage = seite(() => import('./features/ziele/FreigabePage.tsx'), 'FreigabePage');
@@ -387,6 +392,20 @@ function CodetabellenRoute() {
   return <CodetabellenPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Administration»: Vorlagen (UI-48; UC-018 Schritte 1–2, AP-E7-7)
+const vorlagenRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/vorlagen', validateSearch: searchOf.vorlagen, component: VorlagenRoute,
+});
+
+function VorlagenRoute() {
+  const search = vorlagenRoute.useSearch();
+  const navigate = useNavigate({ from: vorlagenRoute.fullPath });
+  const setSearch = useCallback<SetVorlagenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <VorlagenPage search={search} setSearch={setSearch} />;
+}
+
 // Arbeitsraum «Administration»: Phasenmodell (UI-46, AM.02.03)
 const phasenmodellRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/administration/phasenmodell', validateSearch: searchOf.phasenmodell, component: PhasenmodellRoute,
@@ -484,6 +503,30 @@ const devRoutes = import.meta.env.DEV
   ? [createRoute({ getParentRoute: () => rootRoute, path: '/dev/galerie', component: lazyRouteComponent(() => import('./dev/Galerie.tsx'), 'Galerie') })]
   : [];
 
+// Arbeitsraum «Administration»: Zugänge entziehen mit Neubesetzung (UI-42, UC-016 A1)
+const zugaengeRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/administration/zugaenge', validateSearch: searchOf.zugaenge, component: ZugaengeRoute,
+});
+
+function ZugaengeRoute() {
+  const search = zugaengeRoute.useSearch();
+  const navigate = useNavigate({ from: zugaengeRoute.fullPath });
+  const setSearch = useCallback<SetZugaengeSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <ZugaengePage search={search} setSearch={setSearch} gehe={gehe} />;
+}
+
+const neubesetzungRoute = createRoute({ getParentRoute: () => rootRoute, path: '/administration/neubesetzungen/$id', component: NeubesetzungRoute });
+
+function NeubesetzungRoute() {
+  const { id } = neubesetzungRoute.useParams();
+  const navigate = useNavigate();
+  const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
+  return <NeubesetzungPage id={id} gehe={gehe} />;
+}
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   eingangRoute,
@@ -511,8 +554,11 @@ const routeTree = rootRoute.addChildren([
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,
+  vorlagenRoute,
   phasenmodellRoute,
   portfoliosRoute,
+  zugaengeRoute,
+  neubesetzungRoute,
   ressourcenRoute,
   auslastungRoute,
   kapazitaetRoute,

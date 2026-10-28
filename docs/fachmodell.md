@@ -79,6 +79,7 @@ Features nutzen keine anderen Features (`feature-nur-gemeinsame-bausteine`); gem
 |---|---|---|---|---|---|
 | `eingang` | Eingang | UI-01 | `eingang` (+ Kopfdaten der Module) | alle | AP-E0-8 |
 | `konto` | Kontomenü › Profil, Stellvertretung | UI-43 | `eingang` | – | AP-E0-8 |
+| `zugang` | Administration › Zugänge, Neubesetzung | UI-42 (Teil Zugang entziehen) | `eingang` (`neubesetzung*`) | – | AP-E7-8 |
 | `projekt` | Projekte (Meine Projekte), Projekt › Übersicht; Rahmen der Projektakte (Kopf, Reiter) | UI-05, UI-06 | `projekt`, `projektdaten` | K1, K2 | AP-E0-4 |
 | `bericht` | Projekte › Projekt › Bericht | UI-13 | `statusbericht` | K1 | AP-E1-1 |
 | `monatsabschluss` | Portfolio › Monatsabschluss (+ Termine) | UI-15, UI-16 | `statusbericht` | K1 | AP-E1-2 |
@@ -740,6 +741,12 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-45 | – (Bauplan) | Je Portfolio genau ein entscheidendes Gremium (PRAT ↔ A, GLPA ↔ B, Direktion ↔ C); Rechte im Gremium = Rolle `gremium` am Portfolio | AP-E0-1, AP-E0-5 |
 | A-46 | – (Bauplan) | Antragstellende = alle Mitglieder (Rolle `antragsteller` an «Alle Mitglieder») | AP-E0-1, AP-E4-1 |
 | A-47 | – (Bauplan) | Projektnummer «JJJJ-NNN» fortlaufend je Jahr der Anlage und Organisation | AP-E0-4 |
+| A-48 | K3 Schritt 4 | Portfoliobericht nur aus einer abgeschlossenen Periode, Inhalt als Stand bei Erzeugung; «Entwurf» → «bereitgestellt», ab dann für Gremien sichtbar; ein Kommentar je Bericht («Bericht der Programmleitung»); Traktandum als Vorschlag beim Bereitstellen; Risikolage ohne eigene Bewertungsregel, nur aktive Projekte | AP-E2-3 |
+| A-49 | – (Bauplan, I-B3) | Aufgabe «Zielerreichung erfassen» als Sammelaufgabe je Quartal an `zielerreichung:write` mit Fortschritt, ohne Frist bis zur Klärung des Termins des Quartalsreportings | AP-E6-3 |
+| A-50 | UC-016 A1 | «Zugang sperren» = Mitglied im Baukasten entfernen; neu zu besetzen sind nur unbefristete Rollen an Orten (befristete entfallen mit dem Ablauf); neu besetzt wird dort, wo die Rolle vergeben wird; die Aufgabe erledigt die Administration | AP-E7-8 |
+| A-51 | K25 | Bei Kategorie C ist die Direktion das Portfolio C mit seiner Organisationseinheit; sie benennt SP und PL mit der Freigabe; sonst erfasst die UE SP und PL vor dem Entscheid (ohne beide 422); «Mit Auflagen freigegeben» wirkt wie «Freigegeben»; die Direktion kann nicht zurückstellen; eine Korrektur weg von «Freigegeben» zieht das Projekt zurück | AP-E4-3 |
+| A-52 | K01, UX-OF-18, K5 Z4 | Matrix: Achse = Durchschnitt hoch 3 / mittel 2 / tief 1 der zugeordneten Kriterien, > 2 hoch, < 2 tief, = 2 Grenze ohne Feld (Gremium beurteilt); Kosten = Summe Prognose, sonst Budget-Baseline; Ressourcen = FTE × Monate, sonst Grösse S/M/L = 1/6, 1/2, 5/6 der Achse («geschätzt»); Rangfolge nur als Entwurf der UE, «entschieden» mit AP-E5-5 | AP-E5-2 |
+| A-53 | Q7 | Änderungsantrag: Rubriken der Hauptänderungen Scope = Kap. 3–5, Zeitplan = Kap. 7, Ressourcen/Budget = Kap. 9, Annahmen = Kap. 4, Key-Risiken = Kap. 10; Wirkung aus den gegenüber der Baseline geänderten Kapiteln und `kapitel_wirkung` des Phasenmodells (ohne Phasenmodell entscheidet der SP); Antrag an den PRAT nur bei Wirkung; eingereicht = «in Prüfung» beim SP ohne Quality-Check; Korrektur des Gremiums hebt eine gesetzte Baseline nicht auf; die UE erhält keine Mitteilung (keine Mitteilung an ein Recht, offen) | AP-E3-4 |
 
 A-25 ist nicht vergeben (in A-24 enthalten). Annahmen A-41 bis A-47 sind technische Schnitte dieses Bauplans ohne
 Fachregel; sie kommen als Frage in die Klärungsliste, sobald eine Fachfrage daran hängt.

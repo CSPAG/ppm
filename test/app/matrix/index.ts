@@ -16,6 +16,7 @@ export const MATRIX = sammle([
   (await import('./vertrag-dokument.ts')).matrix,
   (await import('./vorlage.ts')).matrix,
   (await import('./vertrag-pruefung.ts')).matrix,
+  (await import('./vertrag-gate.ts')).matrix,
   (await import('./ziel-zyklus.ts')).matrix,
   (await import('./ziel-freigabe.ts')).matrix,
   (await import('./sitzung.ts')).matrix,
@@ -35,6 +36,7 @@ export const MATRIX = sammle([
   (await import('./idee-freigabe.ts')).matrix,
   (await import('./priorisierung.ts')).matrix,
   (await import('./priorisierung-matrix.ts')).matrix,
+  (await import('./priorisierung-szenario.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
   (await import('./schnittstelle.ts')).matrix,
 ]);

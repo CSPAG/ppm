@@ -40,16 +40,19 @@ test('Sitzung vorbereiten: einplanen, verschieben und zurückholen, versenden; b
   await page.getByRole('button', { name: new RegExp(`Sitzung ${kuerzel.toUpperCase()} .* öffnen`) }).first().click();
   await expect(page).toHaveURL(new RegExp(`/gremien/${kuerzel}/sitzungen/${termin1}$`));
 
-  // Termin ohne Sitzung: anlegen; leere Liste erklärt sich (Z2)
+  // Termin ohne Sitzung: anlegen; Traktandum 1 «Bericht der Programmleitung» ist immer gesetzt (K3 Schritt 4), ohne
+  // Griff und ohne Entfernen, mit Hinweis
   await page.getByRole('button', { name: 'Sitzung vorbereiten' }).click();
-  await expect(page.getByText(/Noch keine Traktanden/)).toBeVisible();
+  const liste = page.getByRole('list', { name: 'Traktandenliste' });
+  await expect(liste.getByRole('heading', { name: 'Bericht der Programmleitung' })).toBeVisible();
+  await expect(liste.getByText(/bleibt Traktandum 1; Sie können es weder entfernen noch verschieben/)).toBeVisible();
+  await expect(liste.getByRole('button', { name: /Bericht der Programmleitung/ })).toHaveCount(0);
   await expectAccessible(page);
   await expectNoOverflow(page);
 
   // Gate-Review einplanen (PP.04.05): 35 Minuten; ohne Unterlagen Warnung mit Ausweg (UC-006 A2)
   await page.getByLabel('Gate-Review einplanen').selectOption({ label: `${projekt.nummer} Projekt ${lauf} · P2` });
   await page.getByRole('button', { name: 'Aufnehmen', exact: true }).click();
-  const liste = page.getByRole('list', { name: 'Traktandenliste' });
   await expect(liste.getByText(/35 Min\./)).toBeVisible();
   await expect(liste.getByText(/Unterlagen für .* fehlen/)).toBeVisible();
   await expectAccessible(page);
@@ -63,7 +66,7 @@ test('Sitzung vorbereiten: einplanen, verschieben und zurückholen, versenden; b
   // Unterlagen versenden: Vorschau der Wirkung, dann ein bewusster Klick (I-R1 Stufe 3)
   await page.getByRole('button', { name: 'Unterlagen versenden' }).click();
   const dialog = page.getByRole('dialog', { name: 'Unterlagen jetzt versenden?' });
-  await expect(dialog.getByText(new RegExp(`Die Mitglieder des ${kuerzel.toUpperCase()} erhalten Traktandenliste \\(1 Traktandum\\)`))).toBeVisible();
+  await expect(dialog.getByText(new RegExp(`Die Mitglieder des ${kuerzel.toUpperCase()} erhalten Traktandenliste \\(2 Traktanden\\)`))).toBeVisible();
   await expect(dialog.getByText(/Frist 5 Arbeitstage: eingehalten|Unterlagen/).first()).toBeVisible();
   await expectAccessible(page);
   await dialog.getByRole('button', { name: 'Unterlagen versenden' }).click();

@@ -107,7 +107,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
 
   test('Entwurf «Änderung»: übernimmt die Baseline vollständig; nur mit Baseline und Begründung (UC-007 Schritt 1)', async () => {
     const b = await baseline();
-    assert.deepEqual((await ok('pl', 'GET', `/v1/projekte/${projekt.id}/vertrag`)).json().can.entwerfen, ['aenderung']);
+    assert.deepEqual((await ok('pl', 'GET', `/v1/projekte/${projekt.id}/vertrag`)).json().can.entwerfen, ['aenderung', 'gate'], 'mit Baseline auch das Gate (AP-E3-3)');
     assert.deepEqual((await ok('pl', 'GET', `/v1/projekte/${ohneBaseline}/vertrag`)).json().can.entwerfen, ['initial']);
     const ohne = await call('pl', 'POST', `/v1/projekte/${ohneBaseline}/vertrag/entwuerfe`, { anlass: 'aenderung', begruendung: 'x' });
     assert.equal(ohne.statusCode, 409, ohne.body);

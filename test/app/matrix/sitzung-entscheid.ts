@@ -59,7 +59,7 @@ export const matrix: Matrix = {
       s = await inject('POST', `/v1/sitzungen/${s.id}/traktanden`, { art: 'eskalation', titel: mark, antrag: mark });
       s = await inject('POST', `/v1/sitzungen/${s.id}/versenden`, undefined, { 'if-match': `W/"${s.version}"` });
       const m = await inject('POST', `/v1/sitzungen/${s.id}/starten`, undefined, { 'if-match': `W/"${s.version}"` });
-      const t = m.traktanden[0].traktandumId;
+      const t = m.traktanden.find((x: { art: string }) => x.art === 'eskalation').traktandumId;
       const e = await inject('PUT', `/v1/traktanden/${t}/entscheid`, { ergebnis: 'erledigt', begruendung: mark, auflagen: [{ text: mark, verantwortlich, termin: '2027-02-01' }] });
       return { s: m, t, auflage: e.auflagen[0].id };
     };

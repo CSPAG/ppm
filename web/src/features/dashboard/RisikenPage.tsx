@@ -120,7 +120,8 @@ export function Lage({ r, projektLink, filter, setFilter }: { r: LageDaten; proj
     <>
       <div className="db-kennzahlen" role="status">
         <ul>
-          <li>{TR.kennzahl.risiken(r.risiken.length)}</li>
+          {/* die Gesamtzahl hebt eine Auswahl auf und zeigt alle Risiken */}
+          <li>{gefiltert ? zahl(TR.kennzahl.risiken(r.risiken.length), r.risiken.length, {}) : TR.kennzahl.risiken(r.risiken.length)}</li>
           <li>{zahl(TR.kennzahl.hoch(hoch), hoch, { w: 'hoch', a: 'hoch' })}</li>
           <li>{zahl(TR.kennzahl.offen(offen), offen, { massnahme: 'offen' })}</li>
         </ul>

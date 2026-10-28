@@ -133,8 +133,10 @@ describe('Risikolage', () => {
     expect(klick).toHaveBeenCalledOnce();
     klick.mockRestore();
 
-    await userEvent.click(screen.getByRole('button', { name: TR.filter.entfernen(TR.filter.feld('hoch', 'hoch')) }));
+    // die Gesamtzahl hebt die Auswahl auf und zeigt alle Risiken
+    await userEvent.click(screen.getByRole('button', { name: TR.zeigen(TR.kennzahl.risiken(2)) }));
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{}'));
+    expect(within(screen.getByRole('table', { name: TR.risiken.titel })).getAllByRole('row')).toHaveLength(3);
     await userEvent.click(screen.getByRole('button', { name: TR.zeigen(TR.kennzahl.offen(1)) }));
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{"massnahme":"offen"}'));
   });

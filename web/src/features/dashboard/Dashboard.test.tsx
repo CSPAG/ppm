@@ -95,8 +95,11 @@ describe('Dashboard', () => {
     // das nicht gemeldete (Vorperiode kritisch) zählt nicht
     expect(screen.getAllByRole('link').map(a => a.textContent)).toEqual(['2026-001 Vorhaben 1']);
     expect(screen.getByText(TD.auswahl.kritisch!, { selector: '.chip .v *, .chip .v' })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: TD.auswahlEntfernen(TD.auswahl.kritisch!) }));
+    // die Gesamtzahl hebt die Auswahl auf und zeigt alle gezählten Projekte
+    await userEvent.click(screen.getByRole('button', { name: TD.zeigen(TD.kennzahl.projekte(3)) }));
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('{}'));
+    expect(screen.getAllByRole('link')).toHaveLength(3);
+    expect(screen.queryByRole('button', { name: TD.zeigen(TD.kennzahl.projekte(3)) })).toBeNull();
 
     await userEvent.click(screen.getByRole('button', { name: TD.ansicht.funnel }));
     const tab = await screen.findByRole('table', { name: TD.funnel.titel });

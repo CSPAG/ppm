@@ -33,8 +33,11 @@ function Kopf({ unter, aktionen }: { unter?: string; aktionen?: ReactNode }) {
   );
 }
 
-/** Kennzahlen der Liste (nach Phase gefiltert); jede Zahl zeigt ihre Projekte (Auswahl in der Adresse). */
-function Kennzahlen({ items, waehlen }: { items: DashboardZeile[]; waehlen(a: Auswahl): void }) {
+/**
+ * Kennzahlen der Liste (nach Phase gefiltert); jede Zahl zeigt ihre Projekte (Auswahl in der Adresse). Die Gesamtzahl
+ * hebt eine Auswahl auf und zeigt damit alle gezählten Projekte.
+ */
+function Kennzahlen({ items, waehlen, alle }: { items: DashboardZeile[]; waehlen(a: Auswahl): void; alle?(): void }) {
   const teil = (a: Auswahl, text: (n: number) => string, immer = false) => {
     const n = anzahl(items, a);
     if (!n && !immer) return null;
@@ -47,7 +50,9 @@ function Kennzahlen({ items, waehlen }: { items: DashboardZeile[]; waehlen(a: Au
   return (
     <div className="db-kennzahlen" role="status">
       <ul>
-        <li>{TD.kennzahl.projekte(items.length)}</li>
+        <li>{alle && items.length
+          ? <button type="button" className="linkbtn db-zahl" onClick={alle} aria-label={TD.zeigen(TD.kennzahl.projekte(items.length))}>{TD.kennzahl.projekte(items.length)}</button>
+          : TD.kennzahl.projekte(items.length)}</li>
         {teil('im_plan', TD.kennzahl.imPlan, true)}
         {teil('kritisch', TD.kennzahl.kritisch, true)}
         {teil('nicht_gemeldet', TD.kennzahl.nichtGemeldet)}
@@ -124,7 +129,8 @@ export function DashboardPage({ search, setSearch, heute = new Date() }: { searc
         ) : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : d ? (
           <>
             {d.periodeStand === 'offen' ? <div className="db-hinweis"><Hinweis stufe="hinweis">{TD.periodeOffen(fmtPeriode(d.periode).split(' ')[0]!)}</Hinweis></div> : null}
-            <Kennzahlen items={inPhase} waehlen={auswahl => setSearch({ ansicht: undefined, auswahl })} />
+            <Kennzahlen items={inPhase} waehlen={auswahl => setSearch({ ansicht: undefined, auswahl })}
+              alle={search.auswahl ? () => setSearch({ ansicht: undefined, auswahl: undefined }) : undefined} />
             {!d.items.length ? <Empty>{TD.leer}</Empty> : search.ansicht === 'funnel' ? (
               <Funnel items={d.items} waehlen={(phase: Phase, auswahl?: Auswahl) => setSearch({ ansicht: undefined, phase, auswahl })} />
             ) : zeilen.length ? (

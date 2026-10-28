@@ -47,7 +47,9 @@ export function useLaeufe(id: string) {
 export function useSchnittstellenMutationen() {
   const qc = useQueryClient();
   // Läufe und Konfiguration ändern auch das Änderungsprotokoll und den Eingang (Fehleraufgabe)
-  const refresh = () => Promise.all([qc.invalidateQueries({ queryKey: schnittstellenKeys.all }), qc.invalidateQueries({ queryKey: ['aenderungsprotokoll'] })]);
+  const refresh = () => Promise.all([
+    qc.invalidateQueries({ queryKey: schnittstellenKeys.all }), qc.invalidateQueries({ queryKey: ['aenderungsprotokoll'] }), qc.invalidateQueries({ queryKey: ['eingang'] }),
+  ]);
   const einrichten = useMutation({
     mutationFn: async ({ body, key }: { body: Schemas['SchnittstelleCreate']; key: string }) =>
       (await api.POST('/v1/schnittstellen', { body, params: { header: { 'idempotency-key': key } } })).data!,

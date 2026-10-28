@@ -3,6 +3,7 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
+import { abschlussTexte } from './features/abschluss/index.ts';
 import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
@@ -38,6 +39,8 @@ export const navigation: NavRegistrierung = {
     // Risikolage (UI-18) und Portfoliobericht (UI-29), AP-E2-3
     { raum: 'portfolio', pfad: '/portfolio/dashboard/risiken', label: risikenTexte.bereich, recht: 'auswertung:read' },
     { raum: 'portfolio', pfad: '/portfolio/auswertungen/portfoliobericht', label: portfolioberichtTexte.bereich, recht: 'auswertung:read' },
+    // Lessons Learned (UI-32, PS.04.03; AP-E7-1): sichtbar wie die Auswertungen; Projektrollen sehen sie in der Projektakte
+    { raum: 'portfolio', pfad: '/portfolio/auswertungen/lessons-learned', label: abschlussTexte.liste.bereich, recht: 'auswertung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
     { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: ['idee:create', 'idee:read'] },
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite

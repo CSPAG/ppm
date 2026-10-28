@@ -61,6 +61,7 @@ describe('MCP-Dienst', { skip }, () => {
     assert.deepEqual(tools.map(t => t.name).sort(), [
       'get_handlungsfeld',
       'get_phasenmodell',
+      'get_roadmap',
       'list_aufgaben',
       'list_handlungsfelder',
       'list_org_einheiten',

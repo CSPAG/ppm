@@ -13,6 +13,7 @@ import { handlungsfeldModule } from './modules/handlungsfeld/index.ts';
 import { ideeModule } from './modules/idee/index.ts';
 import { phasenmodellModule } from './modules/phasenmodell/index.ts';
 import { portfolioModule } from './modules/portfolio/index.ts';
+import { priorisierungModule } from './modules/priorisierung/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
 import { ressourceModule } from './modules/ressource/index.ts';
@@ -20,6 +21,7 @@ import { sitzungModule } from './modules/sitzung/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { statusberichtModule } from './modules/statusbericht/index.ts';
 import { vertragModule } from './modules/vertrag/index.ts';
+import { vorlageModule } from './modules/vorlage/index.ts';
 import { webhooksModule } from './modules/webhooks/index.ts';
 import { zielModule } from './modules/ziel/index.ts';
 import { platform } from './platform.ts';
@@ -40,9 +42,11 @@ export const app = defineApp({
     sitzungModule,
     statusberichtModule,
     auswertungModule,
+    vorlageModule,
     vertragModule,
     ideeModule,
     ressourceModule,
+    priorisierungModule,
     webhooksModule,
   ],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4);

@@ -5,6 +5,7 @@
  * darf (I-N2, keine leeren Seiten). Bereiche prüfen mit `canSomewhere` (Navigation), Aktionen ohne Ressource mit `can`.
  */
 import { useIam, useIamNav } from '@vollholz/iam-web';
+import { useQueries } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type { AppPermission } from '../auth/permissions.ts';
 import { T, type IconName } from '../ui/index.ts';
@@ -28,7 +29,13 @@ export const UNTEN_VORRANG: readonly ArbeitsraumId[] = ['eingang', 'projekte', '
 export const UNTEN_ANZAHL = 3;
 
 /** Bereich eines Arbeitsraums (I-N5: `/<arbeitsraum>/<bereich>`), sichtbar mit dem Recht irgendwo. */
-export interface BereichEintrag { raum: ArbeitsraumId; pfad: string; label: string; recht: AppPermission }
+export interface BereichEintrag {
+  raum: ArbeitsraumId; pfad: string; label: string;
+  /** Recht oder Liste von Rechten, von denen eines genügt. */
+  recht: AppPermission | readonly AppPermission[];
+  /** Adressen mit Parametern, unter denen der Bereich aktiv ist (z. B. `/ziele/2026` für den Zielzyklus); ersetzt `pfad` als Prüfung. */
+  muster?: RegExp;
+}
 
 /** Häufige Aktion für die Befehlspalette (I-N4), sichtbar mit dem Recht an der Organisation. */
 export interface AktionEintrag { id: string; label: string; icon: IconName; pfad: string; recht: AppPermission }
@@ -38,7 +45,24 @@ export interface Treffer { id: string; label: string; detail?: string; icon: Ico
 /** Suche nach Objekten für die Befehlspalette, nur mit dem Recht irgendwo; die Antwort der API filtert je Objekt. */
 export interface SucheEintrag { id: string; recht: AppPermission; suchen(q: string, signal: AbortSignal): Promise<Treffer[]> }
 
-export interface NavRegistrierung { bereiche: readonly BereichEintrag[]; aktionen: readonly AktionEintrag[]; suchen: readonly SucheEintrag[] }
+/**
+ * Zähler an einem Arbeitsraum (I-N3: offene Aufgaben an «Eingang»), sichtbar mit dem Recht irgendwo. `queryKey` teilt
+ * das Feature mit seinen eigenen Abfragen, damit der Zähler nach einer Änderung dort mit neu lädt.
+ */
+export interface ZaehlerEintrag {
+  raum: ArbeitsraumId; recht: AppPermission; queryKey: readonly unknown[];
+  laden(signal: AbortSignal): Promise<number>;
+  /** Text für Bildschirmleser, z. B. «3 offene Aufgaben». */
+  text(n: number): string;
+}
+
+/** Persönliche Seite im Kontomenü und unter «Mehr» (IA: Profil und Stellvertretung), sichtbar mit dem Recht irgendwo. */
+export interface KontoEintrag { id: string; label: string; icon: IconName; pfad: string; recht: AppPermission }
+
+export interface NavRegistrierung {
+  bereiche: readonly BereichEintrag[]; aktionen: readonly AktionEintrag[]; suchen: readonly SucheEintrag[];
+  zaehler?: readonly ZaehlerEintrag[]; konto?: readonly KontoEintrag[];
+}
 
 export interface Bereich { pfad: string; label: string; aktiv: boolean }
 export interface SichtbarerRaum extends Arbeitsraum { pfad: string; bereiche: Bereich[]; aktiv: boolean }
@@ -48,18 +72,19 @@ export const liegtIn = (path: string, pfad: string) => path === pfad || path.sta
 
 /**
  * Sichtbare Arbeitsräume in fester Reihenfolge, je mit ihren erlaubten Bereichen (Ziel des Arbeitsraums ist sein erster
- * Bereich). Die Verwalten-Seiten des Baukastens sind die Bereiche der Administration (bereits nach Recht gefiltert).
+ * Bereich). Die Verwalten-Seiten des Baukastens sind die ersten Bereiche der Administration (IA: «Benutzer und Rollen»
+ * zuerst, dann Organisation, Codetabellen …; bereits nach Recht gefiltert).
  */
 export function sichtbareRaeume(
   reg: Pick<NavRegistrierung, 'bereiche'>, darf: (p: AppPermission) => boolean, path: string,
   verwalten: readonly { path: string; title: string }[] = [],
 ): SichtbarerRaum[] {
-  const alle = [
-    ...reg.bereiche.filter(b => darf(b.recht)),
+  const alle: { raum: ArbeitsraumId; pfad: string; label: string; muster?: RegExp }[] = [
     ...verwalten.map(v => ({ raum: 'administration' as const, pfad: v.path, label: v.title })),
+    ...reg.bereiche.filter(b => (typeof b.recht === 'string' ? [b.recht] : b.recht).some(darf)),
   ];
   return ARBEITSRAEUME.flatMap(r => {
-    const bereiche = alle.filter(b => b.raum === r.id).map(b => ({ pfad: b.pfad, label: b.label, aktiv: liegtIn(path, b.pfad) }));
+    const bereiche = alle.filter(b => b.raum === r.id).map(b => ({ pfad: b.pfad, label: b.label, aktiv: b.muster ? b.muster.test(path) : liegtIn(path, b.pfad) }));
     if (!bereiche.length) return [];
     return [{ ...r, pfad: bereiche[0]!.pfad, bereiche, aktiv: bereiche.some(b => b.aktiv) }];
   });
@@ -83,4 +108,21 @@ export function useNavigation(reg: NavRegistrierung, path: string) {
     aktionen: reg.aktionen.filter(a => can(a.recht)),
     suchen: reg.suchen.filter(s => canSomewhere(s.recht)),
   }), [reg, can, canSomewhere, path, verwalten]);
+}
+
+/** Zähler je Arbeitsraum (nur mit Recht und Wert über 0); lädt jede Minute und beim Zurückkehren ins Fenster neu. */
+export type Zaehler = Partial<Record<ArbeitsraumId, { n: number; text: string }>>;
+
+export function useZaehler(reg: Pick<NavRegistrierung, 'zaehler'>): Zaehler {
+  const { canSomewhere } = useIam();
+  const eintraege = (reg.zaehler ?? []).filter(z => canSomewhere(z.recht));
+  const q = useQueries({
+    queries: eintraege.map(z => ({ queryKey: z.queryKey, queryFn: ({ signal }: { signal: AbortSignal }) => z.laden(signal), refetchInterval: 60_000 })),
+  });
+  const out: Zaehler = {};
+  eintraege.forEach((z, i) => {
+    const n = q[i]?.data;
+    if (typeof n === 'number' && n > 0) out[z.raum] = { n, text: z.text(n) };
+  });
+  return out;
 }

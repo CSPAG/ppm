@@ -76,4 +76,6 @@ export const TZZ = {
   neuLaden: 'Neu laden',
   hinzufuegen: 'Hinzufügen',
   abbrechen: 'Abbrechen',
+  zurFreigabeVorlegen: 'Zur Freigabe vorlegen',
+  freigabeErfassen: 'Freigabe erfassen',
 };

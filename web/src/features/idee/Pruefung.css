@@ -1,0 +1,30 @@
+/* Ideenpool und Prüfung (AP-E4-2, K4): Ansichten, Filter, Funnel, zweispaltige Prüfansicht, Raster */
+.idee-ansichten{display:flex;gap:4px;padding:0 22px;border-bottom:1px solid var(--line)}
+.idee-filter{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.idee-filter-f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--fg-2)}
+.idee-filter-f select,.idee-select{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 28px 0 10px;background-color:var(--surface);color:var(--fg);min-width:0;max-width:100%}
+.idee-filter-f select:focus,.idee-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.idee-funnel h2{font-size:16px;margin:0 0 10px}
+.idee-funnel-bars{display:flex;flex-direction:column;gap:6px;max-width:640px}
+.idee-funnel-row{display:grid;grid-template-columns:180px 1fr 40px;gap:10px;align-items:center}
+.idee-funnel-b{height:18px;border-radius:4px;background:var(--accent);min-width:4px}
+.idee-funnel-n{text-align:right;font-variant-numeric:tabular-nums}
+.idee-funnel-alt ul{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:2px}
+.idee-pruefung-body{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;padding:16px 22px;align-items:start}
+.idee-pruefung-main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.idee-pruefung-aside{border-left:1px solid var(--line);padding-left:16px;min-width:0}
+.idee-pruefung-aside h2,.idee-abschnitt h2{font-size:16px;margin:0 0 6px}
+.idee-abschnitt .hint{font-size:12.5px;color:var(--fg-3);margin:0 0 8px}
+.idee-aehnlich{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.idee-aehnlich li{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.idee-raster{display:flex;flex-direction:column;gap:10px}
+.idee-raster-z{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.idee-raster-z legend{float:left;width:260px;margin:0}
+.idee-vorschlag,.idee-wirkung{display:flex;gap:6px;align-items:center;margin:8px 0 0}
+@media (max-width:900px){
+  .idee-pruefung-body{grid-template-columns:1fr;padding:12px 16px}
+  .idee-pruefung-aside{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:12px}
+  .idee-funnel-row{grid-template-columns:120px 1fr 32px}
+  .idee-raster-z legend{width:100%}
+  .idee-ansichten{padding:0 16px;overflow-x:auto}
+}

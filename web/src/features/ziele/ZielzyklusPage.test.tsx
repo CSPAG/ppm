@@ -152,6 +152,28 @@ describe('Zielzyklus', () => {
     expect(await api.calls.find(c => c.method === 'POST')!.json()).toEqual({ jahreszielId: JZ2, text: 'Inventur', verantwortlich: null });
   });
 
+  it('zwei Felder rasch nacheinander: das zweite speichert mit der Version aus der ersten Antwort (kein 412)', async () => {
+    let n = 0;
+    const antwort = (version: number) => json({ id: JZ2, jahr: 2027, strategischesZielId: SZ, nummer: '2.1.2', text: 'Lager reduzieren', metrik: 'Lagerwert', zielwert: '1', version, createdAt: '2026-10-01T08:00:00Z', createdBy: null, updatedAt: '2026-10-02T08:00:00Z', updatedBy: null, can: { write: true } });
+    const api = stub({
+      'GET /v1/ziele/2027': () => json(zyklus()),
+      [`PATCH /v1/jahresziele/${JZ2}`]: async () => {
+        n += 1;
+        // erste Antwort kommt erst, nachdem das zweite Feld schon verlassen ist
+        if (n === 1) { await new Promise(r => setTimeout(r, 150)); return antwort(2); }
+        return antwort(3);
+      },
+    });
+    renderWithIam(<Page initial={{ o: 'ziel:2.1.2' }} />);
+    await userEvent.type(await screen.findByLabelText(TZZ.metrik), 'Lagerwert');
+    await userEvent.type(screen.getByLabelText(TZZ.zielwert), '1');
+    await userEvent.tab();
+    expect(await screen.findByText(TZZ.gespeichert)).toBeInTheDocument();
+    await waitFor(() => expect(api.calls.filter(c => c.method === 'PATCH')).toHaveLength(2));
+    expect(api.calls.filter(c => c.method === 'PATCH').map(c => c.headers.get('If-Match'))).toEqual(['W/"1"', 'W/"2"']);
+    expect(screen.queryByText(TZZ.konflikt)).not.toBeInTheDocument();
+  });
+
   it('Jahresziel hinzufügen unter dem strategischen Ziel öffnet das neue Jahresziel', async () => {
     const api = stub({
       'GET /v1/ziele/2027': () => json(zyklus()),
@@ -180,6 +202,20 @@ describe('Zielzyklus', () => {
     expect(await screen.findByText(/liegen dem VR zur Freigabe vor/)).toBeInTheDocument();
     expect(screen.queryByLabelText(TZZ.metrik)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: TZZ.hauptaktivitaetHinzufuegen })).not.toBeInTheDocument();
+  });
+
+  it('Einstieg in die Freigabe (UI-39): «Zur Freigabe vorlegen» in Arbeit, «Freigabe erfassen» zur Freigabe mit Recht', async () => {
+    stub({ 'GET /v1/ziele/2027': () => json(zyklus()) });
+    const freigabe = vi.fn();
+    const { unmount } = renderWithIam(<ZielzyklusPage jahr={2027} search={{}} setSearch={() => undefined} jahrWechseln={() => undefined} projektOeffnen={() => undefined} strategischeZiele={() => undefined} freigabe={freigabe} />);
+    await userEvent.click(await screen.findByRole('button', { name: TZZ.zurFreigabeVorlegen }));
+    expect(freigabe).toHaveBeenCalled();
+    unmount();
+    stub({ 'GET /v1/ziele/2027': () => json(zyklus({ zieljahr: zieljahr({ stand: 'zur_freigabe', vorgelegtAt: '2026-11-10T08:00:00Z', can: { write: false } }) as Zielzyklus['zieljahr'], can: { start: false, write: false, zuordnen: true } })) });
+    renderWithIam(<ZielzyklusPage jahr={2027} search={{}} setSearch={() => undefined} jahrWechseln={() => undefined} projektOeffnen={() => undefined} strategischeZiele={() => undefined} freigabe={freigabe} />,
+      { roles: ['ue'], permissions: ['tenant:read', 'ziel:read', 'ziel:freigabe', 'handlungsfeld:read'] });
+    expect(await screen.findByRole('button', { name: TZZ.freigabeErfassen })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: TZZ.zurFreigabeVorlegen })).not.toBeInTheDocument();
   });
 
   it('unbekanntes Ziel in der Adresse: Hinweis (Z10); Adresse prüft die Nummer (I-N5)', async () => {

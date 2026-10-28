@@ -6,7 +6,7 @@ export const TR = {
   bereich: 'Ressourcen',
   title: 'Ressourcen',
   sub: 'Kapazitätsangebot je Rolle und Monat gegen den Ressourcenbedarf der Projekte.',
-  tabs: { auslastung: 'Auslastung', kapazitaet: 'Kapazität' },
+  tabs: { auslastung: 'Auslastung', kapazitaet: 'Kapazität', bedarf: 'Bedarf' },
   aktionKapazitaet: 'Kapazität planen',
   aktionAuslastung: 'Auslastung analysieren',
   zeitraum: 'Zeitraum', von: 'Von', bis: 'Bis',

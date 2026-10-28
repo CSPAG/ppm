@@ -1,13 +1,13 @@
 /**
- * Kopf des Bereichs «Ressourcen» (Portfolio › Ressourcen, UI-23, UI-24): Titel, Reiter Auslastung und Kapazität (I-N6:
+ * Kopf des Bereichs «Ressourcen» (Portfolio › Ressourcen, UI-23–UI-25): Titel, Reiter Auslastung, Kapazität und Bedarf (I-N6:
  * Arbeitsraum › Bereich › Ansicht) und der Zeitraum als ein Baustein (I-F8), beides in der Adresse (I-N5).
  */
 import { useId, type MouseEvent, type ReactNode } from 'react';
 import { Icon } from '../../ui/index.ts';
 import { TR } from './texte.ts';
 
-export type Reiter = 'auslastung' | 'kapazitaet';
-export const PFAD: Record<Reiter, string> = { auslastung: '/portfolio/ressourcen/auslastung', kapazitaet: '/portfolio/ressourcen/kapazitaet' };
+export type Reiter = 'auslastung' | 'kapazitaet' | 'bedarf';
+export const PFAD = { auslastung: '/portfolio/ressourcen/auslastung', kapazitaet: '/portfolio/ressourcen/kapazitaet', bedarf: '/portfolio/ressourcen/bedarf' } as const satisfies Record<Reiter, string>;
 
 export interface KopfProps {
   reiter: Reiter;
@@ -42,7 +42,7 @@ export function Kopf({ reiter, sub, navigieren, zeitraum, setZeitraum, aktionen 
           {aktionen ? <div className="acts">{aktionen}</div> : null}
         </div>
         <nav className="tabs" aria-label={TR.title}>
-          {(['auslastung', 'kapazitaet'] as const).map(r => (
+          {(Object.keys(PFAD) as Reiter[]).map(r => (
             <a key={r} className={`tab${r === reiter ? ' on' : ''}`} href={href(r)} aria-current={r === reiter ? 'page' : undefined} onClick={klick(r)}>{TR.tabs[r]}</a>
           ))}
         </nav>

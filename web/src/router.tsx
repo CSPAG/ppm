@@ -1,27 +1,60 @@
 /**
  * Routen (TanStack Router, code-basiert): Seiten der App mit typisierten Suchparametern (`search.ts`) und die
- * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen).
+ * Verwalten-Seiten des Baukastens (`makeIamRoutes`, per `load()` erst bei Bedarf geladen). Die Seiten der Features lädt
+ * der Router als eigene Chunks nach (`seite`, Q-L6); die `index.ts` der Features exportieren deshalb keine Seiten.
  */
 import { createRootRoute, createRoute, createRouter, lazyRouteComponent, notFound, redirect, useNavigate } from '@tanstack/react-router';
 import { makeIamRoutes, tanstackParam } from '@vollholz/iam-web';
-import { Suspense, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Root } from './app.tsx';
 import { features, paths } from './auth/index.ts';
 import { projekteRoutes } from './routes/projekte.tsx';
-import { EingangPage, type SetEingangSearch } from './features/eingang/index.ts';
-import { HandlungsfeldPage, type SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
-import { IdeeNeuPage, IdeenPage, IdeePage, nummerAusPfad, type SetIdeeSearch } from './features/idee/index.ts';
-import { AuslastungPage, KapazitaetPage, ressourcenPfad, type SetAuslastungSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
-import { DashboardPage, type SetDashboardSearch } from './features/dashboard/index.ts';
-import { MonatsabschlussPage, type SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
-import { PhasenmodellPage, type SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
-import { PortfoliosPage, type SetPortfoliosSearch } from './features/portfolios/index.ts';
-import { type SetSitzungSearch, SitzungenPage, SitzungPage } from './features/sitzung/index.ts';
-import { CodetabellenPage, OrganisationPage, type SetCodetabellenSearch, type SetOrganisationSearch } from './features/stammdaten/index.ts';
-import { type SetKontoSearch, StellvertretungPage } from './features/konto/index.ts';
-import { abgeschlossenesQuartal, type QuartalNr, type SetZielSearch, type SetZielzyklusSearch, ZielePage, ZielerreichungPage, ZIELJAHR, ZielzyklusPage } from './features/ziele/index.ts';
+import type { SetEingangSearch } from './features/eingang/index.ts';
+import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
+import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
+import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { priorisierungPfad, type SetBewertungSearch, type SetModellSearch } from './features/priorisierung/index.ts';
+import type { SetDashboardSearch } from './features/dashboard/index.ts';
+import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
+import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
+import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
+import type { SetEntscheideSearch, SetSitzungSearch } from './features/sitzung/index.ts';
+import type { SetCodetabellenSearch, SetOrganisationSearch } from './features/stammdaten/index.ts';
+import type { SetKontoSearch } from './features/konto/index.ts';
+import { abgeschlossenesQuartal, type QuartalNr, type SetRoadmapSearch, type SetZielSearch, type SetZielzyklusSearch, ZIELJAHR } from './features/ziele/index.ts';
+import { kopfkarten } from './kopfkarten.ts';
+import { seite } from './routes/seite.ts';
 import { searchOf } from './search.ts';
 import { NotFound } from './shell/index.ts';
+
+// Seiten der Features als eigene Chunks (Q-L6)
+const EingangPage = seite(() => import('./features/eingang/EingangPage.tsx'), 'EingangPage');
+const HandlungsfeldPage = seite(() => import('./features/handlungsfeld/HandlungsfeldPage.tsx'), 'HandlungsfeldPage');
+const IdeenBereich = seite(() => import('./features/idee/PoolSeite.tsx'), 'IdeenBereich');
+const IdeeNeuPage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeeNeuPage');
+const IdeePage = seite(() => import('./features/idee/IdeeSeiten.tsx'), 'IdeePage');
+const AuslastungPage = seite(() => import('./features/ressourcen/AuslastungPage.tsx'), 'AuslastungPage');
+const KapazitaetPage = seite(() => import('./features/ressourcen/KapazitaetPage.tsx'), 'KapazitaetPage');
+const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), 'BedarfPage');
+const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
+const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
+const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
+const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
+const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
+const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
+const SitzungenPage = seite(() => import('./features/sitzung/SitzungenPage.tsx'), 'SitzungenPage');
+const SitzungPage = seite(() => import('./features/sitzung/SitzungPage.tsx'), 'SitzungPage');
+const SitzungsmodusPage = seite(() => import('./features/sitzung/SitzungsmodusPage.tsx'), 'SitzungsmodusPage');
+const ProtokollPage = seite(() => import('./features/sitzung/ProtokollPage.tsx'), 'ProtokollPage');
+const EntscheidePage = seite(() => import('./features/sitzung/EntscheidePage.tsx'), 'EntscheidePage');
+const OrganisationPage = seite(() => import('./features/stammdaten/OrganisationPage.tsx'), 'OrganisationPage');
+const CodetabellenPage = seite(() => import('./features/stammdaten/CodetabellenPage.tsx'), 'CodetabellenPage');
+const StellvertretungPage = seite(() => import('./features/konto/StellvertretungPage.tsx'), 'StellvertretungPage');
+const ZielePage = seite(() => import('./features/ziele/ZielePage.tsx'), 'ZielePage');
+const ZielzyklusPage = seite(() => import('./features/ziele/ZielzyklusPage.tsx'), 'ZielzyklusPage');
+const FreigabePage = seite(() => import('./features/ziele/FreigabePage.tsx'), 'FreigabePage');
+const RoadmapPage = seite(() => import('./features/ziele/RoadmapPage.tsx'), 'RoadmapPage');
+const ZielerreichungPage = seite(() => import('./features/ziele/ZielerreichungPage.tsx'), 'ZielerreichungPage');
 
 const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
 
@@ -41,7 +74,7 @@ function EingangRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <EingangPage search={search} setSearch={setSearch} gehe={gehe} />;
+  return <EingangPage search={search} setSearch={setSearch} gehe={gehe} kopfkarten={kopfkarten} />;
 }
 
 // Kontomenü › Profil mit Stellvertretung (UI-43, UC-016 Schritt 4)
@@ -113,17 +146,47 @@ function ZielzyklusRoute() {
     <ZielzyklusPage jahr={Number(jahr)} search={search} setSearch={setSearch}
       jahrWechseln={j => void navigate({ to: '/ziele/$jahr', params: { jahr: String(j) }, search: {} })}
       projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })}
-      strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })} />
+      strategischeZiele={() => void navigate({ to: '/ziele/strategische-ziele', search: {} })}
+      freigabe={() => void navigate({ to: '/ziele/$jahr/freigabe', params: { jahr } })} />
   );
 }
 
+// Freigabe der Jahresziele (UI-39, K6 Schritte 6–7; AP-E6-2): Assistent `/ziele/2027/freigabe`
+const freigabeRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/freigabe', component: FreigabeRoute,
+  beforeLoad: ({ params }) => { if (!ZIELJAHR.test(params.jahr)) throw notFound(); },
+});
+
+function FreigabeRoute() {
+  const { jahr } = freigabeRoute.useParams();
+  const navigate = useNavigate({ from: freigabeRoute.fullPath });
+  return <FreigabePage jahr={Number(jahr)} zumZyklus={nr => void navigate({ to: '/ziele/$jahr', params: { jahr }, search: nr ? { o: `ziel:${nr}` } : {} })} />;
+}
+
+// Portfolio › Auswertungen › Roadmap (UI-31, K6 Schritt 8; AP-E6-2): `/portfolio/roadmap?jahr=2027`
+const roadmapRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/roadmap', validateSearch: searchOf.roadmap, component: RoadmapRoute });
+
+function RoadmapRoute() {
+  const search = roadmapRoute.useSearch();
+  const navigate = useNavigate({ from: roadmapRoute.fullPath });
+  const setSearch = useCallback<SetRoadmapSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <RoadmapPage search={search} setSearch={setSearch} projektOeffnen={nr => void navigate({ href: `/projekte/${nr}` })} />;
+}
+
 // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): Meine Ideen, Assistent für eine neue Idee, Idee über ihre Nummer
-const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', component: IdeenRoute });
+const ideenRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen', validateSearch: searchOf.ideen, component: IdeenRoute });
 
 function IdeenRoute() {
-  const navigate = useNavigate();
+  const search = ideenRoute.useSearch();
+  const navigate = useNavigate({ from: ideenRoute.fullPath });
   const gehe = useCallback((pfad: string) => { void navigate({ href: pfad }); }, [navigate]);
-  return <IdeenPage gehe={gehe} />;
+  // Ideenpool und Funnel mit Ansicht und Filtern in der Adresse (AP-E4-2, K4 Prüfen 5)
+  const setSearch = useCallback<SetIdeenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  return <IdeenBereich search={search} setSearch={setSearch} gehe={gehe} />;
 }
 
 const ideeNeuRoute = createRoute({ getParentRoute: () => rootRoute, path: '/portfolio/ideen/neu', validateSearch: searchOf.ideeNeu, component: IdeeNeuRoute });
@@ -207,6 +270,53 @@ function KapazitaetRoute() {
   return <KapazitaetPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
 }
 
+// Portfolio › Ressourcen › Bedarf (UI-25; BC RK.02.02, RK.02.03; AP-E7-2)
+const bedarfRoute = createRoute({
+  getParentRoute: () => rootRoute, path: ressourcenPfad.bedarf, validateSearch: searchOf.bedarf, component: BedarfRoute,
+});
+
+function BedarfRoute() {
+  const search = bedarfRoute.useSearch();
+  const navigate = useNavigate({ from: bedarfRoute.fullPath });
+  const setSearch = useCallback<SetBedarfSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BedarfPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+// Arbeitsraum «Portfolio» › Priorisierung: Bewertung (UI-20) und Modell (UI-19) (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1)
+
+const priorisierungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/priorisierung',
+  beforeLoad: () => { throw redirect({ to: priorisierungPfad.bewertung, replace: true }); },
+});
+
+const bewertungRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.bewertung, validateSearch: searchOf.bewertung, component: BewertungRoute,
+});
+
+function BewertungRoute() {
+  const search = bewertungRoute.useSearch();
+  const navigate = useNavigate({ from: bewertungRoute.fullPath });
+  const setSearch = useCallback<SetBewertungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BewertungPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+const modellRoute = createRoute({
+  getParentRoute: () => rootRoute, path: priorisierungPfad.modell, validateSearch: searchOf.bewertungsmodell, component: ModellRoute,
+});
+
+function ModellRoute() {
+  const search = modellRoute.useSearch();
+  const navigate = useNavigate({ from: modellRoute.fullPath });
+  const setSearch = useCallback<SetModellSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <ModellPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Arbeitsraum «Portfolio» › Dashboard (UI-17; PC.04.01, UC-014 Schritt 1; AP-E1-3)
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/dashboard', validateSearch: searchOf.dashboard, component: DashboardRoute,
@@ -218,7 +328,7 @@ function DashboardRoute() {
   const setSearch = useCallback<SetDashboardSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
   }, [navigate]);
-  return <Suspense fallback={null}><DashboardPage search={search} setSearch={setSearch} /></Suspense>;
+  return <DashboardPage search={search} setSearch={setSearch} />;
 }
 
 // Arbeitsraum «Portfolio» › Monatsabschluss (UI-15, UI-16; Kernablauf K1, UC-005; AP-E1-2)
@@ -314,7 +424,41 @@ function SitzungRoute() {
   const setSearch = useCallback<SetSitzungSearch>((next, o) => {
     void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
   }, [navigate]);
-  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} />;
+  return <SitzungPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+// Sitzungsmodus (UI-34), Protokoll (UI-35) und Entscheide (UI-36), AP-E2-2
+const sitzungsmodusRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum/modus', validateSearch: searchOf.sitzung, component: SitzungsmodusRoute,
+});
+
+function SitzungsmodusRoute() {
+  const { kuerzel, datum } = sitzungsmodusRoute.useParams();
+  const search = sitzungsmodusRoute.useSearch();
+  const navigate = useNavigate({ from: sitzungsmodusRoute.fullPath });
+  const setSearch = useCallback<SetSitzungSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <SitzungsmodusPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} search={search} setSearch={setSearch} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const protokollRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/$kuerzel/sitzungen/$datum/protokoll', component: ProtokollRoute });
+
+function ProtokollRoute() {
+  const { kuerzel, datum } = protokollRoute.useParams();
+  const navigate = useNavigate();
+  return <ProtokollPage key={`${kuerzel}/${datum}`} kuerzel={kuerzel} datum={datum} gehe={pfad => void navigate({ to: pfad })} />;
+}
+
+const entscheideRoute = createRoute({ getParentRoute: () => rootRoute, path: '/gremien/entscheide', validateSearch: searchOf.entscheide, component: EntscheideRoute });
+
+function EntscheideRoute() {
+  const search = entscheideRoute.useSearch();
+  const navigate = useNavigate({ from: entscheideRoute.fullPath });
+  const setSearch = useCallback<SetEntscheideSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <EntscheidePage search={search} setSearch={setSearch} />;
 }
 
 const iamRoutes = makeIamRoutes(paths, features, { param: tanstackParam }).map(r =>
@@ -337,7 +481,12 @@ const routeTree = rootRoute.addChildren([
   gremienRoute,
   sitzungenRoute,
   sitzungRoute,
+  sitzungsmodusRoute,
+  protokollRoute,
+  entscheideRoute,
   zielzyklusRoute,
+  freigabeRoute,
+  roadmapRoute,
   ideenRoute,
   ideeNeuRoute,
   ideeRoute,
@@ -352,6 +501,10 @@ const routeTree = rootRoute.addChildren([
   ressourcenRoute,
   auslastungRoute,
   kapazitaetRoute,
+  bedarfRoute,
+  priorisierungRoute,
+  bewertungRoute,
+  modellRoute,
   ...iamRoutes,
   ...devRoutes,
 ]);

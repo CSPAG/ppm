@@ -7,15 +7,15 @@ import { useId } from 'react';
 import { useSession } from '../../auth/index.ts';
 import { fmtDatum, Hinweis, Icon } from '../../ui/index.ts';
 import { useAuswahl, type Idee, type Rueckfrage } from './api.ts';
-import { IdeeStandBadge, Verweis, type Gehe } from './stand.tsx';
+import { IdeeStandBadge, MEINE_IDEEN, Verweis, type Gehe } from './stand.tsx';
 import { TI } from './texte.ts';
 import './idee.css';
 
 export function IdeeAnsicht({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
   const titleId = useId();
-  const { can } = useSession();
+  const { can, canSomewhere } = useSession();
   // Bezeichnungen des Strategiebezugs aus der Auswahl des Assistenten (auch ohne Leserecht auf Ziele)
-  const auswahl = useAuswahl(can('idee:create')).data;
+  const auswahl = useAuswahl(can('idee:create') || canSomewhere('idee:read')).data;
   const feld = auswahl?.handlungsfelder.find(h => h.id === idee.handlungsfeldId);
   const ziel = feld?.ziele.find(z => z.id === idee.strategischesZielId);
   const stufe = (s: string | null, t: string) => (s ? `${TI.stufen[s]}${t ? ` – ${t}` : ''}` : '');
@@ -43,7 +43,7 @@ export function IdeeAnsicht({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
               <div className="sub"><IdeeStandBadge stand={idee.stand} standAt={idee.standAt} updatedAt={idee.updatedAt} /></div>
             </div>
           </div>
-          <div className="acts"><Verweis pfad="/portfolio/ideen" gehe={gehe} className="btn">{TI.zurListe}</Verweis></div>
+          <div className="acts"><Verweis pfad={MEINE_IDEEN} gehe={gehe} className="btn">{TI.zurListe}</Verweis></div>
         </div>
       </header>
       <div className="body idee-body">

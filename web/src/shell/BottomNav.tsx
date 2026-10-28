@@ -7,9 +7,10 @@ import { orgName as nameOf, useAuthz, useIam, useIamConfig } from '@vollholz/iam
 import { useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { applyTheme, Icon, T, themeMode, useFocusTrap, type ThemeMode } from '../ui/index.ts';
-import type { SichtbarerRaum } from './nav.ts';
+import type { KontoEintrag, SichtbarerRaum, Zaehler } from './nav.ts';
+import { Zahl } from './Zahl.tsx';
 
-export function BottomNav({ unten, mehr, mehrOffen, onMehr }: { unten: SichtbarerRaum[]; mehr: SichtbarerRaum[]; mehrOffen: boolean; onMehr(): void }) {
+export function BottomNav({ unten, mehr, mehrOffen, onMehr, zaehler = {} }: { unten: SichtbarerRaum[]; mehr: SichtbarerRaum[]; mehrOffen: boolean; onMehr(): void; zaehler?: Zaehler }) {
   const { router: { Link } } = useIamConfig();
   const mehrAktiv = mehr.some(r => r.aktiv);
   return (
@@ -18,7 +19,7 @@ export function BottomNav({ unten, mehr, mehrOffen, onMehr }: { unten: Sichtbare
         {unten.map(r => (
           <li key={r.id}>
             <Link to={r.pfad} className={`bn${r.aktiv ? ' on' : ''}`} {...(r.aktiv ? { 'aria-current': 'page' as const } : {})}>
-              <Icon name={r.icon} /><span>{r.label}</span>
+              <Icon name={r.icon} /><span>{r.label}</span><Zahl z={zaehler[r.id]} />
             </Link>
           </li>
         ))}
@@ -36,7 +37,9 @@ const THEMES: { mode: ThemeMode; label: string }[] = [
   { mode: 'light', label: T.theme.light }, { mode: 'dark', label: T.theme.dark }, { mode: 'system', label: T.theme.system },
 ];
 
-export function MehrBlatt({ raeume, onClose, onRechte }: { raeume: SichtbarerRaum[]; onClose(): void; onRechte(): void }) {
+export function MehrBlatt({ raeume, onClose, onRechte, konto = [], zaehler = {} }: {
+  raeume: SichtbarerRaum[]; onClose(): void; onRechte(): void; konto?: readonly KontoEintrag[]; zaehler?: Zaehler;
+}) {
   const { router: { Link } } = useIamConfig();
   const { me, orgName, switchOrg, logout } = useIam();
   const { roleLabel } = useAuthz();
@@ -59,7 +62,7 @@ export function MehrBlatt({ raeume, onClose, onRechte }: { raeume: SichtbarerRau
               {raeume.map(r => (
                 <li key={r.id}>
                   <Link to={r.pfad} className={`nav blatt-i${r.aktiv ? ' on' : ''}`} {...(r.aktiv ? { 'aria-current': 'page' as const } : {})}>
-                    <Icon name={r.icon} /><span className="lbl">{r.label}</span>
+                    <Icon name={r.icon} /><span className="lbl">{r.label}</span><Zahl z={zaehler[r.id]} />
                   </Link>
                 </li>
               ))}
@@ -79,6 +82,9 @@ export function MehrBlatt({ raeume, onClose, onRechte }: { raeume: SichtbarerRau
               ))}
             </div>
             <ul className="blatt-l">
+              {konto.map(k => (
+                <li key={k.id}><Link to={k.pfad} className="nav blatt-i"><Icon name={k.icon} /><span className="lbl">{k.label}</span></Link></li>
+              ))}
               <li><button type="button" className="nav blatt-i" onClick={onRechte}><Icon name="shield" /><span className="lbl">{T.konto.rechte}</span></button></li>
               {andere.map(o => (
                 <li key={o}><button type="button" className="nav blatt-i" onClick={() => void switchOrg(o)}><Icon name="building" /><span className="lbl">{T.konto.wechseln(nameOf(me, o))}</span></button></li>

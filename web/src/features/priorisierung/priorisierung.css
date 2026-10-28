@@ -1,0 +1,53 @@
+/*
+ * Priorisierung (UI-19, UI-20): Bewertungsraster mit fester Projektspalte, Einschätzung immer als Text (H/M/T und Wort),
+ * Farbe nur zusätzlich (Q-B5); Bildlauf nur im Raster (360 px). Modell-Schublade mit Kriterien-Editor.
+ */
+.pr-body{padding:12px 22px 22px;display:flex;flex-direction:column;gap:12px}
+.pr-l{color:var(--fg-2);font-size:13px}
+.pr-in{height:34px;border:1px solid var(--line-2);border-radius:7px;padding:0 28px 0 10px;background-color:var(--surface);color:var(--fg);min-width:0;max-width:100%}
+.pr-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.pr-legende{margin:0;color:var(--fg-2);font-size:12.5px}
+.pr-status{color:var(--fg);font-weight:500;margin-left:6px}
+.pr-scroll{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:10px;max-height:calc(100vh - 280px)}
+.pr-raster{width:max-content;min-width:100%}
+.pr-raster thead th{padding:8px 10px;vertical-align:bottom;white-space:normal;width:132px;max-width:132px;min-width:110px}
+.pr-raster .pr-kt{display:block;color:var(--fg);font-weight:500;overflow-wrap:anywhere;hyphens:auto}
+.pr-dim{display:block;color:var(--fg-3);font-size:11.5px;font-weight:400}
+.pr-raster .pr-projekt{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left;max-width:280px;min-width:200px;border-right:1px solid var(--line);padding:0}
+.pr-raster thead .pr-projekt{z-index:3;padding:8px 12px}
+.pr-raster tbody tr{cursor:default}
+.pr-raster tbody td,.pr-raster tbody th{height:38px;border-bottom:1px solid var(--line)}
+.pr-raster tbody tr.cur .pr-projekt{box-shadow:inset 3px 0 0 var(--accent)}
+.pr-pl{border:0;background:none;width:100%;height:37px;text-align:left;padding:0 12px;color:var(--fg);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.pr-pl:hover{background:var(--hover)}
+.pr-pl:focus-visible,.pr-zelle button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.pr-zelle{padding:0!important;border-left:1px solid var(--line)}
+.pr-zelle button{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:37px;border:0;background:none;color:var(--fg);cursor:pointer;font-size:13px}
+.pr-zelle button[aria-disabled="true"]{cursor:default}
+.pr-kurz{font:600 12px/1 var(--f-mono);width:20px;height:20px;border-radius:5px;display:grid;place-items:center}
+.pr-hoch .pr-kurz{background:var(--ok-soft);color:var(--ok)}
+.pr-mittel .pr-kurz{background:var(--info-soft);color:var(--info)}
+.pr-tief .pr-kurz{background:var(--off-soft);color:var(--fg)}
+.pr-offen{color:var(--fg-3)}
+.pr-geaendert{background:var(--accent-soft)}
+.pr-hint{color:var(--fg-2);font-size:12.5px;margin:2px 0 0}
+.pr-kriterium{border:0;padding:0;margin:0 0 14px;min-width:0}
+.pr-kriterium legend{font-weight:600;padding:0;margin-bottom:6px}
+.pr-kommentar{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.pr-kommentar textarea,.pr-editor textarea,.pr-editor input{border:1px solid var(--line-2);border-radius:7px;padding:6px 10px;background:var(--surface);color:var(--fg);width:100%;min-width:0}
+.pr-editor input{height:34px}
+.pr-kommentar textarea:focus,.pr-editor textarea:focus,.pr-editor input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:0}
+.pr-kommentar textarea:disabled{background:var(--surface-2);color:var(--fg-2)}
+.pr-editor [aria-invalid="true"]{border-color:var(--bad)}
+.pr-modell h3,.pr-pruefung h3{font:600 14px var(--f-display);margin:16px 0 6px}
+.pr-akt{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pr-tab tbody tr{cursor:default}
+.pr-tab tbody td{white-space:normal;height:auto;padding:8px 12px}
+.pr-fs{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:12px 0;min-width:0}
+.pr-fs legend{font-weight:600;padding:0 4px}
+.pr-krit{display:grid;grid-template-columns:minmax(0,1fr) 170px auto;gap:8px;align-items:end;padding:6px 0;border-bottom:1px solid var(--line)}
+.pr-krit-f{display:flex;flex-direction:column;gap:4px;min-width:0;margin-bottom:6px}
+.pr-krit-f label{font-size:12.5px;color:var(--fg-2)}
+.pr-krit-a{display:flex;gap:2px}
+.pr-editor .ferr{color:var(--bad);font-size:12.5px;margin:0}
+@media (max-width:640px){ .pr-body{padding:10px 14px 14px} .pr-krit{grid-template-columns:minmax(0,1fr)} .pr-raster .pr-projekt{min-width:150px;max-width:180px} }

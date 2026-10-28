@@ -31,11 +31,13 @@ export interface ZielzyklusPageProps {
   ideeAnstossen?: (zielNummer: string) => void;
   /** Strategische Ziele pflegen (leerer Zyklus ohne strategische Ziele). */
   strategischeZiele(): void;
+  /** Assistent «Zur Freigabe vorlegen» bzw. «Freigabe erfassen» (UI-39, AP-E6-2): `/ziele/<jahr>/freigabe`. */
+  freigabe?: () => void;
 }
 
 const nummerAusO = (o?: string) => (o ? o.slice('ziel:'.length) : undefined);
 
-export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektOeffnen, ideeAnstossen, strategischeZiele }: ZielzyklusPageProps) {
+export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektOeffnen, ideeAnstossen, strategischeZiele, freigabe }: ZielzyklusPageProps) {
   const { can } = useSession();
   const q = useZielzyklus(jahr);
   const felder = useHandlungsfelder(can('handlungsfeld:read'));
@@ -56,6 +58,11 @@ export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektO
               </div>
             </div>
           </div>
+          {freigabe && zj?.stand === 'in_arbeit' && q.data?.can.write
+            ? <div className="acts"><button type="button" className="btn primary" onClick={freigabe}><Icon name="send" />{TZZ.zurFreigabeVorlegen}</button></div>
+            : freigabe && zj?.stand === 'zur_freigabe' && can('ziel:freigabe')
+              ? <div className="acts"><button type="button" className="btn primary" onClick={freigabe}><Icon name="check" />{TZZ.freigabeErfassen}</button></div>
+              : null}
           <nav className="acts" aria-label={TZZ.bereich}>
             <button type="button" className="btn sm" onClick={() => jahrWechseln(jahr - 1)}><Icon name="chev" className="zz-zurueck" />{jahr - 1}</button>
             <button type="button" className="btn sm" onClick={() => jahrWechseln(jahr + 1)}>{jahr + 1}<Icon name="chev" /></button>
@@ -68,7 +75,7 @@ export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektO
           : !zj ? <Leer zyklus={q.data} onStrategischeZiele={strategischeZiele} />
           : (
             <>
-              {zj.stand === 'zur_freigabe' ? <div className="notice" role="status"><Icon name="lock" /> {TZZ.zurFreigabe(jahr, zj.updatedAt as string)}</div> : null}
+              {zj.stand === 'zur_freigabe' ? <div className="notice" role="status"><Icon name="lock" /> {TZZ.zurFreigabe(jahr, (zj.vorgelegtAt ?? zj.updatedAt) as string)}</div> : null}
               {zj.stand === 'in_kraft' ? <div className="notice" role="status"><Icon name="check" /> {TZZ.inKraft(jahr, zj.freigabeAt as string | null)}</div> : null}
               {zj.stand === 'in_arbeit' && !q.data.can.write ? <p className="note">{TZZ.nurLesen}</p> : null}
               <div className="zz-flaeche">

@@ -5,9 +5,10 @@
  */
 import { useIamConfig } from '@vollholz/iam-web';
 import { Icon, T } from '../ui/index.ts';
-import type { SichtbarerRaum } from './nav.ts';
+import type { SichtbarerRaum, Zaehler } from './nav.ts';
+import { Zahl } from './Zahl.tsx';
 
-export function Rail({ raeume }: { raeume: SichtbarerRaum[] }) {
+export function Rail({ raeume, zaehler = {} }: { raeume: SichtbarerRaum[]; zaehler?: Zaehler }) {
   const { router: { Link } } = useIamConfig();
   return (
     <nav className="rail" aria-label={T.nav.main}>
@@ -17,7 +18,7 @@ export function Rail({ raeume }: { raeume: SichtbarerRaum[] }) {
           return (
             <li key={r.id}>
               <Link to={r.pfad} className={`nav raum${r.aktiv ? ' on' : ''}`} {...(r.aktiv && !sub ? { 'aria-current': 'page' as const } : {})}>
-                <Icon name={r.icon} /><span className="lbl">{r.label}</span>
+                <Icon name={r.icon} /><span className="lbl">{r.label}</span><Zahl z={zaehler[r.id]} />
               </Link>
               {sub ? (
                 <ul className="rail-sub" aria-label={r.label}>

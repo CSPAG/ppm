@@ -10112,6 +10112,911 @@
           }
         }
       },
+      "QuartalsInhalt": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hinweise",
+          "zielerreichung",
+          "portfolios",
+          "weiterleitungen"
+        ],
+        "properties": {
+          "hinweise": {
+            "description": "Hinweise bei Erzeugung, z. B. unvollständige Zielerreichung oder fehlender Portfoliobericht (K6 Z4).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "zielerreichung": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "nachgefuehrt",
+              "gesamt",
+              "ziele"
+            ],
+            "properties": {
+              "nachgefuehrt": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gesamt": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "ziele": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "typ",
+                    "id",
+                    "nummer",
+                    "text",
+                    "metrik",
+                    "zielwert",
+                    "stand",
+                    "beurteilung",
+                    "quartal"
+                  ],
+                  "properties": {
+                    "typ": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "strategisch"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "jahresziel"
+                          ]
+                        }
+                      ]
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nummer": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "metrik": {
+                      "type": "string"
+                    },
+                    "zielwert": {
+                      "type": "string"
+                    },
+                    "stand": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "beurteilung": {
+                      "type": "string"
+                    },
+                    "quartal": {
+                      "anyOf": [
+                        {
+                          "description": "Quartal des Stands; ein früheres, wenn im Quartal nicht nachgeführt.",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "portfolios": {
+            "description": "Je Portfolio mit Berichtspflicht der Portfoliobericht des letzten Quartalsmonats (Herkunft der Zahlen, G11).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "periode",
+                "berichtId",
+                "bereitgestellt",
+                "projekte",
+                "imPlan",
+                "kritisch",
+                "nichtGemeldet",
+                "kritischeProjekte",
+                "meilensteine",
+                "risiken",
+                "abhaengigkeiten",
+                "eskalationen"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "periode": {
+                  "description": "Letzter Monat des Quartals.",
+                  "type": "string"
+                },
+                "berichtId": {
+                  "anyOf": [
+                    {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bereitgestellt": {
+                  "type": "boolean"
+                },
+                "projekte": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "imPlan": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "kritisch": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "nichtGemeldet": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "kritischeProjekte": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "nummer",
+                      "name",
+                      "phase",
+                      "trend"
+                    ],
+                    "properties": {
+                      "nummer": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "phase": {
+                        "type": "string"
+                      },
+                      "trend": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "meilensteine": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "projekt",
+                      "text",
+                      "termin"
+                    ],
+                    "properties": {
+                      "projekt": {
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "nummer",
+                          "name"
+                        ],
+                        "properties": {
+                          "nummer": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "termin": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "risiken": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "projekt",
+                      "text",
+                      "wahrscheinlichkeit",
+                      "auswirkung",
+                      "massnahme"
+                    ],
+                    "properties": {
+                      "projekt": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "nummer",
+                              "name"
+                            ],
+                            "properties": {
+                              "nummer": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "wahrscheinlichkeit": {
+                        "type": "string"
+                      },
+                      "auswirkung": {
+                        "type": "string"
+                      },
+                      "massnahme": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "abhaengigkeiten": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "von",
+                      "zu",
+                      "text"
+                    ],
+                    "properties": {
+                      "von": {
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "nummer",
+                          "name"
+                        ],
+                        "properties": {
+                          "nummer": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "zu": {
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "nummer",
+                          "name"
+                        ],
+                        "properties": {
+                          "nummer": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "eskalationen": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "projekt",
+                      "periode",
+                      "grund",
+                      "massnahme"
+                    ],
+                    "properties": {
+                      "projekt": {
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "nummer",
+                          "name"
+                        ],
+                        "properties": {
+                          "nummer": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "periode": {
+                        "type": "string"
+                      },
+                      "grund": {
+                        "type": "string"
+                      },
+                      "massnahme": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "weiterleitungen": {
+            "description": "Im Gremium zur Weiterleitung an den VR markierte Geschäfte des Quartals (UC-006 A4).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "entscheidId",
+                "datum",
+                "gremium",
+                "titel",
+                "ergebnis",
+                "begruendung",
+                "ausserordentlichAm"
+              ],
+              "properties": {
+                "entscheidId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "datum": {
+                  "format": "date",
+                  "description": "Datum der Sitzung.",
+                  "type": "string"
+                },
+                "gremium": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "ergebnis": {
+                  "type": "string"
+                },
+                "begruendung": {
+                  "type": "string"
+                },
+                "ausserordentlichAm": {
+                  "anyOf": [
+                    {
+                      "format": "date",
+                      "description": "Schon ausserhalb des Quartalsreportings an den VR weitergeleitet (A-03).",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "VrAuftrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "verantwortlich",
+          "termin",
+          "erledigtAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "verantwortlich": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "termin": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "erledigtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Quartalsbericht": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "quartal",
+          "stand",
+          "erzeugtAt",
+          "traktandiertAt",
+          "verabschiedetAt",
+          "version",
+          "inhalt",
+          "kommentare",
+          "rueckmeldungPrat",
+          "vrRueckmeldung",
+          "vrRueckmeldungAt",
+          "auftraege",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "quartal": {
+            "type": "string"
+          },
+          "stand": {
+            "description": "«in Arbeit» (die UE ergänzt Kommentare, erzeugt neu), «traktandiert» (dem PRAT vorgelegt), «verabschiedet» (dem VR bereitgestellt).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "in_arbeit"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "traktandiert"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "verabschiedet"
+                ]
+              }
+            ]
+          },
+          "erzeugtAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "traktandiertAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verabschiedetAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "inhalt": {
+            "$ref": "#/components/schemas/QuartalsInhalt"
+          },
+          "kommentare": {
+            "additionalProperties": false,
+            "description": "Kommentar der UE je Abschnitt: Gesamtstatus, wesentliche Entwicklungen, Risiken, Abhängigkeiten und Eskalationen, finanzielle und organisatorische Auswirkungen, Weiterleitungen.",
+            "type": "object",
+            "required": [
+              "gesamtstatus",
+              "entwicklungen",
+              "risiken",
+              "abhaengigkeiten",
+              "auswirkungen",
+              "weiterleitungen"
+            ],
+            "properties": {
+              "gesamtstatus": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "entwicklungen": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "risiken": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "abhaengigkeiten": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "auswirkungen": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "weiterleitungen": {
+                "maxLength": 4000,
+                "type": "string"
+              }
+            }
+          },
+          "rueckmeldungPrat": {
+            "description": "Rückmeldungen des PRAT bei «Anpassungen verlangt» (UC-012 A1).",
+            "type": "string"
+          },
+          "vrRueckmeldung": {
+            "type": "string"
+          },
+          "vrRueckmeldungAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "auftraege": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VrAuftrag"
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "erzeugen",
+              "bearbeiten",
+              "traktandieren",
+              "rueckmeldung"
+            ],
+            "properties": {
+              "erzeugen": {
+                "type": "boolean"
+              },
+              "bearbeiten": {
+                "type": "boolean"
+              },
+              "traktandieren": {
+                "type": "boolean"
+              },
+              "rueckmeldung": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "QuartalsberichtListe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "description": "Neuestes Quartal zuerst.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "quartal",
+                "stand",
+                "erzeugtAt",
+                "verabschiedetAt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "quartal": {
+                  "type": "string"
+                },
+                "stand": {
+                  "description": "«in Arbeit» (die UE ergänzt Kommentare, erzeugt neu), «traktandiert» (dem PRAT vorgelegt), «verabschiedet» (dem VR bereitgestellt).",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "in_arbeit"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "traktandiert"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "verabschiedet"
+                      ]
+                    }
+                  ]
+                },
+                "erzeugtAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "verabschiedetAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "QuartalsberichtPatch": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kommentare"
+        ],
+        "properties": {
+          "kommentare": {
+            "additionalProperties": false,
+            "description": "Kommentar der UE je Abschnitt: Gesamtstatus, wesentliche Entwicklungen, Risiken, Abhängigkeiten und Eskalationen, finanzielle und organisatorische Auswirkungen, Weiterleitungen.",
+            "type": "object",
+            "properties": {
+              "gesamtstatus": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "entwicklungen": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "risiken": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "abhaengigkeiten": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "auswirkungen": {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "weiterleitungen": {
+                "maxLength": 4000,
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "VrRueckmeldungIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "vrRueckmeldung"
+        ],
+        "properties": {
+          "vrRueckmeldung": {
+            "maxLength": 8000,
+            "type": "string"
+          }
+        }
+      },
+      "VrAuftragIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "verantwortlich"
+        ],
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "verantwortlich": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "termin": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "VrWeiterleitung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "entscheidId",
+          "datum",
+          "gremium",
+          "titel",
+          "ergebnis",
+          "ausserordentlichAm",
+          "bemerkung"
+        ],
+        "properties": {
+          "entscheidId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "datum": {
+            "format": "date",
+            "type": "string"
+          },
+          "gremium": {
+            "type": "string"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "ergebnis": {
+            "type": "string"
+          },
+          "ausserordentlichAm": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bemerkung": {
+            "type": "string"
+          }
+        }
+      },
+      "VrWeiterleitungListe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VrWeiterleitung"
+            }
+          }
+        }
+      },
+      "VrWeiterleitungIn": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "entscheidId"
+        ],
+        "properties": {
+          "entscheidId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "weitergeleitetAm": {
+            "format": "date",
+            "description": "Ohne Angabe heute.",
+            "type": "string"
+          },
+          "bemerkung": {
+            "maxLength": 2000,
+            "type": "string"
+          }
+        }
+      },
       "Versandfrist": {
         "additionalProperties": false,
         "type": "object",
@@ -53134,6 +54039,1439 @@
         }
       }
     },
+    "/v1/quartalsberichte": {
+      "get": {
+        "summary": "Quartalsreportings",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Erzeugte Quartalsreportings mit Stand, neuestes zuerst.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuartalsberichtListe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quartalsberichte/{quartal}": {
+      "get": {
+        "summary": "Quartalsreporting eines Quartals",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quartalsbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Kommentare ergänzen",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Kommentar der UE je Abschnitt (UC-012 Schritt 4); nur «in Arbeit», nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuartalsberichtPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quartalsbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quartalsberichte/{quartal}/erzeugen": {
+      "post": {
+        "summary": "Bericht erstellen",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Entwurf aus Zielerreichung, Portfolioberichten des letzten Quartalsmonats und den an den VR weitergeleiteten Geschäften (UC-012 Schritt 3); im Stand «in Arbeit» neu erzeugen, die Kommentare bleiben. Erst nach Quartalsende (sonst 409); Hinweise bei unvollständiger Zielerreichung oder fehlendem Portfoliobericht (K6 Z4).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quartalsbericht"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quartalsbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quartalsberichte/{quartal}/traktandieren": {
+      "post": {
+        "summary": "Im PRAT traktandieren",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Vorschlag der Art «Quartalsreporting» für die nächste Sitzung des entscheidenden Gremiums des Portfolios der Kategorie A (PRAT, UC-012 Schritt 4); Stand «traktandiert», Aufgabe «Quartalsreporting erstellen» erledigt. Ohne Portfolio A oder Gremium 409. Nur mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quartalsbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quartalsberichte/{quartal}/dokument": {
+      "get": {
+        "summary": "Quartalsreporting als Dokument",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Bericht als PDF oder Word für den VR über die Dokumentausgabe (Modul `vorlage`); Kopfzeile «Intern · enthält Personendaten» (G12). Der Export ist protokolliert.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pdf"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "docx"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Standard PDF."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dokument als Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quartalsberichte/{quartal}/vr-rueckmeldung": {
+      "put": {
+        "summary": "Rückmeldung des VR erfassen",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Rückmeldung des VR zum verabschiedeten Bericht (UC-012 Schritt 6); nur «verabschiedet», nur mit `If-Match`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VrRueckmeldungIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quartalsbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quartalsberichte/{quartal}/auftraege": {
+      "post": {
+        "summary": "Auftrag des VR erfassen",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Auftrag mit verantwortlicher Person und Termin (UC-012 Schritt 6): wird Aufgabe im Eingang der Person. Nur «verabschiedet».",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VrAuftragIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "path",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VrAuftrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vr-auftraege/{id}/erledigen": {
+      "post": {
+        "summary": "Auftrag des VR erledigt melden",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Die verantwortliche Person oder die UE meldet den Auftrag erledigt; die Aufgabe im Eingang schliesst.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VrAuftrag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vr-weiterleitungen": {
+      "get": {
+        "summary": "Weiterleitungen an den VR",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Im Gremium zur Weiterleitung an den VR markierte Geschäfte mit Sitzung im Quartal (UC-006 A4), mit ausserordentlicher Weiterleitung (A-03).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-Q[1-4]$",
+              "type": "string"
+            },
+            "example": "2026-Q3",
+            "in": "query",
+            "name": "quartal",
+            "required": true,
+            "description": "Quartal «JJJJ-Qn» (docs/fachmodell.md 2.14)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VrWeiterleitungListe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Ausserordentliche Weiterleitung erfassen",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Die UE hält fest, dass ein zur Weiterleitung markiertes Geschäft ausserhalb des Quartalsreportings an den VR ging (A-03, K03). Nur für Entscheide mit «an den VR» (sonst 422); je Entscheid einmal (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VrWeiterleitungIn"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Erfasst"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vr-weiterleitungen/{id}": {
+      "delete": {
+        "summary": "Ausserordentliche Weiterleitung entfernen",
+        "tags": [
+          "Quartalsreporting"
+        ],
+        "description": "Erfassung zurücknehmen; `id` ist der Entscheid.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Entfernt"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/gremien/{kuerzel}/sitzungen": {
       "get": {
         "summary": "Sitzungen eines Gremiums",
@@ -70543,6 +72881,10 @@
     {
       "name": "Ziele",
       "description": "Strategische Ziele je Handlungsfeld mit Metrik, Zielwert und Verlauf; ab Etappe E6 Zielzyklus, Jahresziele und Zielerreichung."
+    },
+    {
+      "name": "Quartalsreporting",
+      "description": "Quartalsreporting an den VR aus Zielerreichung und Portfolioberichten, Weiterleitungen, Rückmeldungen und Aufträge des VR."
     },
     {
       "name": "Sitzungen",

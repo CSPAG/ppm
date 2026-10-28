@@ -1,7 +1,7 @@
 export { Icon } from './Icon.tsx';
 export type { IconName } from './icons.ts';
 export { Confirm, Dialog, Drawer, useFocusTrap } from './Overlay.tsx';
-export { Empty, ErrorState, Loading } from './states.tsx';
+export { Empty, ErrorState, Loading, TeilFehler } from './states.tsx';
 export { T, type Texte } from './texte/index.ts';
 export { useToast } from './toasts.ts';
 export { applyTheme, themeMode, type ThemeMode } from './theme.ts';

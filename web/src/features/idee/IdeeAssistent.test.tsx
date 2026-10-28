@@ -53,7 +53,7 @@ function stub(routes: Parameters<typeof mockIamApi>[0]) {
 }
 
 /** Nachgebildete Idee auf dem Server: Anlegen, Ändern (Version + 1), Einreichen. */
-function server(start: ReturnType<typeof idee> | null, liste: ReturnType<typeof idee>[] = []) {
+function server(start: ReturnType<typeof idee> | null, liste: ReturnType<typeof idee>[] = [], extra: Parameters<typeof mockIamApi>[0] = {}) {
   let cur = start;
   const api = stub({
     'GET /v1/ideen': (req: Request) => {
@@ -68,6 +68,7 @@ function server(start: ReturnType<typeof idee> | null, liste: ReturnType<typeof 
     [`PATCH /v1/ideen/${ID}`]: async (req: Request) => { cur = idee({ ...cur, ...(await req.json()), version: cur!.version + 1 }); return json(cur, 200, { ETag: `W/"${cur.version}"` }); },
     [`POST /v1/ideen/${ID}/einreichen`]: () => { cur = idee({ ...cur, stand: 'eingereicht', version: cur!.version + 1, can: { bearbeiten: false, einreichen: false, loeschen: false } }); return json(cur, 200, { ETag: `W/"${cur.version}"` }); },
     [`PUT /v1/ideen/${ID}/rueckfragen/${RF}`]: async (req: Request) => json({ id: RF, feld: 'zielsetzung', text: 'Woran misst du den Erfolg?', antwort: (await req.json()).antwort, gestelltAt: '2026-10-07T08:00:00Z', beantwortetAt: '2026-10-08T08:00:00Z' }),
+    ...extra,
   });
   return api;
 }
@@ -141,6 +142,21 @@ describe('Assistent Projektidee', () => {
     await waitFor(() => expect(api.calls.some(c => c.method === 'POST')).toBe(true));
     expect(await api.calls.find(c => c.method === 'POST')!.json()).toMatchObject({ handlungsfeldId: HF, strategischesZielId: Z1, herkunft: 'strategieprozess' });
     expect(ideeNeuPfad({ ziel: '1.1' })).toBe('/portfolio/ideen/neu?ziel=ziel%3A1.1');
+  });
+
+  it('Fehler beim Laden der Auswahl: Schritt 2 zeigt den Fehler mit «Erneut versuchen», nicht «keine Handlungsfelder» (Z5)', async () => {
+    let ok = false;
+    server(null, [], { 'GET /v1/ideen/auswahl': () => ok ? json(auswahl) : json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' }) });
+    renderWithIam(<IdeeNeuPage search={validateIdeeNeuSearch({})} gehe={gehe} />, ALS_AS);
+    await userEvent.type(await screen.findByLabelText(TI.titelFeld), 'Ohne Auswahl');
+    await userEvent.type(screen.getByLabelText(TI.ausgangslage), 'A');
+    await userEvent.type(screen.getByLabelText(TI.zielsetzung), 'Z');
+    await userEvent.click(screen.getByRole('button', { name: TI.weiterSchritt }));
+    expect(await screen.findByText(`${TI.auswahlLaden} konnte nicht geladen werden.`)).toBeInTheDocument();
+    expect(screen.queryByText(TI.keineHandlungsfelder)).toBeNull();
+    ok = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Erneut versuchen' }));
+    expect(await screen.findByRole('radio', { name: /^Patientenorientierung/ })).toBeInTheDocument();
   });
 
   it('bietet einen offenen Entwurf an', async () => {

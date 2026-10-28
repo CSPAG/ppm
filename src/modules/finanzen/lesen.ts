@@ -1,11 +1,11 @@
 /**
  * Finanzen je Projekt zusammenstellen (UC-010 Schritte 2–3, 5): Budget und Prognose aus dem Register `kosten`
- * (`projektdaten`), Ist-Kosten aus dem ERP über den Kostenträger (A-16), Toleranz «Kosten» aus dem Phasenmodell des
- * Projekts (A-10; die Übersteuerung im Vertrag ist dort noch nicht erfasst), Begründungen; Jahresbedarf (A-17).
+ * (`projektdaten`), Ist-Kosten aus dem ERP über den Kostenträger (A-16), gültige Toleranz «Kosten» (A-10: Baseline des
+ * Projektvertrags, sonst Phasenmodell), Begründungen; Jahresbedarf (A-17).
  */
 import type { Tx } from '@vollholz/platform';
-import { aktuellesPhasenmodell, phasenmodellLesen } from '../phasenmodell/index.ts';
 import { projektdaten } from '../projektdaten/index.ts';
+import { vertrag } from '../vertrag/index.ts';
 import { abweichung, ARTEN, jahresbedarf, jePhase, summen, type Art, type Position, type Termin } from './rechnen.ts';
 import * as store from './store.ts';
 
@@ -24,15 +24,17 @@ export interface ProjektFinanzen {
   begruendung: { periode: string; text: string; version: number; geaendertAt: string } | null;
 }
 
-/** Toleranz «Kosten» in Prozent je Phasenmodell (ohne Wert oder andere Einheit: keine). */
-async function toleranzen(tx: Tx, ids: readonly (string | null)[]): Promise<Map<string | null, number | null>> {
-  const out = new Map<string | null, number | null>();
-  for (const id of new Set(ids)) {
-    const pm = id ? await phasenmodellLesen(tx, id) : await aktuellesPhasenmodell(tx);
-    const t = pm?.toleranzen.find(x => x.dimension === 'kosten');
-    out.set(id, t && t.einheit === 'prozent' ? t.wert : null);
-  }
-  return out;
+/**
+ * Gültige Toleranz «Kosten» in Prozent je Projekt (A-10): Baseline des Projektvertrags, sonst Phasenmodell
+ * (`vertrag.toleranzen`); ohne Wert oder in anderer Einheit keine. Liest in voller Sicht: die Projekte hat der Aufrufer
+ * schon nach der Lesesicht gewählt, die Toleranz ist nicht vertraulich (auch die PL ohne `phasenmodell:read`).
+ */
+async function toleranzen(voll: Tx, ids: readonly string[]): Promise<Map<string, number | null>> {
+  const t = await vertrag.toleranzen(voll, ids);
+  return new Map(ids.map(id => {
+    const k = t.get(id)?.find(x => x.dimension === 'kosten');
+    return [id, k && k.einheit === 'prozent' ? k.wert : null];
+  }));
 }
 
 export const positionen = async (tx: Tx, projektId: string): Promise<Position[]> =>
@@ -40,9 +42,10 @@ export const positionen = async (tx: Tx, projektId: string): Promise<Position[]>
     phase: e.phase as string, art: e.art as Art, budgetBaseline: (e.budgetBaseline as number | null) ?? null, prognose: (e.prognose as number | null) ?? null,
   }));
 
-export async function finanzen(tx: Tx, projekte: readonly store.ProjektRow[]): Promise<ProjektFinanzen[]> {
+/** Finanzen der Projekte unter der Lesesicht von `tx`; `voll` (volle Sicht) liest die gültige Toleranz. */
+export async function finanzen(tx: Tx, projekte: readonly store.ProjektRow[], voll: Tx = tx): Promise<ProjektFinanzen[]> {
   const ids = projekte.map(p => p.id);
-  const [kt, ist, begr, tol] = await Promise.all([store.kostentraeger(tx, ids), store.ist(tx, ids), store.begruendungen(tx, ids), toleranzen(tx, projekte.map(p => p.phasenmodell_id))]);
+  const [kt, ist, begr, tol] = await Promise.all([store.kostentraeger(tx, ids), store.ist(tx, ids), store.begruendungen(tx, ids), toleranzen(voll, ids)]);
   const out: ProjektFinanzen[] = [];
   for (const p of projekte) {
     const ps = await positionen(tx, p.id);
@@ -51,7 +54,7 @@ export async function finanzen(tx: Tx, projekte: readonly store.ProjektRow[]): P
     const monate = [...new Set(eigene.map(i => i.monat))].sort();
     const jeArt = (a: Art) => (eigene.some(i => i.art === a) ? Math.round(eigene.filter(i => i.art === a).reduce((x, i) => x + i.betrag, 0) * 100) / 100 : null);
     const b = begr.find(x => x.projekt_id === p.id);
-    const t = tol.get(p.phasenmodell_id) ?? null;
+    const t = tol.get(p.id) ?? null;
     out.push({
       id: p.id, nummer: p.nummer, name: p.name, phase: p.phase, portfolioId: p.portfolio_id,
       kostentraeger: kt.get(p.id)?.nummer ?? null,

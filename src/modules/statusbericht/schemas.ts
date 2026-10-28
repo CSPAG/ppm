@@ -107,4 +107,23 @@ export const StatusberichtKurz = Type.Object({
 
 export const StatusberichtList = Type.Object({ items: Type.Array(Type.Ref('StatusberichtKurz')) }, { $id: 'StatusberichtList', additionalProperties: false });
 
+/** Stand der Berichte je Projekt für die Kopfkarte «Meine Projekte» (informationsarchitektur.md «Startseite je Rolle»). */
+export const BerichtStandQuery = Type.Object({
+  projektId: Type.Array(Uuid, { minItems: 1, maxItems: 20, description: 'Projekte (mehrfach, höchstens 20).' }),
+}, { additionalProperties: false });
+
+export const BerichtStandList = Type.Object({
+  items: Type.Array(Type.Object({
+    projektId: Uuid,
+    letzter: Nullable(Type.Object({
+      periode: Type.String(), status: Nullable(Status), trend: Nullable(Type.String()),
+      begruendung: Type.String({ description: 'Begründung des Status (Pflicht bei «kritisch»).' }),
+    }, { additionalProperties: false, description: 'Letzter eingereichter Bericht (auch zurückgegeben oder geprüft).' })),
+    laufend: Nullable(Type.Object({
+      periode: Type.String(), stand: Nullable(Type.Union(STAENDE.map(s => Type.Literal(s)))),
+      stichtag: Nullable(Type.String({ format: 'date', description: 'Stichtag der Berichte; null ohne Phasenmodell in Kraft.' })),
+    }, { additionalProperties: false, description: 'Bericht der laufenden Periode, solange das Projekt berichtet (aktiv, P0–P3); `stand` null ohne gespeicherten Bericht.' })),
+  }, { additionalProperties: false })),
+}, { $id: 'BerichtStandList', additionalProperties: false });
+
 export const BerichtParams = Type.Object({ id: Type.String({ format: 'uuid' }), periode: Periode }, { additionalProperties: false });

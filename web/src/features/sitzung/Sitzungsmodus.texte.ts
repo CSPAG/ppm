@@ -107,8 +107,6 @@ export const TM = {
   entscheideSub: 'Entscheide der Gremien mit Begründung und Auflagen, neueste Sitzung zuerst.',
   entscheideLeer: 'Noch keine Entscheide. Entscheide entstehen im Sitzungsmodus einer Sitzung.',
   entscheideGefiltert: 'Keine Entscheide für diesen Filter.',
-  filterGremium: 'Gremium',
-  filterAlle: 'Alle Gremien',
   filterAuflagen: 'Nur mit offenen Auflagen',
   filterVr: 'Nur an den VR weitergeleitet',
   zuruecksetzen: 'Filter zurücksetzen',

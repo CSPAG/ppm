@@ -3854,12 +3854,12 @@
                 "wert": {
                   "anyOf": [
                     {
+                      "type": "null"
+                    },
+                    {
                       "minimum": 0,
                       "maximum": 9999999,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -4597,12 +4597,12 @@
                 "wert": {
                   "anyOf": [
                     {
+                      "type": "null"
+                    },
+                    {
                       "minimum": 0,
                       "maximum": 9999999,
                       "type": "number"
-                    },
-                    {
-                      "type": "null"
                     }
                   ]
                 },
@@ -6557,14 +6557,14 @@
           "prognose": {
             "anyOf": [
               {
+                "type": "null"
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           },
@@ -6687,14 +6687,14 @@
           "prognose": {
             "anyOf": [
               {
+                "type": "null"
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -6745,14 +6745,14 @@
           "prognose": {
             "anyOf": [
               {
+                "type": "null"
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
                 "description": "Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.",
                 "type": "number"
-              },
-              {
-                "type": "null"
               }
             ]
           }
@@ -13587,6 +13587,163 @@
               "kommentar": {
                 "maxLength": 2000,
                 "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "BerichtStandList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "letzter",
+                "laufend"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "letzter": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "Letzter eingereichter Bericht (auch zurückgegeben oder geprüft).",
+                      "type": "object",
+                      "required": [
+                        "periode",
+                        "status",
+                        "trend",
+                        "begruendung"
+                      ],
+                      "properties": {
+                        "periode": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "anyOf": [
+                            {
+                              "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "im_plan"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "kritisch"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "trend": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "begruendung": {
+                          "description": "Begründung des Status (Pflicht bei «kritisch»).",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "laufend": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "Bericht der laufenden Periode, solange das Projekt berichtet (aktiv, P0–P3); `stand` null ohne gespeicherten Bericht.",
+                      "type": "object",
+                      "required": [
+                        "periode",
+                        "stand",
+                        "stichtag"
+                      ],
+                      "properties": {
+                        "periode": {
+                          "type": "string"
+                        },
+                        "stand": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "entwurf"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "eingereicht"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "zurueckgegeben"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "geprueft"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "stichtag": {
+                          "anyOf": [
+                            {
+                              "format": "date",
+                              "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -28996,7 +29153,7 @@
                 ]
               },
               "wesentlich": {
-                "description": "Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie.",
+                "description": "Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie.",
                 "type": "boolean"
               }
             }
@@ -64434,6 +64591,104 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/statusberichte/stand": {
+      "get": {
+        "summary": "Stand der Berichte mehrerer Projekte",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»): je Projekt der letzte eingereichte Bericht mit Status, Trend und Begründung und der Bericht der laufenden Periode mit Stichtag. Projekte ohne Leserecht entfallen.",
+        "parameters": [
+          {
+            "schema": {
+              "minItems": 1,
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "projektId",
+            "required": true,
+            "description": "Projekte (mehrfach, höchstens 20)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BerichtStandList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

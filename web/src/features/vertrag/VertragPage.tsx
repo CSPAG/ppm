@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { describeError } from '@vollholz/iam-web';
 import { isConflict, newIdempotencyKey, statusOf } from '../../api/index.ts';
-import { Dialog, Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, Stand, T, useToast, useVerzoegert, type Phase, type StandFamilie } from '../../ui/index.ts';
+import { Dialog, Empty, ErrorState, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, Stand, T, TeilFehler, useToast, useVerzoegert, type Phase, type StandFamilie } from '../../ui/index.ts';
 import {
   kapitelLaden, useKapitel, usePflichtangaben, useProjekt, useVersion, useVertrag, useVertragMutations, type Angabe, type Inhalt, type KapitelLoaded,
   type Version, type VersionLoaded,
@@ -71,11 +71,14 @@ function Akte({ nummer, projektId, projektName, versionId, search, setSearch }: 
   const skelett = useVerzoegert(version.isPending);
   if (version.isPending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={6} /> : null}</div>;
   if (version.error) return <ErrorState error={version.error} onRetry={() => void version.refetch()} />;
-  return <Arbeitsflaeche nummer={nummer} projektId={projektId} projektName={projektName} loaded={version.data} angaben={pflicht.data?.angaben ?? []} search={search} setSearch={setSearch} />;
+  return <Arbeitsflaeche nummer={nummer} projektId={projektId} projektName={projektName} loaded={version.data} angaben={pflicht.data?.angaben ?? []} search={search} setSearch={setSearch}
+    pflicht={{ laedt: pflicht.isPending, fehler: pflicht.error, erneut: () => void pflicht.refetch() }} />;
 }
 
-function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, search, setSearch }: {
+function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, search, setSearch, pflicht }: {
   nummer: string; projektId: string; projektName: string; loaded: VersionLoaded; angaben: Angabe[]; search: VertragSearch; setSearch: SetVertragSearch;
+  /** Stand der Abfrage der Pflichtangaben: Ein Fehler darf nicht als «keine Angaben verlangt» erscheinen (Z5) */
+  pflicht: { laedt: boolean; fehler: unknown; erneut: () => void };
 }) {
   const toast = useToast();
   const v = loaded.detail.version;
@@ -191,7 +194,9 @@ function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, searc
         </section>
         <aside className="vt-panel" aria-labelledby={`${navId}-p`}>
           <h3 id={`${navId}-p`} className="grp-h">{TV.pflicht} {TV.pflichtFuer(phase)}</h3>
-          {angaben.length === 0 ? <p className="muted small">{TV.pflichtKeine}</p>
+          {pflicht.fehler ? <TeilFehler was={TV.pflicht} error={pflicht.fehler} onRetry={pflicht.erneut} />
+            : pflicht.laedt ? <p className="muted small" role="status">{T.common.loading}</p>
+            : angaben.length === 0 ? <p className="muted small">{TV.pflichtKeine}</p>
             : fehlend.length === 0 ? <Hinweis stufe="hinweis">{TV.pflichtVollstaendig}</Hinweis> : (
               <>
                 <p className="small" role="status">{TV.pflichtFehlen(fehlend.length, phase)}</p>

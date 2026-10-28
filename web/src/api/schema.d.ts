@@ -28477,6 +28477,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/statusberichte/stand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stand der Berichte mehrerer Projekte
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»): je Projekt der letzte eingereichte Bericht mit Status, Trend und Begründung und der Bericht der laufenden Periode mit Stichtag. Projekte ohne Leserecht entfallen.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Projekte (mehrfach, höchstens 20). */
+                    projektId: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BerichtStandList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/berichte": {
         parameters: {
             query?: never;
@@ -45835,7 +45931,7 @@ export interface components {
             }[];
             toleranzen: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
+                wert: null | number;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
             /** @description Prüfbericht (I-P4): Hinweise und Warnungen vor dem In-Kraft-Setzen. */
@@ -45942,7 +46038,7 @@ export interface components {
             }[];
             toleranzen?: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
+                wert: null | number;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
         };
@@ -46405,7 +46501,7 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
-            prognose: number | null;
+            prognose: null | number;
             budgetBaseline: number | null;
             ist: number | null;
         };
@@ -46434,7 +46530,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: number | null;
+            prognose?: null | number;
         };
         KostenPatch: {
             /**
@@ -46453,7 +46549,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: number | null;
+            prognose?: null | number;
         };
         Risiko: {
             /** Format: uuid */
@@ -48156,6 +48252,24 @@ export interface components {
                 stufe: string | null;
                 kommentar: string;
             };
+        };
+        BerichtStandList: {
+            items: {
+                /** Format: uuid */
+                projektId: string;
+                letzter: {
+                    periode: string;
+                    status: ("im_plan" | "kritisch") | null;
+                    trend: string | null;
+                    /** @description Begründung des Status (Pflicht bei «kritisch»). */
+                    begruendung: string;
+                } | null;
+                laufend: {
+                    periode: string;
+                    stand: ("entwurf" | "eingereicht" | "zurueckgegeben" | "geprueft") | null;
+                    stichtag: string | null;
+                } | null;
+            }[];
         };
         StatusberichtEskalationNeu: {
             /** @description Worum es geht, z. B. die wesentliche Abweichung zur Baseline. */
@@ -51179,7 +51293,7 @@ export interface components {
             abweichung: {
                 betrag: number | null;
                 prozent: number | null;
-                /** @description Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie. */
+                /** @description Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie. */
                 wesentlich: boolean;
             };
             toleranzProzent: number | null;

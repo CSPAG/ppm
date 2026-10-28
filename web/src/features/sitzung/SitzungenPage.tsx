@@ -1,11 +1,15 @@
 /**
  * Einstieg «Gremien › Sitzungen» (UI-33, UC-006 Schritt 1; K3): je entscheidendem Gremium, dessen Sitzungen die Person
  * sieht, die nächsten Termine mit Stand und Zahl der Traktanden. Ein Termin öffnet die Sitzung
- * (`/gremien/<kuerzel>/sitzungen/<datum>`, I-N5). Gremien ohne Recht entfallen (I-N2).
+ * (`/gremien/<kuerzel>/sitzungen/<datum>`, I-N5). Gremien ohne Recht entfallen (I-N2). Das Gremium steht im Kopf und in
+ * der Adresse (`/gremien/prat/sitzungen`, IA «Kontext im Kopf»); `/gremien/sitzungen` zeigt alle oder führt auf das
+ * einzige bzw. zuletzt gewählte Gremium.
  */
+import { useEffect } from 'react';
 import { Empty, ErrorState, Icon, Loading, Stand, fmtDatum } from '../../ui/index.ts';
 import { useGremien, useSitzungsliste, type Gremium } from './api.ts';
-import { sitzungPfad } from './search.ts';
+import { GremiumWahl, gremiumMerken, vorgabeGremium } from './GremiumWahl.tsx';
+import { gremiumSitzungenPfad, sitzungPfad } from './search.ts';
 import { standFamilie } from './Traktandenliste.tsx';
 import { TS } from './texte.ts';
 import './sitzung.css';
@@ -37,8 +41,15 @@ function GremiumSitzungen({ g, gehe }: { g: Gremium; gehe(pfad: string): void })
   );
 }
 
-export function SitzungenPage({ gehe }: { gehe(pfad: string): void }) {
+export function SitzungenPage({ kuerzel, gehe }: { kuerzel?: string; gehe(pfad: string, o?: { replace?: boolean }): void }) {
   const gremien = useGremien();
+  const liste = gremien.data;
+  const gewaehlt = kuerzel ? liste?.find(g => g.kuerzel === kuerzel) : undefined;
+  // ohne Gremium in der Adresse: das einzige bzw. zuletzt gewählte setzen (ersetzt den Eintrag im Verlauf, I-N7)
+  const vorgabe = !kuerzel && liste ? vorgabeGremium(liste) : undefined;
+  useEffect(() => { if (vorgabe) gehe(gremiumSitzungenPfad(vorgabe), { replace: true }); }, [vorgabe, gehe]);
+  useEffect(() => { if (gewaehlt) gremiumMerken(gewaehlt.kuerzel); }, [gewaehlt]);
+  const sichtbar = kuerzel ? (gewaehlt ? [gewaehlt] : []) : liste ?? [];
   return (
     <section aria-labelledby="page-title">
       <header className="mh">
@@ -50,12 +61,18 @@ export function SitzungenPage({ gehe }: { gehe(pfad: string): void }) {
               <div className="sub">{TS.sub}</div>
             </div>
           </div>
+          <div className="acts">
+            <GremiumWahl gremien={liste} wert={kuerzel} onWahl={k => gehe(k ? gremiumSitzungenPfad(k) : '/gremien/sitzungen')} />
+          </div>
         </div>
       </header>
       <div className="body sz-uebersicht">
-        {gremien.isPending ? <Loading /> : gremien.error ? <ErrorState error={gremien.error} onRetry={() => void gremien.refetch()} />
+        {gremien.isPending || vorgabe ? <Loading /> : gremien.error ? <ErrorState error={gremien.error} onRetry={() => void gremien.refetch()} />
           : !gremien.data.length ? <Empty>{TS.keineGremien}</Empty>
-          : gremien.data.map(g => <GremiumSitzungen key={g.id} g={g} gehe={gehe} />)}
+          : kuerzel && !gewaehlt ? (
+            <Empty action={<button type="button" className="btn" onClick={() => { gremiumMerken(undefined); gehe('/gremien/sitzungen'); }}>{TS.zuAllenGremien}</button>}>{TS.gremiumUnbekannt}</Empty>
+          )
+          : sichtbar.map(g => <GremiumSitzungen key={g.id} g={g} gehe={gehe} />)}
       </div>
     </section>
   );

@@ -13,6 +13,7 @@ import { expectNoAxe } from '../../test/axe.ts';
 import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
 import { feldId, KAPITEL, TERMINE } from './felder.ts';
 import type { SetVertragSearch, VertragSearch } from './search.ts';
+import { T } from '../../ui/index.ts';
 import { TV } from './texte.ts';
 import { VertragPage } from './VertragPage.tsx';
 
@@ -116,6 +117,20 @@ describe('Projektvertrag (UI-07)', () => {
     // Symbol «Angaben fehlen» an den Kapiteln (vorher, I-P3)
     expect(screen.getAllByText(TV.fehlt(1))).toHaveLength(3);
     await expectNoAxe(container);
+  });
+
+  it('Pflichtangaben nicht ladbar: Seitenpanel meldet es mit «Erneut versuchen» statt «keine verlangt» (Z5)', async () => {
+    let fehler = true;
+    stub({ routes: { [`GET /v1/vertragsversionen/${V}/pflichtangaben`]: () => fehler
+      ? json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' })
+      : json({ versionId: V, zielphase: 'P1', vollstaendig: false, angaben: FEHLEND }) } });
+    renderWithIam(<Page />, PL as never);
+    const panel = await screen.findByRole('complementary');
+    expect(await within(panel).findByText(T.common.teilFehler(TV.pflicht))).toBeInTheDocument();
+    expect(within(panel).queryByText(TV.pflichtKeine)).toBeNull();
+    fehler = false;
+    await userEvent.click(within(panel).getByRole('button', { name: T.common.retry }));
+    expect(await within(panel).findByText(TV.pflichtFehlen(3, 'P1 Konzept und Planung'))).toBeInTheDocument();
   });
 
   it('Alt+N springt zur nächsten fehlenden Angabe', async () => {

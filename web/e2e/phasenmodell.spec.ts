@@ -28,9 +28,9 @@ test('Phasenmodell in Kraft: gesperrt, Abschnitte in der Adresse, barrierefrei',
   await expectNoOverflow(page);
 
   // Erste Phase über die Navigation (breit) bzw. die Auswahl (schmal); die Adresse folgt (I-N5)
-  const auswahl = page.getByLabel('Abschnitt', { exact: true });
-  if (await auswahl.isVisible()) await auswahl.selectOption('P0');
-  else await page.getByRole('navigation').getByRole('button', { name: 'Initialisierung', exact: true }).click();
+  const inhalt = page.getByRole('navigation', { name: 'Inhalt des Phasenmodells' });
+  if (page.viewportSize()!.width < 768) await inhalt.getByRole('combobox').selectOption('P0');
+  else await inhalt.getByRole('button', { name: 'Initialisierung', exact: true }).click();
   await expect(page).toHaveURL(/[?&]e=P0/);
   await expectAccessible(page);
 });

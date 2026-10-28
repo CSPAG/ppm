@@ -1775,6 +1775,453 @@
           }
         }
       },
+      "ZugangVorschau": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "person",
+          "orgRollen",
+          "rollen",
+          "aufgaben",
+          "can"
+        ],
+        "properties": {
+          "person": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "orgRollen": {
+            "description": "Rollen an der Organisation (Programmrollen, Administration); entfallen mit dem Zugang.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rolle",
+                "rolleName"
+              ],
+              "properties": {
+                "rolle": {
+                  "type": "string"
+                },
+                "rolleName": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "rollen": {
+            "description": "Rollen an Projekten, Portfolios und anderen Orten, die neu zu besetzen sind.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "ort",
+                "rolle",
+                "rolleName"
+              ],
+              "properties": {
+                "ort": {
+                  "additionalProperties": false,
+                  "description": "Den Namen des Orts löst die Oberfläche auf (wie im Baukasten).",
+                  "type": "object",
+                  "required": [
+                    "typ",
+                    "id"
+                  ],
+                  "properties": {
+                    "typ": {
+                      "description": "Typ des Orts aus dem Modell, z. B. `projekt` oder `portfolio`.",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  }
+                },
+                "rolle": {
+                  "description": "Rolle des Modells, z. B. `pl`.",
+                  "type": "string"
+                },
+                "rolleName": {
+                  "description": "Name der Rolle, z. B. «Projektleitung».",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "aufgaben": {
+            "description": "Offene Aufgaben an die Person persönlich.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "art",
+                "titel",
+                "kontext",
+                "link",
+                "frist",
+                "fristArt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "art": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "kontext": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "link": {
+                  "description": "Adresse der Aufgabe in der Oberfläche.",
+                  "type": "string"
+                },
+                "frist": {
+                  "anyOf": [
+                    {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fristArt": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "kalendertage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "arbeitstage"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "entziehen"
+            ],
+            "properties": {
+              "entziehen": {
+                "description": "Nicht für sich selbst.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ZugangEntzogen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "neubesetzung",
+          "rollen",
+          "aufgaben"
+        ],
+        "properties": {
+          "neubesetzung": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "rollen": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "aufgaben": {
+            "minimum": 0,
+            "description": "Offene Aufgaben der Person beim Entziehen.",
+            "type": "integer"
+          }
+        }
+      },
+      "Neubesetzung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "person",
+          "entzogenAt",
+          "entzogenVon",
+          "rollen",
+          "offeneRollen",
+          "erledigt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "entzogenAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entzogenVon": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rollen": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "offeneRollen": {
+            "minimum": 0,
+            "description": "Rollen, die am Ort noch niemand wieder hat.",
+            "type": "integer"
+          },
+          "erledigt": {
+            "description": "Keine offene Aufgabe «neu besetzen» (nichts zu tun oder von Hand erledigt).",
+            "type": "boolean"
+          }
+        }
+      },
+      "NeubesetzungList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Neubesetzung"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "NeubesetzungDetail": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "neubesetzung",
+          "rollen",
+          "aufgaben"
+        ],
+        "properties": {
+          "neubesetzung": {
+            "$ref": "#/components/schemas/Neubesetzung"
+          },
+          "rollen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "ort",
+                "rolle",
+                "rolleName",
+                "besetzt"
+              ],
+              "properties": {
+                "ort": {
+                  "additionalProperties": false,
+                  "description": "Den Namen des Orts löst die Oberfläche auf (wie im Baukasten).",
+                  "type": "object",
+                  "required": [
+                    "typ",
+                    "id"
+                  ],
+                  "properties": {
+                    "typ": {
+                      "description": "Typ des Orts aus dem Modell, z. B. `projekt` oder `portfolio`.",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  }
+                },
+                "rolle": {
+                  "description": "Rolle des Modells, z. B. `pl`.",
+                  "type": "string"
+                },
+                "rolleName": {
+                  "description": "Name der Rolle, z. B. «Projektleitung».",
+                  "type": "string"
+                },
+                "besetzt": {
+                  "description": "Jemand hat die Rolle am Ort wieder.",
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "aufgaben": {
+            "description": "Offene Aufgaben, die noch an die Person gehen.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "id",
+                "art",
+                "titel",
+                "kontext",
+                "link",
+                "frist",
+                "fristArt"
+              ],
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "art": {
+                  "type": "string"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "kontext": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "link": {
+                  "description": "Adresse der Aufgabe in der Oberfläche.",
+                  "type": "string"
+                },
+                "frist": {
+                  "anyOf": [
+                    {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fristArt": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "kalendertage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "arbeitstage"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "OrgEinheit": {
         "additionalProperties": false,
         "type": "object",
@@ -15938,6 +16385,331 @@
           }
         }
       },
+      "AuswertungGruppe": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schluessel",
+          "label",
+          "werte"
+        ],
+        "properties": {
+          "schluessel": {
+            "description": "Schlüssel der Gruppe; `-` für «ohne» (z. B. ohne Handlungsfeld).",
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "werte": {
+            "description": "Wert je gewählter Kennzahl (Beträge in CHF).",
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "AuswertungEinzelwert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "nummer",
+          "name",
+          "portfolio",
+          "phase",
+          "lebenszyklus",
+          "status",
+          "handlungsfeld",
+          "gruppe",
+          "werte"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "portfolio": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          },
+          "lebenszyklus": {
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "im_plan"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "kritisch"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handlungsfeld": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gruppe": {
+            "description": "Schlüssel der Gruppe, zu der das Projekt zählt.",
+            "type": "string"
+          },
+          "werte": {
+            "description": "Wert je gewählter Kennzahl (Beträge in CHF).",
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "Auswertung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "periode",
+          "gruppierung",
+          "kennzahlen",
+          "gruppen",
+          "summe",
+          "einzelwerte",
+          "optionen"
+        ],
+        "properties": {
+          "periode": {
+            "type": "string"
+          },
+          "gruppierung": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "keine"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "portfolio"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "phase"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "status"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "lebenszyklus"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "handlungsfeld"
+                ]
+              }
+            ]
+          },
+          "kennzahlen": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "schluessel",
+                "label",
+                "einheit"
+              ],
+              "properties": {
+                "schluessel": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "projekte"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kritisch"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "eskalationen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "meilensteine_offen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "risiken"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "budget"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "prognose"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ist"
+                      ]
+                    }
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "anzahl"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "chf"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "gruppen": {
+            "description": "In der Ordnung der Gruppierung (Phase P0–P4, Status, sonst nach Name).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuswertungGruppe"
+            }
+          },
+          "summe": {
+            "description": "Wert je gewählter Kennzahl (Beträge in CHF).",
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "einzelwerte": {
+            "description": "Projekte hinter den Zahlen, nach Nummer.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuswertungEinzelwert"
+            }
+          },
+          "optionen": {
+            "additionalProperties": false,
+            "description": "Auswahl für die Filter, nur Sichtbares.",
+            "type": "object",
+            "required": [
+              "portfolios",
+              "handlungsfelder",
+              "finanzen"
+            ],
+            "properties": {
+              "portfolios": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "schluessel",
+                    "name"
+                  ],
+                  "properties": {
+                    "schluessel": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "handlungsfelder": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "label"
+                  ],
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "finanzen": {
+                "description": "Beträge wählbar (`finanzen:read` an der Organisation).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
       "VorlageGrundbestand": {
         "additionalProperties": false,
         "description": "Mitgelieferte Vorlage; gilt ohne aktive eigene Version.",
@@ -18596,6 +19368,548 @@
           "begruendung": {
             "maxLength": 2000,
             "description": "Pflicht beim Verweigern: Die Projektleitung erfährt sonst nicht, was zu ändern ist.",
+            "type": "string"
+          }
+        }
+      },
+      "VertragUnterschied": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "feld",
+          "label",
+          "eintrag",
+          "eintragFeld",
+          "art",
+          "alt",
+          "neu",
+          "differenz"
+        ],
+        "properties": {
+          "feld": {
+            "description": "Feld im Kapitel (z. B. `kosten`, `termine.projektabschluss`).",
+            "type": "string"
+          },
+          "label": {
+            "description": "Bezeichnung des Felds bzw. der Liste.",
+            "type": "string"
+          },
+          "eintrag": {
+            "anyOf": [
+              {
+                "description": "Listeneintrag (Bezeichnung); null bei einem Feld des Kapitels.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eintragFeld": {
+            "anyOf": [
+              {
+                "description": "Geändertes Feld im Listeneintrag (z. B. `termin`).",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "neu",
+              "entfernt",
+              "geaendert"
+            ],
+            "description": "Kennzeichnung zusätzlich zur Farbe (Q-B5)."
+          },
+          "alt": {
+            "description": "Wert in der verglichenen (älteren) Version; bei «neu» null."
+          },
+          "neu": {
+            "description": "Wert in dieser Version; bei «entfernt» null."
+          },
+          "differenz": {
+            "anyOf": [
+              {
+                "description": "neu − alt bei Zahlen (Beträge, FTE).",
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "VertragVergleich": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "versionId",
+          "nummer",
+          "mitVersionId",
+          "mitNummer",
+          "betraege",
+          "kapitel"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "mitVersionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mitNummer": {
+            "type": "string"
+          },
+          "betraege": {
+            "description": "Beträge verglichen (Recht auf Beträge, A-33); sonst ohne Beträge.",
+            "type": "boolean"
+          },
+          "kapitel": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "kapitel",
+                "titel",
+                "geaendert",
+                "unterschiede"
+              ],
+              "properties": {
+                "kapitel": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "type": "integer"
+                },
+                "titel": {
+                  "type": "string"
+                },
+                "geaendert": {
+                  "type": "boolean"
+                },
+                "unterschiede": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VertragUnterschied"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "VertragHauptaenderungen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "versionId",
+          "basisVersionId",
+          "rubriken",
+          "andere",
+          "version",
+          "can"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "basisVersionId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rubriken": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rubrik",
+                "label",
+                "erzeugt",
+                "text"
+              ],
+              "properties": {
+                "rubrik": {
+                  "type": "string",
+                  "enum": [
+                    "scope",
+                    "zeitplan",
+                    "ressourcen_budget",
+                    "annahmen",
+                    "key_risiken"
+                  ],
+                  "description": "Rubrik der Hauptänderungen (Q7 Kopf)."
+                },
+                "label": {
+                  "type": "string"
+                },
+                "erzeugt": {
+                  "description": "Vom System aus dem Vergleich zur Basis erzeugte Sätze.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "text": {
+                  "anyOf": [
+                    {
+                      "description": "Umformulierung der Projektleitung; ersetzt die erzeugten Sätze in der Anzeige.",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "andere": {
+            "description": "Weitere Hauptänderungen («Andere»), von der Projektleitung erfasst.",
+            "type": "string"
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Version der Vertragsversion (ETag).",
+            "type": "integer"
+          },
+          "can": {
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "description": "Umformulieren (Entwurf in Arbeit, vertrag:write).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "VertragHauptaenderungenPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rubriken",
+          "andere"
+        ],
+        "properties": {
+          "rubriken": {
+            "additionalProperties": false,
+            "description": "Umformulierung je Rubrik; null oder leer übernimmt wieder die erzeugten Sätze.",
+            "type": "object",
+            "properties": {
+              "scope": {
+                "anyOf": [
+                  {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "zeitplan": {
+                "anyOf": [
+                  {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ressourcen_budget": {
+                "anyOf": [
+                  {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "annahmen": {
+                "anyOf": [
+                  {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "key_risiken": {
+                "anyOf": [
+                  {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "andere": {
+            "maxLength": 5000,
+            "type": "string"
+          }
+        }
+      },
+      "VertragAenderung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "versionId",
+          "projektId",
+          "nummer",
+          "basisVersionId",
+          "basisNummer",
+          "stand",
+          "begruendung",
+          "eingereichtAt",
+          "wirkung",
+          "entscheid",
+          "version",
+          "can"
+        ],
+        "properties": {
+          "versionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nummer": {
+            "type": "string"
+          },
+          "basisVersionId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "basisNummer": {
+            "anyOf": [
+              {
+                "description": "Nummer der Baseline, aus der der Antrag entstand.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "in_arbeit",
+              "in_pruefung",
+              "zur_unterzeichnung",
+              "unterzeichnet",
+              "traktandiert",
+              "abgenommen",
+              "abgelehnt",
+              "verworfen",
+              "zurueckgezogen"
+            ],
+            "description": "Bearbeitungsstand; «in_pruefung» heisst hier: beim Sponsor zum Entscheid."
+          },
+          "begruendung": {
+            "description": "Begründung der Projektleitung (UC-007 Schritt 2).",
+            "type": "string"
+          },
+          "eingereichtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "wirkung": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "prat",
+              "dimensionen",
+              "kapitel",
+              "hinweis"
+            ],
+            "properties": {
+              "prat": {
+                "description": "Freigabe durch den PRAT nötig (UC-007 A1): ein geändertes Kapitel wirkt auf Scope, Budget oder Ressourcen.",
+                "type": "boolean"
+              },
+              "dimensionen": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "scope",
+                    "budget",
+                    "ressourcen"
+                  ],
+                  "description": "Dimension nach der Kapitelwirkung im Phasenmodell."
+                }
+              },
+              "kapitel": {
+                "description": "Geänderte Kapitel mit dieser Wirkung.",
+                "type": "array",
+                "items": {
+                  "minimum": 1,
+                  "maximum": 13,
+                  "type": "integer"
+                }
+              },
+              "hinweis": {
+                "anyOf": [
+                  {
+                    "description": "Hinweis für den Sponsor (K2 Regel «Änderung an Scope, Budget oder Ressourcen»).",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "entscheid": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "ergebnis",
+                  "begruendung",
+                  "at",
+                  "personId"
+                ],
+                "properties": {
+                  "ergebnis": {
+                    "type": "string",
+                    "enum": [
+                      "freigegeben",
+                      "abgelehnt",
+                      "an_prat"
+                    ],
+                    "description": "Entscheid des Sponsors: freigeben (Schritt 4), ablehnen (A2) oder Antrag an den PRAT unterstützen (A1)."
+                  },
+                  "begruendung": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "personId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "description": "Version der Vertragsversion (ETag).",
+            "type": "integer"
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "einreichen",
+              "freigeben",
+              "ablehnen",
+              "anPrat"
+            ],
+            "properties": {
+              "einreichen": {
+                "description": "«Änderung einreichen» (Entwurf in Arbeit, vertrag:write).",
+                "type": "boolean"
+              },
+              "freigeben": {
+                "description": "«Änderung freigeben» (eingereicht, vertrag:decide, ohne Wirkung auf Scope, Budget, Ressourcen).",
+                "type": "boolean"
+              },
+              "ablehnen": {
+                "description": "«Ablehnen» mit Begründung (eingereicht, vertrag:decide).",
+                "type": "boolean"
+              },
+              "anPrat": {
+                "description": "«Antrag an den PRAT unterstützen» (eingereicht, vertrag:decide, mit Wirkung).",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "VertragAenderungEntscheid": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ergebnis"
+        ],
+        "properties": {
+          "ergebnis": {
+            "type": "string",
+            "enum": [
+              "freigegeben",
+              "abgelehnt",
+              "an_prat"
+            ],
+            "description": "Entscheid des Sponsors: freigeben (Schritt 4), ablehnen (A2) oder Antrag an den PRAT unterstützen (A1)."
+          },
+          "begruendung": {
+            "maxLength": 5000,
+            "description": "Begründung (Pflicht beim Ablehnen, UC-007 A2).",
             "type": "string"
           }
         }
@@ -23443,6 +24757,558 @@
             "items": {
               "pattern": "^(\\*|[a-z][a-z0-9_.-]{0,127})$",
               "description": "Ereignistyp, z. B. `handlungsfeld.created`, oder `*` für alle.",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SchnittstelleKatalogeintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "umsystem",
+          "umsystemLabel",
+          "daten",
+          "datenLabel",
+          "richtung",
+          "quelle",
+          "verfuegbar"
+        ],
+        "properties": {
+          "umsystem": {
+            "type": "string"
+          },
+          "umsystemLabel": {
+            "type": "string"
+          },
+          "daten": {
+            "type": "string"
+          },
+          "datenLabel": {
+            "type": "string"
+          },
+          "richtung": {
+            "type": "string",
+            "enum": [
+              "eingehend",
+              "ausgehend"
+            ],
+            "description": "`eingehend`: Daten vom Umsystem abholen; `ausgehend`: an das Umsystem liefern."
+          },
+          "quelle": {
+            "description": "Herkunft im Bauplan (Annahme, Klärung, BC).",
+            "type": "string"
+          },
+          "verfuegbar": {
+            "description": "Verarbeitung der Daten vorhanden; sonst schlägt ein Lauf mit «noch nicht verfügbar» fehl (der Testlauf prüft nur die Verbindung).",
+            "type": "boolean"
+          }
+        }
+      },
+      "SchnittstelleLauf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "schnittstelleId",
+          "art",
+          "stand",
+          "start",
+          "ende",
+          "umfang",
+          "fehler",
+          "gestartetVon"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "schnittstelleId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "test",
+              "geplant",
+              "manuell"
+            ],
+            "description": "`test`: beim Einrichten (nur Verbindung); `geplant`: nach Rhythmus; `manuell`: von Hand gestartet."
+          },
+          "stand": {
+            "type": "string",
+            "enum": [
+              "laeuft",
+              "erfolgreich",
+              "fehlgeschlagen"
+            ]
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ende": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "umfang": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "description": "Übertragene Datensätze.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fehler": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gestartetVon": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Person; null bei geplanten Läufen.",
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Schnittstelle": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "umsystem",
+          "daten",
+          "name",
+          "richtung",
+          "rhythmus",
+          "adresse",
+          "aktiv",
+          "verfuegbar",
+          "letzterLauf",
+          "version",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "umsystem": {
+            "type": "string"
+          },
+          "daten": {
+            "type": "string"
+          },
+          "name": {
+            "description": "Umsystem und Daten, z. B. «ERP · Ist-Kosten je Kostenträger und Monat».",
+            "type": "string"
+          },
+          "richtung": {
+            "type": "string",
+            "enum": [
+              "eingehend",
+              "ausgehend"
+            ],
+            "description": "`eingehend`: Daten vom Umsystem abholen; `ausgehend`: an das Umsystem liefern."
+          },
+          "rhythmus": {
+            "type": "string",
+            "enum": [
+              "manuell",
+              "taeglich",
+              "woechentlich",
+              "monatlich"
+            ],
+            "description": "Geplanter Lauf einmal je Tag, Woche bzw. Monat (Europe/Zurich); `manuell`: nur von Hand."
+          },
+          "adresse": {
+            "type": "string"
+          },
+          "aktiv": {
+            "type": "boolean"
+          },
+          "verfuegbar": {
+            "description": "Verarbeitung der Daten vorhanden.",
+            "type": "boolean"
+          },
+          "letzterLauf": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SchnittstelleLauf"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SchnittstelleList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "katalog"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Schnittstelle"
+            }
+          },
+          "katalog": {
+            "description": "Umsysteme und Daten, die sich einrichten lassen.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchnittstelleKatalogeintrag"
+            }
+          }
+        }
+      },
+      "SchnittstelleErgebnis": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schnittstelle",
+          "testlauf"
+        ],
+        "properties": {
+          "schnittstelle": {
+            "$ref": "#/components/schemas/Schnittstelle"
+          },
+          "testlauf": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SchnittstelleLauf"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "SchnittstelleCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "umsystem",
+          "daten",
+          "rhythmus",
+          "adresse"
+        ],
+        "properties": {
+          "umsystem": {
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "type": "string"
+          },
+          "daten": {
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "type": "string"
+          },
+          "rhythmus": {
+            "type": "string",
+            "enum": [
+              "manuell",
+              "taeglich",
+              "woechentlich",
+              "monatlich"
+            ],
+            "description": "Geplanter Lauf einmal je Tag, Woche bzw. Monat (Europe/Zurich); `manuell`: nur von Hand."
+          },
+          "adresse": {
+            "format": "uri",
+            "pattern": "^https?://",
+            "maxLength": 2000,
+            "description": "Adresse des Umsystems (HTTPS; Abruf mit SSRF-Schutz).",
+            "type": "string"
+          },
+          "aktiv": {
+            "default": true,
+            "type": "boolean"
+          }
+        }
+      },
+      "SchnittstellePatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "rhythmus": {
+            "type": "string",
+            "enum": [
+              "manuell",
+              "taeglich",
+              "woechentlich",
+              "monatlich"
+            ],
+            "description": "Geplanter Lauf einmal je Tag, Woche bzw. Monat (Europe/Zurich); `manuell`: nur von Hand."
+          },
+          "adresse": {
+            "format": "uri",
+            "pattern": "^https?://",
+            "maxLength": 2000,
+            "description": "Adresse des Umsystems (HTTPS; Abruf mit SSRF-Schutz).",
+            "type": "string"
+          },
+          "aktiv": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SchnittstelleLaufList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchnittstelleLauf"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AenderungsprotokollEintrag": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "zeit",
+          "person",
+          "quelle",
+          "aktion",
+          "art",
+          "objekt",
+          "aenderungen"
+        ],
+        "properties": {
+          "id": {
+            "description": "Folge im Audit (aufsteigend).",
+            "type": "string"
+          },
+          "zeit": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "person": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name",
+                  "art"
+                ],
+                "properties": {
+                  "id": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "art": {
+                    "description": "`user` oder `client` (Maschinen-Client).",
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quelle": {
+            "description": "`ui`, `api`, `mcp`, `worker`, `webhook` oder `system`.",
+            "type": "string"
+          },
+          "aktion": {
+            "description": "Aktion im Audit, z. B. `org_einheit.updated`.",
+            "type": "string"
+          },
+          "art": {
+            "type": "string",
+            "enum": [
+              "angelegt",
+              "geaendert",
+              "geloescht",
+              "sonstig"
+            ]
+          },
+          "objekt": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "typ",
+              "id"
+            ],
+            "properties": {
+              "typ": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "aenderungen": {
+            "description": "Alter und neuer Wert je Feld (beim Anlegen nur neu, beim Löschen nur alt).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "feld",
+                "vorher",
+                "nachher"
+              ],
+              "properties": {
+                "feld": {
+                  "type": "string"
+                },
+                "vorher": {},
+                "nachher": {}
+              }
+            }
+          }
+        }
+      },
+      "AenderungsprotokollList": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AenderungsprotokollEintrag"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AenderungsprotokollObjekte": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
               "type": "string"
             }
           }
@@ -36010,6 +37876,449 @@
           },
           "409": {
             "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/zugaenge/{person}": {
+      "get": {
+        "summary": "Zugang: Vorschau vor dem Entziehen",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Was mit dem Zugang entfällt (UC-016 A1): Rollen an der Organisation, Rollen an Projekten, Portfolios und anderen Orten, die neu zu besetzen sind, und offene Aufgaben an die Person. Ändert nichts.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "person",
+            "required": true,
+            "description": "Person (Principal) der Organisation."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZugangVorschau"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/zugaenge/{person}/entziehen": {
+      "post": {
+        "summary": "Zugang entziehen",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Hält die Rollen der Person an Orten ausser der Organisation fest, entfernt sie dann im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration) und legt der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben. Ein abgebrochener Versuch wird beim nächsten Aufruf fortgesetzt.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "person",
+            "required": true,
+            "description": "Person (Principal) der Organisation."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZugangEntzogen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/neubesetzungen": {
+      "get": {
+        "summary": "Neubesetzungen",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Entzogene Zugänge mit der Zahl der festgehaltenen und noch nicht wieder besetzten Rollen, neueste zuerst.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "offen",
+            "required": false,
+            "description": "Nur mit offener Aufgabe «neu besetzen»."
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeubesetzungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/neubesetzungen/{id}": {
+      "get": {
+        "summary": "Neubesetzung",
+        "tags": [
+          "Neubesetzung"
+        ],
+        "description": "Festgehaltene Rollen mit Stand (wieder besetzt, sobald jemand die Rolle am Ort hat) und offene Aufgaben, die noch an die Person gehen. Neu besetzt wird dort, wo die Rolle vergeben wird (z. B. Projektorganisation); erledigt wird die Aufgabe im Eingang.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeubesetzungDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -59264,7 +61573,7 @@
         "tags": [
           "Portfoliobericht"
         ],
-        "description": "Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio und Unterlage des Traktandums «Bericht der Programmleitung»; nur mit `If-Match`.",
+        "description": "Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio, und schlägt dem entscheidenden Gremium das Traktandum «Bericht der Programmleitung» mit dem Bericht als Unterlage vor (K3 Schritte 1 und 4); nur mit `If-Match`.",
         "parameters": [
           {
             "schema": {
@@ -59481,6 +61790,248 @@
           },
           "404": {
             "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auswertungen": {
+      "get": {
+        "summary": "Ad-hoc-Auswertung",
+        "tags": [
+          "Auswertungen"
+        ],
+        "description": "Ad-hoc-Auswertung (UC-014 A2, PC.04.03): Projekte der sichtbaren Portfolios nach Filter (Portfolio, Phase, Lebenszyklus, Status des letzten Berichts bis zur Stichperiode, Handlungsfeld), Kennzahlen je Gruppe mit Summe und den Einzelwerten je Projekt. Beträge (Budget, Prognose, Ist aus den Kostenpositionen) nur mit `finanzen:read` an der Organisation. Mit `format=csv` als Export (Gruppen oder mit `ebene=einzelwerte` je Projekt). Recht `auswertung:write` an der Organisation.",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "periode",
+            "required": false,
+            "description": "Stichperiode für den Status (letzter eingereichter Bericht bis zu dieser Periode); ohne Angabe die laufende."
+          },
+          {
+            "schema": {
+              "pattern": "^[a-z0-9_-]{1,40}(,[a-z0-9_-]{1,40})*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "portfolio",
+            "required": false,
+            "description": "Schlüssel der Portfolios (I-N5), mehrere mit Komma; ohne Angabe alle sichtbaren."
+          },
+          {
+            "schema": {
+              "pattern": "^(P0|P1|P2|P3|P4)(,(P0|P1|P2|P3|P4))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "phase",
+            "required": false,
+            "description": "Phasen. Mehrere mit Komma: `P0`, `P1`, `P2`, `P3`, `P4`."
+          },
+          {
+            "schema": {
+              "pattern": "^(aktiv|sistiert|abgebrochen|abgeschlossen|zurueckgezogen)(,(aktiv|sistiert|abgebrochen|abgeschlossen|zurueckgezogen))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "lebenszyklus",
+            "required": false,
+            "description": "Lebenszyklus; ohne Angabe `aktiv`. Mehrere mit Komma: `aktiv`, `sistiert`, `abgebrochen`, `abgeschlossen`, `zurueckgezogen`."
+          },
+          {
+            "schema": {
+              "pattern": "^(im_plan|kritisch|ohne)(,(im_plan|kritisch|ohne))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "description": "Status des letzten Berichts; `ohne`: noch kein eingereichter Bericht. Mehrere mit Komma: `im_plan`, `kritisch`, `ohne`."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "handlungsfeld",
+            "required": false
+          },
+          {
+            "schema": {
+              "pattern": "^(projekte|kritisch|eskalationen|meilensteine_offen|risiken|budget|prognose|ist)(,(projekte|kritisch|eskalationen|meilensteine_offen|risiken|budget|prognose|ist))*$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "kennzahlen",
+            "required": false,
+            "description": "Kennzahlen; ohne Angabe `projekte,kritisch`. Beträge nur mit `finanzen:read`. Mehrere mit Komma: `projekte`, `kritisch`, `eskalationen`, `meilensteine_offen`, `risiken`, `budget`, `prognose`, `ist`."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "keine"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfolio"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "phase"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "status"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "lebenszyklus"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "handlungsfeld"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "gruppierung",
+            "required": false,
+            "description": "Gruppierung; ohne Angabe `portfolio`."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "json"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "csv"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "`csv`: Export (UTF-8 mit BOM, Semikolon) statt JSON."
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "gruppen"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "einzelwerte"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "ebene",
+            "required": false,
+            "description": "Nur mit `format=csv`: Gruppen mit Summe (Standard) oder Einzelwerte je Projekt."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Auswertung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -62274,6 +64825,733 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/vergleich": {
+      "get": {
+        "summary": "Versionen vergleichen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Unterschiede je Kapitel zwischen dieser Version und `mit` (Standard: Basisversion; PS.03.04, UI-10): Texte alt und neu, Listeneinträge «neu» / «entfernt» / «geändert», Zahlen mit Differenz. Beträge (Kap. 9) nur mit `finanzen:read`, sonst ohne Beträge verglichen (A-33).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "mit",
+            "required": false,
+            "description": "Version zum Vergleich (Standard: Basisversion, aus der der Entwurf entstand)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragVergleich"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/hauptaenderungen": {
+      "get": {
+        "summary": "Hauptänderungen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Hauptänderungen gegenüber der Basisversion in den Rubriken Scope, Zeitplan, Ressourcen/Budget, Annahmen, Key-Risiken (UC-007 Schritt 2, UC-003 Schritt 5): vom System erzeugte Sätze und die Umformulierung der Projektleitung, dazu «Andere». In Ressourcen/Budget das Budget je Phase alt und neu (nur mit `finanzen:read`). `ETag` der Version.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragHauptaenderungen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Hauptänderungen umformulieren",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Umformulierung je Rubrik und «Andere» im Entwurf «in Arbeit» (K2 Schritt 5); null oder leer stellt die erzeugten Sätze wieder her. Ressourcen/Budget nur mit `finanzen:read` (die Rubrik nennt Beträge, A-33). `If-Match` auf die Version.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragHauptaenderungenPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragHauptaenderungen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/aenderung": {
+      "get": {
+        "summary": "Änderungsantrag",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Zusammenfassung des Änderungsantrags für den Sponsor (K2 Schritt 9, UC-007 Schritt 4): Begründung, Baseline, Wirkung auf Scope, Budget oder Ressourcen (dann gibt der PRAT frei, A1) und Entscheid. Hauptänderungen und Vergleich unter `…/hauptaenderungen` und `…/vergleich`. `ETag` der Version.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragAenderung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/aenderung/einreichen": {
+      "post": {
+        "summary": "Änderung einreichen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Änderungsantrag «in Arbeit» beim Sponsor einreichen (UC-007 Schritt 3, kein Quality-Check): Pflichtangaben der Phase erfüllt (sonst 422 mit `/kapitel/<nr>/<feld>`), mindestens ein Kapitel geändert, Sponsor in der Projektorganisation (sonst 409). Der SP erhält die Aufgabe «Änderung entscheiden». `If-Match` Pflicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragAenderung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vertragsversionen/{id}/aenderung/entscheiden": {
+      "post": {
+        "summary": "Änderung entscheiden",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Entscheid des Sponsors (`vertrag:decide`; UC-007 Schritt 4, A1, A2): `freigegeben` setzt die Version als Baseline und führt das Register nach – bei Wirkung auf Scope, Budget oder Ressourcen gesperrt (409 `prat`); `an_prat` schlägt das Traktandum «Änderung» dem entscheidenden Gremium vor (nur mit Wirkung); `abgelehnt` mit Begründung (Pflicht), die Baseline bleibt. Die Projektleitung wird informiert. `If-Match` Pflicht.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VertragAenderungEntscheid"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragAenderung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
                 }
               }
             }
@@ -68669,6 +71947,889 @@
           }
         }
       }
+    },
+    "/v1/schnittstellen": {
+      "get": {
+        "summary": "Schnittstellen auflisten",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Eingerichtete Schnittstellen mit letztem Lauf und der Katalog der Umsysteme und Daten (UC-018 Schritte 3–4).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Schnittstelle einrichten",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Umsystem, Daten, Rhythmus und Adresse; die Richtung folgt aus dem Katalog. Speichert und führt bei aktiver Schnittstelle einen Testlauf aus (UC-018 Schritt 3). 409, wenn es für Umsystem und Daten schon eine gibt.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchnittstelleCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleErgebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schnittstellen/{id}": {
+      "get": {
+        "summary": "Schnittstelle lesen",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schnittstelle"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Schnittstelle ändern",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Rhythmus, Adresse, aktiv (deaktivieren statt löschen). Neue Adresse oder Aktivieren führt einen Testlauf aus. `If-Match` erforderlich.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchnittstellePatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleErgebnis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schnittstellen/{id}/laeufe": {
+      "get": {
+        "summary": "Läufe einer Schnittstelle",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Laufprotokoll: je Lauf Zeitpunkt, Umfang und Fehler, neueste zuerst (UC-018 Schritt 4).",
+        "parameters": [
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleLaufList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schnittstellen/{id}/starten": {
+      "post": {
+        "summary": "Lauf starten",
+        "tags": [
+          "Schnittstellen"
+        ],
+        "description": "Lauf von Hand, auch erneut nach einem Fehler (UC-018 A1.1); wartet auf das Ergebnis. 409, wenn die Schnittstelle nicht aktiv ist oder schon ein Lauf läuft.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchnittstelleLauf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/aenderungsprotokoll": {
+      "get": {
+        "summary": "Änderungsprotokoll",
+        "tags": [
+          "Änderungsprotokoll"
+        ],
+        "description": "Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "objekt",
+            "required": false,
+            "description": "Objekttyp, z. B. `projekt`."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "objektId",
+            "required": false
+          },
+          {
+            "schema": {
+              "format": "date",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "von",
+            "required": false
+          },
+          {
+            "schema": {
+              "format": "date",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "bis",
+            "required": false
+          },
+          {
+            "schema": {
+              "maxLength": 512,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "description": "Opaker Cursor aus `nextCursor` der vorherigen Seite."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Seitengrösse (höchstens 200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AenderungsprotokollList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/aenderungsprotokoll/objekte": {
+      "get": {
+        "summary": "Objekttypen im Änderungsprotokoll",
+        "tags": [
+          "Änderungsprotokoll"
+        ],
+        "description": "Objekttypen mit Einträgen, für den Filter.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AenderungsprotokollObjekte"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [
@@ -68688,6 +72849,10 @@
     {
       "name": "Stellvertretungen",
       "description": "Stellvertretung mit Zeitraum: Aufgaben und befristete Rollen für die Vertretung."
+    },
+    {
+      "name": "Neubesetzung",
+      "description": "Zugang entziehen mit offenen Aufgaben und neu zu besetzenden Rollen (UC-016 A1)."
     },
     {
       "name": "Stammdaten",
@@ -68746,6 +72911,10 @@
       "description": "Portfoliobericht der Periode aus dem abgeschlossenen Dashboard und der Risikolage, mit Kommentar der UE, als PDF oder Word."
     },
     {
+      "name": "Auswertungen",
+      "description": "Ad-hoc-Auswertungen (AP-E7-6): Filter, Kennzahlen, Gruppierung, Einzelwerte und Export als CSV."
+    },
+    {
       "name": "Vorlagen",
       "description": "Vorlagen je Dokumentart mit Versionen und Zuordnung der Platzhalter zu den Daten (UC-018); Dokumentausgabe in Word und PDF."
     },
@@ -68768,6 +72937,14 @@
     {
       "name": "Webhooks",
       "description": "Ausgehende Ereignisse (CloudEvents, Standard Webhooks) an Systeme der Organisation."
+    },
+    {
+      "name": "Schnittstellen",
+      "description": "Schnittstellen zu Umsystemen (ERP, HR-System, Budgetprozess) mit Testlauf, Rhythmus und Laufprotokoll; Fehler als Aufgabe im Eingang."
+    },
+    {
+      "name": "Änderungsprotokoll",
+      "description": "Wer wann was geändert hat: Einträge des Audits mit altem und neuem Wert, nach Objekt und Zeitraum."
     },
     {
       "name": "Konto",

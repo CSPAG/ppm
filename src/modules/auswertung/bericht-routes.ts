@@ -8,7 +8,7 @@ import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, etag, forbidden, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { FORMATE, MIME, vorlage, type Format } from '../vorlage/index.ts';
-import { daten, erzeugen, kurz, lesenOder404, voll } from './bericht.ts';
+import { daten, erzeugen, kurz, lesenOder404, voll, vorschlagen } from './bericht.ts';
 import { berichtDokument, dateiname } from './bericht-dokument.ts';
 import {
   Portfoliobericht, PortfolioberichtCreate, PortfolioberichtKurz, PortfolioberichtListe, PortfolioberichtPatch, PortfolioberichtQuery,
@@ -65,7 +65,7 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
       const pf = (await sichtbarePortfolios(req, tx)).find(x => x.schluessel === body.portfolio);
       if (!pf) throw notFound('Portfolio');
       const r = await erzeugen(tx, pf, body.periode);
-      const b = (await store.lesen(tx, r.id))!;
+      const b = await lesenOder404(tx, r.id);
       await record(tx, who, {
         action: r.neu ? 'portfoliobericht.created' : 'portfoliobericht.regenerated', resourceType: 'portfoliobericht', resourceId: b.id,
         data: { portfolio: pf.schluessel, periode: b.periode },
@@ -103,7 +103,7 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
       if (vorher.stand !== 'entwurf') throw conflict('Der Portfoliobericht ist bereitgestellt und nicht mehr änderbar.');
       if (vorher.version !== version || !(await store.kommentieren(tx, id, version, kommentar.trim()))) throw preconditionFailed(vorher.version);
       await record(tx, who, { action: 'portfoliobericht.commented', resourceType: 'portfoliobericht', resourceId: id, data: { periode: vorher.periode } });
-      return (await store.lesen(tx, id))!;
+      return lesenOder404(tx, id);
     });
     reply.header('etag', etag(b.version));
     return voll(b, true);
@@ -112,7 +112,7 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
   app.post('/v1/portfolioberichte/:id/bereitstellen', {
     schema: {
       tags: [TAG_BERICHT], summary: 'Portfoliobericht bereitstellen',
-      description: 'Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio und Unterlage des Traktandums «Bericht der Programmleitung»; nur mit `If-Match`.',
+      description: 'Stellt den Bericht dem Gremium bereit (UC-014 Schritt 3): danach fest, sichtbar mit `auswertung:read` am Portfolio, und schlägt dem entscheidenden Gremium das Traktandum «Bericht der Programmleitung» mit dem Bericht als Unterlage vor (K3 Schritte 1 und 4); nur mit `If-Match`.',
       params: IdParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Portfoliobericht') },
     },
   }, async (req, reply): Promise<PortfolioberichtOut> => {
@@ -124,9 +124,10 @@ export function registerBerichtRoutes(app: FastifyInstance, deps: Deps): void {
       const vorher = await lesenOder404(tx, id);
       if (vorher.stand !== 'entwurf') throw conflict('Der Portfoliobericht ist bereits bereitgestellt.');
       if (vorher.version !== version || !(await store.bereitstellen(tx, id, version))) throw preconditionFailed(vorher.version);
-      const daten = { id, portfolioId: vorher.portfolio_id, periode: vorher.periode };
+      const traktandumId = await vorschlagen(tx, vorher);
+      const daten = { id, portfolioId: vorher.portfolio_id, periode: vorher.periode, traktandumId };
       await record(tx, who, { action: 'portfoliobericht.provided', resourceType: 'portfoliobericht', resourceId: id, data: daten, event: daten });
-      return (await store.lesen(tx, id))!;
+      return lesenOder404(tx, id);
     });
     reply.header('etag', etag(b.version));
     return voll(b, true);

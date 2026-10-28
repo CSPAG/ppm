@@ -1,6 +1,6 @@
 /**
  * Datenzugriff des Portfolioberichts (BC PC.04.02, UC-014 Schritt 3; AP-E2-3): Tabelle `portfoliobericht` (150) und für
- * die Traktandenart die Sitzung mit Portfolio und Datum. Läuft immer in einer Transaktion mit Mandantenkontext.
+ * die Lesesicht auf Projekte. Läuft immer in einer Transaktion mit Mandantenkontext.
  */
 import type { Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
@@ -55,20 +55,14 @@ export async function bereitstellen(tx: Tx, id: string, version: number): Promis
       WHERE id = $1 AND version = $2 AND stand = 'entwurf'`, [id, version])).rowCount ?? 0) > 0;
 }
 
+/** Projekte aus der Liste, die die Person sieht (Lesesicht, u. a. vertrauliche nur mit `projekt:vertraulich`). */
+export async function sichtbareProjekte(tx: Tx, ids: string[]): Promise<string[]> {
+  if (!ids.length) return [];
+  return (await tx.query<{ id: string }>(`SELECT id FROM ${S}.projekt WHERE id = ANY ($1::uuid[])`, [ids])).rows.map(r => r.id);
+}
+
 export interface PeriodeStandRow { periode: string; stand: 'offen' | 'abgeschlossen'; abgeschlossen_at: Date | null }
 
 export async function periode(tx: Tx, p: string): Promise<PeriodeStandRow | null> {
   return (await tx.query<PeriodeStandRow>(`SELECT periode, stand, abgeschlossen_at FROM ${S}.periode WHERE periode = $1`, [p])).rows[0] ?? null;
-}
-
-/**
- * Bericht zur Sitzung (K3 Schritt 4): Portfolio der Sitzung und die letzte vor dem Sitzungsmonat abgeschlossene Periode;
- * `bericht` ist null, solange für diese Periode keiner erzeugt (bzw. für die Person sichtbar) ist.
- */
-export async function zurSitzung(tx: Tx, sitzungId: string): Promise<{ portfolioId: string; periode: string | null; bericht: BerichtRow | null } | null> {
-  const s = (await tx.query<{ portfolio_id: string; periode: string | null }>(
-    `SELECT s.portfolio_id, (SELECT max(p.periode) FROM ${S}.periode p WHERE p.stand = 'abgeschlossen' AND p.periode < to_char(s.datum, 'YYYY-MM')) AS periode
-       FROM ${S}.sitzung s WHERE s.id = $1`, [sitzungId])).rows[0];
-  if (!s) return null;
-  return { portfolioId: s.portfolio_id, periode: s.periode, bericht: s.periode ? await von(tx, s.portfolio_id, s.periode) : null };
 }

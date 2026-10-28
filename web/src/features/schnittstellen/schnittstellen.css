@@ -1,0 +1,14 @@
+/* Schnittstellen (UI-49) und Änderungsprotokoll (UI-50), AP-E7-3: Laufprotokoll, Filter, Änderungen; Farben aus den Variablen der Werkbank */
+.sx-acts{display:flex;gap:8px;align-items:center;margin:10px 0}
+.sx-tab{margin:6px 0 12px}
+.sx-tab th,.sx-tab td{padding:6px 8px 6px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:normal;height:auto;max-width:none}
+.sx-tab tbody tr{cursor:default}
+.sx-tab .num{text-align:right;font-variant-numeric:tabular-nums}
+.sx-filter{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end;margin-bottom:12px}
+.sx-filter label{display:grid;gap:4px;font-size:13px;color:var(--fg-2)}
+.sx-filter select,.sx-filter input{height:34px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface);color:var(--fg);padding:0 8px}
+.sx-filter input[aria-invalid="true"]{border-color:var(--bad)}
+.sx-aend{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.sx-aend .feld{color:var(--fg-2)}
+.sx-aend del{color:var(--fg-3)}
+.sx-aend ins{text-decoration:none}

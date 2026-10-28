@@ -68,4 +68,9 @@ export const TP = {
     keineWirkung: 'Die Zugriffe auf das Projekt bleiben gleich.',
   },
   palette: { detail: 'Projekt' },
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle»: PL, CTL, SP)
+  kopfkarte: {
+    titel: 'Meine Projekte',
+    alle: (n: number) => `Alle ${n} Projekte`,
+  },
 };

@@ -121,4 +121,10 @@ export const TM = {
     imPlan: 'im Plan',
     frueher: (t: string) => `${t} früher`,
   },
+  // Kopfkarte «Monatszyklus» im Eingang (informationsarchitektur.md «Startseite je Rolle», UE und PMO)
+  kopfkarte: {
+    titel: (periode: string) => `Statusberichte ${periode}`,
+    zuPruefen: (n: number) => (n === 1 ? '1 Bericht prüfen' : `${n} Berichte prüfen`),
+    oeffnen: 'Monatsabschluss öffnen',
+  },
 };

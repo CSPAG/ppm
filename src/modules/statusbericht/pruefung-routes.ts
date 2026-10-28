@@ -221,7 +221,7 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
   app.get('/v1/statusberichte/kopf', {
     schema: {
       tags: [TAG], summary: 'Kennzahlen der Statusberichte für die Startseite',
-      description: 'Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.',
+      description: 'Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.',
       response: { 200: Type.Ref('StatusberichteKopf') },
     },
   }, async req => {
@@ -234,7 +234,12 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
       const periode = vorStand?.stand !== 'abgeschlossen' && (await pstore.hatBerichte(tx, vor)) ? vor : laufend;
       const u = await uebersicht(tx, periode, rechteVon(req));
       const a = u.kopf.anzahl;
-      return { pruefen: { periode, eingereicht: a.eingereicht, ausstehend: a.ausstehend, auffaellig: a.auffaellig, abschlussBis: u.kopf.fristen.abschlussBis } };
+      return {
+        pruefen: {
+          periode, eingereicht: a.eingereicht, ausstehend: a.ausstehend, auffaellig: a.auffaellig, abschlussBis: u.kopf.fristen.abschlussBis,
+          projekte: a.projekte, zurueckgegeben: a.zurueckgegeben, geprueft: a.geprueft, stichtag: u.kopf.fristen.stichtag,
+        },
+      };
     });
   });
 

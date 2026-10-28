@@ -12100,7 +12100,8 @@
                 "datum",
                 "stand",
                 "traktanden",
-                "versandBis"
+                "versandBis",
+                "unterlagenBereit"
               ],
               "properties": {
                 "id": {
@@ -12165,6 +12166,10 @@
                       "type": "null"
                     }
                   ]
+                },
+                "unterlagenBereit": {
+                  "description": "Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste.",
+                  "type": "integer"
                 }
               }
             }
@@ -15248,7 +15253,11 @@
                   "eingereicht",
                   "ausstehend",
                   "auffaellig",
-                  "abschlussBis"
+                  "abschlussBis",
+                  "projekte",
+                  "zurueckgegeben",
+                  "geprueft",
+                  "stichtag"
                 ],
                 "properties": {
                   "periode": {
@@ -15267,6 +15276,28 @@
                   "abschlussBis": {
                     "format": "date",
                     "type": "string"
+                  },
+                  "projekte": {
+                    "description": "Berichtspflichtige Projekte der Periode.",
+                    "type": "integer"
+                  },
+                  "zurueckgegeben": {
+                    "type": "integer"
+                  },
+                  "geprueft": {
+                    "type": "integer"
+                  },
+                  "stichtag": {
+                    "anyOf": [
+                      {
+                        "format": "date",
+                        "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 }
               },
@@ -61016,7 +61047,7 @@
         "tags": [
           "Sitzungen"
         ],
-        "description": "Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).",
+        "description": "Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -65431,7 +65462,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.",
+        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.",
         "responses": {
           "200": {
             "description": "Default Response",

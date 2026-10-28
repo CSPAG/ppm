@@ -25674,7 +25674,7 @@ export interface paths {
         };
         /**
          * Kopf im Eingang
-         * @description Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).
+         * @description Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).
          */
         get: {
             parameters: {
@@ -29677,7 +29677,7 @@ export interface paths {
         };
         /**
          * Kennzahlen der Statusberichte für die Startseite
-         * @description Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.
+         * @description Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.
          */
         get: {
             parameters: {
@@ -47198,6 +47198,8 @@ export interface components {
                 stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
                 traktanden: number;
                 versandBis: string | null;
+                /** @description Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste. */
+                unterlagenBereit: number;
             }[];
         };
         EntscheidErgebnis: {
@@ -47857,6 +47859,11 @@ export interface components {
                 auffaellig: number;
                 /** Format: date */
                 abschlussBis: string;
+                /** @description Berichtspflichtige Projekte der Periode. */
+                projekte: number;
+                zurueckgegeben: number;
+                geprueft: number;
+                stichtag: string | null;
             } | null;
         };
         DashboardZeile: {

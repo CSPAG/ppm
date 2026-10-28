@@ -196,6 +196,10 @@ describe('Monatsabschluss', { skip }, () => {
     assert.equal((await call('GET', '/v1/statusberichte/kopf', pl)).json().pruefen, null);
     const k = (await call('GET', '/v1/statusberichte/kopf', ue)).json().pruefen;
     assert.deepEqual([k.periode, k.eingereicht, k.ausstehend], [PERIODE, 4, 1], '5 auffällige, davon 2026-129 einzeln bestätigt');
+    // Kopfkarte «Monatszyklus»: gleiche Zahlen und Fristen wie der Kopf der Periode
+    const u = (await call('GET', `/v1/perioden/${PERIODE}`, ue)).json().kopf;
+    assert.deepEqual([k.projekte, k.zurueckgegeben, k.geprueft, k.stichtag, k.abschlussBis],
+      [u.anzahl.projekte, u.anzahl.zurueckgegeben, u.anzahl.geprueft, u.fristen.stichtag, u.fristen.abschlussBis]);
   });
 
   test('Terminabweichungen nach Grösse sortiert (Schritt 4)', async () => {

@@ -49,7 +49,10 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       const version = r ? requireIfMatch(req) : 0;
       if (r?.stand === 'traktandiert') throw conflict('Der Jahresrückblick ist traktandiert. Erfasse die Erkenntnisse nach dem Entscheid des PRAT.');
       if (r && r.version !== version) throw preconditionFailed(r.version);
-      const id = r ? (await store.erfassen(tx, r.id, version, t), r.id) : await store.anlegen(tx, jahr, t);
+      // Gleichzeitig geändert bzw. angelegt: 412 statt einer verlorenen Änderung
+      if (r && !(await store.erfassen(tx, r.id, version, t))) throw preconditionFailed((await store.vonId(tx, r.id))?.version ?? r.version);
+      const id = r ? r.id : await store.anlegen(tx, jahr, t);
+      if (!id) throw preconditionFailed((await store.lesen(tx, jahr))?.version ?? 1);
       await record(tx, who, { action: r ? 'jahresrueckblick.updated' : 'jahresrueckblick.created', resourceType: 'jahresrueckblick', resourceId: id, data: { jahr } });
       return antwort(tx, jahr, await store.lesen(tx, jahr), true);
     });

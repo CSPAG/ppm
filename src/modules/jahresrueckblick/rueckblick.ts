@@ -62,7 +62,7 @@ export async function traktandieren(tx: Tx, jahr: number): Promise<store.Rueckbl
   const id = r.id;
   const portfolioId = await store.portfolioA(tx);
   if (!portfolioId) throw conflict('Es ist kein Portfolio der Kategorie A erfasst; der PRAT ist dessen entscheidendes Gremium.');
-  await store.traktandieren(tx, id, await auswerten(tx, jahr));
+  if (!(await store.traktandieren(tx, id, await auswerten(tx, jahr)))) throw conflict(`Der ${TITEL(jahr)} ist bereits traktandiert oder ausgewertet.`);
   await traktandum.vorschlagen(tx, {
     art: 'jahresrueckblick', bezug: bezugVon(id), portfolioId, titel: TITEL(jahr),
     antrag: `Auswertung des Jahres ${jahr}; Erkenntnisse und Massnahmen für den nächsten Zielzyklus`,

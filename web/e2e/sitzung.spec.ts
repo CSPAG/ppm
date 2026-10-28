@@ -45,7 +45,7 @@ test('Sitzung vorbereiten: einplanen, verschieben und zurückholen, versenden; b
   await page.getByRole('button', { name: 'Sitzung vorbereiten' }).click();
   const liste = page.getByRole('list', { name: 'Traktandenliste' });
   await expect(liste.getByRole('heading', { name: 'Bericht der Programmleitung' })).toBeVisible();
-  await expect(liste.getByText(/bleibt Traktandum 1; du kannst es weder entfernen noch verschieben/)).toBeVisible();
+  await expect(liste.getByText(/bleibt Traktandum 1; Sie können es weder entfernen noch verschieben/)).toBeVisible();
   await expect(liste.getByRole('button', { name: /Bericht der Programmleitung/ })).toHaveCount(0);
   await expectAccessible(page);
   await expectNoOverflow(page);

@@ -37,7 +37,7 @@ Stände: **offen** · **in Arbeit** · **umgesetzt** · **teilweise** (Grundfunk
 | AP-E4-2 | Ideenpool und Prüfung | 230–239 | in Arbeit (230 Leitfragen, Raster, Vorschlag; Pool mit Funnel, Prüfung, Rückfrage, Zurückweisen, Zusammenführen; Oberfläche Pool und Prüfansicht) | – | A-06 (UE weist allein zurück, Gremium des Portfolios per Mitteilung informiert), A-32; Vorschlag der Kategorie: Mehrheit «hoch» → A, Mehrheit «tief» → C, sonst B (Annahme bis zur Klärung, G11); Leitfragen als Abschrift aus dem Phasenmodell in Kraft; erste Prüfhandlung setzt «in Prüfung»; Bereich Portfolio › Ideen zeigt mit `idee:read` den Pool, «Meine Ideen» als Ansicht |
 | AP-E4-3 | Freigabe der Initialisierung | 240–249 | offen | – | – |
 | AP-E5-1 | Bewertungsmodell und Bewertung | 250–259 | umgesetzt (250, Modul `priorisierung`; Portfolio › Priorisierung mit Bewertung UI-20 und Modell UI-19; E2E grün) | #71, #79 | A-01, A-18; Modell «Entwurf»/«in Kraft», gilt das zuletzt in Kraft gesetzte; Entscheid des Gremiums als Text erfasst; Vorgabe = Kriterien aus UC-008 Schritt 2 ohne Zuordnung Nutzen/Risiko (A-39 legt die UE fest); Budgetrahmen je Portfolio; Modell lesen auch mit `priorisierung:read` am Portfolio (Gremium) |
-| AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | offen | – | – |
+| AP-E5-2 | Matrix, Rangfolge, Portfoliorisiken | 260–269 | in Arbeit (260, API Matrix und Rangfolge im Modul `priorisierung`; Oberfläche folgt) | – | A-01, A-33, A-39; Annahmen: Achse = Durchschnitt hoch=3/mittel=2/tief=1 der zugeordneten Kriterien, über 2 «hoch», unter 2 «tief», genau 2 «Grenze» ohne Feld (Gremium beurteilt); Felder nach Q6 F9; Kosten = Summe Prognose, sonst Budget-Baseline; Ressourcen = FTE × Monate und grösste Grösse; Rangfolge der UE als Entwurf, «entschieden» erst mit dem Entscheid des Gremiums (Folgepaket); Abhängigkeiten und Portfoliorisiken aus den Registern von `projektdaten` |
 | AP-E5-4 | Kapazität und Auslastung | 270–279 | umgesetzt (270, Modul `ressource`, `get_auslastung`; Portfolio › Ressourcen mit Auslastung UI-23 und Kapazität UI-24; Bedarfsliste UI-25 mit AP-E7-2; E2E offen bis CI läuft) | #35 (über #46), #40 | A-20; Auslastung zählt den Bedarf der Projekte, die die Person sieht (vertrauliche nur mit `projekt:vertraulich`); Bedarf nur als Grösse S/M/L zählt nicht (Richtwerte je Grösse offen, K5 Z4); Szenario: inaktive Projekte fallen weg, Start verschiebt den ganzen Bedarf, Projekte ausserhalb bleiben; Engpass je Rolle und Quartal = Monat mit der grössten Überbuchung |
 | AP-E5-3 | Szenarien mit Wasserlinie | 280–289 | offen | – | – |
 | AP-E5-5 | Priorisierungsentscheid | 290–299 | offen | – | – |
@@ -83,14 +83,14 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.01.02 | Bewertungsmodell festlegen | 008 | E5 | AP-E5-1 | umgesetzt | #71, #79 |
 | PP.01.03 | Portfoliokategorien und Budgetrahmen festlegen | 008 | E5 | AP-E5-1 | umgesetzt (Budgetrahmen je Portfolio, A-18) | #71, #79 |
 | PP.02.01 | Vorhaben bewerten | 008 | E5 | AP-E5-1 | umgesetzt (hoch/mittel/tief ohne Score, A-01) | #71, #79 |
-| PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | offen | – |
+| PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | in Arbeit (API Rangfolge-Entwurf) | – |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | in Arbeit | – |
 | PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus umgesetzt (AP-E6-1, API und Oberfläche); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1, in Arbeit) | #28, #38, #43, #49 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | offen | – |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | offen | – |
-| PP.03.04 | Portfolio in Matrixsicht beurteilen | 008 | E5 | AP-E5-2 | offen | – |
+| PP.03.04 | Portfolio in Matrixsicht beurteilen | 008 | E5 | AP-E5-2 | in Arbeit (API Matrix) | – |
 | PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | umgesetzt (UC-006 Schritte 6–9, A1, A3, A4) | #42, #45 |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | umgesetzt (#72) | #72 |

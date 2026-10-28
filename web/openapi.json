@@ -26592,6 +26592,75 @@
           }
         }
       },
+      "KapazitaetHr": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "von",
+          "bis",
+          "zellen",
+          "uebernommenAt"
+        ],
+        "properties": {
+          "von": {
+            "type": "string"
+          },
+          "bis": {
+            "type": "string"
+          },
+          "zellen": {
+            "description": "Je Rolle und Monat mit Lieferung des HR-Systems; Monate ohne Lieferung fehlen.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "rolle",
+                "monat",
+                "fte",
+                "abwesend",
+                "personen"
+              ],
+              "properties": {
+                "rolle": {
+                  "type": "string"
+                },
+                "monat": {
+                  "type": "string"
+                },
+                "fte": {
+                  "description": "Pensum minus Abwesenheit der Personen der Rolle in FTE.",
+                  "type": "number"
+                },
+                "abwesend": {
+                  "description": "Abwesenheit in FTE.",
+                  "type": "number"
+                },
+                "personen": {
+                  "description": "Anzahl Personen der Rolle im Monat.",
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "uebernommenAt": {
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "Kriterium": {
         "additionalProperties": false,
         "type": "object",
@@ -80546,6 +80615,111 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ZuteilungList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/kapazitaet/hr": {
+      "get": {
+        "summary": "Kapazität laut HR-System lesen",
+        "tags": [
+          "Ressourcen"
+        ],
+        "description": "Summen der Schnittstelle «HR-System › Personal- und Abwesenheitsdaten» je Rolle und Monat (UC-009 Schritt 1): Pensum minus Abwesenheit und Anzahl Personen, ohne Personendaten. Wo die RM kein Angebot festgelegt hat, zählt dieser Wert in der Auslastung (Annahme AP-E7-2).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2027-04",
+            "in": "query",
+            "name": "von",
+            "required": false,
+            "description": "Monat «JJJJ-MM»."
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2027-04",
+            "in": "query",
+            "name": "bis",
+            "required": false,
+            "description": "Monat «JJJJ-MM»."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KapazitaetHr"
                 }
               }
             }

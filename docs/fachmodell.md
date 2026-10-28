@@ -719,7 +719,7 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-21 | K23 | Benutzer aus dem Verzeichnisdienst (Entra über den Baukasten); keine Abwesenheiten | AP-E7-8 |
 | A-22 | K24 | ICT- und Infrastrukturbedarf als Meldung im System (Mitteilung an die konfigurierte Stelle); keine Schnittstelle | AP-E0-6, AP-E3-1 |
 | A-23 | K25 | Direktionen als Organisationseinheiten mit Kürzel; Bedeutung der Kürzel pflegt ADM | AP-E0-2 |
-| A-24 | UX-OF-1, UX-OF-2 | Anrede «Sie», nur Deutsch, Texte zentral und übersetzbar | alle mit Oberfläche |
+| A-24 | UX-OF-2 | Nur Deutsch, Texte zentral und übersetzbar (Anrede: Entscheid UX-OF-1 «Du», 28.10.2026) | alle mit Oberfläche |
 | A-26 | UX-OF-4 | Aufgabe «Statusbericht erstellen» am 18. | AP-E1-1 |
 | A-27 | UX-OF-5 | «Gate vorbereiten» 30, «Sitzung vorbereiten» 15 Arbeitstage vor der Sitzung, im Phasenmodell konfigurierbar | AP-E0-3, AP-E2-1, AP-E3-3 |
 | A-28 | UX-OF-7 | Sammelbestätigung unauffälliger Berichte; Berichte mit Auffälligkeit einzeln | AP-E1-2 |

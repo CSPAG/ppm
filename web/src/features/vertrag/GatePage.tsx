@@ -202,6 +202,7 @@ function LeitfrageFeld({ versionId, projektId, frage, darf }: { versionId: strin
 function Nutzen({ versionId, projektId, gate }: { versionId: string; projektId: string; gate: Gate }) {
   const id = useId();
   const toast = useToast();
+  const qc = useQueryClient();
   const { nutzen } = useGateMutations(projektId);
   const n = gate.nutzen!;
   const [werte, setWerte] = useState<Record<string, { wert: string; bemerkung: string }>>(
@@ -238,7 +239,12 @@ function Nutzen({ versionId, projektId, gate }: { versionId: string; projektId: 
         <label htmlFor={`${id}-b`}>{TG.beurteilung}</label>
         <textarea id={`${id}-b`} rows={3} maxLength={5000} value={beurteilung} disabled={!darf} onChange={e => setBeurteilung(e.target.value)} />
       </div>
-      {isConflict(nutzen.error) ? <Hinweis stufe="warnung" live>{TG.konflikt}</Hinweis> : nutzen.error ? <ErrorState error={nutzen.error} /> : null}
+      {/* Z7: «Neu laden» holt die neue Version für If-Match; die Eingaben bleiben in den Feldern */}
+      {isConflict(nutzen.error) ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { nutzen.reset(); void qc.invalidateQueries({ queryKey: gateKey(versionId) }); }}>{TG.neuLaden}</button>}>
+          {TG.konfliktNutzen}
+        </Hinweis>
+      ) : nutzen.error ? <ErrorState error={nutzen.error} /> : null}
       {darf ? <button type="button" className="btn primary" disabled={nutzen.isPending} onClick={senden}>{TG.nutzenSpeichern}</button> : null}
     </section>
   );

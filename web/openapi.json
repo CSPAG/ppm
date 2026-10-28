@@ -1276,6 +1276,58 @@
           }
         }
       },
+      "CustomRole": {
+        "title": "CustomRole",
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "description",
+          "permissions",
+          "places",
+          "assignments",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "key": {
+            "description": "Schlüssel (`c-…`); Relation der Tupel, nie gleich einer Rolle des Modells",
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "permissions": {
+            "description": "Rechte aus dem Modell der App (keine, die nur org-admin hat)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "places": {
+            "description": "Typen, an denen die Rolle vergeben werden darf (`org` für die Organisation)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assignments": {
+            "description": "Vergaben (Tupel); löschen und Orte entfernen erst bei 0 am Ort",
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "Aufgabe": {
         "additionalProperties": false,
         "type": "object",
@@ -29711,7 +29763,7 @@
         "tags": [
           "Konto"
         ],
-        "description": "Für jede angemeldete Person und jeden Client, auch ohne Organisation, ohne Rechteprüfung (nicht vertraulich). Einzige Quelle für Labels, Rechtegruppen, Rollenbeschreibungen, Scope-Texte, Orte mit ihren Rollen, Stufen der Vertraulichkeit und die MCP-Werkzeuge mit ihrem Recht.",
+        "description": "Für jede angemeldete Person und jeden Client, auch ohne Organisation, ohne Rechteprüfung (nicht vertraulich). In einer Organisation mit ihren eigenen Rollen (`custom: true`, nach den Rollen des Modells, in `types[].roles` an ihren Orten). Einzige Quelle für Labels, Rechtegruppen, Rollenbeschreibungen, Scope-Texte, Orte mit ihren Rollen, Stufen der Vertraulichkeit und die MCP-Werkzeuge mit ihrem Recht.",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -29795,7 +29847,8 @@
                               "webhook:admin",
                               "members:admin",
                               "access:admin",
-                              "audit:read"
+                              "audit:read",
+                              "roles:admin"
                             ]
                           },
                           "label": {
@@ -29974,13 +30027,21 @@
                                 "webhook:admin",
                                 "members:admin",
                                 "access:admin",
-                                "audit:read"
+                                "audit:read",
+                                "roles:admin"
                               ]
                             }
                           },
                           "adminOnly": {
                             "description": "Nur die Plattform-Administration vergibt diese Rolle",
                             "type": "boolean"
+                          },
+                          "custom": {
+                            "description": "Eigene Rolle der Organisation (`roles:admin`); fehlt bei Rollen des Modells",
+                            "type": "boolean",
+                            "enum": [
+                              true
+                            ]
                           }
                         }
                       }
@@ -30055,7 +30116,8 @@
                                 "webhook:admin",
                                 "members:admin",
                                 "access:admin",
-                                "audit:read"
+                                "audit:read",
+                                "roles:admin"
                               ]
                             }
                           }
@@ -30204,7 +30266,8 @@
                               "webhook:admin",
                               "members:admin",
                               "access:admin",
-                              "audit:read"
+                              "audit:read",
+                              "roles:admin"
                             ]
                           },
                           "write": {
@@ -30258,7 +30321,8 @@
                               "webhook:admin",
                               "members:admin",
                               "access:admin",
-                              "audit:read"
+                              "audit:read",
+                              "roles:admin"
                             ]
                           }
                         }
@@ -30372,7 +30436,8 @@
                               "webhook:admin",
                               "members:admin",
                               "access:admin",
-                              "audit:read"
+                              "audit:read",
+                              "roles:admin"
                             ]
                           },
                           "scope": {
@@ -31712,13 +31777,21 @@
                                 "webhook:admin",
                                 "members:admin",
                                 "access:admin",
-                                "audit:read"
+                                "audit:read",
+                                "roles:admin"
                               ]
                             }
                           },
                           "adminOnly": {
                             "description": "Nur die Plattform-Administration vergibt diese Rolle",
                             "type": "boolean"
+                          },
+                          "custom": {
+                            "description": "Eigene Rolle der Organisation (fehlt bei Rollen des Modells)",
+                            "type": "boolean",
+                            "enum": [
+                              true
+                            ]
                           }
                         }
                       }
@@ -40795,6 +40868,1236 @@
           },
           "404": {
             "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/roles": {
+      "get": {
+        "summary": "Eigene Rollen der Organisation",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Eigene Rollen mit Rechten, Orten und Zahl der Vergaben. Die Rollen des Modells (Vorgabe, nicht änderbar) stehen im Katalog (`GET /v1/authz/catalog`).",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomRole"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Eigene Rolle anlegen",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Stellt eine Rolle aus Rechten des Modells zusammen. Ohne `key` entsteht er aus dem Namen (`c-…`). Rechte, die nur org-admin hat, und unbekannte Orte ergeben 422; mehr als 50 Rollen 409 `limit`, gleicher Name 409 `duplicate-label`. Recht «Rollen zusammenstellen» (roles:admin); niemand gibt mehr, als er hat (403 `exceeds-own`).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "label",
+                  "permissions",
+                  "places"
+                ],
+                "properties": {
+                  "key": {
+                    "pattern": "^c-[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$",
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "minItems": 1,
+                    "maxItems": 200,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "tenant:read",
+                        "handlungsfeld:read",
+                        "handlungsfeld:write",
+                        "handlungsfeld:delete",
+                        "ziel:read",
+                        "ziel:write",
+                        "ziel:freigabe",
+                        "zielerreichung:write",
+                        "quartalsbericht:write",
+                        "stammdaten:read",
+                        "phasenmodell:read",
+                        "phasenmodell:write",
+                        "portfolio:read",
+                        "portfolio:admin",
+                        "projekt:read",
+                        "projekt:write",
+                        "projekt:create",
+                        "projekt:organisation",
+                        "projekt:vertraulich",
+                        "finanzen:read",
+                        "finanzen:write",
+                        "statusbericht:write",
+                        "statusbericht:review",
+                        "periode:close",
+                        "kpi:write",
+                        "vertrag:write",
+                        "vertrag:review",
+                        "vertrag:sign",
+                        "vertrag:decide",
+                        "sitzung:read",
+                        "sitzung:write",
+                        "idee:create",
+                        "idee:read",
+                        "idee:write",
+                        "idee:decide",
+                        "priorisierung:read",
+                        "priorisierung:write",
+                        "ressource:read",
+                        "ressource:write",
+                        "auswertung:read",
+                        "auswertung:write",
+                        "vorlage:write",
+                        "audit:read"
+                      ]
+                    }
+                  },
+                  "places": {
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "org",
+                        "portfolio",
+                        "projekt"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRole"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/roles/{key}": {
+      "put": {
+        "summary": "Eigene Rolle ändern",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Name, Beschreibung, Rechte und Orte setzen; gilt sofort für alle, die die Rolle haben. Einen Ort entfernen geht nur, wo die Rolle nicht vergeben ist (409 `in-use`). Wer ändert, braucht die Rechte vorher und nachher. Recht «Rollen zusammenstellen» (roles:admin); niemand gibt mehr, als er hat (403 `exceeds-own`).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "label",
+                  "permissions",
+                  "places"
+                ],
+                "properties": {
+                  "label": {
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "minItems": 1,
+                    "maxItems": 200,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "tenant:read",
+                        "handlungsfeld:read",
+                        "handlungsfeld:write",
+                        "handlungsfeld:delete",
+                        "ziel:read",
+                        "ziel:write",
+                        "ziel:freigabe",
+                        "zielerreichung:write",
+                        "quartalsbericht:write",
+                        "stammdaten:read",
+                        "phasenmodell:read",
+                        "phasenmodell:write",
+                        "portfolio:read",
+                        "portfolio:admin",
+                        "projekt:read",
+                        "projekt:write",
+                        "projekt:create",
+                        "projekt:organisation",
+                        "projekt:vertraulich",
+                        "finanzen:read",
+                        "finanzen:write",
+                        "statusbericht:write",
+                        "statusbericht:review",
+                        "periode:close",
+                        "kpi:write",
+                        "vertrag:write",
+                        "vertrag:review",
+                        "vertrag:sign",
+                        "vertrag:decide",
+                        "sitzung:read",
+                        "sitzung:write",
+                        "idee:create",
+                        "idee:read",
+                        "idee:write",
+                        "idee:decide",
+                        "priorisierung:read",
+                        "priorisierung:write",
+                        "ressource:read",
+                        "ressource:write",
+                        "auswertung:read",
+                        "auswertung:write",
+                        "vorlage:write",
+                        "audit:read"
+                      ]
+                    }
+                  },
+                  "places": {
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "org",
+                        "portfolio",
+                        "projekt"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^c-[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRole"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eigene Rolle löschen",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Nur, wenn sie nirgends mehr vergeben ist (409 `in-use` mit `assignments`). Recht «Rollen zusammenstellen» (roles:admin); niemand gibt mehr, als er hat (403 `exceeds-own`).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^c-[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/organizations/{alias}/roles": {
+      "get": {
+        "summary": "Eigene Rollen der Organisation",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Eigene Rollen mit Rechten, Orten und Zahl der Vergaben. Die Rollen des Modells (Vorgabe, nicht änderbar) stehen im Katalog (`GET /v1/authz/catalog`).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,62}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "alias",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomRole"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Eigene Rolle anlegen",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Stellt eine Rolle aus Rechten des Modells zusammen. Ohne `key` entsteht er aus dem Namen (`c-…`). Rechte, die nur org-admin hat, und unbekannte Orte ergeben 422; mehr als 50 Rollen 409 `limit`, gleicher Name 409 `duplicate-label`. Recht «Rollen zusammenstellen» (roles:admin); niemand gibt mehr, als er hat (403 `exceeds-own`).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "label",
+                  "permissions",
+                  "places"
+                ],
+                "properties": {
+                  "key": {
+                    "pattern": "^c-[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$",
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "minItems": 1,
+                    "maxItems": 200,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "tenant:read",
+                        "handlungsfeld:read",
+                        "handlungsfeld:write",
+                        "handlungsfeld:delete",
+                        "ziel:read",
+                        "ziel:write",
+                        "ziel:freigabe",
+                        "zielerreichung:write",
+                        "quartalsbericht:write",
+                        "stammdaten:read",
+                        "phasenmodell:read",
+                        "phasenmodell:write",
+                        "portfolio:read",
+                        "portfolio:admin",
+                        "projekt:read",
+                        "projekt:write",
+                        "projekt:create",
+                        "projekt:organisation",
+                        "projekt:vertraulich",
+                        "finanzen:read",
+                        "finanzen:write",
+                        "statusbericht:write",
+                        "statusbericht:review",
+                        "periode:close",
+                        "kpi:write",
+                        "vertrag:write",
+                        "vertrag:review",
+                        "vertrag:sign",
+                        "vertrag:decide",
+                        "sitzung:read",
+                        "sitzung:write",
+                        "idee:create",
+                        "idee:read",
+                        "idee:write",
+                        "idee:decide",
+                        "priorisierung:read",
+                        "priorisierung:write",
+                        "ressource:read",
+                        "ressource:write",
+                        "auswertung:read",
+                        "auswertung:write",
+                        "vorlage:write",
+                        "audit:read"
+                      ]
+                    }
+                  },
+                  "places": {
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "org",
+                        "portfolio",
+                        "projekt"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,62}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "alias",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRole"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/platform/organizations/{alias}/roles/{key}": {
+      "put": {
+        "summary": "Eigene Rolle ändern",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Name, Beschreibung, Rechte und Orte setzen; gilt sofort für alle, die die Rolle haben. Einen Ort entfernen geht nur, wo die Rolle nicht vergeben ist (409 `in-use`). Wer ändert, braucht die Rechte vorher und nachher. Recht «Rollen zusammenstellen» (roles:admin); niemand gibt mehr, als er hat (403 `exceeds-own`).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "label",
+                  "permissions",
+                  "places"
+                ],
+                "properties": {
+                  "label": {
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "minItems": 1,
+                    "maxItems": 200,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "tenant:read",
+                        "handlungsfeld:read",
+                        "handlungsfeld:write",
+                        "handlungsfeld:delete",
+                        "ziel:read",
+                        "ziel:write",
+                        "ziel:freigabe",
+                        "zielerreichung:write",
+                        "quartalsbericht:write",
+                        "stammdaten:read",
+                        "phasenmodell:read",
+                        "phasenmodell:write",
+                        "portfolio:read",
+                        "portfolio:admin",
+                        "projekt:read",
+                        "projekt:write",
+                        "projekt:create",
+                        "projekt:organisation",
+                        "projekt:vertraulich",
+                        "finanzen:read",
+                        "finanzen:write",
+                        "statusbericht:write",
+                        "statusbericht:review",
+                        "periode:close",
+                        "kpi:write",
+                        "vertrag:write",
+                        "vertrag:review",
+                        "vertrag:sign",
+                        "vertrag:decide",
+                        "sitzung:read",
+                        "sitzung:write",
+                        "idee:create",
+                        "idee:read",
+                        "idee:write",
+                        "idee:decide",
+                        "priorisierung:read",
+                        "priorisierung:write",
+                        "ressource:read",
+                        "ressource:write",
+                        "auswertung:read",
+                        "auswertung:write",
+                        "vorlage:write",
+                        "audit:read"
+                      ]
+                    }
+                  },
+                  "places": {
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "uniqueItems": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "org",
+                        "portfolio",
+                        "projekt"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,62}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "alias",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^c-[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRole"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eigene Rolle löschen",
+        "tags": [
+          "Verwaltung: Mitglieder und Rollen"
+        ],
+        "description": "Nur, wenn sie nirgends mehr vergeben ist (409 `in-use` mit `assignments`). Recht «Rollen zusammenstellen» (roles:admin); niemand gibt mehr, als er hat (403 `exceeds-own`).",
+        "parameters": [
+          {
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,62}$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "alias",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^c-[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -80723,7 +82026,7 @@
     },
     {
       "name": "Verwaltung: Mitglieder und Rollen",
-      "description": "Mitglieder und Maschinen-Clients der eigenen Organisation: einladen, entfernen, Rollen an der Organisation und Freigabestufe setzen (Recht «Mitglieder und Rollen verwalten»)."
+      "description": "Mitglieder und Maschinen-Clients der eigenen Organisation: einladen, entfernen, Rollen an der Organisation und Freigabestufe setzen (Recht «Mitglieder und Rollen verwalten»); eigene Rollen der Organisation zusammenstellen (Recht «Rollen zusammenstellen»)."
     },
     {
       "name": "Verwaltung: Anmeldung über Microsoft Entra ID",

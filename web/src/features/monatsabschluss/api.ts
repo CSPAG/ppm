@@ -102,11 +102,24 @@ export function useMonatsabschlussAktionen(periode: string) {
     (await api.POST(pfad, { params: { path: { periode }, header: { 'idempotency-key': newIdempotencyKey() } }, body: { projekte } })).data!;
   const sammelBestaetigen = useMutation({ mutationFn: sammel('/v1/perioden/{periode}/bestaetigen'), onSettled: refresh });
   const einfordern = useMutation({ mutationFn: sammel('/v1/perioden/{periode}/einfordern'), onSettled: refresh });
+  // Rückgängig nach der Sammelbestätigung (I-R1 Stufe 1): je Bericht mit dem aktuellen Stand (If-Match), Rest gezählt
+  const sammelZuruecknehmen = useMutation({
+    mutationFn: async (projekte: string[]) => {
+      const { data } = await api.GET('/v1/perioden/{periode}', { params: { path: { periode }, query: { limit: 1000 } } });
+      const zs = data!.items.filter(z => projekte.includes(z.projektId) && z.can.zuruecknehmen);
+      const r = await Promise.allSettled(zs.map(z => api.POST('/v1/projekte/{id}/berichte/{periode}/pruefung-zuruecknehmen', {
+        params: { path: { id: z.projektId, periode }, header: lower(ifMatch(z.version)) },
+      })));
+      const ok = r.filter(x => x.status === 'fulfilled').length;
+      return { ok, nicht: projekte.length - ok };
+    },
+    onSettled: refresh,
+  });
   const abschliessen = useMutation({
     mutationFn: async (version: number) => (await api.POST('/v1/perioden/{periode}/abschliessen', { params: { path: { periode }, header: lower(ifMatch(version)) } })).data!,
     onSettled: refresh,
   });
-  return { bestaetigen, zuruecknehmen, rueckfrage, sammelBestaetigen, einfordern, abschliessen };
+  return { bestaetigen, zuruecknehmen, rueckfrage, sammelBestaetigen, sammelZuruecknehmen, einfordern, abschliessen };
 }
 
 /** `If-Match` als Kopfzeile in Kleinbuchstaben (Schema der API). */

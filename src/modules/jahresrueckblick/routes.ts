@@ -5,10 +5,13 @@
  */
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance } from 'fastify';
-import { actorOf, conflict, etag, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
+import { actorOf, conflict, etag, notFound, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
 import { record } from '../../platform.ts';
+import { MIME, vorlage, type Format } from '../vorlage/index.ts';
+import { dateiname, rueckblickDokument } from './dokument.ts';
+import { anfordern } from './lessons.ts';
 import { antwort, traktandieren } from './rueckblick.ts';
-import { Jahresauswertung, JahrParams, Jahresrueckblick, JahresrueckblickPut, type JahresrueckblickOut, type JahresrueckblickPutIn } from './schemas.ts';
+import { DokumentQuery, Jahresauswertung, JahrParams, Jahresrueckblick, JahresrueckblickPut, type JahresrueckblickOut, type JahresrueckblickPutIn } from './schemas.ts';
 import * as store from './store.ts';
 
 export const TAG = 'Jahresrückblick';
@@ -76,5 +79,51 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     });
     reply.header('etag', etag(out.version));
     return out;
+  });
+
+  app.post('/v1/jahresrueckblicke/:jahr/lessons-learned/anfordern', {
+    schema: {
+      tags: [TAG], summary: 'Lessons Learned anfordern', params: JahrParams,
+      response: { 200: Type.Object({
+        vorhaben: Type.Integer({ description: 'Im Jahr abgeschlossene Vorhaben ohne Lessons Learned.' }),
+        aufgaben: Type.Integer({ description: 'Geöffnete oder nachgeführte Aufgaben an die Projektleitungen.' }),
+      }, { additionalProperties: false }) },
+      description: 'Legt den Projektleitungen der im Jahr abgeschlossenen Vorhaben ohne Lessons Learned die Aufgabe «Lessons Learned erfassen» in den Eingang (UC-013 A1); idempotent je Projekt und Person, erledigt mit der ersten erfassten Lesson Learned. Legt den Jahresrückblick an, falls noch keiner gespeichert ist. Recht `quartalsbericht:write`.',
+    },
+  }, async (req) => {
+    const { jahr } = req.params as { jahr: number };
+    await req.need(SCHREIBEN);
+    const who = actorOf(req);
+    return req.tx(async tx => {
+      // Anfordern gehört zur Arbeit am Rückblick (UC-013 Schritt 2): ohne gespeicherten Rückblick wird er angelegt
+      const leer = { erkenntnisse: '', massnahmen: '' };
+      const id = (await store.lesen(tx, jahr))?.id ?? (await store.anlegen(tx, jahr, leer)) ?? (await store.lesen(tx, jahr))!.id;
+      const n = await anfordern(tx, jahr);
+      await record(tx, who, { action: 'jahresrueckblick.lessons_requested', resourceType: 'jahresrueckblick', resourceId: id, data: { jahr, ...n } });
+      return n;
+    });
+  });
+
+  app.get('/v1/jahresrueckblicke/:jahr/dokument', {
+    schema: {
+      tags: [TAG], summary: 'Jahresrückblick als Dokument', params: JahrParams, querystring: DokumentQuery,
+      description: 'Jahresauswertung mit Erkenntnissen und Massnahmen als PDF oder Word über die Dokumentausgabe (Modul `vorlage`), in der Lesesicht der Person; Kopfzeile «Intern · enthält Personendaten» (G12). Ohne gespeicherten Jahresrückblick 404. Der Export ist protokolliert. Recht `ziel:read` oder `quartalsbericht:write`.',
+      response: { 200: { description: 'Dokument als Datei (Content-Disposition: attachment).', content: { [MIME.pdf]: { schema: { type: 'string', format: 'binary' } }, [MIME.docx]: { schema: { type: 'string', format: 'binary' } } } } },
+    },
+  }, async (req, reply) => {
+    const { jahr } = req.params as { jahr: number };
+    const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
+    const schreiben = await req.can(SCHREIBEN);
+    if (!schreiben) await req.need('ziel:read');
+    const who = actorOf(req);
+    const out = await req.tx(async tx => {
+      const r = await store.lesen(tx, jahr);
+      if (!r) throw notFound('Jahresrückblick');
+      // Export eines Dokuments mit Personendaten im Audit (I-Z3); kein Ereignis
+      await record(tx, who, { action: 'jahresrueckblick.exported', resourceType: 'jahresrueckblick', resourceId: r.id, data: { jahr, format } });
+      return antwort(tx, jahr, r, schreiben);
+    });
+    return reply.header('content-type', MIME[format]).header('content-disposition', `attachment; filename="${dateiname(jahr, format)}"`)
+      .header('cache-control', 'private, no-store').send(vorlage.setzen(rueckblickDokument(out), format));
   });
 }

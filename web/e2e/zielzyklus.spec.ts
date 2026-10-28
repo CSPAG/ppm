@@ -4,16 +4,16 @@
  * Hauptaktivität hinzufügen; Baum mit Tastatur; axe hell, dunkel und 360 px; Leser:in ändert nichts.
  */
 import { expect, test } from '@playwright/test';
-import { ANNA, BRUNO, expectAccessible, expectNoOverflow, login } from './support.ts';
+import { ANNA, BRUNO, expectAccessible, expectNoOverflow, login, zieljahre } from './support.ts';
 
-/** Eindeutiges Jahr und eindeutige Nummer je Lauf (Projekte hell, dunkel, schmal laufen gegen dieselbe Datenbank). */
-const jahr = () => 2031 + Math.floor(Math.random() * 69);
+/** Eindeutige Nummer je Lauf; das Jahr aus dem eigenen Bereich je Projekt (support.ts, nie ein freigegebener Zyklus). */
 const nummer = () => `${100 + Math.floor(Math.random() * 900)}.${Math.floor(Math.random() * 1000)}`;
 
-test('Zielzyklus: starten, Jahresziel mit Metrik und Hauptaktivität; Baum mit Tastatur; barrierefrei', async ({ page }) => {
+test('Zielzyklus: starten, Jahresziel mit Metrik und Hauptaktivität; Baum mit Tastatur; barrierefrei', async ({ page }, info) => {
   const feld = `E2E Zyklus ${Date.now()}`;
   const nr = nummer();
-  const j = jahr();
+  const jahre = zieljahre('zielzyklus', info.project.name);
+  const j = jahre[Math.floor(Math.random() * jahre.length)]!;
   await login(page, ANNA);
   await page.getByRole('button', { name: 'Neues Handlungsfeld' }).click();
   await page.getByLabel('Bezeichnung').fill(feld);

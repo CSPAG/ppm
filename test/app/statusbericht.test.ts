@@ -139,6 +139,17 @@ describe('Statusbericht erfassen', { skip }, () => {
 
     const list = await call('GET', `/v1/projekte/${projekt['2026-001']}/berichte`, kt);
     assert.deepEqual(list.json().items.map((x: { periode: string; stand: string }) => [x.periode, x.stand]), [[PERIODE, 'eingereicht'], [VORPERIODE, 'geprueft']]);
+
+    // Kopfkarte «Meine Projekte»: letzter Bericht und laufende Periode; P4 berichtet nicht; fremdes Projekt entfällt
+    const q = ['2026-001', '2026-002', '2026-003'].map(nr => `projektId=${projekt[nr]}`).join('&');
+    const st = await call('GET', `/v1/statusberichte/stand?${q}`, pl);
+    assert.equal(st.statusCode, 200, st.body);
+    const items = st.json().items as { projektId: string; letzter: { periode: string; status: string; trend: string } | null; laufend: { periode: string; stand: string | null } | null }[];
+    assert.deepEqual(items.map(i => i.projektId), [projekt['2026-001'], projekt['2026-003']]);
+    assert.deepEqual(items[0]!.letzter && [items[0]!.letzter.periode, items[0]!.letzter.status, items[0]!.letzter.trend], [PERIODE, 'im_plan', 'gleichbleibend']);
+    assert.deepEqual(items[0]!.laufend && [items[0]!.laufend.periode, items[0]!.laufend.stand], [PERIODE, 'eingereicht']);
+    assert.equal(items[1]!.laufend, null, 'P4 berichtet nicht monatlich');
+    assert.equal((await call('GET', `/v1/statusberichte/stand?${q}`, fremd)).statusCode, 403);
   });
 
   test('Rückgängig innert 10 s durch die einreichende Person (K1 Schritt 8)', async () => {

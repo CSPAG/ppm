@@ -28477,6 +28477,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/statusberichte/stand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stand der Berichte mehrerer Projekte
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»): je Projekt der letzte eingereichte Bericht mit Status, Trend und Begründung und der Bericht der laufenden Periode mit Stichtag. Projekte ohne Leserecht entfallen.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Projekte (mehrfach, höchstens 20). */
+                    projektId: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BerichtStandList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/berichte": {
         parameters: {
             query?: never;
@@ -42831,6 +42927,232 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/jahresrueckblicke/{jahr}/lessons-learned/anfordern": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lessons Learned anfordern
+         * @description Legt den Projektleitungen der im Jahr abgeschlossenen Vorhaben ohne Lessons Learned die Aufgabe «Lessons Learned erfassen» in den Eingang (UC-013 A1); idempotent je Projekt und Person, erledigt mit der ersten erfassten Lesson Learned. Legt den Jahresrückblick an, falls noch keiner gespeichert ist. Recht `quartalsbericht:write`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description Im Jahr abgeschlossene Vorhaben ohne Lessons Learned. */
+                            vorhaben: number;
+                            /** @description Geöffnete oder nachgeführte Aufgaben an die Projektleitungen. */
+                            aufgaben: number;
+                        };
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/jahresrueckblicke/{jahr}/dokument": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Jahresrückblick als Dokument
+         * @description Jahresauswertung mit Erkenntnissen und Massnahmen als PDF oder Word über die Dokumentausgabe (Modul `vorlage`), in der Lesesicht der Person; Kopfzeile «Intern · enthält Personendaten» (G12). Ohne gespeicherten Jahresrückblick 404. Der Export ist protokolliert. Recht `ziel:read` oder `quartalsbericht:write`.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Standard PDF. */
+                    format?: "pdf" | "docx";
+                };
+                header?: never;
+                path: {
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Dokument als Datei (Content-Disposition: attachment). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/pdf": string;
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string;
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks": {
         parameters: {
             query?: never;
@@ -48028,6 +48350,24 @@ export interface components {
                 kommentar: string;
             };
         };
+        BerichtStandList: {
+            items: {
+                /** Format: uuid */
+                projektId: string;
+                letzter: {
+                    periode: string;
+                    status: ("im_plan" | "kritisch") | null;
+                    trend: string | null;
+                    /** @description Begründung des Status (Pflicht bei «kritisch»). */
+                    begruendung: string;
+                } | null;
+                laufend: {
+                    periode: string;
+                    stand: ("entwurf" | "eingereicht" | "zurueckgegeben" | "geprueft") | null;
+                    stichtag: string | null;
+                } | null;
+            }[];
+        };
         StatusberichtEskalationNeu: {
             /** @description Worum es geht, z. B. die wesentliche Abweichung zur Baseline. */
             grund: string;
@@ -50839,6 +51179,34 @@ export interface components {
                     seit: string | null;
                 }[];
             };
+            /** @description Lessons Learned des Jahres (UC-013 Schritte 1–2). */
+            lessonsLearned: {
+                /** @description Im Jahr erfasst (PS.04.03), neueste zuerst. */
+                eintraege: {
+                    /** Format: uuid */
+                    id: string;
+                    projekt: {
+                        /** Format: uuid */
+                        id: string;
+                        nummer: string;
+                        name: string;
+                    };
+                    text: string;
+                    kategorie: string;
+                }[];
+                /** @description Im Jahr abgeschlossene Vorhaben ohne Lessons Learned (UC-013 Schritt 2, A1). */
+                ohne: {
+                    /** Format: uuid */
+                    id: string;
+                    nummer: string;
+                    name: string;
+                    portfolio: string;
+                    phase: string;
+                    /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
+                    lebenszyklus: string;
+                    seit: string | null;
+                }[];
+            };
         };
         Jahresrueckblick: {
             jahr: number;
@@ -51044,7 +51412,7 @@ export interface components {
             abweichung: {
                 betrag: number | null;
                 prozent: number | null;
-                /** @description Über der Toleranz «Kosten» des Phasenmodells (A-10); ohne Toleranz nie. */
+                /** @description Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie. */
                 wesentlich: boolean;
             };
             toleranzProzent: number | null;

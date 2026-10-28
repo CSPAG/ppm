@@ -171,6 +171,8 @@ PL erhält eine Erinnerung, die UE sieht den Bericht als «ausstehend» (UC-005 
   Auffälligkeiten ohne Schwelle: jede Statusänderung, jede Verschiebung gegenüber Baseline bzw. «Abschluss per» der
   Vorperiode, jede Prognose über Budget. Bestätigen hat «Rückgängig» im Toast, solange die Periode offen ist.
 - Offen: Schwelle der wesentlichen Abweichung (K11). Bis zur Klärung warnt das System ab +4 Wochen Termin oder +10 %
-  Prognose je Phase (Vorschlag, als Standardwert im Phasenmodell konfigurierbar).
+  Prognose je Phase (Vorschlag, als Standardwert im Phasenmodell konfigurierbar). Die gültige Toleranz des Projekts
+  steht in Kap. 7 der Baseline des Projektvertrags, sonst gilt der Standard (A-10); die PL sieht die Warnung auch ohne
+  Recht auf das Phasenmodell.
 - Offen: Wann erscheint die Berichtsaufgabe ([UX-OF-4](../fahrplan.md#offene-fragen)); Umgang mit verspäteten Berichten nach dem
   Abschluss ([UX-OF-16](../fahrplan.md#offene-fragen)); Skala der Abweichungsbeurteilung ([UX-OF-17](../fahrplan.md#offene-fragen)).

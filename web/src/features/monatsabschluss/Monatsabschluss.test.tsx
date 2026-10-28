@@ -75,22 +75,56 @@ describe('Monatsabschluss', () => {
     await expectNoAxe(container);
   });
 
-  it('Sammelbestätigung nennt das Ergebnis und überspringt auffällige (A-28, I-L4)', async () => {
+  it('Sammelbestätigung: Vorschau nennt bestätigte und übersprungene, Ergebnis mit Rückgängig (A-28, I-L4, I-R1)', async () => {
+    let liste = ZEILEN;
     const api = stub({
-      [`POST /v1/perioden/${P}/bestaetigen`]: () => json({ erledigt: [id(1)], uebersprungen: [{ projektId: id(2), projektNummer: '2026-002', grund: 'auffaellig' }, { projektId: id(3), projektNummer: '2026-003', grund: 'auffaellig' }], unbekannt: 0, kopf: kopf() }),
+      [`GET /v1/perioden/${P}`]: () => json({ kopf: kopf(), items: liste, nextCursor: null }),
+      [`POST /v1/perioden/${P}/bestaetigen`]: () => {
+        liste = [zeile(1, { stand: 'geprueft', version: 4, can: { bestaetigen: false, rueckfrage: false, einfordern: false, zuruecknehmen: true } }), ...ZEILEN.slice(1)];
+        return json({ erledigt: [id(1)], uebersprungen: [{ projektId: id(2), projektNummer: '2026-002', grund: 'auffaellig' }, { projektId: id(3), projektNummer: '2026-003', grund: 'auffaellig' }], unbekannt: 0, kopf: kopf() });
+      },
+      [`POST /v1/projekte/${id(1)}/berichte/${P}/pruefung-zuruecknehmen`]: () => json(zeile(1, { version: 5 })),
     });
     renderWithIam(<Page />, UE);
     await userEvent.click(await screen.findByLabelText(TM.alleAuswaehlen));
     expect(screen.getByText(TM.auswahl(4))).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: new RegExp(TM.aktion.sammelBestaetigen(3)) }));
+    // Vorschau (I-R1 Stufe 3): noch nichts gesendet, Aufteilung sichtbar
+    const dlg = await screen.findByRole('dialog', { name: TM.vorschau.bestaetigenTitel(1) });
+    expect(api.calls.some(c => c.method === 'POST')).toBe(false);
+    expect(within(dlg).getByText(TM.vorschau.uebersprungenAuffaellig(2))).toBeInTheDocument();
+    expect(within(dlg).getByText(TM.vorschau.uebersprungenStand(1))).toBeInTheDocument();
+    expect(within(dlg).getAllByRole('listitem').map(li => li.textContent)).toEqual(['2026-001 Vorhaben 1', '2026-002 Vorhaben 2', '2026-003 Vorhaben 3', '2026-004 Vorhaben 4']);
+    await expectNoAxe(dlg);
+    await userEvent.click(within(dlg).getByRole('button', { name: new RegExp(TM.aktion.sammelBestaetigen(1)) }));
     await waitFor(() => expect(api.calls.some(c => c.method === 'POST')).toBe(true));
     const post = api.calls.find(c => c.method === 'POST')!;
     expect(await post.json()).toEqual({ projekte: [id(2), id(3), id(1)] });
     expect(post.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
     expect(await screen.findByText('1 bestätigt, 2 mit Auffälligkeit übersprungen.', { selector: '[role=status]' })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // Rückgängig: je bestätigten Bericht mit aktuellem Stand (If-Match)
+    await userEvent.click(await screen.findByRole('button', { name: TM.aktion.zuruecknehmen }));
+    await waitFor(() => expect(api.calls.some(c => c.url.endsWith('/pruefung-zuruecknehmen'))).toBe(true));
+    expect(api.calls.find(c => c.url.endsWith('/pruefung-zuruecknehmen'))!.headers.get('If-Match')).toBe('W/"4"');
+    expect(await screen.findByText(TM.toast.sammelZurueckgenommen(1, 0), { selector: '[role=status]' })).toBeInTheDocument();
   });
 
-  it('Tastatur: ↓ wechselt die Zeile, B bestätigt mit If-Match, R öffnet die Rückfrage, E fordert ein', async () => {
+  it('Einfordern als Sammelaktion: Vorschau nennt die Projekte, Abbrechen sendet nichts', async () => {
+    const api = stub({}, [...ZEILEN, zeile(5, { stand: 'ausstehend', status: null, trend: null, eingereichtAt: null, version: 0, can: { bestaetigen: false, rueckfrage: false, einfordern: true, zuruecknehmen: false } })]);
+    renderWithIam(<Page />, UE);
+    await userEvent.click(await screen.findByLabelText(TM.alleAuswaehlen));
+    await userEvent.click(screen.getByRole('button', { name: new RegExp(TM.aktion.sammelEinfordern(2)) }));
+    const dlg = await screen.findByRole('dialog', { name: TM.vorschau.einfordernTitel(null, 2) });
+    expect(within(dlg).getByText(TM.vorschau.einfordernWirkung(2))).toBeInTheDocument();
+    expect(within(dlg).getAllByRole('listitem')).toHaveLength(2);
+    await userEvent.click(within(dlg).getByRole('button', { name: TM.aktion.abbrechen }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(api.calls.some(c => c.method === 'POST')).toBe(false);
+  });
+
+  it('Tastatur: ↓ wechselt die Zeile, B bestätigt mit If-Match, R öffnet die Rückfrage, E fordert nach der Vorschau ein', async () => {
     const api = stub({
       [`POST /v1/projekte/${id(3)}/berichte/${P}/pruefen`]: () => json(zeile(3, { stand: 'geprueft', version: 4 }), 200, { ETag: 'W/"4"' }),
       [`POST /v1/projekte/${id(1)}/berichte/${P}/rueckfragen`]: () => json(zeile(1, { stand: 'zurueckgegeben', version: 4 })),
@@ -122,6 +156,9 @@ describe('Monatsabschluss', () => {
     const vierte = await zeileVon('2026-004 Vorhaben 4');
     vierte.focus();
     fireEvent.keyDown(vierte, { key: 'e' });
+    const dlg = await screen.findByRole('dialog', { name: TM.vorschau.einfordernTitel('2026-004', 1) });
+    expect(api.calls.some(c => c.url.endsWith('/einfordern'))).toBe(false);
+    await userEvent.click(within(dlg).getByRole('button', { name: new RegExp(`^${TM.aktion.einfordern}$`) }));
     await waitFor(() => expect(api.calls.some(c => c.url.endsWith('/einfordern'))).toBe(true));
     expect(await screen.findByText(TM.toast.eingefordert(1, 0), { selector: '[role=status]' })).toBeInTheDocument();
   });

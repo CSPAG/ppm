@@ -241,9 +241,9 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.deepEqual([audit.length, audit[0]!.data.vorlauf, audit[0]!.data.fristEingehalten], [1, s.versandVorlauf, true]);
     const an = (p: string) => mitteilungen.filter(x => x.empfaenger_person === p).map(x => x.text);
     assert.equal(an(ctl).length, 1, 'je Person gebündelt');
-    assert.equal(an(ctl)[0], `Sie stellen am ${kurz(termin1)} im PRAT vor: ${p1.nummer} Projekt P1 · ca. 14:00.`);
+    assert.equal(an(ctl)[0], `Du stellst am ${kurz(termin1)} im PRAT vor: ${p1.nummer} Projekt P1 · ca. 14:00.`);
     // SP ist zu beiden Geschäften eingeladen: eine Mitteilung (Eskalation ohne Zeitbedarf zuerst)
-    assert.ok(an(sp).includes(`Sie stellen am ${kurz(termin1)} im PRAT vor: ${p2.nummer} Projekt P2 · ca. 14:00; ${p1.nummer} Projekt P1 · ca. 14:00.`), JSON.stringify(an(sp)));
+    assert.ok(an(sp).includes(`Du stellst am ${kurz(termin1)} im PRAT vor: ${p2.nummer} Projekt P2 · ca. 14:00; ${p1.nummer} Projekt P1 · ca. 14:00.`), JSON.stringify(an(sp)));
     assert.equal(an(pl).length, 2, 'Einladung und Verschiebung');
     assert.ok(an(sp).some(t => t.includes('verschoben auf')), 'SP über die Verschiebung informiert');
     assert.ok(!an(ctl).some(t => t.includes('verschoben')), 'CTL nicht');

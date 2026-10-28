@@ -1,0 +1,35 @@
+/*
+ * Arbeitsfläche «Abschluss» (UI-14) und Liste «Lessons Learned» (UI-32): Abschnitte links, Seitenpanel «Bereit zum
+ * Einreichen» rechts; schmal untereinander. Nur Tokens aus styles/base.css, keine Inline-Stile (CSP).
+ */
+.ab-wrap{display:flex;flex-direction:column}
+.ab-tools{gap:8px;position:sticky;top:0;z-index:3;background:var(--surface);flex-wrap:wrap}
+.ab-titel{margin:0;font:700 16px/1.2 var(--f-display)}
+.ab-banner{padding:12px 22px 0}
+.ab-leer{padding:16px 22px 0}
+.ab-flaeche{display:grid;grid-template-columns:minmax(0,1fr) 300px;align-items:start}
+.ab-haupt{padding:16px 22px 32px;min-width:0;display:flex;flex-direction:column;gap:18px;max-width:980px}
+.ab-panel{border-left:1px solid var(--line);padding:16px;position:sticky;top:59px;display:flex;flex-direction:column;gap:10px}
+.ab-abschnitt{margin:0;display:flex;flex-direction:column;gap:10px}
+.ab-attrs{margin:0}
+.ab-liste,.ab-fehlt,.ab-punkte,.ab-lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ab-punkt{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr) 10em auto;gap:6px;align-items:center}
+.ab-lesson{display:flex;gap:8px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ab-lesson-neu{display:flex;flex-direction:column;gap:8px;max-width:720px}
+.ab-nutzen{display:flex;flex-direction:column;gap:4px}
+.ab-nutzen p{margin:0}
+.ab-in{height:32px;border:1px solid var(--line-2);border-radius:7px;padding:0 10px;background:var(--surface);color:var(--fg);min-width:0;width:100%;outline:0}
+.ab-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ab-tab-wrap{overflow-x:auto}
+.ab-tab{width:100%;border-collapse:collapse;font-size:13px}
+.ab-tab th{text-align:left;font-weight:600;color:var(--fg-3);padding:4px 6px}
+.ab-tab td{padding:6px;border-top:1px solid var(--line);vertical-align:top}
+.ab-dok{display:inline-flex;gap:6px;align-items:center}
+.ab-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ab-filter select{height:32px}
+@media (max-width: 900px){
+  .ab-flaeche{grid-template-columns:minmax(0,1fr)}
+  .ab-panel{border-left:0;border-top:1px solid var(--line);position:static}
+  .ab-haupt{padding:12px 16px 20px}
+  .ab-punkt{grid-template-columns:minmax(0,1fr) auto}
+}

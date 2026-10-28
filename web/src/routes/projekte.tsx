@@ -7,6 +7,7 @@
 import { type AnyRoute, createRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { Suspense, useCallback } from 'react';
 import { type ProjekteSearch, PROJEKTNUMMER, projektTexte, type Reiter, type SetProjekteSearch } from '../features/projekt/index.ts';
+import { abschlussTexte } from '../features/abschluss/index.ts';
 import { berichtTexte, laufendePeriode } from '../features/bericht/index.ts';
 import { type SetVersionenSearch, type SetVertragSearch, type VersionenSearch, type VertragSearch, vertragTexte } from '../features/vertrag/index.ts';
 import { Loading } from '../ui/index.ts';
@@ -24,6 +25,7 @@ const UnterzeichnenPage = seite(() => import('../features/vertrag/UnterzeichnenP
 const GatePage = seite(() => import('../features/vertrag/GatePage.tsx'), 'GatePage');
 const AenderungPage = seite(() => import('../features/vertrag/AenderungPage.tsx'), 'AenderungPage');
 const VersionenPage = seite(() => import('../features/vertrag/VersionenPage.tsx'), 'VersionenPage');
+const AbschlussPage = seite(() => import('../features/abschluss/AbschlussPage.tsx'), 'AbschlussPage');
 
 /** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
 const REITER: readonly Reiter[] = [
@@ -31,6 +33,7 @@ const REITER: readonly Reiter[] = [
   { pfad: 'vertrag', label: vertragTexte.reiter, recht: 'projekt:read' },
   { pfad: 'bericht', label: berichtTexte.reiter, recht: 'projekt:read' },
   { pfad: 'versionen', label: vertragTexte.reiterVersionen, recht: 'projekt:read' },
+  { pfad: 'abschluss', label: abschlussTexte.reiter, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -124,5 +127,12 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><VersionenPage nummer={nr} search={search} setSearch={setSearch} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, gateRoute, berichtRoute, versionenRoute])] as const;
+  // Abschluss (UI-14, UC-015; AP-E7-1): Ziel der Aufgabe «Abschlussbericht erstellen» im Eingang (I-B1)
+  const abschlussRoute = createRoute({ getParentRoute: () => akteRoute, path: '/abschluss', component: AbschlussRoute });
+  function AbschlussRoute() {
+    const { nr } = akteRoute.useParams();
+    return <Suspense fallback={<Loading />}><AbschlussPage nummer={nr} /></Suspense>;
+  }
+
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, gateRoute, berichtRoute, versionenRoute, abschlussRoute])] as const;
 }

@@ -15,6 +15,7 @@ import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './featur
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch, type SetSzenarioSearch } from './features/priorisierung/index.ts';
 import type { SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
+import type { SetLessonsSearch } from './features/abschluss/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -45,6 +46,7 @@ const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx')
 const SzenarioPage = seite(() => import('./features/priorisierung/SzenarioPage.tsx'), 'SzenarioPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
 const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
+const LessonsPage = seite(() => import('./features/abschluss/LessonsPage.tsx'), 'LessonsPage');
 const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
@@ -412,6 +414,21 @@ function RisikenRoute() {
   return <RisikenPage search={search} setSearch={setSearch} />;
 }
 
+// Portfolio › Auswertungen › Lessons Learned (UI-32; PS.04.03, UC-013, UC-015; AP-E7-1)
+const lessonsRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/auswertungen/lessons-learned', validateSearch: searchOf.lessonsLearned, component: LessonsRoute,
+});
+
+function LessonsRoute() {
+  const search = lessonsRoute.useSearch();
+  const navigate = useNavigate({ from: lessonsRoute.fullPath });
+  const setSearch = useCallback<SetLessonsSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  const projektOeffnen = useCallback((nr: string) => { void navigate({ to: '/projekte/$nr/abschluss', params: { nr }, search: {} }); }, [navigate]);
+  return <LessonsPage search={search} setSearch={setSearch} projektOeffnen={projektOeffnen} />;
+}
+
 // Portfolio › Auswertungen › Portfoliobericht (UI-29; PC.04.02, UC-014 Schritt 3, K3 Schritt 4; AP-E2-3)
 const portfolioberichtRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/auswertungen/portfoliobericht', validateSearch: searchOf.portfoliobericht, component: PortfolioberichtRoute,
@@ -657,6 +674,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute,
   risikenRoute,
   portfolioberichtRoute,
+  lessonsRoute,
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,

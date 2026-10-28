@@ -2,6 +2,7 @@
  * Typisierte Suchparameter je Seite (TanStack Router `validateSearch`). Jede Seite beschreibt ihre Parameter in ihrem
  * Feature; hier werden sie den Routen zugeordnet.
  */
+import { validateLessonsSearch } from './features/abschluss/index.ts';
 import { validateBerichtSearch } from './features/bericht/index.ts';
 import { validateEingangSearch } from './features/eingang/index.ts';
 import { type HandlungsfeldSearch, validateHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
@@ -45,6 +46,7 @@ export const searchOf = {
   dashboard: validateDashboardSearch,
   risiken: validateRisikenSearch,
   portfoliobericht: validatePortfolioberichtSearch,
+  lessonsLearned: validateLessonsSearch,
   monatsabschluss: validateMonatsabschlussSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,

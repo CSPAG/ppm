@@ -29665,11 +29665,14 @@ export interface paths {
         };
         /**
          * Terminabweichungen über alle Projekte
-         * @description Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.
+         * @description Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert, mit den Einzelwerten (`meilensteine`). Stand der Register heute. Mit `format=csv` als Export (eine Zeile je Meilenstein bzw. Lieferergebnis).
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Export als CSV: eine Zeile je Meilenstein bzw. Lieferergebnis. */
+                    format?: "csv";
+                };
                 header?: never;
                 path: {
                     /**
@@ -48419,6 +48422,20 @@ export interface components {
                 tage: number;
             } | null;
             maxTage: number;
+            /** @description Einzelwerte: Meilensteine und Lieferergebnisse mit Termin der Baseline, nach Phase und Termin (Seitentyp Bericht). */
+            meilensteine: {
+                phase: string;
+                art: "meilenstein" | "lieferergebnis";
+                text: string;
+                /** @description Erreicht (aktuell = Datum erreicht). */
+                erreicht: boolean;
+                /** Format: date */
+                baseline: string;
+                /** Format: date */
+                aktuell: string;
+                /** @description Abweichung in Kalendertagen (positiv = später). */
+                tage: number;
+            }[];
         };
         TerminabweichungList: {
             items: components["schemas"]["Terminabweichung"][];

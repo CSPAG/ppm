@@ -149,7 +149,7 @@ Prüfung und Abschluss der Periode durch die Unternehmensentwicklung (BC PS.01.0
 | `POST /v1/perioden/{periode}/bestaetigen` | `statusbericht:review` | Sammelbestätigung; auffällige und Berichte in anderem Stand werden übersprungen und genannt (A-28) |
 | `POST /v1/perioden/{periode}/einfordern` | `statusbericht:review` | ausstehende Berichte einfordern: Aufgabe `statusbericht.erstellen` an die Projektleitung |
 | `POST /v1/perioden/{periode}/abschliessen` | `periode:close` | 409 bei eingereichten, ungeprüften Berichten; sonst Stand je Projekt mit «nicht gemeldet» (A-11), Periode gesperrt (A-37); `If-Match` optional |
-| `GET /v1/perioden/{periode}/terminabweichungen` | `statusbericht:review` | Baseline und aufdatiert je Phase und Abschluss, nach grösster Verschiebung |
+| `GET /v1/perioden/{periode}/terminabweichungen` | `statusbericht:review` | Baseline und aufdatiert je Phase und Abschluss, nach grösster Verschiebung, mit den Einzelwerten (`meilensteine`); `format=csv`: Export, eine Zeile je Meilenstein bzw. Lieferergebnis |
 | `POST /v1/projekte/{id}/berichte/{periode}/pruefen` | `statusbericht:review` am Portfolio | Bericht bestätigen («geprüft»), `If-Match` Pflicht |
 | `POST /v1/projekte/{id}/berichte/{periode}/pruefung-zuruecknehmen` | `statusbericht:review` am Portfolio | Rückgängig: wieder «eingereicht» |
 | `GET /v1/projekte/{id}/berichte/{periode}/rueckfragen` | `projekt:read` am Projekt | Rückfragen, neueste zuerst |

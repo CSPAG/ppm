@@ -13,7 +13,7 @@ import { useKopf, useMonatsabschlussAktionen, usePeriode, type Zeile } from './a
 import { BerichtDrawer } from './BerichtDrawer.tsx';
 import { Posteingang } from './Posteingang.tsx';
 import { SammelDialog, type Vorschau } from './SammelDialog.tsx';
-import { berichtO, nummerAusO, periodePlus, type MonatsabschlussSearch, type SetMonatsabschlussSearch, type ZeilenStand } from './search.ts';
+import { berichtO, nummerAusO, nummerAusTermineO, periodePlus, termineO, type MonatsabschlussSearch, type SetMonatsabschlussSearch, type ZeilenStand } from './search.ts';
 import { Termine } from './Termine.tsx';
 import { TM } from './texte.ts';
 import './monatsabschluss.css';
@@ -85,7 +85,7 @@ function Periode({ periode, search, setSearch, heute, darfAbschliessen }: { peri
   const zeilen = useMemo(() => filtern(alle, search), [alle, search]);
   const portfolios = useMemo(() => [...new Map(alle.map(z => [z.portfolioId, z.portfolioName])).entries()], [alle]);
   const beschaeftigt = m.bestaetigen.isPending || m.zuruecknehmen.isPending || m.rueckfrage.isPending || m.sammelBestaetigen.isPending || m.sammelZuruecknehmen.isPending || m.einfordern.isPending || m.abschliessen.isPending;
-  const offenZ = search.o ? alle.find(z => z.projektNummer === nummerAusO(search.o!)) : undefined;
+  const offenZ = search.o?.startsWith('bericht:') ? alle.find(z => z.projektNummer === nummerAusO(search.o!)) : undefined;
   const pLabel = fmtPeriode(periode);
   const melden = (text: string, o?: Parameters<typeof toast.show>[1]) => { setAnsage(text); toast.show(text, o); };
   const fehler = (e: unknown) => toast.error(e, isConflict(e) ? TM.konflikt : undefined);
@@ -157,7 +157,10 @@ function Periode({ periode, search, setSearch, heute, darfAbschliessen }: { peri
         <button type="button" className={`tab${search.ansicht === 'termine' ? ' on' : ''}`} aria-current={search.ansicht === 'termine' ? 'page' : undefined} onClick={() => setSearch({ ansicht: 'termine', o: undefined })}>{TM.ansicht.termine}</button>
       </div>
       {search.ansicht === 'termine' ? (
-        <div className="body"><Termine periode={periode} projektLink={nr => `/projekte/${nr}`} /></div>
+        <div className="body">
+          <Termine periode={periode} projektLink={nr => `/projekte/${nr}`} offen={nummerAusTermineO(search.o)}
+            oeffnen={nr => setSearch({ o: termineO(nr) })} schliessen={() => setSearch({ o: undefined })} />
+        </div>
       ) : (
         <>
           <div className="toolbar" role="search" aria-label={TM.filter.stand}>

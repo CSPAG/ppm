@@ -15269,7 +15269,8 @@
           "phase",
           "phasen",
           "abschluss",
-          "maxTage"
+          "maxTage",
+          "meilensteine"
         ],
         "properties": {
           "projektId": {
@@ -15348,6 +15349,63 @@
           },
           "maxTage": {
             "type": "integer"
+          },
+          "meilensteine": {
+            "description": "Einzelwerte: Meilensteine und Lieferergebnisse mit Termin der Baseline, nach Phase und Termin (Seitentyp Bericht).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "phase",
+                "art",
+                "text",
+                "erreicht",
+                "baseline",
+                "aktuell",
+                "tage"
+              ],
+              "properties": {
+                "phase": {
+                  "type": "string"
+                },
+                "art": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "meilenstein"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "lieferergebnis"
+                      ]
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string"
+                },
+                "erreicht": {
+                  "description": "Erreicht (aktuell = Datum erreicht).",
+                  "type": "boolean"
+                },
+                "baseline": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "aktuell": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "tage": {
+                  "description": "Abweichung in Kalendertagen (positiv = später).",
+                  "type": "integer"
+                }
+              }
+            }
           }
         }
       },
@@ -65989,8 +66047,20 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.",
+        "description": "Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert, mit den Einzelwerten (`meilensteine`). Stand der Register heute. Mit `format=csv` als Export (eine Zeile je Meilenstein bzw. Lieferergebnis).",
         "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "description": "Export als CSV: eine Zeile je Meilenstein bzw. Lieferergebnis."
+          },
           {
             "schema": {
               "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",

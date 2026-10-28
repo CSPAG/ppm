@@ -128,6 +128,7 @@ Unten nur Schlüssel- und Steuerspalten; fachliche Felder ergeben sich aus Use C
 | `aufgabe` | `id`, `art` (z. B. `statusbericht.erstellen`), `bezug_typ`, `bezug_id`, `empfaenger_person` uuid NULL, `empfaenger_recht` text NULL, `ort_typ` (`org`/`portfolio`/`projekt`), `ort_id`, `titel`, `link`, `frist` date, `frist_art` (`kalendertage`/`arbeitstage`, UX-E11), `stand` (`offen`/`erledigt`/`entfallen`), `erledigt_von`, `erledigt_at`; eindeutig offen je (`art`, `bezug_id`, Empfänger) | genau eines von Person oder Recht |
 | `mitteilung` | `id`, `empfaenger_person`, `bezug_typ`, `bezug_id`, `text`, `link`, `gelesen_at` | Benachrichtigungen; E-Mail nur mit Link (A-44) |
 | `stellvertretung` | `id`, `vertretene_person`, `vertreter_person`, `von`, `bis`, `unterschriften` bool (UX-OF-10, A-31) | befristete Tupel, [4.3](#43-stellvertretung) |
+| `neubesetzung`, `neubesetzung_rolle` | `id`, `person`, `stand` (`vorbereitet`/`entzogen`), `entzogen_at`; Rollen `ort_typ`, `ort_id`, `rolle` | Zugang entziehen (UC-016 A1, AP-E7-8); «besetzt» aus den Tupeln, nicht gespeichert |
 
 ### 2.2 stammdaten
 
@@ -486,6 +487,7 @@ await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: { typ: 'perio
 | `bedarf.decken`, `konflikt.aufloesen` | Recht `ressource:write` | Bedarf gemeldet / Überbuchung | – | Zuteilung | AP-E7-2 |
 | `abweichung.klaeren`, `budget.uebergeben` | Recht `finanzen:write` | Prognose über Budget / Budgetzyklus | – | Begründung / Übergabe | AP-E7-4 |
 | `schnittstelle.fehler` | Recht `schnittstelle:admin` | Lauf fehlgeschlagen | – | erfolgreicher Lauf | AP-E7-3 |
+| `zugang.neu_besetzen` | Recht `members:admin` | Zugang entzogen mit Rollen an Orten oder offenen Aufgaben (UC-016 A1) | – | von Hand, sobald neu besetzt | AP-E7-8 |
 
 ### 4.3 Stellvertretung
 
@@ -511,7 +513,7 @@ Vergangenheit (`statusbericht.submitted`, `vertrag.baselined`, `entscheid.record
 
 | Modul | Ressourcen und Routen (Präfix `/v1`) | MCP (lesend) |
 |---|---|---|
-| `eingang` | `GET /eingang` (Aufgaben, Filter `frist`), `GET /eingang/anzahl`, `POST /eingang/aufgaben/:id/erledigen` (nur manuell erledigbare), `GET /mitteilungen`, `POST /mitteilungen/:id/gelesen`, `GET/POST/DELETE /stellvertretungen` | `list_aufgaben` |
+| `eingang` | `GET /eingang` (Aufgaben, Filter `frist`), `GET /eingang/anzahl`, `POST /eingang/aufgaben/:id/erledigen` (nur manuell erledigbare), `GET /mitteilungen`, `POST /mitteilungen/:id/gelesen`, `GET/POST/DELETE /stellvertretungen`; `GET /zugaenge/:person`, `POST /zugaenge/:person/entziehen`, `GET /neubesetzungen`, `GET /neubesetzungen/:id` (AP-E7-8) | `list_aufgaben` |
 | `stammdaten` | `/org-einheiten` (CRUD), `/codetabellen`, `/codetabellen/:schluessel/werte` (CRUD, deaktivieren), `/feiertage` | `list_org_einheiten` |
 | `phasenmodell` | `/phasenmodelle` (Liste, Entwurf anlegen aus aktueller Version), `/phasenmodelle/:id` (lesen mit Phasen, Gates, Leitfragen, Ergebnissen, Pflichtangaben, Fristen, Toleranzen; `PATCH` nur Entwurf), `POST /phasenmodelle/:id/in-kraft-setzen`, `GET /phasenmodelle/aktuell` | `get_phasenmodell` |
 | `portfolio` | `/portfolios`, `/gremien`, `/gremien/:id/termine`, `/portfolios/:id/gremienweg` | `list_portfolios` |

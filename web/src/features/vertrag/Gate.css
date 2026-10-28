@@ -1,0 +1,26 @@
+/*
+ * Gate-Modus (UI-08): Leitfragen je Wertestrom links, Lieferergebnisse und fehlende Angaben im Seitenpanel; ab 900 px
+ * einspaltig, ab 360 px ohne horizontales Scrollen (Tabelle der Nutzenprüfung scrollt in sich). Nur Tokens aus
+ * styles/base.css.
+ */
+.gm{display:flex;flex-direction:column;gap:12px}
+.gm-kopf{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.gm-kopf .vt-h{flex-basis:100%;margin:0}
+.gm-summe{flex-basis:100%;margin:0;font-weight:600}
+.gm-flaeche{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start;border-top:1px solid var(--line);padding-top:12px}
+.gm-panel{display:flex;flex-direction:column;gap:16px;position:sticky;top:0}
+.gm-block{display:flex;flex-direction:column;gap:8px;min-width:0}
+.gm-ws{border-bottom:1px solid var(--line);padding:6px 0}
+.gm-ws summary{cursor:pointer;font-weight:600;padding:4px 0}
+.gm-fragen{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.gm-frage{display:flex;flex-direction:column;gap:4px}
+.gm-text{font-weight:500}
+.gm-zeile{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.gm-check{display:flex;align-items:center;gap:6px;font-size:13px}
+.gm-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.gm-liste li{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+.gm-tabelle{overflow-x:auto;max-width:100%}
+.gm-tabelle table{border-collapse:collapse;width:100%;font-size:13px}
+.gm-tabelle th,.gm-tabelle td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.gm-tabelle input{width:100%;min-width:90px}
+@media (max-width:900px){ .gm-flaeche{grid-template-columns:minmax(0,1fr)} .gm-panel{position:static} }

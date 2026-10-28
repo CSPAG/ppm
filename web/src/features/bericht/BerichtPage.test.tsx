@@ -2,7 +2,7 @@
  * Statusbericht erfassen (UI-13, K1) gegen die nachgebildete API: Vorbelegung ohne Status und Trend, Seitenpanel mit
  * fehlenden Angaben und Sprung zur Stelle, automatisches Speichern mit If-Match, «kritisch» mit Pflichtfeldern,
  * Einreichen mit Rückgängig, nur lesbar nach dem Einreichen (Z8), Abweichung zur Baseline an der Meilensteinzeile,
- * Ist-Kosten fehlen (Z4), K1-1 (≤ 15 Interaktionen ohne Änderung an Registern), axe ohne Befund.
+ * «Änderung beantragen» an der Warnung nur mit Recht (UC-004 A1), Ist-Kosten fehlen (Z4), K1-1 (≤ 15 Interaktionen ohne Änderung an Registern), axe ohne Befund.
  */
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -38,7 +38,7 @@ const leer = () => json({ items: [], nextCursor: null, can: { write: true } });
 
 const PL_ME: Partial<Me> = { roles: [], permissions: ['tenant:read'] };
 
-function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | Promise<Response>; kosten?: () => Response; meilensteine?: () => Response; einreichen?: () => Response } = {}) {
+function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | Promise<Response>; kosten?: () => Response; meilensteine?: () => Response; einreichen?: () => Response; entwerfen?: string[] } = {}) {
   const api = mockIamApi({
     'GET /v1/projekte': () => json({ items: [projekt], nextCursor: null }),
     [`GET ${URL_B}`]: o.bericht ?? (() => json(bericht(), 200, { etag: 'W/"0"' })),
@@ -51,6 +51,7 @@ function stub(o: { bericht?: () => Response; put?: (req: Request) => Response | 
     [`GET /v1/projekte/${ID}/meilensteine`]: o.meilensteine ?? (() => json({ items: [meilenstein()], nextCursor: null, can: { write: true } })),
     [`GET /v1/projekte/${ID}/kosten`]: o.kosten ?? leer,
     [`GET /v1/projekte/${ID}/risiken`]: leer,
+    [`GET /v1/projekte/${ID}/vertrag`]: () => json({ versionen: [], entwurf: null, baseline: null, can: { entwerfen: o.entwerfen ?? [] } }),
     'GET /v1/phasenmodelle/aktuell': () => json({ toleranzen: [{ dimension: 'termin', wert: 14, einheit: 'kalendertage' }, { dimension: 'kosten', wert: 10, einheit: 'prozent' }] }),
   }, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
   vi.stubGlobal('fetch', api.fetch);
@@ -80,6 +81,24 @@ describe('Statusbericht erfassen (UI-13)', () => {
     expect(screen.getByText(/Konzept abgenommen neu .* statt .* laut Baseline/)).toBeInTheDocument();
     expect(await screen.findByText(TB.kosten.istFehlt)).toBeInTheDocument();
     expect(screen.getByText(/Prognose P2: CHF\s1,32\sMio\. · 6\s% über Budget/)).toBeInTheDocument();
+  });
+
+  it('Warnung «wesentlich»: «Änderung beantragen» öffnet den Vertrag mit dem Dialog, nur mit Recht (UC-004 A1 → UC-007)', async () => {
+    stub({ entwerfen: ['aenderung'] });
+    const { container, unmount } = renderWithIam(<BerichtPage nummer="2026-014" periode={PERIODE} />, PL_ME);
+    const link = await screen.findByRole('link', { name: TB.wesentlich.beantragen });
+    expect(link).toHaveAttribute('href', '/projekte/2026-014/vertrag?aenderung=1');
+    expect(link.closest('.hinweis')).toHaveTextContent(/Konzept abgenommen neu .* statt .* laut Baseline/);
+    await expectNoAxe(container);
+    unmount();
+
+    // ohne Recht (oder mit offenem Entwurf): Warnung ohne Link
+    const api = stub({ entwerfen: ['gate'] });
+    renderWithIam(<BerichtPage nummer="2026-014" periode={PERIODE} />, PL_ME);
+    expect(await screen.findByText(/Konzept abgenommen neu .* statt .* laut Baseline/)).toBeInTheDocument();
+    await waitFor(() => expect(api.calls.some(c => c.url.endsWith(`/v1/projekte/${ID}/vertrag`))).toBe(true));
+    await act(async () => { await new Promise(r => setTimeout(r, 20)); });
+    expect(screen.queryByRole('link', { name: TB.wesentlich.beantragen })).toBeNull();
   });
 
   it('«Kritisch» verlangt Begründung und Massnahme; Speichern mit If-Match, nur die geänderten Felder', async () => {

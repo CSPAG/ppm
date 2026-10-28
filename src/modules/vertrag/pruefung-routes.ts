@@ -102,7 +102,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
       throw invalid('Je Kapitel höchstens ein Kommentar.', [{ path: '/kommentare', message: 'Kapitel doppelt' }]);
     }
     if (body.ergebnis === 'rueckmeldung' && !Object.keys(kommentare).length) {
-      throw invalid('Rückmeldung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist. Kommentieren Sie mindestens ein Kapitel.',
+      throw invalid('Rückmeldung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist. Kommentiere mindestens ein Kapitel.',
         [{ path: '/kommentare', message: 'mindestens ein Kommentar' }]);
     }
     const who = actorOf(req);

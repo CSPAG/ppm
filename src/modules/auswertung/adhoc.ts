@@ -130,17 +130,4 @@ function ordnen(gruppen: AuswertungGruppeOut[], g: Gruppierung): AuswertungGrupp
 
 export const istFinanz = (k: Kennzahl) => FINANZ_KENNZAHLEN.includes(k);
 
-/**
- * Feld für CSV (RFC 4180, Semikolon wie Excel in der Schweiz): in Anführungszeichen bei Trennzeichen, Anführungszeichen
- * oder Zeilenumbruch; Text, der mit = + - @ beginnt, mit Apostroph davor (keine Formel beim Öffnen).
- */
-export function csvFeld(v: string | number | null): string {
-  if (v === null) return '';
-  if (typeof v === 'number') return String(v);
-  const t = /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
-  return /[;"\r\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
-}
-
-export function csv(zeilen: (string | number | null)[][]): string {
-  return `﻿${zeilen.map(z => z.map(csvFeld).join(';')).join('\r\n')}\r\n`;
-}
+export { csv, csvFeld } from '../../platform.ts';

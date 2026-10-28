@@ -5,8 +5,7 @@
  * halten `{ before, after }` fest, Anlegen und Löschen den Stand.
  */
 import type { Tx } from '@vollholz/platform';
-import { SCHEMA } from '../../platform.ts';
-import { csv } from '../auswertung/index.ts';
+import { csv, SCHEMA } from '../../platform.ts';
 
 export interface Filter { objekt?: string; objektId?: string; von?: string; bis?: string; nach?: string; limit: number }
 

@@ -1,12 +1,12 @@
 /**
- * Texte des Features «Sitzungen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte des Features «Sitzungen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung, Begriffe und Schaltflächen aus K3 (docs/ux/ablaeufe/K3-gremiumssitzung.md «Texte»).
  */
 export const TS = {
   bereich: 'Sitzungen',
   title: 'Sitzungen',
   sub: 'Sitzungen der Gremien vorbereiten: Traktandenliste aus Vorschlägen, Unterlagen prüfen und spätestens 5 Arbeitstage vorher versenden.',
-  keineGremien: 'Sie sehen noch keine Sitzungen. Sitzungen entstehen aus den Sitzungsterminen der Gremien (Administration › Portfolios und Gremien).',
+  keineGremien: 'Du siehst noch keine Sitzungen. Sitzungen entstehen aus den Sitzungsterminen der Gremien (Administration › Portfolios und Gremien).',
   keineTermine: 'Für dieses Gremium sind keine weiteren Sitzungstermine geplant.',
   spalten: { datum: 'Datum', stand: 'Stand', traktanden: 'Traktanden' },
   oeffnen: (g: string, d: string) => `Sitzung ${g} ${d} öffnen`,
@@ -28,15 +28,15 @@ export const TS = {
   // Zustände
   leer: (n: number) => (n
     ? `Noch keine Traktanden. Rechts stehen ${n} ${n === 1 ? 'Vorschlag' : 'Vorschläge'} aus Gates, Eskalationen und Änderungen.`
-    : 'Noch keine Traktanden und keine Vorschläge. Planen Sie ein Geschäft ein, zum Beispiel ein Gate-Review.'),
+    : 'Noch keine Traktanden und keine Vorschläge. Plane ein Geschäft ein, zum Beispiel ein Gate-Review.'),
   leerLesen: 'Die Traktandenliste erscheint mit dem Versand der Unterlagen.',
   nichtAngelegt: 'Zu diesem Termin ist die Sitzung noch nicht angelegt.',
   anlegen: 'Sitzung vorbereiten',
   angelegt: 'Sitzung angelegt.',
-  gone: 'Diese Sitzung gibt es nicht, oder Sie sehen sie nicht.',
-  nurLesen: 'Sie sehen die Sitzung lesend. Die Traktandenliste bereitet die Unternehmensentwicklung vor.',
+  gone: 'Diese Sitzung gibt es nicht, oder du siehst sie nicht.',
+  nurLesen: 'Du siehst die Sitzung lesend. Die Traktandenliste bereitet die Unternehmensentwicklung vor.',
   versendetBanner: (z: string) => `Unterlagen versendet am ${z}. Die Traktandenliste ist fest.`,
-  konflikt: 'Die Sitzung wurde inzwischen geändert. Sie ist neu geladen; wiederholen Sie Ihre letzte Aktion.',
+  konflikt: 'Die Sitzung wurde inzwischen geändert und ist neu geladen; wiederhole deine letzte Aktion.',
 
   // Traktandenliste (K3 Schritte 2–3)
   liste: 'Traktandenliste',
@@ -47,7 +47,7 @@ export const TS = {
   nachUnten: (t: string) => `${t} nach unten`,
   entfernen: 'Aus der Liste nehmen',
   // festes Traktandum 1 (K3 Schritt 4)
-  festHinweis: 'Dieses Traktandum ist in jeder Sitzung gesetzt und bleibt Traktandum 1; Sie können es weder entfernen noch verschieben.',
+  festHinweis: 'Dieses Traktandum ist in jeder Sitzung gesetzt und bleibt Traktandum 1; du kannst es weder entfernen noch verschieben.',
   festPlatzhalter: 'Der Portfoliobericht ist noch nicht bereitgestellt. «Portfoliobericht erzeugen» im abgeschlossenen Dashboard füllt dieses Traktandum.',
   entfernt: 'Traktandum aus der Liste genommen.',
   verschieben: 'Auf nächste Sitzung verschieben',
@@ -66,9 +66,9 @@ export const TS = {
   unterlagen: {
     bereit: 'Unterlagen bereit', quality_check_offen: 'Quality-Check offen', fehlt: 'Unterlagen fehlen', keine: 'keine Unterlagen nötig',
   } as Record<string, string>,
-  unterlagenWarnung: (titel: string, rest: string) => `Unterlagen für ${titel} fehlen; Versand ${rest}. Verschieben Sie das Traktandum auf die nächste Sitzung oder warten Sie auf die Unterlagen.`,
+  unterlagenWarnung: (titel: string, rest: string) => `Unterlagen für ${titel} fehlen; Versand ${rest}. Verschiebe das Traktandum auf die nächste Sitzung oder warte auf die Unterlagen.`,
   qcWarnung: (titel: string) => `Quality-Check: offen für ${titel}. Ohne bestandenen Quality-Check wird das Geschäft nicht behandelt.`,
-  zeitbedarfHinweis: (ist: string, soll: string) => `Zeitbedarf: ${ist} statt höchstens ${soll}. Verschieben Sie ein Traktandum oder kürzen Sie die Zeit.`,
+  zeitbedarfHinweis: (ist: string, soll: string) => `Zeitbedarf: ${ist} statt höchstens ${soll}. Verschiebe ein Traktandum oder kürze die Zeit.`,
 
   // Vorschläge (K3 Schritt 1)
   vorschlaege: 'Vorschläge',

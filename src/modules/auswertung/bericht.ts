@@ -120,7 +120,8 @@ export function registrierePortfoliobericht(): void {
   registriereTraktandenart({
     art: 'portfoliobericht',
     label: 'Portfoliobericht',
-    ergebnisse: [{ schluessel: 'kenntnis_genommen', label: 'Zur Kenntnis genommen' }],
+    // Kenntnisnahme ohne Entscheid (fachmodell.md 2.9; leer wie in der Sitzung vorgesehen)
+    ergebnisse: [],
     zusammenfassung: async (tx, bezug) => {
       const b = bezug.typ === 'portfoliobericht' ? await store.lesen(tx, bezug.id) : null;
       return b ? { titel: TITEL_TRAKTANDUM, antrag: `Kenntnisnahme des Portfolioberichts ${monat(b.periode)}` } : null;

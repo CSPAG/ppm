@@ -46137,7 +46137,7 @@ export interface components {
             }[];
             toleranzen?: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
+                wert: null | number;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
         };
@@ -46600,7 +46600,6 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
-            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
             prognose: null | number;
             budgetBaseline: null | number;
             ist: null | number;
@@ -46630,8 +46629,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
-            prognose?: number | null;
+            prognose?: null | number;
         };
         KostenPatch: {
             /**
@@ -46650,8 +46648,7 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
-            prognose?: number | null;
+            prognose?: null | number;
         };
         Risiko: {
             /** Format: uuid */
@@ -50137,7 +50134,6 @@ export interface components {
                  * @example 2027-04
                  */
                 monat: string;
-                /** @description null entfernt das Angebot der Zelle. */
                 fte: null | number;
                 /** @description Gelesene Version der Zelle; Pflicht, wenn die Zelle schon ein Angebot hat (sonst 412). */
                 version?: number;
@@ -50549,7 +50545,6 @@ export interface components {
                 projektId: string;
                 /** @description Fester Schlüssel des Kriteriums (Kleinbuchstaben, Ziffern, Unterstrich); bleibt über Modellversionen gleich. */
                 kriterium: string;
-                /** @description null entfernt die Bewertung des Kriteriums. */
                 einschaetzung: null | ("hoch" | "mittel" | "tief");
                 kommentar?: string;
                 /** @description Gelesene Version; Pflicht, wenn die Zelle schon bewertet ist (sonst 412). */

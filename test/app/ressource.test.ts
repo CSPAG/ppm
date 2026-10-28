@@ -116,6 +116,10 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
     ]);
     assert.equal((await call('rm', 'PUT', '/v1/kapazitaet', { zellen: [{ rolle: 'projektleitung', monat: '2027-04', fte: 6, version: 1 }] })).statusCode, 412);
     assert.equal((await call('rm', 'PUT', '/v1/kapazitaet', { zellen: [{ rolle: 'projektleitung', monat: '2027-05', fte: 5 }] })).statusCode, 200, 'entfernte Zelle neu');
+    // 0 bleibt 0 (Angebot null FTE), nicht null durch die Typumwandlung
+    const null0 = await call('rm', 'PUT', '/v1/kapazitaet', { zellen: [{ rolle: 'ctl', monat: '2027-04', fte: 0, version: 1 }] });
+    assert.equal(null0.statusCode, 200, null0.body);
+    assert.deepEqual(null0.json().zellen, [{ rolle: 'ctl', monat: '2027-04', fte: 0, version: 2 }]);
 
     // deaktivierte oder unbekannte Rolle, doppelte Zelle, falscher Monat, Zeitraum zu lang: 422
     for (const zellen of [[{ rolle: 'alt', monat: '2027-04', fte: 1 }], [{ rolle: 'gibts_nicht', monat: '2027-04', fte: 1 }],
@@ -128,7 +132,7 @@ describe('Kapazität und Auslastung (API)', { skip }, () => {
 
     // Audit und Ereignis je Zelle
     const audit = await full(api.t.runtime, T, async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action LIKE 'kapazitaet.%' ORDER BY seq")).rows.map(r => r.action));
-    assert.deepEqual(audit, ['kapazitaet.created', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated', 'kapazitaet.deleted', 'kapazitaet.created', 'kapazitaet.created']);
+    assert.deepEqual(audit, ['kapazitaet.created', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated', 'kapazitaet.deleted', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated']);
   });
 
   test('Rechte: lesen mit ressource:read (RM, UE), pflegen nur mit ressource:write (RM)', async () => {

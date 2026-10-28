@@ -50,7 +50,7 @@ export const FinanzQuery = Type.Object({
   alle: Type.Optional(Type.Boolean({ description: 'Auch nicht aktive Projekte (abgeschlossen, sistiert …).' })),
 }, { additionalProperties: false });
 
-export const KostentraegerPut = Type.Object({ nummer: Type.Union([Type.Null(), KostentraegerNummer]) }, { $id: 'KostentraegerPut', additionalProperties: false });
+export const KostentraegerPut = Type.Object({ nummer: Nullable(KostentraegerNummer) }, { $id: 'KostentraegerPut', additionalProperties: false });
 
 export const BegruendungOut = Type.Object({ periode: Monat, text: Type.String(), version: Type.Integer({ minimum: 1 }), geaendertAt: DateTime }, { $id: 'Begruendung', additionalProperties: false });
 export const BegruendungList = Type.Object({
@@ -85,8 +85,8 @@ export type BudgetuebergabeOut = Static<typeof Budgetuebergabe>;
 export const BudgetuebergabePut = Type.Object({
   korrekturen: Type.Array(Type.Object({
     projektId: Uuid,
-    capex: Type.Union([Type.Null(), Type.Number({ minimum: 0, maximum: 1e11 })]),
-    opex: Type.Union([Type.Null(), Type.Number({ minimum: 0, maximum: 1e11 })]),
+    capex: Nullable(Type.Number({ minimum: 0, maximum: 1e11 })),
+    opex: Nullable(Type.Number({ minimum: 0, maximum: 1e11 })),
     bemerkung: Type.Optional(Type.String({ maxLength: 500 })),
   }, { additionalProperties: false }), { maxItems: 1000 }),
 }, { $id: 'BudgetuebergabePut', additionalProperties: false });

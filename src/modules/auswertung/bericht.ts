@@ -8,6 +8,7 @@
 import { conflict, notFound, type Tx } from '@vollholz/platform';
 import { registriereTraktandenart } from '../sitzung/index.ts';
 import { funnel, sortieren, zeile } from './dashboard.ts';
+import { matrix } from './risiko.ts';
 import { risikolage } from './risiko-routes.ts';
 import type { PortfolioberichtKurzOut, PortfolioberichtOut } from './bericht-schemas.ts';
 import * as store from './bericht-store.ts';
@@ -54,16 +55,45 @@ export function kurz(b: Omit<store.BerichtRow, 'inhalt' | 'kommentar'>): Portfol
   };
 }
 
+/**
+ * Gespeicherten Stand auf die Sicht der lesenden Person beschränken: Projekte, die sie nicht sieht (vertraulich ohne
+ * `projekt:vertraulich`, Lesesicht `projekt_sichtbar`), fallen mit ihren Risiken, Abhängigkeiten und Eskalationen weg;
+ * Funnel und Matrix werden neu gezählt.
+ */
+export async function fuerLeser(tx: Tx, b: store.BerichtRow): Promise<store.BerichtRow> {
+  const i = b.inhalt as unknown as BerichtInhalt;
+  const alle = [...new Set([
+    ...i.dashboard.items.map(z => z.projektId),
+    ...i.risikolage.risiken.flatMap(r => (r.projekt ? [r.projekt.id] : [])),
+    ...i.risikolage.abhaengigkeiten.flatMap(a => [a.von.id, a.zu.id]),
+    ...i.risikolage.eskalationen.map(e => e.projekt.id),
+  ])];
+  const sicht = new Set(await store.sichtbareProjekte(tx, alle));
+  if (sicht.size === alle.length) return b;
+  const items = i.dashboard.items.filter(z => sicht.has(z.projektId));
+  const risiken = i.risikolage.risiken.filter(r => !r.projekt || sicht.has(r.projekt.id));
+  const inhalt: BerichtInhalt = {
+    dashboard: { ...i.dashboard, items, funnel: funnel(items) },
+    risikolage: {
+      risiken, matrix: matrix(risiken),
+      abhaengigkeiten: i.risikolage.abhaengigkeiten.filter(a => sicht.has(a.von.id) && sicht.has(a.zu.id)),
+      eskalationen: i.risikolage.eskalationen.filter(e => sicht.has(e.projekt.id)),
+    },
+  };
+  return { ...b, inhalt: inhalt as unknown as Record<string, unknown> };
+}
+
 export function voll(b: store.BerichtRow, schreiben: boolean): PortfolioberichtOut {
   const i = b.inhalt as unknown as BerichtInhalt;
   const entwurf = b.stand === 'entwurf';
   return { ...kurz(b), kommentar: b.kommentar, dashboard: i.dashboard, risikolage: i.risikolage, can: { bearbeiten: schreiben && entwurf, bereitstellen: schreiben && entwurf } };
 }
 
+/** Bericht in der Sicht der lesenden Person (siehe `fuerLeser`) oder 404. */
 export async function lesenOder404(tx: Tx, id: string): Promise<store.BerichtRow> {
   const b = await store.lesen(tx, id);
   if (!b) throw notFound('Portfoliobericht');
-  return b;
+  return fuerLeser(tx, b);
 }
 
 /** Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9; UC-006 Schritt 4, K3 Schritt 4). */
@@ -73,10 +103,8 @@ export function registrierePortfoliobericht(): void {
     label: 'Portfoliobericht',
     fest: true,
     ergebnisse: [{ schluessel: 'kenntnis_genommen', label: 'Zur Kenntnis genommen' }],
-    zusammenfassung: async (tx, bezug) => {
-      const s = bezug.typ === 'sitzung' ? await store.zurSitzung(tx, bezug.id) : null;
-      return { titel: TITEL_TRAKTANDUM, antrag: s?.periode ? `Kenntnisnahme des Portfolioberichts ${monat(s.periode)}` : 'Kenntnisnahme des Portfolioberichts' };
-    },
+    // ohne Monat: die Periode nennt nur die Unterlage, bestimmt beim Ansehen und beim Versand (ein Stand)
+    zusammenfassung: async () => ({ titel: TITEL_TRAKTANDUM, antrag: 'Kenntnisnahme des Portfolioberichts' }),
     unterlagen: async (tx, bezug) => {
       const s = bezug.typ === 'sitzung' ? await store.zurSitzung(tx, bezug.id) : null;
       if (!s?.periode) return [];

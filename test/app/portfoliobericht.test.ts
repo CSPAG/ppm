@@ -24,7 +24,7 @@ function mittwochIn(n: number): string {
 describe('Risikolage und Portfoliobericht', { skip }, () => {
   let api: TestApi;
   let T = '';
-  let ue: Record<string, string>, gremium: Record<string, string>, pl: Record<string, string>;
+  let ue: Record<string, string>, gremium: Record<string, string>, pl: Record<string, string>, gl: Record<string, string>;
   const p: Record<string, string> = {};
   let pfA = '', pfC = '';
 
@@ -40,6 +40,8 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
       for (const [nr, pf, phase] of [['2026-001', pfA, 'P1'], ['2026-002', pfA, 'P2'], ['2026-003', pfC, 'P1']] as const) {
         p[nr] = (await tx.query<{ id: string }>('INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, $2, $3, $4, $5) RETURNING id', [T, nr, `Projekt ${nr}`, pf, phase])).rows[0]!.id;
       }
+      // vertraulich: nur mit projekt:vertraulich (UE, Gremium; nicht GL)
+      await tx.query('UPDATE ppm.projekt SET vertraulich = true WHERE id = $1', [p['2026-002']]);
       // abgeschlossenes Projekt: seine Risiken zählen nicht
       p['2025-009'] = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase, lebenszyklus) VALUES ($1, '2025-009', 'Altprojekt', $2, 'P4', 'abgeschlossen') RETURNING id", [T, pfA])).rows[0]!.id;
       await tx.query("INSERT INTO ppm.projekt_person (tenant_id, projekt_id, person_id, funktion) VALUES ($1, $2, $3, 'pl')", [T, p['2026-001'], l.principalId]);
@@ -63,6 +65,7 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     const g = await login(api, 'demo', 'u-gremium', null);
     await grant(api, T, `user:${g.principalId}`, 'gremium', { type: 'portfolio', id: pfA });
     gremium = { authorization: g.authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
   });
   after(async () => { await api?.close(); });
 
@@ -138,6 +141,13 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.deepEqual([g.stand, g.can.bearbeiten], ['bereitgestellt', false]);
     assert.deepEqual((await ok('GET', '/v1/portfolioberichte?portfolio=transformation', gremium)).items.map((x: { id: string }) => x.id), [id]);
     assert.equal((await call('GET', '/v1/portfolioberichte', pl)).statusCode, 403);
+    // gespeicherter Stand in der Sicht der Person: GL ohne projekt:vertraulich sieht 2026-002 weder als Zeile noch über
+    // Risiken oder Abhängigkeiten; Funnel und Matrix neu gezählt
+    const l = await ok('GET', `/v1/portfolioberichte/${id}`, gl);
+    assert.ok(!JSON.stringify(l).includes('2026-002'));
+    assert.deepEqual([l.risikolage.risiken.length, l.risikolage.abhaengigkeiten.length], [2, 0]);
+    assert.equal(l.dashboard.funnel.reduce((n: number, f: { anzahl: number }) => n + f.anzahl, 0), l.dashboard.items.length);
+    assert.ok(JSON.stringify(await ok('GET', `/v1/portfolioberichte/${id}`, ue)).includes('2026-002'));
   });
 
   test('Dokument als PDF und Word über die Ausgabe der Vorlagen; Export im Audit', async () => {
@@ -161,7 +171,9 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     const t = s.traktanden[0];
     assert.equal(s.traktanden.length, 1);
     assert.deepEqual([t.art, t.titel, t.position], ['portfoliobericht', 'Bericht der Programmleitung', 1]);
-    assert.match(t.antrag, /^Kenntnisnahme des Portfolioberichts /);
+    // Antrag ohne Monat; die Periode nennt die Unterlage (ein Stand, auch wenn inzwischen eine Periode abgeschlossen wird)
+    assert.equal(t.antrag, 'Kenntnisnahme des Portfolioberichts');
+    assert.equal(t.unterlagen.liste[0].titel, `Portfoliobericht ${new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${VORPERIODE}-01T00:00:00Z`))}`);
     assert.deepEqual([t.unterlagen.stand, t.unterlagen.liste[0].hinweis], ['bereit', 'bereitgestellt']);
     const e = await ok('GET', `/v1/sitzungen/${s.id}/entscheide`, ue);
     assert.ok(JSON.stringify(e).includes('kenntnis_genommen'), 'Ergebnis «Zur Kenntnis genommen»');

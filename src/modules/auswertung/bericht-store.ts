@@ -55,6 +55,12 @@ export async function bereitstellen(tx: Tx, id: string, version: number): Promis
       WHERE id = $1 AND version = $2 AND stand = 'entwurf'`, [id, version])).rowCount ?? 0) > 0;
 }
 
+/** Projekte aus der Liste, die die Person sieht (Lesesicht, u. a. vertrauliche nur mit `projekt:vertraulich`). */
+export async function sichtbareProjekte(tx: Tx, ids: string[]): Promise<string[]> {
+  if (!ids.length) return [];
+  return (await tx.query<{ id: string }>(`SELECT id FROM ${S}.projekt WHERE id = ANY ($1::uuid[])`, [ids])).rows.map(r => r.id);
+}
+
 export interface PeriodeStandRow { periode: string; stand: 'offen' | 'abgeschlossen'; abgeschlossen_at: Date | null }
 
 export async function periode(tx: Tx, p: string): Promise<PeriodeStandRow | null> {

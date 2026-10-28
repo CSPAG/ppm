@@ -148,7 +148,8 @@ function Arbeitsflaeche({ nummer, projektId, loaded, angaben, search, setSearch 
         {/* Als Dokument herunterladen (K2 Schritt 11, AP-E3-5) */}
         <DokumentAusgabe versionId={v.id} nummer={v.nummer} />
         {/* Änderung beantragen (UC-007 Schritt 1, AP-E3-4) */}
-        <AenderungBeantragen projektId={projektId} onAngelegt={() => setSearch({ version: 'entwurf', kapitel: undefined, feld: undefined })} />
+        <AenderungBeantragen projektId={projektId} oeffnen={search.aenderung} onGeschlossen={() => setSearch({ aenderung: undefined }, { replace: true })}
+          onAngelegt={() => setSearch({ version: 'entwurf', kapitel: undefined, feld: undefined, aenderung: undefined })} />
       </div>
       {banner ? <div className="vt-banner"><Hinweis stufe="hinweis">{banner}</Hinweis></div> : null}
       <div className="vt-flaeche">

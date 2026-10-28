@@ -1,5 +1,5 @@
 /**
- * Texte des Features «Ziele» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer
+ * Texte des Features «Ziele» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung, Begriffe der Ebenen aus K6 («Handlungsfeld», «Strategisches Ziel»).
  */
 export const TZ = {
@@ -16,22 +16,22 @@ export const TZ = {
   nummerHint: 'Ziffern mit Punkten, z. B. 2.1; eindeutig in der Organisation.',
   horizontHint: 'Zieljahr; strategische Ziele sind die Ziele 2030.',
   metrikFehlt: 'Metrik fehlt',
-  metrikFehltHinweis: 'Dieses Ziel hat noch keine Metrik. Ergänzen Sie Metrik und Zielwert, damit sich die Erreichung beurteilen lässt.',
+  metrikFehltHinweis: 'Dieses Ziel hat noch keine Metrik. Ergänze Metrik und Zielwert, damit sich die Erreichung beurteilen lässt.',
   keinZielwert: 'kein Zielwert',
   handlungsfeldWaehlen: 'Handlungsfeld wählen',
   handlungsfeldUnbekannt: 'Handlungsfeld nicht sichtbar',
-  keineHandlungsfelder: 'Erfassen Sie zuerst ein Handlungsfeld; jedes strategische Ziel gehört zu einem Handlungsfeld.',
+  keineHandlungsfelder: 'Erfasse zuerst ein Handlungsfeld; jedes strategische Ziel gehört zu einem Handlungsfeld.',
   created: 'Strategisches Ziel angelegt.', saved: 'Änderungen gespeichert.', deleted: 'Strategisches Ziel gelöscht.',
   confirmDelete: (nummer: string) => `Strategisches Ziel ${nummer} wirklich löschen? Der Verlauf bleibt erhalten.`,
-  conflict: 'Dieses Ziel wurde inzwischen geändert. Laden Sie es neu und übernehmen Sie Ihre Änderungen danach nochmals.',
-  nummerVergeben: 'Diese Nummer ist bereits vergeben. Wählen Sie eine andere Nummer.',
-  gone: 'Dieses strategische Ziel gibt es nicht mehr, oder Sie sehen es nicht.',
+  conflict: 'Dieses Ziel wurde inzwischen geändert. Lade es neu und übernimm deine Änderungen danach nochmals.',
+  nummerVergeben: 'Diese Nummer ist bereits vergeben. Wähle eine andere Nummer.',
+  gone: 'Dieses strategische Ziel gibt es nicht mehr, oder du siehst es nicht.',
   history: 'Verlauf', version: (v: number) => `Fassung ${v}`,
   actions: { created: 'angelegt', updated: 'geändert', deleted: 'gelöscht' } as Record<string, string>,
   vorher: 'vorher',
-  noRight: 'Sie können strategische Ziele nur ansehen.',
-  nummerInvalid: 'Geben Sie eine Nummer aus Ziffern und Punkten ein, z. B. 2.1.',
-  textMissing: 'Formulieren Sie das Ziel.',
-  handlungsfeldMissing: 'Wählen Sie ein Handlungsfeld.',
+  noRight: 'Du kannst strategische Ziele nur ansehen.',
+  nummerInvalid: 'Gib eine Nummer aus Ziffern und Punkten ein, z. B. 2.1.',
+  textMissing: 'Formuliere das Ziel.',
+  handlungsfeldMissing: 'Wähle ein Handlungsfeld.',
   horizontInvalid: 'Jahr von 2000 bis 2100.',
 };

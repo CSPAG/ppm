@@ -1,18 +1,18 @@
 /**
  * Texte für die Freigabe der Initialisierung (AP-E4-3, Kernablauf K4 Schritte 8–10; Namensraum des Features «Ideen»):
- * Anrede «Sie», Schweizer Rechtschreibung; Wirkung vor der Handlung (I-R1) mit den Texten aus K4.
+ * Anrede «Du», Schweizer Rechtschreibung; Wirkung vor der Handlung (I-R1) mit den Texten aus K4.
  */
 export const TF = {
   titel: 'Entscheid über die Initialisierung',
-  ohneKategorie: 'Ordnen Sie zuerst die Kategorie zu; sie bestimmt, wer über die Initialisierung entscheidet.',
+  ohneKategorie: 'Ordne zuerst die Kategorie zu; sie bestimmt, wer über die Initialisierung entscheidet.',
   zustaendig: (wer: string) => `Zuständig: ${wer}`,
 
   // Gremium (Kategorie A, B; UC-001 Schritt 6)
   sponsor: 'Sponsor',
   projektleitung: 'Projektleitung',
-  angabenHilfe: 'Das Gremium benennt den Sponsor, der Sponsor die Projektleitung. Erfassen Sie beide vor dem Entscheid; ohne sie lässt sich die Initialisierung nicht freigeben.',
-  sponsorFehlt: 'Sponsor fehlt: Benennen Sie den Sponsor, er trägt das Projekt.',
-  plFehlt: 'Projektleitung fehlt: Sie erhält die Aufgabe «Projektvertrag erstellen».',
+  angabenHilfe: 'Das Gremium benennt den Sponsor, der Sponsor die Projektleitung. Erfasse beide vor dem Entscheid; ohne sie lässt sich die Initialisierung nicht freigeben.',
+  sponsorFehlt: 'Sponsor fehlt: Benenne den Sponsor, er trägt das Projekt.',
+  plFehlt: 'Projektleitung fehlt: Die Projektleitung erhält die Aufgabe «Projektvertrag erstellen».',
   angabenSpeichern: 'Sponsor und Projektleitung speichern',
   traktandieren: 'Für das Gremium traktandieren',
   traktandierenWirkung: (gremium: string) => `Die Idee erscheint als Vorschlag in der nächsten Sitzung von ${gremium}; die antragstellende Person wird informiert.`,
@@ -30,7 +30,7 @@ export const TF = {
   zurueckweisen: 'Zurückweisen',
   zurueckweisenFrage: (titel: string) => `Initialisierung von «${titel}» zurückweisen?`,
   begruendungFehlt: 'Begründung fehlt: Die antragstellende Person erfährt sonst nicht, warum die Idee nicht weiterverfolgt wird.',
-  zurueckweisenWirkung: 'Die Idee wird mit Stand «zurückgewiesen» geschlossen; die antragstellende Person erhält Ihre Begründung.',
+  zurueckweisenWirkung: 'Die Idee wird mit Stand «zurückgewiesen» geschlossen; die antragstellende Person erhält deine Begründung.',
 
   // Ergebnis (K4 Schritt 10)
   freigegeben: (nummer: string, name: string) => `Initialisierung freigegeben: Projekt ${nummer} ${name} in Phase P0.`,
@@ -39,5 +39,5 @@ export const TF = {
   vorgelegtToast: 'Zum Entscheid vorgelegt.',
   freigegebenToast: 'Initialisierung freigegeben.',
   zurueckgewiesenToast: 'Idee zurückgewiesen.',
-  konflikt: 'Die Idee wurde inzwischen geändert. Laden Sie sie neu und wiederholen Sie die Aktion.',
+  konflikt: 'Die Idee wurde inzwischen geändert. Lade sie neu und wiederhole die Aktion.',
 };

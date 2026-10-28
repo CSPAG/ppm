@@ -29,7 +29,7 @@ type Modell = {
 const kurz = ({ kriterien: _k, budgetrahmen: _b, ...m }: Modell) => m;
 function pruefung(m: Modell) {
   const p: { stufe: string; text: string; pfad: string }[] = [];
-  if (!m.kriterien.length) p.push({ stufe: 'sperre', text: 'Kriterien: keines statt mindestens eines. Erfassen Sie die Kriterien der Bewertung.', pfad: '/kriterien' });
+  if (!m.kriterien.length) p.push({ stufe: 'sperre', text: 'Kriterien: keines statt mindestens eines. Erfasse die Kriterien der Bewertung.', pfad: '/kriterien' });
   m.kriterien.forEach((k, i) => { if (!k.dimension) p.push({ stufe: 'hinweis', text: `Kriterium «${k.text}»: weder Nutzen noch Risiko zugeordnet.`, pfad: `/kriterien/${i}/dimension` }); });
   return p;
 }

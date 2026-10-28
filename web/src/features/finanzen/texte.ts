@@ -90,4 +90,13 @@ export const TF = {
   nurLesen: 'Du kannst den Jahresbedarf nur ansehen; übergeben wird er von Finanzen (FI).',
   keinRecht: 'Den Jahresbedarf aller Projekte sehen Personen mit Recht auf die Beträge der Organisation (FI, GL, UE).',
   budgetKonflikt: 'Der Jahresbedarf wurde inzwischen geändert. Lade neu; deine Korrekturen gehen dabei verloren.',
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», FI)
+  kopfkarte: {
+    titel: 'Finanzen',
+    prognose: (prognose: string, budget: string) => `Prognose ${prognose} bei Budget ${budget}`,
+    ueberschritten: (n: number) => (n === 1 ? '1 Projekt über der Toleranz' : `${n} Projekte über der Toleranz`),
+    istBis: (monat: string) => `Ist-Kosten bis ${monat}`,
+    ohneIst: 'noch keine Ist-Kosten übernommen',
+    abweichungen: 'Abweichungen klären',
+  },
 };

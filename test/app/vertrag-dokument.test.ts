@@ -1,13 +1,15 @@
 /**
  * Dokumentausgabe des Projektvertrags (AP-E3-5; DM.02.07, AM.03.01 Grundfunktion; UC-002 Schritt 12; K2 Schritt 11):
  * PDF und Word im Layout der Vorlage mit Versionsnummer, Stand und Freigabe; Kopfzeile «Intern · enthält
- * Personendaten» (Abnahme G12); Beträge nur mit `finanzen:read` (A-33); Rechte; Export im Audit; Vorlagen-Liste.
+ * Personendaten» (Abnahme G12); Beträge nur mit `finanzen:read` (A-33); Rechte; Export im Audit; Vorlagen-Liste;
+ * Toleranzen in Kap. 7.2 (A-10, K11) mit dem Standard des Phasenmodells, auch als Platzhalter eigener Word-Vorlagen.
  */
 import assert from 'node:assert/strict';
 import { inflateRawSync, inflateSync } from 'node:zlib';
 import { after, before, describe, test } from 'node:test';
 import { grant, login, testApi, type TestApi } from './api.ts';
 import { full, skipDb, tenant } from './harness.ts';
+import { wordVorlage } from './fixtures/word.ts';
 
 const skip = await skipDb();
 
@@ -78,6 +80,15 @@ describe('Dokumentausgabe Projektvertrag', { skip }, () => {
     await speichern(1, i => { i.ausgangslage = 'Papierformulare bei der Aufnahme – «heute» € 0,–\nzweite Zeile'; });
     await speichern(8, i => { i.mitglieder = [{ personId: id.pl, funktion: 'pl', akv: 'führt das Projekt' }]; });
     await speichern(9, i => { i.kosten = [{ registerId: null, phase: 'P1', art: 'capex', text: 'Lizenzen', lieferant: 'Muster AG', offerte: 'O-1', betrag: 12345.5 }]; });
+    // Toleranz Termin im Vertrag; Kosten aus dem Phasenmodell in Kraft (10 %), Umfang ohne Standard (A-10)
+    await speichern(7, i => { i.toleranzen = [{ dimension: 'termin', wert: 14, einheit: 'kalendertage' }]; });
+    const adm = { authorization: (await login(api, 'acme', 'dok-adm', 'org-admin')).authorization };
+    const pm = await call('ue', 'POST', '/v1/phasenmodelle', { quelle: 'vorgabe' });
+    assert.equal(pm.statusCode, 201, pm.body);
+    const t = await call('ue', 'PATCH', `/v1/phasenmodelle/${pm.json().id}`, { toleranzen: [{ dimension: 'kosten', wert: 10, einheit: 'prozent' }] }, { 'if-match': pm.headers.etag as string });
+    assert.equal(t.statusCode, 200, t.body);
+    const k = await api.app.inject({ method: 'POST', url: `/v1/phasenmodelle/${pm.json().id}/in-kraft-setzen`, headers: { ...adm, 'if-match': t.headers.etag as string } });
+    assert.equal(k.statusCode, 200, k.body);
   });
   after(async () => { await api?.close(); });
 
@@ -100,6 +111,10 @@ describe('Dokumentausgabe Projektvertrag', { skip }, () => {
     assert.match(text, /CHF 12.345\.50/);
     assert.match(text, /Seite 1 von \d+/);
     assert.match(text, /Vorlage Projektvertrag, Fassung 1/);
+    // Kap. 7.2: Toleranz des Vertrags, sonst Standard des Phasenmodells (A-10, K11)
+    assert.match(text, /Toleranz Termin\n14 Kalendertage/);
+    assert.match(text, /Toleranz Kosten\nStandard des Phasenmodells: 10 %/);
+    assert.match(text, /Toleranz Umfang\nStandard des Phasenmodells: keiner/);
   });
 
   test('Word: gültiges Paket mit Kopfzeile, Überschriften und Seitenzahl', async () => {
@@ -115,6 +130,7 @@ describe('Dokumentausgabe Projektvertrag', { skip }, () => {
     assert.match(doc, /<w:pStyle w:val="Heading1"\/><\/w:pPr><w:r><w:t xml:space="preserve">9 Ressourcen<\/w:t>/);
     assert.match(doc, /«heute» € 0,–<\/w:t><\/w:r><w:r><w:br\/><w:t xml:space="preserve">zweite Zeile/);
     assert.match(doc, /Neues KIS \(Zürich\)/);
+    assert.match(doc, /Toleranz Kosten<\/w:t>.*?Standard des Phasenmodells: 10 %/s);
   });
 
   test('ohne Recht auf Beträge «nicht verfügbar» (A-33, G12); ohne Leserecht 404/403; Format geprüft', async () => {
@@ -138,5 +154,19 @@ describe('Dokumentausgabe Projektvertrag', { skip }, () => {
     const v = r.json().items.find((x: { art: string }) => x.art === 'projektvertrag');
     assert.deepEqual([v.grundbestand.version, v.grundbestand.quelle, v.aktiv], ['1', 'PM-Handbuch, Vorlage Projektvertrag (Q7)', null]);
     assert.equal((await call('pl', 'GET', '/v1/vorlagen')).statusCode, 403);
+  });
+  test('eigene Word-Vorlage: Platzhalter der Toleranzen aus Kap. 7.2 (AM.03.01, UC-018 Schritt 2)', async () => {
+    const katalog = (await call('ue', 'GET', '/v1/vorlagen/projektvertrag')).json().felder.map((f: { schluessel: string }) => f.schluessel);
+    assert.ok(['kap7.toleranzTermin', 'kap7.toleranzKosten', 'kap7.toleranzUmfang'].every(k => katalog.includes(k)));
+    const datei = wordVorlage([['Termin: «Toleranz Termin»'], ['Kosten: «Toleranz Kosten»'], ['Umfang: «Toleranz Umfang»']], 'Intern · enthält Personendaten');
+    const v = await call('ue', 'POST', '/v1/vorlagen/projektvertrag/versionen', { dateiname: 'Toleranzen.docx', inhalt: datei.toString('base64') });
+    assert.equal(v.statusCode, 201, v.body);
+    assert.deepEqual([v.json().zuordnung, v.json().pruefung.aktivierbar], [{ 'Toleranz Termin': 'kap7.toleranzTermin', 'Toleranz Kosten': 'kap7.toleranzKosten', 'Toleranz Umfang': 'kap7.toleranzUmfang' }, true]);
+    const a = await call('ue', 'POST', `/v1/vorlagen/projektvertrag/versionen/${v.json().version}/aktivieren`, undefined, { 'if-match': v.headers.etag as string });
+    assert.equal(a.statusCode, 200, a.body);
+    const doc = unzip((await call('pl', 'GET', `/v1/vertragsversionen/${version}/dokument?format=docx`)).rawPayload).get('word/document.xml')!;
+    assert.match(doc, /Termin: 14 Kalendertage/);
+    assert.match(doc, /Kosten: Standard des Phasenmodells: 10 %/);
+    assert.match(doc, /Umfang: Standard des Phasenmodells: keiner/);
   });
 });

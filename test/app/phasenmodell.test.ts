@@ -109,14 +109,18 @@ describe('Phasenmodell', { skip }, () => {
     const ohne = await call('PATCH', url, { ...ue, 'if-match': entwurf.etag }, { toleranzen: [{ dimension: 'kosten', wert: null, einheit: 'prozent' }] });
     assert.equal(ohne.statusCode, 200, ohne.body);
     assert.deepEqual(ohne.json().toleranzen.map((t: { wert: number | null }) => t.wert), [null, null, null]);
-    const mit = await call('PATCH', url, { ...ue, 'if-match': ohne.headers.etag as string }, { toleranzen: [{ dimension: 'kosten', wert: 10, einheit: 'prozent' }] });
+    // 0 bleibt 0 (Toleranz null, jede Abweichung ist wesentlich), nicht null durch die Typumwandlung
+    const null0 = await call('PATCH', url, { ...ue, 'if-match': ohne.headers.etag as string }, { toleranzen: [{ dimension: 'kosten', wert: 0, einheit: 'prozent' }] });
+    assert.equal(null0.statusCode, 200, null0.body);
+    assert.deepEqual(null0.json().toleranzen.map((t: { wert: number | null }) => t.wert), [null, 0, null]);
+    const mit = await call('PATCH', url, { ...ue, 'if-match': null0.headers.etag as string }, { toleranzen: [{ dimension: 'kosten', wert: 10, einheit: 'prozent' }] });
     assert.equal(mit.statusCode, 200, mit.body);
     assert.deepEqual(mit.json().toleranzen.map((t: { wert: number | null }) => t.wert), [null, 10, null]);
     entwurf.etag = mit.headers.etag as string;
 
     const stale = await call('PATCH', url, { ...ue, 'if-match': 'W/"1"' }, { beschreibung: 'alt' });
     assert.equal(stale.statusCode, 412);
-    assert.equal(stale.json().currentVersion, 4);
+    assert.equal(stale.json().currentVersion, 5);
 
     for (const [body, pfad] of [
       [{ fristen: [{ schluessel: 'versand', wert: 5, einheit: 'tag_im_monat' }] }, '/fristen/0/einheit'],
@@ -198,6 +202,6 @@ describe('Phasenmodell', { skip }, () => {
   test('Audit: jede Änderung protokolliert', async () => {
     const rows = await full(api.t.runtime, tenantId, async tx => (await tx.query<{ action: string }>(
       "SELECT action FROM ppm.audit_log WHERE resource_type = 'phasenmodell' ORDER BY id")).rows.map(r => r.action));
-    assert.deepEqual(rows, ['phasenmodell.created', 'phasenmodell.updated', 'phasenmodell.updated', 'phasenmodell.updated', 'phasenmodell.activated', 'phasenmodell.created', 'phasenmodell.activated', 'phasenmodell.created', 'phasenmodell.deleted']);
+    assert.deepEqual(rows, ['phasenmodell.created', 'phasenmodell.updated', 'phasenmodell.updated', 'phasenmodell.updated', 'phasenmodell.updated', 'phasenmodell.activated', 'phasenmodell.created', 'phasenmodell.activated', 'phasenmodell.created', 'phasenmodell.deleted']);
   });
 });

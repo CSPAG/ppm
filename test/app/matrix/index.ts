@@ -4,6 +4,7 @@ import { sammle } from './typ.ts';
 export const MATRIX = sammle([
   (await import('./plattform.ts')).matrix,
   (await import('./eingang.ts')).matrix,
+  (await import('./neubesetzung.ts')).matrix,
   (await import('./stammdaten.ts')).matrix,
   (await import('./handlungsfeld.ts')).matrix,
   (await import('./phasenmodell.ts')).matrix,
@@ -24,6 +25,7 @@ export const MATRIX = sammle([
   (await import('./monatsabschluss.ts')).matrix,
   (await import('./statusbericht-eskalation.ts')).matrix,
   (await import('./auswertung.ts')).matrix,
+  (await import('./auswertung-bericht.ts')).matrix,
   (await import('./ressource.ts')).matrix,
   (await import('./ressource-zuteilung.ts')).matrix,
   (await import('./idee.ts')).matrix,

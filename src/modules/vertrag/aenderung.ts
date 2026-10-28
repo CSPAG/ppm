@@ -97,7 +97,7 @@ async function entscheidSetzen(tx: Tx, id: string, version: number, nach: store.
 }
 
 /** Führt `fn` mit `app.vertrag_intern` aus (Folge eines Gremiumsentscheids, 200_vertrag_aenderung) und stellt den Wert wieder her. */
-async function intern<T>(tx: Tx, fn: () => Promise<T>): Promise<T> {
+export async function intern<T>(tx: Tx, fn: () => Promise<T>): Promise<T> {
   const prev = (await tx.query<{ v: string | null }>("SELECT current_setting('app.vertrag_intern', true) AS v")).rows[0]?.v ?? '';
   await tx.query("SELECT set_config('app.vertrag_intern', 'on', true)");
   try {

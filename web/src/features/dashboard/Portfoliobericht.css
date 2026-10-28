@@ -1,0 +1,25 @@
+/*
+ * Risikolage (UI-18) und Portfoliobericht (UI-29): Matrix als Tabelle, Tabellen mit Umbruch, Kommentar. Farben nur aus
+ * den Tokens (hell und dunkel); auf dem Telefon ohne Massnahme und Verantwortliche (I-L6).
+ */
+.pb-abschnitt{padding:12px 22px}
+.pb-matrix{border-collapse:collapse;margin:4px 0}
+.pb-matrix caption{text-align:left;font-weight:600;padding-bottom:8px}
+.pb-matrix th,.pb-matrix td{padding:6px 10px;border:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums}
+.pb-matrix th[scope=row]{text-align:left;font-weight:500}
+.pb-feld{min-width:56px}
+.pb-bad{background:var(--bad-soft);font-weight:600}
+.pb-mid{background:var(--warn-soft)}
+.pb-ok{background:var(--surface)}
+.pb-scroll{overflow-x:auto}
+.pb-tab{width:100%;border-collapse:collapse}
+.pb-tab th,.pb-tab td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.pb-text{max-width:360px;overflow-wrap:anywhere}
+.pb-kopf{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pb-aktionen{display:flex;flex-wrap:wrap;gap:8px;padding:12px 22px;border-bottom:1px solid var(--line)}
+.pb-kommentar textarea{width:100%;min-height:120px}
+.pb-liste{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:767px){
+  .pb-abschnitt,.pb-aktionen{padding-left:14px;padding-right:14px}
+  .pb-tab .pb-opt{display:none}
+}

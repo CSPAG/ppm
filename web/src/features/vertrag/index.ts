@@ -4,3 +4,4 @@
  */
 export { validateVertragSearch, type SetVertragSearch, type VertragSearch } from './search.ts';
 export { TV as vertragTexte } from './texte.ts';
+export { validateVersionenSearch, type SetVersionenSearch, type VersionenSearch } from './VersionenSearch.ts';

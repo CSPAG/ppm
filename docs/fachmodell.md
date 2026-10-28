@@ -39,7 +39,7 @@ Reihenfolge = Reihenfolge in `src/app.ts` (Tags der API-Doku). Jedes Modul nach 
 | `portfolio` | Portfolios A/B/C, Gremien, Gremienweg je Phase und Kategorie, Sitzungsrhythmus | AM.02.04 | UC-017 | E0 | `stammdaten`, `phasenmodell` |
 | `projekt` | Projekt (Nummer, Portfolio, Phase, Lebenszyklus), Projektorganisation, Meine Projekte, Projektübersicht, Übernahme Excel | PP.04.04, PP.02.04 (Zuordnung), PC.04.01 (UC-014 A1) | UC-002 Schritt 2, UC-014 A1, UC-016 Schritt 2 | E0 | `eingang`, `stammdaten`, `phasenmodell`, `portfolio` |
 | `projektdaten` | Register je Projekt: Meilensteine, Lieferergebnisse, Kosten je Phase, Risiken (Projekt und Portfolio), KPIs mit Werten, Stakeholder, Kommunikation, Abhängigkeiten, Ressourcenbedarf, ICT-/Infrastrukturmeldung | PS.02.04, PC.01.01, PC.01.03, PC.02.01, PC.02.03, PC.02.04, PC.03.01, PC.03.03, PS.05.01–03, PP.02.03, RK.02.01, RK.02.05, RK.02.06 | UC-002, UC-003, UC-004 | E0 | `projekt`, `phasenmodell`, `eingang` |
-| `ziel` | strategische Ziele, Jahresziele, Hauptaktivitäten, Metrik, Zuordnung Projekt ↔ Ziel, Zielerreichung, Quartalsreporting, Roadmap | ZM.01.02, ZM.02.01–04, ZM.03.01, ZM.03.02, PP.02.05, PP.04.03 | UC-011, UC-012 | E0, E6 | `handlungsfeld`, `projekt`, `eingang`, `sitzung` (ab E6) |
+| `ziel` | strategische Ziele, Jahresziele, Hauptaktivitäten, Metrik, Zuordnung Projekt ↔ Ziel, Zielerreichung, Quartalsreporting, Roadmap | ZM.01.02, ZM.02.01–04, ZM.03.01, ZM.03.02, PP.02.05, PP.04.03 | UC-011, UC-012 | E0, E6 | `handlungsfeld`, `projekt`, `eingang`, `sitzung` (ab E6), `vorlage` (Dokument des Quartalsreportings, AP-E6-4); liest den Portfoliobericht (`auswertung`) nur als Daten in den Entwurf |
 | `sitzung` | Sitzungen, Traktanden mit Arten-Registry, Unterlagen, Versand, Entscheide, Auflagen, Protokoll | PP.04.01, PP.04.02, PP.04.05, PS.02.02, PS.02.03 | UC-006 | E2 | `portfolio`, `projekt`, `phasenmodell`, `eingang` |
 | `statusbericht` | Periode, Statusbericht, Prüfung, Rückfrage, Monatsabschluss, Dashboard-Stand der Periode, Terminabweichungen, Eskalation | PS.01.01–04, PS.03.03 | UC-004, UC-005 | E1, E2 | `projekt`, `projektdaten`, `phasenmodell`, `eingang`, `sitzung` (ab E2) |
 | `auswertung` | Dashboard (Liste, Funnel), Risikolage, Portfoliobericht, Ad-hoc-Auswertungen | PC.04.01–03, PC.02.02 | UC-014 | E1, E2, E7 | `statusbericht`, `projektdaten`, `projekt`, `portfolio`, `sitzung` |
@@ -482,6 +482,7 @@ await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: { typ: 'perio
 | `jahresziele.vervollstaendigen` | Recht `ziel:write` | Zielzyklus geöffnet | Vorlage an den VR | Vorlage | AP-E6-1 |
 | `zielerreichung.erfassen` | Recht `zielerreichung:write` | Job nach Quartalsende | – | erfasst | AP-E6-3 |
 | `quartalsreporting.erstellen` | Recht `quartalsbericht:write` | Job nach Quartalsende | – | traktandiert | AP-E6-4 |
+| `quartalsreporting.auftrag` | verantwortliche Person | Auftrag des VR erfasst (UC-012 Schritt 6) | Termin des Auftrags | Erledigt melden | AP-E6-4 |
 | `abschluss.erstellen` | PL | Phase P4 erreicht bzw. Entscheid Sistieren/Abbrechen | – | Einreichen | AP-E7-1 |
 | `lessons_learned.erfassen` | PL | UE fordert an (UC-013 A1) | – | erfasst | AP-E7-5 |
 | `bedarf.decken`, `konflikt.aufloesen` | Recht `ressource:write` | Bedarf gemeldet / Überbuchung | – | Zuteilung | AP-E7-2 |

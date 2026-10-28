@@ -3,15 +3,15 @@
  * Kraft, Ändern mit ETag, Prüfbericht, in Kraft setzen (ADM), Unveränderlichkeit, Ablösung, Verwerfen, Rechte.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
-describe('Phasenmodell', { skip }, () => {
+describe('Phasenmodell', () => {
   let api: TestApi;
   let ue: H, adm: H, leser: H, niemand: H;
   let tenantId: string;

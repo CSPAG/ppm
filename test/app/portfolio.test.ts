@@ -4,14 +4,14 @@
  * AP-E0-5, Q8 Kap. 5.1, UC-006 A1), Sitzungstermine, Rechte (portfolio:read, portfolio:admin), ETag und Audit.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 import { entscheidendesGremium, gremienwegFuerGate, sitzungstermine } from '../../src/modules/portfolio/index.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Portfolios und Gremien', { skip }, () => {
+describe('Portfolios und Gremien', () => {
   let api: TestApi;
   let ue: Record<string, string>, gl: Record<string, string>, nobody: Record<string, string>;
   let tenantId: string;

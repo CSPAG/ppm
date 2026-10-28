@@ -5,8 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { after, before, describe, test } from 'node:test';
-import { skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { login, testApi, type TestApi } from './api.ts';
 import { apiTags } from '@vollholz/platform';
 import { app as ppm } from '../../src/app.ts';
@@ -14,14 +13,14 @@ import { MATRIX } from './matrix/index.ts';
 
 const API_TAGS = apiTags(ppm.modules);
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 const MARK = 'GEHEIM-A';
 
 /** Routen der App-Module mit ihrem Prüffall (fremde ID bzw. Liste), je Modul in test/app/matrix/<modul>.ts. */
 const CASES = MATRIX.cases;
 const APP_TAGS = new Set(MATRIX.tags);
 
-describe('Mandantentrennung über die API', { skip }, () => {
+describe('Mandantentrennung über die API', () => {
   let api: TestApi;
   let A: Record<string, string>, B: Record<string, string>;
   const ids: Record<string, string> = {};

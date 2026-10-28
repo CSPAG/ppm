@@ -3,12 +3,12 @@
  * Vorgabe und Deaktivieren statt Löschen, Feiertage und Arbeitstage (A-43); Rechte, ETag, Audit.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, testApi, type TestApi } from './api.ts';
 import { arbeitstageZwischen, CODETABELLEN, istArbeitstag, plusArbeitstage, plusArbeitstageDb } from '../../src/modules/stammdaten/index.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 describe('Arbeitstage (A-43)', () => {
   const ft = new Set(['2026-12-25', '2026-12-26', '2027-01-01']);
@@ -33,7 +33,7 @@ describe('Arbeitstage (A-43)', () => {
   });
 });
 
-describe('Stammdaten', { skip }, () => {
+describe('Stammdaten', () => {
   let api: TestApi;
   let adm: Record<string, string>, leser: Record<string, string>, nobody: Record<string, string>;
   let tenantId: string;

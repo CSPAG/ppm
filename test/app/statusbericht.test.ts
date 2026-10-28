@@ -5,12 +5,12 @@
  * und Ereignis, Folgen für die Erweiterungen.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { folgen } from '../../src/modules/statusbericht/index.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 /** Laufende Periode und Vormonat nach Schweizer Zeit. */
 const heute = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
@@ -23,7 +23,7 @@ const VOLL = {
   abweichung: Object.fromEntries(['inhalt', 'termin', 'ressourcen', 'budget'].map(d => [d, { stufe: 'keine', kommentar: '' }])),
 };
 
-describe('Statusbericht erfassen', { skip }, () => {
+describe('Statusbericht erfassen', () => {
   let api: TestApi;
   let T = '';
   let pl: Record<string, string>, pl2: Record<string, string>, admin: Record<string, string>, kt: Record<string, string>, fremd: Record<string, string>, ue: Record<string, string>;

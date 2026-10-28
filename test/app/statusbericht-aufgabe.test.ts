@@ -5,12 +5,12 @@
  * «kritisch» informiert den Sponsor. Vorbelegung des nächsten Meilensteins aus dem Meilensteinplan.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { app as ppm } from '../../src/app.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const PERIODE = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }).slice(0, 7);
 const VOLL = {
@@ -19,7 +19,7 @@ const VOLL = {
 };
 const log = { info() {}, warn() {}, error(o: object, m: string) { throw new Error(`${m} ${JSON.stringify(o)}`); } };
 
-describe('Berichtsaufgabe und Mitteilung «kritisch»', { skip }, () => {
+describe('Berichtsaufgabe und Mitteilung «kritisch»', () => {
   let api: TestApi;
   let T = '';
   let pl: Record<string, string>;

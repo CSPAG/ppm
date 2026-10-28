@@ -5,9 +5,10 @@
  * (G11), Budgetrahmen optional (A-18), Rechte und Lesesicht.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 import { schluesselAus } from '../../src/modules/priorisierung/vorgabe.ts';
 
 describe('Schlüssel eines Kriteriums', () => {
@@ -18,9 +19,10 @@ describe('Schlüssel eines Kriteriums', () => {
   });
 });
 
-const skip = await skipDb();
+// Tests mit Datenbank: ohne Konfiguration einzeln übersprungen, konfiguriert und nicht erreichbar scheitert der Lauf
+const db = dbTests(await postgresSkip());
 
-describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
+db.describe('Priorisierung: Bewertungsmodell und Bewertung', () => {
   let api: TestApi;
   let T: string;
   let pf: string, pfB: string;
@@ -35,7 +37,7 @@ describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
   const call = (who: string, method: string, url: string, payload?: unknown, headers: Record<string, string> = {}) =>
     api.app.inject({ method: method as 'GET', url, headers: { ...h[who], ...headers }, ...(payload !== undefined ? { payload: payload as Record<string, unknown> } : {}) });
 
-  before(async () => {
+  db.before(async () => {
     api = await testApi();
     T = await tenant(api.t.runtime, 'acme');
     await full(api.t.runtime, T, async tx => {
@@ -55,11 +57,11 @@ describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
     h.rm = await person('rm', 'rm');
     h.gremium = await person('gremium', 'gremium', { type: 'portfolio', id: pf });
   });
-  after(async () => { await api?.close(); });
+  db.after(async () => { await api?.close(); });
 
   let m1 = '';
 
-  test('Bewerten ohne Modell in Kraft: 409; Raster zeigt die aktiven Projekte ohne Modell', async () => {
+  db.test('Bewerten ohne Modell in Kraft: 409; Raster zeigt die aktiven Projekte ohne Modell', async () => {
     const r = await call('ue', 'GET', `/v1/portfolios/${pf}/bewertungen`);
     assert.equal(r.statusCode, 200, r.body);
     assert.equal(r.json().modell, null);
@@ -71,7 +73,7 @@ describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
     assert.equal((await call('ue', 'GET', '/v1/bewertungsmodelle/aktuell')).statusCode, 404);
   });
 
-  test('Entwurf aus der Vorgabe (UC-008 Schritt 2), ändern mit ETag, Prüfbericht, in Kraft setzen mit Entscheid (A1)', async () => {
+  db.test('Entwurf aus der Vorgabe (UC-008 Schritt 2), ändern mit ETag, Prüfbericht, in Kraft setzen mit Entscheid (A1)', async () => {
     const c = await call('ue', 'POST', '/v1/bewertungsmodelle', { beschreibung: 'Priorisierung 2027' });
     assert.equal(c.statusCode, 201, c.body);
     const m = c.json();
@@ -124,7 +126,7 @@ describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
     assert.deepEqual(audit, ['bewertungsmodell.created', 'bewertungsmodell.updated', 'bewertungsmodell.updated', 'bewertungsmodell.updated', 'bewertungsmodell.activated']);
   });
 
-  test('Bewerten (PP.02.01): Raster mit Version je Zelle, Fortschritt, nur aktive Projekte und Kriterien des Modells', async () => {
+  db.test('Bewerten (PP.02.01): Raster mit Version je Zelle, Fortschritt, nur aktive Projekte und Kriterien des Modells', async () => {
     const put = (zellen: unknown[]) => call('ue', 'PUT', `/v1/portfolios/${pf}/bewertungen`, { zellen });
     const r = await put([
       { projektId: projekt.x, kriterium: 'strategiebeitrag', einschaetzung: 'hoch', kommentar: ' Kernvorhaben ' },
@@ -163,7 +165,7 @@ describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
     assert.deepEqual(audit, ['bewertung.created', 'bewertung.created', 'bewertung.created', 'bewertung.created', 'bewertung.updated', 'bewertung.deleted']);
   });
 
-  test('Rechte: UE pflegt; Gremium liest Raster und Budgetrahmen seines Portfolios; GL und RM sehen die Priorisierung nicht', async () => {
+  db.test('Rechte: UE pflegt; Gremium liest Raster und Budgetrahmen seines Portfolios; GL und RM sehen die Priorisierung nicht', async () => {
     const gr = await call('gremium', 'GET', `/v1/portfolios/${pf}/bewertungen`);
     assert.equal(gr.statusCode, 200, gr.body);
     assert.deepEqual(gr.json().can, { write: false });
@@ -178,7 +180,7 @@ describe('Priorisierung: Bewertungsmodell und Bewertung', { skip }, () => {
     assert.equal((await call('ue', 'GET', '/v1/portfolios/00000000-0000-4000-8000-000000000099/bewertungen')).statusCode, 404);
   });
 
-  test('Neues Modell (A1): Entwurf kopiert das Modell in Kraft; frühere Bewertungen bleiben nach dem damaligen Modell lesbar (G11)', async () => {
+  db.test('Neues Modell (A1): Entwurf kopiert das Modell in Kraft; frühere Bewertungen bleiben nach dem damaligen Modell lesbar (G11)', async () => {
     const c = await call('ue', 'POST', '/v1/bewertungsmodelle', {});
     assert.equal(c.statusCode, 201, c.body);
     const m2 = c.json();

@@ -5,15 +5,15 @@
  */
 import { randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { registriereTraktandenart, traktandum } from '../../src/modules/sitzung/index.ts';
 import { _abmelden, traktandenart, type Traktandenart } from '../../src/modules/sitzung/arten.ts';
 import { fristenPruefen } from '../../src/modules/sitzung/fristen.ts';
 import { heute, kurzDatum as kurz } from '../../src/modules/sitzung/format.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 /** Datum n Kalendertage nach heute, auf den nächsten Mittwoch gelegt (Sitzungstag). */
 function mittwochIn(n: number): string {
@@ -25,7 +25,7 @@ function mittwochIn(n: number): string {
 /** Unterlagen der Probe-Art «gate» je Projekt: Quality-Check bestanden oder offen. */
 const qc = new Map<string, 'bestanden' | 'offen'>();
 
-describe('Sitzungen vorbereiten', { skip }, () => {
+describe('Sitzungen vorbereiten', () => {
   let api: TestApi;
   let tenantId: string;
   let ue: Record<string, string>, gl: Record<string, string>, mitglied: Record<string, string>, plH: Record<string, string>, nobody: Record<string, string>;

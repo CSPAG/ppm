@@ -5,16 +5,16 @@
  * Programmleitung» mit dem Bericht als Unterlage.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { BERICHT_FELDER, mitFeldern } from '../../src/modules/auswertung/bericht-vorlage.ts';
 import type { BerichtDaten } from '../../src/modules/auswertung/bericht.ts';
 import { werte } from '../../src/modules/vorlage/modell.ts';
 import { entpacken } from '../../src/modules/vorlage/zip.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
 import { wordVorlage } from './fixtures/word.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const heute = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
 const PERIODE = heute.slice(0, 7);
@@ -26,7 +26,7 @@ function mittwochIn(n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-describe('Risikolage und Portfoliobericht', { skip }, () => {
+describe('Risikolage und Portfoliobericht', () => {
   let api: TestApi;
   let T = '';
   let ue: Record<string, string>, gremium: Record<string, string>, pl: Record<string, string>, gl: Record<string, string>;

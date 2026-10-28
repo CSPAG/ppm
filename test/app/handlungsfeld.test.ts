@@ -3,13 +3,13 @@
  * inklusive Scope (Rolle ∩ Scope), Audit, Ereignis in der Outbox und Verlauf.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { full, skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
+import { full } from './harness.ts';
 import { login, machine, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Handlungsfelder', { skip }, () => {
+describe('Handlungsfelder', () => {
   let api: TestApi;
   let editor: Record<string, string>, viewer: Record<string, string>, nobody: Record<string, string>;
   let tenantId: string;

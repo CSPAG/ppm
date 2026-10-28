@@ -5,15 +5,14 @@
  * mit Begründung und Mitteilung, Zusammenführen; Antragstellende sehen weder Raster noch Leitfragen (K4 Z8).
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { skipDb } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
-describe('Ideenpool und Prüfung', { skip }, () => {
+describe('Ideenpool und Prüfung', () => {
   let api: TestApi;
   let tenantId = '';
   let as1: H, as2: H, ue: H, adm: H, gremium: H;

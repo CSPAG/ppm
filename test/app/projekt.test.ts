@@ -4,18 +4,18 @@
  * Projektrolle wirkt nur im eigenen Projekt –, «vertraulich» (A-34), Filter, Cursor und Kopf.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { systemActor } from '@vollholz/platform';
 import { projekt as aktionen } from '../../src/modules/projekt/index.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 interface Person { h: H; id: string }
 
-describe('Projekte', { skip }, () => {
+describe('Projekte', () => {
   let api: TestApi;
   let T: string;
   let ue: Person, pl: Person, sp: Person, kt: Person, ctl: Person, gremiumC: Person, direktionC: Person, ohne: Person;

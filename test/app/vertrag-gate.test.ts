@@ -7,13 +7,13 @@
  * eingeplanten Sitzung (A-27) und Entscheid «mit Auflagen»: wieder in Arbeit, Baseline und Phase bleiben.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { traktandenart } from '../../src/modules/sitzung/arten.ts';
 import { gateVorbereitenPruefen } from '../../src/modules/vertrag/gate-job.ts';
 import { login, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const heute = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(new Date());
 const plusTage = (d: string, n: number) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
@@ -26,7 +26,7 @@ function mittwochIn(n: number): string {
 
 type H = Record<string, string>;
 
-describe('Projektvertrag: Gate-Modus und Gate-Entscheid', { skip }, () => {
+describe('Projektvertrag: Gate-Modus und Gate-Entscheid', () => {
   let api: TestApi;
   let T = '';
   const h: Record<string, H> = {};

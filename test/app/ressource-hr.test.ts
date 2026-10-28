@@ -6,10 +6,10 @@
  */
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
-import { after, before, describe, test } from 'node:test';
+import { describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { mitHr, personalLesen } from '../../src/modules/ressource/hr.ts';
 import { login, testApi, type TestApi } from './api.ts';
-import { skipDb } from './harness.ts';
 
 describe('HR-Lieferung (ohne Datenbank)', () => {
   test('je Rolle und Monat: Pensum minus Abwesenheit, Personen gezählt; Fehler mit Eintrag', () => {
@@ -39,9 +39,10 @@ describe('HR-Lieferung (ohne Datenbank)', () => {
   });
 });
 
-const skip = await skipDb();
+// Tests mit Datenbank: ohne Konfiguration einzeln übersprungen, konfiguriert und nicht erreichbar scheitert der Lauf
+const db = dbTests(await postgresSkip());
 
-describe('Personal- und Abwesenheitsdaten über die Schnittstelle', { skip }, () => {
+db.describe('Personal- und Abwesenheitsdaten über die Schnittstelle', () => {
   let api: TestApi;
   let server: Server;
   let basis = '';
@@ -52,7 +53,7 @@ describe('Personal- und Abwesenheitsdaten über die Schnittstelle', { skip }, ()
   let schnittstelle = '';
   const lauf = async () => (await call('adm', 'POST', `/v1/schnittstellen/${schnittstelle}/starten`)).json();
 
-  before(async () => {
+  db.before(async () => {
     server = createServer((_req, res) => { res.writeHead(200, { 'content-type': 'application/json' }).end(hrAntwort); });
     await new Promise<void>(r => server.listen(0, '127.0.0.1', r));
     basis = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
@@ -68,12 +69,12 @@ describe('Personal- und Abwesenheitsdaten über die Schnittstelle', { skip }, ()
     assert.equal(s.statusCode, 201, s.body);
     schnittstelle = s.json().schnittstelle.id;
   });
-  after(async () => {
+  db.after(async () => {
     await api?.close();
     await new Promise(r => server.close(r));
   });
 
-  test('Übernahme je Rolle und Monat; Kapazität laut HR; das festgelegte Angebot hat in der Auslastung Vorrang (UC-009 Schritte 1–2)', async () => {
+  db.test('Übernahme je Rolle und Monat; Kapazität laut HR; das festgelegte Angebot hat in der Auslastung Vorrang (UC-009 Schritte 1–2)', async () => {
     hrAntwort = JSON.stringify([
       { personalnummer: 'P-1', rolle: 'pl', monat: '2027-01', fte: 1, abwesend: 0.25 },
       { personalnummer: 'P-2', rolle: 'pl', monat: '2027-01', fte: 0.8 },
@@ -100,7 +101,7 @@ describe('Personal- und Abwesenheitsdaten über die Schnittstelle', { skip }, ()
     assert.deepEqual(angebot, { arch: [1, null], pl: [3, 1] });
   });
 
-  test('ein Lauf ersetzt die gelieferten Monate; unbekannte Rolle bricht ab, ohne etwas zu ändern', async () => {
+  db.test('ein Lauf ersetzt die gelieferten Monate; unbekannte Rolle bricht ab, ohne etwas zu ändern', async () => {
     hrAntwort = JSON.stringify([{ personalnummer: 'P-1', rolle: 'pl', monat: '2027-02', fte: 0.6 }]);
     assert.equal((await lauf()).stand, 'erfolgreich');
     const hr = (await call('rm', 'GET', '/v1/kapazitaet/hr?von=2027-01&bis=2027-03')).json();
@@ -113,7 +114,7 @@ describe('Personal- und Abwesenheitsdaten über die Schnittstelle', { skip }, ()
     assert.equal((await call('rm', 'GET', '/v1/kapazitaet/hr?von=2027-01&bis=2027-01')).json().zellen.length, 2, 'unverändert');
   });
 
-  test('Rechte: lesen mit ressource:read (UE, RM); Antragstellende nicht', async () => {
+  db.test('Rechte: lesen mit ressource:read (UE, RM); Antragstellende nicht', async () => {
     assert.equal((await call('ue', 'GET', '/v1/kapazitaet/hr')).statusCode, 200);
     assert.equal((await call('antrag', 'GET', '/v1/kapazitaet/hr')).statusCode, 403);
     assert.equal((await call('rm', 'GET', '/v1/kapazitaet/hr?von=2027-05&bis=2027-01')).statusCode, 422);

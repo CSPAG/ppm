@@ -6,16 +6,16 @@
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { login, testApi, type TestApi } from './api.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 const BEISPIEL = readFileSync(new URL('../../scripts/uebernahme/beispiel.csv', import.meta.url), 'utf8');
 const KOPF = BEISPIEL.split('\n')[0]!;
 const PERIODE = '2026-09';
 
-describe('Übernahme aus dem Excel-Dashboard', { skip }, () => {
+describe('Übernahme aus dem Excel-Dashboard', () => {
   let api: TestApi;
   let T: string;
   let adm: Record<string, string>, ue: Record<string, string>;

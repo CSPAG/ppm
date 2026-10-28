@@ -7,15 +7,15 @@
  */
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { verarbeitungSetzen } from '../../src/modules/schnittstelle/index.ts';
 import { faelligeAusfuehren } from '../../src/modules/schnittstelle/lauf.ts';
 import { login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
+describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', () => {
   let api: TestApi;
   let T: string;
   let server: Server;

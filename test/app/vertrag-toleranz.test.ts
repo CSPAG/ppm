@@ -4,17 +4,17 @@
  * `vertrag.toleranzen` und `GET /v1/projekte/:id/toleranzen`.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { systemActor } from '@vollholz/platform';
 import { vertrag } from '../../src/modules/vertrag/index.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 type H = Record<string, string>;
 
-describe('Toleranzen im Projektvertrag', { skip }, () => {
+describe('Toleranzen im Projektvertrag', () => {
   let api: TestApi;
   let T: string;
   const p: Record<'a' | 'b', string> = { a: '', b: '' };

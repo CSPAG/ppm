@@ -5,12 +5,12 @@
  * Anlegen (`projekt:create` an org oder am Portfolio). Fälle: Rolle an der Organisation, am Portfolio, am Projekt.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import type { Principal } from '@vollholz/iam';
 import { grant, person, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 /** Projekte: Portfolio und Kennzeichen «vertraulich». */
 const PROJEKTE = {
@@ -33,7 +33,7 @@ const FAELLE: { sub: string; tupel: { rolle: string; ort: 'org' | 'portfolio:a' 
   { sub: 'gl-sp-004', tupel: [{ rolle: 'gl', ort: 'org' }, { rolle: 'sp', ort: 'projekt:2026-004' }], liest: ['2026-001', '2026-003', '2026-004'], aendert: [], legtAn: [] },
 ];
 
-describe('Lesesicht = can: Projekte', { skip }, () => {
+describe('Lesesicht = can: Projekte', () => {
   let api: TestApi;
   let T: string;
   const portfolio: Record<string, string> = {};

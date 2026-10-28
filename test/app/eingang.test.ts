@@ -4,20 +4,20 @@
  * (Aufgabe einer Person sieht die Vertretung, befristete Tupel, künftiger Zeitraum über den Job) und Lesesicht.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { aufgabe, mitteilung, stellvertretung } from '../../src/modules/eingang/index.ts';
 import { platform } from '../../src/platform.ts';
-import { full, skipDb } from './harness.ts';
+import { full } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 const tag = (offset: number) => {
   const d = new Date(Date.now() + offset * 86_400_000);
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(d);
 };
 
-describe('Eingang', { skip }, () => {
+describe('Eingang', () => {
   let api: TestApi;
   let tenantId: string;
   type P = { h: Record<string, string>; id: string };

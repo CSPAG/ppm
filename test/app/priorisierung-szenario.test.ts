@@ -4,10 +4,11 @@
  * Entscheidungsvorlage, Rechte; K5-1 (Neuberechnung ≤ 1 s bei 60 Projekten).
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
+import { describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { abhaengigkeitVerletzt, wasserlinie, type RechenZelle } from '../../src/modules/priorisierung/szenario.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
-import { full, skipDb, tenant } from './harness.ts';
+import { full, tenant } from './harness.ts';
 
 describe('Wasserlinie (ohne Datenbank)', () => {
   const zelle = (monat: string, angebot: number | null, ...beitraege: [string, number][]): RechenZelle =>
@@ -53,9 +54,10 @@ describe('Wasserlinie (ohne Datenbank)', () => {
   });
 });
 
-const skip = await skipDb();
+// Tests mit Datenbank: ohne Konfiguration einzeln übersprungen, konfiguriert und nicht erreichbar scheitert der Lauf
+const db = dbTests(await postgresSkip());
 
-describe('Szenarien (API)', { skip }, () => {
+db.describe('Szenarien (API)', () => {
   let api: TestApi;
   let T: string;
   let pf: string, pfB: string;
@@ -72,7 +74,7 @@ describe('Szenarien (API)', { skip }, () => {
   const istStand = () => full(api.t.runtime, T, async tx => (await tx.query<{ x: string }>(
     'SELECT projekt_id || \':\' || rang || \':\' || stand || \':\' || version AS x FROM ppm.rangfolge ORDER BY stand, rang')).rows.map(r => r.x));
 
-  before(async () => {
+  db.before(async () => {
     api = await testApi();
     T = await tenant(api.t.runtime, 'acme');
     await full(api.t.runtime, T, async tx => {
@@ -107,11 +109,11 @@ describe('Szenarien (API)', { skip }, () => {
     const r = await call('ue', 'PUT', `/v1/portfolios/${pf}/bewertungen`, { zellen: [z(p.a, 'strategiebeitrag', 'hoch'), z(p.a, 'komplexitaet', 'tief'), z(p.b, 'strategiebeitrag', 'mittel')] });
     assert.equal(r.statusCode, 200, r.body);
   });
-  after(async () => { await api?.close(); });
+  db.after(async () => { await api?.close(); });
 
   let s1: string;
 
-  test('Szenario anlegen kopiert den Ist-Stand; Wasserlinie nach Budget, Hinweise und Warnungen', async () => {
+  db.test('Szenario anlegen kopiert den Ist-Stand; Wasserlinie nach Budget, Hinweise und Warnungen', async () => {
     const leer = await call('ue', 'GET', `/v1/portfolios/${pf}/szenarien`);
     assert.deepEqual([leer.statusCode, leer.json().items, leer.json().can.write], [200, [], true]);
     const vorher = await istStand();
@@ -136,7 +138,7 @@ describe('Szenarien (API)', { skip }, () => {
     assert.deepEqual(await istStand(), vorher, 'Ist-Stand unverändert');
   });
 
-  test('Reihenfolge und Start (K5 Schritt 5): Abhängigkeit verletzt, Kapazität, If-Match, nur Projekte des Portfolios', async () => {
+  db.test('Reihenfolge und Start (K5 Schritt 5): Abhängigkeit verletzt, Kapazität, If-Match, nur Projekte des Portfolios', async () => {
     const vorher = await istStand();
     await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.kapazitaet SET fte = 2 WHERE rolle = 'pl'"));
     const put = (positionen: unknown, v: string) => call('ue', 'PUT', `/v1/szenarien/${s1}/positionen`, { positionen }, { 'if-match': v });
@@ -167,14 +169,14 @@ describe('Szenarien (API)', { skip }, () => {
     assert.deepEqual(await istStand(), vorher, 'Ist-Stand unverändert');
   });
 
-  test('Bedarf geändert seit Anlage (K5 Z7): Hinweis am Projekt, gerechnet mit dem neuen Wert', async () => {
+  db.test('Bedarf geändert seit Anlage (K5 Z7): Hinweis am Projekt, gerechnet mit dem neuen Wert', async () => {
     await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.ressourcenbedarf SET fte = 0.5 WHERE projekt_id = $1", [p.b]));
     const s = (await call('ue', 'GET', `/v1/szenarien/${s1}`)).json();
     const b = s.positionen.find((x: { nummer: string }) => x.nummer === '2026-002');
     assert.match(b.warnungen.map((w: { text: string }) => w.text).join(' '), /^Bedarf geändert am \d{2}\.\d{2}\.\d{4}\./);
   });
 
-  test('Vergleich, Als Antrag wählen, Verwerfen; Ist-Stand bleibt', async () => {
+  db.test('Vergleich, Als Antrag wählen, Verwerfen; Ist-Stand bleibt', async () => {
     const vorher = await istStand();
     const s2 = (await call('ue', 'POST', `/v1/portfolios/${pf}/szenarien`, { name: 'B: alle' })).json();
     const v = await call('ue', 'GET', `/v1/szenarien/vergleich?ids=${s1},${s2.id}`);
@@ -205,7 +207,7 @@ describe('Szenarien (API)', { skip }, () => {
     assert.deepEqual(audit, ['szenario.created', 'szenario.reordered', 'szenario.reordered', 'szenario.created', 'szenario.proposed', 'szenario.proposed', 'szenario.discarded']);
   });
 
-  test('Rechte: Gremium liest Szenarien seines Portfolios, ändert nichts; RM sieht sie nicht', async () => {
+  db.test('Rechte: Gremium liest Szenarien seines Portfolios, ändert nichts; RM sieht sie nicht', async () => {
     const g = await call('gremium', 'GET', `/v1/szenarien/${s1}`);
     assert.equal(g.statusCode, 200, g.body);
     assert.equal(g.json().can.write, false);
@@ -216,7 +218,7 @@ describe('Szenarien (API)', { skip }, () => {
     assert.equal((await call('rm', 'GET', `/v1/szenarien/${s1}`)).statusCode, 404);
   });
 
-  test('K5-1: Neuberechnung nach Umordnen ≤ 1 s bei 60 Projekten', async () => {
+  db.test('K5-1: Neuberechnung nach Umordnen ≤ 1 s bei 60 Projekten', async () => {
     const pfC = await full(api.t.runtime, T, async tx => {
       const id = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'C', 'last', 'Last', false) RETURNING id", [T])).rows[0]!.id;
       for (let i = 0; i < 60; i++) {

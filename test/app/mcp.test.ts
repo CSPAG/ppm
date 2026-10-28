@@ -4,17 +4,15 @@
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:net';
-import { after, before, describe, test } from 'node:test';
-import { startMockIdp, type MockIdp } from '@vollholz/iam-testkit';
+import { dbTests, postgresSkip, startMockIdp, type MockIdp } from '@vollholz/iam-testkit';
 import type { FastifyInstance } from 'fastify';
 import { app } from '../../src/app.ts';
-import { skipDb } from './harness.ts';
 import { claims, login, testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 const freePort = () => new Promise<number>(r => { const s = createServer().listen(0, '127.0.0.1', () => { const p = (s.address() as { port: number }).port; s.close(() => r(p)); }); });
 
-describe('MCP-Dienst', { skip }, () => {
+describe('MCP-Dienst', () => {
   let api: TestApi, idp: MockIdp, mcp: FastifyInstance;
   let base = '';
 

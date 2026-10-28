@@ -5,13 +5,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { after, before, describe, test } from 'node:test';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { safePath, uiCsp } from '@vollholz/platform';
 import { app } from '../../src/app.ts';
-import { skipDb } from './harness.ts';
 import { testApi, type TestApi } from './api.ts';
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
 test('Pfadschutz: nichts ausserhalb von dist', () => {
   const root = '/srv/dist';
@@ -31,7 +30,7 @@ test('OpenAPI ↔ Client: web/openapi.json ist aktuell (npm run openapi:export &
   assert.deepEqual(have, JSON.parse(JSON.stringify(await app.openApi())));
 });
 
-describe('Auslieferung', { skip }, () => {
+describe('Auslieferung', () => {
   let api: TestApi;
   before(async () => { api = await testApi(); });
   after(async () => { await api?.close(); });

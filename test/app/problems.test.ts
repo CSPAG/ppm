@@ -2,17 +2,16 @@
  * Fehler als application/problem+json (RFC 9457) für 401/403/404/409/412/422/428/500 und genau ein Tag je Route.
  */
 import assert from 'node:assert/strict';
-import { after, before, describe, test } from 'node:test';
-import { skipDb } from './harness.ts';
+import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { login, testApi, type TestApi } from './api.ts';
 import { apiTags, buildApp } from '@vollholz/platform';
 import { app as ppm } from '../../src/app.ts';
 
 const API_TAGS = apiTags(ppm.modules);
 
-const skip = await skipDb();
+const { after, before, describe, test } = dbTests(await postgresSkip());
 
-describe('Problem-JSON und OpenAPI', { skip }, () => {
+describe('Problem-JSON und OpenAPI', () => {
   let api: TestApi;
   let editor: Record<string, string>, viewer: Record<string, string>;
   before(async () => {

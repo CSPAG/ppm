@@ -14,6 +14,7 @@ import { Empty, ErrorState, fmtDatum, fmtGate, fmtPhase, Hinweis, Icon, Skelett,
 import { usePflichtangaben, useProjekt, useVertrag, type Version } from './api.ts';
 import { gateKey, useGate, useGateMutations, useWertestroeme, type Gate, type Leitfrage } from './GateApi.ts';
 import { TG } from './GateTexte.ts';
+import { useNeuLaden } from './neuLaden.ts';
 import { TV } from './texte.ts';
 import './Gate.css';
 
@@ -68,7 +69,8 @@ function GateModus({ nummer, projektId, version }: { nummer: string; projektId: 
   const ws = useWertestroeme();
   const skelett = useVerzoegert(gate.isPending);
   if (gate.isPending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={6} /> : null}</div>;
-  if (gate.error) return <ErrorState error={gate.error} onRetry={() => void gate.refetch()} />;
+  // ein gescheitertes Neuladen behält das geladene Gate und die Eingaben darin; nur ohne Daten der Fehler (Z5)
+  if (gate.error && !gate.data) return <ErrorState error={gate.error} onRetry={() => void gate.refetch()} />;
   const g = gate.data;
   const label = (k: string) => ws.data?.get(k) ?? k;
   const fehlend = (pflicht.data?.angaben ?? []).filter(a => !a.erfuellt);
@@ -138,7 +140,7 @@ function GateModus({ nummer, projektId, version }: { nummer: string; projektId: 
         </aside>
       </div>
 
-      {g.nutzen ? <Nutzen versionId={version.id} projektId={projektId} gate={g} /> : null}
+      {g.nutzen ? <Nutzen versionId={version.id} projektId={projektId} gate={g} neuLaden={() => gate.refetch()} /> : null}
     </section>
   );
 }
@@ -199,10 +201,11 @@ function LeitfrageFeld({ versionId, projektId, frage, darf }: { versionId: strin
 }
 
 /** Nutzenprüfung am Gate ab P3 (UC-003 A2): erreichte Werte je KPI und Beurteilung. */
-function Nutzen({ versionId, projektId, gate }: { versionId: string; projektId: string; gate: Gate }) {
+function Nutzen({ versionId, projektId, gate, neuLaden }: { versionId: string; projektId: string; gate: Gate; neuLaden(): Promise<{ error: unknown }> }) {
   const id = useId();
   const toast = useToast();
   const { nutzen } = useGateMutations(projektId);
+  const laden = useNeuLaden(neuLaden, () => nutzen.reset());
   const n = gate.nutzen!;
   const [werte, setWerte] = useState<Record<string, { wert: string; bemerkung: string }>>(
     () => Object.fromEntries(n.werte.map(w => [w.kpiId, { wert: w.wert, bemerkung: w.bemerkung }])));
@@ -238,8 +241,13 @@ function Nutzen({ versionId, projektId, gate }: { versionId: string; projektId: 
         <label htmlFor={`${id}-b`}>{TG.beurteilung}</label>
         <textarea id={`${id}-b`} rows={3} maxLength={5000} value={beurteilung} disabled={!darf} onChange={e => setBeurteilung(e.target.value)} />
       </div>
-      {isConflict(nutzen.error) ? <Hinweis stufe="warnung" live>{TG.konflikt}</Hinweis> : nutzen.error ? <ErrorState error={nutzen.error} /> : null}
-      {darf ? <button type="button" className="btn primary" disabled={nutzen.isPending} onClick={senden}>{TG.nutzenSpeichern}</button> : null}
+      {/* Z7: «Neu laden» holt die neue Version für If-Match; die Eingaben bleiben in den Feldern */}
+      {isConflict(nutzen.error) ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" disabled={laden.laedt} onClick={() => void laden.laden()}>{TG.neuLaden}</button>}>
+          {TG.konfliktNutzen}
+        </Hinweis>
+      ) : nutzen.error ? <ErrorState error={nutzen.error} /> : null}
+      {darf ? <button type="button" className="btn primary" disabled={nutzen.isPending || isConflict(nutzen.error)} onClick={senden}>{TG.nutzenSpeichern}</button> : null}
     </section>
   );
 }

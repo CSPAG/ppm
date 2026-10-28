@@ -127,9 +127,9 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
 
   app.post('/v1/eingang/aufgaben/:id/wieder-oeffnen', {
     schema: {
-      tags: [TAG_EINGANG], summary: 'Von Hand erledigte Aufgabe wieder öffnen', params: IdParams, response: { 200: Type.Ref('Aufgabe') },
-      description: '«Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat, sonst 404. '
-        + 'Ist inzwischen dieselbe Aufgabe wieder offen, 409.',
+      tags: [TAG_EINGANG], summary: 'Von Hand erledigte Aufgabe wieder öffnen', params: IdParams, headers: IdempotencyHeaders, response: { 200: Type.Ref('Aufgabe') },
+      description: '«Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat und die keine '
+        + 'fachliche Handlung inzwischen beendet hat (z. B. Sitzung geschlossen), sonst 404. Ist dieselbe Aufgabe wieder offen, 409.',
     },
   }, async req => {
     const { id } = req.params as { id: string };

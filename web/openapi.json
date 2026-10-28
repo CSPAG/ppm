@@ -43227,7 +43227,7 @@
         "tags": [
           "Eingang"
         ],
-        "description": "«Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat, sonst 404. Ist inzwischen dieselbe Aufgabe wieder offen, 409.",
+        "description": "«Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat und die keine fachliche Handlung inzwischen beendet hat (z. B. Sitzung geschlossen), sonst 404. Ist dieselbe Aufgabe wieder offen, 409.",
         "parameters": [
           {
             "schema": {
@@ -43237,6 +43237,17 @@
             "in": "path",
             "name": "id",
             "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
           }
         ],
         "responses": {

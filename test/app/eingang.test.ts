@@ -126,6 +126,11 @@ describe('Eingang', { skip }, () => {
     assert.match(doppelt.headers['content-type'] as string, /application\/problem\+json/);
     await sys(tx => aufgabe.entfallen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's1' } }));
     await sys(tx => aufgabe.entfallen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertrag_version', id: 'v1' } }));
+    // beendet eine fachliche Handlung die von Hand erledigte Aufgabe (Sitzung geschlossen), bleibt sie zu
+    const s2 = await sys(tx => aufgabe.oeffnen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's2' }, empfaenger: { person: anna.id }, titel: 'Unterlagen lesen', link: '/gremien/prat', manuell: true }));
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${s2}/erledigen`, anna.h)).statusCode, 200);
+    await sys(tx => aufgabe.erledigen(tx, { art: 'sitzung.lesen', bezug: { typ: 'sitzung', id: 's2' } }));
+    assert.equal((await call('POST', `/v1/eingang/aufgaben/${s2}/wieder-oeffnen`, anna.h)).statusCode, 404);
   });
 
   test('Mitteilungen: nur an die Empfängerin, gelesen markieren', async () => {

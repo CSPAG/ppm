@@ -53,7 +53,8 @@ export function useEingangMutations() {
   });
   // «Rückgängig» im Toast nach «Erledigt» (I-R1 Stufe 1)
   const wiederOeffnen = useMutation({
-    mutationFn: async (id: string) => (await api.POST('/v1/eingang/aufgaben/{id}/wieder-oeffnen', { params: { path: { id } } })).data!,
+    mutationFn: async (id: string) =>
+      (await api.POST('/v1/eingang/aufgaben/{id}/wieder-oeffnen', { params: { path: { id }, header: { 'idempotency-key': newIdempotencyKey() } } })).data!,
     onSettled: refresh,
   });
   const gelesen = useMutation({

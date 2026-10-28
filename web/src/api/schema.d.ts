@@ -9720,12 +9720,15 @@ export interface paths {
         put?: never;
         /**
          * Von Hand erledigte Aufgabe wieder öffnen
-         * @description «Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat, sonst 404. Ist inzwischen dieselbe Aufgabe wieder offen, 409.
+         * @description «Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat und die keine fachliche Handlung inzwischen beendet hat (z. B. Sitzung geschlossen), sonst 404. Ist dieselbe Aufgabe wieder offen, 409.
          */
         post: {
             parameters: {
                 query?: never;
-                header?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
                 path: {
                     id: string;
                 };

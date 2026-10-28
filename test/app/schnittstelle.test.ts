@@ -43,6 +43,9 @@ describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
     await new Promise<void>(r => server.listen(0, '127.0.0.1', r));
     basis = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
     api = await testApi();
+    // Das Modul finanzen registriert die Verarbeitung von Ist-Kosten und Jahresbedarf (AP-E7-4); hier zuerst ohne
+    verarbeitungSetzen('ist_kosten', null);
+    verarbeitungSetzen('jahresbedarf', null);
     T = await tenant(api.t.runtime, 'acme');
     for (const [sub, rolle] of [['adm', 'org-admin'], ['ue', 'ue'], ['gl', 'gl']] as const) {
       h[sub] = { authorization: (await login(api, 'acme', sub, rolle)).authorization };

@@ -8,7 +8,7 @@ import { PersonName, PersonPick } from '@vollholz/iam-web';
 import { useId, useState } from 'react';
 import { isConflict } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
-import { Dialog, ErrorState, fmtDatum, Hinweis, Icon, Loading, T, useToast } from '../../ui/index.ts';
+import { Dialog, ErrorState, fmtDatum, Hinweis, Icon, Loading, T, TeilFehler, useToast } from '../../ui/index.ts';
 import { useAuswahl, type Idee, type Rueckfrage } from './api.ts';
 import { FreigabeAbschnitt } from './FreigabeAbschnitt.tsx';
 import {
@@ -107,7 +107,9 @@ export function PruefungPage({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
         {write ? (
           <aside className="idee-pruefung-aside" aria-labelledby={`${titleId}-s`}>
             <h2 id={`${titleId}-s`}>{TP.aehnliche}</h2>
-            {aehnliche.isPending ? <p role="status" className="muted">…</p> : (aehnliche.data ?? []).length ? (
+            {aehnliche.isPending ? <p role="status" className="muted">…</p>
+              : aehnliche.error ? <TeilFehler was={TP.aehnliche} error={aehnliche.error} onRetry={() => void aehnliche.refetch()} />
+              : (aehnliche.data ?? []).length ? (
               <ul className="idee-aehnlich">
                 {aehnliche.data!.map(a => (
                   <li key={a.idee.id}>

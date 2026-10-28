@@ -31,6 +31,7 @@ export const deCH = {
   common: {
     save: 'Speichern', cancel: 'Abbrechen', close: 'Schliessen', delete: 'Löschen', edit: 'Bearbeiten', retry: 'Erneut versuchen',
     reload: 'Neu laden', more: 'Mehr laden', loading: 'Wird geladen …', search: 'Suchen', error: 'Etwas ist schiefgegangen.',
+    teilFehler: (was: string) => `${was} konnte nicht geladen werden.`,
   },
   // Zustände einer Liste (docs/ux/rahmen/interaktion.md, Abschnitt 6)
   liste: {

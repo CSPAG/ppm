@@ -89,4 +89,5 @@ Klären mit: UE. Fragen, die beim Bau aufgefallen sind; bis zur Antwort gilt die
 | K30 | Darf «mit Auflagen freigegeben» bei der Initialisierung anders wirken als «freigegeben»? | UC-001 Schritt 7; A-51 | Wirkt heute wie «freigegeben», die Auflagen werden Aufgaben. |
 | K31 | Erzeugt das System eine Aufgabe «Jahresrückblick vorbereiten», und an wen? | UC-013 Schritt 1; fachmodell 4.2; A-61 | Aufgabe an die UE zu Beginn des neuen Jahres; heute keine automatische Aufgabe. |
 | K32 | Zählt eine Zuteilung zu einem Projekt, das die lesende Person nicht sieht (z. B. vertraulich), in deren Auslastung? | UC-015 Schritt 6; A-63; A-33 | Lebenszyklus unabhängig von der Sicht prüfen; heute zählt sie weiter, wenn das Projekt nicht sichtbar ist. |
+| K33 | Soll ein Gremium einen Priorisierungsantrag auch zurückstellen können? | UC-008 Schritt 7; K3; A-64 | Zweites Ergebnis «Zurückgestellt» für die Art `priorisierung`; heute nur «Szenario gewählt». |
 

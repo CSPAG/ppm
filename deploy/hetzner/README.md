@@ -122,11 +122,23 @@ die Schritte mit SSH für die lokale Session in [lokale-session.md](lokale-sessi
 
 | Aufgabe | Wie |
 |---|---|
-| Neue Version | Workflow «Deploy» › `deploy` mit Image-Digest; Migrationen laufen vorher (`migrate`) |
+| Neue Version | Workflow «Deploy» › `deploy` mit dem Digest des gewünschten Commits (unten «Digest finden»); Migrationen laufen vorher (`migrate`) |
 | Zurück | «Deploy» › `rollback` (vorheriges Image; Migrationen bleiben, deshalb nur vorwärts verträgliche Schemaänderungen) |
 | Wartungsseite | «Deploy» › `maintenance-on` / `maintenance-off` (Caddy antwortet 503 mit Wartungsseite) |
 | Zustand | «Deploy» › `status` |
-| Geheimnis ändern | SOPS-Datei ändern, PR, danach «Deploy» › `deploy` mit dem laufenden Digest |
+| Geheimnis, Caddy oder Compose ändern | PR, danach «Deploy» › `deploy`. Mit dem laufenden Digest (`status`) bleibt der Code der App alt; soll er mitkommen, den Digest des neuesten `main` nehmen |
+
+### Digest finden
+
+Das Formular von «Deploy» hat keine Vorgabe: Der Digest muss jedes Mal zum gewünschten Commit passen.
+
+- Lauf «CI» des Commits auf `main` (grün), Job «Image (Build, Rauchtest, Scan, SBOM, Signatur)»: Die Zusammenfassung des
+  Laufs zeigt unter «Image» `ghcr.io/cspag/ppm@sha256:…`. Nur ein solcher Digest besteht `cosign verify` in «Deploy».
+- Der Tag `ghcr.io/cspag/ppm:sha-<commit>` (Package auf GitHub) zeigt auf denselben Digest. Das Formular nimmt nur den
+  Digest, nicht den Tag.
+- `status` zeigt den Digest, der gerade läuft. Mit ihm bleibt der Code der App beim alten Stand, auch wenn der Workflow
+  von einem neueren `main` läuft: «Deploy» liefert Bundle (Compose, Caddy, Geheimnisse) aus dem Workflow-Stand, das Image
+  aber nur aus der Eingabe.
 
 ## Backup und Wiederherstellung (PITR)
 

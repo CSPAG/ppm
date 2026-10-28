@@ -27,3 +27,20 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
     </div>
   );
 }
+
+/**
+ * Fehler eines Teils der Seite (Z5): sagt, was nicht geladen ist, und bietet «Erneut versuchen»; der Rest der Seite bleibt
+ * nutzbar. Nie «keine Daten» zeigen, wenn die Abfrage gescheitert ist.
+ */
+export function TeilFehler({ was, error, onRetry }: { was: string; error: unknown; onRetry: () => void }) {
+  const e = describeError(error);
+  return (
+    <div className="hinweis hinweis-warnung" role="alert">
+      <Icon name="warn" />
+      <div>
+        <strong>{T.common.teilFehler(was)}</strong>{e.detail ? ` ${e.detail}` : ''}{' '}
+        <button type="button" className="btn sm" onClick={onRetry}>{T.common.retry}</button>
+      </div>
+    </div>
+  );
+}

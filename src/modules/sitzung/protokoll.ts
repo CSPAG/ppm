@@ -123,10 +123,10 @@ export async function beteiligte(tx: Tx, s: store.SitzungRow): Promise<{ personI
  * Mitteilung mit Link (E-Mail nur mit Link, UX-E9; Netz-Adapter folgt, A-44); «Protokoll versenden» ist erledigt.
  */
 export async function versenden(tx: Tx, s: store.SitzungRow, version: number): Promise<{ empfaenger: number; frist: Protokollfrist }> {
-  if (s.stand !== 'geschlossen') throw conflict(s.stand === 'protokoll_versendet' ? 'Das Protokoll ist bereits versendet.' : 'Schliessen Sie zuerst die Sitzung.');
+  if (s.stand !== 'geschlossen') throw conflict(s.stand === 'protokoll_versendet' ? 'Das Protokoll ist bereits versendet.' : 'Schliesse zuerst die Sitzung.');
   if (!(await es.protokollVersenden(tx, s.id, version))) {
     const p = await es.protokollVon(tx, s.id);
-    throw conflict(!p ? 'Zur Sitzung gibt es kein Protokoll.' : 'Das Protokoll wurde inzwischen geändert. Laden Sie es neu.');
+    throw conflict(!p ? 'Zur Sitzung gibt es kein Protokoll.' : 'Das Protokoll wurde inzwischen geändert. Lade es neu.');
   }
   await es.protokollVersendetMarkieren(tx, s.id);
   await aufgabe.erledigen(tx, { art: 'protokoll.versenden', bezug: { typ: 'sitzung', id: s.id } });

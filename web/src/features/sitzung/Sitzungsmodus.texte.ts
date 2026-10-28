@@ -1,5 +1,5 @@
 /**
- * Texte für Sitzungsmodus, Protokoll und Entscheide (AP-E2-2; Namensraum des Features «Sitzungen»): Anrede «Sie»
+ * Texte für Sitzungsmodus, Protokoll und Entscheide (AP-E2-2; Namensraum des Features «Sitzungen»): Anrede «Du»
  * (UX-E7), Schweizer Rechtschreibung, Schaltflächen und Meldungen aus K3 (docs/ux/ablaeufe/K3-gremiumssitzung.md).
  */
 export const TM = {
@@ -11,7 +11,7 @@ export const TM = {
   zurVorbereitung: 'Traktandenliste',
   starten: 'Sitzung starten',
   gestartet: 'Sitzung gestartet.',
-  nichtGestartet: 'Die Sitzung ist noch nicht gestartet. Starten Sie sie, um Entscheide zu erfassen.',
+  nichtGestartet: 'Die Sitzung ist noch nicht gestartet. Starte sie, um Entscheide zu erfassen.',
   nochNichtVersendet: 'Den Sitzungsmodus gibt es ab dem Versand der Unterlagen.',
   traktanden: 'Traktanden',
   vorher: 'Vorheriges Traktandum',
@@ -32,9 +32,9 @@ export const TM = {
   stellungnahme: 'Stellungnahme des Gremiums',
   ergebnis: 'Ergebnis',
   begruendung: 'Begründung',
-  begruendungHinweis: 'Pflicht: Sie erscheint im Protokoll und beim Projekt.',
-  begruendungFehlt: 'Begründung fehlt: Sie erscheint im Protokoll und beim Projekt.',
-  ergebnisFehlt: 'Ergebnis fehlt: Wählen Sie eine Option.',
+  begruendungHinweis: 'Pflicht: erscheint im Protokoll und beim Projekt.',
+  begruendungFehlt: 'Begründung fehlt: Die Begründung erscheint im Protokoll und beim Projekt.',
+  ergebnisFehlt: 'Ergebnis fehlt: Wähle eine Option.',
   auflagen: 'Auflagen',
   auflageNeu: 'Auflage hinzufügen',
   auflageText: 'Auflage',
@@ -43,7 +43,7 @@ export const TM = {
   auflageWaehlen: 'Person wählen',
   ergebnisWaehlen: 'Ergebnis wählen',
   auflageEntfernen: (n: number) => `Auflage ${n} entfernen`,
-  auflagenFehlen: 'Auflagen fehlen: Erfassen Sie je Auflage Text, Termin und Verantwortliche.',
+  auflagenFehlen: 'Auflagen fehlen: Erfasse je Auflage Text, Termin und Verantwortliche.',
   anVr: 'An den VR weiterleiten (nächstes Quartalsreporting)',
   wirkung: 'Wirkung',
   wirkungText: (art: string, label: string, auflagen: number, sns: boolean) => [
@@ -74,8 +74,8 @@ export const TM = {
   geschlossenBanner: (d: string) => `Sitzung geschlossen am ${d} · Protokoll im Entwurf.`,
   protokollVersendetBanner: (d: string) => `Protokoll versendet am ${d}.`,
   fest: 'Die Sitzung ist geschlossen; Entscheide lassen sich nur noch über ein neues Traktandum ändern.',
-  konflikt: 'Die Sitzung wurde inzwischen geändert. Sie ist neu geladen; wiederholen Sie Ihre letzte Aktion.',
-  nurLesen: 'Sie sehen die Entscheide lesend. Erfasst werden sie von der Unternehmensentwicklung.',
+  konflikt: 'Die Sitzung wurde inzwischen geändert und ist neu geladen; wiederhole deine letzte Aktion.',
+  nurLesen: 'Du siehst die Entscheide lesend. Erfasst werden sie von der Unternehmensentwicklung.',
 
   // Protokoll (UI-35, K3 Schritt 10)
   protokoll: 'Protokoll',
@@ -99,13 +99,13 @@ export const TM = {
   protokollFristVerletzt: (bis: string) => `Protokoll: Versand fällig seit ${bis}.`,
   protokollVersendet: 'Protokoll versendet.',
   protokollFest: 'Das Protokoll ist versendet und lässt sich nicht mehr ändern.',
-  protokollKonflikt: 'Das Protokoll wurde inzwischen geändert. Es ist neu geladen; Ihre letzte Eingabe ist nicht gespeichert.',
+  protokollKonflikt: 'Das Protokoll wurde inzwischen geändert. Es ist neu geladen; deine letzte Eingabe ist nicht gespeichert.',
   drucken: 'Drucken',
 
   // Entscheide und Auflagen (UI-36)
   entscheide: 'Entscheide',
   entscheideSub: 'Entscheide der Gremien mit Begründung und Auflagen, neueste Sitzung zuerst.',
-  entscheideLeer: 'Noch keine Entscheide. Sie entstehen im Sitzungsmodus einer Sitzung.',
+  entscheideLeer: 'Noch keine Entscheide. Entscheide entstehen im Sitzungsmodus einer Sitzung.',
   entscheideGefiltert: 'Keine Entscheide für diesen Filter.',
   filterGremium: 'Gremium',
   filterAlle: 'Alle Gremien',

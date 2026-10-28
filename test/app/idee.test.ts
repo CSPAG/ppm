@@ -147,14 +147,14 @@ describe('Projektidee einreichen', { skip }, () => {
     const ueId = (await login(api, 'demo', 'u-ue', 'ue')).principalId;
     const frage = await full(api.t.runtime, tenantId, async tx => {
       await tx.query("UPDATE ppm.idee SET stand = 'in_ergaenzung' WHERE id = $1", [e.id]);
-      const id = (await tx.query<{ id: string }>("INSERT INTO ppm.idee_rueckfrage (tenant_id, idee_id, feld, text, gestellt_von) VALUES ($1, $2, 'zielsetzung', 'Woran messen Sie den Erfolg?', $3) RETURNING id", [tenantId, e.id, ueId])).rows[0]!.id;
+      const id = (await tx.query<{ id: string }>("INSERT INTO ppm.idee_rueckfrage (tenant_id, idee_id, feld, text, gestellt_von) VALUES ($1, $2, 'zielsetzung', 'Woran misst du den Erfolg?', $3) RETURNING id", [tenantId, e.id, ueId])).rows[0]!.id;
       await aufgabe.erledigen(tx, { art: 'idee.pruefen', bezug: { typ: 'idee', id: e.id } });
-      await aufgabe.oeffnen(tx, { art: 'idee.ergaenzen', bezug: { typ: 'idee', id: e.id }, empfaenger: { person: as1Id }, titel: 'Rückfragen zu Ihrer Idee beantworten', link: `/portfolio/ideen/${e.nummer}/bearbeiten` });
+      await aufgabe.oeffnen(tx, { art: 'idee.ergaenzen', bezug: { typ: 'idee', id: e.id }, empfaenger: { person: as1Id }, titel: 'Rückfragen zu deiner Idee beantworten', link: `/portfolio/ideen/${e.nummer}/bearbeiten` });
       return id;
     });
     const g = (await call('GET', `/v1/ideen/${e.id}`, as1)).json();
     assert.deepEqual([g.stand, g.can.bearbeiten, g.rueckfragen.map((q: { feld: string; text: string; antwort: string | null }) => [q.feld, q.text, q.antwort])],
-      ['in_ergaenzung', true, [['zielsetzung', 'Woran messen Sie den Erfolg?', null]]]);
+      ['in_ergaenzung', true, [['zielsetzung', 'Woran misst du den Erfolg?', null]]]);
     assert.equal((await call('GET', '/v1/ideen?eigene=true', as1)).json().items.find((x: { id: string }) => x.id === e.id).rueckfragenOffen, 1);
 
     assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as2, { antwort: 'fremd' })).statusCode, 404);

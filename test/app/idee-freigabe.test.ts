@@ -123,7 +123,7 @@ describe('Freigabe der Initialisierung', { skip }, () => {
     const vertrag = await aufgaben('vertrag.erstellen', projekt.id);
     assert.deepEqual(vertrag.map(x => [x.empfaenger_person, x.stand, x.link]), [[pl, 'offen', `/projekte/${projekt.nummer}/vertrag`]]);
     assert.ok((await mitteilungen(as1Id)).some(x => x.includes(`Das Projekt ${projekt.nummer} entsteht in Phase P0`)));
-    assert.ok((await mitteilungen(sp)).some(x => x.includes('Sie sind Sponsor')));
+    assert.ok((await mitteilungen(sp)).some(x => x.includes('Du bist Sponsor')));
 
     // je Idee ein Projekt
     const anzahl = async () => sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.projekt WHERE herkunft->>'ideeId' = $1", [i.id])).rows[0]!.n);

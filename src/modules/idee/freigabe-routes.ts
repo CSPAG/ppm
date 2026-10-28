@@ -130,7 +130,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, deps: Deps): void {
       const r = await laden(tx, id, version, VORLEGBAR);
       const a = (await fs.angaben(tx, id))!;
       const pf = a.portfolio_id ? await fs.portfolio(tx, a.portfolio_id) : null;
-      if (!pf) throw conflict('Ordnen Sie zuerst die Kategorie zu; sie bestimmt Portfolio und Gremium.');
+      if (!pf) throw conflict('Ordne zuerst die Kategorie zu; sie bestimmt Portfolio und Gremium.');
       const bezug = { typ: 'idee', id };
       let an: string;
       if (pf.kategorie === 'C') {
@@ -146,7 +146,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, deps: Deps): void {
       }
       await ps.setzen(tx, id, { stand: 'traktandiert' });
       await aufgabe.erledigen(tx, { art: 'idee.pruefen', bezug });
-      await mitteilung.senden(tx, { an: r.erfasst_von, bezug, text: `Ihre Projektidee «${titelVon(r)}» ist ${an} zum Entscheid vorgelegt.`, link: link(r.nummer) });
+      await mitteilung.senden(tx, { an: r.erfasst_von, bezug, text: `Deine Projektidee «${titelVon(r)}» ist ${an} zum Entscheid vorgelegt.`, link: link(r.nummer) });
       await record(tx, who, { action: 'idee.scheduled', resourceType: 'idee', resourceId: id, data: { ...snap(r), portfolioId: pf.id, kategorie: pf.kategorie }, event: { ...snap(r), stand: 'traktandiert' } });
       return antwort(req, reply, tx, id);
     });

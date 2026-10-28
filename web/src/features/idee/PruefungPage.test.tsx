@@ -115,7 +115,7 @@ describe('Idee prüfen', () => {
     expect(put.headers.get('If-Match')).toBe('W/"3"');
     expect(await put.json()).toEqual({ raster: [{ kriterium: 'change', einschaetzung: 'mittel' }] });
     await userEvent.click(screen.getByRole('radio', { name: TP.kategorien.B }));
-    expect(screen.getByText(/Sie haben B gewählt; halten Sie den Grund fest/)).toBeInTheDocument();
+    expect(screen.getByText(/Du hast B gewählt; halte den Grund fest/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: TP.zuordnen }));
     await waitFor(() => expect(api.calls.some(c => c.url.endsWith('/kategorie'))).toBe(true));
     expect(await screen.findByText(TP.wirkung('B', 'GLPA'), { exact: false })).toBeInTheDocument();

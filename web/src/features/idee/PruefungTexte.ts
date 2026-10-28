@@ -1,5 +1,5 @@
 /**
- * Texte für Ideenpool und Prüfung (AP-E4-2, Kernablauf K4; Namensraum des Features «Ideen»): Anrede «Sie», Schweizer
+ * Texte für Ideenpool und Prüfung (AP-E4-2, Kernablauf K4; Namensraum des Features «Ideen»): Anrede «Du», Schweizer
  * Rechtschreibung; Regeln nach I-P2 (Regel, Ist, Ausweg) mit den Texten aus K4 «Regeln und Rückmeldungen».
  */
 export const TP = {
@@ -40,7 +40,7 @@ export const TP = {
   gespeichert: 'Gespeichert.',
 
   raster: 'Kriterienraster',
-  rasterSub: 'Je Kriterium hoch, mittel oder tief; das System schlägt die naheliegende Kategorie vor, Sie entscheiden.',
+  rasterSub: 'Je Kriterium hoch, mittel oder tief; das System schlägt die naheliegende Kategorie vor, du entscheidest.',
   kriterien: {
     relevanz: 'Strategische Relevanz', direktionen: 'Anzahl betroffener Direktionen', abhaengigkeiten: 'Abhängigkeiten',
     priorisierung: 'Bedarf an zentraler Priorisierung und Finanzierung', change: 'Change-Aufwand',
@@ -51,14 +51,14 @@ export const TP = {
     const [n, s] = v.kategorie === 'A' ? [v.hoch, 'hoch'] : v.kategorie === 'C' ? [v.tief, 'tief'] : [v.mittel, 'mittel'];
     return `Raster: ${n} von 5 Kriterien ${s}, das spricht für Kategorie ${v.kategorie}.`;
   },
-  vorschlagFehlt: 'Schätzen Sie alle fünf Kriterien ein, dann zeigt das System die naheliegende Kategorie.',
+  vorschlagFehlt: 'Schätze alle fünf Kriterien ein, dann zeigt das System die naheliegende Kategorie.',
 
   kategorie: 'Kategorie',
   kategorien: { A: 'A · Transformation (strategisch)', B: 'B · Geschäftsleitung (taktisch-operativ)', C: 'C · Direktion (operativ)' } as Record<string, string>,
   portfolio: 'Portfolio',
   portfolioWaehlen: 'Portfolio wählen',
   kategorieBegruendung: 'Begründung',
-  abweichung: (v: { kategorie: string; hoch: number; mittel: number; tief: number }, gewaehlt: string) => `${TP.vorschlag(v)} Sie haben ${gewaehlt} gewählt; halten Sie den Grund fest.`,
+  abweichung: (v: { kategorie: string; hoch: number; mittel: number; tief: number }, gewaehlt: string) => `${TP.vorschlag(v)} Du hast ${gewaehlt} gewählt; halte den Grund fest.`,
   zuordnen: 'Kategorie zuordnen',
   wirkung: (kategorie: string, gremium: string | null) => `Kategorie ${kategorie}${gremium ? ` · zuständig ${gremium}` : ''}`,
 
@@ -67,7 +67,7 @@ export const TP = {
   rueckfrageText: 'Rückfrage',
   rueckfrageFeld: 'Betrifft',
   rueckfrageAllgemein: 'die Idee allgemein',
-  rueckfrageWirkung: (name: string) => `Die Idee geht mit Stand «in Ergänzung» an ${name} zurück; ${name} erhält «Rückfragen zu Ihrer Idee beantworten».`,
+  rueckfrageWirkung: (name: string) => `Die Idee geht mit Stand «in Ergänzung» an ${name} zurück; ${name} erhält «Rückfragen zu deiner Idee beantworten».`,
   rueckfrageGestellt: 'Rückfrage gestellt.',
   felder: {
     titel: 'Titel', ausgangslage: 'Ausgangslage', zielsetzung: 'Zielsetzung', handlungsfeld: 'Handlungsfeld', strategischesZiel: 'Strategisches Ziel',
@@ -77,7 +77,7 @@ export const TP = {
   zurueckweisenFrage: (titel: string) => `Idee «${titel}» zurückweisen?`,
   begruendung: 'Begründung',
   begruendungFehlt: (name: string) => `Begründung fehlt: ${name} erfährt sonst nicht, warum die Idee nicht weiterverfolgt wird.`,
-  zurueckweisenWirkung: (name: string) => `${name} wird mit Ihrer Begründung informiert. Ist ein Portfolio zugeordnet, erfährt es auch das Gremium (A-06).`,
+  zurueckweisenWirkung: (name: string) => `${name} wird mit deiner Begründung informiert. Ist ein Portfolio zugeordnet, erfährt es auch das Gremium (A-06).`,
   zurueckgewiesen: 'Idee zurückgewiesen.',
   zusammenfuehrenFrage: 'Ideen zusammenführen?',
   fuehrend: 'Führende Idee',
@@ -92,6 +92,6 @@ export const TP = {
   zurFuehrenden: 'Zur führenden Idee',
   bannerZurueckgewiesen: (begruendung: string) => `Zurückgewiesen. Begründung: ${begruendung}`,
   bannerErgaenzung: 'Die Idee liegt bei der antragstellenden Person zur Ergänzung; Prüfung und Kategorie sind bis zum erneuten Einreichen gesperrt.',
-  nurLesen: 'Sie sehen die Idee lesend; prüfen kann die Unternehmensentwicklung.',
-  konflikt: 'Die Idee wurde inzwischen geändert. Laden Sie sie neu und wiederholen Sie die Aktion.',
+  nurLesen: 'Du siehst die Idee lesend; prüfen kann die Unternehmensentwicklung.',
+  konflikt: 'Die Idee wurde inzwischen geändert. Lade sie neu und wiederhole die Aktion.',
 };

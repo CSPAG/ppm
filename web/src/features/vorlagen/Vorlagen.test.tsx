@@ -81,10 +81,11 @@ describe('Vorlagen', () => {
     expect(await screen.findByRole('button', { name: `${TV.version(1)}, ${TV.stand.entwurf}` })).toBeInTheDocument();
     const dialog = screen.getByRole('dialog', { name: 'Projektvertrag' });
     const input = dialog.querySelector('input[type=file]') as HTMLInputElement;
-    await userEvent.upload(input, new File([new Uint8Array([0x50, 0x4b, 3, 4])], 'Vertrag neu.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
+    await userEvent.upload(input, new File([new Uint8Array([0x50, 0x4b, 3, 4])], 'Vertrag neu.DOCX', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
     await waitFor(() => expect(api.calls.some(c => c.method === 'POST')).toBe(true));
     const post = api.calls.find(c => c.method === 'POST')!;
     expect(post.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
+    // Endung gross geschrieben: klein an den Server (sonst 422)
     expect(await post.json()).toEqual({ dateiname: 'Vertrag neu.docx', inhalt: 'UEsDBA==' });
     await waitFor(() => expect(screen.getByTestId('s')).toHaveTextContent('"v":2'));
   });

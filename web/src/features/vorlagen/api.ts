@@ -31,6 +31,9 @@ export async function base64(file: Blob): Promise<string> {
   return btoa(s);
 }
 
+/** Endung klein schreiben («Vertrag.DOCX» → «Vertrag.docx»); der Server prüft `.docx` genau. */
+export const dateiname = (name: string) => name.replace(/\.docx$/i, '.docx');
+
 const etag = (v: VorlageVersion) => `W/"${v.rev}"`;
 
 export function useVorlageMutations(art: Art) {
@@ -40,7 +43,7 @@ export function useVorlageMutations(art: Art) {
   return {
     hochladen: useMutation({
       mutationFn: async ({ file, key }: { file: File; key: string }) =>
-        (await api.POST('/v1/vorlagen/{art}/versionen', { params: { path: { art }, header: { 'idempotency-key': key } }, body: { dateiname: file.name, inhalt: await base64(file) } })).data!,
+        (await api.POST('/v1/vorlagen/{art}/versionen', { params: { path: { art }, header: { 'idempotency-key': key } }, body: { dateiname: dateiname(file.name), inhalt: await base64(file) } })).data!,
       onSuccess: refresh,
     }),
     zuordnen: useMutation({

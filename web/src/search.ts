@@ -12,7 +12,7 @@ import { validateDashboardSearch } from './features/dashboard/index.ts';
 import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { type PortfoliosSearch, validatePortfoliosSearch } from './features/portfolios/index.ts';
-import { type BewertungSearch, type ModellSearch, validateBewertungSearch, validateModellSearch, validateSzenarioSearch } from './features/priorisierung/index.ts';
+import { type BewertungSearch, type MatrixSearch, type ModellSearch, validateBewertungSearch, validateMatrixSearch, validateModellSearch, validateSzenarioSearch } from './features/priorisierung/index.ts';
 import { type EntscheideSearch, type SitzungSearch, validateEntscheideSearch, validateSitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
 import { validateKontoSearch } from './features/konto/index.ts';
@@ -22,6 +22,7 @@ import { type RoadmapSearch, validateRoadmapSearch, validateZielerreichungSearch
 export const searchOf = {
   bewertung: validateBewertungSearch,
   bewertungsmodell: validateModellSearch,
+  matrix: validateMatrixSearch,
   szenarien: validateSzenarioSearch,
   eingang: validateEingangSearch,
   stellvertretung: validateKontoSearch,
@@ -49,4 +50,4 @@ export const searchOf = {
   vertrag: validateVertragSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { AuslastungSearch, BewertungSearch, EntscheideSearch, HandlungsfeldSearch, KapazitaetSearch, ModellSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, RoadmapSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };
+export type { AuslastungSearch, BewertungSearch, MatrixSearch, EntscheideSearch, HandlungsfeldSearch, KapazitaetSearch, ModellSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, RoadmapSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };

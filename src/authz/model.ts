@@ -213,6 +213,7 @@ export const model = defineModel({
     get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // vertrag
     get_vertrag: { title: 'Projektvertrag lesen', permission: 'projekt:read', readOnly: true },
+    compare_vertrag: { title: 'Vertragsversionen vergleichen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     get_roadmap: { title: 'Portfolio-Roadmap lesen', permission: 'tenant:read', readOnly: true },

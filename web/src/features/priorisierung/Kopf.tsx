@@ -1,6 +1,6 @@
 /**
  * Kopf des Bereichs «Priorisierung» (Portfolio › Priorisierung, K5): Titel und Reiter (I-N6: Arbeitsraum › Bereich ›
- * Ansicht). «Modell» nur mit `priorisierung:read` an der Organisation; Matrix und Szenarien kommen mit AP-E5-2 und AP-E5-3.
+ * Ansicht). «Modell» nur mit `priorisierung:read` an der Organisation; Matrix (AP-E5-2) mit dem gewählten Portfolio; Szenarien folgen mit AP-E5-3.
  */
 import type { MouseEvent, ReactNode } from 'react';
 import { Icon } from '../../ui/index.ts';

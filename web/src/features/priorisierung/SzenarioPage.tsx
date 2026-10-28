@@ -10,6 +10,7 @@ import { isConflict, newIdempotencyKey } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Confirm, Dialog, Empty, ErrorState, fmtDatum, Hinweis, Icon, Skelett, Stand, useToast, useVerzoegert, type StandFamilie } from '../../ui/index.ts';
 import { usePortfolios } from './api.ts';
+import { useBreit } from './breite.ts';
 import { Kopf, PFAD, type Reiter } from './Kopf.tsx';
 import { useRollen, useSzenarien, useSzenario, useSzenarioMutations, useVergleich } from './SzenarioApi.ts';
 import { SzenarioListe, type Reihe } from './SzenarioListe.tsx';
@@ -21,20 +22,6 @@ import './Szenario.css';
 
 const SPEICHERN_NACH = 250;
 const FAMILIE: Record<string, StandFamilie> = { entwurf: 'entwurf', beantragt: 'wartet', entschieden: 'positiv', verworfen: 'ruhend' };
-
-/** Breite ab 1024 px (Umordnen nur dort, K5 «Mobil»); ohne Angabe der Umgebung (Tests) breit. */
-function useBreit(): boolean {
-  const schmal = '(max-width: 1023.98px)';
-  const [breit, setBreit] = useState(() => !(typeof window !== 'undefined' && window.matchMedia?.(schmal).matches));
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mq = window.matchMedia(schmal);
-    const f = () => setBreit(!mq.matches);
-    mq.addEventListener('change', f);
-    return () => mq.removeEventListener('change', f);
-  }, []);
-  return breit;
-}
 
 export function SzenarioPage({ search, setSearch, navigieren }: { search: SzenarioSearch; setSearch: SetSzenarioSearch; navigieren(pfad: string): void }) {
   const { can } = useSession();
@@ -54,7 +41,7 @@ export function SzenarioPage({ search, setSearch, navigieren }: { search: Szenar
   const skelett = useVerzoegert(portfolios.isPending || (!!pf && liste.isPending));
   const darfAnlegen = !!liste.data?.can.write && breit;
 
-  const reiter: Reiter[] = orgLesen ? ['bewertung', 'szenarien', 'modell'] : ['bewertung', 'szenarien'];
+  const reiter: Reiter[] = orgLesen ? ['bewertung', 'matrix', 'szenarien', 'modell'] : ['bewertung', 'matrix', 'szenarien'];
   const query = new URLSearchParams(pf ? { portfolio: pf.schluessel } : {}).toString();
 
   return (

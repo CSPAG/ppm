@@ -1,11 +1,10 @@
 /**
  * Grundbestand der Vorlagen (AM.03.01 Grundfunktion, AP-E3-5): die Vorlage «Projektvertrag» nach Q7 (PM-Handbuch,
  * Vorlage Projektvertrag) mit Deckblatt «Vorliegende Version», Kapiteln 1–13 und Kopfzeile «Intern · enthält
- * Personendaten» (G12, darstellung.md «Sensible Daten»). Hochladen eigener Fassungen und die Feldzuordnung folgen mit
- * AP-E7-7; bis dahin gilt für jede Organisation dieser Grundbestand.
+ * Personendaten» (G12, darstellung.md «Sensible Daten»). Er gilt, solange die Organisation für die Art keine eigene
+ * Vorlage aktiv gesetzt hat (AP-E7-7, `store.ts`); das PDF setzt immer der Grundbestand.
  */
-export const ARTEN = ['projektvertrag'] as const;
-export type Art = (typeof ARTEN)[number];
+import type { Art } from './arten.ts';
 
 export interface Vorlage {
   art: Art;
@@ -57,13 +56,13 @@ const PROJEKTVERTRAG: Vorlage = {
   grundbestand: true,
 };
 
-const GRUNDBESTAND: Record<Art, Vorlage> = { projektvertrag: PROJEKTVERTRAG };
+const GRUNDBESTAND: Partial<Record<Art, Vorlage>> = { projektvertrag: PROJEKTVERTRAG };
 
-/** Gültige Vorlage einer Art (heute: der Grundbestand). */
-export const aktuell = (art: Art): Vorlage => GRUNDBESTAND[art];
+/** Grundbestand einer Art; null, wenn das System für sie keinen mitliefert. */
+export const grundbestand = (art: Art): Vorlage | null => GRUNDBESTAND[art] ?? null;
 
-/** Alle Vorlagen (heute: der Grundbestand). */
-export const alle = (): Vorlage[] => ARTEN.map(aktuell);
+/** Grundbestand des Projektvertrags (Layout der Ausgabe). */
+export const aktuell = (_art: 'projektvertrag'): Vorlage => PROJEKTVERTRAG;
 
 /** Titel eines Abschnitts der Gliederung, z. B. `titelVon(v, '9.1')` → «Kosten». */
 export function titelVon(v: Vorlage, nr: string): string {

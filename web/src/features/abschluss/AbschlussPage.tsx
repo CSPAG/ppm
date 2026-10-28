@@ -257,6 +257,7 @@ function Grundlagen({ a }: { a: Abschluss }) {
         <dt>{TA.grundlagen.ziele}</dt><dd>{text(g.ziele)}</dd>
         <dt>{TA.grundlagen.nutzen}</dt><dd>{text(g.nutzen)}</dd>
         <dt>{TA.grundlagen.businessCase}</dt><dd>{text(g.businessCase)}</dd>
+        {g.nutzenpruefung ? <><dt>{TA.grundlagen.nutzenpruefung(g.nutzenpruefung.version)}</dt><dd>{text(g.nutzenpruefung.beurteilung)}</dd></> : null}
         <dt>{TA.grundlagen.kosten}</dt>
         <dd>{g.kosten ? TA.grundlagen.kostenWerte(fmtBetragKurz(g.kosten.budgetBaseline), fmtBetragKurz(g.kosten.prognose), fmtBetragKurz(g.kosten.ist)) : <span className="muted">{TA.grundlagen.keineBetraege}</span>}</dd>
       </dl>
@@ -275,6 +276,7 @@ function Grundlagen({ a }: { a: Abschluss }) {
 /** Erreichte Werte je KPI am Abschluss mit Zielwert und letztem Ist-Wert (UC-015 Schritt 2: Vergleich mit den Zielwerten). */
 function KpiWerte({ a, f, setze, dis }: { a: Abschluss; f: Felder; setze(p: Partial<Felder>): void; dis: boolean }) {
   const kpis = a.grundlagen.kpis;
+  const gate = a.grundlagen.nutzenpruefung;
   if (!kpis.length) return <p className="empty">{TA.kpi.leer}</p>;
   const wert = (id: string) => f.kpiWerte.find(w => w.kpiId === id) ?? { kpiId: id, wert: '', bemerkung: '' };
   const aendern = (id: string, patch: { wert?: string; bemerkung?: string }) => {
@@ -285,13 +287,14 @@ function KpiWerte({ a, f, setze, dis }: { a: Abschluss; f: Felder; setze(p: Part
   return (
     <div className="ab-tab-wrap">
       <table className="ab-tab">
-        <thead><tr><th scope="col">{TA.kpi.kpi}</th><th scope="col">{TA.kpi.ziel}</th><th scope="col">{TA.kpi.ist}</th><th scope="col">{TA.kpi.erreicht}</th><th scope="col">{TA.kpi.bemerkung}</th></tr></thead>
+        <thead><tr><th scope="col">{TA.kpi.kpi}</th><th scope="col">{TA.kpi.ziel}</th><th scope="col">{TA.kpi.ist}</th>{gate ? <th scope="col">{TA.grundlagen.gateWert}</th> : null}<th scope="col">{TA.kpi.erreicht}</th><th scope="col">{TA.kpi.bemerkung}</th></tr></thead>
         <tbody>
           {kpis.map(k => (
             <tr key={k.id}>
               <td>{k.text}{k.einheit ? <span className="muted small"> ({k.einheit})</span> : null}</td>
               <td>{k.zielwert || '–'}</td>
               <td>{k.ist ? String(k.ist.wert) : '–'}</td>
+              {gate ? <td>{gate.werte.find(w => w.kpiId === k.id)?.wert || '–'}</td> : null}
               <td><input className="ab-in" aria-label={TA.kpi.erreichtVon(k.text)} value={wert(k.id).wert} disabled={dis} maxLength={200} onChange={e => aendern(k.id, { wert: e.target.value })} /></td>
               <td><input className="ab-in" aria-label={TA.kpi.bemerkungVon(k.text)} value={wert(k.id).bemerkung} disabled={dis} maxLength={1000} onChange={e => aendern(k.id, { bemerkung: e.target.value })} /></td>
             </tr>

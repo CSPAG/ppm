@@ -31,6 +31,7 @@ const abschluss = (o: Record<string, unknown> = {}, b: Record<string, unknown> |
     kpis: [{ id: KPI, art: 'projekt', text: 'Durchlaufzeit', einheit: 'h', zielwert: '24', ist: { periode: '2026-09', wert: 26 } }],
     kosten: { budgetBaseline: 1_200_000, prognose: 1_150_000, ist: 1_100_000 },
     offeneMeilensteine: [{ id: '00000000-0000-4000-8000-0000000000c1', phase: 'P4', art: 'lieferergebnis', text: 'Schulung Linie', terminBaseline: '2026-12-15', terminAktuell: null }],
+    nutzenpruefung: { version: '4.0', beurteilung: 'Nutzen stabil', werte: [{ kpiId: KPI, wert: '25', bemerkung: '' }] },
   },
   lessonsLearned: [], entscheid: null,
   can: { bearbeiten: true, einreichen: true, nutzenSp: false, nutzenUe: false, wiederaufnahme: false, lessons: true, dokument: true }, ...o,
@@ -55,6 +56,8 @@ describe('Abschluss (UI-14)', () => {
     const { container } = renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
     expect(await screen.findByRole('heading', { name: TA.titel.abschluss })).toBeInTheDocument();
     expect(screen.getByText('Labor in Betrieb')).toBeInTheDocument();
+    expect(screen.getByText('Nutzen stabil')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: TA.grundlagen.gateWert })).toBeInTheDocument();
     expect(screen.getByText(TA.grundlagen.offeneMeilensteine(1))).toBeInTheDocument();
     expect(screen.getByText('3 Angaben fehlen')).toBeInTheDocument();
     await expectNoAxe(container);

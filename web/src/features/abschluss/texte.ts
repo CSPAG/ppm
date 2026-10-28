@@ -1,15 +1,15 @@
 /**
  * Texte des Features «Abschluss» (UI-14 Projektakte › Abschluss, UI-32 Portfolio › Auswertungen › Lessons Learned;
- * UC-015, PS.04.03; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Sie» (UX-E7), Schweizer Rechtschreibung,
+ * UC-015, PS.04.03; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7, Entscheid UX-OF-1), Schweizer Rechtschreibung,
  * «Organisation» statt «Mandant».
  */
 export const TA = {
   reiter: 'Abschluss',
-  projektFehlt: 'Dieses Projekt gibt es nicht oder Sie haben keinen Zugriff darauf.',
+  projektFehlt: 'Dieses Projekt gibt es nicht oder du hast keinen Zugriff darauf.',
   titel: { abschluss: 'Abschlussbericht', sistierung: 'Bericht zur Sistierung', abbruch: 'Bericht zum Abbruch' } as Record<string, string>,
   stand: { entwurf: 'in Arbeit', eingereicht: 'eingereicht', traktandiert: 'beim Gremium', abgenommen: 'abgenommen', nacharbeit: 'Nacharbeit' } as Record<string, string>,
   gespeichert: 'Gespeichert', speichert: 'Speichert …', ungespeichert: 'Ungespeicherte Änderungen',
-  konflikt: 'Jemand anderes hat den Bericht geändert. Die Seite zeigt den neuen Stand; prüfen Sie Ihre letzte Eingabe.',
+  konflikt: 'Jemand anderes hat den Bericht geändert. Die Seite zeigt den neuen Stand; prüf deine letzte Eingabe.',
   keine: {
     titel: 'Noch kein Abschluss',
     text: (phase: string) => `Der Abschluss beginnt in Phase P4 oder mit einem Entscheid des Gremiums zu Sistierung oder Abbruch. Das Projekt ist in ${phase}.`,
@@ -18,9 +18,9 @@ export const TA = {
     abgeschlossen: (d: string) => `Das Projekt ist seit ${d} formell abgeschlossen. Die Projektakte kann nur noch gelesen werden; Lessons Learned lassen sich weiter erfassen.`,
     traktandiert: 'Der Abschlussbericht liegt beim Gremium (Exit-Gate P4). Bis zum Entscheid ist er gesperrt; Sponsor und UE können die Nutzenrealisierung noch beurteilen.',
     eingereicht: (d: string) => `Eingereicht am ${d}. Der Bericht kann nur noch gelesen werden.`,
-    nacharbeit: 'Das Gremium verlangt Nacharbeiten. Überarbeiten Sie den Bericht und reichen Sie ihn erneut ein; die Auflagen finden Sie im Eingang.',
-    sistiert: 'Das Projekt ist sistiert. Erfassen Sie Stand, offene Punkte und Lessons Learned; die Wiederaufnahme beschliesst das Gremium.',
-    abgebrochen: 'Das Projekt ist abgebrochen und kann nur noch gelesen werden. Erfassen Sie Stand, offene Punkte und Lessons Learned.',
+    nacharbeit: 'Das Gremium verlangt Nacharbeiten. Überarbeite den Bericht und reich ihn erneut ein; die Auflagen findest du im Eingang.',
+    sistiert: 'Das Projekt ist sistiert. Erfasse Stand, offene Punkte und Lessons Learned; die Wiederaufnahme beschliesst das Gremium.',
+    abgebrochen: 'Das Projekt ist abgebrochen und kann nur noch gelesen werden. Erfasse Stand, offene Punkte und Lessons Learned.',
     nurLesen: 'Den Bericht erfasst die Projektleitung.',
   },
   abschnitte: {
@@ -36,6 +36,7 @@ export const TA = {
     offeneMeilensteine: (n: number) => (n === 1 ? '1 Meilenstein oder Lieferergebnis ist nicht erreicht' : `${n} Meilensteine oder Lieferergebnisse sind nicht erreicht`),
     alleErreicht: 'Alle Meilensteine und Lieferergebnisse sind erreicht.',
     leer: 'Keine Angaben.',
+    nutzenpruefung: (v: string) => `Nutzenprüfung am Gate (Version ${v})`, gateWert: 'Wert am Gate',
   },
   felder: {
     projektstand: 'Stand des Vorhabens', projektstandHint: 'Was ist erreicht, was ist angehalten, was ist zu sichern?',
@@ -58,14 +59,14 @@ export const TA = {
     hint: 'Sponsor und UE beurteilen, ob der Nutzen stabil erreicht ist (PC.03.02).',
   },
   lessons: {
-    leer: 'Noch keine Lessons Learned. Halten Sie fest, was künftige Vorhaben wissen sollten.',
+    leer: 'Noch keine Lessons Learned. Halte fest, was künftige Vorhaben wissen sollten.',
     text: 'Erkenntnis', kategorie: 'Kategorie (optional)', erfassen: 'Lesson Learned erfassen', erfasst: 'Lesson Learned erfasst.',
     von: (wer: string, jahr: number) => `${wer} · ${jahr}`, loeschen: (t: string) => `Lesson Learned «${t}» löschen`, geloescht: 'Lesson Learned gelöscht.',
   },
   panel: {
     titel: 'Bereit zum Einreichen', bereit: 'Alle Pflichtangaben sind erfasst.',
     fehlt: (n: number) => (n === 1 ? '1 Angabe fehlt' : `${n} Angaben fehlen`),
-    sperre: (liste: string) => `Einreichen nicht möglich: ${liste} fehlen. Ergänzen Sie sie, um einzureichen.`,
+    sperre: (liste: string) => `Einreichen nicht möglich: ${liste} fehlen. Ergänze sie, um einzureichen.`,
     wirkungAbschluss: 'Mit dem Einreichen wird das Exit-Gate P4 dem Gremium vorgeschlagen; die UE traktandiert es. Bis zum Entscheid ist der Bericht gesperrt.',
     wirkungAnderer: 'Mit dem Einreichen ist der Bericht abgeschlossen und kann nur noch gelesen werden.',
     einreichen: 'Bericht einreichen', eingereicht: 'Bericht eingereicht.', eingereichtGremium: 'Bericht eingereicht; das Exit-Gate ist dem Gremium vorgeschlagen.',
@@ -74,8 +75,8 @@ export const TA = {
   },
   wiederaufnahme: {
     aktion: 'Wiederaufnahme beantragen', titel: 'Wiederaufnahme beim Gremium beantragen?', begruendung: 'Begründung für das Gremium',
-    wirkung: 'Der Antrag erscheint in den Vorschlägen des entscheidenden Gremiums. Mit «Weiterführen» ist das Projekt wieder aktiv; danach schreiben Sie den Projektvertrag über ein Gate fort.',
-    senden: 'Antrag stellen', gesendet: 'Antrag an das Gremium gestellt.', fehlt: 'Begründung fehlt: Das Gremium entscheidet anhand Ihrer Begründung.',
+    wirkung: 'Der Antrag erscheint in den Vorschlägen des entscheidenden Gremiums. Mit «Weiterführen» ist das Projekt wieder aktiv; danach schreibst du den Projektvertrag über ein Gate fort.',
+    senden: 'Antrag stellen', gesendet: 'Antrag an das Gremium gestellt.', fehlt: 'Begründung fehlt: Das Gremium entscheidet anhand deiner Begründung.',
   },
   entscheid: {
     abgeschlossen: 'Abgeschlossen', nacharbeiten: 'Nacharbeiten verlangt', sistiert: 'Sistiert', abgebrochen: 'Abgebrochen', weiterfuehren: 'Weiterführen',
@@ -89,7 +90,7 @@ export const TA = {
     suche: 'Suchen in Erkenntnis und Projekt', jahr: 'Jahr', alleJahre: 'Alle Jahre', kategorie: 'Kategorie', alleKategorien: 'Alle Kategorien',
     ohneKategorie: 'ohne Kategorie', projekt: 'Projekt', erkenntnis: 'Erkenntnis', erfasst: 'Erfasst',
     leer: 'Noch keine Lessons Learned. Die Projektleitungen erfassen sie in der Projektakte unter «Abschluss».',
-    leerGefiltert: 'Nichts passt zu Ihrer Suche.', eine: 'Lesson Learned', projektOeffnen: 'Zur Projektakte',
+    leerGefiltert: 'Nichts passt zu deiner Suche.', eine: 'Lesson Learned', projektOeffnen: 'Zur Projektakte',
     nurLesen: 'Ändern kann die Projektleitung des Projekts.', bearbeiten: 'Bearbeiten', speichern: 'Speichern', gespeichert: 'Gespeichert.',
   },
 };

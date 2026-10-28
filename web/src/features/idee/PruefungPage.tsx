@@ -10,6 +10,7 @@ import { isConflict } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { Dialog, ErrorState, fmtDatum, Hinweis, Icon, Loading, T, useToast } from '../../ui/index.ts';
 import { useAuswahl, type Idee, type Rueckfrage } from './api.ts';
+import { FreigabeAbschnitt } from './FreigabeAbschnitt.tsx';
 import {
   useAehnliche, useIdeeNummer, usePortfolios, usePruefung, usePruefungMutations, type Aehnlich, type Kategorie, type Pruefung,
 } from './PruefungApi.ts';
@@ -101,6 +102,7 @@ export function PruefungPage({ idee, gehe }: { idee: Idee; gehe: Gehe }) {
           <Raster key={JSON.stringify(item.raster)} pruefung={item} titleId={titleId} setzen={(kriterium, einschaetzung) => m.raster.mutate({ etag, body: { raster: [{ kriterium, einschaetzung }] } }, { onError: fehler })} />
           <KategorieWahl pruefung={item} titleId={titleId} busy={m.kategorie.isPending}
             zuordnen={body => m.kategorie.mutate({ etag, body }, { onSuccess: () => toast.show(TP.gespeichert), onError: fehler })} />
+          <FreigabeAbschnitt idee={idee} gehe={gehe} titleId={titleId} />
         </div>
         {write ? (
           <aside className="idee-pruefung-aside" aria-labelledby={`${titleId}-s`}>

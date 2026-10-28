@@ -17,6 +17,7 @@ import { priorisierungModule } from './modules/priorisierung/index.ts';
 import { projektModule } from './modules/projekt/index.ts';
 import { projektdatenModule } from './modules/projektdaten/index.ts';
 import { ressourceModule } from './modules/ressource/index.ts';
+import { schnittstelleModule } from './modules/schnittstelle/index.ts';
 import { sitzungModule } from './modules/sitzung/index.ts';
 import { stammdatenModule } from './modules/stammdaten/index.ts';
 import { statusberichtModule } from './modules/statusbericht/index.ts';
@@ -48,6 +49,7 @@ export const app = defineApp({
     ressourceModule,
     priorisierungModule,
     webhooksModule,
+    schnittstelleModule,
   ],
   // Personenverzeichnis auch mit `stammdaten:read` (alle Rollen): jede Person wählt ihre Stellvertretung (UC-016 Schritt 4);
   // mit `projekt:read` auch für Clients mit Lese-Scope (Namen der Projektorganisation, PP.04.04)

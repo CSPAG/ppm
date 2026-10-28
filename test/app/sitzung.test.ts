@@ -212,7 +212,8 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     // Protokoll: Audit sitzung.dispatched mit Vorlauf; Mitteilungen; Aufgabe «Unterlagen lesen» für die Mitglieder
     const [audit, mitteilungen] = await sys(async tx => [
       (await tx.query<{ data: { vorlauf: number; fristEingehalten: boolean } }>("SELECT data FROM ppm.audit_log WHERE action = 'sitzung.dispatched'")).rows,
-      (await tx.query<{ empfaenger_person: string; text: string }>("SELECT empfaenger_person, text FROM ppm.mitteilung ORDER BY text")).rows,
+      // ohne Mitteilungen zu Rollen (Projektorganisation, UC-016 Schritt 3)
+      (await tx.query<{ empfaenger_person: string; text: string }>("SELECT empfaenger_person, text FROM ppm.mitteilung WHERE bezug_typ <> 'rolle' ORDER BY text")).rows,
     ] as const);
     assert.deepEqual([audit.length, audit[0]!.data.vorlauf, audit[0]!.data.fristEingehalten], [1, s.versandVorlauf, true]);
     const an = (p: string) => mitteilungen.filter(x => x.empfaenger_person === p).map(x => x.text);

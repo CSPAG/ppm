@@ -111,10 +111,10 @@ export const navigation: NavRegistrierung = {
       })),
     },
     // «Änderung beantragen» mit Projektwahl (IA «Navigation», K2 Einstieg; UC-007): Dialog im Reiter Vertrag, der
-    // prüft, ob eine Änderung möglich ist (`can.entwerfen`)
+    // prüft, ob eine Änderung möglich ist (`can.entwerfen`); laufende Projekte wie im Vertrag (aktiv oder sistiert)
     {
       id: 'aenderung', recht: 'vertrag:write',
-      suchen: async (q, signal) => (await sucheProjekte(q, signal)).filter(p => p.lebenszyklus === 'aktiv').map(p => ({
+      suchen: async (q, signal) => (await sucheProjekte(q, signal)).filter(p => p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert').map(p => ({
         id: `aenderung:${p.id}`, label: aenderungTexte.palette(p.nummer, p.name), detail: aenderungTexte.antrag, icon: 'edit', pfad: `/projekte/${encodeURIComponent(p.nummer)}/vertrag?aenderung=1`,
       })),
     },

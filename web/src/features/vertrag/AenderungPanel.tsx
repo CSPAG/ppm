@@ -22,6 +22,12 @@ export function AenderungBeantragen({ projektId, oeffnen = false, onAngelegt, on
 }) {
   const vertrag = useVertrag(projektId);
   const [offen, setOffen] = useState(oeffnen);
+  // Wechselt `oeffnen` auf der offenen Seite (Befehlspalette «Änderung beantragen» auf diesem Vertrag), öffnet der Dialog auch dann
+  const [vorher, setVorher] = useState(oeffnen);
+  if (oeffnen !== vorher) {
+    setVorher(oeffnen);
+    if (oeffnen) setOffen(true);
+  }
   if (!vertrag.data?.can.entwerfen.includes('aenderung')) return null;
   const schliessen = () => { setOffen(false); onGeschlossen?.(); };
   return (

@@ -8,7 +8,7 @@ export const TP = {
   ...NAV,
   title: 'Priorisierung',
   sub: 'Projekte nach dem Bewertungsmodell bewerten; Modell und Budgetrahmen festlegen.',
-  tabs: { bewertung: 'Bewertung', matrix: 'Matrix', modell: 'Modell' },
+  tabs: { bewertung: 'Bewertung', matrix: 'Matrix', szenarien: 'Szenarien', modell: 'Modell' },
   // Bewertung (UI-20)
   portfolio: 'Portfolio',
   modellVersion: 'Modell',

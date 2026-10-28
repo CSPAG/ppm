@@ -40,6 +40,9 @@ export const Rechnung = Type.Object({
     beiRang: Nullable(Type.Integer({ description: 'Rang des ersten Projekts unter der Wasserlinie; null = alle darüber.' })),
     grund: Nullable(Type.Union([Type.Literal('budget'), Type.Literal('kapazitaet')])),
     text: Nullable(Type.String({ description: 'Regel mit Ist-Wert (K5 Regeln), z. B. «Budget: CHF 14,2 Mio. statt höchstens 12,0 Mio. …».' })),
+    kapazitaet: Nullable(Type.Object({
+      rolle: Type.String(), monat: Monat, bedarf: Type.Number(), angebot: Type.Number(), projekte: Type.Integer({ description: 'Projekte mit Bedarf in diesem Monat und dieser Rolle.' }),
+    }, { additionalProperties: false, description: 'Rolle und Monat, in denen das Projekt an der Wasserlinie die Kapazität übersteigt.' })),
   }, { additionalProperties: false }),
   budget: Type.Object({
     rahmen: Nullable(Type.Number({ description: 'Budgetrahmen des Portfolios nach dem Modell in Kraft (A-18); null = keiner.' })),
@@ -106,7 +109,10 @@ const VergleichSpalte = Type.Object({
   risiko: Type.Object({ hoch: Type.Integer(), tief: Type.Integer(), grenze: Type.Integer(), offen: Type.Integer() }, { additionalProperties: false }),
   strategiebeitrag: Type.Object({ hoch: Type.Integer(), mittel: Type.Integer(), tief: Type.Integer(), offen: Type.Integer() }, { additionalProperties: false, description: 'Einschätzung «Strategiebeitrag» der Projekte über der Wasserlinie.' }),
   ueber: Type.Array(Uuid), unter: Type.Array(Uuid),
-  wasserlinie: Type.Object({ beiRang: Nullable(Type.Integer()), grund: Nullable(Type.Union([Type.Literal('budget'), Type.Literal('kapazitaet')])), text: Nullable(Type.String()) }, { additionalProperties: false }),
+  wasserlinie: Type.Object({
+    beiRang: Nullable(Type.Integer()), grund: Nullable(Type.Union([Type.Literal('budget'), Type.Literal('kapazitaet')])), text: Nullable(Type.String()),
+    kapazitaet: Nullable(Type.Object({ rolle: Type.String(), monat: Monat, bedarf: Type.Number(), angebot: Type.Number(), projekte: Type.Integer() }, { additionalProperties: false })),
+  }, { additionalProperties: false }),
   engpaesse: Type.Array(Engpass),
 }, { additionalProperties: false });
 

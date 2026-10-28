@@ -208,6 +208,9 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
   sieht es, bevor er entscheidet (G4). Welche Kapitel Scope, Budget und Ressourcen bilden, legt die UE im Phasenmodell fest.
 - Entscheid: Unterzeichnen als protokollierter Klick der angemeldeten Person; keine Rückfrage, aber Wirkung davor (G6, I-R1
   Stufe 3). Ob das rechtlich genügt, ist offen ([UX-OF-10](../fahrplan.md#offene-fragen)).
+- Annahme (A-10, K11): Die Toleranzen des Projekts je Dimension (Termin, Kosten, Umfang) stehen in Kapitel 7 bei der
+  Zusammenfassung der Projektplanung, weil Q7 kein Kapitel dafür hat. Sie gelten ab der Baseline und ersetzen den Standard
+  des Phasenmodells; ohne Eintrag gilt der Standard.
 - Offen: Pflichtangaben je Phase (K13), Struktur Business Case (K21), Sponsoren-Koalition (K05), Anbindung DTI/DBI (K24).
 - Offen: Zeitpunkt der Gate-Aufgabe ([UX-OF-5](../fahrplan.md#offene-fragen)); Dateiformat der Dokumentausgabe.
 - Umsetzung AP-E3-4: «Änderung freigeben» informiert die Projektleitung per Mitteilung; die Unternehmensentwicklung sieht

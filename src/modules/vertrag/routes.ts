@@ -124,6 +124,12 @@ async function pruefeInhalt(tx: Tx, nr: number, inhalt: unknown, zielLesen: Ziel
     const sichtbar = await store.projekteSichtbar(tx, liste.map(a => a.zuProjektId));
     liste.forEach((a, n) => { if (!sichtbar.has(a.zuProjektId)) fehler.push({ path: `/inhalt/abhaengigkeiten/${n}/zuProjektId`, message: 'Dieses Projekt gibt es nicht.' }); });
   }
+  if (nr === 7) {
+    // Toleranzen (A-10): je Dimension höchstens eine
+    ((i.toleranzen ?? []) as { dimension: string }[]).forEach((t, n, alle) => {
+      if (alle.findIndex(x => x.dimension === t.dimension) !== n) fehler.push({ path: `/inhalt/toleranzen/${n}/dimension`, message: `${t.dimension} ist mehrfach genannt.` });
+    });
+  }
   if (nr === 8) {
     const liste = i.mitglieder as { personId: string; funktion: string }[];
     const da = await store.personenVorhanden(tx, [...new Set(liste.map(m => m.personId))]);

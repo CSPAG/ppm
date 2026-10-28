@@ -20,6 +20,7 @@ import { registerGateRoutes } from './gate-routes.ts';
 import { vertragTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
+import { registerToleranzRoutes, toleranzen } from './toleranz.ts';
 import * as store from './store.ts';
 import { vergleichTools } from './vergleich-mcp.ts';
 import { registerVergleichRoutes } from './vergleich-routes.ts';
@@ -38,6 +39,7 @@ export const vertragModule = defineModule({
     registerGateRoutes(app, deps); // Gate-Modus (AP-E3-3)
     registerVergleichRoutes(app, deps); // Versionsvergleich und Hauptänderungen (AP-E3-4)
     registerAenderungRoutes(app, deps); // Änderungsantrag (AP-E3-4)
+    registerToleranzRoutes(app, deps, TAG); // Gültige Toleranzen des Projekts (A-10)
   },
   tasks: [gateTask], // Aufgabe «Gate vorbereiten» (AP-E3-3)
   mcpTools: { ...vertragTools, ...vergleichTools },
@@ -52,8 +54,11 @@ export const vertrag = {
   versionen: store.versionen,
   version: store.version,
   kapitel: store.kapitel,
+  /** Gültige Toleranz je Projekt und Dimension: Baseline des Vertrags, sonst Phasenmodell (A-10). */
+  toleranzen,
 };
 export { unterzeichnung } from './pruefung.ts';
 export { gateEntscheid, type GateEntscheid } from './gate.ts';
 export { KAPITEL, titel as kapitelTitel, type Inhalt as KapitelInhalt } from './kapitel.ts';
 export type { Anlass, Stand, VersionRow } from './store.ts';
+export type { GueltigeToleranz } from './toleranz.ts';

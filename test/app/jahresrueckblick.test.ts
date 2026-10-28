@@ -30,6 +30,7 @@ describe('Jahresrückblick', { skip }, () => {
   const url = `/v1/jahresrueckblicke/${jahr}`;
   const termin = mittwochIn(28);
   const projekt: Record<string, string> = {};
+  let lesson: { id: string; jahr: number } = { id: '', jahr: 0 };
 
   const call = (method: string, u: string, headers: H, payload?: unknown) =>
     api.app.inject({ method: method as 'GET', url: u, headers: { ...headers, ...(payload !== undefined ? { 'content-type': 'application/json' } : {}) }, ...(payload !== undefined ? { payload: JSON.stringify(payload) } : {}) });
@@ -77,7 +78,10 @@ describe('Jahresrückblick', { skip }, () => {
       await neu('2020-902', 'abgeschlossen', '2020-06-15');
       await neu('2020-903', 'abgebrochen', `${jahr}-03-01`);
       await neu('2020-904', 'aktiv', null);
+      await neu('2020-905', 'abgeschlossen', `${jahr}-09-30`);
     });
+    // Lessons Learned über die REST-Schnittstelle von `abschluss` (AP-E7-1): nur 2020-905 hat welche
+    lesson = (await ok('POST', `/v1/projekte/${projekt['2020-905']}/lessons-learned`, ue, { text: 'Früh mit dem Betrieb planen', kategorie: 'Übergabe' }, 201)).json();
   });
   after(async () => { await api?.close(); });
 
@@ -90,7 +94,11 @@ describe('Jahresrückblick', { skip }, () => {
     assert.deepEqual([b.auswertung.zielerreichung.gesamt, b.auswertung.zielerreichung.mitStand], [2, 1]);
     assert.deepEqual(b.auswertung.zielerreichung.ziele.map((z: { nummer: string; stand: string | null; quartal: string | null }) => [z.nummer, z.stand, z.quartal]),
       [['1.1', '−4 %', quartal], ['1.2', null, null]]);
-    assert.deepEqual(nummern(b.auswertung.vorhaben.abgeschlossen), ['2020-901']);
+    assert.deepEqual(nummern(b.auswertung.vorhaben.abgeschlossen), ['2020-901', '2020-905']);
+    // UC-013 Schritt 2: abgeschlossene Vorhaben ohne Lessons Learned; die Lessons Learned des Jahres der Erfassung
+    assert.deepEqual(nummern(b.auswertung.lessonsLearned.ohne), ['2020-901']);
+    const ll = (await ok('GET', `/v1/jahresrueckblicke/${lesson.jahr}`, gl)).json().auswertung.lessonsLearned.eintraege;
+    assert.deepEqual(ll.map((l: { id: string; projekt: { nummer: string }; kategorie: string }) => [l.id, l.projekt.nummer, l.kategorie]), [[lesson.id, '2020-905', 'Übergabe']]);
     assert.equal(b.auswertung.vorhaben.abgeschlossen[0].seit, `${jahr}-06-15`);
     assert.deepEqual(nummern(b.auswertung.vorhaben.abgebrochen), ['2020-903']);
     assert.ok(nummern(b.auswertung.vorhaben.laufend).includes('2020-904'));
@@ -117,7 +125,7 @@ describe('Jahresrückblick', { skip }, () => {
     assert.equal((await call('PUT', url, mit(ue, r.headers.etag as string), { erkenntnisse: 'x', massnahmen: '' })).statusCode, 409);
     // Stand bei Traktandierung: ein später abgeschlossenes Vorhaben ändert die Auswertung nicht mehr
     await sys(tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgeschlossen' WHERE id = $1", [projekt['2020-904']]));
-    assert.deepEqual(nummern((await ok('GET', url, gl)).json().auswertung.vorhaben.abgeschlossen), ['2020-901']);
+    assert.deepEqual(nummern((await ok('GET', url, gl)).json().auswertung.vorhaben.abgeschlossen), ['2020-901', '2020-905']);
 
     const t = await sys(async tx => (await tx.query<{ id: string; titel: string; portfolio_id: string }>(
       "SELECT id, titel, portfolio_id FROM ppm.traktandum WHERE art = 'jahresrueckblick' AND stand = 'vorgeschlagen'")).rows);

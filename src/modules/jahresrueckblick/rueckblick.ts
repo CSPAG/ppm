@@ -2,9 +2,10 @@
  * Jahresrückblick (BC ZM.03.03; UC-013 Schritte 1, 3, 4; AP-E7-5): Die Jahresauswertung entsteht aus der Zielerreichung
  * des Jahres (Modul `ziel`, AP-E6-3) und den Vorhaben des Jahres; die UE traktandiert sie im PRAT (Art
  * `jahresrueckblick`, K3 Schritt 8: «Verabschiedet» · «Anpassungen verlangt») und erfasst Erkenntnisse und Massnahmen
- * für den nächsten Zielzyklus (UC-011). Lessons Learned (PS.04.03, UC-013 Schritt 2, A1) folgen mit AP-E7-1.
+ * für den nächsten Zielzyklus (UC-011). Lessons Learned (PS.04.03, UC-013 Schritt 2) liest es über `lessonsLearned` aus `abschluss` (AP-E7-1).
  */
 import { conflict, notFound, type Tx } from '@vollholz/platform';
+import { lessonsLearned } from '../abschluss/index.ts';
 import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../sitzung/index.ts';
 import { zielerreichungDesJahres } from '../ziel/index.ts';
 import type { JahresauswertungOut, JahresrueckblickOut } from './schemas.ts';
@@ -22,10 +23,18 @@ export async function auswerten(tx: Tx, jahr: number): Promise<JahresauswertungO
   }));
   const vh = await store.vorhaben(tx, jahr);
   const projekt = (v: store.VorhabenRow) => ({ id: v.id, nummer: v.nummer, name: v.name, portfolio: v.portfolio, phase: v.phase, lebenszyklus: v.lebenszyklus, seit: v.seit });
+  const abgeschlossen = vh.filter(v => v.lebenszyklus === 'abgeschlossen').map(projekt);
+  // Lessons Learned über die Schnittstelle von `abschluss` (AP-E7-1); «ohne» zählt Einträge aus allen Jahren
+  const mitLessons = new Set((await lessonsLearned.lesen(tx, {})).map(l => l.projekt_id));
+  const desJahres = await lessonsLearned.lesen(tx, { jahr });
   return {
     zielerreichung: { gesamt: ziele.length, mitStand: ziele.filter(z => z.stand !== null).length, ziele },
+    lessonsLearned: {
+      eintraege: desJahres.map(l => ({ id: l.id, projekt: { id: l.projekt_id, nummer: l.nummer, name: l.name }, text: l.text, kategorie: l.kategorie })),
+      ohne: abgeschlossen.filter(p => !mitLessons.has(p.id)),
+    },
     vorhaben: {
-      abgeschlossen: vh.filter(v => v.lebenszyklus === 'abgeschlossen').map(projekt),
+      abgeschlossen,
       abgebrochen: vh.filter(v => v.lebenszyklus === 'abgebrochen').map(projekt),
       laufend: vh.filter(v => v.lebenszyklus === 'aktiv' || v.lebenszyklus === 'sistiert').map(projekt),
     },
@@ -35,9 +44,14 @@ export async function auswerten(tx: Tx, jahr: number): Promise<JahresauswertungO
 /** Gespeicherter Stand in der Lesesicht der Person: vertrauliche Vorhaben nur, wer sie sieht. */
 async function fuerLeser(tx: Tx, a: JahresauswertungOut): Promise<JahresauswertungOut> {
   const v = a.vorhaben;
-  const ids = await store.sichtbar(tx, [...v.abgeschlossen, ...v.abgebrochen, ...v.laufend].map(p => p.id));
+  const ll = a.lessonsLearned;
+  const ids = await store.sichtbar(tx, [...v.abgeschlossen, ...v.abgebrochen, ...v.laufend, ...ll.ohne, ...ll.eintraege.map(l => l.projekt)].map(p => p.id));
   const nur = (l: typeof v.laufend) => l.filter(p => ids.has(p.id));
-  return { ...a, vorhaben: { abgeschlossen: nur(v.abgeschlossen), abgebrochen: nur(v.abgebrochen), laufend: nur(v.laufend) } };
+  return {
+    ...a,
+    vorhaben: { abgeschlossen: nur(v.abgeschlossen), abgebrochen: nur(v.abgebrochen), laufend: nur(v.laufend) },
+    lessonsLearned: { eintraege: ll.eintraege.filter(l => ids.has(l.projekt.id)), ohne: nur(ll.ohne) },
+  };
 }
 
 /** Antwort: gespeicherter Stand, Auswertung live (in Arbeit) bzw. bei Traktandierung. */

@@ -8,7 +8,7 @@
  * (DM.02.02, UC-002 Schritt 8). Weitere Pakete (Quality-Check, Gate, Änderung, Vergleich, Dokument) hängen eigene
  * Routendateien in `index.ts` ein.
  */
-import { Type, TypeRegistry } from '@sinclair/typebox';
+import { Type } from '@sinclair/typebox';
 import { Value } from '@sinclair/typebox/value';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import {
@@ -90,11 +90,6 @@ function runden(nr: number, inhalt: Record<string, unknown>): Record<string, unk
 }
 
 type Fehler = { path: string; message: string };
-
-// `Nullable` aus @vollholz/platform 0.6.2 hat vorne den Zweig `Type.Unsafe({ const: null })` (Kind «Unsafe»), den
-// `Value.Check` ohne Eintrag in der TypeRegistry mit «Unknown type» ablehnt. Bis das Paket ihn selbst anmeldet: prüft
-// `const`, sonst offen wie für Fastify (AJV).
-if (!TypeRegistry.Has('Unsafe')) TypeRegistry.Set<{ const?: unknown }>('Unsafe', (s, v) => !('const' in s) || v === s.const);
 
 /** Schema des Kapitels (Q7) und fachliche Regeln der Listen; Fehler mit Pfad im Inhalt. */
 interface ZielLesen {

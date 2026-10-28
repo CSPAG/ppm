@@ -26646,6 +26646,11 @@
           "uebernommenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },

@@ -50914,7 +50914,7 @@ export interface components {
                 /** @description Anzahl Personen der Rolle im Monat. */
                 personen: number;
             }[];
-            uebernommenAt: string | null;
+            uebernommenAt: null | string;
         };
         Kriterium: {
             schluessel: string;

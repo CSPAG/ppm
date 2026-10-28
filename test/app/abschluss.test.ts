@@ -91,8 +91,13 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
     assert.equal(a.length, 1);
     assert.deepEqual([a[0]!.titel, a[0]!.empfaenger_person, a[0]!.link, a[0]!.stand], ['Abschlussbericht Neues Labor erstellen', id.pl, `/projekte/${pj.exit!.nummer}/abschluss`, 'offen']);
 
-    const g = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
-    assert.deepEqual([g.body.lage, g.body.bericht, g.body.can.bearbeiten, g.etag], ['abschluss', null, true, 'W/"0"']);
+    let g = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
+    assert.deepEqual([g.body.lage, g.body.bericht, g.body.can.bearbeiten, g.etag, g.body.grundlagen.nutzenpruefung], ['abschluss', null, true, 'W/"0"', null]);
+    // Grundlage der Beurteilung: letzte Nutzenprüfung aus dem Gate-Modus (UC-003 A2)
+    await sys(tx => tx.query(`WITH v AS (INSERT INTO ppm.vertrag_version (tenant_id, projekt_id, nummer, anlass, zielphase) VALUES ($1, $2, '4.0', 'gate', 'P4') RETURNING id)
+      INSERT INTO ppm.nutzenpruefung (tenant_id, projekt_id, version_id, beurteilung) SELECT $1, $2, id, 'Nutzen stabil' FROM v`, [T, pj.exit!.id]));
+    g = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
+    assert.deepEqual(g.body.grundlagen.nutzenpruefung, { version: '4.0', beurteilung: 'Nutzen stabil', werte: [] });
     const kt = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
     assert.deepEqual([kt.body.can.bearbeiten, kt.body.grundlagen.kosten], [false, null], 'Kernteam liest, ohne Beträge (A-33)');
     assert.equal((await call('kt', 'PUT', `/v1/projekte/${pj.exit!.id}/abschluss`, LEER, { 'if-match': 'W/"0"' })).statusCode, 403);

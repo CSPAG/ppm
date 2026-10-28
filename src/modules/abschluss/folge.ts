@@ -155,7 +155,7 @@ async function anwenden(tx: Tx, p: store.ProjektKopf, lage: store.Kontext, ergeb
       for (const an of await store.spUndPl(tx, p.id)) {
         await mitteilung.senden(tx, {
           an, bezug: bezugVon(p), link: `/projekte/${p.nummer}/vertrag`,
-          text: `${p.nummer} ${p.name} ist wieder aufgenommen. Schreiben Sie den Projektvertrag über ein Gate fort.`,
+          text: `${p.nummer} ${p.name} ist wieder aufgenommen. Schreib den Projektvertrag über ein Gate fort.`,
         });
       }
       return keine;
@@ -258,7 +258,7 @@ async function unterlagen(tx: Tx, projektId: string): Promise<Unterlage[]> {
       hinweis: bereit ? `eingereicht ${datum(b.eingereicht_at!)} · Nutzenprüfung ${nutzen.length ? `durch ${nutzen.join(' und ')}` : 'offen'}` : 'in Nacharbeit',
       inhalt: {
         zielerreichung: b.zielerreichung, kpiWerte: b.kpi_werte, businessCase: b.business_case, uebergabe: b.uebergabe, offenePunkte: b.offene_punkte,
-        nutzen: { sp: b.nutzen_sp, ue: b.nutzen_ue },
+        nutzen: { sp: b.nutzen_sp, ue: b.nutzen_ue }, nutzenpruefungGate: await store.letzteNutzenpruefung(tx, p.id),
       },
     }];
   }

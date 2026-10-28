@@ -66,6 +66,7 @@ export async function ausgabe(req: FastifyRequest, tx: Tx, p: store.ProjektKopf)
   const lessons = await store.lessons(tx, { projektId: p.id, limit: 500 });
   const personen = await store.personen(tx, [...new Set([b?.nutzen_sp_by, b?.nutzen_ue_by, ...lessons.map(l => l.created_by)].filter((x): x is string => !!x))]);
   const entscheid = await store.letzterEntscheid(tx, p.id);
+  const nutzenpruefung = await store.letzteNutzenpruefung(tx, p.id);
   const schreiben = await req.can('projekt:write', projektOrt(p.id));
   const nutzenOffen = !!b && b.art === 'abschluss' && ['entwurf', 'nacharbeit', 'eingereicht', 'traktandiert'].includes(b.stand) && p.lebenszyklus === 'aktiv';
   const art = artFuer(p);
@@ -93,6 +94,7 @@ export async function ausgabe(req: FastifyRequest, tx: Tx, p: store.ProjektKopf)
         id: m.id, phase: String(m.phase), art: String(m.art), text: String(m.text ?? ''),
         terminBaseline: (m.terminBaseline as string | null) ?? null, terminAktuell: (m.terminAktuell as string | null) ?? null,
       })),
+      nutzenpruefung,
     },
     lessonsLearned: lessons.map(l => lessonOut(l, personen, lessonCan)),
     entscheid: entscheid && { ergebnis: entscheid.ergebnis, at: entscheid.entschieden_at },
@@ -241,10 +243,10 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const who = actorOf(req);
     const out = await req.tx(async tx => {
       const b = await store.offenerBericht(tx, p.id);
-      if (!b || !bearbeitbar(b, p)) throw conflict(b ? 'Der Bericht ist bereits eingereicht.' : 'Es liegt kein Bericht vor; erfassen Sie ihn zuerst.', { reason: 'stand', stand: b?.stand ?? null });
+      if (!b || !bearbeitbar(b, p)) throw conflict(b ? 'Der Bericht ist bereits eingereicht.' : 'Es liegt kein Bericht vor; erfasse ihn zuerst.', { reason: 'stand', stand: b?.stand ?? null });
       if (b.version !== erwartet) throw preconditionFailed(b.version);
       const f = fehlend(b);
-      if (f.length) throw invalid(`Angaben fehlen: ${f.map(x => x.message).join(', ')}. Ergänzen Sie sie, um einzureichen.`, f);
+      if (f.length) throw invalid(`Angaben fehlen: ${f.map(x => x.message).join(', ')}. Ergänze sie, um einzureichen.`, f);
       let nach: 'eingereicht' | 'traktandiert' = 'eingereicht';
       let traktandumId: string | null = null;
       if (b.art === 'abschluss') {

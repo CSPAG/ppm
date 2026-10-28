@@ -48821,6 +48821,12 @@ export interface components {
                     terminBaseline: string | null;
                     terminAktuell: string | null;
                 }[];
+                nutzenpruefung: {
+                    /** @description Vertragsversion des Gates. */
+                    version: string;
+                    beurteilung: string;
+                    werte: components["schemas"]["AbschlussKpiWert"][];
+                } | null;
             };
             lessonsLearned: components["schemas"]["AbschlussLessonLearned"][];
             entscheid: {

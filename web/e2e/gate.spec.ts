@@ -6,6 +6,7 @@
  * Befund, kein Überlauf.
  */
 import { expect, test, type Page } from '@playwright/test';
+import { apiAls as datenApi, phasenmodellMitToleranzen } from './daten.ts';
 import { expectAccessible, expectNoOverflow, login, MAX } from './support.ts';
 
 /** Schreibende Aufrufe der API mit CSRF-Token und Organisation der Sitzung (wie die Oberfläche). */
@@ -26,13 +27,12 @@ async function apiAls(page: Page) {
   };
 }
 
-/** Phasenmodell nach der Vorgabe in Kraft (einmal je Organisation), Projekt in P0 mit Max und Entwurf 0.1; liefert die Nummer. */
+/** Phasenmodell nach der Vorgabe in Kraft (einmal je Organisation, daten.ts), Projekt in P0 mit Max und Entwurf 0.1; liefert die Nummer. */
 async function projektMitEntwurf(page: Page): Promise<string> {
   const a = await apiAls(page);
-  if ((await a.get('/v1/phasenmodelle/aktuell')).status() === 404) {
-    const m = await a.send<{ id: string }>('POST', '/v1/phasenmodelle', { quelle: 'vorgabe' });
-    await a.send('POST', `/v1/phasenmodelle/${m.body.id}/in-kraft-setzen`, undefined, { 'if-match': m.etag });
-  }
+  const daten = await datenApi(page);
+  // gemeinsam mit den Specs aus daten.ts: parallel sicher (Entwurf eines anderen Laufs → erneut lesen)
+  await phasenmodellMitToleranzen(daten);
   const schluessel = `e2e-${Date.now().toString(36)}`;
   const pf = await a.send<{ id: string }>('POST', '/v1/portfolios', { kategorie: 'A', schluessel, name: `E2E ${schluessel}` });
   const pj = await a.send<{ id: string; nummer: string }>('POST', '/v1/projekte', { name: `Gate E2E ${schluessel}`, portfolioId: pf.body.id, phase: 'P0' });

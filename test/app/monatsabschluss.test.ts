@@ -111,7 +111,7 @@ describe('Monatsabschluss', { skip }, () => {
 
   test('Abschluss gesperrt, solange eingereichte Berichte ungeprüft sind', async () => {
     const u = await uebersicht();
-    assert.deepEqual([u.kopf.abschluss.moeglich, u.kopf.abschluss.sperre], [false, 'Abschluss: 31 Berichte sind eingereicht, aber nicht geprüft. Prüfen Sie diese zuerst.']);
+    assert.deepEqual([u.kopf.abschluss.moeglich, u.kopf.abschluss.sperre], [false, 'Abschluss: 31 Berichte sind eingereicht, aber nicht geprüft. Prüfe diese zuerst.']);
     const r = await call('POST', `/v1/perioden/${PERIODE}/abschliessen`, ue);
     assert.equal(r.statusCode, 409);
     assert.equal(r.json().reason, 'ungeprueft');

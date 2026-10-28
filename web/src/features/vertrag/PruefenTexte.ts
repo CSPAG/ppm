@@ -1,5 +1,5 @@
 /**
- * Texte für Prüfen und Unterzeichnen (UI-12; Kernablauf K2 Schritte 7–8, «Texte»): Anrede «Sie», Schweizer
+ * Texte für Prüfen und Unterzeichnen (UI-12; Kernablauf K2 Schritte 7–8, «Texte»): Anrede «Du», Schweizer
  * Rechtschreibung, Schaltflächen wie im Kernablauf.
  */
 type Funktion = 'sp' | 'pl' | 'ctl';
@@ -14,7 +14,7 @@ export const TP = {
   pruefenTitel: 'Quality-Check',
   checkliste: 'Checkliste',
   checkPflicht: (fehlen: number) => (fehlen === 0 ? 'Pflichtangaben der Phase vollständig' : `${fehlen === 1 ? '1 Pflichtangabe fehlt' : `${fehlen} Pflichtangaben fehlen`}`),
-  checkHandbuch: 'Einhaltung PM-Handbuch: prüfen Sie die Kapitel; Abweichungen kommentieren Sie am Kapitel.',
+  checkHandbuch: 'Einhaltung PM-Handbuch: prüfe die Kapitel; Abweichungen kommentierst du am Kapitel.',
   kapitel: 'Kapitel',
   kapitelAnsehen: (nr: number) => `Kapitel ${nr} ansehen`,
   kommentar: (nr: number, titel: string) => `Rückmeldung zu Kapitel ${nr} ${titel}`,
@@ -23,8 +23,8 @@ export const TP = {
   bestaetigen: 'Quality-Check bestätigen',
   bestaetigenWirkung: 'Sponsor, Projektleitung und CTL erhalten je eine Unterzeichnungsaufgabe.',
   zurueckgeben: 'Zurück an die Projektleitung',
-  zurueckgebenWirkung: 'Der Entwurf geht mit Ihren Rückmeldungen zurück an die Projektleitung und ist wieder in Arbeit.',
-  zurueckgebenFehlt: 'Rückmeldung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist. Kommentieren Sie mindestens ein Kapitel.',
+  zurueckgebenWirkung: 'Der Entwurf geht mit deinen Rückmeldungen zurück an die Projektleitung und ist wieder in Arbeit.',
+  zurueckgebenFehlt: 'Rückmeldung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist. Kommentiere mindestens ein Kapitel.',
   bestaetigt: 'Quality-Check bestätigt. Sponsor, Projektleitung und CTL unterzeichnen.',
   zurueckgegeben: 'Zurück an die Projektleitung.',
   nichtInPruefung: (stand: string) => `Diese Version ist ${stand}; ein Quality-Check ist nur «in Prüfung» möglich.`,
@@ -33,7 +33,7 @@ export const TP = {
   rueckmeldungVom: (datum: string) => `Rückmeldung vom ${datum}`,
   bestaetigtAm: (datum: string) => `Bestätigt am ${datum}`,
   organisationFehlt: 'Die Projektorganisation ist unvollständig. Sponsor und Projektleitung legen sie in der Projektübersicht fest.',
-  konflikt: 'Der Stand hat sich inzwischen geändert. Laden Sie neu und prüfen Sie erneut.',
+  konflikt: 'Der Stand hat sich inzwischen geändert. Lade neu und prüfe erneut.',
 
   // Unterzeichnen (K2 Schritt 8, K2-1)
   unterzeichnenTitel: 'Projektvertrag unterzeichnen',
@@ -44,8 +44,8 @@ export const TP = {
   verweigert: 'nicht unterzeichnet',
   ausstehend: 'ausstehend',
   inVertretung: 'in Vertretung von',
-  vertretungBanner: 'Sie unterzeichnen in Vertretung. Die Unterschrift trägt den Vermerk.',
-  wirkungLetzte: 'Mit Ihrer Unterschrift ist der Vertrag vollständig unterzeichnet und geht an das zuständige Gremium.',
+  vertretungBanner: 'Du unterzeichnest in Vertretung. Die Unterschrift trägt den Vermerk.',
+  wirkungLetzte: 'Mit deiner Unterschrift ist der Vertrag vollständig unterzeichnet und geht an das zuständige Gremium.',
   wirkungWeitere: (fehlen: string) => `Danach fehlt noch die Unterschrift von ${fehlen}.`,
   unterzeichnen: 'Unterzeichnen',
   nichtUnterzeichnen: 'Nicht unterzeichnen',
@@ -56,8 +56,8 @@ export const TP = {
   abbrechen: 'Abbrechen',
   toastVollstaendig: 'Unterzeichnet. Der Vertrag ist vollständig unterzeichnet.',
   toastFehlt: (fehlen: string) => `Unterzeichnet. Es fehlt noch die Unterschrift von ${fehlen}.`,
-  toastNicht: 'Nicht unterzeichnet. Die Projektleitung erhält Ihre Begründung.',
-  keineOffene: 'Sie haben für diese Version keine offene Unterschrift.',
+  toastNicht: 'Nicht unterzeichnet. Die Projektleitung erhält deine Begründung.',
+  keineOffene: 'Du hast für diese Version keine offene Unterschrift.',
   nichtZurUnterzeichnung: (stand: string) => `Diese Version ist ${stand}.`,
   vollstaendig: 'Der Vertrag ist vollständig unterzeichnet.',
 } as const;

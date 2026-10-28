@@ -6,7 +6,7 @@
  */
 import { defineModule, type Deps } from '@vollholz/platform';
 import type { FastifyInstance } from 'fastify';
-import { freigabeUmgebung, registriereIdee } from './freigabe.ts';
+import { registriereIdee } from './freigabe.ts';
 import { registerFreigabeRoutes } from './freigabe-routes.ts';
 import { ideeTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
@@ -19,7 +19,6 @@ export const ideeModule = defineModule({
     registerRoutes(app, deps);
     registerPruefungRoutes(app, deps);
     registerFreigabeRoutes(app, deps);
-    freigabeUmgebung(deps);
   },
   mcpTools: { ...ideeTools },
 });

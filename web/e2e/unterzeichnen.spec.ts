@@ -62,7 +62,7 @@ test('Unterzeichnen ab dem Eingang bei 360 px in höchstens 3 Interaktionen (K2-
   interaktionen++;
   await expect(page).toHaveURL(new RegExp(`/projekte/${nr}/vertrag/unterzeichnen`));
   await expect(page.getByRole('heading', { name: 'Projektvertrag unterzeichnen' })).toBeVisible();
-  await expect(page.getByText('Mit Ihrer Unterschrift ist der Vertrag vollständig unterzeichnet und geht an das zuständige Gremium.')).toBeVisible();
+  await expect(page.getByText('Mit deiner Unterschrift ist der Vertrag vollständig unterzeichnet und geht an das zuständige Gremium.')).toBeVisible();
   await expectNoOverflow(page);
   await expectAccessible(page);
 

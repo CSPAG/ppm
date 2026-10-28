@@ -235,6 +235,8 @@ export const model = defineModel({
     // idee
     list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },
     get_idee: { title: 'Projektidee lesen', permission: 'idee:read', readOnly: true },
+    // abschluss
+    list_lessons_learned: { title: 'Lessons Learned auflisten', permission: 'projekt:read', readOnly: true },
   },
   capabilities: {
     // projekt: Fähigkeiten `can` je Projekt (Projekt ändern, Projektorganisation festlegen)

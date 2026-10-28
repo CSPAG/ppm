@@ -19,21 +19,21 @@ export function pruefen(art: Art, platzhalter: readonly string[], zuordnung: Rea
     m.push({ stufe: 'sperre', regel: 'datenquelle', text: `Datenquelle fehlt: Für «${ART_NAME[art]}» liefert noch kein Modul Daten. Die Vorlage bleibt Entwurf, bis die Dokumentausgabe dieser Art gebaut ist.` });
   }
   if (!platzhalter.length) {
-    m.push({ stufe: 'sperre', regel: 'platzhalter', text: 'Platzhalter fehlen: Die Datei enthält keinen Platzhalter in Guillemets, z. B. «Projektname». Ergänzen Sie die Platzhalter in Word und laden Sie die Datei erneut hoch.' });
+    m.push({ stufe: 'sperre', regel: 'platzhalter', text: 'Platzhalter fehlen: Die Datei enthält keinen Platzhalter in Guillemets, z. B. «Projektname». Ergänze die Platzhalter in Word und lade die Datei erneut hoch.' });
   }
   const offen = platzhalter.filter(p => !zuordnung[p]);
   if (offen.length) {
-    m.push({ stufe: 'sperre', regel: 'zuordnung', platzhalter: offen, text: `Zuordnung fehlt: ${offen.length} von ${platzhalter.length} Platzhaltern ohne Datenfeld (${liste(offen)}). Ordnen Sie jedem Platzhalter ein Feld zu.` });
+    m.push({ stufe: 'sperre', regel: 'zuordnung', platzhalter: offen, text: `Zuordnung fehlt: ${offen.length} von ${platzhalter.length} Platzhaltern ohne Datenfeld (${liste(offen)}). Ordne jedem Platzhalter ein Feld zu.` });
   }
   if (felder) {
     const bekannt = new Set(felder.map(f => f.schluessel));
     const unbekannt = platzhalter.filter(p => zuordnung[p] && !bekannt.has(zuordnung[p]!));
     if (unbekannt.length) {
-      m.push({ stufe: 'sperre', regel: 'feld', platzhalter: unbekannt, text: `Datenfeld unbekannt: ${liste(unbekannt)} verweisen auf Felder, die es für «${ART_NAME[art]}» nicht gibt. Wählen Sie ein Feld aus der Liste.` });
+      m.push({ stufe: 'sperre', regel: 'feld', platzhalter: unbekannt, text: `Datenfeld unbekannt: ${liste(unbekannt)} verweisen auf Felder, die es für «${ART_NAME[art]}» nicht gibt. Wähle ein Feld aus der Liste.` });
     }
   }
   if (!personendaten) {
-    m.push({ stufe: 'warnung', regel: 'personendaten', text: 'Kennzeichnung fehlt: Die Vorlage nennt «Personendaten» nicht. Erzeugte Dokumente enthalten Namen; ergänzen Sie in der Kopfzeile «Intern · enthält Personendaten» (G12).' });
+    m.push({ stufe: 'warnung', regel: 'personendaten', text: 'Kennzeichnung fehlt: Die Vorlage nennt «Personendaten» nicht. Erzeugte Dokumente enthalten Namen; ergänze in der Kopfzeile «Intern · enthält Personendaten» (G12).' });
   }
   return { aktivierbar: !m.some(x => x.stufe === 'sperre'), meldungen: m };
 }

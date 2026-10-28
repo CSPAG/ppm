@@ -14,8 +14,8 @@ export const Aufgabe = Type.Object({
   frist: Nullable(Datum),
   fristArt: Nullable(Type.Union([Type.Literal('kalendertage'), Type.Literal('arbeitstage')], { description: 'UX-E11: Art der Frist steht immer dabei.' })),
   bezug: Type.Object({ typ: Type.String(), id: Type.String() }, { additionalProperties: false }),
-  empfaenger: Type.Union([Type.Literal('person'), Type.Literal('recht')], { description: '`person`: an Sie persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.' }),
-  vertretung: Nullable(Type.Object({ person: Person, bis: Datum }, { additionalProperties: false, description: 'Gesetzt, wenn die Aufgabe einer Person gehört, die Sie heute vertreten (UC-016 Schritt 4).' })),
+  empfaenger: Type.Union([Type.Literal('person'), Type.Literal('recht')], { description: '`person`: an dich persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort.' }),
+  vertretung: Nullable(Type.Object({ person: Person, bis: Datum }, { additionalProperties: false, description: 'Gesetzt, wenn die Aufgabe einer Person gehört, die du heute vertrittst (UC-016 Schritt 4).' })),
   createdAt: DateTime,
   can: Type.Object({ erledigen: Type.Boolean({ description: 'Nur Aufgaben ohne fachlichen Übergang sind von Hand erledigbar.' }) }, { additionalProperties: false }),
 }, { $id: 'Aufgabe', additionalProperties: false });
@@ -65,7 +65,7 @@ export const Stellvertretung = Type.Object({
   bis: Datum,
   unterschriften: Type.Boolean({ description: 'Die Vertretung darf in Vertretung unterzeichnen (UX-OF-10, A-31).' }),
   aktiv: Type.Boolean({ description: 'Heute im Zeitraum.' }),
-  richtung: Type.Union([Type.Literal('eigene'), Type.Literal('fuer_andere')], { description: '`eigene`: Sie werden vertreten; `fuer_andere`: Sie vertreten.' }),
+  richtung: Type.Union([Type.Literal('eigene'), Type.Literal('fuer_andere')], { description: '`eigene`: du wirst vertreten; `fuer_andere`: du vertrittst.' }),
   createdAt: DateTime,
   can: Type.Object({ beenden: Type.Boolean() }, { additionalProperties: false }),
 }, { $id: 'Stellvertretung', additionalProperties: false });

@@ -58,7 +58,7 @@ async function version(tx: Tx, art: Art, nr: number): Promise<store.VersionRow> 
 
 /** Entwurf mit passendem Stand der Zeile, sonst 409 (nicht Entwurf) bzw. 412. */
 function entwurf(r: store.VersionRow, rev: number): void {
-  if (r.stand !== 'entwurf') throw conflict(`Version ${r.version} ist ${r.stand === 'aktiv' ? 'aktiv' : 'abgelöst'} und lässt sich nicht mehr ändern. Laden Sie eine neue Version hoch.`, { reason: 'nicht_entwurf' });
+  if (r.stand !== 'entwurf') throw conflict(`Version ${r.version} ist ${r.stand === 'aktiv' ? 'aktiv' : 'abgelöst'} und lässt sich nicht mehr ändern. Lade eine neue Version hoch.`, { reason: 'nicht_entwurf' });
   if (r.rev !== rev) throw preconditionFailed(r.rev);
 }
 

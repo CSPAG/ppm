@@ -16,7 +16,7 @@ import { TA } from './AenderungTexte.ts';
 const P = '00000000-0000-4000-8000-000000000001';
 const B = '00000000-0000-4000-8000-0000000000b1';
 const V = '00000000-0000-4000-8000-0000000000c2';
-const HINWEIS = 'Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Sie können sie unterstützen; entscheiden wird der PRAT.';
+const HINWEIS = 'Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Du kannst sie unterstützen; entscheiden wird der PRAT.';
 
 const projekt = { id: P, nummer: '2026-014', name: 'Digitale Patientenaufnahme', phase: 'P1', lebenszyklus: 'aktiv' };
 const version = (id: string, nummer: string, o: Record<string, unknown> = {}) => ({

@@ -55,6 +55,7 @@ const ZielzyklusPage = seite(() => import('./features/ziele/ZielzyklusPage.tsx')
 const FreigabePage = seite(() => import('./features/ziele/FreigabePage.tsx'), 'FreigabePage');
 const RoadmapPage = seite(() => import('./features/ziele/RoadmapPage.tsx'), 'RoadmapPage');
 const ZielerreichungPage = seite(() => import('./features/ziele/ZielerreichungPage.tsx'), 'ZielerreichungPage');
+const QuartalsreportingPage = seite(() => import('./features/ziele/QuartalsreportingPage.tsx'), 'QuartalsreportingPage');
 
 const rootRoute = createRootRoute({ component: Root, notFoundComponent: NotFound });
 
@@ -236,6 +237,32 @@ function ZielerreichungRoute() {
   }, [navigate]);
   const zuZielen = useCallback(() => { void navigate({ to: '/ziele/strategische-ziele' }); }, [navigate]);
   return <ZielerreichungPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} zuZielen={zuZielen} />;
+}
+
+// Quartalsreporting an den VR (UI-41, BC ZM.03.02, AP-E6-4): /ziele/2026/quartalsreporting?quartal=q3; ohne Jahr und
+// Quartal das zuletzt abgeschlossene
+const quartalsreportingStartRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/quartalsreporting',
+  beforeLoad: () => {
+    const q = abgeschlossenesQuartal();
+    throw redirect({ to: '/ziele/$jahr/quartalsreporting', params: { jahr: String(q.jahr) }, search: { quartal: `q${q.quartal}` }, replace: true });
+  },
+});
+
+const quartalsreportingRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/ziele/$jahr/quartalsreporting', validateSearch: searchOf.zielerreichung, component: QuartalsreportingRoute,
+  beforeLoad: ({ params }) => { if (!/^\d{4}$/.test(params.jahr) || Number(params.jahr) < 2000 || Number(params.jahr) > 2100) throw notFound(); },
+});
+
+function QuartalsreportingRoute() {
+  const { jahr } = quartalsreportingRoute.useParams();
+  const search = quartalsreportingRoute.useSearch();
+  const navigate = useNavigate({ from: quartalsreportingRoute.fullPath });
+  const quartal = Number((search.quartal ?? `q${abgeschlossenesQuartal().quartal}`).slice(1)) as QuartalNr;
+  const setQuartal = useCallback((j: number, q: QuartalNr) => {
+    void navigate({ to: '/ziele/$jahr/quartalsreporting', params: { jahr: String(j) }, search: { quartal: `q${q}` } });
+  }, [navigate]);
+  return <QuartalsreportingPage jahr={Number(jahr)} quartal={quartal} setQuartal={setQuartal} />;
 }
 
 // Arbeitsraum «Portfolio» › Ressourcen: Auslastung (UI-23) und Kapazität (UI-24) (BC RK.01.01, RK.02.04, AP-E5-4)
@@ -492,6 +519,8 @@ const routeTree = rootRoute.addChildren([
   ideeRoute,
   zielerreichungStartRoute,
   zielerreichungRoute,
+  quartalsreportingStartRoute,
+  quartalsreportingRoute,
   dashboardRoute,
   monatsabschlussRoute,
   organisationRoute,

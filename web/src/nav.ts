@@ -16,7 +16,7 @@ import { dashboardTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
-import { roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
+import { quartalsreportingTexte, roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
 import type { NavRegistrierung } from './shell/index.ts';
 import { T } from './ui/index.ts';
 
@@ -42,6 +42,8 @@ export const navigation: NavRegistrierung = {
     { raum: 'ziele', pfad: '/ziele/strategische-ziele', label: zieleTexte.bereich, recht: 'ziel:read' },
     // Zielerreichung je Quartal (BC ZM.03.01, AP-E6-3); führt ins zuletzt abgeschlossene Quartal
     { raum: 'ziele', pfad: '/ziele/zielerreichung', label: zielerreichungTexte.bereich, recht: 'ziel:read', muster: /^\/ziele\/\d{4}\/zielerreichung\/?$/ },
+    // Quartalsreporting an den VR (BC ZM.03.02, AP-E6-4); führt ins zuletzt abgeschlossene Quartal
+    { raum: 'ziele', pfad: '/ziele/quartalsreporting', label: quartalsreportingTexte.bereich, recht: 'ziel:read', muster: /^\/ziele\/\d{4}\/quartalsreporting\/?$/ },
     // Arbeitsraum «Portfolio»: Ressourcen mit Auslastung und Kapazität (BC RK.01.01, RK.02.04, AP-E5-4)
     // Priorisierung mit Bewertung und Modell (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1); Gremium mit Recht am Portfolio
     { raum: 'portfolio', pfad: '/portfolio/priorisierung', label: priorisierungTexte.bereich, recht: 'priorisierung:read' },

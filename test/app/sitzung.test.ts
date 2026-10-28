@@ -3,6 +3,7 @@
  * Aufnehmen mit Zeitbedarf und Einladungen, «via SNS-VR» aus dem Gremienweg, Unterlagenstand mit Verschieben, Versand mit
  * Vorschau und Protokoll, Lesesicht vor und nach dem Versand, Aufgabe «Sitzung vorbereiten» aus dem Lauf der Fristen.
  */
+import { randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 import { full, skipDb } from './harness.ts';
@@ -108,7 +109,10 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     await sys(tx => traktandum.vorschlagen(tx, { art: 'abschluss', bezug: { typ: 'abschlussbericht', id: 'a-1' }, projektId: p2.id, titel: 'Eskalation Lieferverzug' }));
 
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin1 }, 201);
-    assert.deepEqual([s.stand, s.traktanden.length, s.can.write, s.frist.arbeitstage], ['geplant', 0, true, 5]);
+    assert.deepEqual([s.stand, s.traktanden.length, s.can.write, s.frist.arbeitstage], ['geplant', 1, true, 5]);
+    // festes Traktandum 1 (K3 Schritt 4): ohne Portfoliobericht ein Platzhalter
+    const fest = s.traktanden[0];
+    assert.deepEqual([fest.titel, fest.art, fest.fest, fest.position, fest.bezug.typ, fest.unterlagen.stand], ['Bericht der Programmleitung', 'portfoliobericht', true, 1, 'sitzung', 'fehlt']);
     assert.equal((await call('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin1 })).statusCode, 409);
     assert.equal((await call('POST', '/v1/gremien/prat/sitzungen', ue, { datum: mittwochIn(200) })).statusCode, 422, 'nur zu einem Termin');
 
@@ -117,8 +121,8 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.equal(v.gruppen[0].traktanden[0].antrag, 'Freigabe Phase P2');
 
     let r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: g1 });
-    const t1 = r.traktanden[0];
-    assert.deepEqual([t1.dauerMin, t1.viaSns, t1.position, t1.zeit, r.stand], [35, true, 1, null, 'in_vorbereitung']);
+    const t1 = r.traktanden[1];
+    assert.deepEqual([t1.dauerMin, t1.viaSns, t1.position, t1.zeit, r.stand, t1.fest], [35, true, 2, null, 'in_vorbereitung', false]);
     assert.deepEqual(t1.einladungen.map((e: { funktion: string; personId: string }) => [e.funktion, e.personId]), [['pl', pl], ['ctl', ctl], ['sp', sp]]);
     assert.deepEqual([t1.unterlagen.stand, t1.unterlagen.liste[0].titel], ['bereit', 'Gate Review Packet']);
 
@@ -127,28 +131,35 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: g2 });
     r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: esk });
     assert.deepEqual(r.traktanden.map((t: { viaSns: boolean; dauerMin: number | null; unterlagen: { stand: string } }) => [t.viaSns, t.dauerMin, t.unterlagen.stand]),
-      [[true, 35, 'bereit'], [false, 35, 'bereit'], [false, null, 'keine']], 'P2 nicht über den SNS-VR; Eskalation ohne Unterlagen');
+      [[false, null, 'fehlt'], [true, 35, 'bereit'], [false, 35, 'bereit'], [false, null, 'keine']], 'P2 nicht über den SNS-VR; Eskalation ohne Unterlagen');
     assert.equal(r.zeitbedarfMin, 70);
     assert.deepEqual((await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue)).gruppen, []);
 
     // Zeitfenster ab Beginn, Dauer gegen die Sitzungsdauer
     r = await ok('PATCH', `/v1/sitzungen/${s.id}`, { ...ue, 'if-match': `W/"${r.version}"` }, { beginn: '14:00', dauerMin: 180, ort: 'Sitzungszimmer 1' });
-    assert.deepEqual(r.traktanden.map((t: { zeit: string }) => t.zeit), ['14:00', '14:35', '15:10']);
+    assert.deepEqual(r.traktanden.map((t: { zeit: string }) => t.zeit), ['14:00', '14:00', '14:35', '15:10']);
 
     // Ordnen nur mit If-Match und vollständig
     const ids = r.traktanden.map((t: { id: string }) => t.id);
     assert.equal((await call('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': 'W/"1"' }, { reihenfolge: ids })).statusCode, 412);
     assert.equal((await call('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': `W/"${r.version}"` }, { reihenfolge: ids.slice(1) })).statusCode, 422);
-    r = await ok('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': `W/"${r.version}"` }, { reihenfolge: [ids[2], ids[0], ids[1]] });
-    assert.deepEqual(r.traktanden.map((t: { id: string; position: number }) => [t.id, t.position]), [[ids[2], 1], [ids[0], 2], [ids[1], 3]]);
+    // das feste Traktandum bleibt an Position 1, lässt sich weder entfernen noch verschieben (409)
+    const gesperrt = await call('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': `W/"${r.version}"` }, { reihenfolge: [ids[1], ids[0], ids[2], ids[3]] });
+    assert.deepEqual([gesperrt.statusCode, gesperrt.json().reason], [409, 'fest']);
+    for (const weg of ['entfernen', 'verschieben']) {
+      const x = await call('POST', `/v1/traktanden/${ids[0]}/${weg}`, ue);
+      assert.deepEqual([x.statusCode, x.headers['content-type'], x.json().reason], [409, 'application/problem+json; charset=utf-8', 'fest'], weg);
+    }
+    r = await ok('PUT', `/v1/sitzungen/${s.id}/traktanden`, { ...ue, 'if-match': `W/"${r.version}"` }, { reihenfolge: [ids[0], ids[3], ids[1], ids[2]] });
+    assert.deepEqual(r.traktanden.map((t: { id: string; position: number }) => [t.id, t.position]), [[ids[0], 1], [ids[3], 2], [ids[1], 3], [ids[2], 4]]);
 
     // Einplanen (PP.04.05) und wieder entfernen
     r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'gate', projektId: p2.id, titel: 'Gate eingeplant' });
     const geplant = r.traktanden.find((t: { titel: string }) => t.titel === 'Gate eingeplant');
-    assert.deepEqual([geplant.bezug.typ, geplant.position, geplant.antrag], ['projekt', 4, `Freigabe Gate für ${p2.nummer}`]);
+    assert.deepEqual([geplant.bezug.typ, geplant.position, geplant.antrag], ['projekt', 5, `Freigabe Gate für ${p2.nummer}`]);
     assert.equal((await call('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'gate', projektId: p2.id })).statusCode, 409, 'Geschäft schon traktandiert');
     r = await ok('POST', `/v1/traktanden/${geplant.id}/entfernen`, ue);
-    assert.equal(r.traktanden.length, 3);
+    assert.equal(r.traktanden.length, 4);
     sitzung = { id: s.id, version: r.version };
   });
 
@@ -158,11 +169,11 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     const t = s.traktanden.find((x: { projekt: { id: string } | null; art: string }) => x.art === 'gate' && x.projekt?.id === p2.id);
     assert.equal(t.unterlagen.stand, 'quality_check_offen');
     const vor = await ok('GET', `/v1/sitzungen/${sitzung.id}/versand`, ue);
-    assert.deepEqual(vor.warnungen.map((w: { traktandumId: string; stand: string }) => [w.traktandumId, w.stand]), [[t.id, 'quality_check_offen']]);
+    assert.deepEqual(vor.warnungen.map((w: { traktandumId: string; stand: string }) => [w.traktandumId, w.stand]).filter(([id]: string[]) => id === t.id), [[t.id, 'quality_check_offen']]);
 
     const v = await ok('POST', `/v1/traktanden/${t.id}/verschieben`, ue);
     assert.deepEqual([v.nach.datum, v.traktandum.stand, v.traktandum.verschobenVon, v.traktandum.einladungen], [termin2, 'verschoben', termin1, []]);
-    assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).traktanden.length, 2);
+    assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).traktanden.length, 3);
     const naechste = await ok('GET', `/v1/gremien/prat/sitzungen/${termin2}`, ue);
     const vs = await ok('GET', `/v1/sitzungen/${naechste.id}/vorschlaege`, ue);
     // verschobene zuerst in ihrer Art; danach der vorhin entfernte Vorschlag ohne Sitzung
@@ -170,10 +181,10 @@ describe('Sitzungen vorbereiten', { skip }, () => {
 
     // Rückgängig: in der ursprünglichen Sitzung wieder aufnehmen, dann endgültig verschieben
     let r = await ok('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { vorschlagId: t.id });
-    assert.equal(r.traktanden.length, 3);
+    assert.equal(r.traktanden.length, 4);
     await ok('POST', `/v1/traktanden/${t.id}/verschieben`, ue);
     r = await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue);
-    assert.deepEqual(r.traktanden.map((x: { position: number }) => x.position), [1, 2]);
+    assert.deepEqual(r.traktanden.map((x: { position: number }) => x.position), [1, 2, 3]);
     sitzung.version = r.version;
     qc.delete(p2.id);
   });
@@ -198,8 +209,8 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     sitzung.version = (await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue)).version;
 
     const vor = await ok('GET', `/v1/sitzungen/${sitzung.id}/versand`, ue);
-    assert.deepEqual([vor.traktanden, vor.unterlagen, vor.eingeladene, vor.warnungen, vor.verschoben, vor.frist.eingehalten],
-      [2, { packet: 1, bericht: 0, beilage: 0 }, 3, [], 1, true]);
+    assert.deepEqual([vor.traktanden, vor.unterlagen, vor.eingeladene, vor.warnungen.map((w: { titel: string; stand: string }) => [w.titel, w.stand]), vor.verschoben, vor.frist.eingehalten],
+      [3, { packet: 1, bericht: 0, beilage: 0 }, 3, [['Bericht der Programmleitung', 'fehlt']], 1, true]);
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, ue)).statusCode, 428);
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': 'W/"1"' })).statusCode, 412);
     const s = await ok('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${sitzung.version}"` });
@@ -231,7 +242,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.ok(eingang.some((t: string) => t.startsWith('Unterlagen PRAT') && t.endsWith('lesen')), JSON.stringify(eingang));
 
     // Mitglieder lesen ab Versand; Eingeladene nur ihr Traktandum
-    assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, mitglied)).traktanden.length, 2);
+    assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, mitglied)).traktanden.length, 3);
     const fuerPl = await ok('GET', `/v1/sitzungen/${sitzung.id}`, plH);
     assert.deepEqual(fuerPl.traktanden.map((t: { projekt: { id: string } }) => t.projekt.id), [p1.id]);
   });
@@ -269,5 +280,21 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     const k = await ok('GET', '/v1/sitzungen/kopf', ue);
     assert.equal(k.sitzungen[0].datum, termin1);
     assert.equal((await call('GET', '/v1/gremien/unbekannt/sitzungen', ue)).statusCode, 404);
+  });
+
+  test('Festes Traktandum 1 «Bericht der Programmleitung»: der Vorschlag füllt den Platzhalter, einmal (K3 Schritt 4)', async () => {
+    // nächste Sitzung in Vorbereitung mit Platzhalter: die zum zweiten Termin
+    let s = await ok('GET', `/v1/gremien/prat/sitzungen/${termin2}`, ue);
+    s = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { art: 'abschluss', titel: 'Eskalation Termin' });
+    const platzhalter = s.traktanden[0].id;
+    // Vorschlag mit Recht auf die Traktandenliste (Job, UE): ersetzt den Platzhalter der nächsten Sitzung an Position 1
+    const id = await sys(tx => traktandum.vorschlagen(tx, { art: 'portfoliobericht', bezug: { typ: 'portfoliobericht', id: randomUUID() }, portfolioId: portfolio, titel: 'Bericht der Programmleitung' }));
+    s = await ok('GET', `/v1/sitzungen/${s.id}`, ue);
+    assert.deepEqual(s.traktanden.map((t: { id: string; position: number; fest: boolean }) => [t.id === id, t.position, t.fest]), [[true, 1, true], [false, 2, false]]);
+    assert.equal(s.traktanden.some((t: { id: string }) => t.id === platzhalter), false, 'Platzhalter ersetzt');
+    // ein zweiter Bericht lässt sich nicht zusätzlich traktandieren
+    const zweiter = await sys(tx => traktandum.vorschlagen(tx, { art: 'portfoliobericht', bezug: { typ: 'portfoliobericht', id: randomUUID() }, portfolioId: portfolio, titel: 'Bericht der Programmleitung' }));
+    const x = await call('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: zweiter });
+    assert.deepEqual([x.statusCode, x.json().reason], [409, 'fest']);
   });
 });

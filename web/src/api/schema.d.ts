@@ -43635,6 +43635,8 @@ export interface components {
             /** @description «via SNS-VR»: Der Entscheid des Gremiums ist eine Stellungnahme (UC-006 A1). */
             viaSns: boolean;
             vertraulich: boolean;
+            /** @description Festes Traktandum 1 «Bericht der Programmleitung» (K3 Schritt 4): weder entfernen noch verschieben, bleibt an Position 1. */
+            fest: boolean;
             /** @description Datum der Sitzung, von der das Traktandum verschoben wurde (UC-006 A2). */
             verschobenVon: string | null;
             unterlagen: {

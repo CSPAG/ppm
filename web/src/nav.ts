@@ -11,6 +11,7 @@ import { portfoliosTexte } from './features/portfolios/index.ts';
 import { suchePersonen, zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
 import { naechsteSitzungPfad, sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
+import { jahresrueckblickTexte } from './features/jahresrueckblick/index.ts';
 import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
 import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
@@ -32,10 +33,12 @@ export const navigation: NavRegistrierung = {
     { raum: 'eingang', pfad: '/eingang', label: eingangTexte.titel, recht: 'tenant:read' },
     // Arbeitsraum «Projekte»: Meine Projekte mit der Projektakte (UI-05, UI-06; Projektrollen sehen nur ihre Projekte)
     { raum: 'projekte', pfad: '/projekte', label: projektTexte.bereich, recht: 'projekt:read' },
-    // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1); Jahresrückblick folgt
-    { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read', muster: /^\/gremien\/(sitzungen|(?!entscheide\/?$)[a-z0-9][a-z0-9-]*(\/sitzungen.*)?)\/?$/ },
+    // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1)
+    { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungTexte.bereich, recht: 'sitzung:read', muster: /^\/gremien\/(sitzungen|(?!(entscheide|jahresrueckblick)\/?$)[a-z0-9][a-z0-9-]*(\/sitzungen.*)?)\/?$/ },
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
     { raum: 'gremien', pfad: '/gremien/entscheide', label: sitzungsmodusTexte.entscheide, recht: 'sitzung:read' },
+    // Jahresrückblick (UI-37, UC-013, AP-E7-5) für Gremium und UE; führt im Q4 ins laufende Jahr, sonst ins Vorjahr
+    { raum: 'gremien', pfad: '/gremien/jahresrueckblick', label: jahresrueckblickTexte.bereich, recht: ['sitzung:read', 'quartalsbericht:write'], muster: /^\/gremien\/jahresrueckblick(\/\d{4})?\/?$/ },
     // Arbeitsraum «Portfolio» › Dashboard (UI-17, PC.04.01; AP-E1-3): erster Bereich des Portfolios (IA)
     { raum: 'portfolio', pfad: '/portfolio/dashboard', label: dashboardTexte.bereich, recht: 'auswertung:read', muster: /^\/portfolio\/dashboard\/?$/ },
     // Risikolage (UI-18) und Portfoliobericht (UI-29), AP-E2-3

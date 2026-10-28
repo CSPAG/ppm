@@ -28477,6 +28477,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/statusberichte/stand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stand der Berichte mehrerer Projekte
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»): je Projekt der letzte eingereichte Bericht mit Status, Trend und Begründung und der Bericht der laufenden Periode mit Stichtag. Projekte ohne Leserecht entfallen.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Projekte (mehrfach, höchstens 20). */
+                    projektId: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BerichtStandList"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/berichte": {
         parameters: {
             query?: never;
@@ -47923,6 +48019,24 @@ export interface components {
                 stufe: string | null;
                 kommentar: string;
             };
+        };
+        BerichtStandList: {
+            items: {
+                /** Format: uuid */
+                projektId: string;
+                letzter: {
+                    periode: string;
+                    status: ("im_plan" | "kritisch") | null;
+                    trend: string | null;
+                    /** @description Begründung des Status (Pflicht bei «kritisch»). */
+                    begruendung: string;
+                } | null;
+                laufend: {
+                    periode: string;
+                    stand: ("entwurf" | "eingereicht" | "zurueckgegeben" | "geprueft") | null;
+                    stichtag: string | null;
+                } | null;
+            }[];
         };
         StatusberichtEskalationNeu: {
             /** @description Worum es geht, z. B. die wesentliche Abweichung zur Baseline. */

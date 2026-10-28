@@ -178,6 +178,9 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
 
     await entscheiden(t.id, 'sistiert');
     assert.equal(await lz(pj.stopp!.id), 'sistiert');
+    // Audit beim Projekt mit der Person, die den Entscheid erfasst (FolgeKontext, #120)
+    const audit = await sys(async tx => (await tx.query<{ actor_kind: string }>("SELECT actor_kind FROM ppm.audit_log WHERE action = 'projekt.suspended' AND resource_id = $1", [pj.stopp!.id])).rows);
+    assert.deepEqual(audit.map(a => a.actor_kind), ['user']);
     let g = await ok('pl', 'GET', `/v1/projekte/${pj.stopp!.id}/abschluss`);
     assert.deepEqual([g.body.lage, g.body.bericht.art, g.body.bericht.stand, g.body.can.wiederaufnahme], ['sistierung', 'sistierung', 'entwurf', true]);
     assert.equal((await aufgaben(pj.stopp!.id)).filter(a => a.stand === 'offen')[0]!.titel, 'Bericht zur Sistierung Digitale Visite erstellen');

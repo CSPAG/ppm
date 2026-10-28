@@ -108,7 +108,7 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', { skip }, () => {
     const g = await ok('kt', 'GET', `/v1/vertragsversionen/${id.v1}/gate`);
     assert.deepEqual([g.body.gate.code, g.body.gate.label, g.body.gremienweg.gremium.kuerzel, g.body.fortschritt], ['P0_P1', 'P0–P1', 'prat', { beantwortet: 0, gesamt: 5 }]);
     assert.deepEqual(g.body.can, { antworten: false, nutzen: false }, 'Kernteam liest nur');
-    await bisUnterzeichnet(id.v1, e.etag);
+    await bisUnterzeichnet(id.v1!, e.etag);
 
     const [t] = await traktanden();
     assert.deepEqual([t!.bezug_typ, t!.bezug_id, t!.gremium_id, t!.stand, t!.titel, t!.antrag],
@@ -195,7 +195,7 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', { skip }, () => {
     const cur = await ok('pl', 'GET', `/v1/vertragsversionen/${id.v2}/gate`);
     assert.equal(cur.body.stand, 'in_arbeit');
     const k = await ok('pl', 'GET', `/v1/vertragsversionen/${id.v2}/pruefung`);
-    await bisUnterzeichnet(id.v2, k.etag);
+    await bisUnterzeichnet(id.v2!, k.etag);
     assert.equal((await call('pl', 'PUT', url(f1!), { antwort: 'zu spät' }, { 'if-match': 'W/"1"' })).statusCode, 409, 'nach dem Einreichen gesperrt');
     assert.equal((await aufgaben('gate.vorbereiten'))[0]!.stand, 'erledigt');
     const ts = await traktanden();

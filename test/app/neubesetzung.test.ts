@@ -1,7 +1,8 @@
 /**
  * Zugang entziehen mit Neubesetzung (AM.01.01, UC-016 A1; Fachmodell 4.2): Vorschau mit Rollen und offenen Aufgaben,
  * Entziehen über den Baukasten (Mitgliedschaft und Tupel), Aufgabe «Rollen von ‹Person› neu besetzen» bei der
- * Administration, Stand der Rollen aus den Tupeln, Wiederaufnahme nach einem Fehler und Rechte.
+ * Administration, Stand der Rollen aus den Tupeln, Wiederaufnahme nach einem Fehler und Rechte; über die Haken des
+ * Baukastens (iam 4.0) auch beim Entfernen unter «Benutzer und Rollen»; Mitteilung bei Rollenänderungen (Schritt 3).
  */
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -150,5 +151,40 @@ describe('Zugang entziehen und Neubesetzung', { skip }, () => {
     assert.equal(e2.statusCode, 201, e2.body);
     assert.equal(e2.json().rollen, 1);
     assert.equal((await call('GET', '/v1/neubesetzungen', adm.h)).json().items.length, vorher + 1);
+  });
+
+  test('Entfernen unter «Benutzer und Rollen» (Route des Baukastens) löst die Neubesetzung aus (Haken member.removing/removed)', async () => {
+    const p = await mk('u-baukasten', 'leser');
+    await grant(api, tenantId, `user:${p.id}`, 'ctl', { type: 'projekt', id: projekt });
+    const r = await call('DELETE', `/v1/admin/members/${p.sub}`, adm.h);
+    assert.equal(r.statusCode, 200, r.body);
+    const liste = (await call('GET', '/v1/neubesetzungen', adm.h)).json().items;
+    const nb = liste.find((x: { person: { id: string } }) => x.person.id === p.id);
+    assert.ok(nb, JSON.stringify(liste));
+    assert.deepEqual([nb.rollen, nb.offeneRollen, nb.erledigt, nb.entzogenVon?.id], [1, 1, false, adm.id]);
+    const d = (await call('GET', `/v1/neubesetzungen/${nb.id}`, adm.h)).json();
+    assert.deepEqual(d.rollen.map((x: { rolle: string }) => x.rolle), ['ctl']);
+    const a = (await call('GET', '/v1/eingang', adm.h)).json().items.find((x: { bezug: { id: string } }) => x.bezug.id === nb.id);
+    assert.equal(a?.titel, 'Rollen von u-baukasten neu besetzen');
+    // Während des Entfernens keine Mitteilung je entzogener Rolle
+    const m = await sys(async tx => (await tx.query("SELECT count(*)::int AS n FROM ppm.mitteilung WHERE empfaenger_person = $1 AND bezug_typ = 'rolle'", [p.id])).rows[0].n);
+    assert.equal(m, 0);
+  });
+
+  test('Rollen setzen informiert die Person (UC-016 Schritt 3): erhalten und entzogen, nicht für die eigene Person', async () => {
+    const p = await mk('u-rolle', 'leser');
+    const texte = async () => (await call('GET', '/v1/mitteilungen', p.h)).json().items.map((x: { text: string }) => x.text);
+    const setzen = await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['leser', 'pmo'] });
+    assert.equal(setzen.statusCode, 200, setzen.body);
+    const nach1 = await texte();
+    assert.equal(nach1.length, 1, JSON.stringify(nach1));
+    assert.match(nach1[0], /^Sie haben die Rolle «.+» in der Organisation erhalten\.$/);
+    assert.equal((await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['leser'] })).statusCode, 200);
+    const nach2 = await texte();
+    assert.equal(nach2.length, 2);
+    assert.ok(nach2.some((t: string) => /^Ihre Rolle «.+» in der Organisation wurde entzogen\.$/.test(t)), JSON.stringify(nach2));
+    // Die Administration erhält für ihre eigenen Änderungen an anderen keine Mitteilung
+    const eigene = await sys(async tx => (await tx.query("SELECT count(*)::int AS n FROM ppm.mitteilung WHERE empfaenger_person = $1 AND bezug_typ = 'rolle'", [adm.id])).rows[0].n);
+    assert.equal(eigene, 0);
   });
 });

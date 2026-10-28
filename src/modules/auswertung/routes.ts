@@ -6,7 +6,7 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance } from 'fastify';
 import { forbidden, notFound, type Deps } from '@vollholz/platform';
-import { funnel, sortieren, zeile } from './dashboard.ts';
+import { funnel, zeilen } from './dashboard.ts';
 import { Dashboard, DashboardQuery, DashboardZeile, FunnelStufe, type DashboardOut, type DashboardQueryIn } from './schemas.ts';
 import * as store from './store.ts';
 
@@ -42,7 +42,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       const abgeschlossen = stand?.stand === 'abgeschlossen';
       const rows = abgeschlossen ? await store.zeilenAbgeschlossen(tx, periode, ids) : await store.zeilenOffen(tx, periode, ids);
       const namen = new Map(sichtbar.map(x => [x.id, x.name]));
-      const items = sortieren(rows.map(r => zeile(r, namen.get(r.portfolio_id) ?? '')));
+      const items = await zeilen(tx, rows, r => namen.get(r.portfolio_id) ?? '');
 
       const liste = perioden.map(x => ({ periode: x.periode, stand: x.stand }));
       if (!liste.some(x => x.periode === laufend)) liste.unshift({ periode: laufend, stand: 'offen' });

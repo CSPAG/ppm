@@ -1,9 +1,9 @@
-/** Modul eingang, Teil Neubesetzung (410_neubesetzung, AM.01.01, UC-016 A1): entzogene Zugänge mit festgehaltenen Rollen. */
+/** Modul eingang, Teil Neubesetzung (410_neubesetzung, 411_neubesetzung_haken, AM.01.01, UC-016 A1): entzogene Zugänge mit festgehaltenen Rollen. */
 import { randomUUID } from 'node:crypto';
 import { full, tenant } from '../harness.ts';
 import type { Matrix } from './typ.ts';
 
-const ADMIN = "(app.has_permission('members:admin'::text) OR ((app.principal_id() IS NULL) AND app.write_all()))";
+const ADMIN = "(app.has_permission('members:admin'::text) OR (current_setting('app.eingang_intern'::text, true) = 'on'::text) OR ((app.principal_id() IS NULL) AND app.write_all()))";
 
 export const matrix: Matrix = {
   tables: {
@@ -20,7 +20,7 @@ export const matrix: Matrix = {
     },
   },
   policies: [
-    // Lesesicht ADMIN: nur mit «Mitglieder und Rollen verwalten» oder als System
+    // Lesesicht ADMIN: nur mit «Mitglieder und Rollen verwalten», als Modul (Haken des Baukastens, 411) oder als System
     `ppm.neubesetzung.neubesetzung_admin RESTRICTIVE ALL ppm_app USING ${ADMIN} CHECK ${ADMIN}`,
     `ppm.neubesetzung_rolle.neubesetzung_rolle_admin RESTRICTIVE ALL ppm_app USING ${ADMIN} CHECK ${ADMIN}`,
   ],

@@ -32,7 +32,7 @@ export const DashboardZeile = Type.Object({
   trend: Nullable(Type.String()),
   meldung: Type.Union(MELDUNGEN.map(m => Type.Literal(m))),
   werteAus: Nullable(Type.String({ description: 'Periode, aus der Status und Trend stammen (bei «nicht gemeldet» bzw. «ausstehend» eine frühere).' })),
-  merkmale: Type.Array(Type.Union([Type.Literal('eskalation')]), { description: '«Eskalation»: Bericht der Periode mit «Entscheid des PRAT nötig» (UC-004 A2.2).' }),
+  merkmale: Type.Array(Type.Union([Type.Literal('eskalation')]), { description: '«Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4).' }),
 }, { $id: 'DashboardZeile', additionalProperties: false });
 export type DashboardZeileOut = Static<typeof DashboardZeile>;
 

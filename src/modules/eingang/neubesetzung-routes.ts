@@ -3,13 +3,12 @@
  * offenen Aufgaben der Person, Entziehen (Rollen festhalten, dann Mitglied im Baukasten entfernen) und die
  * Neubesetzungen der Administration. Recht `members:admin` wie die Verwaltung der Mitglieder im Baukasten.
  *
- * Schmale Erweiterung des Baukastens: Er entfernt Mitgliedschaft und Tupel (`admin.removeMember`), kennt aber keine
- * Rollen an Orten, die neu zu besetzen sind, und keinen Haken vor dem Entfernen (Folgearbeit fürs Paket, README.md).
+ * Das Entfernen selbst macht der Baukasten (`admin.removeMember`); die Neubesetzung entsteht in den Haken des Moduls
+ * (`iamHaken` in neubesetzung.ts, `AppSpec.iamEvents`), auch beim Entfernen über die Seiten des Baukastens.
  */
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { actorOf, decodeCursor, encodeCursor, forbidden, HttpError, IdempotencyHeaders, IdParams, notFound, type Deps } from '@vollholz/platform';
-import { record } from '../../platform.ts';
+import { decodeCursor, encodeCursor, forbidden, HttpError, IdempotencyHeaders, IdParams, notFound, type Deps } from '@vollholz/platform';
 import * as nb from './neubesetzung.ts';
 import {
   Neubesetzung, NeubesetzungDetail, NeubesetzungList, NeubesetzungQuery, ZugangEntzogen, ZugangVorschau,
@@ -67,40 +66,21 @@ export function registerNeubesetzung(app: FastifyInstance, deps: Deps): void {
   app.post('/v1/zugaenge/:person/entziehen', {
     schema: {
       tags: [TAG_NEUBESETZUNG], summary: 'Zugang entziehen', headers: IdempotencyHeaders, params: PersonParams, response: { 201: Type.Ref('ZugangEntzogen') },
-      description: 'Hält die Rollen der Person an Orten ausser der Organisation fest, entfernt sie dann im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration) und legt der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben. Ein abgebrochener Versuch wird beim nächsten Aufruf fortgesetzt.',
+      description: 'Entfernt die Person im Baukasten als Mitglied (Mitgliedschaft und alle Freigaben; Regeln des Baukastens: nicht sich selbst, nicht die letzte Administration). Die Haken des Moduls halten dabei die Rollen an Orten ausser der Organisation fest und legen der Administration die Aufgabe «Rollen von ‹Person› neu besetzen» in den Eingang, sofern Rollen oder offene Aufgaben bleiben – gleich wie beim Entfernen unter «Benutzer und Rollen».',
     },
   }, async (req, reply) => {
     const p = await admin(req);
     const { person: id } = req.params as { person: string };
     if (id === p.principalId) throw forbidden('Sie können sich den Zugang nicht selbst entziehen.');
-    const who = actorOf(req);
-    // 1. Rollen festhalten (vor dem Entfernen; danach gibt es keine Tupel mehr)
-    const vor = await req.tx(async tx => {
-      const pers = await nb.person(tx, id);
-      if (!pers) throw notFound('Person');
-      const wieder = await nb.laeuft(tx, id);
-      if (pers.entfernt && !wieder) throw notFound('Person');
-      const svc = deps.iam.admin;
-      if (!svc) throw new HttpError(503, 'Verwaltung nicht eingerichtet', 'Die Verwaltung der Mitglieder ist nicht eingerichtet.');
-      return { pers, wieder, svc, nb: await nb.vorbereiten(tx, id, pers.entfernt ? [] : await nb.rollen(tx, id)) };
-    });
-    // 2. Zugang sperren im Baukasten; eigene Transaktion des Pakets mit Sperre, Audit je Tupel und Abgleich mit Keycloak
-    try {
-      await vor.svc.removeMember({ alias: p.tenantAlias, actor: p, platform: false, source: req.source, correlationId: req.id }, vor.pers.subject);
-    } catch (e) {
-      // Wiederaufnahme: Beim abgebrochenen Versuch hat der Baukasten die Person schon entfernt
-      if (!(vor.wieder && e instanceof HttpError && e.status === 404)) throw e;
-    }
-    // 3. Neubesetzung abschliessen und Aufgabe der Administration
-    const r = await req.tx(async tx => {
-      const n = await nb.abschliessen(tx, vor.nb, { id, name: vor.pers.name });
-      await record(tx, who, {
-        action: 'neubesetzung.created', resourceType: 'neubesetzung', resourceId: vor.nb,
-        data: { person: id, ...n }, event: { id: vor.nb, person: id, ...n },
-      });
-      return n;
-    });
-    return reply.code(201).header('location', `/v1/neubesetzungen/${vor.nb}`).send({ neubesetzung: vor.nb, ...r });
+    const pers = await req.tx(tx => nb.person(tx, id));
+    if (!pers || pers.entfernt) throw notFound('Person');
+    const svc = deps.iam.admin;
+    if (!svc) throw new HttpError(503, 'Verwaltung nicht eingerichtet', 'Die Verwaltung der Mitglieder ist nicht eingerichtet.');
+    // Transaktion des Baukastens mit Sperre, Audit je Tupel und den Haken `member.removing`/`member.removed` (iamHaken)
+    await svc.removeMember({ alias: p.tenantAlias, actor: p, platform: false, source: req.source, correlationId: req.id }, pers.subject);
+    const r = await req.tx(tx => nb.zuletzt(tx, id));
+    if (!r) throw new HttpError(500, 'Neubesetzung fehlt', 'Der Zugang ist entzogen, die Neubesetzung wurde aber nicht angelegt.');
+    return reply.code(201).header('location', `/v1/neubesetzungen/${r.id}`).send({ neubesetzung: r.id, rollen: r.rollen, aufgaben: r.aufgaben });
   });
 
   app.get('/v1/neubesetzungen', {

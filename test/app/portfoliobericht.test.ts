@@ -6,8 +6,13 @@
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
+import { BERICHT_FELDER, mitFeldern } from '../../src/modules/auswertung/bericht-vorlage.ts';
+import type { BerichtDaten } from '../../src/modules/auswertung/bericht.ts';
+import { werte } from '../../src/modules/vorlage/modell.ts';
+import { entpacken } from '../../src/modules/vorlage/zip.ts';
 import { full, skipDb } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
+import { wordVorlage } from './fixtures/word.ts';
 
 const skip = await skipDb();
 
@@ -166,20 +171,47 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.equal(n, 2);
   });
 
+  test('eigene Word-Vorlage: Feldkatalog aus dem gespeicherten Stand, Word-Ausgabe mit der aktiven Vorlage (AM.03.01, UC-018 Schritt 2)', async () => {
+    // jedes Feld des Katalogs hat einen Wert aus dem Dokument (gleiche Texte wie im Grundbestand)
+    const w = werte(mitFeldern(await ok('GET', `/v1/portfolioberichte/${id}`, ue) as BerichtDaten));
+    assert.deepEqual(BERICHT_FELDER.filter(f => !(f.schluessel in w)).map(f => f.schluessel), []);
+    const art = await ok('GET', '/v1/vorlagen/portfoliobericht', ue);
+    assert.equal(art.felder.length, BERICHT_FELDER.length);
+
+    const datei = wordVorlage([['«Portfolio» · «Peri', 'ode»'], ['«Kommentar der Programmleitung»'], ['«Projekte der Periode»'], ['«Offene Eskalationen»']], 'Intern · enthält Personendaten');
+    const r = await call('POST', '/v1/vorlagen/portfoliobericht/versionen', ue, { dateiname: 'Portfoliobericht.docx', inhalt: datei.toString('base64') });
+    assert.equal(r.statusCode, 201, r.body);
+    assert.deepEqual([r.json().zuordnung, r.json().pruefung.aktivierbar], [{
+      Portfolio: 'portfolio.name', Periode: 'bericht.periode', 'Kommentar der Programmleitung': 'bericht.kommentar', 'Projekte der Periode': 'projekte',
+      'Offene Eskalationen': 'risikolage.eskalationen',
+    }, true]);
+    assert.equal((await call('POST', '/v1/vorlagen/portfoliobericht/versionen/1/aktivieren', { ...ue, 'if-match': r.headers.etag as string })).statusCode, 200);
+
+    // das Gremium liest die Vorlage nicht, erhält aber den Bericht in ihrer Gestaltung; PDF weiter im Grundbestand
+    const d = await call('GET', `/v1/portfolioberichte/${id}/dokument?format=docx`, gremium);
+    assert.equal(d.statusCode, 200, d.body);
+    const xml = entpacken(d.rawPayload).find(e => e.name === 'word/document.xml')!.daten.toString('utf8');
+    assert.match(xml, /Transformation · \S+ \d{4}/);
+    assert.match(xml, /Lage stabil, ein Projekt kritisch\./);
+    assert.match(xml, /2026-001 · Projekt 2026-001 \(Eskalation\) · P1 · Kritisch/);
+    assert.match(xml, /Lieferverzug · Zweitlieferant/);
+    assert.doesNotMatch(xml, /«/);
+    assert.equal((await call('GET', `/v1/portfolioberichte/${id}/dokument`, gremium)).rawPayload.subarray(0, 5).toString(), '%PDF-');
+  });
+
   test('Vorschlag «Bericht der Programmleitung» an das Gremium mit dem Bericht als Unterlage (K3 Schritte 1 und 4)', async () => {
     const datum = mittwochIn(35);
     await ok('POST', `/v1/gremien/${prat}/termine`, ue, { datum }, 201);
+    // neue Sitzung: der offene Vorschlag wird festes Traktandum 1 (K3 Schritt 4)
     const s = await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum }, 201);
-    assert.equal(s.traktanden.length, 0, 'kein festes Traktandum');
-    const v = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
-    const g = v.gruppen.find((x: { art: string }) => x.art === 'portfoliobericht');
-    assert.equal(g.traktanden.length, 1);
-    const t = g.traktanden[0];
+    assert.equal(s.traktanden.length, 1, 'festes Traktandum 1');
+    const t = s.traktanden[0];
     const monat = new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${VORPERIODE}-01T00:00:00Z`));
-    assert.deepEqual([t.titel, t.antrag], ['Bericht der Programmleitung', `Kenntnisnahme des Portfolioberichts ${monat}`]);
-    // aufnehmen: Unterlage «Portfoliobericht <Monat>» bereit
-    const r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: t.id });
-    const a = r.traktanden.find((x: { art: string }) => x.art === 'portfoliobericht');
+    assert.deepEqual([t.titel, t.antrag, t.position, t.fest, t.bezug.typ], ['Bericht der Programmleitung', `Kenntnisnahme des Portfolioberichts ${monat}`, 1, true, 'portfoliobericht']);
+    const vs = await ok('GET', `/v1/sitzungen/${s.id}/vorschlaege`, ue);
+    assert.equal(vs.gruppen.find((x: { art: string }) => x.art === 'portfoliobericht'), undefined, 'kein Vorschlag mehr offen');
+    // Unterlage «Portfoliobericht <Monat>» bereit
+    const a = t;
     assert.deepEqual([a.unterlagen.stand, a.unterlagen.liste[0].titel], ['bereit', `Portfoliobericht ${monat}`]);
   });
 });

@@ -7,7 +7,7 @@
  */
 import { conflict, notFound, type Tx } from '@vollholz/platform';
 import { registriereTraktandenart, traktandum } from '../sitzung/index.ts';
-import { funnel, sortieren, zeile } from './dashboard.ts';
+import { funnel, zeilen } from './dashboard.ts';
 import { matrix } from './risiko.ts';
 import { risikolage } from './risiko-routes.ts';
 import type { PortfolioberichtKurzOut, PortfolioberichtOut } from './bericht-schemas.ts';
@@ -22,7 +22,7 @@ export const TITEL_TRAKTANDUM = 'Bericht der Programmleitung';
 
 /** Inhalt bei Erzeugung: abgeschlossenes Dashboard des Portfolios und Risikolage (Lesesicht der UE). */
 export async function inhalt(tx: Tx, pf: dashboard.PortfolioRow, p: store.PeriodeStandRow) {
-  const items = sortieren((await dashboard.zeilenAbgeschlossen(tx, p.periode, [pf.id])).map(r => zeile(r, pf.name)));
+  const items = await zeilen(tx, await dashboard.zeilenAbgeschlossen(tx, p.periode, [pf.id]), () => pf.name);
   return {
     dashboard: { abgeschlossenAt: p.abgeschlossen_at, items, funnel: funnel(items) },
     risikolage: await risikolage(tx, [pf.id]),

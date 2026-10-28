@@ -35,5 +35,5 @@ export const sitzungModule = defineModule({
 
 /** Geschäfte vorschlagen und zurücknehmen (für obere Module, in ihrer Transaktion; Rechte prüft der Aufrufer). */
 export const traktandum = { vorschlagen, zuruecknehmen: vorschlagZuruecknehmen };
-export { ARTEN, registriereTraktandenart, type Art, type Bezug, type EntscheidFolge, type Ergebnis, type Traktandenart, type Unterlage } from './arten.ts';
+export { ARTEN, registriereTraktandenart, type Art, type Bezug, type EntscheidFolge, type Ergebnis, type FolgeKontext, type Traktandenart, type Unterlage } from './arten.ts';
 export type { Vorschlag } from './aktionen.ts';

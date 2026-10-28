@@ -244,6 +244,14 @@ describe('Entscheide und Auflagen', () => {
     expect(api.calls.find(c => c.url.includes('/v1/entscheide'))!.url).toContain('auflagen=offen');
     await expectNoAxe(container.ownerDocument.body);
     await userEvent.click(within(drawer).getByRole('button', { name: TM.erfuellenName('Risikoplan nachreichen') }));
+    // nicht umkehrbar: erst die Rückfrage mit Wirkung (I-R1 Stufe 2); Abbrechen meldet nichts
+    const frage = await screen.findByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') });
+    expect(within(frage).getByText(TM.erfuellenWirkung)).toBeInTheDocument();
+    await expectNoAxe(container.ownerDocument.body);
+    await userEvent.click(within(frage).getByRole('button', { name: 'Abbrechen' }));
+    expect(api.calls.some(c => c.method === 'POST')).toBe(false);
+    await userEvent.click(within(drawer).getByRole('button', { name: TM.erfuellenName('Risikoplan nachreichen') }));
+    await userEvent.click(within(await screen.findByRole('dialog', { name: TM.erfuellenFrage('Risikoplan nachreichen') })).getByRole('button', { name: TM.erfuellen }));
     await waitFor(() => expect(api.calls.some(c => c.method === 'POST')).toBe(true));
     expect(api.calls.find(c => c.method === 'POST')!.headers.get('Idempotency-Key')).toMatch(/^[0-9a-f-]{36}$/);
   });

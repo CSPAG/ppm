@@ -114,6 +114,8 @@ export const TM = {
   auflagenAnzahl: (offen: number, alle: number) => (alle ? `${offen} von ${alle} offen` : '–'),
   erfuellen: 'Erledigt melden',
   erfuellenName: (t: string) => `Auflage erledigt melden: ${t}`,
+  erfuellenFrage: (t: string) => `Auflage «${t}» erledigt melden?`,
+  erfuellenWirkung: 'Die Auflage gilt dann als erfüllt, und die Aufgabe im Eingang ist erledigt. Zurücknehmen lässt sich das nicht.',
   erfuellt: 'erfüllt',
   erfuelltOk: 'Auflage als erledigt gemeldet.',
   mehrAlt: 'Ältere Entscheide über den Filter Gremium.',

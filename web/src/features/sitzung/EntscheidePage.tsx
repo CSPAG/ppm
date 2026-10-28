@@ -5,11 +5,11 @@
  * `?auflage=<id>` aus der Aufgabe «Auflage erfüllen» (I-B1, I-N5). Das Gremium steht im Kopf (`?gremium=prat`, IA «Kontext
  * im Kopf»); ohne Angabe gilt das einzige bzw. zuletzt gewählte, ausser die Adresse nennt einen Entscheid oder eine Auflage.
  */
-import { useEffect, useId } from 'react';
-import { Datenliste, Drawer, Hinweis, Icon, Stand, fmtDatum, useToast, type Spalte } from '../../ui/index.ts';
+import { useEffect, useId, useState } from 'react';
+import { Datenliste, Dialog, Drawer, Hinweis, Icon, Stand, T, fmtDatum, useToast, type Spalte } from '../../ui/index.ts';
 import { useGremien } from './api.ts';
 import { GremiumWahl, gremiumMerken, vorgabeGremium } from './GremiumWahl.tsx';
-import { useAuflageErfuellen, useEntscheide, type EntscheidEintrag } from './Sitzungsmodus.api.ts';
+import { useAuflageErfuellen, useEntscheide, type Auflage, type EntscheidEintrag } from './Sitzungsmodus.api.ts';
 import type { EntscheideSearch, SetEntscheideSearch } from './Entscheide.search.ts';
 import { TM } from './Sitzungsmodus.texte.ts';
 import './sitzung.css';
@@ -29,6 +29,8 @@ export function EntscheidePage({ search, setSearch }: { search: EntscheideSearch
   useEffect(() => { if (vorgabe) setSearch({ gremium: vorgabe }, { replace: true }); }, [vorgabe, setSearch]);
   useEffect(() => { if (search.gremium && gremien.data?.some(g => g.kuerzel === search.gremium)) gremiumMerken(search.gremium); }, [search.gremium, gremien.data]);
   const erfuellen = useAuflageErfuellen();
+  // «Erledigt melden» lässt sich nicht zurücknehmen: Rückfrage mit der Auflage und der Wirkung (I-R1 Stufe 2)
+  const [frage, setFrage] = useState<Auflage | null>(null);
   const items = q.data?.items;
   const offen = search.e ? items?.find(x => x.id === search.e) : search.auflage ? items?.find(x => x.auflagen.some(a => a.id === search.auflage)) : undefined;
   const gefiltert = !!(search.gremium || search.auflagen || search.vr);
@@ -82,7 +84,7 @@ export function EntscheidePage({ search, setSearch }: { search: EntscheideSearch
                       {a.stand === 'erfuellt' ? <Stand familie="positiv" label={TM.erfuellt} />
                         : a.can.erfuellen ? (
                           <button type="button" className="btn" disabled={erfuellen.isPending} aria-label={TM.erfuellenName(a.text)}
-                            onClick={() => erfuellen.mutate(a, { onSuccess: () => toast.show(TM.erfuelltOk), onError: x => toast.error(x) })}>
+                            onClick={() => setFrage(a)}>
                             <Icon name="check" />{TM.erfuellen}
                           </button>
                         ) : <Stand familie="wartet" label={TM.offen} />}
@@ -93,6 +95,17 @@ export function EntscheidePage({ search, setSearch }: { search: EntscheideSearch
             ) : null}
           </div>
         </Drawer>
+      ) : null}
+      {frage ? (
+        <Dialog title={TM.erfuellenFrage(frage.text)} onClose={() => setFrage(null)} footer={<>
+          <button type="button" className="btn" onClick={() => setFrage(null)} data-autofocus>{T.common.cancel}</button>
+          <button type="button" className="btn primary" disabled={erfuellen.isPending}
+            onClick={() => erfuellen.mutate(frage, { onSuccess: () => { setFrage(null); toast.show(TM.erfuelltOk); }, onError: x => { setFrage(null); toast.error(x); } })}>
+            {TM.erfuellen}
+          </button>
+        </>}>
+          <p>{TM.erfuellenWirkung}</p>
+        </Dialog>
       ) : null}
     </section>
   );

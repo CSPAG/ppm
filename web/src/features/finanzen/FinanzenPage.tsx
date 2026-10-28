@@ -22,14 +22,13 @@ type Art = 'uebersicht' | 'abweichungen';
 export function FinanzenPage({ art = 'uebersicht', search, setSearch, navigieren }: { art?: Art; search: FinanzenSearch; setSearch: SetFinanzenSearch; navigieren(pfad: string): void }) {
   const { can } = useSession();
   const selId = useId();
-  const orgLesen = can('finanzen:read');
   const portfolios = usePortfolios();
-  // Ohne Recht an der Organisation zuerst das erste Portfolio (Gremium); sonst «Alle Portfolios»
-  const pf = portfolios.data ? (search.portfolio ? portfolios.data.find(p => p.schluessel === search.portfolio) : orgLesen ? undefined : portfolios.data[0]) : undefined;
-  const bereit = !!portfolios.data && (!search.portfolio || !!pf) && (orgLesen || !!pf);
+  // Ohne Portfolio alle Projekte mit sichtbaren Beträgen (die PL ihre, das Gremium die seines Portfolios)
+  const pf = search.portfolio ? portfolios.data?.find(p => p.schluessel === search.portfolio) : undefined;
+  const bereit = !search.portfolio || !!pf;
   const q = useFinanzen(art, pf?.id ?? null, !!search.alle, bereit);
   const d = q.data;
-  const skelett = useVerzoegert(portfolios.isPending || (bereit && q.isPending));
+  const skelett = useVerzoegert((!!search.portfolio && portfolios.isPending) || (bereit && q.isPending));
   const query = new URLSearchParams(pf ? { portfolio: pf.schluessel } : {}).toString();
   const offen = search.o && d ? d.projekte.find(p => p.nummer === search.o) : undefined;
 
@@ -42,14 +41,14 @@ export function FinanzenPage({ art = 'uebersicht', search, setSearch, navigieren
 
   return (
     <section aria-labelledby="page-title" className="fi">
-      <Kopf reiter={art} reiterSichtbar={reiterFuer(orgLesen)} navigieren={navigieren} query={query}
+      <Kopf reiter={art} reiterSichtbar={reiterFuer(can('finanzen:read'))} navigieren={navigieren} query={query}
         sub={d ? <Stand d={d} /> : TF.sub}
         aktionen={d?.projekte.length ? <button type="button" className="btn" onClick={exportieren}><Icon name="download" />{TF.export}</button> : null} />
       <div className="toolbar" role="search" aria-label={TF.title}>
         <label htmlFor={selId} className="fi-l">{TF.portfolio}</label>
-        <select id={selId} className="fi-in" value={pf?.schluessel ?? ''} disabled={!portfolios.data?.length}
+        <select id={selId} className="fi-in" value={pf?.schluessel ?? ''} disabled={!portfolios.data?.length && !search.portfolio}
           onChange={e => setSearch({ portfolio: e.target.value || undefined, o: undefined })}>
-          {orgLesen ? <option value="">{TF.allePortfolios}</option> : null}
+          <option value="">{TF.allePortfolios}</option>
           {(portfolios.data ?? []).map(p => <option key={p.id} value={p.schluessel}>{`${p.kategorie} · ${p.name}`}</option>)}
         </select>
         <label className="fi-check">
@@ -58,9 +57,8 @@ export function FinanzenPage({ art = 'uebersicht', search, setSearch, navigieren
         </label>
       </div>
       <div className="body fi-body">
-        {portfolios.error || q.error ? <ErrorState error={portfolios.error ?? q.error} onRetry={() => { void portfolios.refetch(); void q.refetch(); }} /> : null}
+        {q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} /> : null}
         {skelett ? <Skelett zeilen={8} /> : null}
-        {portfolios.data && !portfolios.data.length ? <Empty>{TF.keinPortfolio}</Empty> : null}
         {portfolios.data && search.portfolio && !pf ? <Empty>{TF.portfolioUnbekannt}</Empty> : null}
         {d && d.ohneProjekt.length ? (
           <Hinweis stufe="hinweis">
@@ -96,7 +94,7 @@ function Kennzahlen({ d }: { d: Finanzuebersicht }) {
       <div><dt>{TF.budget}</dt><dd>{kurz(s.budget)}</dd></div>
       <div><dt>{TF.ist}</dt><dd>{ist(s.ist)}</dd></div>
       <div><dt>{TF.abweichung}</dt><dd>{abweichung({ betrag: s.budget > 0 ? s.abweichung : null, prozent })}</dd></div>
-      <div className={wesentlich ? 'fi-warn' : undefined}><dt>{TF.wesentlich}</dt><dd>{TF.anzahlWesentlich(wesentlich)}</dd></div>
+      <div className={wesentlich ? 'fi-warn' : undefined}><dt>{TF.ueberToleranz}</dt><dd>{TF.anzahlProjekte(wesentlich)}</dd></div>
     </dl>
   );
 }

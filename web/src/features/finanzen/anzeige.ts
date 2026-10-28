@@ -16,7 +16,7 @@ export function csv(kopf: readonly string[], zeilen: readonly (readonly (string 
 
 /** Datei im Browser speichern (same-origin, ohne Netz). */
 export function herunterladen(name: string, inhalt: string): void {
-  const url = URL.createObjectURL(new Blob([`﻿${inhalt}`], { type: 'text/csv;charset=utf-8' }));
+  const url = URL.createObjectURL(new Blob([`\uFEFF${inhalt}`], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
   a.download = name;

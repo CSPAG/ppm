@@ -9,7 +9,7 @@
 import { conflict, invalid, systemActor, type Tx } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
-import { registriereTraktandenart, type EntscheidFolge, type Ergebnis } from '../sitzung/index.ts';
+import { registriereTraktandenart, type EntscheidFolge, type Ergebnis, type FolgeKontext } from '../sitzung/index.ts';
 import * as es from './entscheid-store.ts';
 import * as store from './store.ts';
 import { szenarioRechnen, type Gerechnet } from './szenario-routes.ts';
@@ -47,7 +47,7 @@ export function pruefeFolgen(offen: Awaited<ReturnType<typeof unterWasserlinie>>
  * Folge des Entscheids (fachmodell.md 2.9; UC-008 Schritt 8, A2) in der Transaktion des Entscheids, idempotent: ein
  * zweites Erfassen (Korrektur) schreibt den Ist-Stand erneut, informiert aber nicht doppelt.
  */
-export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
+export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   if (f.bezug.typ !== 'szenario' || f.ergebnis !== 'szenario_gewaehlt') return;
   const s = await sz.lesen(tx, f.bezug.id);
   if (!s) return;
@@ -64,7 +64,8 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
   const enthalten = g.positionen.filter(p => p.aktiv);
   const bisher = await es.rangfolgeEntscheiden(tx, s.portfolio_id, enthalten.map(p => ({ projektId: p.projektId, startMonat: p.startMonat })));
   await es.szenarioEntscheiden(tx, s.id);
-  const who = systemActor('system');
+  // Akteur ist die Person, die den Entscheid erfasst (FolgeKontext); ohne Kontext (direkter Aufruf) das System
+  const who = k?.akteur ?? systemActor('system');
   const link = szenarioLink(pf.schluessel, s.id);
 
   // Sponsoren und Projektleitungen der Projekte mit geändertem Rang oder Start informieren (UC-008 Schritt 8)

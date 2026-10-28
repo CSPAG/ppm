@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.5.5) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.5 sync
+# Verwaltet von identity-kit (create-iam-app 0.5.6) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.6 sync
 #
 # Realm der App aus dem Modul product-realm (Spezifikation Kap. 3). Alle Werte kommen aus identity.app.json (Zone
 # «Einstellbar»); was das Modul fest vorgibt (Sicherheit, Clients, Richtlinien), ist hier nicht änderbar (Zone «Fest»).

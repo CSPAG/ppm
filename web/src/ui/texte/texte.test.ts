@@ -23,11 +23,17 @@ function visible(src: string): string[] {
   return [...quoted, ...jsx];
 }
 
-/** Sie-Form (Höflichkeitspronomen). */
-const FORMAL = /\b(Sie|Ihnen|Ihr|Ihre|Ihren|Ihrem|Ihrer|Ihres)\b/;
+/** Sie-Form (Höflichkeitspronomen samt Zusammensetzungen wie «Ihrerseits»); gross geschrieben nur als Anrede. */
+const FORMAL = /\b(Sie|Ihnen|Ihr\w*)\b/;
 const TENANT = /\b(Mandant\w*|Tenant\w*)\b/;
 
 describe('Texte', () => {
+  it('erkennt die Sie-Form, nicht aber «sie» als 3. Person', () => {
+    for (const t of ['Geben Sie ein Datum ein.', 'Ihnen fehlt das Recht.', 'Ihre Änderungen', 'Ihrerseits ist nichts zu tun.', 'Ihretwegen'])
+      expect(t, t).toMatch(FORMAL);
+    for (const t of ['Lade sie neu.', 'Deine Änderungen', 'Die Begründung erscheint im Protokoll.']) expect(t, t).not.toMatch(FORMAL);
+  });
+
   it('kein Eszett in den Quelldateien', () => {
     expect(Object.keys(sources).length).toBeGreaterThan(10);
     for (const [file, src] of Object.entries(sources)) expect(src.includes(ESZETT), file).toBe(false);

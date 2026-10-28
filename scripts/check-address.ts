@@ -7,8 +7,8 @@
  */
 import { files, lineOf, read, report, stripComments } from './lib.ts';
 
-/** Sie-Form in Texten (Höflichkeitspronomen; Imperative wie «Geben Sie» erkennt die Prüfung über «Sie»). */
-const FORMAL = /\b(Sie|Ihnen|Ihr(e[mnrs]?)?)\b/;
+/** Sie-Form in Texten (Höflichkeitspronomen samt «Ihrerseits», «Ihretwegen»; Imperative wie «Geben Sie» über «Sie»). */
+const FORMAL = /\b(Sie|Ihnen|Ihr\w*)\b/;
 const SHARP_S = /ß/;
 const TENANT = /\b(Mandant(en)?|Tenants?)\b/i;
 

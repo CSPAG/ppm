@@ -12100,7 +12100,8 @@
                 "datum",
                 "stand",
                 "traktanden",
-                "versandBis"
+                "versandBis",
+                "unterlagenBereit"
               ],
               "properties": {
                 "id": {
@@ -12165,6 +12166,10 @@
                       "type": "null"
                     }
                   ]
+                },
+                "unterlagenBereit": {
+                  "description": "Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste.",
+                  "type": "integer"
                 }
               }
             }
@@ -13587,6 +13592,26 @@
           }
         }
       },
+      "StatusberichtEskalationNeu": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "grund"
+        ],
+        "properties": {
+          "grund": {
+            "minLength": 1,
+            "maxLength": 4000,
+            "description": "Worum es geht, z. B. die wesentliche Abweichung zur Baseline.",
+            "type": "string"
+          },
+          "massnahme": {
+            "maxLength": 4000,
+            "description": "Vorgeschlagene Massnahme; leer: das Gremium entscheidet über das weitere Vorgehen.",
+            "type": "string"
+          }
+        }
+      },
       "StatusberichtFehlend": {
         "additionalProperties": false,
         "type": "object",
@@ -13634,6 +13659,7 @@
           "geprueftAt",
           "version",
           "updatedAt",
+          "eskalation",
           "can"
         ],
         "properties": {
@@ -13918,12 +13944,84 @@
               }
             ]
           },
+          "eskalation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "anlass",
+                  "stand",
+                  "vorgeschlagen",
+                  "angelegtAt"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "anlass": {
+                    "description": "`kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "kritisch"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "abweichung"
+                        ]
+                      }
+                    ]
+                  },
+                  "stand": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "offen"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "traktandiert"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "erledigt"
+                        ]
+                      }
+                    ]
+                  },
+                  "vorgeschlagen": {
+                    "description": "Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand.",
+                    "type": "boolean"
+                  },
+                  "angelegtAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "can": {
             "type": "object",
             "required": [
               "write",
               "einreichen",
-              "zurueckziehen"
+              "zurueckziehen",
+              "eskalieren"
             ],
             "properties": {
               "write": {
@@ -13935,6 +14033,10 @@
               },
               "zurueckziehen": {
                 "description": "Rückgängig innert 10 s nach dem Einreichen.",
+                "type": "boolean"
+              },
+              "eskalieren": {
+                "description": "Eskalation aus der Warnung «wesentliche Abweichung» starten (UC-004 A1.2): bearbeitbar und noch ohne Eskalation.",
                 "type": "boolean"
               }
             }
@@ -15151,7 +15253,11 @@
                   "eingereicht",
                   "ausstehend",
                   "auffaellig",
-                  "abschlussBis"
+                  "abschlussBis",
+                  "projekte",
+                  "zurueckgegeben",
+                  "geprueft",
+                  "stichtag"
                 ],
                 "properties": {
                   "periode": {
@@ -15170,6 +15276,28 @@
                   "abschlussBis": {
                     "format": "date",
                     "type": "string"
+                  },
+                  "projekte": {
+                    "description": "Berichtspflichtige Projekte der Periode.",
+                    "type": "integer"
+                  },
+                  "zurueckgegeben": {
+                    "type": "integer"
+                  },
+                  "geprueft": {
+                    "type": "integer"
+                  },
+                  "stichtag": {
+                    "anyOf": [
+                      {
+                        "format": "date",
+                        "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 }
               },
@@ -26388,6 +26516,195 @@
               "format": "uuid",
               "type": "string"
             }
+          }
+        }
+      },
+      "SzenarioEntscheid": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "szenarioId",
+          "stand",
+          "traktandiert",
+          "unterWasserlinie",
+          "traktandierbar",
+          "pruefung",
+          "can"
+        ],
+        "properties": {
+          "szenarioId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "stand": {
+            "type": "string"
+          },
+          "traktandiert": {
+            "description": "Antrag traktandiert; geänderte Folgeentscheide nehmen das Traktandum zurück (versendet: 409).",
+            "type": "boolean"
+          },
+          "unterWasserlinie": {
+            "description": "Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "nummer",
+                "name",
+                "phase",
+                "folge",
+                "begruendung"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nummer": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "phase": {
+                  "type": "string"
+                },
+                "folge": {
+                  "anyOf": [
+                    {
+                      "description": "Folgeentscheid (UC-008 A2); Sistieren und Abbrechen leiten UC-015 ein.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "zurueckstellen"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "sistieren"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "abbrechen"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "begruendung": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "traktandierbar": {
+            "description": "Antrag gewählt und Folgeentscheid für jedes laufende Projekt unter der Wasserlinie beantragt.",
+            "type": "boolean"
+          },
+          "pruefung": {
+            "type": "array",
+            "items": {
+              "description": "Sperre mit Regel, Ist-Wert und Ausweg (I-P2).",
+              "type": "string"
+            }
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "write"
+            ],
+            "properties": {
+              "write": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "SzenarioFolgenPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "folgen"
+        ],
+        "properties": {
+          "folgen": {
+            "maxItems": 500,
+            "description": "Folgeentscheid je laufendem Projekt unter der Wasserlinie (ersetzt die bisherigen).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "projektId",
+                "folge"
+              ],
+              "properties": {
+                "projektId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "folge": {
+                  "description": "Folgeentscheid (UC-008 A2); Sistieren und Abbrechen leiten UC-015 ein.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "zurueckstellen"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "sistieren"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "abbrechen"
+                      ]
+                    }
+                  ]
+                },
+                "begruendung": {
+                  "maxLength": 1000,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SzenarioTraktandiert": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "traktandumId",
+          "titel",
+          "antrag"
+        ],
+        "properties": {
+          "traktandumId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "antrag": {
+            "type": "string"
           }
         }
       },
@@ -61029,7 +61346,7 @@
         "tags": [
           "Sitzungen"
         ],
-        "description": "Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).",
+        "description": "Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -64576,6 +64893,150 @@
         }
       }
     },
+    "/v1/projekte/{id}/berichte/{periode}/eskalation": {
+      "post": {
+        "summary": "Aus der Warnung «wesentliche Abweichung» eskalieren",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "UC-004 A1.2, K1 Schritt 2: Die PL startet eine Eskalation (UC-006) zum Bericht, auch im Entwurf und unabhängig vom Status; fehlt der Entwurf noch, entsteht er mit der Vorbelegung. Die Eskalation geht als Traktandenvorschlag an die nächste Sitzung des entscheidenden Gremiums, die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren. Der Bericht bleibt, wie er ist. Je Bericht höchstens eine Eskalation (409); nur, solange der Bericht bearbeitbar ist (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusberichtEskalationNeu"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statusbericht"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/projekte/{id}/berichte/{periode}/zurueckziehen": {
       "post": {
         "summary": "Einreichen rückgängig machen",
@@ -65300,7 +65761,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.",
+        "description": "Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -71240,6 +71701,17 @@
           },
           {
             "schema": {
+              "minLength": 1,
+              "maxLength": 200,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "description": "Suche im Titel (Teilstring) oder nach der Nummer (Befehlspalette, I-N4)."
+          },
+          {
+            "schema": {
               "maxLength": 512,
               "type": "string"
             },
@@ -74627,7 +75099,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.",
+        "description": "Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20), ebenso Bedarf von Projekten, die nicht mehr aktiv sind (UC-015 Schritt 6). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.",
         "parameters": [
           {
             "schema": {
@@ -75016,7 +75488,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt: 409.",
+        "description": "Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt oder Projekt nicht mehr aktiv: 409.",
         "requestBody": {
           "required": true,
           "content": {
@@ -75149,7 +75621,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412. Informiert Person und Projektleitung.",
+        "description": "Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412; Projekt nicht mehr aktiv: 409. Informiert Person und Projektleitung.",
         "requestBody": {
           "required": true,
           "content": {
@@ -75288,7 +75760,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Nur mit `If-Match`. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.",
+        "description": "Nur mit `If-Match`, auch bei Projekten, die nicht mehr aktiv sind. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.",
         "parameters": [
           {
             "schema": {
@@ -75412,7 +75884,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf 409.",
+        "description": "Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf oder Projekt, das nicht mehr aktiv ist, 409.",
         "requestBody": {
           "required": true,
           "content": {
@@ -75644,7 +76116,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Ohne Zeitraum der laufende Monat und die elf folgenden.",
+        "description": "Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Zuteilungen von Projekten, die nicht mehr aktiv sind, zählen nicht (UC-015 Schritt 6). Ohne Zeitraum der laufende Monat und die elf folgenden.",
         "parameters": [
           {
             "schema": {
@@ -75745,7 +76217,7 @@
         "tags": [
           "Ressourcen"
         ],
-        "description": "Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt.",
+        "description": "Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt. Ohne `projekt` fehlen Zuteilungen sichtbarer Projekte, die nicht mehr aktiv sind (UC-015 Schritt 6).",
         "parameters": [
           {
             "schema": {
@@ -78088,6 +78560,380 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Szenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/entscheid": {
+      "get": {
+        "summary": "Entscheid vorbereiten",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid (UC-008 A2) und ob der Antrag traktandiert werden kann. ETag = Version des Szenarios.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioEntscheid"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/folgen": {
+      "put": {
+        "summary": "Folgeentscheide beantragen",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Je laufendem Projekt unter der Wasserlinie «zurückstellen», «sistieren» oder «abbrechen» (UC-008 A2); ersetzt die bisherigen. Nur für laufende Projekte unter der Wasserlinie (422), im Entwurf oder Antrag, mit `If-Match` auf das Szenario (412).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SzenarioFolgenPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioEntscheid"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/szenarien/{id}/traktandieren": {
+      "post": {
+        "summary": "Für das Gremium traktandieren",
+        "tags": [
+          "Priorisierung"
+        ],
+        "description": "Schlägt den Antrag als Traktandum der Art `priorisierung` dem entscheidenden Gremium des Portfolios vor (UC-008 Schritt 7, K5 Schritt 7); erneut aufgerufen, aktualisiert es Titel und Antrag. Nur für das als Antrag gewählte Szenario und mit Folgeentscheid für jedes laufende Projekt unter der Wasserlinie (409 `folge_fehlt`). Mit `If-Match` (412).",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SzenarioTraktandiert"
                 }
               }
             }

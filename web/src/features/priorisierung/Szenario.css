@@ -35,3 +35,6 @@
 .sz-kopf{margin-top:6px}
 .sz-auswahl{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
 .sz-auswahl legend{font-weight:500;padding:0;margin-bottom:6px;width:100%}
+.sz-antrag{display:flex;flex-direction:column;gap:10px}
+.sz-h3{font-size:13.5px;font-weight:600;margin:4px 0 0}
+.sz-begr{min-width:220px;width:100%}

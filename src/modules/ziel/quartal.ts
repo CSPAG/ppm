@@ -6,6 +6,7 @@
  * bereit, «Anpassungen verlangt» setzt ihn auf «in Arbeit» zurück (A1).
  */
 import { type Tx } from '@vollholz/platform';
+import { portfoliobericht, type PortfolioberichtDaten } from '../auswertung/index.ts';
 import { aufgabe } from '../eingang/index.ts';
 import { registriereTraktandenart, type EntscheidFolge } from '../sitzung/index.ts';
 import * as es from './erreichung-store.ts';
@@ -53,7 +54,8 @@ interface Risikolage {
 const pk = (p: { nummer: string; name: string }) => ({ nummer: p.nummer, name: p.name });
 
 /** Zahlen eines Portfolios aus seinem Portfoliobericht (Stand bei dessen Erzeugung). */
-function portfolioAus(pf: { id: string; name: string }, periode: string, b: store.PortfolioberichtRow | undefined): Portfolio {
+function portfolioAus(pf: { id: string; name: string }, periode: string, b: PortfolioberichtDaten | undefined): Portfolio {
+  // Stand bei Erzeugung des Portfolioberichts, lesend übernommen (gespeicherte Inhalte älterer Fassungen tolerant)
   const d = (b?.inhalt.dashboard as { items?: DashboardZeile[] } | undefined)?.items ?? [];
   const r = (b?.inhalt.risikolage as Risikolage | undefined) ?? { risiken: [], abhaengigkeiten: [], eskalationen: [] };
   return {
@@ -88,7 +90,7 @@ export async function inhaltErzeugen(tx: Tx, quartal: string): Promise<Inhalt> {
   if (nachgefuehrt < zz.length) hinweise.push(`Zielerreichung ${quartalLabel(quartal)}: ${zz.length - nachgefuehrt} von ${zz.length} Zielen ohne neuen Stand; diese erscheinen mit dem letzten früheren Stand.`);
 
   const periode = letztePeriode(quartal);
-  const berichte = new Map((await store.portfolioberichte(tx, periode)).map(b => [b.portfolio_id, b]));
+  const berichte = new Map((await portfoliobericht.derPeriode(tx, periode)).map(b => [b.portfolioId, b]));
   const portfolios = (await store.portfolios(tx)).map(pf => {
     const b = berichte.get(pf.id);
     // K6 Z4 «Teilweise»: Entwurf möglich, Zahlen können sich ändern

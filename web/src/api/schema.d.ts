@@ -25674,7 +25674,7 @@ export interface paths {
         };
         /**
          * Kopf im Eingang
-         * @description Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).
+         * @description Je Gremium die nächste Sitzung, die die Person sieht (höchstens 5, nach Datum), mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).
          */
         get: {
             parameters: {
@@ -28940,6 +28940,131 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/{id}/berichte/{periode}/eskalation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aus der Warnung «wesentliche Abweichung» eskalieren
+         * @description UC-004 A1.2, K1 Schritt 2: Die PL startet eine Eskalation (UC-006) zum Bericht, auch im Entwurf und unabhängig vom Status; fehlt der Entwurf noch, entsteht er mit der Vorbelegung. Die Eskalation geht als Traktandenvorschlag an die nächste Sitzung des entscheidenden Gremiums, die Unternehmensentwicklung erhält die Aufgabe, sie zu traktandieren. Der Bericht bleibt, wie er ist. Je Bericht höchstens eine Eskalation (409); nur, solange der Bericht bearbeitbar ist (409).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                    /**
+                     * @description Periode des Monatszyklus.
+                     * @example 2026-10
+                     */
+                    periode: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StatusberichtEskalationNeu"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Statusbericht"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/berichte/{periode}/zurueckziehen": {
         parameters: {
             query?: never;
@@ -29552,7 +29677,7 @@ export interface paths {
         };
         /**
          * Kennzahlen der Statusberichte für die Startseite
-         * @description Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), ausstehenden und auffälligen Berichten; sonst `pruefen: null`.
+         * @description Kopf je Rolle (docs/fachmodell.md 4.1): mit `statusbericht:review` die Periode in Arbeit mit eingereichten (zu prüfenden), zurückgegebenen, geprüften, ausstehenden und auffälligen Berichten, Stichtag und Abschluss; sonst `pruefen: null`.
          */
         get: {
             parameters: {
@@ -34493,6 +34618,8 @@ export interface paths {
                     eigene?: boolean;
                     /** @description Genau diese Nummer (Schlüssel in der Oberfläche, I-N5). */
                     nummer?: number;
+                    /** @description Suche im Titel (Teilstring) oder nach der Nummer (Befehlspalette, I-N4). */
+                    q?: string;
                     /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
                     cursor?: string;
                     /** @description Seitengrösse (höchstens 200). */
@@ -37518,7 +37645,7 @@ export interface paths {
         };
         /**
          * Bedarfsliste
-         * @description Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.
+         * @description Ressourcenbedarf der sichtbaren Projekte in FTE × Monate mit Deckung, Stand, gemeldeter Lücke und Priorität (UC-009 Schritt 3), nach Priorität und Beginn. Bedarf nur als Grösse S/M/L lässt sich nicht zuteilen und fehlt (A-20), ebenso Bedarf von Projekten, die nicht mehr aktiv sind (UC-015 Schritt 6). `von`/`bis` zeigt Bedarfe, die den Zeitraum berühren.
          */
         get: {
             parameters: {
@@ -37844,7 +37971,7 @@ export interface paths {
         put?: never;
         /**
          * Person zuteilen
-         * @description Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt: 409.
+         * @description Teilt eine Person dem Bedarf zu, je Monat mit demselben Anteil (UC-009 Schritt 4); ohne Zeitraum der ganze Bedarf. Bucht die Kapazität, informiert Person und Projektleitung und meldet Überbuchungen als Warnung (UC-009 A1). Monate ausserhalb des Bedarfs: 422; schon zugeteilt oder Projekt nicht mehr aktiv: 409.
          */
         post: {
             parameters: {
@@ -37965,7 +38092,7 @@ export interface paths {
         post?: never;
         /**
          * Zuteilung entfernen
-         * @description Nur mit `If-Match`. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.
+         * @description Nur mit `If-Match`, auch bei Projekten, die nicht mehr aktiv sind. Informiert Person und Projektleitung (UC-009 A1.2); «gedeckt» wird nachgeführt.
          */
         delete: {
             parameters: {
@@ -38075,7 +38202,7 @@ export interface paths {
         head?: never;
         /**
          * Anteil ändern
-         * @description Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412. Informiert Person und Projektleitung.
+         * @description Anteil einer Zuteilung ändern, z. B. um einen Konflikt nach Priorität aufzulösen (UC-009 A1.2); nur mit `If-Match`, bei abweichender Version 412; Projekt nicht mehr aktiv: 409. Informiert Person und Projektleitung.
          */
         patch: {
             parameters: {
@@ -38199,7 +38326,7 @@ export interface paths {
         get?: never;
         /**
          * Lücke melden
-         * @description Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf 409.
+         * @description Bedarf nicht deckbar (UC-009 A2.1): markiert den Bedarf als ungedeckt; er erscheint im Dashboard und in der Priorisierung. Ersetzt eine frühere Meldung; bei gedecktem Bedarf oder Projekt, das nicht mehr aktiv ist, 409.
          */
         put: {
             parameters: {
@@ -38412,7 +38539,7 @@ export interface paths {
         };
         /**
          * Überbuchungen
-         * @description Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Ohne Zeitraum der laufende Monat und die elf folgenden.
+         * @description Personen mit mehr als einer Stelle und Rollen (Pools) mit mehr Zuteilung als Angebot je Monat (UC-009 A1), die beteiligten Projekte nach Priorität. Zuteilungen von Projekten, die nicht mehr aktiv sind, zählen nicht (UC-015 Schritt 6). Ohne Zeitraum der laufende Monat und die elf folgenden.
          */
         get: {
             parameters: {
@@ -38508,7 +38635,7 @@ export interface paths {
         };
         /**
          * Zuteilungen lesen
-         * @description Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt.
+         * @description Eigene Zuteilungen (`person=ich`, jede Person), die eines Projekts (Projektleitung, RM, UE) oder einer Person (RM, UE); darstellung.md: Zuteilung einzelner Personen nur für RM, UE und die Person selbst, die Projektleitung für das eigene Projekt. Ohne `projekt` fehlen Zuteilungen sichtbarer Projekte, die nicht mehr aktiv sind (UC-015 Schritt 6).
          */
         get: {
             parameters: {
@@ -40662,6 +40789,364 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["Szenario"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/szenarien/{id}/entscheid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Entscheid vorbereiten
+         * @description Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid (UC-008 A2) und ob der Antrag traktandiert werden kann. ETag = Version des Szenarios.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SzenarioEntscheid"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/szenarien/{id}/folgen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Folgeentscheide beantragen
+         * @description Je laufendem Projekt unter der Wasserlinie «zurückstellen», «sistieren» oder «abbrechen» (UC-008 A2); ersetzt die bisherigen. Nur für laufende Projekte unter der Wasserlinie (422), im Entwurf oder Antrag, mit `If-Match` auf das Szenario (412).
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SzenarioFolgenPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SzenarioEntscheid"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/szenarien/{id}/traktandieren": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Für das Gremium traktandieren
+         * @description Schlägt den Antrag als Traktandum der Art `priorisierung` dem entscheidenden Gremium des Portfolios vor (UC-008 Schritt 7, K5 Schritt 7); erneut aufgerufen, aktualisiert es Titel und Antrag. Nur für das als Antrag gewählte Szenario und mit Folgeentscheid für jedes laufende Projekt unter der Wasserlinie (409 `folge_fehlt`). Mit `If-Match` (412).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SzenarioTraktandiert"];
                     };
                 };
                 /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
@@ -47299,6 +47784,8 @@ export interface components {
                 stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
                 traktanden: number;
                 versandBis: string | null;
+                /** @description Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste. */
+                unterlagenBereit: number;
             }[];
         };
         EntscheidErgebnis: {
@@ -47663,6 +48150,12 @@ export interface components {
                 kommentar: string;
             };
         };
+        StatusberichtEskalationNeu: {
+            /** @description Worum es geht, z. B. die wesentliche Abweichung zur Baseline. */
+            grund: string;
+            /** @description Vorgeschlagene Massnahme; leer: das Gremium entscheidet über das weitere Vorgehen. */
+            massnahme?: string;
+        };
         StatusberichtFehlend: {
             /** @description Feld im Bericht, z. B. `status` oder `abweichung.budget`. */
             feld: string;
@@ -47708,12 +48201,25 @@ export interface components {
             /** @description 0: noch nicht gespeichert; mit `If-Match: W/"0"` anlegen. */
             version: number;
             updatedAt: string | null;
+            eskalation: {
+                /** Format: uuid */
+                id: string;
+                /** @description `kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet. */
+                anlass: "kritisch" | "abweichung";
+                stand: "offen" | "traktandiert" | "erledigt";
+                /** @description Beim Anlegen dem entscheidenden Gremium vorgeschlagen; false: das Portfolio hat keines, die Unternehmensentwicklung traktandiert von Hand. */
+                vorgeschlagen: boolean;
+                /** Format: date-time */
+                angelegtAt: string;
+            } | null;
             can: {
                 /** @description Entwurf speichern. */
                 write: boolean;
                 einreichen: boolean;
                 /** @description Rückgängig innert 10 s nach dem Einreichen. */
                 zurueckziehen: boolean;
+                /** @description Eskalation aus der Warnung «wesentliche Abweichung» starten (UC-004 A1.2): bearbeitbar und noch ohne Eskalation. */
+                eskalieren: boolean;
             };
         };
         StatusberichtKurz: {
@@ -47939,6 +48445,11 @@ export interface components {
                 auffaellig: number;
                 /** Format: date */
                 abschlussBis: string;
+                /** @description Berichtspflichtige Projekte der Periode. */
+                projekte: number;
+                zurueckgegeben: number;
+                geprueft: number;
+                stichtag: string | null;
             } | null;
         };
         DashboardZeile: {
@@ -50100,6 +50611,45 @@ export interface components {
         SzenarioBeantragen: {
             /** @description Weitere verglichene Szenarien desselben Portfolios (bis drei mit diesem). */
             vergleich?: string[];
+        };
+        SzenarioEntscheid: {
+            /** Format: uuid */
+            szenarioId: string;
+            stand: string;
+            /** @description Antrag traktandiert; geänderte Folgeentscheide nehmen das Traktandum zurück (versendet: 409). */
+            traktandiert: boolean;
+            /** @description Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid. */
+            unterWasserlinie: {
+                /** Format: uuid */
+                projektId: string;
+                nummer: string;
+                name: string;
+                phase: string;
+                folge: ("zurueckstellen" | "sistieren" | "abbrechen") | null;
+                begruendung: string;
+            }[];
+            /** @description Antrag gewählt und Folgeentscheid für jedes laufende Projekt unter der Wasserlinie beantragt. */
+            traktandierbar: boolean;
+            pruefung: string[];
+            can: {
+                write: boolean;
+            };
+        };
+        SzenarioFolgenPut: {
+            /** @description Folgeentscheid je laufendem Projekt unter der Wasserlinie (ersetzt die bisherigen). */
+            folgen: {
+                /** Format: uuid */
+                projektId: string;
+                /** @description Folgeentscheid (UC-008 A2); Sistieren und Abbrechen leiten UC-015 ein. */
+                folge: "zurueckstellen" | "sistieren" | "abbrechen";
+                begruendung?: string;
+            }[];
+        };
+        SzenarioTraktandiert: {
+            /** Format: uuid */
+            traktandumId: string;
+            titel: string;
+            antrag: string;
         };
         AbschlussKpiWert: {
             /** Format: uuid */

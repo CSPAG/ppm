@@ -3,20 +3,23 @@
  * seine Bereiche liegen, welche Aktionen und Suchen es der Befehlspalette gibt und mit welchem Recht. Die Shell
  * (`shell/nav.ts`) blendet aus, was die Person nicht darf, und Arbeitsräume ohne sichtbaren Bereich (I-N2).
  */
+import { abschlussTexte } from './features/abschluss/index.ts';
 import { berichtTexte, laufendePeriode } from './features/bericht/index.ts';
 import { anzahlOffen, eingangTexte } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosTexte } from './features/portfolios/index.ts';
 import { zugangTexte } from './features/zugang/index.ts';
 import { projektTexte, sucheProjekte } from './features/projekt/index.ts';
-import { sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
-import { ideeNeuPfad, ideeTexte } from './features/idee/index.ts';
+import { naechsteSitzungPfad, sitzungsmodusTexte, sitzungTexte } from './features/sitzung/index.ts';
+import { ideeNeuPfad, ideeTexte, sucheIdeen } from './features/idee/index.ts';
 import { ressourcenPfad, ressourcenTexte } from './features/ressourcen/index.ts';
+import { finanzenPfad, finanzenTexte } from './features/finanzen/index.ts';
 import { priorisierungPfad, priorisierungTexte } from './features/priorisierung/index.ts';
 import { dashboardTexte, portfolioberichtTexte, risikenTexte } from './features/dashboard/index.ts';
 import { monatsabschlussTexte } from './features/monatsabschluss/index.ts';
 import { stammdatenTexte as TS, sucheOrgEinheiten } from './features/stammdaten/index.ts';
 import { vorlagenTexte } from './features/vorlagen/index.ts';
+import { aenderungTexte } from './features/vertrag/index.ts';
 import { kontoTexte } from './features/konto/index.ts';
 import { schnittstellenTexte as TX } from './features/schnittstellen/index.ts';
 import { quartalsreportingTexte, roadmapTexte, sucheZiele, zielerreichungTexte, zieleTexte, zielO, zielzyklusTexte } from './features/ziele/index.ts';
@@ -38,6 +41,8 @@ export const navigation: NavRegistrierung = {
     // Risikolage (UI-18) und Portfoliobericht (UI-29), AP-E2-3
     { raum: 'portfolio', pfad: '/portfolio/dashboard/risiken', label: risikenTexte.bereich, recht: 'auswertung:read' },
     { raum: 'portfolio', pfad: '/portfolio/auswertungen/portfoliobericht', label: portfolioberichtTexte.bereich, recht: 'auswertung:read' },
+    // Lessons Learned (UI-32, PS.04.03; AP-E7-1): sichtbar wie die Auswertungen; Projektrollen sehen sie in der Projektakte
+    { raum: 'portfolio', pfad: '/portfolio/auswertungen/lessons-learned', label: abschlussTexte.liste.bereich, recht: 'auswertung:read' },
     // Arbeitsraum «Portfolio» › Ideen (K4, AP-E4-1): alle Mitglieder reichen Ideen ein (A-46); Pool der UE folgt (AP-E4-2)
     { raum: 'portfolio', pfad: '/portfolio/ideen', label: ideeTexte.bereich, recht: ['idee:create', 'idee:read'] },
     // Zielzyklus des Folgejahres (UC-011 Schritt 1, K6; AP-E6-1); andere Jahre über den Kopf der Seite
@@ -54,6 +59,8 @@ export const navigation: NavRegistrierung = {
     // Priorisierung mit Bewertung und Modell (BC PP.01.02, PP.01.03, PP.02.01, AP-E5-1); Gremium mit Recht am Portfolio
     { raum: 'portfolio', pfad: '/portfolio/priorisierung', label: priorisierungTexte.bereich, recht: 'priorisierung:read' },
     { raum: 'portfolio', pfad: '/portfolio/ressourcen', label: ressourcenTexte.bereich, recht: 'ressource:read' },
+    // Finanzen (UI-26–UI-28, UC-010, AP-E7-4): Beträge mit finanzen:read (Organisation oder Portfolio, A-33)
+    { raum: 'portfolio', pfad: finanzenPfad.uebersicht, label: finanzenTexte.bereich, recht: 'finanzen:read' },
     // Arbeitsraum «Portfolio»: Monatsabschluss der Unternehmensentwicklung (UI-15, UI-16; K1, UC-005; AP-E1-2)
     // Portfolio › Auswertungen › Roadmap (UI-31, AP-E6-2): sichtbar wie die Auswertungen (auswertung:read; IA «Sichtbarkeit je
     // Rolle»: Portfolio nicht für Antragstellende und Leser:innen); lesen über die API dürfen alle Angemeldeten (A-35)
@@ -83,6 +90,10 @@ export const navigation: NavRegistrierung = {
     { id: 'idee-einreichen', label: ideeTexte.einreichen, icon: 'plus', pfad: ideeNeuPfad(), recht: 'idee:create' },
     { id: 'einheit-anlegen', label: TS.aktion.einheitAnlegen, icon: 'plus', pfad: '/administration/organisation?o=neu', recht: 'stammdaten:write' },
     { id: 'feiertag-erfassen', label: TS.aktion.feiertagErfassen, icon: 'plus', pfad: '/administration/organisation?ansicht=feiertage&o=neu', recht: 'stammdaten:write' },
+    // «Nächste Sitzung öffnen» (IA «Navigation», K3): Mitglieder sehen Sitzungen über ihr Gremium (Recht irgendwo)
+    { id: 'naechste-sitzung', label: sitzungTexte.aktionNaechste, icon: 'gavel', pfad: '/gremien/sitzungen', recht: 'sitzung:read', irgendwo: true, ziel: naechsteSitzungPfad },
+    // «Dashboard öffnen» (IA «Navigation», UI-17)
+    { id: 'dashboard', label: dashboardTexte.aktionOeffnen, icon: 'grid', pfad: '/portfolio/dashboard', recht: 'auswertung:read', irgendwo: true },
     // Befehlspalette «Stellvertretung erfassen» (IA «Navigation», UC-016 Schritt 4)
     { id: 'stellvertretung-erfassen', label: kontoTexte.erfassen, icon: 'users', pfad: '/konto/stellvertretung?o=neu', recht: 'tenant:read' },
     { id: 'schnittstelle-einrichten', label: TX.aktion.einrichten, icon: 'plug', pfad: '/administration/schnittstellen?o=neu', recht: 'schnittstelle:admin' },
@@ -93,6 +104,7 @@ export const navigation: NavRegistrierung = {
     { id: 'projekte-bewerten', label: priorisierungTexte.aktionBewerten, icon: 'layers', pfad: priorisierungPfad.bewertung, recht: 'priorisierung:write' },
     { id: 'bewertungsmodell', label: priorisierungTexte.aktionModell, icon: 'rules', pfad: priorisierungPfad.modell, recht: 'priorisierung:write' },
     { id: 'auslastung-analysieren', label: ressourcenTexte.aktionAuslastung, icon: 'grid', pfad: ressourcenPfad.auslastung, recht: 'ressource:read' },
+    { id: 'budget-uebergeben', label: finanzenTexte.aktionBudget, icon: 'download', pfad: finanzenPfad.budgetprozess, recht: 'finanzen:write' },
     { id: 'kapazitaet-planen', label: ressourcenTexte.aktionKapazitaet, icon: 'calendar', pfad: ressourcenPfad.kapazitaet, recht: 'ressource:write' },
   ],
   // Zähler offener Aufgaben an «Eingang» (I-N3); jede Rolle enthält tenant:read
@@ -107,10 +119,25 @@ export const navigation: NavRegistrierung = {
         id: `statusbericht:${p.id}`, label: berichtTexte.palette(p.nummer, p.name), detail: berichtTexte.reiter, icon: 'doc', pfad: `/projekte/${p.nummer}/bericht?periode=${laufendePeriode()}`,
       })),
     },
+    // «Änderung beantragen» mit Projektwahl (IA «Navigation», K2 Einstieg; UC-007): Dialog im Reiter Vertrag, der
+    // prüft, ob eine Änderung möglich ist (`can.entwerfen`); laufende Projekte wie im Vertrag (aktiv oder sistiert)
+    {
+      id: 'aenderung', recht: 'vertrag:write',
+      suchen: async (q, signal) => (await sucheProjekte(q, signal)).filter(p => p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert').map(p => ({
+        id: `aenderung:${p.id}`, label: aenderungTexte.palette(p.nummer, p.name), detail: aenderungTexte.antrag, icon: 'edit', pfad: `/projekte/${encodeURIComponent(p.nummer)}/vertrag?aenderung=1`,
+      })),
+    },
     {
       id: 'projekte', recht: 'projekt:read',
       suchen: async (q, signal) => (await sucheProjekte(q, signal)).map(p => ({
         id: `projekt:${p.id}`, label: `${p.nummer} ${p.name}`, detail: projektTexte.palette.detail, icon: 'folder', pfad: `/projekte/${p.nummer}`,
+      })),
+    },
+    // Ideen nach Titel oder Nummer (I-N4): eigene für Antragstellende, eingereichte für den Ideenpool
+    {
+      id: 'ideen', recht: ['idee:create', 'idee:read'],
+      suchen: async (q, signal) => (await sucheIdeen(q, signal)).map(i => ({
+        id: `idee:${i.id}`, label: `${i.nummer} ${i.titel}`, detail: ideeTexte.bereich, icon: 'doc', pfad: `/portfolio/ideen/${i.nummer}`,
       })),
     },
     {

@@ -154,7 +154,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
   test('Entscheid erfassen: Begründung Pflicht, Auflagen bei «mit Auflagen», Folge sofort, Benachrichtigung erst beim Schliessen', async () => {
     let r = await entscheid('gateP2', { ergebnis: 'freigegeben', begruendung: '  ' });
     assert.equal(r.statusCode, 422);
-    assert.equal(r.json().detail ?? r.json().title, 'Begründung fehlt: Sie erscheint im Protokoll und beim Projekt.');
+    assert.equal(r.json().detail ?? r.json().title, 'Begründung fehlt: Die Begründung erscheint im Protokoll und beim Projekt.');
     assert.equal((await entscheid('gateP2', { ergebnis: 'abgenommen', begruendung: 'x' })).statusCode, 422, 'Ergebnis der Art');
     assert.equal((await entscheid('gateP2', { ergebnis: 'mit_auflagen', begruendung: 'x' })).statusCode, 422, 'mindestens eine Auflage');
     assert.equal((await entscheid('gateP2', { ergebnis: 'mit_auflagen', begruendung: 'x', auflagen: [{ text: 'a', verantwortlich: '00000000-0000-4000-8000-000000000009', termin: '2026-12-01' }] })).statusCode, 422);

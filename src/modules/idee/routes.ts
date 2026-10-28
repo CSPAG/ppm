@@ -137,11 +137,11 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     schema: { tags: [TAG], summary: 'Projektideen auflisten', description: 'Neueste zuerst, Cursor-Paginierung. Antragstellende sehen ihre eigenen Ideen (`eigene`), der Ideenpool (`idee:read`) alle eingereichten; Entwürfe nur, wer sie erfasst.', querystring: ListQuery, response: { 200: Type.Ref('IdeeList') } },
   }, async req => {
     await needLesen(req);
-    const q = req.query as { stand?: Stand[]; eigene?: boolean; nummer?: number; cursor?: string; limit?: number };
+    const q = req.query as { stand?: Stand[]; eigene?: boolean; nummer?: number; q?: string; cursor?: string; limit?: number };
     const limit = q.limit ?? 50;
-    const filter = `${(q.stand ?? []).join(',')}|${q.eigene ? 1 : 0}|${q.nummer ?? ''}`;
+    const filter = `${(q.stand ?? []).join(',')}|${q.eigene ? 1 : 0}|${q.nummer ?? ''}|${q.q ?? ''}`;
     const after = decodeCursor<{ n: number; f: string }>(q.cursor, v => Number.isInteger(v.n) && v.f === filter);
-    const rows = await req.tx(tx => store.list(tx, { stand: q.stand, eigene: q.eigene, nummer: q.nummer, after: after?.n, limit }));
+    const rows = await req.tx(tx => store.list(tx, { stand: q.stand, eigene: q.eigene, nummer: q.nummer, q: q.q?.trim() || undefined, after: after?.n, limit }));
     const page = rows.slice(0, limit);
     const c = await ctxOf(req);
     const last = page[page.length - 1];

@@ -19,7 +19,7 @@ export function IdeeKopfKarte() {
   ].filter(Boolean) : [];
   return (
     <div className="idee-kopf">
-      <h3><a href="/portfolio/ideen">{TI.kopfTitel}</a></h3>
+      <h2><a href="/portfolio/ideen">{TI.kopfTitel}</a></h2>
       <p>{teile.length ? teile.join(' · ') : TI.kopfLeer}</p>
       <a href={ideeNeuPfad()} className="btn primary sm"><Icon name="plus" />{TI.einreichen}</a>
     </div>

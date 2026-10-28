@@ -2,6 +2,7 @@
  * Typisierte Suchparameter je Seite (TanStack Router `validateSearch`). Jede Seite beschreibt ihre Parameter in ihrem
  * Feature; hier werden sie den Routen zugeordnet.
  */
+import { validateLessonsSearch } from './features/abschluss/index.ts';
 import { validateBerichtSearch } from './features/bericht/index.ts';
 import { validateEingangSearch } from './features/eingang/index.ts';
 import { type HandlungsfeldSearch, validateHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
@@ -12,6 +13,7 @@ import { validateDashboardSearch, validatePortfolioberichtSearch, validateRisike
 import { validateMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import { type PhasenmodellSearch, validatePhasenmodellSearch } from './features/phasenmodell/index.ts';
 import { type PortfoliosSearch, validatePortfoliosSearch } from './features/portfolios/index.ts';
+import { type BudgetSearch, type FinanzenSearch, validateBudgetSearch, validateFinanzenSearch } from './features/finanzen/index.ts';
 import { type BewertungSearch, type MatrixSearch, type ModellSearch, validateBewertungSearch, validateMatrixSearch, validateModellSearch, validateSzenarioSearch } from './features/priorisierung/index.ts';
 import { type EntscheideSearch, type SitzungSearch, validateEntscheideSearch, validateSitzungSearch } from './features/sitzung/index.ts';
 import { validateCodetabellenSearch, validateOrganisationSearch } from './features/stammdaten/index.ts';
@@ -26,6 +28,8 @@ export const searchOf = {
   bewertung: validateBewertungSearch,
   bewertungsmodell: validateModellSearch,
   matrix: validateMatrixSearch,
+  finanzen: validateFinanzenSearch,
+  budgetprozess: validateBudgetSearch,
   szenarien: validateSzenarioSearch,
   eingang: validateEingangSearch,
   stellvertretung: validateKontoSearch,
@@ -45,6 +49,7 @@ export const searchOf = {
   dashboard: validateDashboardSearch,
   risiken: validateRisikenSearch,
   portfoliobericht: validatePortfolioberichtSearch,
+  lessonsLearned: validateLessonsSearch,
   monatsabschluss: validateMonatsabschlussSearch,
   organisation: validateOrganisationSearch,
   codetabellen: validateCodetabellenSearch,
@@ -60,4 +65,4 @@ export const searchOf = {
   zugaenge: validateZugaengeSearch,
 } satisfies Record<string, (raw: Record<string, unknown>) => object>;
 
-export type { AuslastungSearch, BewertungSearch, MatrixSearch, EntscheideSearch, HandlungsfeldSearch, KapazitaetSearch, ModellSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, RoadmapSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };
+export type { AuslastungSearch, BewertungSearch, BudgetSearch, FinanzenSearch, MatrixSearch, EntscheideSearch, HandlungsfeldSearch, KapazitaetSearch, ModellSearch, PhasenmodellSearch, PortfoliosSearch, ProjekteSearch, RoadmapSearch, SitzungSearch, VertragSearch, ZielSearch, ZielerreichungSearch, ZielzyklusSearch };

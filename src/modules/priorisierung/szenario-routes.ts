@@ -22,6 +22,7 @@ import {
   type SzenarioBeantragenIn, type SzenarioListeOut, type SzenarioOut, type SzenarioPositionenPutIn, type SzenarioVergleichOut,
 } from './szenario-schemas.ts';
 import * as sz from './szenario-store.ts';
+import { antragZuruecknehmen, istStart } from './entscheid-store.ts';
 import * as store from './store.ts';
 
 const NAME = 'Szenario';
@@ -304,7 +305,9 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
       const reihe = [...g.reihenfolge].sort((a, b) =>
         (ent.get(a) ?? Infinity) - (ent.get(b) ?? Infinity) || (entw.get(a) ?? Infinity) - (entw.get(b) ?? Infinity));
       const s = await sz.anlegen(tx, id, body.name);
-      await sz.positionenSetzen(tx, s.id, reihe.map(p => ({ projektId: p, aktiv: true, startMonat: null })));
+      // Start aus dem Ist-Stand (Rangfolge «entschieden», AP-E5-5), sonst wie geplant
+      const start = await istStart(tx, id);
+      await sz.positionenSetzen(tx, s.id, reihe.map(p => ({ projektId: p, aktiv: true, startMonat: start.get(p) ?? null })));
       const daten = { ...snapshot(s), projekte: reihe.length };
       await record(tx, who, { action: 'szenario.created', resourceType: 'szenario', resourceId: s.id, data: daten, event: daten });
       return aufbereiten(tx, g, s, true);
@@ -419,7 +422,11 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
       params: IdParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Szenario') },
     },
   }, async (req, reply) => {
-    const out = await aendern(req, 'szenario.discarded', (tx, s) => sz.aendern(tx, s.id, s.version, { stand: 'verworfen', vorlage: null }), ['entwurf', 'beantragt']);
+    const out = await aendern(req, 'szenario.discarded', async (tx, s) => {
+      await antragZuruecknehmen(tx, s);
+      const s2 = (await sz.lesen(tx, s.id))!;
+      return sz.aendern(tx, s2.id, s2.version, { stand: 'verworfen', vorlage: null });
+    }, ['entwurf', 'beantragt']);
     reply.header('etag', etag(out.version));
     return out;
   });
@@ -440,7 +447,12 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
         throw invalid('Verglichen werden nur Szenarien desselben Portfolios.', [{ path: '/vergleich', message: 'anderes Portfolio' }]);
       }
       const bisher = await sz.beantragtes(tx, s.portfolio_id, s.id);
-      if (bisher) await sz.aendern(tx, bisher.id, bisher.version, { stand: 'entwurf', vorlage: null });
+      if (bisher) {
+        // ein noch nicht versendetes Traktandum des bisherigen Antrags entfällt; versendet bleibt er fest (409, AP-E5-5)
+        await antragZuruecknehmen(tx, bisher);
+        const b = (await sz.lesen(tx, bisher.id))!;
+        await sz.aendern(tx, b.id, b.version, { stand: 'entwurf', vorlage: null });
+      }
       const r = await rechnen(tx, g, s);
       const vergleich = await vergleichen(tx, g, [s, ...verglichen]);
       vergleich.szenarien[0]!.stand = 'beantragt';
@@ -450,4 +462,9 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
     reply.header('etag', etag(out.version));
     return out;
   });
+}
+
+/** Für den Entscheid (AP-E5-5, `entscheid*`): Szenario mit Wasserlinie rechnen, wie es die Routen zeigen. */
+export async function szenarioRechnen(tx: Tx, s: sz.SzenarioRow, kostenSichtbar: boolean): Promise<Gerechnet> {
+  return rechnen(tx, await grundlage(tx, s.portfolio_id, kostenSichtbar), s);
 }

@@ -2,9 +2,9 @@
  * Gate-Modus und Gate-Entscheid (AP-E3-3; PS.02.01, PS.02.02, PS.02.05; UC-002 Schritte 10–11, UC-003 Schritte 1–10,
  * A6; K2, K3): Nach der dritten Unterschrift steht das Gate-Review beim Gremium des Gremienwegs; der Entscheid in der
  * Sitzung setzt Baseline, Phase und Phasenmodell, bevor die Sitzung geschlossen ist (Abnahme «Phase und Baseline nach
- * Entscheid»), eine Korrektur nimmt die Folge zurück (A-30). Danach Entwurf für das Gate P1–P2 aus der Baseline mit
- * Leitfragen, Aufgabe «Gate vorbereiten» 30 Arbeitstage vor der eingeplanten Sitzung (A-27) und Entscheid «mit Auflagen»:
- * wieder in Arbeit, Baseline und Phase bleiben.
+ * Entscheid»), eine Korrektur nimmt die Folge zurück (A-30), auch «Gestoppt» → «freigegeben» nach dem Abbruch. Danach
+ * Entwurf für das Gate P1–P2 aus der Baseline mit Leitfragen, Aufgabe «Gate vorbereiten» 30 Arbeitstage vor der
+ * eingeplanten Sitzung (A-27) und Entscheid «mit Auflagen»: wieder in Arbeit, Baseline und Phase bleiben.
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
@@ -144,6 +144,20 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', { skip }, () => {
     assert.ok(r.body);
     const g = await ok('pl', 'GET', `/v1/vertragsversionen/${id.v1}/gate`);
     assert.equal(g.body.entscheid.ergebnis, 'freigegeben');
+
+    // Korrektur auf «Gestoppt» bricht das Projekt ab (Modul abschluss, UC-015 A1); zurück auf «freigegeben» nimmt den
+    // Abbruch vor der Folge zurück: Projekt aktiv, Baseline und Phase P1 (A-30)
+    const lebenszyklus = async () => (await ok('pl', 'GET', `/v1/projekte/${projekt.id}`)).body.lebenszyklus;
+    const e3 = await ok('ue', 'GET', `/v1/traktanden/${id.t1}/entscheid`);
+    await ok('ue', 'PUT', `/v1/traktanden/${id.t1}/entscheid`, { ergebnis: 'abgelehnt', begruendung: 'Nutzen nicht belegt' }, { 'if-match': `W/"${e3.body.version}"` });
+    [v] = await versionen();
+    assert.deepEqual([v!.stand, v!.baseline, (await projektZeile()).phase, await lebenszyklus()], ['abgelehnt', false, 'P0', 'abgebrochen']);
+    const e4 = await ok('ue', 'GET', `/v1/traktanden/${id.t1}/entscheid`);
+    await ok('ue', 'PUT', `/v1/traktanden/${id.t1}/entscheid`, { ergebnis: 'freigegeben', begruendung: 'Nutzen belegt' }, { 'if-match': `W/"${e4.body.version}"` });
+    [v] = await versionen();
+    assert.deepEqual([v!.stand, v!.baseline, (await projektZeile()).phase, await lebenszyklus()], ['abgenommen', true, 'P1', 'aktiv']);
+    assert.equal((await ok('pl', 'GET', `/v1/projekte/${projekt.id}/abschluss`)).body.entscheid?.ergebnis, 'weiterfuehren', 'Projektakte nicht mehr «abgebrochen»');
+    assert.equal((await ok('ue', 'GET', `/v1/vertragsversionen/${id.v1}/gate`)).body.entscheid.ergebnis, 'freigegeben');
   });
 
   test('Aufgabe «Gate vorbereiten» 30 Arbeitstage vor der eingeplanten Sitzung, idempotent (fachmodell.md 4.2, A-27)', async () => {

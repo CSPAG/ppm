@@ -178,5 +178,9 @@ export const StatusberichteKopf = Type.Object({
     periode: Type.String({ description: 'Periode, an der die Unternehmensentwicklung arbeitet: die Vorperiode, solange sie offen ist und Berichte hat, sonst die laufende.' }),
     eingereicht: Type.Integer(), ausstehend: Type.Integer(), auffaellig: Type.Integer(),
     abschlussBis: Type.String({ format: 'date' }),
+    // Kopfkarte «Monatszyklus» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «23 von 31 eingereicht, 15 geprüft · Stichtag …»)
+    projekte: Type.Integer({ description: 'Berichtspflichtige Projekte der Periode.' }),
+    zurueckgegeben: Type.Integer(), geprueft: Type.Integer(),
+    stichtag: Nullable(Type.String({ format: 'date', description: 'Stichtag der Berichte; null ohne Phasenmodell in Kraft.' })),
   }, { additionalProperties: false, description: 'Nur mit `statusbericht:review`.' })),
 }, { $id: 'StatusberichteKopf', additionalProperties: false });

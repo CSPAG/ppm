@@ -13,8 +13,10 @@ import type { SetEingangSearch } from './features/eingang/index.ts';
 import type { SetHandlungsfeldSearch } from './features/handlungsfeld/index.ts';
 import { nummerAusPfad, type SetIdeenSearch, type SetIdeeSearch } from './features/idee/index.ts';
 import { ressourcenPfad, type SetAuslastungSearch, type SetBedarfSearch, type SetKapazitaetSearch } from './features/ressourcen/index.ts';
+import { finanzenPfad, type SetBudgetSearch, type SetFinanzenSearch } from './features/finanzen/index.ts';
 import { priorisierungPfad, type SetBewertungSearch, type SetMatrixSearch, type SetModellSearch, type SetSzenarioSearch } from './features/priorisierung/index.ts';
 import type { SetDashboardSearch, SetPortfolioberichtSearch, SetRisikenSearch } from './features/dashboard/index.ts';
+import type { SetLessonsSearch } from './features/abschluss/index.ts';
 import type { SetMonatsabschlussSearch } from './features/monatsabschluss/index.ts';
 import type { SetPhasenmodellSearch } from './features/phasenmodell/index.ts';
 import type { SetPortfoliosSearch } from './features/portfolios/index.ts';
@@ -42,9 +44,13 @@ const BedarfPage = seite(() => import('./features/ressourcen/BedarfPage.tsx'), '
 const BewertungPage = seite(() => import('./features/priorisierung/BewertungPage.tsx'), 'BewertungPage');
 const ModellPage = seite(() => import('./features/priorisierung/ModellPage.tsx'), 'ModellPage');
 const MatrixPage = seite(() => import('./features/priorisierung/MatrixPage.tsx'), 'MatrixPage');
+const FinanzenPage = seite(() => import('./features/finanzen/FinanzenPage.tsx'), 'FinanzenPage');
+const AbweichungenPage = seite(() => import('./features/finanzen/FinanzenPage.tsx'), 'AbweichungenPage');
+const BudgetprozessPage = seite(() => import('./features/finanzen/BudgetprozessPage.tsx'), 'BudgetprozessPage');
 const SzenarioPage = seite(() => import('./features/priorisierung/SzenarioPage.tsx'), 'SzenarioPage');
 const DashboardPage = seite(() => import('./features/dashboard/DashboardPage.tsx'), 'DashboardPage');
 const RisikenPage = seite(() => import('./features/dashboard/RisikenPage.tsx'), 'RisikenPage');
+const LessonsPage = seite(() => import('./features/abschluss/LessonsPage.tsx'), 'LessonsPage');
 const PortfolioberichtPage = seite(() => import('./features/dashboard/PortfolioberichtPage.tsx'), 'PortfolioberichtPage');
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
@@ -398,6 +404,39 @@ function DashboardRoute() {
   return <DashboardPage search={search} setSearch={setSearch} />;
 }
 
+// Arbeitsraum «Portfolio» › Finanzen: Übersicht (UI-26), Abweichungen (UI-27), Budgetprozess (UI-28) (BC PC.01.02,
+// PC.01.04, PC.01.05; UC-010; AP-E7-4)
+const finanzenRoute = createRoute({ getParentRoute: () => rootRoute, path: finanzenPfad.uebersicht, validateSearch: searchOf.finanzen, component: FinanzenRoute });
+const abweichungenRoute = createRoute({ getParentRoute: () => rootRoute, path: finanzenPfad.abweichungen, validateSearch: searchOf.finanzen, component: AbweichungenRoute });
+const budgetprozessRoute = createRoute({ getParentRoute: () => rootRoute, path: finanzenPfad.budgetprozess, validateSearch: searchOf.budgetprozess, component: BudgetprozessRoute });
+
+function FinanzenRoute() {
+  const search = finanzenRoute.useSearch();
+  const navigate = useNavigate({ from: finanzenRoute.fullPath });
+  const setSearch = useCallback<SetFinanzenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <FinanzenPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+function AbweichungenRoute() {
+  const search = abweichungenRoute.useSearch();
+  const navigate = useNavigate({ from: abweichungenRoute.fullPath });
+  const setSearch = useCallback<SetFinanzenSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <AbweichungenPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
+function BudgetprozessRoute() {
+  const search = budgetprozessRoute.useSearch();
+  const navigate = useNavigate({ from: budgetprozessRoute.fullPath });
+  const setSearch = useCallback<SetBudgetSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }), replace: o?.replace ?? false });
+  }, [navigate]);
+  return <BudgetprozessPage search={search} setSearch={setSearch} navigieren={href => void navigate({ href })} />;
+}
+
 // Portfolio › Dashboard › Risiken (UI-18; PC.02.02, UC-014 Schritt 2; AP-E2-3)
 const risikenRoute = createRoute({
   getParentRoute: () => rootRoute, path: '/portfolio/dashboard/risiken', validateSearch: searchOf.risiken, component: RisikenRoute,
@@ -410,6 +449,21 @@ function RisikenRoute() {
     void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
   }, [navigate]);
   return <RisikenPage search={search} setSearch={setSearch} />;
+}
+
+// Portfolio › Auswertungen › Lessons Learned (UI-32; PS.04.03, UC-013, UC-015; AP-E7-1)
+const lessonsRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/auswertungen/lessons-learned', validateSearch: searchOf.lessonsLearned, component: LessonsRoute,
+});
+
+function LessonsRoute() {
+  const search = lessonsRoute.useSearch();
+  const navigate = useNavigate({ from: lessonsRoute.fullPath });
+  const setSearch = useCallback<SetLessonsSearch>((next, o) => {
+    void navigate({ search: prev => ({ ...prev, ...next }) as typeof prev, replace: o?.replace ?? false });
+  }, [navigate]);
+  const projektOeffnen = useCallback((nr: string) => { void navigate({ to: '/projekte/$nr/abschluss', params: { nr }, search: {} }); }, [navigate]);
+  return <LessonsPage search={search} setSearch={setSearch} projektOeffnen={projektOeffnen} />;
 }
 
 // Portfolio › Auswertungen › Portfoliobericht (UI-29; PC.04.02, UC-014 Schritt 3, K3 Schritt 4; AP-E2-3)
@@ -657,6 +711,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute,
   risikenRoute,
   portfolioberichtRoute,
+  lessonsRoute,
   monatsabschlussRoute,
   organisationRoute,
   codetabellenRoute,
@@ -674,6 +729,9 @@ const routeTree = rootRoute.addChildren([
   priorisierungRoute,
   bewertungRoute,
   matrixRoute,
+  finanzenRoute,
+  abweichungenRoute,
+  budgetprozessRoute,
   modellRoute,
   szenarienRoute,
   ...iamRoutes,

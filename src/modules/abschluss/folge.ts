@@ -7,8 +7,8 @@
  *   Exit-Gate P4 mit eingereichtem Abschlussbericht (abgeschlossen, Nacharbeiten verlangt), aktives Projekt (sistiert,
  *   abgebrochen, weiterführen) oder sistiertes Projekt (weiterführen = Wiederaufnahme, A-09; sistiert; abgebrochen).
  * - Die Folge läuft in der Transaktion des Entscheids (UX-Rückfluss UC-006 7–8) mit `app.abschluss_intern`; eine
- *   Korrektur in der Sitzung (A-30) nimmt die vorige Folge zurück. Abgeschlossen und abgebrochen sind Endzustände
- *   (UC-015 Schritt 6): Das Modul `projekt` lässt keinen Weg zurück zu, die Korrektur wird mit 409 abgewiesen.
+ *   Korrektur in der Sitzung (A-30) nimmt die vorige Folge zurück, auch einen Endzustand (abgeschlossen,
+ *   abgebrochen; UC-015 Schritt 6): Das Modul `projekt` nimmt ihn über `projekt.endzustandZuruecknehmen` zurück.
  * - Gate «Gestoppt» (UC-002 Ende, UC-003 A6, K2: «weiter in UC-015») über `gateEntscheid.registrieren` des Moduls
  *   vertrag: das Projekt ist abgebrochen. Gate P3–P4 freigegeben: Phase P4 erreicht, Aufgabe an die Projektleitung.
  */
@@ -163,14 +163,30 @@ async function anwenden(tx: Tx, who: Actor, p: store.ProjektKopf, lage: store.Ko
   }
 }
 
-/** Vorige Folge zurücknehmen (Korrektur in der Sitzung, A-30); Endzustände nicht (409). */
+/** Vorige Folge zurücknehmen (Korrektur in der Sitzung, A-30), auch einen Endzustand. */
 async function zuruecknehmen(tx: Tx, who: Actor, e: store.EntscheidRow, p: store.ProjektKopf): Promise<void> {
   const grund = { korrektur: true, ergebnis: e.ergebnis };
   switch (e.ergebnis) {
-    case 'abgeschlossen':
-    case 'abgebrochen':
-      throw conflict(`Der Entscheid «${LABEL[e.ergebnis]}» hat das Projekt ${p.nummer} beendet und lässt sich nicht mehr korrigieren; das Projekt kann nur noch gelesen werden.`,
-        { reason: 'lebenszyklus', lebenszyklus: p.lebenszyklus });
+    case 'abgeschlossen': {
+      // Abschlussbericht wieder wie vor der Abnahme; das Projekt wieder aktiv
+      if (p.lebenszyklus === 'abgeschlossen') await projektAktion.endzustandZuruecknehmen(tx, who, p.id, 'abgeschlossen', 'aktiv', grund);
+      const b = e.bericht_id ? await store.bericht(tx, e.bericht_id) : null;
+      if (b) await store.standSetzen(tx, b.id, ['abgenommen'], b.traktandum_id ? 'traktandiert' : 'eingereicht');
+      return;
+    }
+    case 'abgebrochen': {
+      // Projekt in den Lebenszyklus vor dem Abbruch (ein sistiertes über «aktiv», Übergänge im Modul projekt)
+      if (p.lebenszyklus === 'abgebrochen') {
+        await projektAktion.endzustandZuruecknehmen(tx, who, p.id, 'abgebrochen', 'aktiv', grund);
+        if (e.vorher_lebenszyklus === 'sistiert') await wechseln(tx, who, p, 'sistiert', grund);
+      }
+      if (e.bericht_id) {
+        if (e.bericht_art_vorher) await store.artSetzen(tx, e.bericht_id, e.bericht_art_vorher);
+        else await store.entwurfEntfernen(tx, e.bericht_id);
+      }
+      await erstellenEntfallen(tx, p);
+      return;
+    }
     case 'nacharbeiten': {
       const b = e.bericht_id ? await store.bericht(tx, e.bericht_id) : null;
       if (b) await store.standSetzen(tx, b.id, ['nacharbeit'], b.traktandum_id ? 'traktandiert' : 'eingereicht');
@@ -220,6 +236,28 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
   });
 }
 
+/**
+ * Vor der Folge des Gate-Entscheids (Modul vertrag): Korrektur von «Gestoppt» auf ein anderes Ergebnis (A-30) nimmt den
+ * Abbruch zurück, bevor die Freigabe die Phase setzt (abgebrochen ist lesend).
+ */
+export async function vorGate(tx: Tx, g: GateEntscheid): Promise<void> {
+  if (g.ergebnis === 'abgelehnt') return;
+  await store.intern(tx, async () => {
+    const p = await store.projekt(tx, g.projektId);
+    const vorher = await store.entscheid(tx, 'gate', g.versionId);
+    if (p && vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await gateAbbruchZuruecknehmen(tx, systemActor('system'), vorher, p);
+  });
+}
+
+/**
+ * Abbruch nach Gate «Gestoppt» zurücknehmen (A-30); der Eintrag gilt danach als «weiterführen», damit ein späterer Abbruch
+ * aus einem anderen Geschäft nicht als Folge dieses Gates gilt und die Projektakte nicht mehr «abgebrochen» zeigt.
+ */
+async function gateAbbruchZuruecknehmen(tx: Tx, who: Actor, vorher: store.EntscheidRow, p: store.ProjektKopf): Promise<void> {
+  await zuruecknehmen(tx, who, vorher, p);
+  await store.entscheidSetzen(tx, { ...vorher, kontext: 'aktiv', ergebnis: 'weiterfuehren', bericht_id: null, bericht_art_vorher: null });
+}
+
 /** Gate-Entscheid (Modul vertrag): «Gestoppt» bricht ab, P3–P4 freigegeben öffnet den Abschluss. */
 export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
   // der Gate-Entscheid übergibt keine Person; die Person steht im Audit des Entscheids (sitzung)
@@ -229,7 +267,8 @@ export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
     if (!p) return;
     const vorher = await store.entscheid(tx, 'gate', g.versionId);
     if (g.ergebnis === 'abgelehnt') {
-      if (vorher?.ergebnis === 'abgebrochen' || p.lebenszyklus !== 'aktiv') return;
+      // erneut «Gestoppt» nach einer Korrektur (A-30): wieder abbrechen; der Eintrag des Entscheids wird überschrieben
+      if (p.lebenszyklus !== 'aktiv') return;
       const folge = await anwenden(tx, who, p, 'aktiv', 'abgebrochen', { gate: g.gate, versionId: g.versionId, ergebnis: 'gestoppt' }, g.begruendung);
       await store.entscheidSetzen(tx, {
         projekt_id: p.id, quelle: 'gate', quelle_id: g.versionId, kontext: 'aktiv', ergebnis: 'abgebrochen', vorher_lebenszyklus: 'aktiv',
@@ -237,7 +276,7 @@ export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
       });
       return;
     }
-    if (vorher?.ergebnis === 'abgebrochen') await zuruecknehmen(tx, who, vorher, p); // 409: beendet
+    if (vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await gateAbbruchZuruecknehmen(tx, who, vorher, p);
     if (g.gate !== 'P3_P4') return;
     if (g.ergebnis === 'freigegeben' && p.phase === 'P4' && p.lebenszyklus === 'aktiv') await erstellenOeffnen(tx, p, 'abschluss');
     else if (!(await store.offenerBericht(tx, p.id))) await erstellenEntfallen(tx, p);
@@ -291,5 +330,6 @@ export function registriereAbschluss(): void {
     unterlagen: async (tx, bezug) => (bezug.typ === 'projekt' ? unterlagen(tx, bezug.id) : []),
     beiEntscheid,
   });
+  gateEntscheid.vorFolgeRegistrieren(vorGate);
   gateEntscheid.registrieren(nachGate);
 }

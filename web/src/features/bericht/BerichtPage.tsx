@@ -16,6 +16,7 @@ import {
   useAenderungMoeglich, useBericht, useKosten, useKpis, useKpiWerte, useKpiWertSetzen, useMeilensteine, useProjekt, useRegisterAendern, useRisiken, useSpeichern,
   useToleranzen, useUebergang, type Bericht, type BerichtPut, type Kosten, type Kpi, type Meilenstein, type Toleranz,
 } from './api.ts';
+import { Eskalieren, type EskalationLage } from './Eskalieren.tsx';
 import { TB } from './texte.ts';
 import './bericht.css';
 
@@ -61,7 +62,9 @@ function AenderungBeantragen({ nummer, projektId }: { nummer: string; projektId:
   return <Link to={`/projekte/${encodeURIComponent(nummer)}/vertrag?aenderung=1`} className="btn sm"><Icon name="edit" />{TB.wesentlich.beantragen}</Link>;
 }
 
-function Meilensteine({ nummer, projektId, bearbeitbar, toleranzTage }: { nummer: string; projektId: string; bearbeitbar: boolean; toleranzTage: number | null }) {
+function Meilensteine({ nummer, projektId, bearbeitbar, toleranzTage, eskalation }: {
+  nummer: string; projektId: string; bearbeitbar: boolean; toleranzTage: number | null; eskalation: EskalationLage;
+}) {
   const q = useMeilensteine(projektId);
   const aendern = useRegisterAendern(projektId, 'meilensteine');
   const toast = useToast();
@@ -98,7 +101,10 @@ function Meilensteine({ nummer, projektId, bearbeitbar, toleranzTage }: { nummer
             ) : null}
             {wesentlich && termin && m.terminBaseline ? (
               <div className="sb-zeile-w">
-                <Hinweis stufe="warnung" live aktion={<AenderungBeantragen nummer={nummer} projektId={projektId} />}>
+                <Hinweis stufe="warnung" live aktion={<>
+                  <AenderungBeantragen nummer={nummer} projektId={projektId} />
+                  <Eskalieren lage={eskalation} grund={TB.wesentlich.grundVon.termin(m.text, fmtDatum(termin), fmtDatum(m.terminBaseline), fmtAbweichungWochen(Math.round(tage / 7)))} />
+                </>}>
                   {TB.wesentlich.termin(m.text, fmtDatum(termin), fmtDatum(m.terminBaseline), fmtAbweichungWochen(Math.round(tage / 7)))}
                 </Hinweis>
               </div>
@@ -111,7 +117,9 @@ function Meilensteine({ nummer, projektId, bearbeitbar, toleranzTage }: { nummer
 }
 
 /** Kosten (UC-004 Schritt 3): je Phase Budget, Ist und Prognose; die Person ändert nur die Prognose. */
-function KostenAbschnitt({ nummer, projektId, bearbeitbar, toleranzProzent }: { nummer: string; projektId: string; bearbeitbar: boolean; toleranzProzent: number | null }) {
+function KostenAbschnitt({ nummer, projektId, bearbeitbar, toleranzProzent, eskalation }: {
+  nummer: string; projektId: string; bearbeitbar: boolean; toleranzProzent: number | null; eskalation: EskalationLage;
+}) {
   const q = useKosten(projektId);
   const aendern = useRegisterAendern(projektId, 'kosten');
   const toast = useToast();
@@ -155,7 +163,10 @@ function KostenAbschnitt({ nummer, projektId, bearbeitbar, toleranzProzent }: { 
             </table>
             <p className={`small sb-summe${wesentlich ? ' sb-warn' : ''}`} aria-live="polite">{TB.kosten.summe(p, fmtBetragKurz(prognose), diff)}</p>
             {wesentlich && pct !== null ? (
-              <Hinweis stufe="warnung" aktion={<AenderungBeantragen nummer={nummer} projektId={projektId} />}>{TB.wesentlich.kosten(p, fmtProzent(pct, { vorzeichen: false }))}</Hinweis>
+              <Hinweis stufe="warnung" aktion={<>
+                <AenderungBeantragen nummer={nummer} projektId={projektId} />
+                <Eskalieren lage={eskalation} grund={TB.wesentlich.grundVon.kosten(p, fmtProzent(pct, { vorzeichen: false }))} />
+              </>}>{TB.wesentlich.kosten(p, fmtProzent(pct, { vorzeichen: false }))}</Hinweis>
             ) : null}
           </div>
         );
@@ -434,6 +445,8 @@ function Arbeitsflaeche({ nummer, projektId, periode, geladen, refetch }: { numm
   };
 
   const vor = b.vorperiode;
+  // Eskalation aus der Warnung «wesentliche Abweichung» (UC-004 A1.2): vorher offene Änderungen speichern
+  const eskalationLage: EskalationLage = { kann: b.can.eskalieren, eskalation: b.eskalation, projektId, periode, sichern };
   const tolTage = toleranz(toleranzen.data, 'termin');
   const tolProzent = toleranz(toleranzen.data, 'kosten');
   const abP2 = PHASEN.indexOf(b.phase) >= 2;
@@ -462,8 +475,8 @@ function Arbeitsflaeche({ nummer, projektId, periode, geladen, refetch }: { numm
             <dt>{TB.kopf.vorperiode}</dt>
             <dd>{vor ? <>{fmtPeriode(vor.periode)}: <Status status={statusUi(vor.status)} /> {vor.trend ? (TB.beurteilung.trendWerte[vor.trend] ?? vor.trend) : ''}</> : TB.kopf.keineVorperiode}</dd>
           </dl>
-          <Abschnitt id="sb-ms" titel={TB.abschnitte.meilensteine}><Meilensteine nummer={nummer} projektId={projektId} bearbeitbar={bearbeitbar} toleranzTage={tolTage} /></Abschnitt>
-          <Abschnitt id="sb-kosten" titel={TB.abschnitte.kosten}><KostenAbschnitt nummer={nummer} projektId={projektId} bearbeitbar={bearbeitbar} toleranzProzent={tolProzent} /></Abschnitt>
+          <Abschnitt id="sb-ms" titel={TB.abschnitte.meilensteine}><Meilensteine nummer={nummer} projektId={projektId} bearbeitbar={bearbeitbar} toleranzTage={tolTage} eskalation={eskalationLage} /></Abschnitt>
+          <Abschnitt id="sb-kosten" titel={TB.abschnitte.kosten}><KostenAbschnitt nummer={nummer} projektId={projektId} bearbeitbar={bearbeitbar} toleranzProzent={tolProzent} eskalation={eskalationLage} /></Abschnitt>
           <Abschnitt id="sb-risiken" titel={TB.abschnitte.risiken}><RisikenAbschnitt projektId={projektId} bearbeitbar={bearbeitbar} /></Abschnitt>
           <Abschnitt id="sb-komm" titel={TB.abschnitte.kommunikation}><Kommunikation projektId={projektId} periode={periode} bearbeitbar={bearbeitbar} /></Abschnitt>
           {abP2 ? <Abschnitt id="sb-kpi" titel={TB.abschnitte.kpis}><Kpis projektId={projektId} periode={periode} bearbeitbar={bearbeitbar} /></Abschnitt> : null}

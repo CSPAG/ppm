@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 import { full, skipDb } from './harness.ts';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
-import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../../src/modules/sitzung/index.ts';
+import { registriereTraktandenart, traktandum, type EntscheidFolge, type FolgeKontext } from '../../src/modules/sitzung/index.ts';
 import { _abmelden, traktandenart, type Traktandenart } from '../../src/modules/sitzung/arten.ts';
 import { optionen } from '../../src/modules/sitzung/entscheid.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
@@ -23,6 +23,8 @@ function mittwochIn(n: number): string {
 
 /** Folgen, die die Probe-Art «gate» erhält (wie vertrag in AP-E3-3: Baseline und Phase). */
 const folgen: EntscheidFolge[] = [];
+/** Kontext je Folge (FolgeKontext: Akteur, Sitzung, Vorher bei Korrektur, Zugang). */
+const kontexte: (FolgeKontext | undefined)[] = [];
 
 /**
  * Art für den Test ersetzen: Registriert ein Modul die Art schon beim Laden (statusbericht: eskalation, meilenstein,
@@ -39,6 +41,7 @@ function probeArt(a: Traktandenart): void {
 describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () => {
   let api: TestApi;
   let tenantId: string;
+  let ueId = '';
   let ue: Record<string, string>, mitglied: Record<string, string>, plH: Record<string, string>, nobody: Record<string, string>;
   let pl: string, sp: string;
   let p1: { id: string; nummer: string }, p2: { id: string; nummer: string };
@@ -63,6 +66,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     api = await testApi();
     const u = await login(api, 'demo', 'u-ue', 'ue');
     tenantId = u.tenantId;
+    ueId = u.principalId;
     ue = { authorization: u.authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
     const adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
@@ -98,11 +102,12 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
       art: 'gate',
       ergebnisse: [{ schluessel: 'freigegeben', label: 'Freigegeben' }, { schluessel: 'mit_auflagen', label: 'Mit Auflagen freigegeben' },
         { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }, { schluessel: 'abgelehnt', label: 'Gestoppt' }],
-      beiEntscheid: async (tx, e) => {
+      beiEntscheid: async (tx, e, k) => {
         // in der Transaktion des Entscheids: sieht den Entscheid schon
         const n = (await tx.query('SELECT 1 FROM ppm.entscheid WHERE traktandum_id = $1', [e.traktandumId])).rowCount;
         assert.equal(n, 1);
         folgen.push(e);
+        kontexte.push(k);
       },
     });
     probeArt({ art: 'eskalation', ergebnisse: [{ schluessel: 'erledigt', label: 'Erledigt mit Massnahme' }, { schluessel: 'zurueckgestellt', label: 'Zurückgestellt' }] });
@@ -166,6 +171,11 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
       ['mit_auflagen', 'Mit Auflagen freigegeben', false, 1, pl, 1, true]);
     // Folge der Art sofort, vor dem Schliessen (K3 Abnahme «Phase und Baseline stehen richtig, bevor die Sitzung geschlossen wird»)
     assert.deepEqual(folgen.map(f => [f.traktandumId, f.ergebnis, f.viaSns, f.bezug.id]), [[tid.gateP2, 'mit_auflagen', false, 'g-p2']]);
+    // Kontext: die UE als Akteur, Sitzung und Traktandum, noch kein früheres Ergebnis, Zugang zu Datenbank und Tupeln
+    const k = kontexte[0]!;
+    assert.deepEqual([k.principalId, k.akteur.principal?.principalId, k.sitzungId, k.traktandumId, k.vorher], [ueId, ueId, sitzung.id, tid.gateP2, null]);
+    assert.equal(typeof k.db.query, 'function');
+    assert.equal(typeof k.tuples, 'object');
     // keine Mitteilung und keine Aufgabe vor dem Schliessen
     assert.equal((await mitteilungen(pl)).length, vorher);
     assert.equal((await aufgaben('auflage.erfuellen')).length, 0);
@@ -185,6 +195,8 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     assert.deepEqual([e.version, e.anVr, e.auflagen.map((a: { text: string }) => a.text), e.verlauf.map((v: { version: number; begruendung: string }) => v.version)],
       [2, true, ['Risikoplan nachreichen', 'Terminplan bestätigen'], [1, 2]]);
     assert.equal(folgen.length, 2, 'Folge erneut mit dem korrigierten Entscheid');
+    // bei Korrektur das zuvor erfasste Ergebnis im Kontext (A-30)
+    assert.deepEqual([folgen[1]!.ergebnis, kontexte[1]?.vorher], ['mit_auflagen', { ergebnis: 'mit_auflagen', begruendung: 'Business Case überzeugt' }]);
   });
 
   test('Via SNS-VR: Stellungnahme ohne Folge; übrige Entscheide; Mitglied liest (UC-006 A1)', async () => {
@@ -242,6 +254,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', { skip }, () =
     const r = await ok('PUT', `/v1/traktanden/${tid.gateP1}/entscheid/sns`, { ...ue, 'if-match': `W/"${e.version}"` }, { ergebnis: 'freigegeben', begruendung: 'SNS-VR stimmt zu' });
     assert.deepEqual([r.sns.ergebnis, r.sns.label, r.can.snsErfassen], ['freigegeben', 'Freigegeben', false]);
     assert.deepEqual(folgen.at(-1) && [folgen.at(-1)!.traktandumId, folgen.at(-1)!.viaSns, folgen.at(-1)!.ergebnis], [tid.gateP1, true, 'freigegeben']);
+    assert.deepEqual([kontexte.at(-1)?.principalId, kontexte.at(-1)?.vorher], [ueId, null], 'SNS-VR: die UE erfasst (A-02)');
     assert.equal((await call('PUT', `/v1/traktanden/${tid.gateP1}/entscheid/sns`, { ...ue, 'if-match': `W/"${r.version}"` }, { ergebnis: 'abgelehnt', begruendung: 'x' })).statusCode, 409);
     assert.ok((await mitteilungen(sp)).some(m => m.text.includes('Entscheid SNS-VR Freigegeben')));
   });

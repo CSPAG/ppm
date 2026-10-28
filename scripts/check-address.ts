@@ -1,14 +1,16 @@
 /**
- * Texte (Leitentscheidung L10): Oberfläche und Fehlertexte der API mit Anrede «Sie» (docs/ux/README.md, UX-E7, bis
- * zur Klärung von UX-OF-1), Schweizer Rechtschreibung ohne ß; in sichtbaren Texten der Oberfläche «Organisation» statt
- * «Mandant»/«Tenant».
+ * Texte (Leitentscheidung L10): Oberfläche und Fehlertexte der API mit Anrede «Du» (docs/ux/README.md, UX-E7,
+ * UX-OF-1 entschieden 28.10.2026), Schweizer Rechtschreibung ohne ß; in sichtbaren Texten der Oberfläche «Organisation»
+ * statt «Mandant»/«Tenant». Während der Umstellung von «Sie» auf «Du» prüft das Skript die Anrede nicht; danach meldet
+ * es die Sie-Form (FORMAL).
  *
  *   node scripts/check-address.ts
  */
 import { files, lineOf, read, report, stripComments } from './lib.ts';
 
-/** Du-Form in Texten (Pronomen; Imperative wie «Gib» erkennt die Prüfung nicht, sie bleiben dem Review). */
-const INFORMAL = /\b([Dd]u|[Dd]ich|[Dd]ir|[Dd]ein(e[mnrs]?)?)\b/;
+/** Sie-Form in Texten (Höflichkeitspronomen; Imperative wie «Geben Sie» erkennt die Prüfung über «Sie»). Bis zum Ende der Umstellung aus. */
+const FORMAL = /\b(Sie|Ihnen|Ihr(e[mnrs]?)?)\b/;
+const PRUEFE_ANREDE = false;
 const SHARP_S = /ß/;
 const TENANT = /\b(Mandant(en)?|Tenants?)\b/i;
 
@@ -28,7 +30,7 @@ const check = (file: string, ui: boolean) => {
   for (const t of texts(src)) {
     // Nur Texte mit Leerzeichen sind Sätze; Bezeichner, Pfade und Schlüssel bleiben aussen vor
     if (!/\s/.test(t.text.trim())) continue;
-    if (INFORMAL.test(t.text)) problems.push(`${file}:${lineOf(src, t.index)}: Du-Form «${t.text.trim().slice(0, 60)}» (Anrede «Sie» verwenden)`);
+    if (PRUEFE_ANREDE && FORMAL.test(t.text)) problems.push(`${file}:${lineOf(src, t.index)}: Sie-Form «${t.text.trim().slice(0, 60)}» (Anrede «Du» verwenden)`);
     if (ui && TENANT.test(t.text)) problems.push(`${file}:${lineOf(src, t.index)}: «Mandant»/«Tenant» in sichtbarem Text «${t.text.trim().slice(0, 60)}» (Begriff «Organisation»)`);
   }
 };

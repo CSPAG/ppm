@@ -8,12 +8,15 @@ import type { FastifyInstance } from 'fastify';
 import { registerAdhocRoutes, TAG_ADHOC } from './adhoc-routes.ts';
 import { registrierePortfoliobericht } from './bericht.ts';
 import { registerBerichtRoutes, TAG_BERICHT } from './bericht-routes.ts';
+import { registriereVorlage } from './bericht-vorlage.ts';
 import { auswertungTools } from './mcp.ts';
 import { registerRisikoRoutes, TAG_RISIKO } from './risiko-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
 // Art `portfoliobericht` in der Registry der Sitzung (fachmodell.md 2.9; AP-E2-3)
 registrierePortfoliobericht();
+// Feldkatalog für eigene Word-Vorlagen des Portfolioberichts (AM.03.01, UC-018 Schritt 2)
+registriereVorlage();
 
 export const auswertungModule = defineModule({
   name: 'auswertung',

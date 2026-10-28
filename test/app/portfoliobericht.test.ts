@@ -6,8 +6,13 @@
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
+import { BERICHT_FELDER, mitFeldern } from '../../src/modules/auswertung/bericht-vorlage.ts';
+import type { BerichtDaten } from '../../src/modules/auswertung/bericht.ts';
+import { werte } from '../../src/modules/vorlage/modell.ts';
+import { entpacken } from '../../src/modules/vorlage/zip.ts';
 import { full, skipDb } from './harness.ts';
 import { grant, login, testApi, type TestApi } from './api.ts';
+import { wordVorlage } from './fixtures/word.ts';
 
 const skip = await skipDb();
 
@@ -164,6 +169,34 @@ describe('Risikolage und Portfoliobericht', { skip }, () => {
     assert.equal(docx.rawPayload.subarray(0, 2).toString(), 'PK');
     const n = await full(api.t.runtime, T, async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.audit_log WHERE action = 'portfoliobericht.exported'")).rows[0]!.n);
     assert.equal(n, 2);
+  });
+
+  test('eigene Word-Vorlage: Feldkatalog aus dem gespeicherten Stand, Word-Ausgabe mit der aktiven Vorlage (AM.03.01, UC-018 Schritt 2)', async () => {
+    // jedes Feld des Katalogs hat einen Wert aus dem Dokument (gleiche Texte wie im Grundbestand)
+    const w = werte(mitFeldern(await ok('GET', `/v1/portfolioberichte/${id}`, ue) as BerichtDaten));
+    assert.deepEqual(BERICHT_FELDER.filter(f => !(f.schluessel in w)).map(f => f.schluessel), []);
+    const art = await ok('GET', '/v1/vorlagen/portfoliobericht', ue);
+    assert.equal(art.felder.length, BERICHT_FELDER.length);
+
+    const datei = wordVorlage([['«Portfolio» · «Peri', 'ode»'], ['«Kommentar der Programmleitung»'], ['«Projekte der Periode»'], ['«Offene Eskalationen»']], 'Intern · enthält Personendaten');
+    const r = await call('POST', '/v1/vorlagen/portfoliobericht/versionen', ue, { dateiname: 'Portfoliobericht.docx', inhalt: datei.toString('base64') });
+    assert.equal(r.statusCode, 201, r.body);
+    assert.deepEqual([r.json().zuordnung, r.json().pruefung.aktivierbar], [{
+      Portfolio: 'portfolio.name', Periode: 'bericht.periode', 'Kommentar der Programmleitung': 'bericht.kommentar', 'Projekte der Periode': 'projekte',
+      'Offene Eskalationen': 'risikolage.eskalationen',
+    }, true]);
+    assert.equal((await call('POST', '/v1/vorlagen/portfoliobericht/versionen/1/aktivieren', { ...ue, 'if-match': r.headers.etag as string })).statusCode, 200);
+
+    // das Gremium liest die Vorlage nicht, erhält aber den Bericht in ihrer Gestaltung; PDF weiter im Grundbestand
+    const d = await call('GET', `/v1/portfolioberichte/${id}/dokument?format=docx`, gremium);
+    assert.equal(d.statusCode, 200, d.body);
+    const xml = entpacken(d.rawPayload).find(e => e.name === 'word/document.xml')!.daten.toString('utf8');
+    assert.match(xml, /Transformation · \S+ \d{4}/);
+    assert.match(xml, /Lage stabil, ein Projekt kritisch\./);
+    assert.match(xml, /2026-001 · Projekt 2026-001 \(Eskalation\) · P1 · Kritisch/);
+    assert.match(xml, /Lieferverzug · Zweitlieferant/);
+    assert.doesNotMatch(xml, /«/);
+    assert.equal((await call('GET', `/v1/portfolioberichte/${id}/dokument`, gremium)).rawPayload.subarray(0, 5).toString(), '%PDF-');
   });
 
   test('Vorschlag «Bericht der Programmleitung» an das Gremium mit dem Bericht als Unterlage (K3 Schritte 1 und 4)', async () => {

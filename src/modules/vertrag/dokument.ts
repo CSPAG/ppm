@@ -69,10 +69,10 @@ export function vertragDokument(d: DokumentDaten, v: Vorlage = vorlage.aktuell('
   const t = (nr: string) => `${nr} ${vorlage.titelVon(v, nr)}`;
   const person = (id: string) => d.personen.get(id) || 'Person nicht verfügbar';
   const funktion = (f: string) => i[8].mitglieder.filter(m => m.funktion === f).map(m => person(m.personId)).join(', ') || '–';
-  const absatz = (titel: string | null, text: string): Block[] => [...(titel ? [{ art: 'ueberschrift' as const, text: titel, ebene: 2 as const }] : []), { art: 'absatz', text, leer: LEER }];
+  const absatz = (titel: string | null, text: string, feld?: string): Block[] => [...(titel ? [{ art: 'ueberschrift' as const, text: titel, ebene: 2 as const }] : []), { art: 'absatz', text, leer: LEER, feld }];
   const h1 = (nr: string): Block => ({ art: 'ueberschrift', text: t(nr), ebene: 1 });
   const h2 = (nr: string): Block => ({ art: 'ueberschrift', text: t(nr), ebene: 2 });
-  const tab = (kopfzeile: string[], zeilen: string[][], breiten?: number[]): Block => ({ art: 'tabelle', kopf: kopfzeile, zeilen, breiten, leer: LEER });
+  const tab = (kopfzeile: string[], zeilen: string[][], breiten: number[], feld: string): Block => ({ art: 'tabelle', kopf: kopfzeile, zeilen, breiten, leer: LEER, feld });
 
   const freigabe = ver.baseline ? `Baseline seit ${datum(ver.baseline_at)}` : ver.stand === 'abgenommen' ? 'abgenommen' : 'nicht freigegeben';
 
@@ -91,80 +91,81 @@ export function vertragDokument(d: DokumentDaten, v: Vorlage = vorlage.aktuell('
       ['Projektleiter/in', funktion('pl')],
       ['Clinical Transformation Lead', funktion('ctl')],
       ['Projektkategorie', d.bez.kategorie ? KATEGORIE_TEXT[d.bez.kategorie] ?? d.bez.kategorie : '–'],
-    ] },
+    ], felder: ['version.nummer', 'version.phase', 'version.datum', 'version.status', 'version.freigabe', 'projekt.klassifikation', 'rolle.sponsor',
+      'rolle.koalition', 'rolle.projektleitung', 'rolle.ctl', 'projekt.kategorie'] },
     { art: 'ueberschrift', text: 'Versionierung und Änderungstracking', ebene: 2 },
     tab(['Version', 'Datum', 'Anlass', 'Stand'], [...d.versionen].reverse().map(x => [
       x.nummer, datum(x.eingereicht_at ?? x.created_at), ANLASS_TEXT[x.anlass], `${STAND_TEXT[x.stand]}${x.baseline ? ' (Baseline)' : ''}`,
-    ]), [1, 2, 2, 3]),
-    ...(ver.begruendung.trim() ? absatz('Begründung der Änderung', ver.begruendung) : []),
+    ]), [1, 2, 2, 3], 'versionierung'),
+    ...(ver.begruendung.trim() ? absatz('Begründung der Änderung', ver.begruendung, 'version.begruendung') : []),
 
     h1('1'),
-    ...absatz('Ausgangslage', i[1].ausgangslage), ...absatz('Problemstellung', i[1].problemstellung),
-    ...absatz('Was geschieht ohne das Projekt', i[1].ohneProjekt), ...absatz('Vorprojekte und Initiativen', i[1].vorprojekte),
-    ...absatz('Vorgaben und Rahmenbedingungen', i[1].rahmenbedingungen),
+    ...absatz('Ausgangslage', i[1].ausgangslage, 'kap1.ausgangslage'), ...absatz('Problemstellung', i[1].problemstellung, 'kap1.problemstellung'),
+    ...absatz('Was geschieht ohne das Projekt', i[1].ohneProjekt, 'kap1.ohneProjekt'), ...absatz('Vorprojekte und Initiativen', i[1].vorprojekte, 'kap1.vorprojekte'),
+    ...absatz('Vorgaben und Rahmenbedingungen', i[1].rahmenbedingungen, 'kap1.rahmenbedingungen'),
 
     h1('2'),
     { art: 'felder', zeilen: [
       ['Handlungsfeld', d.bez.handlungsfeld ?? '–'],
       ['Strategisches Ziel', d.bez.ziel ?? '–'],
       ['Jahresziel', d.bez.jahresziel ?? '–'],
-    ] },
-    ...absatz('Beitrag zum Ziel', i[2].beitrag),
+    ], felder: ['kap2.handlungsfeld', 'kap2.ziel', 'kap2.jahresziel'] },
+    ...absatz('Beitrag zum Ziel', i[2].beitrag, 'kap2.beitrag'),
 
     h1('3'),
-    ...absatz('Ziele', i[3].ziele), ...absatz('Nutzenbeitrag', i[3].nutzen), ...absatz('Business Case', i[3].businessCase),
+    ...absatz('Ziele', i[3].ziele, 'kap3.ziele'), ...absatz('Nutzenbeitrag', i[3].nutzen, 'kap3.nutzen'), ...absatz('Business Case', i[3].businessCase, 'kap3.businessCase'),
     { art: 'ueberschrift', text: 'KPIs', ebene: 2 },
-    tab(['Art', 'KPI', 'Einheit', 'Zielwert'], i[3].kpis.map(k => [KPI_TEXT[k.art] ?? k.art, k.text, k.einheit, k.zielwert]), [2, 5, 2, 2]),
+    tab(['Art', 'KPI', 'Einheit', 'Zielwert'], i[3].kpis.map(k => [KPI_TEXT[k.art] ?? k.art, k.text, k.einheit, k.zielwert]), [2, 5, 2, 2], 'kap3.kpis'),
 
-    h1('4'), ...absatz('Lösungsansatz', i[4].loesungsansatz), ...absatz('Annahmen', i[4].annahmen),
-    h1('5'), ...absatz('Im Projekt bearbeitet', i[5].bearbeitet), ...absatz('Nicht bearbeitet', i[5].nichtBearbeitet),
+    h1('4'), ...absatz('Lösungsansatz', i[4].loesungsansatz, 'kap4.loesungsansatz'), ...absatz('Annahmen', i[4].annahmen, 'kap4.annahmen'),
+    h1('5'), ...absatz('Im Projekt bearbeitet', i[5].bearbeitet, 'kap5.bearbeitet'), ...absatz('Nicht bearbeitet', i[5].nichtBearbeitet, 'kap5.nichtBearbeitet'),
 
     h1('6'),
-    tab(['Projekt', 'Abhängigkeit', 'Ansprechperson'], i[6].abhaengigkeiten.map(a => [d.projekte.get(a.zuProjektId) ?? 'Projekt nicht verfügbar', a.text, a.ansprechperson]), [3, 5, 2]),
-    ...absatz('Weitere Schnittstellen', i[6].schnittstellen),
+    tab(['Projekt', 'Abhängigkeit', 'Ansprechperson'], i[6].abhaengigkeiten.map(a => [d.projekte.get(a.zuProjektId) ?? 'Projekt nicht verfügbar', a.text, a.ansprechperson]), [3, 5, 2], 'kap6.abhaengigkeiten'),
+    ...absatz('Weitere Schnittstellen', i[6].schnittstellen, 'kap6.schnittstellen'),
 
     h1('7'), h2('7.1'),
-    ...absatz(null, i[7].vorgehen),
-    tab(['Phase', 'Art', 'Lieferergebnis / Meilenstein', 'Termin'], i[7].meilensteine.map(m => [m.phase, m.art === 'meilenstein' ? 'Meilenstein' : 'Lieferergebnis', m.text, datum(m.termin)]), [1, 2, 6, 2]),
+    ...absatz(null, i[7].vorgehen, 'kap7.vorgehen'),
+    tab(['Phase', 'Art', 'Lieferergebnis / Meilenstein', 'Termin'], i[7].meilensteine.map(m => [m.phase, m.art === 'meilenstein' ? 'Meilenstein' : 'Lieferergebnis', m.text, datum(m.termin)]), [1, 2, 6, 2], 'kap7.meilensteine'),
     h2('7.2'),
     { art: 'felder', zeilen: [
       ['Projektstart', datum(i[7].termine.projektStart)], ['Start der Phase', datum(i[7].termine.phasenStart)],
       ['Exit der Phase', datum(i[7].termine.phasenExit)], ['Erwarteter Projektabschluss', datum(i[7].termine.projektabschluss)],
-    ] },
+    ], felder: ['kap7.projektStart', 'kap7.phasenStart', 'kap7.phasenExit', 'kap7.projektabschluss'] },
 
     h1('8'),
-    tab(['Rolle', 'Person', 'Aufgaben, Kompetenzen, Verantwortung'], i[8].mitglieder.map(m => [FUNKTION_TEXT[m.funktion] ?? m.funktion, person(m.personId), m.akv]), [3, 3, 6]),
+    tab(['Rolle', 'Person', 'Aufgaben, Kompetenzen, Verantwortung'], i[8].mitglieder.map(m => [FUNKTION_TEXT[m.funktion] ?? m.funktion, person(m.personId), m.akv]), [3, 3, 6], 'kap8.mitglieder'),
 
     h1('9'), h2('9.1'),
     tab(['Phase', 'Art', 'Position', 'Lieferant', 'Offerte', 'Betrag'], i[9].kosten.map(k => [
       k.phase, k.art.toUpperCase(), k.text, k.lieferant, k.offerte, !d.betraege ? NICHT_VERFUEGBAR : k.betrag === null ? '–' : betrag(k.betrag),
-    ]), [1, 1.3, 4, 2, 2, 2.4]),
+    ]), [1, 1.3, 4, 2, 2, 2.4], 'kap9.kosten'),
     ...(d.betraege && i[9].kosten.length
-      ? [{ art: 'felder' as const, zeilen: [['Total', betrag(i[9].kosten.reduce((s, k) => s + (k.betrag ?? 0), 0))] as const] }]
+      ? [{ art: 'felder' as const, zeilen: [['Total', betrag(i[9].kosten.reduce((s, k) => s + (k.betrag ?? 0), 0))] as const], felder: ['kap9.total'] }]
       : []),
     h2('9.2'),
     tab(['Phase', 'Rolle', 'Umfang', 'Zeitraum', 'Bemerkung'], i[9].personal.map(p => [
       p.phase, d.bez.rollen.get(p.rolle) ?? p.rolle, p.fte !== null ? `${p.fte} FTE` : p.groesse ? `Grösse ${p.groesse}` : '–',
       p.vonMonat || p.bisMonat ? `${monat(p.vonMonat)} – ${monat(p.bisMonat)}` : '–', p.bemerkung,
-    ]), [1, 2.5, 1.5, 2.5, 4]),
+    ]), [1, 2.5, 1.5, 2.5, 4], 'kap9.personal'),
 
     h1('10'),
-    tab(['Risiko', 'EW', 'AW', 'Massnahme', 'Verantwortlich'], i[10].risiken.map(r => [r.text, STUFE_TEXT[r.wahrscheinlichkeit]!, STUFE_TEXT[r.auswirkung]!, r.massnahme, r.verantwortlich]), [4, 1.2, 1.2, 4, 2]),
+    tab(['Risiko', 'EW', 'AW', 'Massnahme', 'Verantwortlich'], i[10].risiken.map(r => [r.text, STUFE_TEXT[r.wahrscheinlichkeit]!, STUFE_TEXT[r.auswirkung]!, r.massnahme, r.verantwortlich]), [4, 1.2, 1.2, 4, 2], 'kap10.risiken'),
 
     h1('11'), h2('11.1'),
-    tab(['Stakeholder', 'Interesse', 'Einfluss', 'Massnahmen'], i[11].stakeholder.map(s => [s.gruppe, s.interesse, s.einfluss, s.massnahmen]), [2, 3, 3, 4]),
+    tab(['Stakeholder', 'Interesse', 'Einfluss', 'Massnahmen'], i[11].stakeholder.map(s => [s.gruppe, s.interesse, s.einfluss, s.massnahmen]), [2, 3, 3, 4], 'kap11.stakeholder'),
     h2('11.2'),
-    tab(['Phase', 'Massnahme', 'Adressat', 'Ziel', 'Termin'], i[11].kommunikation.map(k => [k.phase, k.text, k.adressat, k.ziel, datum(k.termin)]), [1, 4, 2, 3, 1.6]),
+    tab(['Phase', 'Massnahme', 'Adressat', 'Ziel', 'Termin'], i[11].kommunikation.map(k => [k.phase, k.text, k.adressat, k.ziel, datum(k.termin)]), [1, 4, 2, 3, 1.6], 'kap11.kommunikation'),
 
     h1('12'),
     { art: 'felder', zeilen: [
       ['Version', ver.nummer], ['Status', STAND_TEXT[ver.stand]], ['Eingereicht', datum(ver.eingereicht_at)], ['Freigabe', freigabe],
       ['Unterschriften', 'noch keine'],
-    ] },
-    ...absatz('Bemerkungen', i[12].bemerkung),
+    ], felder: [null, null, 'version.eingereicht', null, 'kap12.unterschriften'] },
+    ...absatz('Bemerkungen', i[12].bemerkung, 'kap12.bemerkung'),
 
     h1('13'),
-    tab(['Bezeichnung', 'Version / Datum', 'Inhalt'], i[13].beilagen.map(b => [b.bezeichnung, b.version, b.inhalt]), [3, 2, 5]),
+    tab(['Bezeichnung', 'Version / Datum', 'Inhalt'], i[13].beilagen.map(b => [b.bezeichnung, b.version, b.inhalt]), [3, 2, 5], 'kap13.beilagen'),
   ];
 
   return {
@@ -172,5 +173,6 @@ export function vertragDokument(d: DokumentDaten, v: Vorlage = vorlage.aktuell('
     kopfzeile: v.kopfzeile,
     fusszeile: `${v.titel} ${kopf.nummer} · Version ${ver.nummer} · ${STAND_TEXT[ver.stand]} · Vorlage ${v.name}, Fassung ${v.version}`,
     bloecke,
+    felder: { 'projekt.nummer': kopf.nummer, 'projekt.name': kopf.name, 'dokument.datum': datum(new Date()) },
   };
 }

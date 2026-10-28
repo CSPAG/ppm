@@ -213,6 +213,7 @@ export const model = defineModel({
     get_projektdaten: { title: 'Register eines Projekts lesen', permission: 'projekt:read', readOnly: true },
     // vertrag
     get_vertrag: { title: 'Projektvertrag lesen', permission: 'projekt:read', readOnly: true },
+    compare_vertrag: { title: 'Vertragsversionen vergleichen', permission: 'projekt:read', readOnly: true },
     // ziel
     list_ziele: { title: 'Strategische Ziele auflisten', permission: 'ziel:read', readOnly: true },
     get_roadmap: { title: 'Portfolio-Roadmap lesen', permission: 'tenant:read', readOnly: true },
@@ -229,6 +230,7 @@ export const model = defineModel({
     get_auslastung: { title: 'Auslastung je Rolle und Monat', permission: 'ressource:read', readOnly: true },
     // priorisierung
     get_matrix: { title: 'Portfolio-Matrix lesen', permission: 'priorisierung:read', readOnly: true },
+    compare_szenarien: { title: 'Szenarien vergleichen', permission: 'priorisierung:read', readOnly: true },
     list_bedarfe: { title: 'Bedarfsliste mit Deckung', permission: 'ressource:read', readOnly: true },
     // idee
     list_ideen: { title: 'Projektideen auflisten', permission: 'idee:read', readOnly: true },

@@ -87,17 +87,8 @@ CREATE TRIGGER nutzenpruefung_touch BEFORE UPDATE ON ppm.nutzenpruefung FOR EACH
 SELECT app.secure_tenant_tables();
 REVOKE DELETE ON ppm.gate_antrag, ppm.nutzenpruefung FROM ppm_app;
 
--- Folge des Gate-Entscheids (Traktandenart `gate`, fachmodell.md 2.9) in der Transaktion des Entscheids: Die UE erfasst
--- ihn mit `sitzung:write`, hat aber kein `vertrag:write`. Wie `app.sitzung_intern` (130) setzt nur der Server
--- `app.vertrag_intern` für die Dauer der Folge (Baseline, Stand); die Lesesicht bleibt unverändert.
-DROP POLICY vertrag_version_update ON ppm.vertrag_version;
-CREATE POLICY vertrag_version_update ON ppm.vertrag_version AS RESTRICTIVE FOR UPDATE TO ppm_app
-  USING (app.has_permission('vertrag:write', 'projekt', projekt_id) OR current_setting('app.vertrag_intern', true) = 'on')
-  WITH CHECK (app.has_permission('vertrag:write', 'projekt', projekt_id) OR current_setting('app.vertrag_intern', true) = 'on');
-DROP POLICY vertrag_kapitel_update ON ppm.vertrag_kapitel;
-CREATE POLICY vertrag_kapitel_update ON ppm.vertrag_kapitel AS RESTRICTIVE FOR UPDATE TO ppm_app
-  USING (app.has_permission('vertrag:write', 'projekt', projekt_id) OR current_setting('app.vertrag_intern', true) = 'on')
-  WITH CHECK (app.has_permission('vertrag:write', 'projekt', projekt_id) OR current_setting('app.vertrag_intern', true) = 'on');
+-- Die Folge des Gate-Entscheids (Traktandenart `gate`, fachmodell.md 2.9) schreibt Version und Kapitel in der
+-- Transaktion des Entscheids mit `app.vertrag_intern = 'on'`; die Update-Policies dafür setzt 200_vertrag_aenderung.
 
 -- Lesesicht (fachmodell.md 3.4), Muster ÜBER ELTERN mit dem Projekt: lesen, wer das Projekt sieht; schreiben mit
 -- vertrag:write am Projekt (PL), der Entscheid über `app.vertrag_intern`, die Nutzenprüfung auch mit vertrag:decide (SP)

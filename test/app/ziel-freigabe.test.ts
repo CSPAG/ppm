@@ -70,7 +70,7 @@ describe('Freigabe der Jahresziele und Roadmap', { skip }, () => {
     const r = await call('POST', '/v1/ziele/2027/vorlegen', { ...gl, 'if-match': `W/"${v.version}"` });
     assert.equal(r.statusCode, 409);
     assert.equal(r.json().reason, 'metrik_fehlt');
-    assert.equal(r.json().detail, 'Metrik fehlt: 2 Jahresziele haben keine Metrik oder keinen Zielwert (2.1.2, 3.1.1). Ergänzen Sie Metrik und Zielwert.');
+    assert.equal(r.json().detail, 'Metrik fehlt: 2 Jahresziele haben keine Metrik oder keinen Zielwert (2.1.2, 3.1.1). Ergänze Metrik und Zielwert.');
     assert.equal((await call('GET', '/v1/ziele/2027', gl)).json().zieljahr.stand, 'in_arbeit', 'nichts vorgelegt');
   });
 

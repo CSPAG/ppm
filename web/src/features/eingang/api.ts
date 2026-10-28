@@ -38,7 +38,7 @@ export function useMitteilungen() {
   });
 }
 
-/** Laufende Stellvertretungen für den Kopf (Banner «Sie vertreten …», I-Z2). */
+/** Laufende Stellvertretungen für den Kopf (Banner «Du vertrittst …», I-Z2). */
 export function useVertretungen() {
   return useQuery({ queryKey: eingangKeys.vertretungen, queryFn: async ({ signal }) => (await api.GET('/v1/stellvertretungen', { signal })).data!.items });
 }

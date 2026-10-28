@@ -71,7 +71,7 @@ export function registerNeubesetzung(app: FastifyInstance, deps: Deps): void {
   }, async (req, reply) => {
     const p = await admin(req);
     const { person: id } = req.params as { person: string };
-    if (id === p.principalId) throw forbidden('Sie können sich den Zugang nicht selbst entziehen.');
+    if (id === p.principalId) throw forbidden('Du kannst dir den Zugang nicht selbst entziehen.');
     const pers = await req.tx(tx => nb.person(tx, id));
     if (!pers || pers.entfernt) throw notFound('Person');
     const svc = deps.iam.admin;

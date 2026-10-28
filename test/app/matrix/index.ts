@@ -38,6 +38,7 @@ export const MATRIX = sammle([
   (await import('./priorisierung-matrix.ts')).matrix,
   (await import('./priorisierung-szenario.ts')).matrix,
   (await import('./priorisierung-entscheid.ts')).matrix,
+  (await import('./abschluss.ts')).matrix,
   (await import('./webhooks.ts')).matrix,
   (await import('./schnittstelle.ts')).matrix,
 ]);

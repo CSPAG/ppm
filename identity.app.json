@@ -19,8 +19,6 @@
     },
     "theme": "identity",
     "themeTexts": "infra/keycloak/theme-texts.json",
-    "localization": "infra/keycloak/localization.json",
-    "entraDenyMessage": "Ihr Microsoft-Konto ist für diese Organisation nicht freigeschaltet. Bitte wenden Sie sich an die Administration Ihrer Organisation.",
     "machineClients": {
       "ppm-rauchtest": {
         "name": "Rauchtest",

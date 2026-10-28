@@ -61,7 +61,7 @@ export function registerRoadmapRoutes(app: FastifyInstance, _deps: Deps): void {
     const r = await req.tx(async tx => {
       const zj = await zyklus.getJahr(tx, jahr);
       if (!zj) throw notFound(`Zielzyklus ${jahr}`);
-      if (zj.stand !== 'in_kraft') throw conflict(`Die Jahresziele ${jahr} sind noch nicht in Kraft. Publizieren Sie die Roadmap nach der Freigabe durch den VR.`, { reason: 'stand', stand: zj.stand });
+      if (zj.stand !== 'in_kraft') throw conflict(`Die Jahresziele ${jahr} sind noch nicht in Kraft. Publiziere die Roadmap nach der Freigabe durch den VR.`, { reason: 'stand', stand: zj.stand });
       const row = await store.publizieren(tx, jahr, await store.inhalt(tx, jahr));
       const snap = { id: row.id, jahr, version: row.version };
       await record(tx, who, { action: 'roadmap.published', resourceType: 'roadmap', resourceId: row.id, data: snap, event: snap });

@@ -18,7 +18,7 @@ await aufgabe.oeffnen(tx, {
   bezug: { typ: 'statusbericht', id: bericht.id },      // fachlicher Bezug (Text, z. B. UUID oder '2026-10')
   empfaenger: { person: pl },                           // oder { recht: 'statusbericht:review' }
                                                         // oder { recht: 'sitzung:write', ort: { typ: 'portfolio', id } }
-  titel: 'Statusbericht Oktober erstellen',             // Sie-Form, mit Objekt
+  titel: 'Statusbericht Oktober erstellen',             // Du-Form, mit Objekt
   kontext: '2026-014 Neues KIS · als PL',               // optional: Projekt und Rolle
   link: '/projekte/2026-014/bericht?periode=2026-10',   // führt direkt zur Aktion (I-B1)
   frist: { datum: '2026-10-25', art: 'kalendertage' },  // optional; Art immer angeben (UX-E11)
@@ -41,7 +41,7 @@ await aufgabe.entfallen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertr
 
 ```ts
 import { mitteilung } from '../eingang/index.ts';
-await mitteilung.senden(tx, { an: person, bezug: { typ: 'idee', id }, text: 'Ihre Projektidee wurde zurückgewiesen.', link: `/portfolio/ideen?o=${nr}` });
+await mitteilung.senden(tx, { an: person, bezug: { typ: 'idee', id }, text: 'Deine Projektidee wurde zurückgewiesen.', link: `/portfolio/ideen?o=${nr}` });
 ```
 
 Information ohne Handlung; nur im Eingang, E-Mail mit Link folgt mit einem Netz-Adapter (A-44).
@@ -65,7 +65,7 @@ if (!v?.unterschriften) throw forbidden('Unterschriften sind in dieser Stellvert
 // Unterschrift mit in_vertretung_von = sp; Anzeige «‹Vertretung› in Vertretung von ‹Person›» (darstellung.md)
 ```
 
-- Banner «Sie handeln in Vertretung von …» (I-Z2): `stellvertretung.vertretene(tx, me)` liefert die heute vertretenen
+- Banner «Du handelst in Vertretung von …» (I-Z2): `stellvertretung.vertretene(tx, me)` liefert die heute vertretenen
   Personen.
 
 ## Kopf je Rolle
@@ -95,7 +95,7 @@ Befristete Rollen (Stellvertretung) zählen nicht: Sie entfallen mit ihrem Ablau
 
 ## Rollenänderungen mitteilen (UC-016 Schritt 3)
 
-Aus `access.granted` und `access.revoked` (Haken `after`) erhält die Person eine Mitteilung («Sie haben die Rolle
+Aus `access.granted` und `access.revoked` (Haken `after`) erhält die Person eine Mitteilung («Du hast die Rolle
 ‹Projektleitung› (Projekt) erhalten.»), wenn eine Person die Rolle vergeben oder entzogen hat: nicht beim Ablauf, nicht
 für befristete Rollen (Stellvertretung), nicht für Änderungen an sich selbst und nicht, solange die Person entfernt
 wird. Den Namen des Orts kennt `eingang` nicht (es kennt kein Fachmodul).

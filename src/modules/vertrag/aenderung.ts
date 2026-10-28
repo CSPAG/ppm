@@ -12,7 +12,7 @@
  */
 import { conflict, invalid, systemActor, type Actor, type Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
-import { registriereTraktandenart, traktandum, type EntscheidFolge } from '../sitzung/index.ts';
+import { registriereTraktandenart, traktandum, type EntscheidFolge, type FolgeKontext } from '../sitzung/index.ts';
 import { record, SCHEMA } from '../../platform.ts';
 import { baselineSetzen } from './baseline.ts';
 import { entwurfsanlass, type Phasenmodell } from './entwurf.ts';
@@ -75,7 +75,7 @@ export async function wirkung(tx: Tx, versionId: string, modell: Phasenmodell): 
   return {
     prat: dimensionen.length > 0, dimensionen, kapitel,
     hinweis: dimensionen.length
-      ? `Freigabe durch den PRAT: Diese Änderung betrifft ${und(dimensionen.map(d => DIMENSION_TEXT[d]))}. Sie können sie unterstützen; entscheiden wird der PRAT.`
+      ? `Freigabe durch den PRAT: Diese Änderung betrifft ${und(dimensionen.map(d => DIMENSION_TEXT[d]))}. Du kannst sie unterstützen; entscheiden wird der PRAT.`
       : null,
   };
 }
@@ -119,15 +119,15 @@ export async function einreichen(tx: Tx, who: Actor, o: { version: store.Version
   const inhalte = Object.fromEntries((await store.kapitel(tx, v.id)).map(k => [k.kapitel, k.inhalt]));
   const fehlend = pruefen(o.modell, v, inhalte).filter(a => !a.erfuellt);
   if (fehlend.length) {
-    throw invalid(`Angaben für Phase ${v.zielphase} fehlen: ${fehlend.map(a => `${a.text} (Kap. ${a.kapitel})`).join(', ')}. Ergänzen Sie sie, um einzureichen.`,
+    throw invalid(`Angaben für Phase ${v.zielphase} fehlen: ${fehlend.map(a => `${a.text} (Kap. ${a.kapitel})`).join(', ')}. Ergänze sie, um einzureichen.`,
       fehlend.map(a => ({ path: `/kapitel/${a.kapitel}/${a.feld}`, message: a.grund ?? a.text })));
   }
   if (!(await store.kapitel(tx, v.id)).some(k => k.geaendert)) {
-    throw conflict('Die Änderung enthält noch keine Anpassung gegenüber der Baseline. Passen Sie die betroffenen Kapitel an.', { reason: 'unveraendert' });
+    throw conflict('Die Änderung enthält noch keine Anpassung gegenüber der Baseline. Passe die betroffenen Kapitel an.', { reason: 'unveraendert' });
   }
   if (!v.begruendung.trim()) throw invalid('Begründung fehlt: Ohne Begründung kann der Sponsor die Änderung nicht beurteilen.', [{ path: '/begruendung', message: 'Pflicht bei einer Änderung.' }]);
   const sp = (await unterzeichnende(tx, p.id)).sp;
-  if (!sp.length) throw conflict('Die Projektorganisation hat keinen Sponsor; ohne ihn kann niemand die Änderung entscheiden. Legen Sie die Projektorganisation fest.', { reason: 'organisation', fehlend: ['sp'] });
+  if (!sp.length) throw conflict('Die Projektorganisation hat keinen Sponsor; ohne ihn kann niemand die Änderung entscheiden. Lege die Projektorganisation fest.', { reason: 'organisation', fehlend: ['sp'] });
   if (!(await store.standSetzen(tx, v.id, o.erwartet, ['in_arbeit'], 'in_pruefung', { eingereicht: true }))) return false;
   await aufgabe.erledigen(tx, { art: 'vertrag.ueberarbeiten', bezug: { typ: 'vertrag_version', id: v.id } });
   for (const person of sp) {
@@ -159,7 +159,7 @@ export async function entscheiden(tx: Tx, who: Actor, o: {
   const w = await wirkung(tx, v.id, o.modell);
   if (o.entscheid === 'freigegeben' && w.prat) throw conflict(w.hinweis!, { reason: 'prat', dimensionen: w.dimensionen, kapitel: w.kapitel });
   if (o.entscheid === 'an_prat' && !w.prat) {
-    throw conflict('Diese Änderung betrifft weder Scope, Budget noch Ressourcen; Sie entscheiden sie selbst.', { reason: 'kein_prat' });
+    throw conflict('Diese Änderung betrifft weder Scope, Budget noch Ressourcen; du entscheidest sie selbst.', { reason: 'kein_prat' });
   }
   if (o.entscheid === 'abgelehnt' && !o.begruendung.trim()) {
     throw invalid('Begründung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist.', [{ path: '/begruendung', message: 'Pflicht beim Ablehnen.' }]);
@@ -200,10 +200,11 @@ async function geschaeft(tx: Tx, bezug: { typ: string; id: string }): Promise<{ 
  * abgelehnt, Baseline bleibt). Benachrichtigungen schickt die Sitzung beim Schliessen. Ist die Folge schon eingetreten,
  * bleibt sie: Eine Korrektur des Entscheids (A-30) hebt eine gesetzte Baseline nicht wieder auf (Folgearbeit).
  */
-export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
+export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   const g = await geschaeft(tx, f.bezug);
   if (!g || g.v.stand !== 'traktandiert') return;
-  const who = systemActor('system');
+  // Baseline und Register im Audit mit der Person, die den Entscheid erfasst (UE)
+  const who = k?.akteur ?? systemActor('system');
   await intern(tx, async () => {
     if (f.ergebnis === 'freigegeben') await baselineSetzen(tx, who, g.v.id);
     else if (f.ergebnis === 'abgelehnt') await store.standSetzen(tx, g.v.id, null, ['traktandiert'], 'abgelehnt');

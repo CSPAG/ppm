@@ -30951,7 +30951,7 @@
         "tags": [
           "Verwaltung: Mitglieder und Rollen"
         ],
-        "description": "Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen).",
+        "description": "Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen). Die App kann das Entfernen in ihrem Haken `member.removing` ablehnen (z. B. 409 mit Begründung in `detail` und eigenem `reason`); dann bleibt alles unverändert.",
         "parameters": [
           {
             "schema": {
@@ -31788,7 +31788,7 @@
         "tags": [
           "Plattform: Organisationen"
         ],
-        "description": "Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen).",
+        "description": "Entfernt die Mitgliedschaft und alle Freigaben der Person bzw. zieht die Einladung zurück (`id`: Mitglied oder Einladung, wie in der Liste). Hat die Einladung das Konto angelegt, wurde sie nie angenommen und gehört die Person keiner anderen Organisation an, wird das unbenutzte Konto gelöscht. Zurückziehen dauert mindestens `KEYCLOAK_MGMT_INVITE_MIN_TIME` (wie Einladen). Die App kann das Entfernen in ihrem Haken `member.removing` ablehnen (z. B. 409 mit Begründung in `detail` und eigenem `reason`); dann bleibt alles unverändert.",
         "parameters": [
           {
             "schema": {
@@ -77682,7 +77682,7 @@
     },
     {
       "name": "Verwaltung: Mitglieder und Rollen",
-      "description": "Mitglieder und Maschinen-Clients der eigenen Organisation: einladen, entfernen, Rollen an der Organisation und Freigabestufe setzen (Recht «Mitglieder und Rollen verwalten»)."
+      "description": "Mitglieder und Maschinen-Clients der eigenen Organisation: einladen, entfernen, Rollen an der Organisation und Freigabestufe setzen (Recht «Mitglieder und Rollen verwalten»); eigene Rollen der Organisation zusammenstellen (Recht «Rollen zusammenstellen»)."
     },
     {
       "name": "Verwaltung: Anmeldung über Microsoft Entra ID",

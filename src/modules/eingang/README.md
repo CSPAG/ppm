@@ -95,7 +95,7 @@ Befristete Rollen (Stellvertretung) zählen nicht: Sie entfallen mit ihrem Ablau
 
 ## Rollenänderungen mitteilen (UC-016 Schritt 3)
 
-Aus `access.granted` und `access.revoked` (Haken `after`) erhält die Person eine Mitteilung («Sie haben die Rolle
+Aus `access.granted` und `access.revoked` (Haken `after`) erhält die Person eine Mitteilung («Du hast die Rolle
 ‹Projektleitung› (Projekt) erhalten.»), wenn eine Person die Rolle vergeben oder entzogen hat: nicht beim Ablauf, nicht
 für befristete Rollen (Stellvertretung), nicht für Änderungen an sich selbst und nicht, solange die Person entfernt
 wird. Den Namen des Orts kennt `eingang` nicht (es kennt kein Fachmodul).

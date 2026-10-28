@@ -71,6 +71,31 @@ describe('Quality-Check', () => {
     expect(sessionStorage.getItem(`ppm.qc.kommentare.${V}`)).toBeNull();
   });
 
+  it('Konflikt (412): «Neu laden» behält die Kommentare und sendet mit dem neuen Stand (Z7)', async () => {
+    sessionStorage.clear();
+    let geaendert = false;
+    let posts = 0;
+    const api = stub({
+      [`GET /v1/vertragsversionen/${V}/pruefung`]: () => json(pruefung(), 200, { ETag: geaendert ? 'W/"3"' : 'W/"2"' }),
+      [`POST /v1/vertragsversionen/${V}/quality-check`]: () => (posts++
+        ? json(pruefung({ stand: 'in_arbeit', version: 4, can: { qualityCheck: false, unterzeichnen: [] } }), 200, { ETag: 'W/"4"' })
+        : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
+    });
+    renderWithIam(<PruefenPage nummer="2026-014" />);
+    const feld = await screen.findByLabelText(TP.kommentar(9, KAPITEL[8]!.titel));
+    await userEvent.type(feld, 'Personal in FTE fehlt');
+    geaendert = true;
+    await userEvent.click(screen.getByRole('button', { name: TP.zurueckgeben }));
+    expect(await screen.findByText(TP.konflikt)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TP.neuLaden }));
+    await waitFor(() => expect(screen.queryByText(TP.konflikt)).toBeNull());
+    expect(screen.getByLabelText(TP.kommentar(9, KAPITEL[8]!.titel))).toHaveValue('Personal in FTE fehlt');
+    await waitFor(() => expect(api.calls.filter(c => c.url.endsWith('/pruefung')).length).toBeGreaterThan(1));
+    await userEvent.click(screen.getByRole('button', { name: TP.zurueckgeben }));
+    expect(await screen.findByText(TP.zurueckgegeben)).toBeInTheDocument();
+    expect(api.calls.filter(c => c.method === 'POST')[1]!.headers.get('If-Match')).toBe('W/"3"');
+  });
+
   it('bestätigen zeigt die Wirkung davor und sendet ohne Kommentare', async () => {
     const api = stub({ [`POST /v1/vertragsversionen/${V}/quality-check`]: () => json(pruefung({ stand: 'zur_unterzeichnung', version: 3, can: { qualityCheck: false, unterzeichnen: [] } }), 200, { ETag: 'W/"3"' }) });
     renderWithIam(<PruefenPage nummer="2026-014" />);

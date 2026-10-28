@@ -2,12 +2,14 @@
  * Texte des Features «Portfolios und Gremien» (Namensraum des Features, docs/fachmodell.md 7.2): Anrede «Du»,
  * Schweizer Rechtschreibung, Begriffe aus dem Glossar (Portfolio, Gremium, Gate, Gremienweg).
  */
+import { NAV } from './nav.ts';
+
 export const TP = {
-  bereich: 'Portfolios und Gremien',
+  bereich: NAV.bereich,
   title: 'Portfolios und Gremien',
   sub: 'Portfolios A, B und C mit ihren Pflichten, die Gremien mit Sitzungsterminen und der Gremienweg je Gate.',
   create: 'Neues Portfolio',
-  aktionAnlegen: 'Portfolio anlegen',
+  aktionAnlegen: NAV.aktionAnlegen,
   one: 'Portfolio',
   empty: 'Noch keine Portfolios erfasst. Bilde die Portfolios nach dem PM-Handbuch ab: A Transformationsprogramm, B Geschäftsleitung, C je Direktion.',
   name: 'Bezeichnung', kategorie: 'Kategorie', schluessel: 'Schlüssel', pflichten: 'Pflichten', entscheidet: 'Entscheidendes Gremium',

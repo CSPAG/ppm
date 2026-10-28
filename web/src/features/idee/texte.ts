@@ -2,11 +2,13 @@
  * Texte des Features «Ideen» (Namensraum je Feature, docs/fachmodell.md 7.2) nach Kernablauf K4: Anrede «Du» (UX-E7),
  * Schweizer Rechtschreibung, Status für Antragstellende in Klartext, Sperren nach I-P2 (was fehlt, warum, was tun).
  */
+import { NAV } from './nav.ts';
+
 export const TI = {
-  bereich: 'Ideen',
+  bereich: NAV.bereich,
   titel: 'Meine Ideen',
   sub: 'Deine Projektideen und wo sie stehen. Die Unternehmensentwicklung prüft jede eingereichte Idee.',
-  einreichen: 'Projektidee einreichen',
+  einreichen: NAV.einreichen,
   leer: 'Du hast noch keine Idee eingereicht. Ideen für Projekte nimmt die Unternehmensentwicklung jederzeit entgegen.',
   spalten: { nummer: 'Nr.', titel: 'Idee', stand: 'Stand', geaendert: 'Zuletzt' },
   ohneTitel: 'Idee ohne Titel',

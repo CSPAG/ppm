@@ -2,12 +2,14 @@
  * Texte des Features «Projektvertrag» (Namensraum des Features, fachmodell.md 7.2; Kernablauf K2): Anrede «Du»,
  * Schweizer Rechtschreibung, Begriffe nach docs/ux/darstellung.md und der Vorlage Projektvertrag (Q7).
  */
+import { NAV } from './nav.ts';
+
 type Stand = 'in_arbeit' | 'in_pruefung' | 'zur_unterzeichnung' | 'unterzeichnet' | 'traktandiert' | 'abgenommen' | 'abgelehnt' | 'verworfen' | 'zurueckgezogen';
 type Anlass = 'initial' | 'gate' | 'aenderung';
 
 export const TV = {
-  reiter: 'Vertrag',
-  reiterVersionen: 'Versionen',
+  reiter: NAV.reiter,
+  reiterVersionen: NAV.reiterVersionen,
   titel: 'Projektvertrag',
   kapitel: 'Kapitel',
   kapitelWahl: 'Kapitel wählen',

@@ -2,13 +2,15 @@
  * Texte des Features «Ressourcen» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer
  * Rechtschreibung; Pool = Rolle (A-20), Mengen in FTE.
  */
+import { NAV } from './pfade.ts';
+
 export const TR = {
-  bereich: 'Ressourcen',
+  bereich: NAV.bereich,
   title: 'Ressourcen',
   sub: 'Kapazitätsangebot je Rolle und Monat gegen den Ressourcenbedarf der Projekte.',
   tabs: { auslastung: 'Auslastung', kapazitaet: 'Kapazität', bedarf: 'Bedarf' },
-  aktionKapazitaet: 'Kapazität planen',
-  aktionAuslastung: 'Auslastung analysieren',
+  aktionKapazitaet: NAV.aktionKapazitaet,
+  aktionAuslastung: NAV.aktionAuslastung,
   zeitraum: 'Zeitraum', von: 'Von', bis: 'Bis',
   zeitraumUngueltig: 'Wähle einen Zeitraum von höchstens 60 Monaten, der nicht vor seinem Beginn endet.',
   rolle: 'Rolle',

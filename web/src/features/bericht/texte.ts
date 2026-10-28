@@ -2,6 +2,8 @@
  * Texte des Features «Bericht» (UI-13, Kernablauf K1; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du»
  * (UX-E7), Schweizer Rechtschreibung, Texte aus K1 «Texte» und «Regeln und Rückmeldungen».
  */
+import { NAV } from './nav.ts';
+
 const NACHFUEHREN = 'Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantrage eine Änderung oder eskaliere.';
 const TB_GRUND = {
   termin: (text: string, neu: string, alt: string, w: string) => `${text} neu ${neu} statt ${alt} laut Baseline (${w}).`,
@@ -9,8 +11,8 @@ const TB_GRUND = {
 };
 
 export const TB = {
-  reiter: 'Bericht',
-  palette: (nr: string, name: string) => `Statusbericht erstellen: ${nr} ${name}`,
+  reiter: NAV.reiter,
+  palette: NAV.palette,
   titel: (monat: string) => `Statusbericht ${monat}`,
   periode: 'Periode',
   anlass: { monatlich: 'monatlich', ausserordentlich: 'ausserordentlich' } as Record<string, string>,

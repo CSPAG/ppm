@@ -3,8 +3,10 @@
  * docs/fachmodell.md 7.2): Anrede «Du» (UX-E7), Schweizer Rechtschreibung, Wortlaut aus K3 («Portfoliobericht
  * erzeugen», «Bericht der Programmleitung»).
  */
+import { NAV } from './nav.ts';
+
 export const TR = {
-  bereich: 'Risikolage',
+  bereich: NAV.risiken,
   title: 'Risikolage',
   inhalt: 'Inhalt der Risikolage',
   sub: 'Projekt- und Portfoliorisiken mit Bewertung und Massnahme, Abhängigkeiten und offene Eskalationen.',
@@ -39,7 +41,7 @@ export const TR = {
 };
 
 export const TP = {
-  bereich: 'Portfoliobericht',
+  bereich: NAV.portfoliobericht,
   title: 'Portfoliobericht',
   inhalt: 'Inhalt des Portfolioberichts',
   sub: 'Bericht der Periode für das Gremium, erzeugt aus dem abgeschlossenen Dashboard und der Risikolage.',

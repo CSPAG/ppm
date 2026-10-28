@@ -22,10 +22,12 @@ export async function vonId(tx: Tx, id: string): Promise<RueckblickRow | null> {
   return (await tx.query<RueckblickRow>(`SELECT ${SPALTEN} FROM ${S}.jahresrueckblick WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
-export async function anlegen(tx: Tx, jahr: number, t: { erkenntnisse: string; massnahmen: string }): Promise<string> {
+/** Anlegen; null, wenn gleichzeitig schon ein Rückblick des Jahres entstand. */
+export async function anlegen(tx: Tx, jahr: number, t: { erkenntnisse: string; massnahmen: string }): Promise<string | null> {
   return (await tx.query<{ id: string }>(
-    `INSERT INTO ${S}.jahresrueckblick (tenant_id, jahr, erkenntnisse, massnahmen) VALUES (app.tenant_id(), $1, $2, $3) RETURNING id`,
-    [jahr, t.erkenntnisse, t.massnahmen])).rows[0]!.id;
+    `INSERT INTO ${S}.jahresrueckblick (tenant_id, jahr, erkenntnisse, massnahmen) VALUES (app.tenant_id(), $1, $2, $3)
+     ON CONFLICT (tenant_id, jahr) DO NOTHING RETURNING id`,
+    [jahr, t.erkenntnisse, t.massnahmen])).rows[0]?.id ?? null;
 }
 
 export async function erfassen(tx: Tx, id: string, version: number, t: { erkenntnisse: string; massnahmen: string }): Promise<boolean> {
@@ -33,9 +35,10 @@ export async function erfassen(tx: Tx, id: string, version: number, t: { erkennt
     [id, version, t.erkenntnisse, t.massnahmen])).rowCount ?? 0) > 0;
 }
 
-export async function traktandieren(tx: Tx, id: string, inhalt: unknown): Promise<void> {
-  await tx.query(`UPDATE ${S}.jahresrueckblick SET stand = 'traktandiert', inhalt = $2, traktandiert_at = now(), rueckmeldung = '' WHERE id = $1`,
-    [id, JSON.stringify(inhalt)]);
+/** Traktandieren; false, wenn der Rückblick gleichzeitig nicht mehr in Arbeit ist. */
+export async function traktandieren(tx: Tx, id: string, inhalt: unknown): Promise<boolean> {
+  return ((await tx.query(`UPDATE ${S}.jahresrueckblick SET stand = 'traktandiert', inhalt = $2, traktandiert_at = now(), rueckmeldung = ''
+     WHERE id = $1 AND stand = 'in_arbeit'`, [id, JSON.stringify(inhalt)])).rowCount ?? 0) > 0;
 }
 
 /**

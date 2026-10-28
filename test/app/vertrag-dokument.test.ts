@@ -135,8 +135,8 @@ describe('Dokumentausgabe Projektvertrag', { skip }, () => {
   test('Vorlagen: Grundbestand Projektvertrag mit Fassung (AM.03.01)', async () => {
     const r = await call('ue', 'GET', '/v1/vorlagen');
     assert.equal(r.statusCode, 200, r.body);
-    const [v] = r.json().items;
-    assert.deepEqual([v.art, v.version, v.kopfzeile, v.grundbestand, v.gliederung.length], ['projektvertrag', '1', 'Intern · enthält Personendaten', true, 19]);
+    const v = r.json().items.find((x: { art: string }) => x.art === 'projektvertrag');
+    assert.deepEqual([v.grundbestand.version, v.grundbestand.quelle, v.aktiv], ['1', 'PM-Handbuch, Vorlage Projektvertrag (Q7)', null]);
     assert.equal((await call('pl', 'GET', '/v1/vorlagen')).statusCode, 403);
   });
 });

@@ -14213,59 +14213,446 @@
           }
         }
       },
-      "Vorlage": {
+      "VorlageGrundbestand": {
+        "additionalProperties": false,
+        "description": "Mitgelieferte Vorlage; gilt ohne aktive eigene Version.",
+        "type": "object",
+        "required": [
+          "version",
+          "quelle"
+        ],
+        "properties": {
+          "version": {
+            "description": "Fassung des mitgelieferten Grundbestands.",
+            "type": "string"
+          },
+          "quelle": {
+            "type": "string"
+          }
+        }
+      },
+      "VorlageFeld": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schluessel",
+          "bezeichnung",
+          "gruppe"
+        ],
+        "properties": {
+          "schluessel": {
+            "type": "string"
+          },
+          "bezeichnung": {
+            "type": "string"
+          },
+          "gruppe": {
+            "type": "string"
+          }
+        }
+      },
+      "VorlageMeldung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "stufe",
+          "regel",
+          "text"
+        ],
+        "properties": {
+          "stufe": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "sperre"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "warnung"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "hinweis"
+                ]
+              }
+            ]
+          },
+          "regel": {
+            "description": "`datenquelle`, `platzhalter`, `zuordnung`, `feld` oder `personendaten`.",
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "platzhalter": {
+            "description": "Betroffene Platzhalter (Sprung zur Zeile).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "VorlagePruefung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "aktivierbar",
+          "meldungen"
+        ],
+        "properties": {
+          "aktivierbar": {
+            "type": "boolean"
+          },
+          "meldungen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VorlageMeldung"
+            }
+          }
+        }
+      },
+      "VorlageVersion": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "art",
+          "version",
+          "stand",
+          "dateiname",
+          "groesse",
+          "sha256",
+          "platzhalter",
+          "zuordnung",
+          "personendaten",
+          "bemerkung",
+          "aktivAt",
+          "erstelltAt",
+          "erstelltVon",
+          "rev",
+          "pruefung",
+          "can"
+        ],
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "art": {
+            "description": "Dokumentart (UC-018 Schritt 1).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "projektidee"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "vorstudie"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "business_case"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "projektvertrag"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "loesungskonzept"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abschlussbericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "statusbericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "portfoliobericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "quartalsreporting"
+                ]
+              }
+            ]
+          },
+          "version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "stand": {
+            "description": "Entwurf (Zuordnung bearbeitbar), aktiv (für künftige Ausgaben), abgelöst.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entwurf"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "aktiv"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abgeloest"
+                ]
+              }
+            ]
+          },
+          "dateiname": {
+            "type": "string"
+          },
+          "groesse": {
+            "description": "Bytes.",
+            "type": "integer"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "platzhalter": {
+            "description": "Platzhalter der Datei in der Reihenfolge des Vorkommens.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "zuordnung": {
+            "description": "Platzhalter → Datenfeld (null = offen).",
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "personendaten": {
+            "description": "Die Vorlage nennt «Personendaten» (G12).",
+            "type": "boolean"
+          },
+          "bemerkung": {
+            "type": "string"
+          },
+          "aktivAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "erstelltAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "erstelltVon": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rev": {
+            "minimum": 1,
+            "description": "Stand der Zeile für `If-Match`.",
+            "type": "integer"
+          },
+          "pruefung": {
+            "$ref": "#/components/schemas/VorlagePruefung"
+          },
+          "can": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "zuordnen",
+              "aktivieren",
+              "entfernen"
+            ],
+            "properties": {
+              "zuordnen": {
+                "description": "Zuordnung ändern (nur Entwurf).",
+                "type": "boolean"
+              },
+              "aktivieren": {
+                "description": "Aktiv setzen (Entwurf ohne Sperre).",
+                "type": "boolean"
+              },
+              "entfernen": {
+                "description": "Entwurf löschen.",
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "VorlageArt": {
         "additionalProperties": false,
         "type": "object",
         "required": [
           "art",
-          "version",
           "name",
-          "quelle",
-          "kopfzeile",
-          "gliederung",
-          "grundbestand"
+          "grundbestand",
+          "aktiv",
+          "entwuerfe",
+          "versionen",
+          "datenquelle"
         ],
         "properties": {
           "art": {
-            "description": "Art der Vorlage, z. B. `projektvertrag`.",
-            "type": "string"
-          },
-          "version": {
-            "description": "Fassung; erscheint im erzeugten Dokument.",
-            "type": "string"
+            "description": "Dokumentart (UC-018 Schritt 1).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "projektidee"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "vorstudie"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "business_case"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "projektvertrag"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "loesungskonzept"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abschlussbericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "statusbericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "portfoliobericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "quartalsreporting"
+                ]
+              }
+            ]
           },
           "name": {
             "type": "string"
           },
-          "quelle": {
-            "description": "Herkunft der Gliederung.",
-            "type": "string"
-          },
-          "kopfzeile": {
-            "description": "Kopfzeile jeder Seite (G12).",
-            "type": "string"
-          },
-          "gliederung": {
-            "type": "array",
-            "items": {
-              "additionalProperties": false,
-              "type": "object",
-              "required": [
-                "nr",
-                "titel"
-              ],
-              "properties": {
-                "nr": {
-                  "type": "string"
-                },
-                "titel": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "grundbestand": {
-            "description": "Mitgelieferte Vorlage (eigene Fassungen ab AP-E7-7).",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VorlageGrundbestand"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "aktiv": {
+            "anyOf": [
+              {
+                "description": "Aktive eigene Version; null = Grundbestand bzw. keine Vorlage.",
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entwuerfe": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "versionen": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "datenquelle": {
+            "description": "Ein Modul liefert Daten für diese Art (Feldkatalog registriert); sonst nur als Zuordnungsziel vorbereitet.",
             "type": "boolean"
           }
         }
@@ -14280,8 +14667,171 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Vorlage"
+              "$ref": "#/components/schemas/VorlageArt"
             }
+          }
+        }
+      },
+      "VorlageDetail": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "art",
+          "name",
+          "grundbestand",
+          "felder",
+          "versionen"
+        ],
+        "properties": {
+          "art": {
+            "description": "Dokumentart (UC-018 Schritt 1).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "projektidee"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "vorstudie"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "business_case"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "projektvertrag"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "loesungskonzept"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "abschlussbericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "statusbericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "portfoliobericht"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "quartalsreporting"
+                ]
+              }
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "grundbestand": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VorlageGrundbestand"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "felder": {
+            "anyOf": [
+              {
+                "description": "Feldkatalog; null = kein Modul liefert Daten.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VorlageFeld"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "versionen": {
+            "description": "Neueste zuerst.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VorlageVersion"
+            }
+          }
+        }
+      },
+      "VorlageVersionCreate": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dateiname",
+          "inhalt"
+        ],
+        "properties": {
+          "dateiname": {
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\.docx$",
+            "description": "Name der Word-Datei (.docx).",
+            "type": "string"
+          },
+          "inhalt": {
+            "minLength": 4,
+            "maxLength": 7000000,
+            "description": "Datei als Base64, höchstens 5 MB.",
+            "type": "string",
+            "format": "byte"
+          },
+          "bemerkung": {
+            "maxLength": 1000,
+            "description": "Was sich gegenüber der letzten Version ändert.",
+            "type": "string"
+          }
+        }
+      },
+      "VorlageVersionPatch": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "type": "object",
+        "properties": {
+          "zuordnung": {
+            "description": "Ganze Zuordnung: Platzhalter → Feld oder null.",
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "description": "Schlüssel eines Datenfelds aus dem Feldkatalog der Art.",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "bemerkung": {
+            "maxLength": 1000,
+            "type": "string"
           }
         }
       },
@@ -56125,7 +56675,7 @@
         "tags": [
           "Vorlagen"
         ],
-        "description": "Gültige Vorlage je Art mit Fassung und Gliederung; heute der Grundbestand (Projektvertrag nach Q7).",
+        "description": "Alle Dokumentarten (UC-018 Schritt 1) mit Grundbestand, aktiver Version, Anzahl Versionen und Entwürfe und ob ein Modul Daten liefert.",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -56163,6 +56713,1272 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vorlagen/{art}": {
+      "get": {
+        "summary": "Vorlage einer Dokumentart",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Versionen (neueste zuerst) mit Platzhaltern, Zuordnung und Prüfung, dazu der Feldkatalog der Art.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vorlagen/{art}/versionen": {
+      "post": {
+        "summary": "Neue Version hochladen",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Word-Datei (.docx, höchstens 5 MB) als Base64. Das System liest die Platzhalter («Projektname»), schlägt die Zuordnung vor (wie in der letzten Version bzw. nach gleicher Bezeichnung) und legt die Version als Entwurf an. Ungültige Datei: 422.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VorlageVersionCreate"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vorlagen/{art}/versionen/{version}": {
+      "get": {
+        "summary": "Version lesen",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Mit Prüfung der Zuordnung; `ETag` für Änderungen.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "description": "Version der Vorlage (fortlaufend je Art)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Zuordnung ändern",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Ganze Zuordnung (Platzhalter → Datenfeld) und Bemerkung; nur Entwürfe (sonst 409), mit `If-Match` (412). Platzhalter, die die Datei nicht enthält: 422.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VorlageVersionPatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "description": "Version der Vorlage (fortlaufend je Art)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Entwurf löschen",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Nur Entwürfe (sonst 409), mit `If-Match`.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "description": "Version der Vorlage (fortlaufend je Art)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Gelöscht"
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vorlagen/{art}/versionen/{version}/datei": {
+      "get": {
+        "summary": "Datei der Version herunterladen",
+        "tags": [
+          "Vorlagen"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "description": "Version der Vorlage (fortlaufend je Art)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Word-Datei (Content-Disposition: attachment).",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vorlagen/{art}/versionen/{version}/aktivieren": {
+      "post": {
+        "summary": "Version aktiv setzen",
+        "tags": [
+          "Vorlagen"
+        ],
+        "description": "Die Version gilt ab sofort für künftige Word-Ausgaben der Art (DM.02.07); die bisher aktive wird abgelöst. Sperre in der Prüfung: 409 mit `pruefung`.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektidee"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "vorstudie"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "business_case"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "projektvertrag"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loesungskonzept"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "abschlussbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "statusbericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "portfoliobericht"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "quartalsreporting"
+                  ]
+                }
+              ]
+            },
+            "in": "path",
+            "name": "art",
+            "required": true,
+            "description": "Dokumentart (UC-018 Schritt 1)."
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "description": "Version der Vorlage (fortlaufend je Art)."
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VorlageVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
                 }
               }
             }
@@ -65045,7 +66861,7 @@
     },
     {
       "name": "Vorlagen",
-      "description": "Vorlagen je Art mit Fassung (Grundbestand: Projektvertrag nach Q7); Dokumentausgabe in Word und PDF."
+      "description": "Vorlagen je Dokumentart mit Versionen und Zuordnung der Platzhalter zu den Daten (UC-018); Dokumentausgabe in Word und PDF."
     },
     {
       "name": "Projektvertrag",

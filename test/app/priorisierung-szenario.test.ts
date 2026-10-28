@@ -150,6 +150,7 @@ describe('Szenarien (API)', { skip }, () => {
     assert.deepEqual(s.positionen.map((x: { nummer: string; aktiv: boolean; ueberWasserlinie: boolean | null }) => [x.nummer, x.aktiv, x.ueberWasserlinie]),
       [['2026-001', true, true], ['2026-002', true, false], ['2026-003', false, null]]);
     assert.deepEqual([s.rechnung.wasserlinie.beiRang, s.rechnung.wasserlinie.grund], [2, 'kapazitaet']);
+    assert.deepEqual(s.rechnung.wasserlinie.kapazitaet, { rolle: 'pl', monat: '2027-02', bedarf: 2.5, angebot: 2, projekte: 3 });
     assert.match(s.rechnung.wasserlinie.text, /^Kapazität Q1 2027: 2,5 FTE pl statt höchstens 2,0\. Betroffen: 3 Projekte\./);
     assert.deepEqual(s.rechnung.engpaesse.map((e: { rolle: string; quartal: string; bedarf: number }) => [e.rolle, e.quartal, e.bedarf]), [['pl', '2027-Q1', 2.5]]);
     assert.deepEqual(s.positionen[0].warnungen, [{ art: 'abhaengigkeit', text: 'Abhängigkeit: 2026-001 braucht 2026-002, liegt aber vor 2026-002.' }]);
@@ -157,7 +158,7 @@ describe('Szenarien (API)', { skip }, () => {
     // Start später: b ab 2027-04 → nur noch 1.5 im April, keine Wasserlinie; a startet früher als b → Warnung «startet früher» entfällt, weil a vor b liegt (Rang)
     const r2 = await put([{ projektId: p.b, startMonat: '2027-04' }, { projektId: p.a }, { projektId: p.c, aktiv: false }], 'W/"2"');
     assert.equal(r2.statusCode, 200, r2.body);
-    assert.deepEqual(r2.json().rechnung.wasserlinie, { beiRang: null, grund: null, text: null });
+    assert.deepEqual(r2.json().rechnung.wasserlinie, { beiRang: null, grund: null, text: null, kapazitaet: null });
     assert.deepEqual(r2.json().positionen[1].warnungen, [{ art: 'abhaengigkeit', text: 'Abhängigkeit: 2026-001 braucht 2026-002, startet aber früher.' }]);
     // Auslastung je Szenario (Modul ressource, UC-009 Schritt 5)
     const a = await call('ue', 'GET', `/v1/auslastung?von=2027-01&bis=2027-06&szenario=${s1}`);

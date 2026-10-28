@@ -136,11 +136,13 @@ async function rechnen(tx: Tx, g: Grundlage, s: sz.SzenarioRow): Promise<Gerechn
   const unter = pos.filter(p => p.aktiv && wl.ueber.get(p.projektId) === false).length;
   const bei = pos.find(p => p.projektId === wl.beiProjektId);
   let text: string | null = null;
+  let kapazitaet: SzenarioOut['rechnung']['wasserlinie']['kapazitaet'] = null;
   if (wl.grund === 'budget' && g.rahmen !== null) {
     text = `Budget: CHF ${fmtChf(wl.budget.bedarf ?? wl.kumuliert.get(bei!.projektId) ?? 0)} statt höchstens ${fmtChf(g.rahmen)} (${g.portfolio.name}). Unter der Wasserlinie: ${projekteText(unter)}.`;
   } else if (wl.grund === 'kapazitaet' && wl.durchbruch) {
     const d = wl.durchbruch;
     const betroffen = new Set(zellen.find(z => z.rolle === d.rolle && z.monat === d.monat)?.beitraege.map(b => b.projektId)).size;
+    kapazitaet = { ...d, projekte: betroffen };
     text = `Kapazität ${quartal(d.monat)}: ${fmtFte(d.bedarf)} FTE ${d.rolle} statt höchstens ${fmtFte(d.angebot)}. Betroffen: ${projekteText(betroffen)}. Unter der Wasserlinie: ${projekteText(unter)}.`;
   }
 
@@ -176,7 +178,7 @@ async function rechnen(tx: Tx, g: Grundlage, s: sz.SzenarioRow): Promise<Gerechn
   return {
     positionen,
     rechnung: {
-      wasserlinie: { beiRang: bei?.rang ?? null, grund: wl.grund, text },
+      wasserlinie: { beiRang: bei?.rang ?? null, grund: wl.grund, text, kapazitaet },
       budget: { rahmen: g.kostenSichtbar ? g.rahmen : null, bedarf: g.kostenSichtbar ? wl.budget.bedarf : null },
       engpaesse: erg.engpaesse, unter, hinweise,
     },

@@ -47,7 +47,7 @@ export function ModellPage({ search, setSearch, navigieren }: { search: ModellSe
 
   return (
     <section aria-labelledby="page-title" className="pr">
-      <Kopf reiter="modell" reiterSichtbar={['bewertung', 'modell']} navigieren={navigieren} sub={TP.sub} aktionen={anlegenKnopf} />
+      <Kopf reiter="modell" reiterSichtbar={['bewertung', 'szenarien', 'modell']} navigieren={navigieren} sub={TP.sub} aktionen={anlegenKnopf} />
       <div className="body">
         <Datenliste<BewertungsmodellKurz> titel={TP.modelle} spalten={spalten} zeilen={items} schluessel={m => String(m.nummer)} name={m => TP.version(m.nummer)}
           oeffnen={m => setSearch({ o: String(m.nummer) })} aktuell={search.o} laedt={modelle.isPending} fehler={modelle.error} erneut={() => void modelle.refetch()}

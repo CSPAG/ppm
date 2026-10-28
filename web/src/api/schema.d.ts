@@ -40337,6 +40337,14 @@ export interface components {
                     beiRang: number | null;
                     grund: ("budget" | "kapazitaet") | null;
                     text: string | null;
+                    kapazitaet: {
+                        rolle: string;
+                        /** @description Monat «JJJJ-MM». */
+                        monat: string;
+                        bedarf: number;
+                        angebot: number;
+                        projekte: number;
+                    } | null;
                 };
                 engpaesse: {
                     rolle: string;
@@ -40405,6 +40413,15 @@ export interface components {
                     beiRang: number | null;
                     grund: ("budget" | "kapazitaet") | null;
                     text: string | null;
+                    kapazitaet: {
+                        rolle: string;
+                        /** @description Monat «JJJJ-MM». */
+                        monat: string;
+                        bedarf: number;
+                        angebot: number;
+                        /** @description Projekte mit Bedarf in diesem Monat und dieser Rolle. */
+                        projekte: number;
+                    } | null;
                 };
                 budget: {
                     rahmen: number | null;

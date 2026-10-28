@@ -33,7 +33,7 @@ export function Kopf({ reiter, sub, reiterSichtbar, navigieren, aktionen, query 
       {reiterSichtbar.length > 1 ? (
         <nav className="tabs" aria-label={TP.title}>
           {reiterSichtbar.map(r => {
-            const href = `${PFAD[r]}${r === 'bewertung' && query ? `?${query}` : ''}`;
+            const href = `${PFAD[r]}${r !== 'modell' && query ? `?${query}` : ''}`;
             return <a key={r} className={`tab${r === reiter ? ' on' : ''}`} href={href} aria-current={r === reiter ? 'page' : undefined} onClick={klick(href)}>{TP.tabs[r]}</a>;
           })}
         </nav>

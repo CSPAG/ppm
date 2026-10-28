@@ -1,4 +1,4 @@
-# Verwaltet von identity-kit (create-iam-app 0.5.0) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.0 sync
+# Verwaltet von identity-kit (create-iam-app 0.5.1) – nicht von Hand ändern. Einstellungen: identity.app.json; neu schreiben: npx @vollholz/create-iam-app@0.5.1 sync
 
 variable "state_passphrase" {
   description = "Passphrase der State-Verschlüsselung (TF_STATE_PASSPHRASE; kc.sh)."

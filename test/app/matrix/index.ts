@@ -25,6 +25,7 @@ export const MATRIX = sammle([
   (await import('./monatsabschluss.ts')).matrix,
   (await import('./statusbericht-eskalation.ts')).matrix,
   (await import('./auswertung.ts')).matrix,
+  (await import('./auswertung-adhoc.ts')).matrix,
   (await import('./auswertung-bericht.ts')).matrix,
   (await import('./ressource.ts')).matrix,
   (await import('./ressource-zuteilung.ts')).matrix,

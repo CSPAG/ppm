@@ -244,7 +244,8 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', { skip }, 
     // Korrektur des Gate-Entscheids (A-30): Abbruch zurückgenommen, der unbearbeitete Bericht entfällt; danach wieder «Gestoppt»
     await sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'zurueckgestellt', begruendung: '' }));
     assert.equal(await lz(pj.gate!.id), 'aktiv');
-    assert.equal((await ok('pl', 'GET', `/v1/projekte/${pj.gate!.id}/abschluss`)).body.bericht, null);
+    const k = (await ok('pl', 'GET', `/v1/projekte/${pj.gate!.id}/abschluss`)).body;
+    assert.deepEqual([k.bericht, k.entscheid?.ergebnis], [null, 'weiterfuehren']);
     await sys(tx => nachGate(tx, { projektId: pj.gate!.id, versionId: pj.gate!.id, gate: 'P1_P2', ergebnis: 'abgelehnt', begruendung: 'Nutzen nicht belegt' }));
     assert.equal(await lz(pj.gate!.id), 'abgebrochen');
 

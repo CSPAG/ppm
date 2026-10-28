@@ -305,6 +305,11 @@
           "id": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Tupel-ID; null bei Zuständigkeit (`scope`, `data`)",
                 "type": "string"
               },
@@ -360,6 +365,11 @@
               "scopes": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "description": "Nur Clients: Scopes im letzten Token",
                     "type": "array",
                     "items": {
@@ -389,6 +399,11 @@
               },
               "id": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "type": "string"
                   },
@@ -448,6 +463,11 @@
                   },
                   "id": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string"
                       },
@@ -512,6 +532,11 @@
           "expiresAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -523,6 +548,11 @@
           "createdAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -533,6 +563,11 @@
           },
           "createdBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Name",
                 "type": "string"
@@ -605,6 +640,11 @@
           "email": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -653,6 +693,11 @@
           "breakGlassUntil": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -668,6 +713,11 @@
           "lastSeenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -678,6 +728,11 @@
           },
           "createdAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -690,6 +745,11 @@
           "loginPath": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Nur offene Einladung aus Microsoft Entra ID: Pfad der Anmeldung über Microsoft, zum Weitergeben als Link",
                 "type": "string"
               },
@@ -701,6 +761,11 @@
           "clientId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -710,6 +775,11 @@
           },
           "scopes": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Nur Clients: Scopes im letzten Token",
                 "type": "array",
@@ -724,6 +794,11 @@
           },
           "description": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Nur Clients: Beschreibung der Freigabe",
                 "type": "string"
@@ -761,6 +836,11 @@
           "description": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -780,6 +860,11 @@
           },
           "tenant": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Mandant der App; `null`, solange die Organisation nie benutzt wurde",
                 "type": "object",
@@ -850,6 +935,11 @@
           "clientId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Anwendungs-ID der eigenen App (nur `own`); das Geheimnis gibt die API nie aus",
                 "type": "string"
               },
@@ -860,6 +950,11 @@
           },
           "secretExpiresAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -906,6 +1001,11 @@
           "testedAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -917,6 +1017,11 @@
           "testedBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -926,6 +1031,11 @@
           },
           "enforcedAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -937,6 +1047,11 @@
           },
           "enforcedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -959,6 +1074,11 @@
           },
           "lastError": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -1067,6 +1187,11 @@
           "usedAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -1078,6 +1203,11 @@
           "approverName": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Person, die bei Microsoft zugestimmt hat",
                 "type": "string"
               },
@@ -1088,6 +1218,11 @@
           },
           "error": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "object",
                 "required": [
@@ -1178,6 +1313,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Wer freigegeben hat (Name)",
                 "type": "string"
               },
@@ -1189,6 +1329,11 @@
           "lastUsedAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -1199,6 +1344,11 @@
           },
           "lastScopes": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Scopes im Token beim letzten Zugriff",
                 "type": "array",
@@ -1244,6 +1394,11 @@
           "email": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Nur für angemeldete Personen und Verwaltende, sonst `null`",
                 "type": "string"
               },
@@ -1255,6 +1410,11 @@
           "clientId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Client-ID bei Maschinen-Clients",
                 "type": "string"
               },
@@ -1265,6 +1425,11 @@
           },
           "lastSeenAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -1360,6 +1525,11 @@
           "kontext": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Projekt und Rolle, z. B. «2026-014 · als PL».",
                 "type": "string"
               },
@@ -1375,6 +1545,11 @@
           "frist": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Kalendertag (YYYY-MM-DD).",
                 "examples": [
@@ -1389,6 +1564,11 @@
           },
           "fristArt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "UX-E11: Art der Frist steht immer dabei.",
                 "anyOf": [
@@ -1446,6 +1626,11 @@
           },
           "vertretung": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Gesetzt, wenn die Aufgabe einer Person gehört, die du heute vertrittst (UC-016 Schritt 4).",
@@ -1523,6 +1708,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -1553,6 +1743,11 @@
           },
           "naechsteFrist": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Kalendertag (YYYY-MM-DD).",
@@ -1590,6 +1785,11 @@
           "link": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -1615,6 +1815,11 @@
           },
           "gelesenAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -1647,6 +1852,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -1946,6 +2156,11 @@
                 "kontext": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string"
                     },
                     {
@@ -1960,6 +2175,11 @@
                 "frist": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "format": "date",
                       "type": "string"
                     },
@@ -1970,6 +2190,11 @@
                 },
                 "fristArt": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -2074,6 +2299,11 @@
           "entzogenVon": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -2126,6 +2356,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -2224,6 +2459,11 @@
                 "kontext": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string"
                     },
                     {
@@ -2238,6 +2478,11 @@
                 "frist": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "format": "date",
                       "type": "string"
                     },
@@ -2248,6 +2493,11 @@
                 },
                 "fristArt": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -2299,6 +2549,11 @@
           "parentId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -2344,6 +2599,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -2358,6 +2618,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -2402,6 +2667,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -2470,6 +2740,11 @@
           "parentId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "description": "Übergeordnete Einheit; null = oberste Ebene.",
                 "type": "string"
@@ -2525,6 +2800,11 @@
           },
           "parentId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "description": "Übergeordnete Einheit; null = oberste Ebene.",
@@ -2659,6 +2939,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -2673,6 +2958,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -2713,6 +3003,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -2828,6 +3123,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -2842,6 +3142,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -2886,6 +3191,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -3007,6 +3317,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -3021,6 +3336,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -3064,6 +3384,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -3135,6 +3460,11 @@
           },
           "changedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -3300,6 +3630,11 @@
           "inKraftAb": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -3310,6 +3645,11 @@
           },
           "inKraftVon": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -3331,6 +3671,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -3345,6 +3690,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -3586,6 +3936,11 @@
                 },
                 "nachPhase": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "Code der Phase (fest).",
                       "anyOf": [
@@ -3965,6 +4320,11 @@
                     "code": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -4054,6 +4414,11 @@
           "inKraftAb": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -4064,6 +4429,11 @@
           },
           "inKraftVon": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -4085,6 +4455,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -4099,6 +4474,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -4127,6 +4507,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -4683,6 +5068,11 @@
           "orgEinheitId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -4702,6 +5092,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -4716,6 +5111,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -4755,6 +5155,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -4813,6 +5218,11 @@
           "orgEinheitId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -4837,6 +5247,11 @@
           },
           "orgEinheitId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -4912,6 +5327,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -4926,6 +5346,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -4965,6 +5390,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -5153,6 +5583,11 @@
           "zusaetzlich": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -5308,6 +5743,11 @@
                 "zusaetzlichGremiumId": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "format": "uuid",
                       "type": "string"
                     },
@@ -5354,6 +5794,11 @@
           },
           "createdBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -5457,6 +5902,11 @@
           "portfolio": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -5490,6 +5940,11 @@
           "orgEinheitId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -5501,6 +5956,11 @@
           "handlungsfeldId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -5511,6 +5971,11 @@
           },
           "handlungsfeld": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Bezeichnung des Handlungsfelds, falls die Person es sehen darf.",
                 "type": "string"
@@ -5533,6 +5998,11 @@
           },
           "phasenmodellId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -5560,6 +6030,11 @@
           "sponsor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -5571,6 +6046,11 @@
           "projektleitung": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -5581,6 +6061,11 @@
           },
           "controlling": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -5652,6 +6137,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -5697,6 +6187,11 @@
           "orgEinheitId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -5707,6 +6202,11 @@
           },
           "handlungsfeldId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -5738,6 +6238,11 @@
           "orgEinheitId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -5748,6 +6253,11 @@
           },
           "handlungsfeldId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -6204,6 +6714,11 @@
           "terminAktuell": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
@@ -6215,6 +6730,11 @@
           },
           "erreichtAm": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
@@ -6236,6 +6756,11 @@
           "terminBaseline": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Termin der Baseline (aus dem abgenommenen Projektvertrag).",
                 "type": "string"
@@ -6247,6 +6772,11 @@
           },
           "abgenommenAm": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Abnahme durch das Gremium (PS.02.03).",
@@ -6276,6 +6806,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -6349,6 +6884,11 @@
           "terminAktuell": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
@@ -6360,6 +6900,11 @@
           },
           "erreichtAm": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
@@ -6426,6 +6971,11 @@
           "terminAktuell": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "type": "string"
@@ -6437,6 +6987,11 @@
           },
           "erreichtAm": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
@@ -6559,6 +7114,11 @@
           "budgetBaseline": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "multipleOf": 0.01,
@@ -6572,6 +7132,11 @@
           },
           "ist": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 0,
                 "maximum": 999999999999.99,
@@ -6603,6 +7168,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -6764,6 +7334,11 @@
           "projektId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -6843,6 +7418,11 @@
           "portfolioId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Portfoliorisiko (PC.02.01): Portfolio statt Projekt."
@@ -6871,6 +7451,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -7095,6 +7680,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -7280,6 +7870,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -7442,6 +8037,11 @@
           "anderesProjekt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "description": "Das andere Projekt, falls die anfragende Person es sehen darf.",
                 "type": "object",
@@ -7487,6 +8087,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -7627,6 +8232,11 @@
           "groesse": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "enum": [
                   "S",
@@ -7643,6 +8253,11 @@
           "fte": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "exclusiveMinimum": 0,
                 "maximum": 1000,
                 "multipleOf": 0.01,
@@ -7656,6 +8271,11 @@
           },
           "vonMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -7671,6 +8291,11 @@
           },
           "bisMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -7692,6 +8317,11 @@
           },
           "monate": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 1,
                 "description": "Anzahl Monate von bis (einschliesslich).",
@@ -7725,6 +8355,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -7775,6 +8410,11 @@
           "groesse": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "enum": [
                   "S",
@@ -7791,6 +8431,11 @@
           "fte": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "exclusiveMinimum": 0,
                 "maximum": 1000,
                 "multipleOf": 0.01,
@@ -7804,6 +8449,11 @@
           },
           "vonMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -7819,6 +8469,11 @@
           },
           "bisMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -7864,6 +8519,11 @@
           "groesse": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "enum": [
                   "S",
@@ -7880,6 +8540,11 @@
           "fte": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "exclusiveMinimum": 0,
                 "maximum": 1000,
                 "multipleOf": 0.01,
@@ -7893,6 +8558,11 @@
           },
           "vonMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -7908,6 +8578,11 @@
           },
           "bisMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -8001,6 +8676,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -8081,6 +8761,11 @@
           "gemeldetBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -8109,6 +8794,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -8209,6 +8899,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -8223,6 +8918,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -8262,6 +8962,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -8339,6 +9044,11 @@
           },
           "changedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -8496,6 +9206,11 @@
           "vorlageBis": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Geplante Vorlage an den VR.",
                 "type": "string"
@@ -8508,6 +9223,11 @@
           "vorgelegtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -8518,6 +9238,11 @@
           },
           "freigabeAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -8563,6 +9288,11 @@
           "vorlageBis": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
                 "examples": [
@@ -8586,6 +9316,11 @@
         "properties": {
           "vorlageBis": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
@@ -8616,6 +9351,11 @@
           },
           "name": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -8677,6 +9417,11 @@
           },
           "zieljahr": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "$ref": "#/components/schemas/Zieljahr"
               },
@@ -8786,6 +9531,11 @@
                             },
                             "verantwortlich": {
                               "anyOf": [
+                                {
+                                  "enum": [
+                                    null
+                                  ]
+                                },
                                 {
                                   "$ref": "#/components/schemas/ZielPerson"
                                 },
@@ -8945,6 +9695,11 @@
           "createdBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -8959,6 +9714,11 @@
           },
           "updatedBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -9074,6 +9834,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -9112,6 +9877,11 @@
           },
           "verantwortlich": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "$ref": "#/components/schemas/ZielPerson"
               },
@@ -9169,6 +9939,11 @@
           "verantwortlich": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -9197,6 +9972,11 @@
           },
           "verantwortlich": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -9271,6 +10051,11 @@
           },
           "jahresziel": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -9411,6 +10196,11 @@
           "erfasstVon": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "$ref": "#/components/schemas/ZielPerson"
               },
               {
@@ -9479,6 +10269,11 @@
           "eintrag": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "$ref": "#/components/schemas/ZielerreichungEintrag"
               },
               {
@@ -9488,6 +10283,11 @@
           },
           "letzter": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "$ref": "#/components/schemas/ZielerreichungEintrag"
               },
@@ -9670,6 +10470,11 @@
           "anzahlVorjahr": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Jahresziele des Vorjahres; null ohne Zielzyklus im Vorjahr.",
                 "type": "integer"
               },
@@ -9696,6 +10501,11 @@
                 },
                 "label": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "Bezeichnung, falls die Person das Handlungsfeld sehen darf.",
                       "type": "string"
@@ -9939,6 +10749,11 @@
                                   "verantwortlich": {
                                     "anyOf": [
                                       {
+                                        "enum": [
+                                          null
+                                        ]
+                                      },
+                                      {
                                         "description": "Name der verantwortlichen Person.",
                                         "type": "string"
                                       },
@@ -10010,6 +10825,11 @@
           },
           "publiziertBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -10090,6 +10910,11 @@
           "stand": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -10118,6 +10943,11 @@
           },
           "publiziertAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -10230,6 +11060,11 @@
                     "stand": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -10242,6 +11077,11 @@
                     },
                     "quartal": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "description": "Quartal des Stands; ein früheres, wenn im Quartal nicht nachgeführt.",
                           "type": "string"
@@ -10292,6 +11132,11 @@
                 },
                 "berichtId": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "format": "uuid",
                       "type": "string"
@@ -10344,6 +11189,11 @@
                       "trend": {
                         "anyOf": [
                           {
+                            "enum": [
+                              null
+                            ]
+                          },
+                          {
                             "type": "string"
                           },
                           {
@@ -10387,6 +11237,11 @@
                       "termin": {
                         "anyOf": [
                           {
+                            "enum": [
+                              null
+                            ]
+                          },
+                          {
                             "type": "string"
                           },
                           {
@@ -10412,6 +11267,11 @@
                     "properties": {
                       "projekt": {
                         "anyOf": [
+                          {
+                            "enum": [
+                              null
+                            ]
+                          },
                           {
                             "additionalProperties": false,
                             "type": "object",
@@ -10580,6 +11440,11 @@
                 "ausserordentlichAm": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "format": "date",
                       "description": "Schon ausserhalb des Quartalsreportings an den VR weitergeleitet (A-03).",
                       "type": "string"
@@ -10619,6 +11484,11 @@
           "termin": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "type": "string"
               },
@@ -10629,6 +11499,11 @@
           },
           "erledigtAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -10697,6 +11572,11 @@
           "traktandiertAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -10707,6 +11587,11 @@
           },
           "verabschiedetAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -10771,6 +11656,11 @@
           },
           "vrRueckmeldungAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -10870,6 +11760,11 @@
                 "verabschiedetAt": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string",
                       "format": "date-time"
                     },
@@ -10956,6 +11851,11 @@
           "termin": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "type": "string"
               },
@@ -10998,6 +11898,11 @@
           },
           "ausserordentlichAm": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "type": "string"
@@ -11160,6 +12065,11 @@
           "name": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -11211,6 +12121,11 @@
           "sitzungId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -11259,6 +12174,11 @@
           "projekt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -11298,6 +12218,11 @@
           "position": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "integer"
               },
               {
@@ -11307,6 +12232,11 @@
           },
           "dauerMin": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Zeitbedarf in Minuten.",
                 "type": "integer"
@@ -11470,6 +12400,11 @@
           "beginn": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
                 "description": "Uhrzeit (HH:MM).",
                 "examples": [
@@ -11484,6 +12419,11 @@
           },
           "dauerMin": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Sitzungsdauer in Minuten.",
                 "type": "integer"
@@ -11511,6 +12451,11 @@
           "versendetAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -11521,6 +12466,11 @@
           },
           "versandVorlauf": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Arbeitstage zwischen Versand und Sitzung (Versandprotokoll, K3-1).",
                 "type": "integer"
@@ -11578,6 +12528,11 @@
           "beginn": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
                 "description": "Uhrzeit (HH:MM).",
                 "examples": [
@@ -11592,6 +12547,11 @@
           },
           "dauerMin": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 15,
                 "maximum": 720,
@@ -11657,6 +12617,11 @@
           "versendetAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -11706,6 +12671,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -11839,6 +12809,11 @@
               "projektId": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "format": "uuid",
                     "type": "string"
                   },
@@ -11897,6 +12872,11 @@
           },
           "dauerMin": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 1,
                 "maximum": 480,
@@ -12135,6 +13115,11 @@
                 "versandBis": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
                       "description": "Datum (JJJJ-MM-TT).",
                       "examples": [
@@ -12212,6 +13197,11 @@
               "name": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "type": "string"
                   },
                   {
@@ -12239,6 +13229,11 @@
           },
           "erfuelltAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -12354,6 +13349,11 @@
           "erfasstVon": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -12406,6 +13406,11 @@
                 "snsErgebnis": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string"
                     },
                     {
@@ -12419,6 +13424,11 @@
                 },
                 "von": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "type": "string"
                     },
@@ -12590,6 +13600,11 @@
           "geschlossenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -12629,6 +13644,11 @@
                 "position": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "integer"
                     },
                     {
@@ -12663,6 +13683,11 @@
                 },
                 "projekt": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "additionalProperties": false,
                       "type": "object",
@@ -12704,6 +13729,11 @@
                 },
                 "entscheid": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "$ref": "#/components/schemas/Entscheid"
                     },
@@ -12866,6 +13896,11 @@
           "erfasstVon": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -12931,6 +13966,11 @@
           },
           "projekt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -13014,6 +14054,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -13144,6 +14189,11 @@
                   "beginn": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "type": "string"
                       },
                       {
@@ -13186,6 +14236,11 @@
                     "position": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "integer"
                         },
                         {
@@ -13220,6 +14275,11 @@
                     },
                     "projekt": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "additionalProperties": false,
                           "type": "object",
@@ -13258,6 +14318,11 @@
                     },
                     "entscheid": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "additionalProperties": false,
                           "type": "object",
@@ -13302,6 +14367,11 @@
                                   "verantwortlich": {
                                     "anyOf": [
                                       {
+                                        "enum": [
+                                          null
+                                        ]
+                                      },
+                                      {
                                         "type": "string"
                                       },
                                       {
@@ -13344,6 +14414,11 @@
           },
           "versendetAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -13443,6 +14518,11 @@
                 "name": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string"
                     },
                     {
@@ -13477,6 +14557,11 @@
               "stufe": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
                     "type": "string"
@@ -13502,6 +14587,11 @@
             "properties": {
               "stufe": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
@@ -13529,6 +14619,11 @@
               "stufe": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
                     "type": "string"
@@ -13554,6 +14649,11 @@
             "properties": {
               "stufe": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "pattern": "^[a-z0-9_]{1,40}$",
                     "description": "Schlüssel aus der Codetabelle `abweichung` (Vorgabe keine, gering, wesentlich; A-38).",
@@ -13597,6 +14697,11 @@
                 "letzter": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "additionalProperties": false,
                       "description": "Letzter eingereichter Bericht (auch zurückgegeben oder geprüft).",
                       "type": "object",
@@ -13612,6 +14717,11 @@
                         },
                         "status": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
                               "anyOf": [
@@ -13637,6 +14747,11 @@
                         "trend": {
                           "anyOf": [
                             {
+                              "enum": [
+                                null
+                              ]
+                            },
+                            {
                               "type": "string"
                             },
                             {
@@ -13658,6 +14773,11 @@
                 "laufend": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "additionalProperties": false,
                       "description": "Bericht der laufenden Periode, solange das Projekt berichtet (aktiv, P0–P3); `stand` null ohne gespeicherten Bericht.",
                       "type": "object",
@@ -13672,6 +14792,11 @@
                         },
                         "stand": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "anyOf": [
                                 {
@@ -13707,6 +14832,11 @@
                         },
                         "stichtag": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "format": "date",
                               "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
@@ -13803,6 +14933,11 @@
           "id": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -13891,6 +15026,11 @@
           "status": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
                 "anyOf": [
                   {
@@ -13915,6 +15055,11 @@
           "trend": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "pattern": "^[a-z0-9_]{1,40}$",
                 "description": "Schlüssel aus der Codetabelle `trend` (Vorgabe aufwaerts, gleichbleibend, abwaerts).",
                 "type": "string"
@@ -13926,6 +15071,11 @@
           },
           "abschlussPer": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Geplanter Abschluss des Projekts.",
@@ -13969,6 +15119,11 @@
           "vorperiode": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -13983,6 +15138,11 @@
                   },
                   "status": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
                         "anyOf": [
@@ -14007,6 +15167,11 @@
                   },
                   "trend": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string"
                       },
@@ -14035,6 +15200,11 @@
           "eingereichtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -14046,6 +15216,11 @@
           "eingereichtBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -14056,6 +15231,11 @@
           },
           "geprueftAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -14073,6 +15253,11 @@
           "updatedAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -14083,6 +15268,11 @@
           },
           "eskalation": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -14250,6 +15440,11 @@
           "status": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
                 "anyOf": [
                   {
@@ -14274,6 +15469,11 @@
           "trend": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -14286,6 +15486,11 @@
           },
           "eingereichtAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -14338,6 +15543,11 @@
           "status": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Projektstatus (Codetabelle `projektstatus`, zweistufig, Q8 Kap. 9).",
                 "anyOf": [
                   {
@@ -14362,6 +15572,11 @@
           "trend": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "pattern": "^[a-z0-9_]{1,40}$",
                 "description": "Schlüssel aus der Codetabelle `trend` (Vorgabe aufwaerts, gleichbleibend, abwaerts).",
                 "type": "string"
@@ -14373,6 +15588,11 @@
           },
           "abschlussPer": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Geplanter Abschluss des Projekts.",
@@ -14626,6 +15846,11 @@
           "status": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -14649,6 +15874,11 @@
           "trend": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -14658,6 +15888,11 @@
           },
           "abschlussPer": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "type": "string"
@@ -14673,6 +15908,11 @@
           "vorperiode": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -14686,6 +15926,11 @@
                   },
                   "status": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "anyOf": [
                           {
@@ -14709,6 +15954,11 @@
                   },
                   "trend": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string"
                       },
@@ -14736,6 +15986,11 @@
           "rueckfrage": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -14760,6 +16015,11 @@
           "eingereichtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -14771,6 +16031,11 @@
           "geprueftAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -14781,6 +16046,11 @@
           },
           "eingefordertAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -14859,6 +16129,11 @@
           "abgeschlossenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -14869,6 +16144,11 @@
           },
           "abgeschlossenBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -14944,6 +16224,11 @@
               "berichtAufgabe": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "format": "date",
                     "description": "Tag der Berichtsaufgabe (A-26); null ohne Phasenmodell in Kraft.",
                     "type": "string"
@@ -14955,6 +16240,11 @@
               },
               "stichtag": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "format": "date",
                     "description": "Stichtag der Berichte (Q8 Kap. 8.4); null ohne Phasenmodell in Kraft.",
@@ -14990,6 +16280,11 @@
               },
               "sperre": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "description": "Warum der Abschluss gesperrt ist (Text der Regel).",
                     "type": "string"
@@ -15046,6 +16341,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -15176,6 +16476,11 @@
           "antwort": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -15185,6 +16490,11 @@
           },
           "gestelltBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -15213,6 +16523,11 @@
           },
           "beantwortetAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -15299,6 +16614,11 @@
           "abschluss": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -15382,6 +16702,11 @@
           "pruefen": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "description": "Nur mit `statusbericht:review`.",
                 "type": "object",
@@ -15426,6 +16751,11 @@
                   },
                   "stichtag": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "date",
                         "description": "Stichtag der Berichte; null ohne Phasenmodell in Kraft.",
@@ -15488,6 +16818,11 @@
           "handlungsfeld": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Nur mit `handlungsfeld:read`.",
                 "type": "string"
               },
@@ -15498,6 +16833,11 @@
           },
           "projektleitung": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -15543,6 +16883,11 @@
           "abschlussPer": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "type": "string"
               },
@@ -15554,6 +16899,11 @@
           "naechsterMeilenstein": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "description": "Nächster offener Meilenstein aus dem Register, sonst die Angabe des Berichts (ohne Termin).",
                 "type": "object",
@@ -15564,6 +16914,11 @@
                 "properties": {
                   "termin": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "date",
                         "type": "string"
@@ -15585,6 +16940,11 @@
           },
           "status": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -15609,6 +16969,11 @@
           "statusVorperiode": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -15631,6 +16996,11 @@
           },
           "trend": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -15669,6 +17039,11 @@
           },
           "werteAus": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Periode, aus der Status und Trend stammen (bei «nicht gemeldet» bzw. «ausstehend» eine frühere).",
                 "type": "string"
@@ -15791,6 +17166,11 @@
           "abgeschlossenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -15864,6 +17244,11 @@
           "portfolio": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Gewähltes Portfolio (Schlüssel) oder null für alle sichtbaren.",
                 "type": "string"
               },
@@ -15926,6 +17311,11 @@
           },
           "projekt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -16071,6 +17461,11 @@
           },
           "portfolio": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Gewähltes Portfolio (Schlüssel) oder null für alle sichtbaren.",
                 "type": "string"
@@ -16353,6 +17748,11 @@
           "bereitgestelltAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -16435,6 +17835,11 @@
           "bereitgestelltAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -16462,6 +17867,11 @@
             "properties": {
               "abgeschlossenAt": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "type": "string",
                     "format": "date-time"
@@ -16770,6 +18180,11 @@
           "status": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -16792,6 +18207,11 @@
           },
           "handlungsfeld": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -17272,6 +18692,11 @@
             "additionalProperties": {
               "anyOf": [
                 {
+                  "enum": [
+                    null
+                  ]
+                },
+                {
                   "type": "string"
                 },
                 {
@@ -17290,6 +18715,11 @@
           "aktivAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -17305,6 +18735,11 @@
           "erstelltVon": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -17318,6 +18753,11 @@
                   },
                   "name": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string"
                       },
@@ -17444,6 +18884,11 @@
           "grundbestand": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "$ref": "#/components/schemas/VorlageGrundbestand"
               },
               {
@@ -17453,6 +18898,11 @@
           },
           "aktiv": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Aktive eigene Version; null = Grundbestand bzw. keine Vorlage.",
                 "type": "integer"
@@ -17567,6 +19017,11 @@
           "grundbestand": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "$ref": "#/components/schemas/VorlageGrundbestand"
               },
               {
@@ -17576,6 +19031,11 @@
           },
           "felder": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Feldkatalog; null = kein Modul liefert Daten.",
                 "type": "array",
@@ -17637,6 +19097,11 @@
             "additionalProperties": {
               "anyOf": [
                 {
+                  "enum": [
+                    null
+                  ]
+                },
+                {
                   "minLength": 1,
                   "maxLength": 100,
                   "description": "Schlüssel eines Datenfelds aus dem Feldkatalog der Art.",
@@ -17667,6 +19132,11 @@
         "properties": {
           "registerId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -17731,6 +19201,11 @@
           "registerId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
@@ -17771,6 +19246,11 @@
         "properties": {
           "registerId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -17841,6 +19321,11 @@
           },
           "termin": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
@@ -17988,6 +19473,11 @@
           "registerId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
@@ -18068,6 +19558,11 @@
           "betrag": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "minimum": 0,
                 "maximum": 999999999999.99,
                 "description": "Betrag in CHF inkl. MwSt.; nur mit Recht auf Beträge sichtbar (A-33).",
@@ -18096,6 +19591,11 @@
         "properties": {
           "registerId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -18149,6 +19649,11 @@
           "groesse": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Grösse statt FTE, bis zum Gate P1–P2 (UC-002 A1).",
                 "anyOf": [
                   {
@@ -18179,6 +19684,11 @@
           "fte": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "exclusiveMinimum": 0,
                 "maximum": 1000,
                 "description": "FTE (auf zwei Stellen gerundet).",
@@ -18192,6 +19702,11 @@
           "vonMonat": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
                 "type": "string"
@@ -18203,6 +19718,11 @@
           },
           "bisMonat": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -18234,6 +19754,11 @@
         "properties": {
           "registerId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -18322,6 +19847,11 @@
           "registerId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Eintrag im Register des Projekts (nach der ersten Baseline); neu: null."
@@ -18368,6 +19898,11 @@
         "properties": {
           "registerId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -18431,6 +19966,11 @@
           },
           "termin": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "date",
                 "description": "Datum (JJJJ-MM-TT).",
@@ -18523,6 +20063,11 @@
           "handlungsfeldId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Strategisches Handlungsfeld."
@@ -18535,6 +20080,11 @@
           "strategischesZielId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Strategisches Ziel, zu dessen Erfüllung das Projekt beiträgt (nur Ziele in Kraft)."
@@ -18546,6 +20096,11 @@
           },
           "jahreszielId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -18702,6 +20257,11 @@
               "projektStart": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
                     "type": "string"
@@ -18713,6 +20273,11 @@
               },
               "phasenStart": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
@@ -18726,6 +20291,11 @@
               "phasenExit": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
                     "type": "string"
@@ -18737,6 +20307,11 @@
               },
               "projektabschluss": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "format": "date",
                     "description": "Datum (JJJJ-MM-TT).",
@@ -18958,6 +20533,11 @@
           "baselineAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -18968,6 +20548,11 @@
           },
           "basisVersionId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -18984,6 +20569,11 @@
           },
           "eingereichtAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -19107,6 +20697,11 @@
           "entwurf": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string",
                 "description": "Entwurf (höchstens einer, UX-E5)."
@@ -19118,6 +20713,11 @@
           },
           "baseline": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string",
@@ -19209,6 +20809,11 @@
           },
           "basis": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": true,
                 "description": "Inhalt desselben Kapitels in der Basisversion (Abweichung zur Baseline am Feld, K2 Schritt 3).",
@@ -19340,6 +20945,11 @@
                 },
                 "grund": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "Warum die Angabe fehlt.",
                       "type": "string"
@@ -19538,6 +21148,11 @@
           "unterzeichnung": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "description": "Laufender bzw. letzter Durchgang der Unterschriften nach einem bestätigten Quality-Check; null ohne Durchgang.",
                 "type": "object",
@@ -19591,6 +21206,11 @@
                         "unterschrift": {
                           "anyOf": [
                             {
+                              "enum": [
+                                null
+                              ]
+                            },
+                            {
                               "additionalProperties": false,
                               "type": "object",
                               "required": [
@@ -19607,6 +21227,11 @@
                                 },
                                 "inVertretungVon": {
                                   "anyOf": [
+                                    {
+                                      "enum": [
+                                        null
+                                      ]
+                                    },
                                     {
                                       "format": "uuid",
                                       "type": "string"
@@ -19682,6 +21307,11 @@
                     },
                     "inVertretungVon": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "format": "uuid",
                           "type": "string"
@@ -19788,6 +21418,11 @@
           "antwort": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "object",
                 "required": [
                   "text",
@@ -19813,6 +21448,11 @@
                   },
                   "updatedBy": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "uuid",
                         "type": "string"
@@ -19919,6 +21559,11 @@
           "gremienweg": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Gremium aus dem Gremienweg des Portfolios; null ohne Pflicht-Gates (Kategorie C, A-08).",
                 "type": "object",
                 "required": [
@@ -19944,6 +21589,11 @@
                   },
                   "zusaetzlich": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "object",
                         "required": [
@@ -20035,6 +21685,11 @@
                 "erreichtAm": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "format": "date",
                       "type": "string"
                     },
@@ -20048,6 +21703,11 @@
           },
           "nutzen": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Nutzenprüfung am Gate ab P3 (UC-003 A2); sonst null.",
                 "type": "object",
@@ -20112,6 +21772,11 @@
                         "zielwert": {
                           "anyOf": [
                             {
+                              "enum": [
+                                null
+                              ]
+                            },
+                            {
                               "type": "string"
                             },
                             {
@@ -20136,6 +21801,11 @@
           },
           "entscheid": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "object",
                 "required": [
@@ -20275,6 +21945,11 @@
           "eintrag": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Listeneintrag (Bezeichnung); null bei einem Feld des Kapitels.",
                 "type": "string"
               },
@@ -20285,6 +21960,11 @@
           },
           "eintragFeld": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Geändertes Feld im Listeneintrag (z. B. `termin`).",
                 "type": "string"
@@ -20311,6 +21991,11 @@
           },
           "differenz": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "neu − alt bei Zahlen (Beträge, FTE).",
                 "type": "number"
@@ -20405,6 +22090,11 @@
           "basisVersionId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -20448,6 +22138,11 @@
                 },
                 "text": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "Umformulierung der Projektleitung; ersetzt die erzeugten Sätze in der Anzeige.",
                       "type": "string"
@@ -20499,6 +22194,11 @@
               "scope": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "maxLength": 5000,
                     "type": "string"
                   },
@@ -20509,6 +22209,11 @@
               },
               "zeitplan": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "maxLength": 5000,
                     "type": "string"
@@ -20521,6 +22226,11 @@
               "ressourcen_budget": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "maxLength": 5000,
                     "type": "string"
                   },
@@ -20532,6 +22242,11 @@
               "annahmen": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "maxLength": 5000,
                     "type": "string"
                   },
@@ -20542,6 +22257,11 @@
               },
               "key_risiken": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "maxLength": 5000,
                     "type": "string"
@@ -20591,6 +22311,11 @@
           "basisVersionId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -20601,6 +22326,11 @@
           },
           "basisNummer": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Nummer der Baseline, aus der der Antrag entstand.",
                 "type": "string"
@@ -20631,6 +22361,11 @@
           },
           "eingereichtAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -20678,6 +22413,11 @@
               "hinweis": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "description": "Hinweis für den Sponsor (K2 Regel «Änderung an Scope, Budget oder Ressourcen»).",
                     "type": "string"
                   },
@@ -20690,6 +22430,11 @@
           },
           "entscheid": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -20718,6 +22463,11 @@
                   },
                   "personId": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "uuid",
                         "type": "string"
@@ -20842,6 +22592,11 @@
                 "wert": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Ab dieser Abweichung gilt sie als wesentlich; null: keine Warnung «wesentlich».",
                       "type": "number"
                     },
@@ -20852,6 +22607,11 @@
                 },
                 "einheit": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -20881,6 +22641,11 @@
                 },
                 "quelle": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "Baseline des Projektvertrags oder Standard des Phasenmodells.",
                       "anyOf": [
@@ -20926,6 +22691,11 @@
           },
           "feld": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -21001,6 +22771,11 @@
           "antwort": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -21014,6 +22789,11 @@
           },
           "beantwortetAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -21133,6 +22913,11 @@
           "eingereichtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -21167,6 +22952,11 @@
           "handlungsfeldId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -21177,6 +22967,11 @@
           },
           "strategischesZielId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -21198,6 +22993,11 @@
           },
           "nutzen": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -21232,6 +23032,11 @@
           "aufwand": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -21264,6 +23069,11 @@
           },
           "relevanz": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -21298,6 +23108,11 @@
           "herkunft": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "maxLength": 100,
                 "description": "Schlüssel der Codetabelle «Herkunft der Idee».",
                 "type": "string"
@@ -21309,6 +23124,11 @@
           },
           "fuehrendeIdeeId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -21458,6 +23278,11 @@
           "eingereichtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -21471,6 +23296,11 @@
           },
           "handlungsfeldId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -21508,6 +23338,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -21539,6 +23374,11 @@
           "handlungsfeldId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -21549,6 +23389,11 @@
           },
           "strategischesZielId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -21570,6 +23415,11 @@
           },
           "nutzen": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -21604,6 +23454,11 @@
           "aufwand": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -21637,6 +23492,11 @@
           "relevanz": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -21669,6 +23529,11 @@
           },
           "herkunft": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "maxLength": 100,
                 "description": "Schlüssel der Codetabelle «Herkunft der Idee».",
@@ -21704,6 +23569,11 @@
           "handlungsfeldId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -21714,6 +23584,11 @@
           },
           "strategischesZielId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -21735,6 +23610,11 @@
           },
           "nutzen": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -21769,6 +23649,11 @@
           "aufwand": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -21802,6 +23687,11 @@
           "relevanz": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -21834,6 +23724,11 @@
           },
           "herkunft": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "maxLength": 100,
                 "description": "Schlüssel der Codetabelle «Herkunft der Idee».",
@@ -21945,6 +23840,11 @@
                 "parentId": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "format": "uuid",
                       "type": "string"
                     },
@@ -22012,6 +23912,11 @@
           },
           "zuPruefen": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 0,
                 "description": "Eingereichte Ideen im Pool (nur mit `idee:write`).",
@@ -22118,6 +24023,11 @@
           "eingereichtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -22132,6 +24042,11 @@
           },
           "handlungsfeldId": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -22151,6 +24066,11 @@
           "herkunft": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -22160,6 +24080,11 @@
           },
           "kategorie": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "anyOf": [
                   {
@@ -22209,6 +24134,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -22306,6 +24236,11 @@
           "letzteEinreichung": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -22396,6 +24331,11 @@
           "vorgesehenerSponsor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -22451,6 +24391,11 @@
                 "einschaetzung": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "anyOf": [
                         {
                           "type": "string",
@@ -22482,6 +24427,11 @@
           },
           "vorschlag": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Naheliegende Kategorie mit Herleitung (G11); die UE entscheidet (Q8 Kap. 6).",
@@ -22537,6 +24487,11 @@
           "kategorie": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "anyOf": [
                   {
                     "type": "string",
@@ -22569,6 +24524,11 @@
           "portfolioId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -22579,6 +24539,11 @@
           },
           "zustaendig": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Entscheidendes Gremium des Portfolios (A-45).",
@@ -22654,6 +24619,11 @@
           "vorgesehenerSponsor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -22718,6 +24688,11 @@
                 },
                 "einschaetzung": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -22809,6 +24784,11 @@
               "properties": {
                 "feld": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -22932,6 +24912,11 @@
           "weg": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "`gremium` (Kategorie A, B: Entscheid in der Sitzung, K3) oder `direktion` (Kategorie C: Freigabe im Eingang, UC-001 A4); ohne Kategorie `null`.",
                 "anyOf": [
                   {
@@ -22956,6 +24941,11 @@
           "zustaendig": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Gremium (Kürzel und Name) bzw. Portfolio der Direktion.",
                 "type": "string"
               },
@@ -22966,6 +24956,11 @@
           },
           "vorgesehenerSponsor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -22978,6 +24973,11 @@
           "sponsor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -22988,6 +24988,11 @@
           },
           "projektleitung": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -23000,6 +25005,11 @@
           "freigegebenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -23010,6 +25020,11 @@
           },
           "projekt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -23072,6 +25087,11 @@
           "sponsor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -23082,6 +25102,11 @@
           },
           "projektleitung": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -23147,6 +25172,11 @@
           "fte": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Angebot in FTE; null = kein Angebot erfasst (bzw. eben entfernt).",
                 "type": "number"
               },
@@ -23157,6 +25187,11 @@
           },
           "version": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 1,
                 "description": "Version der Zelle für `version` beim Ändern; null ohne Angebot.",
@@ -23300,6 +25335,11 @@
           "angebot": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Angebot in FTE; null ohne Erfassung.",
                 "type": "number"
               },
@@ -23409,6 +25449,11 @@
           },
           "szenario": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -23541,6 +25586,11 @@
           "gemeldetBy": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -23581,6 +25631,11 @@
           },
           "projekt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -23643,6 +25698,11 @@
           "prioritaet": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "description": "Priorität des Projekts aus der Priorisierung; null, solange keine Rangfolge besteht.",
                 "type": "object",
@@ -23669,6 +25729,11 @@
           },
           "luecke": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "$ref": "#/components/schemas/Luecke"
               },
@@ -23697,6 +25762,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -23837,6 +25907,11 @@
           "personName": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -23951,6 +26026,11 @@
           "projekt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -23978,6 +26058,11 @@
           "personName": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -23996,6 +26081,11 @@
           },
           "prioritaet": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Priorität des Projekts aus der Priorisierung; null, solange keine Rangfolge besteht.",
@@ -24051,6 +26141,11 @@
           "personId": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "uuid",
                 "type": "string"
               },
@@ -24062,6 +26157,11 @@
           "personName": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -24071,6 +26171,11 @@
           },
           "rolle": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string"
               },
@@ -24273,6 +26378,11 @@
           "dimension": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Feste Zuordnung zur Achse der Matrix (A-39); null = keine.",
                 "anyOf": [
                   {
@@ -24377,6 +26487,11 @@
           "inKraftAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -24387,6 +26502,11 @@
           },
           "inKraftBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -24469,6 +26589,11 @@
           "inKraftAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -24479,6 +26604,11 @@
           },
           "inKraftBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -24631,6 +26761,11 @@
                 "dimension": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Feste Zuordnung zur Achse der Matrix (A-39); null = keine.",
                       "anyOf": [
                         {
@@ -24746,6 +26881,11 @@
           "modell": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -24801,6 +26941,11 @@
                   "inKraftAt": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "type": "string",
                         "format": "date-time"
                       },
@@ -24811,6 +26956,11 @@
                   },
                   "inKraftBy": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "uuid",
                         "type": "string"
@@ -24906,6 +27056,11 @@
                 "einschaetzung": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Einschätzung je Kriterium ohne Score (A-01).",
                       "anyOf": [
                         {
@@ -24938,6 +27093,11 @@
                 },
                 "version": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "minimum": 1,
                       "type": "integer"
@@ -25085,6 +27245,11 @@
                 "einschaetzung": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Einschätzung je Kriterium ohne Score (A-01).",
                       "anyOf": [
                         {
@@ -25117,6 +27282,11 @@
                 },
                 "version": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "minimum": 1,
                       "type": "integer"
@@ -25169,6 +27339,11 @@
           "modell": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -25187,6 +27362,11 @@
                   },
                   "inKraftAt": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string",
                         "format": "date-time"
@@ -25215,6 +27395,11 @@
                         },
                         "dimension": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "anyOf": [
                                 {
@@ -25297,6 +27482,11 @@
                     "wert": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "description": "Durchschnitt der Einschätzungen der zugeordneten Kriterien (tief 1, mittel 2, hoch 3).",
                           "type": "number"
                         },
@@ -25307,6 +27497,11 @@
                     },
                     "stufe": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "anyOf": [
                             {
@@ -25357,6 +27552,11 @@
                     "wert": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "description": "Durchschnitt der Einschätzungen der zugeordneten Kriterien (tief 1, mittel 2, hoch 3).",
                           "type": "number"
                         },
@@ -25367,6 +27567,11 @@
                     },
                     "stufe": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "anyOf": [
                             {
@@ -25406,6 +27611,11 @@
                 },
                 "feld": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -25450,6 +27660,11 @@
                     "fteMonate": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "description": "Summe FTE × Monate des Ressourcenbedarfs (RK.02.05).",
                           "type": "number"
                         },
@@ -25460,6 +27675,11 @@
                     },
                     "groesse": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "description": "Grösste gemeldete Grösse (RK.02.01).",
                           "anyOf": [
@@ -25493,6 +27713,11 @@
                 "kosten": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Summe der Prognose (sonst Baseline) der Kostenpositionen in CHF; null ohne finanzen:read.",
                       "type": "number"
                     },
@@ -25504,6 +27729,11 @@
                 "rang": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Entschiedener Rang (bisherige Rangfolge, UC-008 Schritt 1).",
                       "type": "integer"
                     },
@@ -25514,6 +27744,11 @@
                 },
                 "rangEntwurf": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "type": "integer"
                     },
@@ -25605,6 +27840,11 @@
           },
           "geaendertAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -25761,6 +28001,11 @@
                 "kosten": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Kosten der Projekte über der Wasserlinie.",
                       "type": "number"
                     },
@@ -25780,6 +28025,11 @@
                     "rahmen": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "number"
                         },
                         {
@@ -25789,6 +28039,11 @@
                     },
                     "bedarf": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "type": "number"
                         },
@@ -25900,6 +28155,11 @@
                     "beiRang": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "integer"
                         },
                         {
@@ -25909,6 +28169,11 @@
                     },
                     "grund": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "anyOf": [
                             {
@@ -25933,6 +28198,11 @@
                     "text": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -25942,6 +28212,11 @@
                     },
                     "kapazitaet": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "additionalProperties": false,
                           "type": "object",
@@ -26103,6 +28378,11 @@
           "beantragtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -26113,6 +28393,11 @@
           },
           "modell": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -26190,6 +28475,11 @@
                 "startMonat": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                       "description": "Start im Szenario (JJJJ-MM); null = wie geplant.",
                       "type": "string"
@@ -26201,6 +28491,11 @@
                 },
                 "startGeplant": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                       "description": "Frühester Monat des Ressourcenbedarfs (geplanter Start).",
@@ -26214,6 +28509,11 @@
                 "kosten": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "description": "Summe der Prognose (sonst Baseline) in CHF; null ohne finanzen:read.",
                       "type": "number"
                     },
@@ -26225,6 +28525,11 @@
                 "kostenKumuliert": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "number"
                     },
                     {
@@ -26235,6 +28540,11 @@
                 "fteMonate": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "number"
                     },
                     {
@@ -26244,6 +28554,11 @@
                 },
                 "groesse": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -26274,6 +28589,11 @@
                 "nutzen": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "anyOf": [
                         {
                           "type": "string",
@@ -26303,6 +28623,11 @@
                 "risiko": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "anyOf": [
                         {
                           "type": "string",
@@ -26331,6 +28656,11 @@
                 },
                 "strategiebeitrag": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "anyOf": [
                         {
@@ -26364,6 +28694,11 @@
                 },
                 "ueberWasserlinie": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "null, wenn das Projekt nicht enthalten ist.",
                       "type": "boolean"
@@ -26442,6 +28777,11 @@
                   "beiRang": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "description": "Rang des ersten Projekts unter der Wasserlinie; null = alle darüber.",
                         "type": "integer"
                       },
@@ -26452,6 +28792,11 @@
                   },
                   "grund": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "anyOf": [
                           {
@@ -26476,6 +28821,11 @@
                   "text": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "description": "Regel mit Ist-Wert (K5 Regeln), z. B. «Budget: CHF 14,2 Mio. statt höchstens 12,0 Mio. …».",
                         "type": "string"
                       },
@@ -26486,6 +28836,11 @@
                   },
                   "kapazitaet": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "additionalProperties": false,
                         "description": "Rolle und Monat, in denen das Projekt an der Wasserlinie die Kapazität übersteigt.",
@@ -26536,6 +28891,11 @@
                   "rahmen": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "description": "Budgetrahmen des Portfolios nach dem Modell in Kraft (A-18); null = keiner.",
                         "type": "number"
                       },
@@ -26546,6 +28906,11 @@
                   },
                   "bedarf": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "description": "Summe der Kosten der enthaltenen Projekte; null ohne finanzen:read oder bei fehlenden Kosten.",
                         "type": "number"
@@ -26612,6 +28977,11 @@
           },
           "vorlage": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Entscheidungsvorlage, Stand bei «Als Antrag wählen» (K5 Schritt 6).",
@@ -26730,6 +29100,11 @@
                 "beantragtAt": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string",
                       "format": "date-time"
                     },
@@ -26812,6 +29187,11 @@
                 },
                 "startMonat": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                       "description": "Monat «JJJJ-MM».",
@@ -26897,6 +29277,11 @@
                 },
                 "folge": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "description": "Folgeentscheid (UC-008 A2); Sistieren und Abbrechen leiten UC-015 ein.",
                       "anyOf": [
@@ -27080,6 +29465,11 @@
           "termin": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "format": "date",
                 "description": "Termin (JJJJ-MM-TT).",
                 "type": "string"
@@ -27258,6 +29648,11 @@
               "sp": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "type": "object",
                     "required": [
                       "text",
@@ -27285,6 +29680,11 @@
               },
               "ue": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "type": "object",
                     "required": [
@@ -27316,6 +29716,11 @@
           "eingereichtAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -27326,6 +29731,11 @@
           },
           "abgenommenAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -27485,6 +29895,11 @@
           "bericht": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "$ref": "#/components/schemas/AbschlussBericht"
               },
               {
@@ -27532,6 +29947,11 @@
                 "eingereichtAt": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "string",
                       "format": "date-time"
                     },
@@ -27542,6 +29962,11 @@
                 },
                 "abgenommenAt": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "type": "string",
                       "format": "date-time"
@@ -27570,6 +29995,11 @@
             "properties": {
               "baseline": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "description": "Nummer der Baseline des Projektvertrags.",
                     "type": "string"
@@ -27621,6 +30051,11 @@
                     "zielwert": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -27630,6 +30065,11 @@
                     },
                     "ist": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "description": "Letzter nachgeführter Wert (PC.03.03).",
                           "type": "object",
@@ -27656,6 +30096,11 @@
               },
               "kosten": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "description": "Summen der Kostenpositionen; null ohne Recht auf Beträge (A-33, «nicht verfügbar»).",
                     "type": "object",
@@ -27711,6 +30156,11 @@
                     "terminBaseline": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "format": "date",
                           "type": "string"
                         },
@@ -27721,6 +30171,11 @@
                     },
                     "terminAktuell": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "format": "date",
                           "type": "string"
@@ -27735,6 +30190,11 @@
               },
               "nutzenpruefung": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "description": "Letzte Nutzenprüfung aus dem Gate-Modus (UC-003 A2), Grundlage der Beurteilung am Abschluss; null ohne.",
                     "type": "object",
@@ -27774,6 +30234,11 @@
           },
           "entscheid": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "object",
                 "required": [
@@ -27901,6 +30366,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -27995,6 +30465,11 @@
                     "stand": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -28007,6 +30482,11 @@
                     },
                     "quartal": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "type": "string"
                         },
@@ -28068,6 +30548,11 @@
                     "seit": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
@@ -28119,6 +30604,11 @@
                     "seit": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
@@ -28169,6 +30659,11 @@
                     },
                     "seit": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
@@ -28279,6 +30774,11 @@
                     "seit": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "format": "date",
                           "description": "Abgeschlossen bzw. abgebrochen am (aus dem Verlauf des Projekts).",
                           "type": "string"
@@ -28356,6 +30856,11 @@
           "traktandiertAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -28366,6 +30871,11 @@
           },
           "ausgewertetAt": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "type": "string",
                 "format": "date-time"
@@ -28456,6 +30966,11 @@
           },
           "createdBy": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "format": "uuid",
                 "type": "string"
@@ -28604,6 +31119,11 @@
           "ende": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -28614,6 +31134,11 @@
           },
           "umfang": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "minimum": 0,
                 "description": "Übertragene Datensätze.",
@@ -28627,6 +31152,11 @@
           "fehler": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string"
               },
               {
@@ -28636,6 +31166,11 @@
           },
           "gestartetVon": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Person; null bei geplanten Läufen.",
@@ -28651,6 +31186,11 @@
                   },
                   "name": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string"
                       },
@@ -28731,6 +31271,11 @@
           "letzterLauf": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "$ref": "#/components/schemas/SchnittstelleLauf"
               },
               {
@@ -28784,6 +31329,11 @@
           },
           "testlauf": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "$ref": "#/components/schemas/SchnittstelleLauf"
               },
@@ -28879,6 +31429,11 @@
           "nextCursor": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
               },
@@ -28914,6 +31469,11 @@
           "person": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
@@ -28925,6 +31485,11 @@
                   "id": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "format": "uuid",
                         "type": "string"
                       },
@@ -28935,6 +31500,11 @@
                   },
                   "name": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "type": "string"
                       },
@@ -28982,6 +31552,11 @@
               "typ": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "type": "string"
                   },
                   {
@@ -28991,6 +31566,11 @@
               },
               "id": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "format": "uuid",
                     "type": "string"
@@ -29040,6 +31620,11 @@
           },
           "nextCursor": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                 "type": "string"
@@ -29108,6 +31693,11 @@
           "kostentraeger": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,39}$",
                 "description": "Kostenträger im ERP (A-16).",
                 "type": "string"
@@ -29120,6 +31710,11 @@
           "budget": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Summe der Budget-Baseline (CHF).",
                 "type": "number"
               },
@@ -29130,6 +31725,11 @@
           },
           "prognose": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Summe der Prognose, ohne Prognose das Budget (CHF).",
                 "type": "number"
@@ -29142,6 +31742,11 @@
           "ist": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "description": "Summe der Ist-Kosten aus dem ERP; null, solange keine geliefert sind («noch nicht verfügbar»).",
                 "type": "number"
               },
@@ -29152,6 +31757,11 @@
           },
           "istBis": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -29173,6 +31783,11 @@
               "capex": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "type": "number"
                   },
                   {
@@ -29182,6 +31797,11 @@
               },
               "opex": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "type": "number"
                   },
@@ -29204,6 +31824,11 @@
               "betrag": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "description": "Prognose minus Budget in CHF; null ohne Budget.",
                     "type": "number"
                   },
@@ -29214,6 +31839,11 @@
               },
               "prozent": {
                 "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
                   {
                     "description": "Abweichung in Prozent des Budgets.",
                     "type": "number"
@@ -29231,6 +31861,11 @@
           },
           "toleranzProzent": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "description": "Toleranz «Kosten» in Prozent (A-10); null ohne Wert.",
                 "type": "number"
@@ -29274,6 +31909,11 @@
                 "budget": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "type": "number"
                     },
                     {
@@ -29283,6 +31923,11 @@
                 },
                 "prognose": {
                   "anyOf": [
+                    {
+                      "enum": [
+                        null
+                      ]
+                    },
                     {
                       "type": "number"
                     },
@@ -29322,6 +31967,11 @@
           },
           "begruendung": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -29371,6 +32021,11 @@
         "properties": {
           "portfolio": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "type": "object",
@@ -29426,6 +32081,11 @@
               "ist": {
                 "anyOf": [
                   {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
                     "type": "number"
                   },
                   {
@@ -29440,6 +32100,11 @@
           },
           "istStand": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
                 "description": "Monat «JJJJ-MM».",
@@ -29629,6 +32294,11 @@
           "uebergebenAt": {
             "anyOf": [
               {
+                "enum": [
+                  null
+                ]
+              },
+              {
                 "type": "string",
                 "format": "date-time"
               },
@@ -29686,6 +32356,11 @@
                 "korrektur": {
                   "anyOf": [
                     {
+                      "enum": [
+                        null
+                      ]
+                    },
+                    {
                       "additionalProperties": false,
                       "type": "object",
                       "required": [
@@ -29697,6 +32372,11 @@
                         "capex": {
                           "anyOf": [
                             {
+                              "enum": [
+                                null
+                              ]
+                            },
+                            {
                               "type": "number"
                             },
                             {
@@ -29706,6 +32386,11 @@
                         },
                         "opex": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "type": "number"
                             },
@@ -29752,6 +32437,11 @@
           },
           "vertraulich": {
             "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
               {
                 "additionalProperties": false,
                 "description": "Vertrauliche Projekte, die die Person nicht sieht, als Summe ohne Namen (in `summe` enthalten, nicht korrigierbar).",
@@ -29912,6 +32602,11 @@
                         },
                         "email": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "type": "string"
                             },
@@ -30368,6 +33063,11 @@
                         "email": {
                           "anyOf": [
                             {
+                              "enum": [
+                                null
+                              ]
+                            },
+                            {
                               "type": "string"
                             },
                             {
@@ -30377,6 +33077,11 @@
                         },
                         "clientId": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "type": "string"
                             },
@@ -30438,6 +33143,11 @@
                     },
                     "breakGlassUntil": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "format": "date-time",
                           "type": "string"
@@ -30902,6 +33612,11 @@
                           "parent": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "type": "string",
                                 "enum": [
                                   "org",
@@ -31194,6 +33909,11 @@
                           "scope": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Scope, den das Recht im Token braucht; null beim Standard-Scope `ppm:read`",
                                 "type": "string"
                               },
@@ -31340,6 +34060,11 @@
                             "id": {
                               "anyOf": [
                                 {
+                                  "enum": [
+                                    null
+                                  ]
+                                },
+                                {
                                   "type": "string"
                                 },
                                 {
@@ -31351,6 +34076,11 @@
                         },
                         "classification": {
                           "anyOf": [
+                            {
+                              "enum": [
+                                null
+                              ]
+                            },
                             {
                               "anyOf": [
                                 {
@@ -31513,6 +34243,11 @@
                   "id": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "format": "uuid",
                         "type": "string"
                       },
@@ -31523,6 +34258,11 @@
                   },
                   "expiresAt": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "date-time",
                         "description": "Ablauf (ISO 8601 mit Zeitzone); null ohne Ablauf",
@@ -31770,6 +34510,11 @@
                               "id": {
                                 "anyOf": [
                                   {
+                                    "enum": [
+                                      null
+                                    ]
+                                  },
+                                  {
                                     "type": "string"
                                   },
                                   {
@@ -31781,6 +34526,11 @@
                           },
                           "tupleId": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "type": "string"
                               },
@@ -31817,6 +34567,11 @@
                                   },
                                   "id": {
                                     "anyOf": [
+                                      {
+                                        "enum": [
+                                          null
+                                        ]
+                                      },
                                       {
                                         "type": "string"
                                       },
@@ -31958,6 +34713,11 @@
                             },
                             "scope": {
                               "anyOf": [
+                                {
+                                  "enum": [
+                                    null
+                                  ]
+                                },
                                 {
                                   "type": "string"
                                 },
@@ -32186,6 +34946,11 @@
                 "properties": {
                   "expiresAt": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "date-time",
                         "description": "Ablauf (ISO 8601 mit Zeitzone); null ohne Ablauf",
@@ -32437,6 +35202,11 @@
                     },
                     "reason": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "type": "string"
                         },
@@ -34556,6 +37326,11 @@
                   "description": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "maxLength": 1000,
                         "type": "string"
                       },
@@ -35228,6 +38003,11 @@
                           "department": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "type": "string"
                               },
                               {
@@ -35237,6 +38017,11 @@
                           },
                           "jobTitle": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "type": "string"
                               },
@@ -35250,6 +38035,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht wählbar (Gast, deaktiviert, Domäne nicht gebunden, schon Mitglied oder eingeladen)",
                                 "type": "string"
@@ -35556,6 +38346,11 @@
                           "department": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "type": "string"
                               },
                               {
@@ -35565,6 +38360,11 @@
                           },
                           "jobTitle": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "type": "string"
                               },
@@ -35578,6 +38378,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht wählbar (Gast, deaktiviert, Domäne nicht gebunden, schon Mitglied oder eingeladen)",
                                 "type": "string"
@@ -35873,6 +38678,11 @@
                     "reason": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -35900,6 +38710,11 @@
                     "ownAppReason": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "description": "Warum die eigene App nicht geht (z. B. ENCRYPTION_KEYS fehlt)",
                           "type": "string"
                         },
@@ -35910,6 +38725,11 @@
                     },
                     "ownApp": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "description": "Anleitung für die App-Registrierung im eigenen Tenant (Kontotyp «Nur Konten in diesem Organisationsverzeichnis»)",
                           "type": "object",
@@ -35973,6 +38793,11 @@
                     },
                     "connection": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "$ref": "#/components/schemas/EntraConnection"
                         },
@@ -36331,6 +39156,11 @@
                           "reason": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
                               },
@@ -36472,6 +39302,11 @@
                   "secretExpiresAt": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "format": "date-time",
                         "description": "Ablauf des Geheimnisses, falls er in der Registrierung nicht zu finden ist (Graph liest ihn sonst selbst)",
                         "type": "string"
@@ -36526,6 +39361,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
@@ -36670,6 +39510,11 @@
                           "reason": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
                               },
@@ -36812,6 +39657,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
@@ -36996,6 +39846,11 @@
                           "reason": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
                               },
@@ -37144,6 +39999,11 @@
                           "reason": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
                               },
@@ -37288,6 +40148,11 @@
                     "reason": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "type": "string"
                         },
                         {
@@ -37315,6 +40180,11 @@
                     "ownAppReason": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "description": "Warum die eigene App nicht geht (z. B. ENCRYPTION_KEYS fehlt)",
                           "type": "string"
                         },
@@ -37325,6 +40195,11 @@
                     },
                     "ownApp": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "description": "Anleitung für die App-Registrierung im eigenen Tenant (Kontotyp «Nur Konten in diesem Organisationsverzeichnis»)",
                           "type": "object",
@@ -37388,6 +40263,11 @@
                     },
                     "connection": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "$ref": "#/components/schemas/EntraConnection"
                         },
@@ -37825,6 +40705,11 @@
                           "reason": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
                               },
@@ -37976,6 +40861,11 @@
                   "secretExpiresAt": {
                     "anyOf": [
                       {
+                        "enum": [
+                          null
+                        ]
+                      },
+                      {
                         "format": "date-time",
                         "description": "Ablauf des Geheimnisses, falls er in der Registrierung nicht zu finden ist (Graph liest ihn sonst selbst)",
                         "type": "string"
@@ -38043,6 +40933,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
@@ -38209,6 +41104,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
@@ -38385,6 +41285,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
@@ -38592,6 +41497,11 @@
                           "reason": {
                             "anyOf": [
                               {
+                                "enum": [
+                                  null
+                                ]
+                              },
+                              {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
                               },
@@ -38762,6 +41672,11 @@
                           },
                           "reason": {
                             "anyOf": [
+                              {
+                                "enum": [
+                                  null
+                                ]
+                              },
                               {
                                 "description": "Warum nicht verknüpft; bei «Nur Entra» kann sich die Person nicht mehr anmelden",
                                 "type": "string"
@@ -39715,6 +42630,11 @@
                     "ownApp": {
                       "anyOf": [
                         {
+                          "enum": [
+                            null
+                          ]
+                        },
+                        {
                           "description": "Anleitung für die App-Registrierung im eigenen Tenant (Kontotyp «Nur Konten in diesem Organisationsverzeichnis»)",
                           "type": "object",
                           "required": [
@@ -40151,6 +43071,11 @@
                   },
                   "secretExpiresAt": {
                     "anyOf": [
+                      {
+                        "enum": [
+                          null
+                        ]
+                      },
                       {
                         "format": "date-time",
                         "description": "Ablauf des Geheimnisses, falls er in der Registrierung nicht zu finden ist (Graph liest ihn sonst selbst)",
@@ -41481,6 +44406,11 @@
                     },
                     "nextCursor": {
                       "anyOf": [
+                        {
+                          "enum": [
+                            null
+                          ]
+                        },
                         {
                           "description": "Cursor der nächsten Seite; `null` auf der letzten Seite.",
                           "type": "string"

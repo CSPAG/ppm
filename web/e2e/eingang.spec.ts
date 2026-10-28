@@ -1,5 +1,6 @@
 /**
- * Eingang (UI-01, UX-E3) und Profil mit Stellvertretung (UI-43, UC-016 Schritt 4) in hell, dunkel und 360 px:
+ * Eingang (UI-01, UX-E3) und Profil mit Stellvertretung (UI-43, UC-016 Schritt 4) in hell, dunkel und 360 px, der
+ * Eingang zusätzlich bei 768 und 1440 px (Leiste links, Kopfkarten; IA «Navigation»):
  * Startseite nach der Anmeldung, «Zu tun» und Mitteilungen, Stellvertretung erfassen und beenden nur mit der Tastatur,
  * axe ohne Befund, kein Überlauf.
  */
@@ -16,6 +17,23 @@ test('Startseite ist der Eingang mit «Zu tun» und Mitteilungen', async ({ page
   await expectNoOverflow(page);
   await page.getByRole('button', { name: 'Nur mit Frist' }).click();
   await expect(page).toHaveURL(/filter=frist/);
+});
+
+test('Eingang bei 768 und 1440 px: Leiste links statt unten, Kopfkarten, axe ohne Befund, kein Überlauf', async ({ page }, info) => {
+  test.skip(info.project.name !== 'hell', 'Breiten der UX-DoD im Projekt «hell»; 360 px misst «schmal»');
+  await login(page, ANNA, '/eingang');
+  for (const width of [768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.getByRole('heading', { level: 1, name: 'Eingang' })).toBeVisible();
+    // ab 768 px die Leiste links, die Leiste unten nur auf dem Telefon (I-N3)
+    await expect(page.locator('nav.rail')).toBeVisible();
+    await expect(page.locator('nav.bnav')).toBeHidden();
+    await expect(page.getByRole('link', { name: /^Eingang/ }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Deine Aufgaben' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Zu tun' })).toBeVisible();
+    await expectAccessible(page);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth), { message: `kein Überlauf bei ${width} px` }).toBeLessThanOrEqual(width);
+  }
 });
 
 test('Stellvertretung erfassen und beenden; die Vertretung erhält eine Mitteilung', async ({ page, browser }) => {

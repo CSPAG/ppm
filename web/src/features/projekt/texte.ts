@@ -26,7 +26,7 @@ export const TP = {
     nummer: 'Nummer', handlungsfeld: 'Handlungsfeld', name: 'Projekt', projektleitung: 'Projektleitung', phase: 'Phase',
     portfolio: 'Portfolio', rollen: 'Meine Rolle', stand: 'Stand',
   },
-  funktion: { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL', kt: 'Kernteam', koalition: 'Sponsoren-Koalition' } satisfies Record<Funktion, string>,
+  funktion: NAV.funktion satisfies Record<Funktion, string>,
   funktionLang: {
     sp: 'Sponsor', pl: 'Projektleitung', ctl: 'Clinical Transformation Lead (CTL)', kt: 'Kernteam', koalition: 'Sponsoren-Koalition',
   } satisfies Record<Funktion, string>,

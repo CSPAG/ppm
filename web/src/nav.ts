@@ -9,7 +9,7 @@ import { anzahlOffen, eingangNav } from './features/eingang/index.ts';
 import { sucheHandlungsfelder } from './features/handlungsfeld/index.ts';
 import { portfoliosNav } from './features/portfolios/index.ts';
 import { suchePersonen, zugangNav } from './features/zugang/index.ts';
-import { projektNav, sucheProjekte } from './features/projekt/index.ts';
+import { projektNav, sucheProjekte, sucheProjektPersonen } from './features/projekt/index.ts';
 import { naechsteSitzungPfad, sitzungNav } from './features/sitzung/index.ts';
 import { jahresrueckblickNav } from './features/jahresrueckblick/index.ts';
 import { ideeNav, ideeNeuPfad, sucheIdeen } from './features/idee/index.ts';
@@ -151,6 +151,15 @@ export const navigation: NavRegistrierung = {
       id: 'personen', recht: 'members:admin',
       suchen: async (q, signal) => (await suchePersonen(q, signal)).map(p => ({
         id: `person:${p.id}`, label: p.name || p.email || p.id, detail: [p.email, zugangNav.palette.mitglieder].filter(Boolean).join(' · '), icon: 'user', pfad: '/verwalten/mitglieder',
+      })),
+    },
+    // Personen nach Name für alle mit Leserecht auf Projekte (I-N4, IA «Navigation»): nur Personen mit einer Funktion in
+    // Projekten, die die suchende Person sieht, mit dieser Funktion als Kontext und ohne E-Mail; Treffer führt ins Projekt
+    {
+      id: 'personen-projekte', recht: 'projekt:read',
+      suchen: async (q, signal) => (await sucheProjektPersonen(q, signal)).filter(p => p.kontexte.length).map(p => ({
+        id: `projekt-person:${p.id}`, label: p.name,
+        detail: p.kontexte.map(k => `${projektNav.funktion[k.funktion]} · ${k.nummer}`).join(', '), icon: 'user', pfad: `/projekte/${encodeURIComponent(p.kontexte[0]!.nummer)}`,
       })),
     },
     {

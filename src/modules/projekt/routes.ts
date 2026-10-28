@@ -12,7 +12,7 @@ import {
 import { record } from '../../platform.ts';
 import { anlegen, organisationFestlegen, pruefeAenderbar, snapshot, standVon } from './aktionen.ts';
 import {
-  Kopf, KopfProjekt, ListQuery, Mitglied, Organisation, OrganisationPut, Projekt, ProjektCreate, ProjektList, ProjektPatch,
+  Kopf, KopfProjekt, ListQuery, Mitglied, Organisation, OrganisationPut, PersonenQuery, Projekt, ProjektCreate, ProjektList, ProjektPatch, ProjektPersonen,
   type Funktion, type Lebenszyklus, type OrganisationOut, type OrganisationPutIn, type Phase, type ProjektCreateIn, type ProjektOut,
   type ProjektPatchIn,
 } from './schemas.ts';
@@ -55,7 +55,7 @@ async function lesen(req: FastifyRequest, id: string): Promise<store.Row> {
 }
 
 export function registerRoutes(app: FastifyInstance, deps: Deps): void {
-  for (const s of [Projekt, ProjektList, ProjektCreate, ProjektPatch, Mitglied, Organisation, OrganisationPut, KopfProjekt, Kopf]) app.addSchema(s);
+  for (const s of [Projekt, ProjektList, ProjektCreate, ProjektPatch, Mitglied, Organisation, OrganisationPut, KopfProjekt, Kopf, ProjektPersonen]) app.addSchema(s);
 
   app.get('/v1/projekte', {
     schema: {
@@ -75,6 +75,18 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     const caps = await req.capabilities();
     const last = page[page.length - 1];
     return { items: page.map(r => out(r, caps)), nextCursor: rows.length > limit && last ? encodeCursor({ n: last.nummer, f: filter }) : null };
+  });
+
+  app.get('/v1/projekte/personen', {
+    schema: {
+      tags: [TAG], summary: 'Personen in sichtbaren Projekten suchen',
+      description: 'Befehlspalette (I-N4): Personen nach Name mit ihren Funktionen in laufenden Projekten, die die anfragende Person sieht; ohne E-Mail. Personen ohne Funktion in einem sichtbaren Projekt erscheinen nicht.',
+      querystring: PersonenQuery, response: { 200: Type.Ref('ProjektPersonen') },
+    },
+  }, async req => {
+    await req.needSomewhere('projekt:read');
+    const q = req.query as { q: string; limit?: number };
+    return { items: await req.tx(tx => store.personen(tx, q.q.trim(), q.limit ?? 8)) };
   });
 
   app.get('/v1/projekte/kopf', {

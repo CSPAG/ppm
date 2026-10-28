@@ -1,8 +1,8 @@
 /**
  * Datenzugriff des Quartalsreportings (BC ZM.03.02; AP-E6-4). Läuft immer in einer Transaktion mit Mandantenkontext; die
  * Lesesicht (RLS) filtert. Für den Entwurf liest das Modul Daten anderer Module nur lesend und hält ihren Stand bei
- * Erzeugung im Bericht fest (docs/fachmodell.md 1.1): Portfolioberichte (`auswertung`, AP-E2-3) und die zur Weiterleitung
- * an den VR markierten Entscheide (`sitzung`, UC-006 A4).
+ * Erzeugung im Bericht fest (docs/fachmodell.md 1.1): die zur Weiterleitung an den VR markierten Entscheide (`sitzung`,
+ * UC-006 A4). Die Portfolioberichte kommen über die Schnittstelle von `auswertung`.
  */
 import type { Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
@@ -109,13 +109,6 @@ export async function portfolios(tx: Tx): Promise<{ id: string; name: string; ka
 /** Portfolio des PRAT: das erste der Kategorie A (Transformation, Q8 Kap. 8.7). */
 export async function portfolioA(tx: Tx): Promise<string | null> {
   return (await tx.query<{ id: string }>(`SELECT id FROM ${SCHEMA}.portfolio WHERE kategorie = 'A' ORDER BY name, id LIMIT 1`)).rows[0]?.id ?? null;
-}
-
-export interface PortfolioberichtRow { id: string; portfolio_id: string; stand: string; inhalt: Record<string, unknown> }
-
-/** Portfolioberichte einer Periode (AP-E2-3, Tabelle `portfoliobericht`); Lesesicht der Person. */
-export async function portfolioberichte(tx: Tx, periode: string): Promise<PortfolioberichtRow[]> {
-  return (await tx.query<PortfolioberichtRow>(`SELECT id, portfolio_id, stand, inhalt FROM ${SCHEMA}.portfoliobericht WHERE periode = $1`, [periode])).rows;
 }
 
 export interface WeiterleitungRow {

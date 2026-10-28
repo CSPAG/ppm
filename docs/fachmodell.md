@@ -232,9 +232,11 @@ Ein Bericht, der nach Abschluss der Periode eingeht, zählt für die nächste Pe
 | `protokoll` | `sitzung_id`, `inhalt` jsonb, `stand` (`entwurf`/`versendet`) | aus Traktanden und Entscheiden erzeugt |
 
 **Traktandenarten (Registry):** `sitzung` exportiert `registriereTraktandenart({ art, label, zusammenfassung(tx, bezug),
-unterlagen(tx, bezug), ergebnisse: [...], beiEntscheid(tx, entscheid) })`. Module registrieren ihre Arten in ihrem
-`index.ts` (Aufruf beim Laden des Moduls); `beiEntscheid` läuft in der Transaktion des Entscheids (Wirkung sofort,
-UX-Rückfluss UC-006 7–8).
+unterlagen(tx, bezug), ergebnisse: [...], beiEntscheid(tx, entscheid, kontext?) })`. Module registrieren ihre Arten in
+ihrem `index.ts` (Aufruf beim Laden des Moduls); `beiEntscheid` läuft in der Transaktion des Entscheids (Wirkung sofort,
+UX-Rückfluss UC-006 7–8). Der `FolgeKontext` (Export von `sitzung`, #120) trägt `akteur` (die Person, die den Entscheid
+erfasst; ins Audit der Folge), `principalId`, `sitzungId`, `traktandumId`, `vorher` (Ergebnis vor einer Korrektur, sonst
+null) sowie `db` und `tuples` für Folgen, die Orte und Rollen anlegen.
 
 | Art | registriert | Folge bei Entscheid |
 |---|---|---|
@@ -753,7 +755,8 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-55 | UC-014 A2 | Ad-hoc-Kennzahlen nur aus vorhandenen Modulen (Projekte, Status kritisch, offene Eskalationen, offene Meilensteine, Risiken, Budget/Prognose/Ist); ohne Angabe nur aktive Projekte; Status = letzter eingereichter Bericht bis zur Stichperiode; Beträge nur mit `finanzen:read` an der Organisation; CSV UTF-8 mit BOM, Semikolon, ohne Formeln; Auswertungen werden nicht gespeichert | AP-E7-6 |
 | A-56 | K6, A-03 | Quartalsreporting: Weiterleitungen = Entscheide «an den VR» mit Sitzung im Quartal, ausserordentliche erfasst die UE mit Datum; Zahlen je Portfolio aus dem Portfoliobericht des letzten Quartalsmonats (fehlt er: Hinweis, K6 Z4); kritische Risiken = Auswirkung hoch bei Wahrscheinlichkeit mittel oder hoch; finanzielle und organisatorische Auswirkungen nur als Kommentar; PRAT = entscheidendes Gremium des ersten Portfolios der Kategorie A; «Anpassungen verlangt» öffnet die Aufgabe erneut | AP-E6-4 |
 | A-57 | K5 Z4, K26, A-01 | Szenarien: Bedarf nur als Grösse S/M/L zählt nicht in der Kapazität (Hinweis «nicht in der Kapazität gerechnet»; anders als die Schätzung in der Matrix A-52, bis K26 geklärt ist); Monat ohne Kapazitätsangebot zieht keine Wasserlinie, erscheint als Engpass; Bedarf der Projekte ausserhalb des Szenarios zählt mit; Budget = Prognose, sonst Baseline, gegen den Budgetrahmen des Portfolios; Vergleich ohne Score; höchstens ein Antrag je Portfolio | AP-E5-3 |
-| A-58 | K3, A-30, PP.04.05 | Gate: geplante Gate-Sitzung = eingeplantes Gate-Review, sonst erster Sitzungstermin des Gremiums ab dem Phasenexit der Baseline; «Gate vorbereiten» erledigt, sobald der Gate-Entwurf über «in Arbeit» hinaus ist, spätestens beim Traktandieren; Version «n.0» für die Zielphase Pn, sonst «n.1» …; Lieferergebnisse = Standard-Ergebnisse der laufenden Phase mit «erreicht am» aus dem Register; Korrektur einer Freigabe setzt Stand, Baseline und Phase zurück, Registereinträge bleiben | AP-E3-3 |
+| A-58 | K3, A-30, PP.04.05 | Gate: geplante Gate-Sitzung = eingeplantes Gate-Review, sonst erster Sitzungstermin des Gremiums ab dem Phasenexit der Baseline; «Gate vorbereiten» erledigt, sobald der Gate-Entwurf über «in Arbeit» hinaus ist, spätestens beim Traktandieren; Version «n.0» für die Zielphase Pn, sonst «n.1» …; Lieferergebnisse = Standard-Ergebnisse der laufenden Phase mit «erreicht am» aus dem Register; Korrektur einer Freigabe setzt Stand, Baseline und Phase zurück, Registereinträge bleiben; der Stand der Lieferergebnisse wird angezeigt, nicht als Sperre geprüft (#118) | AP-E3-3 |
+| A-59 | UC-016 Schritt 3, A-44 | «Informiert den Benutzer» = Mitteilung im Eingang (E-Mail mit A-44); die Mitteilung nennt nur den Typ des Orts, nicht seinen Namen | AP-E7-8 |
 
 A-25 ist nicht vergeben (in A-24 enthalten). Annahmen A-41 bis A-47 sind technische Schnitte dieses Bauplans ohne
 Fachregel; sie kommen als Frage in die Klärungsliste, sobald eine Fachfrage daran hängt.

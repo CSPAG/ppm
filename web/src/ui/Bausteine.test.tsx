@@ -5,7 +5,7 @@ import { StaticIam } from '@vollholz/iam-web/testing';
 import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxe } from '../test/axe.ts';
 import {
-  Datenliste, Hinweis, ProjektKlein, ProjektListe, Regelmeldung, regelText, Stand, Status, statusText, T, type ProjektKurz, type Spalte,
+  Datenliste, Hinweis, Loading, ProjektKlein, ProjektListe, Regelmeldung, regelText, Stand, Status, statusText, T, type ProjektKurz, type Spalte,
 } from './index.ts';
 
 const P: ProjektKurz = {
@@ -81,6 +81,18 @@ describe('Datenliste', () => {
   const liste = (p: Partial<Parameters<typeof Datenliste<R>>[0]>) => (
     <StaticIam><Datenliste<R> titel="Liste" spalten={spalten} zeilen={[]} schluessel={r => r.id} laedt={false} leer="Noch nichts erfasst." {...p} /></StaticIam>
   );
+
+  it('Loading: sofort die Ansage, das Skelett erst nach 300 ms, kein Spinner (Z1)', () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(<Loading />);
+      expect(screen.getByRole('status')).toHaveTextContent(T.common.loading);
+      expect(container.querySelector('.skeleton, .spin')).toBeNull();
+      act(() => { vi.advanceTimersByTime(300); });
+      expect(container.querySelector('.skeleton')).not.toBeNull();
+      expect(container.querySelector('.spin')).toBeNull();
+    } finally { vi.useRealTimers(); }
+  });
 
   it('Laden: Skelett erst nach 300 ms (Z1)', () => {
     vi.useFakeTimers();

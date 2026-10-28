@@ -3,13 +3,14 @@
  * Kernablauf K6 Schritte 11–14; AP-E6-4): Entwurf aus Zielerreichung, Portfolioberichten und Weiterleitungen mit
  * Kommentaren der UE je Abschnitt, «Im PRAT traktandieren», nach der Verabschiedung «Als Dokument herunterladen» und
  * Rückmeldungen und Aufträge des VR. Zustände: Z1 Laden, Z2 noch nicht erstellt, Z4 Hinweise (unvollständige Zahlen),
- * Z5 Fehler, Z7 Konflikt (412 → neu laden), Z8 nur lesen, Z9 traktandiert/verabschiedet.
+ * Z5 Fehler, Z7 Konflikt (412 beim Speichern: ungespeicherte Kommentare bleiben, «Neu laden» übernimmt sie), Z8 nur
+ * lesen, Z9 traktandiert/verabschiedet. «Neu erstellen» und «Im PRAT traktandieren» fragen vorher mit der Wirkung (I-R1).
  */
 import { describeError, PersonPick } from '@vollholz/iam-web';
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { isConflict, statusOf } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
-import { Empty, ErrorState, fmtDatum, fmtPeriode, fmtQuartal, Hinweis, Icon, Skelett, useToast, useVerzoegert } from '../../ui/index.ts';
+import { Dialog, Empty, ErrorState, fmtDatum, fmtPeriode, fmtQuartal, Hinweis, Icon, Skelett, useToast, useVerzoegert } from '../../ui/index.ts';
 import {
   dokumentLaden, useQuartalsbericht, useQuartalsberichtMutations, type Abschnitt, type Kommentare, type Quartalsbericht, type QuartalsberichtLoaded,
 } from './QuartalsreportingApi.ts';
@@ -73,10 +74,16 @@ export function QuartalsreportingPage({ jahr, quartal, setQuartal }: Quartalsrep
               onClick={() => m.erzeugen.mutate(undefined, { onError: e => (statusOf(e) === 409 ? toast.error(e, TQR.laeuftNoch) : fehler(e)) })}>{TQR.erstellen}</button>
           ) : undefined}>{can('quartalsbericht:write') ? TQR.leer(titel) : TQR.leerNurLesen(titel)}</Empty>
         ) : (
-          <Bericht key={l!.etag} l={l!} busy={m.kommentare.isPending}
-            erzeugen={() => m.erzeugen.mutate(undefined, { onSuccess: () => toast.show(TQR.gespeichert), onError: fehler })}
-            speichern={kommentare => m.kommentare.mutate({ etag: l!.etag, kommentare }, { onSuccess: () => toast.show(TQR.gespeichert), onError: fehler })}
-            traktandieren={() => m.traktandieren.mutate({ etag: l!.etag }, { onError: fehler })}
+          <Bericht key={b.quartal} l={l!} busy={m.kommentare.isPending || m.erzeugen.isPending || m.traktandieren.isPending}
+            neuLaden={() => void q.refetch()}
+            erzeugen={fertig => m.erzeugen.mutate(undefined, { onSuccess: () => { fertig(); toast.show(TQR.neuErstellt); }, onError: e => { fertig(); fehler(e); } })}
+            speichern={(kommentare, r) => m.kommentare.mutate({ etag: l!.etag, kommentare }, {
+              // Automatisch gespeichert (I-R3) meldet die Statuszeile, von Hand gespeichert zusätzlich der Toast
+              onSuccess: () => { r.ok(); if (r.manuell) toast.show(TQR.gespeichert); },
+              // Z7: Kommentare nicht verwerfen; der Bericht zeigt den Konflikt und lädt erst auf Wunsch neu
+              onError: e => (isConflict(e) ? r.konflikt() : toast.error(e)),
+            })}
+            traktandieren={fertig => m.traktandieren.mutate({ etag: l!.etag }, { onSuccess: () => { fertig(); toast.show(TQR.traktandiert); }, onError: e => { fertig(); fehler(e); } })}
             vrSpeichern={t => m.vrRueckmeldung.mutate({ etag: l!.etag, vrRueckmeldung: t }, { onSuccess: () => toast.show(TQR.gespeichert), onError: fehler })}
             auftragErfassen={(a, ok) => m.auftrag.mutate(a, { onSuccess: () => { ok(); toast.show(TQR.auftragErfasst); }, onError: fehler })} />
         )}
@@ -85,22 +92,73 @@ export function QuartalsreportingPage({ jahr, quartal, setQuartal }: Quartalsrep
   );
 }
 
+/** Pause nach der letzten Eingabe, bevor die Kommentare automatisch gespeichert werden (I-R3). */
+const PAUSE_MS = 3000;
+
 const ABSCHNITTE_KOMMENTAR: readonly Abschnitt[] = ['gesamtstatus', 'entwicklungen', 'risiken', 'abhaengigkeiten', 'auswirkungen', 'weiterleitungen'];
 
-function Bericht({ l, busy, erzeugen, speichern, traktandieren, vrSpeichern, auftragErfassen }: {
-  l: QuartalsberichtLoaded; busy: boolean; erzeugen(): void; speichern(k: Partial<Kommentare>): void; traktandieren(): void;
+function Bericht({ l, busy, neuLaden, erzeugen, speichern, traktandieren, vrSpeichern, auftragErfassen }: {
+  l: QuartalsberichtLoaded; busy: boolean; neuLaden(): void; erzeugen(fertig: () => void): void;
+  speichern(k: Partial<Kommentare>, r: { manuell: boolean; ok(): void; konflikt(): void }): void; traktandieren(fertig: () => void): void;
   vrSpeichern(t: string): void; auftragErfassen(a: { text: string; verantwortlich: string; termin: string | null }, ok: () => void): void;
 }) {
   const b = l.item;
-  const [kommentare, setKommentare] = useState<Kommentare>(b.kommentare);
-  const geaendert = ABSCHNITTE_KOMMENTAR.some(a => kommentare[a] !== b.kommentare[a]);
+  // Nur die eigenen, noch nicht gespeicherten Änderungen: sie überstehen Neu laden und Neu erstellen (Z7)
+  const [entwurf, setEntwurf] = useState<Partial<Kommentare>>({});
+  const [konflikt, setKonflikt] = useState(false);
+  const [frage, setFrage] = useState<'neu' | 'traktandieren' | null>(null);
+  const offen = ABSCHNITTE_KOMMENTAR.filter(a => entwurf[a] !== undefined && entwurf[a] !== b.kommentare[a]);
+  const geaendert = offen.length > 0;
+  const wert = (a: Abschnitt) => entwurf[a] ?? b.kommentare[a];
   const i = b.inhalt;
   const pf = i.portfolios;
   const kommentar = (a: Abschnitt) => (
-    <KommentarFeld abschnitt={a} wert={kommentare[a]} darf={b.can.bearbeiten} onChange={v => setKommentare(k => ({ ...k, [a]: v }))} />
+    <KommentarFeld abschnitt={a} wert={wert(a)} darf={b.can.bearbeiten} onChange={v => setEntwurf(k => ({ ...k, [a]: v }))} />
   );
+  const [gespeichertAt, setGespeichertAt] = useState<number | null>(null);
+  const [jetzt, setJetzt] = useState(() => Date.now());
+  const sichern = (manuell: boolean) => {
+    const gesendet: Partial<Kommentare> = Object.fromEntries(offen.map(a => [a, wert(a)]));
+    speichern(gesendet, {
+      manuell,
+      // Nur verwerfen, was gesendet wurde: was während des Speicherns getippt wurde, bleibt offen
+      ok: () => {
+        setEntwurf(e => Object.fromEntries(Object.entries(e).filter(([a, v]) => v !== gesendet[a as Abschnitt])));
+        setKonflikt(false);
+        setGespeichertAt(Date.now());
+        setJetzt(Date.now());
+      },
+      konflikt: () => setKonflikt(true),
+    });
+  };
+  // Automatisch speichern nach einer Pause (I-R3); nicht im Konflikt, dort entscheidet die Person (Z7)
+  useEffect(() => {
+    if (!geaendert || konflikt || busy) return;
+    const t = setTimeout(() => sichern(false), PAUSE_MS);
+    return () => clearTimeout(t);
+  }, [entwurf, geaendert, konflikt, busy]); // eslint-disable-line react-hooks/exhaustive-deps -- sichern liest den Stand dieser Darstellung
+  // Eingaben gehen nicht verloren (I-F7): beim Verlassen nachfragen, solange etwas offen ist
+  useEffect(() => {
+    if (!geaendert) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [geaendert]);
+  // «Gespeichert vor 5 s»: Anzeige alle 5 Sekunden nachführen
+  useEffect(() => {
+    if (!gespeichertAt) return;
+    const t = setInterval(() => setJetzt(Date.now()), 5000);
+    return () => clearInterval(t);
+  }, [gespeichertAt]);
+  const statusText = busy && geaendert ? TQR.speichert : geaendert ? TQR.ungespeichert
+    : gespeichertAt ? TQR.gespeichertVor(Math.max(0, Math.round((jetzt - gespeichertAt) / 1000))) : '';
   return (
     <>
+      {konflikt ? (
+        <Hinweis stufe="warnung" live aktion={<button type="button" className="btn sm" onClick={() => { setKonflikt(false); neuLaden(); }}>{TQR.konfliktNeuLaden}</button>}>
+          {TQR.konfliktKommentare(offen.length)}
+        </Hinweis>
+      ) : null}
       {b.stand === 'traktandiert' && b.traktandiertAt ? <Hinweis stufe="hinweis">{TQR.bannerTraktandiert(fmtDatum(b.traktandiertAt))}</Hinweis> : null}
       {b.stand === 'verabschiedet' && b.verabschiedetAt ? <Hinweis stufe="hinweis">{TQR.bannerVerabschiedet(fmtDatum(b.verabschiedetAt))}</Hinweis> : null}
       {b.stand === 'in_arbeit' && b.rueckmeldungPrat ? <Hinweis stufe="warnung">{TQR.rueckmeldungPrat(b.rueckmeldungPrat)}</Hinweis> : null}
@@ -115,16 +173,35 @@ function Bericht({ l, busy, erzeugen, speichern, traktandieren, vrSpeichern, auf
       {b.can.bearbeiten ? (
         <div className="qr-acts">
           <div>
-            <button type="button" className="btn" onClick={erzeugen}>{TQR.neuErstellen}</button>
+            <button type="button" className="btn" onClick={() => setFrage('neu')}>{TQR.neuErstellen}</button>
             <p className="hint">{TQR.neuWirkung}</p>
           </div>
           <div>
-            <button type="button" className="btn primary" onClick={traktandieren} disabled={geaendert}>{TQR.traktandieren}</button>
+            <button type="button" className="btn primary" onClick={() => setFrage('traktandieren')} disabled={geaendert}>{TQR.traktandieren}</button>
             <p className="hint">{TQR.traktandierenWirkung}</p>
           </div>
         </div>
       ) : null}
       <Dokument quartal={b.quartal} />
+      {frage === 'neu' ? (
+        <Dialog title={TQR.neuFrage(qLabel(b.quartal))} onClose={() => setFrage(null)} footer={<>
+          <button type="button" className="btn" onClick={() => setFrage(null)} data-autofocus>{TQR.abbrechen}</button>
+          <button type="button" className="btn primary" disabled={busy} onClick={() => erzeugen(() => setFrage(null))}>{TQR.neuErstellen}</button>
+        </>}>
+          <p>{TQR.neuErsetzt(fmtDatum(b.erzeugtAt))}</p>
+          <p>{geaendert ? TQR.neuKommentareUngespeichert(offen.length) : TQR.neuKommentareBleiben}</p>
+        </Dialog>
+      ) : null}
+      {frage === 'traktandieren' ? (
+        <Dialog title={TQR.traktandierenFrage(qLabel(b.quartal))} onClose={() => setFrage(null)} footer={<>
+          <button type="button" className="btn" onClick={() => setFrage(null)} data-autofocus>{TQR.abbrechen}</button>
+          <button type="button" className="btn primary" disabled={busy} onClick={() => traktandieren(() => setFrage(null))}>{TQR.traktandieren}</button>
+        </>}>
+          <p>{TQR.traktandierenWirkung}</p>
+          <p>{TQR.kommentiert(ABSCHNITTE_KOMMENTAR.filter(a => b.kommentare[a].trim()).length, ABSCHNITTE_KOMMENTAR.length)}</p>
+          {i.hinweise.length ? <Hinweis stufe="warnung">{TQR.traktandierenHinweise(i.hinweise.length)}</Hinweis> : null}
+        </Dialog>
+      ) : null}
 
       <Teil id="gesamtstatus">
         {kommentar('gesamtstatus')}
@@ -172,11 +249,12 @@ function Bericht({ l, busy, erzeugen, speichern, traktandieren, vrSpeichern, auf
 
       {b.can.bearbeiten ? (
         <div className="qr-speichern">
-          <button type="button" className="btn primary" aria-busy={busy} disabled={busy || !geaendert} onClick={() => speichern(kommentare)}>{TQR.kommentareSpeichern}</button>
+          <span className="muted small" role="status">{statusText}</span>
+          <button type="button" className="btn primary" aria-busy={busy} disabled={busy || !geaendert} onClick={() => sichern(true)}>{TQR.kommentareSpeichern}</button>
         </div>
       ) : null}
 
-      {b.stand === 'verabschiedet' ? <Vr b={b} vrSpeichern={vrSpeichern} auftragErfassen={auftragErfassen} /> : null}
+      {b.stand === 'verabschiedet' ? <Vr key={l.etag} b={b} vrSpeichern={vrSpeichern} auftragErfassen={auftragErfassen} /> : null}
     </>
   );
 }

@@ -54,6 +54,23 @@ describe('Quality-Check', () => {
     expect(await screen.findByText(TP.zurueckgegeben)).toBeInTheDocument();
   });
 
+  it('Kommentare bleiben beim Sprung ins Kapitel und zurück erhalten; nach dem Senden ist der Entwurf weg (Z7, I-R3)', async () => {
+    sessionStorage.clear();
+    stub({ [`POST /v1/vertragsversionen/${V}/quality-check`]: () => json(pruefung({ stand: 'in_arbeit', version: 3, can: { qualityCheck: false, unterzeichnen: [] } }), 200, { ETag: 'W/"3"' }) });
+    const erst = renderWithIam(<PruefenPage nummer="2026-014" />);
+    await userEvent.type(await screen.findByLabelText(TP.kommentar(9, KAPITEL[8]!.titel)), 'Personal in FTE fehlt');
+    expect(screen.getByText(TP.entwurfBleibt)).toBeInTheDocument();
+    // Kapitel ansehen ist ein Link im Router (kein Neuladen der Seite)
+    expect(screen.getByRole('link', { name: TP.kapitelAnsehen(9) })).toHaveAttribute('href', '/projekte/2026-014/vertrag?version=entwurf&kapitel=9');
+    erst.unmount();
+
+    renderWithIam(<PruefenPage nummer="2026-014" />);
+    expect(await screen.findByLabelText(TP.kommentar(9, KAPITEL[8]!.titel))).toHaveValue('Personal in FTE fehlt');
+    await userEvent.click(screen.getByRole('button', { name: TP.zurueckgeben }));
+    expect(await screen.findByText(TP.zurueckgegeben)).toBeInTheDocument();
+    expect(sessionStorage.getItem(`ppm.qc.kommentare.${V}`)).toBeNull();
+  });
+
   it('bestätigen zeigt die Wirkung davor und sendet ohne Kommentare', async () => {
     const api = stub({ [`POST /v1/vertragsversionen/${V}/quality-check`]: () => json(pruefung({ stand: 'zur_unterzeichnung', version: 3, can: { qualityCheck: false, unterzeichnen: [] } }), 200, { ETag: 'W/"3"' }) });
     renderWithIam(<PruefenPage nummer="2026-014" />);

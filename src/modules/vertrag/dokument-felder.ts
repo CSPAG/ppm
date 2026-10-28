@@ -27,6 +27,7 @@ export const VERTRAG_FELDER: readonly VorlageFeld[] = [
   ...g('7 Projektplanung und Lieferergebnisse', [
     ['kap7.vorgehen', 'Tätigkeiten je Phase'], ['kap7.meilensteine', 'Lieferergebnisse und Meilensteine'], ['kap7.projektStart', 'Projektstart'],
     ['kap7.phasenStart', 'Start der Phase'], ['kap7.phasenExit', 'Exit der Phase'], ['kap7.projektabschluss', 'Erwarteter Projektabschluss'],
+    ['kap7.toleranzTermin', 'Toleranz Termin'], ['kap7.toleranzKosten', 'Toleranz Kosten'], ['kap7.toleranzUmfang', 'Toleranz Umfang'],
   ]),
   ...g('8 Projektstruktur und Organisation', [['kap8.mitglieder', 'Projektorganisation']]),
   ...g('9 Ressourcen', [['kap9.kosten', 'Kosten'], ['kap9.total', 'Kosten total'], ['kap9.personal', 'Personal']]),

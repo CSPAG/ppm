@@ -62,6 +62,8 @@ export const TA = {
     leer: 'Noch keine Lessons Learned. Halte fest, was künftige Vorhaben wissen sollten.',
     text: 'Erkenntnis', kategorie: 'Kategorie (optional)', erfassen: 'Lesson Learned erfassen', erfasst: 'Lesson Learned erfasst.',
     von: (wer: string, jahr: number) => `${wer} · ${jahr}`, loeschen: (t: string) => `Lesson Learned «${t}» löschen`, geloescht: 'Lesson Learned gelöscht.',
+    loeschenFrage: (t: string) => `Lesson Learned «${t}» löschen?`, loeschenJa: 'Lesson Learned löschen',
+    loeschenWirkung: 'Die Erkenntnis verschwindet auch aus «Lessons Learned» im Portfolio. Das lässt sich nicht rückgängig machen.',
   },
   panel: {
     titel: 'Bereit zum Einreichen', bereit: 'Alle Pflichtangaben sind erfasst.',
@@ -82,7 +84,8 @@ export const TA = {
     abgeschlossen: 'Abgeschlossen', nacharbeiten: 'Nacharbeiten verlangt', sistiert: 'Sistiert', abgebrochen: 'Abgebrochen', weiterfuehren: 'Weiterführen',
   } as Record<string, string>,
   letzterEntscheid: (e: string, d: string) => `Letzter Entscheid des Gremiums: ${e} (${d})`,
-  dokument: { aktion: 'Als Dokument herunterladen', pdf: 'PDF', word: 'Word', personendaten: 'Das Dokument enthält Personendaten.', bereit: (n: string) => `${n} gespeichert.` },
+  dokument: { aktion: 'Als Dokument herunterladen', pdf: 'PDF', word: 'Word', personendaten: 'Enthält Personendaten. Nur intern weitergeben.', bereit: (n: string) => `${n} gespeichert.`,
+    fehler: (grund: string) => `Herunterladen nicht möglich: ${grund}` },
 
   // Portfolio › Auswertungen › Lessons Learned (UI-32)
   liste: {

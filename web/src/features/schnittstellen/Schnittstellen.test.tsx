@@ -202,6 +202,16 @@ describe('Änderungsprotokoll (UI-50)', () => {
     expect(exp).toContain('von=2026-10-01');
     expect(exp).not.toContain('cursor');
     expect(klick).toHaveBeenCalledOnce();
+
+    // Kennung im Feld: ungültig sperrt den Export; gültig gilt auch ohne Verlassen des Felds
+    const feld = screen.getByLabelText(TX.p.objektId);
+    await userEvent.type(feld, 'abc');
+    expect(screen.getByRole('button', { name: TX.p.exportieren })).toBeDisabled();
+    await userEvent.clear(feld);
+    await userEvent.type(feld, S1);
+    await userEvent.click(screen.getByRole('button', { name: TX.p.exportieren }));
+    await waitFor(() => expect(abfragen.filter(a => a.includes('format=csv'))).toHaveLength(2));
+    expect(abfragen.filter(a => a.includes('format=csv')).at(-1)).toContain(`objektId=${S1}`);
     klick.mockRestore();
   });
 

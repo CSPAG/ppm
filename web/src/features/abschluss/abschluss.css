@@ -24,7 +24,8 @@
 .ab-tab{width:100%;border-collapse:collapse;font-size:13px}
 .ab-tab th{text-align:left;font-weight:600;color:var(--fg-3);padding:4px 6px}
 .ab-tab td{padding:6px;border-top:1px solid var(--line);vertical-align:top}
-.ab-dok{display:inline-flex;gap:6px;align-items:center}
+.ab-dok{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ab-dok-fehler{color:var(--bad)}
 .ab-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .ab-filter select{height:32px}
 @media (max-width: 900px){

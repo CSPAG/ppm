@@ -51,4 +51,10 @@ export const TX = {
     vonNachBis: '«von» liegt nach «bis». Wähle einen gültigen Zeitraum.',
     objektIdUngueltig: 'Die Kennung hat das Format 8-4-4-4-12 (z. B. aus der Adresse).',
   },
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», ADM): nur bei fehlgeschlagenem Lauf
+  kopfkarte: {
+    titel: 'Schnittstellen',
+    fehler: (n: number) => (n === 1 ? '1 Lauf fehlgeschlagen' : `${n} Läufe fehlgeschlagen`),
+    lauf: (name: string) => `Lauf «${name}» fehlgeschlagen`,
+  },
 };

@@ -254,6 +254,12 @@ function Rangliste({ portfolioId, m, breit, gewaehlt, oeffnen }: { portfolioId: 
       onError: e => (isConflict(e) ? setKonflikt(true) : toast.error(e)),
     });
   };
+  // umkehrbar (I-R1 Stufe 1): der Entwurf liegt nur hier; «Rückgängig» stellt Reihenfolge und Begründungen wieder her
+  const verwerfenMitRueckgaengig = () => {
+    const vorher = { liste, begruendung };
+    verwerfen();
+    toast.show(TM.verworfen, { action: { label: TM.rueckgaengig, run: () => { setListe(vorher.liste); setBegruendung(vorher.begruendung); } } });
+  };
   const neuLaden = async () => { await rf.refetch(); verwerfen(); setKonflikt(false); };
   const item = rf.data?.item;
 
@@ -299,7 +305,7 @@ function Rangliste({ portfolioId, m, breit, gewaehlt, oeffnen }: { portfolioId: 
       {darf ? (
         <div className="pr-akt">
           <button type="button" className="btn primary" disabled={!geaendert || speichern.isPending || konflikt} onClick={sichern}>{TM.speichern}</button>
-          {geaendert ? <button type="button" className="btn" onClick={verwerfen}>{TM.verwerfen}</button> : null}
+          {geaendert ? <button type="button" className="btn" onClick={verwerfenMitRueckgaengig}>{TM.verwerfen}</button> : null}
           {geaendert ? <span className="pr-status" role="status">{TM.ungespeichert}</span> : null}
         </div>
       ) : null}

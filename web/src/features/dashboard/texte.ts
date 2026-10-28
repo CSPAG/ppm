@@ -43,4 +43,12 @@ export const TD = {
     filtern: (phase: string) => `Projekte in ${phase} anzeigen`,
     zelle: (phase: string, was: string, n: number) => `Projekte in ${phase} anzeigen: ${n} ${was}`,
   },
+  // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle»: PRAT, GLPA Gesamtstatus; DIR Projekte der Direktion)
+  kopfkarte: {
+    titel: (periode: string) => `Portfolio ${periode}`,
+    imPlan: (n: number) => `${n} im Plan`,
+    kritisch: (n: number) => `${n} kritisch`,
+    ohneStatus: (n: number) => `${n} ohne Status`,
+    eskalationen: (n: number) => (n === 1 ? '1 Eskalation' : `${n} Eskalationen`),
+  },
 };

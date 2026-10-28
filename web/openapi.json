@@ -17716,6 +17716,69 @@
           }
         }
       },
+      "ToleranzPlan": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dimension",
+          "wert",
+          "einheit"
+        ],
+        "properties": {
+          "dimension": {
+            "description": "Termin, Kosten oder Umfang.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "termin"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "kosten"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "umfang"
+                ]
+              }
+            ]
+          },
+          "wert": {
+            "minimum": 0,
+            "maximum": 9999999,
+            "description": "Ab dieser Abweichung gilt sie als wesentlich.",
+            "type": "number"
+          },
+          "einheit": {
+            "description": "Prozent, Kalendertage oder Arbeitstage.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "prozent"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "kalendertage"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "arbeitstage"
+                ]
+              }
+            ]
+          }
+        }
+      },
       "MitgliedPlan": {
         "additionalProperties": false,
         "type": "object",
@@ -18548,6 +18611,14 @@
                 ],
                 "description": "Erwarteter Projektabschluss (ab Phase 2)."
               }
+            }
+          },
+          "toleranzen": {
+            "maxItems": 3,
+            "description": "Toleranzen des Projekts je Dimension; übersteuern ab der Baseline den Standard des Phasenmodells (A-10).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToleranzPlan"
             }
           }
         }
@@ -20581,6 +20652,122 @@
             "maxLength": 5000,
             "description": "Begründung (Pflicht beim Ablehnen, UC-007 A2).",
             "type": "string"
+          }
+        }
+      },
+      "GueltigeToleranzen": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projektId",
+          "toleranzen"
+        ],
+        "properties": {
+          "projektId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "toleranzen": {
+            "description": "Termin, Kosten und Umfang in dieser Reihenfolge.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "dimension",
+                "wert",
+                "einheit",
+                "quelle"
+              ],
+              "properties": {
+                "dimension": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "termin"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "kosten"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "umfang"
+                      ]
+                    }
+                  ]
+                },
+                "wert": {
+                  "anyOf": [
+                    {
+                      "description": "Ab dieser Abweichung gilt sie als wesentlich; null: keine Warnung «wesentlich».",
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "einheit": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "prozent"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "kalendertage"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "arbeitstage"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "quelle": {
+                  "anyOf": [
+                    {
+                      "description": "Baseline des Projektvertrags oder Standard des Phasenmodells.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "vertrag"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "phasenmodell"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -71457,6 +71644,108 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/toleranzen": {
+      "get": {
+        "summary": "Gültige Toleranzen des Projekts",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "Je Dimension die Toleranz aus Kap. 7 der Baseline des Projektvertrags, sonst der Standard des Phasenmodells (A-10). Ohne Wert keine Warnung «wesentlich». Lesen mit `projekt:read` am Projekt.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GueltigeToleranzen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

@@ -57,3 +57,7 @@ export const JahresrueckblickPut = Type.Object({
 export type JahresrueckblickPutIn = Static<typeof JahresrueckblickPut>;
 
 export const JahrParams = Type.Object({ jahr: Type.Integer({ minimum: 2000, maximum: 2100 }) }, { additionalProperties: false });
+
+export const DokumentQuery = Type.Object({
+  format: Type.Optional(Type.Union([Type.Literal('pdf'), Type.Literal('docx')], { description: 'Standard PDF.' })),
+}, { additionalProperties: false });

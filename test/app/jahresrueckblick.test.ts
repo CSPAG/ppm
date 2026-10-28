@@ -167,4 +167,16 @@ describe('Jahresrückblick', { skip }, () => {
     await ok('POST', `/v1/projekte/${projekt['2020-901']}/lessons-learned`, ue, { text: 'Abnahme früher planen' }, 201);
     assert.deepEqual((await aufgaben()).map(a => a.stand), ['erledigt']);
   });
+
+  test('Dokument über vorlage (PDF und Word), Export im Audit', async () => {
+    assert.equal((await call('GET', '/v1/jahresrueckblicke/2001/dokument', gl)).statusCode, 404);
+    assert.equal((await call('GET', `${url}/dokument`, ohne)).statusCode, 403);
+    const pdf = await ok('GET', `${url}/dokument`, gl);
+    assert.equal(pdf.headers['content-type'], 'application/pdf');
+    assert.equal(pdf.rawPayload.subarray(0, 5).toString(), '%PDF-');
+    const docx = await ok('GET', `${url}/dokument?format=docx`, ue);
+    assert.match(String(docx.headers['content-disposition']), new RegExp(`Jahresrueckblick_${jahr}\\.docx`));
+    const n = await sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.audit_log WHERE action = 'jahresrueckblick.exported'")).rows[0]!.n);
+    assert.equal(n, 2);
+  });
 });

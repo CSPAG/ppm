@@ -29,6 +29,8 @@ export const matrix: Matrix = {
     // B hat für 2030 keinen Rückblick: 404 wie für ein unbekanntes Jahr
     // B hat keine Vorhaben ohne Lessons Learned: legt seinen eigenen Rückblick an, keine Aufgabe zu Projekten von A
     'POST /v1/jahresrueckblicke/:jahr/lessons-learned/anfordern': () => ({ method: 'POST', url: '/v1/jahresrueckblicke/2032/lessons-learned/anfordern', kind: 'create' }),
+    // B hat für 2030 keinen Rückblick: 404 wie für ein unbekanntes Jahr
+    'GET /v1/jahresrueckblicke/:jahr/dokument': () => ({ method: 'GET', url: '/v1/jahresrueckblicke/2030/dokument', kind: 'foreign' }),
     'POST /v1/jahresrueckblicke/:jahr/traktandieren': () => ({ method: 'POST', url: '/v1/jahresrueckblicke/2029/traktandieren', kind: 'foreign' }),
   },
   unchanged: async (api, a, mark) => {

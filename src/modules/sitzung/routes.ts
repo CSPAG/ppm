@@ -182,7 +182,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   app.get('/v1/traktanden/naechste', {
     schema: {
       tags: [TAG], summary: 'Nächstes Traktandum je Projekt',
-      description: 'Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», CTL «Du stellst am … vor»): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.',
+      description: 'Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», «Du stellst am … vor» nur mit Einladung): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.',
       querystring: NaechsteQuery, response: { 200: Type.Ref('NaechsteTraktanden') },
     },
   }, async req => {
@@ -191,7 +191,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const rows = await req.tx(tx => store.naechsteTraktanden(tx, ids, heute()));
     return {
       items: rows.map(r => ({
-        projektId: r.projekt_id, traktandumId: r.id, art: r.art, artLabel: artLabel(r.art), titel: r.titel,
+        projektId: r.projekt_id, traktandumId: r.id, art: r.art, artLabel: artLabel(r.art), titel: r.titel, eingeladen: r.eingeladen,
         sitzung: { id: r.sitzung_id, datum: r.datum, gremium: { id: r.gremium_id, kuerzel: r.gremium_kuerzel, name: r.gremium_name } },
       })),
     };

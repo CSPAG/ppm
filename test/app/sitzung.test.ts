@@ -174,7 +174,7 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     // Kopfkarte «Meine Projekte»: je Projekt das nächste traktandierte Geschäft mit Gremium und Datum
     const n = await ok('GET', `/v1/traktanden/naechste?projektId=${p1.id}&projektId=${p2.id}&projektId=${randomUUID()}`, ue);
     const fuerP1 = n.items.find((x: { projektId: string }) => x.projektId === p1.id);
-    assert.deepEqual([fuerP1.art, fuerP1.sitzung.id, fuerP1.sitzung.datum, fuerP1.sitzung.gremium.kuerzel], ['gate', s.id, s.datum, 'prat']);
+    assert.deepEqual([fuerP1.art, fuerP1.sitzung.id, fuerP1.sitzung.datum, fuerP1.sitzung.gremium.kuerzel, fuerP1.eingeladen], ['gate', s.id, s.datum, 'prat', false]);
     assert.equal(new Set(n.items.map((x: { projektId: string }) => x.projektId)).size, n.items.length, 'je Projekt höchstens eines');
   });
 
@@ -261,6 +261,9 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.equal((await ok('GET', `/v1/sitzungen/${sitzung.id}`, mitglied)).traktanden.length, 3);
     const fuerPl = await ok('GET', `/v1/sitzungen/${sitzung.id}`, plH);
     assert.deepEqual(fuerPl.traktanden.map((t: { projekt: { id: string } }) => t.projekt.id), [p1.id]);
+    // Kopfkarte: die eingeladene Projektleitung stellt vor (Einladung, nicht Projektrolle)
+    const plN = await ok('GET', `/v1/traktanden/naechste?projektId=${p1.id}`, plH);
+    assert.deepEqual(plN.items.map((x: { projektId: string; eingeladen: boolean }) => [x.projektId, x.eingeladen]), [[p1.id, true]]);
   });
 
   test('Lauf der Fristen: Sitzung und Aufgabe «Sitzung vorbereiten» 15 Arbeitstage vorher, idempotent (A-27)', async () => {

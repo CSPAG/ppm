@@ -2,7 +2,7 @@
  * Kopfkarte «Meine Projekte» auf der Startseite (fachmodell.md 4.1; informationsarchitektur.md «Startseite je Rolle»:
  * PL, CTL, SP «je eigenes Projekt: Phase, Status und Trend, nächste Frist»; SP «kritische zuerst» mit Grund): laufende
  * Projekte, in denen die Person eine Funktion hat, mit Phase, Rolle, dem letzten gemeldeten Status und nächstem
- * Meilenstein, dem nächsten Geschäft im Gremium («Gate im PRAT Mi 10.12.», CTL «Du stellst am … vor»); solange der
+ * Meilenstein, dem nächsten Geschäft im Gremium («Gate im PRAT Mi 10.12.», mit Einladung «Du stellst am … vor»); solange der
  * Bericht der laufenden Periode aussteht, die Frist mit Sprung zum Bericht (K1). Kritische stehen zuerst. Ohne eigenes
  * Projekt entfällt die Karte.
  */
@@ -53,7 +53,7 @@ export function ProjektKopfKarte() {
               {l?.naechsterMeilenstein ? <span className="muted small">{TP.kopfkarte.meilenstein(l.naechsterMeilenstein)}</span> : null}
               {g ? (
                 <Link to={`/gremien/${encodeURIComponent(g.sitzung.gremium.kuerzel)}/sitzungen/${g.sitzung.datum}`} className="small">
-                  {p.rollen.includes('ctl')
+                  {g.eingeladen
                     ? TP.kopfkarte.vorstellen(fmtDatum(g.sitzung.datum), g.sitzung.gremium.kuerzel.toUpperCase())
                     : TP.kopfkarte.traktandum(g.artLabel, g.sitzung.gremium.kuerzel.toUpperCase(), fmtDatum(g.sitzung.datum))}
                 </Link>

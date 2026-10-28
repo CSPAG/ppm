@@ -48,8 +48,8 @@ describe('Kopfkarten je Rolle', () => {
         { projektId: uuid(3), letzter: { periode: '2026-09', status: 'kritisch', trend: 'abwaerts', begruendung: 'Lieferverzug Hauptsystem', naechsterMeilenstein: '' }, laufend: { periode: '2026-10', stand: 'eingereicht', stichtag: tag(3) } },
       ] }),
       'GET /v1/traktanden/naechste': () => json({ items: [
-        { projektId: uuid(1), traktandumId: uuid(301), art: 'gate', artLabel: 'Gate', titel: 'Gate P1–P2', sitzung: { id: uuid(201), datum: tag(10), gremium: prat } },
-        { projektId: uuid(4), traktandumId: uuid(302), art: 'aenderung', artLabel: 'Änderung', titel: 'Änderung', sitzung: { id: uuid(201), datum: tag(10), gremium: prat } },
+        { projektId: uuid(1), traktandumId: uuid(301), art: 'gate', artLabel: 'Gate', titel: 'Gate P1–P2', eingeladen: false, sitzung: { id: uuid(201), datum: tag(10), gremium: prat } },
+        { projektId: uuid(4), traktandumId: uuid(302), art: 'aenderung', artLabel: 'Änderung', titel: 'Änderung', eingeladen: true, sitzung: { id: uuid(201), datum: tag(10), gremium: prat } },
       ] }),
       'GET /v1/sitzungen/kopf': () => json({ sitzungen: [sitzung(1, prat, tag(10)), sitzung(2, glpa, tag(12), { stand: 'versendet' }), sitzung(3, gremium('dir', 3), tag(20)), sitzung(4, gremium('gl', 4), tag(40))] }),
     });
@@ -72,7 +72,7 @@ describe('Kopfkarten je Rolle', () => {
     expect(within(p1).getByText('Im Plan')).toBeInTheDocument();
     expect(within(p1).getByText('Trend aufwärts')).toBeInTheDocument();
     expect(within(p1).getByRole('link', { name: /^Statusbericht Oktober fällig / })).toHaveAttribute('href', '/projekte/2026-011/bericht?periode=2026-10');
-    // Nächster Meilenstein und nächstes Geschäft im Gremium; als CTL «Du stellst am … vor»
+    // Nächster Meilenstein und nächstes Geschäft im Gremium; mit Einladung «Du stellst am … vor»
     expect(within(p1).getByText('Nächster Meilenstein: Go-live Pilot')).toBeInTheDocument();
     expect(within(p1).getByRole('link', { name: /^Gate im PRAT / })).toHaveAttribute('href', `/gremien/prat/sitzungen/${tag(10)}`);
     const p4 = pz.find(z => within(z).queryByRole('link', { name: '2026-014 Projekt 4' }))!;

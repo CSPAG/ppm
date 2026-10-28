@@ -25674,7 +25674,7 @@ export interface paths {
         };
         /**
          * Nächstes Traktandum je Projekt
-         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», CTL «Du stellst am … vor»): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», «Du stellst am … vor» nur mit Einladung): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.
          */
         get: {
             parameters: {
@@ -47591,6 +47591,8 @@ export interface components {
                 art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
                 artLabel: string;
                 titel: string;
+                /** @description Die anfragende Person ist zu diesem Traktandum eingeladen (stellt vor, K3 Schritt 2). */
+                eingeladen: boolean;
                 sitzung: {
                     /** Format: uuid */
                     id: string;

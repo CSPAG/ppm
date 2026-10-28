@@ -187,6 +187,7 @@ export const NaechsteQuery = Type.Object({
 export const NaechsteTraktanden = Type.Object({
   items: Type.Array(Type.Object({
     projektId: Uuid, traktandumId: Uuid, art: ArtT, artLabel: Type.String(), titel: Type.String(),
+    eingeladen: Type.Boolean({ description: 'Die anfragende Person ist zu diesem Traktandum eingeladen (stellt vor, K3 Schritt 2).' }),
     sitzung: Type.Object({ id: Uuid, datum: Datum, gremium: GremiumKurz }, { additionalProperties: false }),
   }, { additionalProperties: false })),
 }, { $id: 'NaechsteTraktanden', additionalProperties: false, description: 'Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»).' });

@@ -14,7 +14,7 @@ test('Szenario anlegen, umordnen, vergleichen; barrierefrei', async ({ page }) =
   // Läufe hell, dunkel und schmal teilen die Datenbank: erst warten, bis die Seite geladen ist (leer, Liste oder ohne Portfolio)
   const leer = page.getByText(/^Noch kein Szenario\./);
   const liste = page.getByRole('table', { name: 'Rangliste des Szenarios' });
-  const ohnePortfolio = page.getByText('Es gibt noch kein Portfolio, das Sie sehen.');
+  const ohnePortfolio = page.getByText('Es gibt noch kein Portfolio, das du siehst.');
   await expect(leer.or(liste).or(ohnePortfolio).first()).toBeVisible();
   if (await ohnePortfolio.isVisible()) return;
   await expectAccessible(page);

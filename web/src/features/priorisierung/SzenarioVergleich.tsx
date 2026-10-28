@@ -33,7 +33,9 @@ export function SzenarioVergleich({ v, rollen, kopf }: { v: Vergleich; rollen: r
   ];
   return (
     <div className="sz-vergleich">
-      <div className="sz-scroll">
+      {/* scrollbar auch ohne Eingabefelder (nur lesen, 360 px) mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+      <div className="sz-scroll" tabIndex={0} role="region" aria-label={TS.vergleich}>
         <table className="sz-tab">
           <caption className="sz-vh">{TS.vergleich}</caption>
           <thead>
@@ -61,7 +63,8 @@ export function SzenarioVergleich({ v, rollen, kopf }: { v: Vergleich; rollen: r
         </table>
       </div>
       {v.szenarien.length > 1 ? (
-        <div className="sz-scroll">
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1, axe scrollable-region-focusable)
+        <div className="sz-scroll" tabIndex={0} role="region" aria-label={TS.projekteSeite}>
           <table className="sz-tab">
             <caption>{TS.projekteSeite}</caption>
             <thead>

@@ -148,7 +148,7 @@ async function rechnen(tx: Tx, g: Grundlage, s: sz.SzenarioRow): Promise<Gerechn
 
   const hinweise: string[] = [];
   if (!g.modell) hinweise.push('Kein Bewertungsmodell in Kraft: Nutzen, Risiko und Budgetrahmen fehlen.');
-  if (!g.kostenSichtbar) hinweise.push('Beträge sehen Sie nicht. Die Wasserlinie zeigt nur die Kapazität.');
+  if (!g.kostenSichtbar) hinweise.push('Beträge siehst du nicht. Die Wasserlinie zeigt nur die Kapazität.');
   else if (g.rahmen === null) hinweise.push('Ohne Budgetrahmen zeigt die Wasserlinie nur die Kapazität.');
   const nurGroesse = pos.filter(p => p.aktiv && g.projekte.get(p.projektId)!.nurGroesse.length).length;
   if (nurGroesse) hinweise.push(`Ressourcenbedarf nur als Grösse: ${projekteText(nurGroesse)}. Dieser Bedarf ist in der Kapazität nicht gerechnet.`);
@@ -225,7 +225,7 @@ async function vergleichen(tx: Tx, g: Grundlage, liste: readonly sz.SzenarioRow[
     });
   }
   const hinweise: string[] = [];
-  if (!g.kostenSichtbar) hinweise.push('Beträge sehen Sie nicht. Die Wasserlinie zeigt nur die Kapazität.');
+  if (!g.kostenSichtbar) hinweise.push('Beträge siehst du nicht. Die Wasserlinie zeigt nur die Kapazität.');
   else if (g.rahmen === null) hinweise.push('Ohne Budgetrahmen zeigt die Wasserlinie nur die Kapazität.');
   return {
     portfolioId: g.portfolio.id,
@@ -323,7 +323,7 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
     const ids = [...new Set((req.query as { ids: string }).ids.split(',').map(x => x.trim()).filter(Boolean))];
     const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!ids.length || ids.length > 3 || ids.some(x => !uuid.test(x))) {
-      throw invalid('Wählen Sie ein bis drei Szenarien.', [{ path: '/ids', message: 'ein bis drei IDs, mit Komma getrennt' }]);
+      throw invalid('Wähle ein bis drei Szenarien.', [{ path: '/ids', message: 'ein bis drei IDs, mit Komma getrennt' }]);
     }
     const rows: sz.SzenarioRow[] = [];
     for (const x of ids) rows.push(await szenario(req, x));

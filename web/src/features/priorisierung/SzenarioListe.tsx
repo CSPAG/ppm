@@ -50,7 +50,10 @@ export function SzenarioListe({ positionen, reihe, beiRang, darf, kostenSichtbar
 
   const linieBei = linieVor ? reihe.findIndex(r => r.projektId === linieVor) : -1;
   return (
-    <div className="sz-scroll">
+    <>
+    {/* scrollbar auch ohne Eingabefelder (nur lesen, 360 px) mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
+    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}
+    <div className="sz-scroll" tabIndex={0} role="region" aria-label={TS.liste}>
       <table className="sz-liste">
         <caption className="sz-vh">{TS.liste}</caption>
         <thead>
@@ -122,7 +125,8 @@ export function SzenarioListe({ positionen, reihe, beiRang, darf, kostenSichtbar
           })}
         </tbody>
       </table>
-      {beiRang === null && ueber.size ? <p className="sz-ok">{TS.ohneWasserlinie}</p> : null}
     </div>
+    {beiRang === null && ueber.size ? <p className="sz-ok">{TS.ohneWasserlinie}</p> : null}
+    </>
   );
 }

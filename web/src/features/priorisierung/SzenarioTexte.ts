@@ -1,6 +1,6 @@
 /**
  * Texte der Szenarien (UI-22; K5 Schritte 5–6, «Texte», «Regeln und Rückmeldungen»; eigene Datei von AP-E5-3): Anrede
- * «Sie» (UX-E7), Schweizer Rechtschreibung; Regeln mit Ist-Wert und Ausweg (I-P2).
+ * «Du» (UX-OF-1, #121), Schweizer Rechtschreibung; Regeln mit Ist-Wert und Ausweg (I-P2).
  */
 import { fmtBetragKurz, fmtFte } from '../../ui/index.ts';
 
@@ -16,20 +16,20 @@ export const TS = {
   szenarien: 'Szenarien',
   anlegen: 'Szenario anlegen',
   name: 'Name des Szenarios',
-  nameFehlt: 'Geben Sie dem Szenario einen Namen.',
+  nameFehlt: 'Gib dem Szenario einen Namen.',
   nameVorschlag: (n: number) => `Szenario ${String.fromCharCode(65 + Math.min(n, 25))}`,
   angelegt: (name: string) => `Szenario «${name}» angelegt.`,
   vergleichen: 'Szenarien vergleichen',
   vergleichAuswahl: 'Szenarien für den Vergleich (bis drei)',
   zurueck: 'Zum Szenario',
   // Zustände
-  leer: 'Noch kein Szenario. Ein Szenario ist eine Kopie des Ist-Stands, mit der Sie Reihenfolge und Start durchspielen.',
-  keinPortfolio: 'Es gibt noch kein Portfolio, das Sie sehen.',
-  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder Sie sehen es nicht.',
-  unbekannt: 'Dieses Szenario gibt es nicht, oder Sie sehen es nicht.',
+  leer: 'Noch kein Szenario. Ein Szenario ist eine Kopie des Ist-Stands, mit der du Reihenfolge und Start durchspielst.',
+  keinPortfolio: 'Es gibt noch kein Portfolio, das du siehst.',
+  portfolioUnbekannt: 'Dieses Portfolio gibt es nicht, oder du siehst es nicht.',
+  unbekannt: 'Dieses Szenario gibt es nicht, oder du siehst es nicht.',
   banner: (name: string) => `Szenario «${name}»: Der Ist-Stand des Portfolios ändert sich nicht.`,
-  nurLesen: 'Sie können das Szenario nur ansehen; Szenarien pflegt die Unternehmensentwicklung.',
-  schmal: 'Umordnen geht ab einer Breite von 1024 px; hier sehen Sie das Szenario nur.',
+  nurLesen: 'Du kannst das Szenario nur ansehen; Szenarien pflegt die Unternehmensentwicklung.',
+  schmal: 'Umordnen geht ab einer Breite von 1024 px; hier siehst du das Szenario nur.',
   stand: { entwurf: 'Entwurf', beantragt: 'als Antrag gewählt', entschieden: 'entschieden', verworfen: 'verworfen' } as Record<string, string>,
   // Rangliste
   liste: 'Rangliste des Szenarios',
@@ -87,7 +87,7 @@ export const TS = {
   verwerfenWirkung: 'Das Szenario verschwindet aus der Liste. Der Ist-Stand des Portfolios bleibt unverändert.',
   verworfen: (name: string) => `Szenario «${name}» verworfen.`,
   umbenennen: 'Umbenennen', speichern: 'Speichern', abbrechen: 'Abbrechen',
-  konflikt: 'Jemand anderes hat das Szenario inzwischen geändert. Laden Sie neu; Ihre letzte Verschiebung geht dabei verloren.',
+  konflikt: 'Jemand anderes hat das Szenario inzwischen geändert. Lade neu; deine letzte Verschiebung geht dabei verloren.',
   neuLaden: 'Neu laden',
   fehler: 'Die Reihenfolge konnte nicht gespeichert werden; sie ist zurückgesetzt.',
   warnungen: 'Hinweise',

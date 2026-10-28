@@ -5,6 +5,7 @@
  */
 import type { Tx } from '@vollholz/platform';
 import { projektdaten } from '../projektdaten/index.ts';
+import { hrList, mitHr } from './hr.ts';
 import { auslastung, nachSzenario, type Bedarf, type Ergebnis, type SzenarioPosition } from './rechnung.ts';
 import * as store from './store.ts';
 
@@ -35,7 +36,8 @@ async function bedarf(tx: Tx, von: string, bis: string): Promise<Bedarf[]> {
  * eine Verschiebung des Starts Bedarf von ausserhalb in den Zeitraum bringen kann.
  */
 export async function berechnen(tx: Tx, von: string, bis: string, positionen?: readonly SzenarioPosition[]): Promise<Ergebnis> {
-  const angebot = await store.list(tx, von, bis);
+  // festgelegtes Angebot, wo es fehlt die Kapazität laut HR-System (RK.01.02, Annahme AP-E7-2)
+  const angebot = mitHr(await store.list(tx, von, bis), await hrList(tx, von, bis));
   const b = positionen ? nachSzenario(await bedarf(tx, '0001-01', '9999-12'), positionen) : await bedarf(tx, von, bis);
   return auslastung(von, bis, angebot, b);
 }

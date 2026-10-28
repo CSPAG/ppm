@@ -2,10 +2,12 @@
  * Texte des Features «Monatsabschluss» (Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7),
  * Schweizer Rechtschreibung, Wortlaut aus Kernablauf K1 (docs/ux/ablaeufe/K1-statusbericht.md, «Texte» und «Regeln»).
  */
+import { NAV } from './nav.ts';
+
 const n = (k: number, eins: string, viele: string) => `${k} ${k === 1 ? eins : viele}`;
 
 export const TM = {
-  bereich: 'Monatsabschluss',
+  bereich: NAV.bereich,
   title: 'Monatsabschluss',
   sub: 'Statusberichte der Periode prüfen, Rückfragen stellen, fehlende einfordern und die Periode abschliessen.',
   periodeVor: 'Vorherige Periode', periodeNach: 'Nächste Periode',

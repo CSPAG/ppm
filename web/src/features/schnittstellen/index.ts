@@ -6,4 +6,5 @@ export {
   validateProtokollSearch, validateSchnittstellenSearch, type ProtokollSearch, type SchnittstellenSearch, type SetProtokollSearch,
   type SetSchnittstellenSearch,
 } from './search.ts';
-export { TX as schnittstellenTexte } from './texte.ts';
+// Texte für Navigation, Befehlspalette und Reiter ohne die Texte der Seiten (Q-L6)
+export { NAV as schnittstellenNav } from './nav.ts';

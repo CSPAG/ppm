@@ -2,10 +2,12 @@
  * Texte des Eingangs (UI-01; Namensraum = Feature, fachmodell.md 7.2). Anrede «Du», Begriffe aus dem Glossar
  * (docs/ux/README.md: Eingang, Zu tun, Mitteilung, Stellvertretung).
  */
+import { NAV } from './nav.ts';
+
 export const E = {
-  titel: 'Eingang',
+  titel: NAV.titel,
   sub: 'Was jetzt gilt und zu tun ist – aus allen deinen Rollen.',
-  zaehler: (n: number) => (n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),
+  zaehler: NAV.zaehler,
   kopf: {
     titel: 'Deine Aufgaben',
     offen: (n: number) => (n === 0 ? 'Keine offenen Aufgaben' : n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),

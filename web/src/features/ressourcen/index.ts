@@ -3,5 +3,4 @@ export { validateBedarfSearch, type BedarfSearch, type SetBedarfSearch } from '.
 export {
   validateAuslastungSearch, validateKapazitaetSearch, type AuslastungSearch, type KapazitaetSearch, type SetAuslastungSearch, type SetKapazitaetSearch,
 } from './search.ts';
-export { PFAD as ressourcenPfad } from './Kopf.tsx';
-export { TR as ressourcenTexte } from './texte.ts';
+export { NAV as ressourcenTexte, PFAD as ressourcenPfad } from './pfade.ts';

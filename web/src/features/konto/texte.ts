@@ -1,8 +1,10 @@
 /**
  * Texte des Profils mit Stellvertretung (UI-43, UC-016 Schritt 4; Namensraum = Feature, fachmodell.md 7.2). Anrede «Du».
  */
+import { NAV } from './nav.ts';
+
 export const K = {
-  titel: 'Profil und Stellvertretung',
+  titel: NAV.titel,
   sub: 'Wer dich bei Abwesenheit vertritt – damit Freigaben nicht liegen bleiben.',
   profil: { titel: 'Profil', name: 'Name', email: 'E-Mail', organisation: 'Organisation', keineAngabe: 'keine Angabe' },
   liste: {
@@ -15,7 +17,7 @@ export const K = {
     ja: 'erteilt', nein: 'nicht erteilt',
     aktiv: 'läuft', geplant: 'geplant',
   },
-  erfassen: 'Stellvertretung erfassen',
+  erfassen: NAV.erfassen,
   form: {
     person: 'Vertretung', personHint: 'Name eingeben und Person wählen.', suchen: 'Person suchen', keineTreffer: 'Keine Person gefunden.',
     gewaehlt: (name: string) => `Gewählt: ${name}`, aendern: 'Andere Person wählen',

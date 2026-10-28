@@ -2,14 +2,16 @@
  * Texte für Zugang entziehen und Neubesetzung (UC-016 A1, AP-E7-8; Namensraum = Feature, fachmodell.md 7.2). Anrede
  * «Du»; sichtbar «Organisation», nie «Mandant».
  */
+import { NAV } from './nav.ts';
+
 const anzahl = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
 
 export const Z = {
-  bereich: 'Zugänge',
+  bereich: NAV.bereich,
   titel: 'Zugänge',
   sub: 'Zugang entziehen, wenn jemand die Organisation verlässt – mit den Rollen und Aufgaben, die neu zu besetzen sind.',
   entziehen: 'Zugang entziehen',
-  aktionEntziehen: 'Zugang entziehen …',
+  aktionEntziehen: NAV.aktionEntziehen,
   filter: { titel: 'Anzeige', alle: 'Alle', offen: 'Nur offene' },
   liste: {
     titel: 'Entzogene Zugänge',
@@ -56,7 +58,7 @@ export const Z = {
     zumEingang: 'Zum Eingang',
   },
   // Kopfkarte im Eingang (informationsarchitektur.md «Startseite je Rolle», ADM): nur mit offenen Neubesetzungen
-  palette: { mitglieder: 'Mitglieder' },
+  palette: NAV.palette,
   kopfkarte: {
     titel: 'Zugänge',
     offen: (n: number) => (n === 1 ? '1 Person mit Rollen zum Neubesetzen' : `${n} Personen mit Rollen zum Neubesetzen`),

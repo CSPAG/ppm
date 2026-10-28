@@ -170,6 +170,16 @@ describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', { skip }, () => {
     assert.deepEqual([s1.items.length, s2.items.length, s2.nextCursor], [3, 1, null]);
     assert.equal((await call('adm', 'GET', `/v1/aenderungsprotokoll?objekt=projekt&cursor=${encodeURIComponent(s1.nextCursor)}`)).statusCode, 422);
     assert.ok((await call('ue', 'GET', '/v1/aenderungsprotokoll/objekte')).json().items.includes('schnittstelle'));
+
+    // Export (UI-50, Seitentyp Bericht): alle Einträge zum Filter, eine Zeile je geändertes Feld
+    const x = await call('ue', 'GET', `/v1/aenderungsprotokoll?objekt=schnittstelle&objektId=${erp}&format=csv`);
+    assert.equal(x.statusCode, 200, x.body);
+    assert.match(x.headers['content-type'] as string, /^text\/csv/);
+    assert.match(x.headers['content-disposition'] as string, /filename="aenderungsprotokoll\.csv"/);
+    const zeilen = x.body.replace(/^﻿/, '').trim().split('\r\n');
+    assert.equal(zeilen[0], 'Zeitpunkt;Quelle;Person;Objekt;Kennung;Art;Aktion;Feld;Vorher;Nachher');
+    assert.ok(zeilen.some(z => z.endsWith(`;schnittstelle;${erp};geändert;schnittstelle.updated;rhythmus;monatlich;taeglich`)), zeilen.join('\n'));
+    assert.equal((await call('gl', 'GET', '/v1/aenderungsprotokoll?format=csv')).statusCode, 403);
   });
 
   test('geplante Läufe nach Rhythmus: einmal je Tag, der Testlauf zählt nicht, ein Lauf von Hand schon', async () => {

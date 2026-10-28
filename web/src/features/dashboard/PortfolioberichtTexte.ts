@@ -30,6 +30,12 @@ export const TR = {
   abhaengigkeiten: { titel: 'Abhängigkeiten', von: 'Projekt', zu: 'hängt ab von', text: 'Beschreibung', leer: 'Keine Abhängigkeiten zwischen den Projekten.' },
   eskalationen: { titel: 'Offene Eskalationen', projekt: 'Projekt', periode: 'Periode', grund: 'Grund', massnahme: 'Massnahme', leer: 'Keine offenen Eskalationen.', stand: { offen: 'offen', traktandiert: 'traktandiert' } as Record<string, string> },
   keinRecht: 'Die Risikolage sehen Gremien, Direktionen, Geschäftsleitung, Finanzen, Ressourcen und die Unternehmensentwicklung.',
+  // Seitentyp Bericht: jede Zahl führt zu ihren Einzelwerten, Export
+  zeigen: (was: string) => `Risiken anzeigen: ${was}`,
+  filter: { feld: (w: string, a: string) => `Wahrscheinlichkeit ${w}, Auswirkung ${a}`, offen: 'Massnahme offen', label: 'Auswahl', entfernen: (was: string) => `Auswahl ${was} entfernen` },
+  leerFilter: 'Keine Risiken für diese Auswahl.',
+  zuruecksetzen: 'Filter zurücksetzen',
+  exportieren: 'Exportieren (CSV)', exportiert: (name: string) => `${name} gespeichert.`,
 };
 
 export const TP = {
@@ -49,7 +55,10 @@ export const TP = {
   keinBericht: (periode: string) => `Für ${periode} gibt es noch keinen Portfoliobericht.`,
   keinBerichtLeser: (periode: string) => `Für ${periode} ist noch kein Portfoliobericht bereitgestellt.`,
   periodeOffen: (periode: string) => `${periode} ist noch nicht abgeschlossen. Der Portfoliobericht entsteht aus dem abgeschlossenen Dashboard.`,
-  kommentar: { label: 'Bericht der Programmleitung', hinweis: 'Dein Kommentar steht zuoberst im Bericht.', leer: 'Kein Kommentar.' },
+  kommentar: {
+    label: 'Bericht der Programmleitung', hinweis: 'Dein Kommentar steht zuoberst im Bericht.', leer: 'Kein Kommentar.',
+    andere: (t: string) => `Inzwischen gespeichert: «${t}». Dein Text oben ist noch nicht gespeichert.`,
+  },
   bereitstellenDialog: {
     titel: (p: string) => `Portfoliobericht ${p} bereitstellen?`,
     text: (gremium: string) => `Der Bericht wird fest und ist für ${gremium} sichtbar. Das Gremium erhält das Traktandum «Bericht der Programmleitung» als Vorschlag für die nächste Sitzung. Danach änderst du ihn nicht mehr.`,
@@ -62,7 +71,7 @@ export const TP = {
     gespeichert: 'Kommentar gespeichert.',
     bereitgestellt: (p: string) => `Portfoliobericht ${p} bereitgestellt.`,
   },
-  konflikt: 'Der Bericht wurde inzwischen geändert. Er ist neu geladen; prüfe deinen Kommentar.',
+  konflikt: 'Der Bericht wurde inzwischen geändert und ist neu geladen. Dein Kommentar ist noch da; speichere ihn nochmals.',
   abschnitt: { uebersicht: 'Übersicht', funnel: 'Funnel nach Phase', projekte: 'Projekte', risiken: 'Risikolage' },
   keinRecht: 'Den Portfoliobericht sehen Gremien, Direktionen, Geschäftsleitung, Finanzen, Ressourcen und die Unternehmensentwicklung.',
 };

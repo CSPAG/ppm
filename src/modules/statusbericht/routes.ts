@@ -129,7 +129,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
         const pflichtig = p.lebenszyklus === 'aktiv' && BERICHTSPHASEN.includes(p.phase);
         items.push({
           projektId: id,
-          letzter: l ? { periode: l.periode, status: l.status, trend: l.trend, begruendung: l.begruendung } : null,
+          letzter: l ? { periode: l.periode, status: l.status, trend: l.trend, begruendung: l.begruendung, naechsterMeilenstein: l.naechster_meilenstein } : null,
           laufend: pflichtig ? { periode: laufend, stand: (await store.get(tx, id, laufend))?.stand ?? null, stichtag } : null,
         });
       }

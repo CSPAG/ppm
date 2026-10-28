@@ -33,7 +33,12 @@ export const Risikolage = Type.Object({
 }, { $id: 'Risikolage', additionalProperties: false });
 export type RisikolageOut = Static<typeof Risikolage>;
 
+const StufeFilter = (d: string) => Type.Optional(Type.Union([Type.Literal('hoch'), Type.Literal('mittel'), Type.Literal('tief')], { description: d }));
 export const RisikolageQuery = Type.Object({
   portfolio: Type.Optional(Type.String({ pattern: '^[a-z0-9_-]{1,40}$', description: 'Schlüssel des Portfolios (I-N5), z. B. `transformation`.' })),
+  w: StufeFilter('Nur für den Export: Wahrscheinlichkeit (Feld der Matrix).'),
+  a: StufeFilter('Nur für den Export: Auswirkung (Feld der Matrix).'),
+  massnahme: Type.Optional(Type.Literal('offen', { description: 'Nur für den Export: Risiken mit offener Massnahme.' })),
+  format: Type.Optional(Type.Literal('csv', { description: 'Export der Risiken als CSV (mit `w`, `a`, `massnahme` wie die Tabelle der Oberfläche).' })),
 }, { additionalProperties: false });
 export type RisikolageQueryIn = Static<typeof RisikolageQuery>;

@@ -24,6 +24,8 @@ describe('HR-Lieferung (ohne Datenbank)', () => {
       { rolle: 'pl', monat: '2027-02', fte: 1, abwesend: 0, personen: 1 },
       { rolle: 'arch', monat: '2027-01', fte: 0, abwesend: 0.5, personen: 1 },
     ]);
+    // ungerundet summiert, je Zelle einmal gerundet: 3 × 0,333 = 1
+    assert.deepEqual(personalLesen(JSON.stringify(['a', 'b', 'c'].map(n => ({ personalnummer: n, rolle: 'pl', monat: '2027-01', fte: 0.333 })))).map(z => z.fte), [1]);
     assert.throws(() => personalLesen('kein json'), /keine gültige JSON-Antwort/);
     assert.throws(() => personalLesen('{"x":1}'), /Liste von Personen/);
     assert.throws(() => personalLesen('[{"personalnummer":"P","rolle":"pl","monat":"2027-13","fte":1}]'), /Eintrag 1: Monat/);

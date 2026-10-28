@@ -23,6 +23,7 @@ import { feldId, KAPITEL, pruefeLokal } from './felder.ts';
 import { KapitelEditor } from './KapitelEditor.tsx';
 import type { SetVertragSearch, VertragSearch } from './search.ts';
 import { TV } from './texte.ts';
+import { Zurueckziehen } from './Zurueckziehen.tsx';
 import './vertrag.css';
 
 const PAUSE_MS = 800;
@@ -59,21 +60,23 @@ export function VertragPage({ nummer, search, setSearch }: { nummer: string; sea
   if (ohneVersion) return <Empty>{TV.leer}</Empty>;
   const gewaehlt = search.version && search.version !== 'baseline' && search.version !== 'entwurf' ? v.versionen.find(x => x.id === search.version)?.id : undefined;
   const versionId = gewaehlt ?? (search.version === 'baseline' ? v.baseline ?? v.entwurf : v.entwurf ?? v.baseline);
-  return <Akte nummer={nummer} projektId={projekt.data.id} versionId={versionId!} search={search} setSearch={setSearch} />;
+  return <Akte nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} versionId={versionId!} search={search} setSearch={setSearch} />;
 }
 
-function Akte({ nummer, projektId, versionId, search, setSearch }: { nummer: string; projektId: string; versionId: string; search: VertragSearch; setSearch: SetVertragSearch }) {
+function Akte({ nummer, projektId, projektName, versionId, search, setSearch }: {
+  nummer: string; projektId: string; projektName: string; versionId: string; search: VertragSearch; setSearch: SetVertragSearch;
+}) {
   const version = useVersion(versionId);
   const pflicht = usePflichtangaben(versionId);
   const skelett = useVerzoegert(version.isPending);
   if (version.isPending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={6} /> : null}</div>;
   if (version.error) return <ErrorState error={version.error} onRetry={() => void version.refetch()} />;
-  return <Arbeitsflaeche nummer={nummer} projektId={projektId} loaded={version.data} angaben={pflicht.data?.angaben ?? []} search={search} setSearch={setSearch}
+  return <Arbeitsflaeche nummer={nummer} projektId={projektId} projektName={projektName} loaded={version.data} angaben={pflicht.data?.angaben ?? []} search={search} setSearch={setSearch}
     pflicht={{ laedt: pflicht.isPending, fehler: pflicht.error, erneut: () => void pflicht.refetch() }} />;
 }
 
-function Arbeitsflaeche({ nummer, projektId, loaded, angaben, search, setSearch, pflicht }: {
-  nummer: string; projektId: string; loaded: VersionLoaded; angaben: Angabe[]; search: VertragSearch; setSearch: SetVertragSearch;
+function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, search, setSearch, pflicht }: {
+  nummer: string; projektId: string; projektName: string; loaded: VersionLoaded; angaben: Angabe[]; search: VertragSearch; setSearch: SetVertragSearch;
   /** Stand der Abfrage der Pflichtangaben: Ein Fehler darf nicht als «keine Angaben verlangt» erscheinen (Z5) */
   pflicht: { laedt: boolean; fehler: unknown; erneut: () => void };
 }) {
@@ -153,6 +156,8 @@ function Arbeitsflaeche({ nummer, projektId, loaded, angaben, search, setSearch,
         {/* Änderung beantragen (UC-007 Schritt 1, AP-E3-4) */}
         <AenderungBeantragen projektId={projektId} oeffnen={search.aenderung} onGeschlossen={() => setSearch({ aenderung: undefined }, { replace: true })}
           onAngelegt={() => setSearch({ version: 'entwurf', kapitel: undefined, feld: undefined, aenderung: undefined })} />
+        {/* Projekt zurückziehen (UC-002 A4, nur SP) */}
+        <Zurueckziehen projektId={projektId} projektName={projektName} loaded={loaded} />
       </div>
       {banner ? <div className="vt-banner"><Hinweis stufe="hinweis">{banner}</Hinweis></div> : null}
       <div className="vt-flaeche">

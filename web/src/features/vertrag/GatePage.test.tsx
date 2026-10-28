@@ -154,4 +154,44 @@ describe('Gate-Modus', () => {
     expect(await put.json()).toEqual({ beurteilung: 'Ziel knapp verfehlt', werte: [{ kpiId: K1, wert: '18', bemerkung: '' }] });
     expect(await screen.findByText(TG.nutzenGespeichert)).toBeInTheDocument();
   });
+
+  it('Nutzenprüfung mit Konflikt (412): «Neu laden» behält die Werte, gespeichert wird mit der neuen Version (Z7)', async () => {
+    const nutzen = { beurteilung: '', werte: [], version: 0, kpis: [{ id: K1, text: 'Wartezeit Aufnahme', einheit: 'min', zielwert: '15' }] };
+    let n = 0;
+    const g = (v: number) => gate({ gate: { code: 'P2_P3', label: 'P2–P3', von: 'P2', nach: 'P3' }, can: { antworten: true, nutzen: true }, nutzen: { ...nutzen, version: v } });
+    const api = stub({
+      [`GET /v1/vertragsversionen/${V}/gate`]: () => json(g(n ? 4 : 0)),
+      [`PUT /v1/vertragsversionen/${V}/gate/nutzen`]: () => (n++ ? json(g(5)) : json({ title: 'Inzwischen geändert', status: 412 }, 412)),
+    });
+    renderWithIam(<GatePage nummer="2026-014" />);
+    await userEvent.type(await screen.findByLabelText(`${TG.erreichterWert}: Wartezeit Aufnahme`), '18');
+    await userEvent.click(screen.getByRole('button', { name: TG.nutzenSpeichern }));
+    expect(await screen.findByText(TG.konfliktNutzen)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TG.neuLaden }));
+    await waitFor(() => expect(screen.queryByText(TG.konfliktNutzen)).toBeNull());
+    expect(screen.getByLabelText(`${TG.erreichterWert}: Wartezeit Aufnahme`)).toHaveValue('18');
+    await waitFor(() => expect(api.calls.filter(c => c.url.endsWith('/gate') && c.method === 'GET').length).toBeGreaterThan(1));
+    await userEvent.click(screen.getByRole('button', { name: TG.nutzenSpeichern }));
+    expect(await screen.findByText(TG.nutzenGespeichert)).toBeInTheDocument();
+    expect(api.calls.filter(c => c.method === 'PUT')[1]!.headers.get('If-Match')).toBe('W/"4"');
+  });
+
+  it('Nutzenprüfung: scheitert das Neuladen, bleiben Werte und Hinweis stehen (Z5, Z7)', async () => {
+    const nutzen = { beurteilung: '', werte: [], version: 0, kpis: [{ id: K1, text: 'Wartezeit Aufnahme', einheit: 'min', zielwert: '15' }] };
+    let n = 0;
+    stub({
+      [`GET /v1/vertragsversionen/${V}/gate`]: () => (n
+        ? json({ title: 'Nicht erreichbar', status: 503 }, 503, { 'Content-Type': 'application/problem+json' })
+        : json(gate({ gate: { code: 'P2_P3', label: 'P2–P3', von: 'P2', nach: 'P3' }, can: { antworten: true, nutzen: true }, nutzen }))),
+      [`PUT /v1/vertragsversionen/${V}/gate/nutzen`]: () => { n++; return json({ title: 'Inzwischen geändert', status: 412 }, 412); },
+    });
+    renderWithIam(<GatePage nummer="2026-014" />);
+    await userEvent.type(await screen.findByLabelText(`${TG.erreichterWert}: Wartezeit Aufnahme`), '18');
+    await userEvent.click(screen.getByRole('button', { name: TG.nutzenSpeichern }));
+    await userEvent.click(await screen.findByRole('button', { name: TG.neuLaden }));
+    await new Promise(r => setTimeout(r, 300));
+    expect(screen.getByText(TG.konfliktNutzen)).toBeInTheDocument();
+    expect(screen.getByLabelText(`${TG.erreichterWert}: Wartezeit Aufnahme`)).toHaveValue('18');
+    expect(screen.getByRole('button', { name: TG.nutzenSpeichern })).toBeDisabled();
+  });
 });

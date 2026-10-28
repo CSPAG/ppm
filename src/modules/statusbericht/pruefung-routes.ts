@@ -9,13 +9,13 @@ import {
   actorOf, conflict, decodeCursor, encodeCursor, etag, forbidden, IdempotencyHeaders, IfMatchHeaders, invalid, notFound, preconditionFailed,
   requireIfMatch, type Deps, type Tx,
 } from '@vollholz/platform';
-import { record } from '../../platform.ts';
+import { csv, record } from '../../platform.ts';
 import { aufgabe } from '../eingang/index.ts';
 import { laufendePeriode } from './bericht.ts';
 import { fristen, monat, PERIODE_ABGESCHLOSSEN, register, vorperiodeVon } from './pruefung.ts';
 import {
   Auffaelligkeit, Auswahl, PeriodeParams, PeriodeQuery, Periodenstand, PeriodeUebersicht, PeriodeZeile, Rueckfrage, RueckfrageCreate,
-  RueckfrageList, Sammelergebnis, StatusberichteKopf, Terminabweichung, TerminabweichungList,
+  RueckfrageList, Sammelergebnis, StatusberichteKopf, Terminabweichung, TerminabweichungList, TerminabweichungQuery,
   type AuswahlIn, type PeriodeQueryIn, type PeriodeZeileOut, type RueckfrageOut, type TerminabweichungOut,
 } from './pruefung-schemas.ts';
 import * as pstore from './pruefung-store.ts';
@@ -104,11 +104,14 @@ const tage = (von: string, bis: string) => Math.round((Date.parse(`${bis}T00:00:
 /** Termine der Baseline und aufdatiert je Phase und Abschluss (PS.01.04); null ohne Baseline. */
 function terminabweichung(z: pstore.ZeileRow, meilensteine: Awaited<ReturnType<typeof register>>['meilensteine']): TerminabweichungOut | null {
   const phasen = new Map<string, { baseline: string; aktuell: string }>();
+  const einzelwerte: TerminabweichungOut['meilensteine'] = [];
   for (const m of meilensteine) {
     if (m.art !== 'meilenstein' && m.art !== 'lieferergebnis') continue;
     const baseline = typeof m.terminBaseline === 'string' ? m.terminBaseline : null;
     if (!baseline) continue;
+    const erreicht = typeof m.erreichtAm === 'string' && !!m.erreichtAm;
     const aktuell = (typeof m.erreichtAm === 'string' && m.erreichtAm) || (typeof m.terminAktuell === 'string' && m.terminAktuell) || baseline;
+    einzelwerte.push({ phase: String(m.phase), art: m.art, text: String(m.text ?? ''), erreicht, baseline, aktuell, tage: tage(baseline, aktuell) });
     const p = phasen.get(String(m.phase));
     phasen.set(String(m.phase), { baseline: !p || baseline > p.baseline ? baseline : p.baseline, aktuell: !p || aktuell > p.aktuell ? aktuell : p.aktuell });
   }
@@ -120,6 +123,7 @@ function terminabweichung(z: pstore.ZeileRow, meilensteine: Awaited<ReturnType<t
   return {
     projektId: z.projekt_id, projektNummer: z.nummer, projektName: z.name, phase: z.projekt_phase,
     phasen: liste, abschluss, maxTage: Math.max(abschluss.tage, ...liste.map(t => t.tage)),
+    meilensteine: einzelwerte.sort((a, b) => a.phase.localeCompare(b.phase) || a.baseline.localeCompare(b.baseline) || a.text.localeCompare(b.text)),
   };
 }
 
@@ -200,13 +204,14 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
   app.get('/v1/perioden/:periode/terminabweichungen', {
     schema: {
       tags: [TAG], summary: 'Terminabweichungen über alle Projekte',
-      description: 'Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.',
-      params: PeriodeParams, response: { 200: Type.Ref('TerminabweichungList') },
+      description: 'Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert, mit den Einzelwerten (`meilensteine`). Stand der Register heute. Mit `format=csv` als Export (eine Zeile je Meilenstein bzw. Lieferergebnis).',
+      params: PeriodeParams, querystring: TerminabweichungQuery, response: { 200: Type.Ref('TerminabweichungList') },
     },
-  }, async req => {
+  }, async (req, reply) => {
     const { periode } = req.params as { periode: string };
+    const { format } = req.query as { format?: 'csv' };
     await req.need(REVIEW);
-    return req.tx(async tx => {
+    const liste = await req.tx(async tx => {
       const items: TerminabweichungOut[] = [];
       const ohneBaseline: { projektId: string; projektNummer: string; projektName: string }[] = [];
       for (const z of await pstore.zeilen(tx, periode)) {
@@ -216,6 +221,15 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
       items.sort((a, b) => b.maxTage - a.maxTage || a.projektNummer.localeCompare(b.projektNummer));
       return { items, ohneBaseline };
     });
+    if (format !== 'csv') return liste;
+    // Export (Seitentyp Bericht): eine Zeile je Meilenstein bzw. Lieferergebnis, Projekte in der Reihenfolge der Seite
+    const zeilen = liste.items.flatMap(t => t.meilensteine.map(m => [
+      t.projektNummer, t.projektName, t.phase, m.phase, m.art === 'meilenstein' ? 'Meilenstein' : 'Lieferergebnis', m.text, m.baseline, m.aktuell, m.tage, m.erreicht ? 'ja' : 'nein',
+    ]));
+    return reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="terminabweichungen-${periode}.csv"`)
+      .send(csv([['Nummer', 'Projekt', 'Phase des Projekts', 'Phase', 'Art', 'Bezeichnung', 'Baseline', 'Aktuell', 'Abweichung (Tage)', 'Erreicht'], ...zeilen]));
   });
 
   app.get('/v1/statusberichte/kopf', {

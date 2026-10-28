@@ -65,6 +65,16 @@ export async function erledigen(tx: Tx, id: string): Promise<boolean> {
       WHERE id = $1 AND stand = 'offen' AND manuell`, [id])).rowCount ?? 0) > 0);
 }
 
+/**
+ * Von Hand Erledigtes wieder öffnen (Rückgängig im Toast, docs/ux/rahmen/interaktion.md I-R1 Stufe 1): nur eine
+ * manuelle Aufgabe, die die Person selbst erledigt hat. `false`, wenn es keine solche gibt.
+ */
+export async function wiederOeffnen(tx: Tx, id: string): Promise<boolean> {
+  return intern(tx, async () => ((await tx.query(
+    `UPDATE ${SCHEMA}.aufgabe SET stand = 'offen', erledigt_von = NULL, erledigt_at = NULL
+      WHERE id = $1 AND stand = 'erledigt' AND manuell AND erledigt_von = app.principal_id()`, [id])).rowCount ?? 0) > 0);
+}
+
 export interface MitteilungRow { id: string; text: string; link: string | null; bezug_typ: string; bezug_id: string; gelesen_at: Date | null; created_at: Date; created_key: string }
 
 export async function mitteilungen(tx: Tx, o: { ungelesen: boolean; after: { c: string; i: string } | null; limit: number }): Promise<MitteilungRow[]> {

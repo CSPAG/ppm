@@ -57,6 +57,24 @@ export function useTermine(periode: string | undefined) {
   });
 }
 
+/**
+ * Export der Terminabweichungen als CSV (UI-16, Seitentyp Bericht): eine Zeile je Meilenstein bzw. Lieferergebnis, über
+ * den typisierten Client (gleiche Herkunft, Organisation im Kopf), im Browser gespeichert; liefert den Dateinamen.
+ */
+export async function termineExportieren(periode: string): Promise<string> {
+  const { data, response } = await api.GET('/v1/perioden/{periode}/terminabweichungen', { params: { path: { periode }, query: { format: 'csv' } }, parseAs: 'blob' });
+  const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') ?? '')?.[1] ?? `terminabweichungen-${periode}.csv`;
+  const url = URL.createObjectURL(data as Blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+  return name;
+}
+
 /** Bericht der Periode und der Vorperiode für den Vergleich (K1 Prüfen Schritt 2); `null` ohne gespeicherten Bericht. */
 export function useBerichtVergleich(projektId: string | undefined, periode: string, vorperiode: string | null) {
   return useQuery({

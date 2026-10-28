@@ -76,8 +76,7 @@ const kostenFelder = {
   text: text(500, 'Position.', 1),
   lieferant: text(200, 'Lieferant.'),
   offerte: text(200, 'Verweis auf Offerte bzw. Kostenkalkulation.'),
-  // null zuerst: AJV wandelt mit coerceTypes sonst null in 0 um, bevor die Alternative null geprüft wird
-  prognose: Type.Union([Type.Null(), { ...Betrag, description: 'Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.' }]),
+  prognose: Nullable(Type.Number({ ...Betrag, description: 'Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt.' })),
 };
 export const Kosten = register('Kosten', {
   ...kostenFelder,

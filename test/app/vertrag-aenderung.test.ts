@@ -118,7 +118,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', { skip }, () 
 
     const e = await entwurf('Annahmen zum WLAN haben sich geändert');
     v1 = e.id;
-    assert.deepEqual([e.nummer, e.anlass, e.zielphase, e.stand, e.basisVersionId, e.begruendung, e.can], ['0.2', 'aenderung', 'P1', 'in_arbeit', b, 'Annahmen zum WLAN haben sich geändert', { write: true, einreichen: false }]);
+    assert.deepEqual([e.nummer, e.anlass, e.zielphase, e.stand, e.basisVersionId, e.begruendung, e.can], ['0.2', 'aenderung', 'P1', 'in_arbeit', b, 'Annahmen zum WLAN haben sich geändert', { write: true, einreichen: false, zurueckziehen: false }]);
     const k9 = (await ok('pl', 'GET', `/v1/vertragsversionen/${v1}/kapitel/9`)).json();
     assert.deepEqual(k9.inhalt, k9.basis, 'Baseline vollständig übernommen, mit den Verweisen ins Register');
     assert.ok(k9.inhalt.kosten.every((k: { registerId: string | null }) => k.registerId));

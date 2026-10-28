@@ -51,13 +51,19 @@ export function useEingangMutations() {
       (await api.POST('/v1/eingang/aufgaben/{id}/erledigen', { params: { path: { id }, header: { 'idempotency-key': newIdempotencyKey() } } })).data!,
     onSuccess: refresh,
   });
+  // «Rückgängig» im Toast nach «Erledigt» (I-R1 Stufe 1)
+  const wiederOeffnen = useMutation({
+    mutationFn: async (id: string) =>
+      (await api.POST('/v1/eingang/aufgaben/{id}/wieder-oeffnen', { params: { path: { id }, header: { 'idempotency-key': newIdempotencyKey() } } })).data!,
+    onSettled: refresh,
+  });
   const gelesen = useMutation({
     mutationFn: async (id: string) => {
       await api.POST('/v1/mitteilungen/{id}/gelesen', { params: { path: { id }, header: { 'idempotency-key': newIdempotencyKey() } } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: eingangKeys.mitteilungen }),
   });
-  return { erledigen, gelesen };
+  return { erledigen, wiederOeffnen, gelesen };
 }
 
 /**

@@ -62,6 +62,7 @@ export const TP = {
   terminGeplant: (d: string) => `Termin ${d} geplant.`,
   terminEntfernen: (d: string) => `Termin ${d} entfernen`,
   terminEntfernt: (d: string) => `Termin ${d} entfernt.`,
+  rueckgaengig: 'Rückgängig',
   terminDoppelt: 'An diesem Tag ist schon ein Termin geplant.',
   terminUngueltig: 'Gib ein Datum ein.',
   anzahlTermine: (n: number) => (n === 1 ? '1 Termin' : `${n} Termine`),

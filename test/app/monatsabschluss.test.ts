@@ -210,6 +210,20 @@ describe('Monatsabschluss', { skip }, () => {
     assert.equal(t.items[0].maxTage, 21);
     assert.equal(t.items.length, 30);
     assert.deepEqual(t.ohneBaseline.map((x: { projektNummer: string }) => x.projektNummer), ['2026-201', '2026-202']);
+    // Einzelwerte (Seitentyp Bericht): die Meilensteine hinter der Zahl; die grösste Verschiebung stammt aus ihnen
+    const ms = t.items[0].meilensteine as { phase: string; tage: number; baseline: string; aktuell: string }[];
+    assert.ok(ms.length > 0);
+    assert.equal(Math.max(...ms.map(m => m.tage)), 21);
+
+    // Export: eine Zeile je Meilenstein bzw. Lieferergebnis, Projekte in derselben Reihenfolge
+    const x = await call('GET', `/v1/perioden/${PERIODE}/terminabweichungen?format=csv`, ue);
+    assert.equal(x.statusCode, 200, x.body);
+    assert.match(x.headers['content-disposition'] as string, new RegExp(`filename="terminabweichungen-${PERIODE}\\.csv"`));
+    const zeilen = x.body.replace(/^\uFEFF/, '').trim().split('\r\n');
+    assert.equal(zeilen[0], 'Nummer;Projekt;Phase des Projekts;Phase;Art;Bezeichnung;Baseline;Aktuell;Abweichung (Tage);Erreicht');
+    assert.equal(zeilen.length - 1, t.items.reduce((n: number, i: { meilensteine: unknown[] }) => n + i.meilensteine.length, 0));
+    assert.ok(zeilen[1]!.startsWith('2026-117;'));
+    assert.equal((await call('GET', `/v1/perioden/${PERIODE}/terminabweichungen?format=csv`, pl)).statusCode, 403);
   });
 
   test('Job am Stichtag öffnet «Periode abschliessen» (ohne Phasenmodell sofort)', async () => {

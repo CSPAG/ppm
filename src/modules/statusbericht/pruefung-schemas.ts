@@ -165,8 +165,18 @@ export const Terminabweichung = Type.Object({
   abschluss: Nullable(Termin),
   /** Grösste Verschiebung über Phasen und Abschluss (Sortierung). */
   maxTage: Type.Integer(),
+  meilensteine: Type.Array(Type.Composite([Type.Object({
+    phase: Type.String(),
+    art: Type.Union([Type.Literal('meilenstein'), Type.Literal('lieferergebnis')]),
+    text: Type.String(),
+    erreicht: Type.Boolean({ description: 'Erreicht (aktuell = Datum erreicht).' }),
+  }), Termin], { additionalProperties: false }), { description: 'Einzelwerte: Meilensteine und Lieferergebnisse mit Termin der Baseline, nach Phase und Termin (Seitentyp Bericht).' }),
 }, { $id: 'Terminabweichung', additionalProperties: false });
 export type TerminabweichungOut = Static<typeof Terminabweichung>;
+
+export const TerminabweichungQuery = Type.Object({
+  format: Type.Optional(Type.Literal('csv', { description: 'Export als CSV: eine Zeile je Meilenstein bzw. Lieferergebnis.' })),
+}, { additionalProperties: false });
 
 export const TerminabweichungList = Type.Object({
   items: Type.Array(Type.Ref('Terminabweichung')),

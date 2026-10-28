@@ -100,7 +100,7 @@ function ZuTun({ filter, setSearch, gehe }: { filter: 'frist' | undefined; setSe
   const id = useId();
   const q = useAufgaben(filter);
   const skelett = useVerzoegert(q.isPending);
-  const { erledigen } = useEingangMutations();
+  const { erledigen, wiederOeffnen } = useEingangMutations();
   const toast = useToast();
   const items = q.data?.pages.flatMap(p => p.items) ?? [];
   return (
@@ -140,7 +140,11 @@ function ZuTun({ filter, setSearch, gehe }: { filter: 'frist' | undefined; setSe
                   <div className="eg-a-akt">
                     {a.can.erledigen ? (
                       <button type="button" className="btn sm" aria-label={E.zuTun.erledigtAria(a.titel)} disabled={erledigen.isPending}
-                        onClick={() => erledigen.mutate(a.id, { onSuccess: () => toast.show(E.zuTun.erledigtToast(a.titel)) })}>
+                        onClick={() => erledigen.mutate(a.id, {
+                          onSuccess: () => toast.show(E.zuTun.erledigtToast(a.titel), {
+                            action: { label: E.zuTun.rueckgaengig, run: () => wiederOeffnen.mutate(a.id, { onSuccess: () => toast.show(E.zuTun.wiederOffen(a.titel)), onError: e => toast.error(e) }) },
+                          }),
+                        })}>
                         <Icon name="check" />{E.zuTun.erledigt}
                       </button>
                     ) : null}

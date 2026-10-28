@@ -35,7 +35,9 @@ export const TP = {
   rueckmeldungVom: (datum: string) => `Rückmeldung vom ${datum}`,
   bestaetigtAm: (datum: string) => `Bestätigt am ${datum}`,
   organisationFehlt: 'Die Projektorganisation ist unvollständig. Sponsor und Projektleitung legen sie in der Projektübersicht fest.',
-  konflikt: 'Der Stand hat sich inzwischen geändert. Lade neu und prüfe erneut.',
+  konflikt: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und sende danach erneut; deine Kommentare bleiben erhalten.',
+  neuLaden: 'Neu laden',
+  konfliktUnterzeichnen: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und prüfe, was du unterzeichnest.',
 
   // Unterzeichnen (K2 Schritt 8, K2-1)
   unterzeichnenTitel: 'Projektvertrag unterzeichnen',

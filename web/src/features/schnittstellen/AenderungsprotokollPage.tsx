@@ -1,11 +1,11 @@
 /**
  * Seite «Änderungsprotokoll» in der Administration (UI-50; BC AM.03.03; UC-018 Schritt 5; AP-E7-3), Seitentyp Bericht:
  * Filter oben (Objekt, Kennung, Zeitraum, in der Adresse), darunter die Änderungen mit Person, Zeitpunkt, altem und neuem
- * Wert; neueste zuerst, «Mehr laden». Für ADM und UE (`audit:read`).
+ * Wert; neueste zuerst, «Mehr laden»; Export aller Einträge zum Filter als CSV. Für ADM und UE (`audit:read`).
  */
 import { useId, useState } from 'react';
-import { Empty, ErrorState, fmtZeitpunkt, Icon, Skelett, T, useVerzoegert } from '../../ui/index.ts';
-import { useProtokoll, useProtokollObjekte, type ProtokollEintrag } from './api.ts';
+import { Empty, ErrorState, fmtZeitpunkt, Icon, Skelett, T, useToast, useVerzoegert } from '../../ui/index.ts';
+import { protokollExportieren, useProtokoll, useProtokollObjekte, type ProtokollEintrag } from './api.ts';
 import type { ProtokollSearch, SetProtokollSearch } from './search.ts';
 import { TX } from './texte.ts';
 import './schnittstellen.css';
@@ -54,6 +54,15 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
   const gefiltert = !!(search.objekt || search.objektId || search.von || search.bis);
   const zuruecksetzen = () => { setKennung(''); setSearch({ objekt: undefined, objektId: undefined, von: undefined, bis: undefined }); };
   const kennungUebernehmen = () => { if (!kennungFalsch) setSearch({ objektId: kennung.trim().toLowerCase() || undefined }, { replace: true }); };
+  const toast = useToast();
+  const [exportLaeuft, setExportLaeuft] = useState(false);
+  // Export aller Einträge zum Filter (Seitentyp Bericht), nicht nur der geladenen Seiten; die Kennung so, wie sie im Feld
+  // steht (beim Klick ist sie noch nicht übernommen), bei ungültiger Kennung gesperrt
+  const exportieren = () => {
+    if (kennungFalsch) return;
+    setExportLaeuft(true);
+    protokollExportieren({ ...search, objektId: kennung.trim().toLowerCase() || undefined }).then(name => toast.show(TX.p.exportiert(name)), e => toast.error(e)).finally(() => setExportLaeuft(false));
+  };
 
   return (
     <section aria-labelledby="page-title">
@@ -66,6 +75,13 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
               <div className="sub">{TX.p.sub}</div>
             </div>
           </div>
+          {items.length ? (
+            <div className="acts">
+              <button type="button" className="btn" onClick={exportieren} disabled={exportLaeuft || zeitraumFalsch || kennungFalsch} aria-busy={exportLaeuft || undefined}>
+                <Icon name="download" />{TX.p.exportieren}
+              </button>
+            </div>
+          ) : null}
         </div>
       </header>
       <div className="body">

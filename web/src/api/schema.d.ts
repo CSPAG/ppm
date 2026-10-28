@@ -36,7 +36,7 @@ export interface paths {
                                 /** @description ID der Person in Keycloak (wie `Member.id`) */
                                 subject: string;
                                 name: string;
-                                email: string | null;
+                                email: null | string;
                                 emailVerified: boolean;
                             };
                             /** @description Realm-Rolle der Plattform-Administration (Organisationen über alle Mandanten verwalten; keine Rechte in einer Organisation) */
@@ -369,8 +369,8 @@ export interface paths {
                                 id: string;
                                 kind: "user" | "client";
                                 name: string;
-                                email: string | null;
-                                clientId: string | null;
+                                email: null | string;
+                                clientId: null | string;
                             };
                             /** @description Rollen an der Organisation (Tupel eines meiner Subjekte) */
                             roles: string[];
@@ -379,7 +379,7 @@ export interface paths {
                             /** @description Rechte, die an mindestens einem Ort gelten (Obermenge von permissions) */
                             somewhere: string[];
                             clearance: 0 | 1 | 2;
-                            breakGlassUntil: string | null;
+                            breakGlassUntil: null | string;
                             tokenBinding: string;
                         };
                     };
@@ -514,7 +514,7 @@ export interface paths {
                                 /** @enum {string} */
                                 key: "org" | "portfolio" | "projekt";
                                 label: string;
-                                parent: ("org" | "portfolio" | "projekt") | null;
+                                parent: null | ("org" | "portfolio" | "projekt");
                                 /** @enum {boolean} */
                                 self?: true;
                                 /** @description Rollen, die hier hängen dürfen (org: alle) */
@@ -546,7 +546,7 @@ export interface paths {
                                 title: string;
                                 /** @enum {string} */
                                 permission: "tenant:read" | "handlungsfeld:read" | "handlungsfeld:write" | "handlungsfeld:delete" | "ziel:read" | "ziel:write" | "ziel:freigabe" | "zielerreichung:write" | "quartalsbericht:write" | "stammdaten:read" | "stammdaten:write" | "phasenmodell:read" | "phasenmodell:write" | "phasenmodell:activate" | "portfolio:read" | "portfolio:admin" | "projekt:read" | "projekt:write" | "projekt:create" | "projekt:organisation" | "projekt:vertraulich" | "finanzen:read" | "finanzen:write" | "statusbericht:write" | "statusbericht:review" | "periode:close" | "kpi:write" | "vertrag:write" | "vertrag:review" | "vertrag:sign" | "vertrag:decide" | "sitzung:read" | "sitzung:write" | "idee:create" | "idee:read" | "idee:write" | "idee:decide" | "priorisierung:read" | "priorisierung:write" | "ressource:read" | "ressource:write" | "auswertung:read" | "auswertung:write" | "vorlage:write" | "schnittstelle:admin" | "webhook:admin" | "members:admin" | "access:admin" | "audit:read" | "roles:admin";
-                                scope: string | null;
+                                scope: null | string;
                                 /** @description Werkzeug liest nur (`readOnlyHint`) */
                                 readOnly: boolean;
                                 /** @description Werkzeug greift auf fremde Systeme oder das Netz zu (`openWorldHint`) */
@@ -643,9 +643,9 @@ export interface paths {
                         "application/json": {
                             resource: {
                                 type: string;
-                                id: string | null;
+                                id: null | string;
                             };
-                            classification: (0 | 1 | 2) | null;
+                            classification: null | (0 | 1 | 2);
                             /** @description Direkt zuerst, dann geerbt von unten nach oben, dann Zuständigkeit */
                             items: components["schemas"]["AccessEntry"][];
                             /** @description Relationen, die ich hier vergeben darf; leer ohne access:admin */
@@ -729,8 +729,8 @@ export interface paths {
                         subject: string;
                         relation: string;
                         type: string;
-                        id?: string | null;
-                        expiresAt?: string | null;
+                        id?: null | string;
+                        expiresAt?: null | string;
                     };
                 };
             };
@@ -858,9 +858,9 @@ export interface paths {
                                 relation: string;
                                 place: {
                                     type: string;
-                                    id: string | null;
+                                    id: null | string;
                                 };
-                                tupleId: string | null;
+                                tupleId: null | string;
                                 /** @description Welches Subjekt passt, z. B. `group:<entra-object-id>` oder `org:members` */
                                 matched: string;
                                 /** @description Anzeigename von `matched` */
@@ -868,7 +868,7 @@ export interface paths {
                                 unit?: {
                                     ref: {
                                         type: string;
-                                        id: string | null;
+                                        id: null | string;
                                     };
                                     /** @description Name der Kante (Zuständigkeit) */
                                     relation: string;
@@ -888,7 +888,7 @@ export interface paths {
                             } | {
                                 /** @enum {string} */
                                 reason: "scope";
-                                scope: string | null;
+                                scope: null | string;
                             } | null;
                         };
                     };
@@ -1182,7 +1182,7 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        expiresAt: string | null;
+                        expiresAt: null | string;
                     };
                 };
             };
@@ -1300,7 +1300,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             enabled: boolean;
-                            reason: string | null;
+                            reason: null | string;
                             organization: string;
                             platformAdmin: boolean;
                             canManageMembers: boolean;
@@ -3012,7 +3012,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         name?: string;
-                        description?: string | null;
+                        description?: null | string;
                         domains?: string[];
                     };
                 };
@@ -3575,10 +3575,10 @@ export interface paths {
                                 /** @description Adresse, unter der das Konto angelegt würde (`mail` in einer gebundenen Domäne, sonst UPN) */
                                 email: string;
                                 userPrincipalName: string;
-                                department: string | null;
-                                jobTitle: string | null;
+                                department: null | string;
+                                jobTitle: null | string;
                                 selectable: boolean;
-                                reason: string | null;
+                                reason: null | string;
                             }[];
                             /** @description Es gäbe weitere Treffer: Suche verfeinern */
                             more: boolean;
@@ -3812,10 +3812,10 @@ export interface paths {
                                 /** @description Adresse, unter der das Konto angelegt würde (`mail` in einer gebundenen Domäne, sonst UPN) */
                                 email: string;
                                 userPrincipalName: string;
-                                department: string | null;
-                                jobTitle: string | null;
+                                department: null | string;
+                                jobTitle: null | string;
                                 selectable: boolean;
-                                reason: string | null;
+                                reason: null | string;
                             }[];
                             /** @description Es gäbe weitere Treffer: Suche verfeinern */
                             more: boolean;
@@ -4056,15 +4056,15 @@ export interface paths {
                         "application/json": {
                             /** @description App der Plattform eingerichtet (ENTRA_CLIENT_ID); ohne sie geht nur die eigene App (`methods`) */
                             enabled: boolean;
-                            reason: string | null;
+                            reason: null | string;
                             methods: {
                                 /** @description Verbinden über die App der Plattform (Zustimmung bei Microsoft) */
                                 platformApp: boolean;
                                 /** @description Verbinden mit einer eigenen App der Organisation (`PUT …/app`) */
                                 ownApp: boolean;
                             };
-                            ownAppReason: string | null;
-                            ownApp: {
+                            ownAppReason: null | string;
+                            ownApp: null | {
                                 /** @description In der App einzutragende Umleitungs-URI, Plattform «Web» (Broker-Endpunkt des Anbieters in Keycloak); fest je Organisation */
                                 redirectUri: string;
                                 permissions: {
@@ -4080,12 +4080,12 @@ export interface paths {
                                     /** @description true: nicht nötig (zurzeit sind alle nötig) */
                                     optional: boolean;
                                 }[];
-                            } | null;
+                            };
                             /** @description Pfad der Oberfläche, auf den Microsoft nach der Admin-Zustimmung zurückleitet (ENTRA_UI_PATH + `/zustimmung`; Redirect-URI der Entra-App) */
                             consentPath: string;
                             /** @description Pfad der Oberfläche nach der Testanmeldung (ENTRA_UI_PATH + `/test`) */
                             testPath: string;
-                            connection: components["schemas"]["EntraConnection"] | null;
+                            connection: null | components["schemas"]["EntraConnection"];
                         };
                     };
                 };
@@ -4387,7 +4387,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -4495,7 +4495,7 @@ export interface paths {
                         clientId: string;
                         /** @description Wert des geheimen Clientschlüssels (verschlüsselt gespeichert, nie ausgegeben) */
                         clientSecret: string;
-                        secretExpiresAt?: string | null;
+                        secretExpiresAt?: null | string;
                     };
                 };
             };
@@ -4514,7 +4514,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -4628,7 +4628,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -4733,7 +4733,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -4856,7 +4856,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -4973,7 +4973,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -5081,15 +5081,15 @@ export interface paths {
                         "application/json": {
                             /** @description App der Plattform eingerichtet (ENTRA_CLIENT_ID); ohne sie geht nur die eigene App (`methods`) */
                             enabled: boolean;
-                            reason: string | null;
+                            reason: null | string;
                             methods: {
                                 /** @description Verbinden über die App der Plattform (Zustimmung bei Microsoft) */
                                 platformApp: boolean;
                                 /** @description Verbinden mit einer eigenen App der Organisation (`PUT …/app`) */
                                 ownApp: boolean;
                             };
-                            ownAppReason: string | null;
-                            ownApp: {
+                            ownAppReason: null | string;
+                            ownApp: null | {
                                 /** @description In der App einzutragende Umleitungs-URI, Plattform «Web» (Broker-Endpunkt des Anbieters in Keycloak); fest je Organisation */
                                 redirectUri: string;
                                 permissions: {
@@ -5105,12 +5105,12 @@ export interface paths {
                                     /** @description true: nicht nötig (zurzeit sind alle nötig) */
                                     optional: boolean;
                                 }[];
-                            } | null;
+                            };
                             /** @description Pfad der Oberfläche, auf den Microsoft nach der Admin-Zustimmung zurückleitet (ENTRA_UI_PATH + `/zustimmung`; Redirect-URI der Entra-App) */
                             consentPath: string;
                             /** @description Pfad der Oberfläche nach der Testanmeldung (ENTRA_UI_PATH + `/test`) */
                             testPath: string;
-                            connection: components["schemas"]["EntraConnection"] | null;
+                            connection: null | components["schemas"]["EntraConnection"];
                         };
                     };
                 };
@@ -5454,7 +5454,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -5573,7 +5573,7 @@ export interface paths {
                         clientId: string;
                         /** @description Wert des geheimen Clientschlüssels (verschlüsselt gespeichert, nie ausgegeben) */
                         clientSecret: string;
-                        secretExpiresAt?: string | null;
+                        secretExpiresAt?: null | string;
                     };
                 };
             };
@@ -5592,7 +5592,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -5717,7 +5717,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -5842,7 +5842,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -5976,7 +5976,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -6104,7 +6104,7 @@ export interface paths {
                                 name: string;
                                 /** @description Mit der Person in Entra ID verknüpft (über die Objekt-ID) */
                                 linked: boolean;
-                                reason: string | null;
+                                reason: null | string;
                                 /** @description Warum Passwort und Passkey bei «Nur Entra» bleiben (Konto der Plattform-Administration) */
                                 passwordKept?: string;
                             }[];
@@ -6901,7 +6901,7 @@ export interface paths {
                             expiresAt: string;
                             /** @description Hinweis für die Seite: Was die Zustimmung bewirkt (verifizierte Domänen gehen an die Organisation) */
                             notice: string;
-                            ownApp: {
+                            ownApp: null | {
                                 /** @description In der App einzutragende Umleitungs-URI, Plattform «Web» (Broker-Endpunkt des Anbieters in Keycloak); fest je Organisation */
                                 redirectUri: string;
                                 permissions: {
@@ -6917,7 +6917,7 @@ export interface paths {
                                     /** @description true: nicht nötig (zurzeit sind alle nötig) */
                                     optional: boolean;
                                 }[];
-                            } | null;
+                            };
                         };
                     };
                 };
@@ -7249,7 +7249,7 @@ export interface paths {
                         clientId: string;
                         /** @description Wert des geheimen Clientschlüssels (verschlüsselt gespeichert, nie ausgegeben) */
                         clientSecret: string;
-                        secretExpiresAt?: string | null;
+                        secretExpiresAt?: null | string;
                     };
                 };
             };
@@ -8406,7 +8406,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             items: components["schemas"]["Person"][];
-                            nextCursor: string | null;
+                            nextCursor: null | string;
                         };
                     };
                 };
@@ -9605,6 +9605,122 @@ export interface paths {
         /**
          * Aufgabe von Hand erledigen
          * @description Nur Aufgaben ohne fachlichen Übergang (`can.erledigen`); alle anderen schliesst die Handlung selbst (z. B. Einreichen). Sonst 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Aufgabe"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/eingang/aufgaben/{id}/wieder-oeffnen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Von Hand erledigte Aufgabe wieder öffnen
+         * @description «Rückgängig» nach «Erledigt» (I-R1): nur eine manuelle Aufgabe, die die Person selbst erledigt hat und die keine fachliche Handlung inzwischen beendet hat (z. B. Sitzung geschlossen), sonst 404. Ist dieselbe Aufgabe wieder offen, 409.
          */
         post: {
             parameters: {
@@ -24071,7 +24187,7 @@ export interface paths {
         };
         /**
          * Quartalsreporting eines Quartals
-         * @description Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist.
+         * @description Bericht mit Inhalt bei Erzeugung, Kommentaren, Rückmeldungen und Aufträgen des VR; 404, solange er nicht erzeugt ist. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404.
          */
         get: {
             parameters: {
@@ -25621,6 +25737,102 @@ export interface paths {
                 };
                 /** @description Nicht gefunden oder nicht sichtbar */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/traktanden/naechste": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Nächstes Traktandum je Projekt
+         * @description Kopfkarte «Meine Projekte» im Eingang (informationsarchitektur.md «Startseite je Rolle»: «Gate P1–P2 im PRAT Mi 10.12.», «Du stellst am … vor» nur mit Einladung): je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute, soweit die Person sie sieht.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Projekte (mehrfach, höchstens 20). */
+                    projektId: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NaechsteTraktanden"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -29665,11 +29877,14 @@ export interface paths {
         };
         /**
          * Terminabweichungen über alle Projekte
-         * @description Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert. Stand der Register heute.
+         * @description Terminabweichungen (UC-005 Schritt 4, PS.01.04): je berichtspflichtigem Projekt Baseline und aufdatierte Termine je Phase (letzter Meilenstein bzw. letztes Lieferergebnis der Phase, erreicht oder geplant) und des Abschlusses, nach grösster Verschiebung sortiert, mit den Einzelwerten (`meilensteine`). Stand der Register heute. Mit `format=csv` als Export (eine Zeile je Meilenstein bzw. Lieferergebnis).
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Export als CSV: eine Zeile je Meilenstein bzw. Lieferergebnis. */
+                    format?: "csv";
+                };
                 header?: never;
                 path: {
                     /**
@@ -30477,7 +30692,7 @@ export interface paths {
         };
         /**
          * Dashboard der Periode
-         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         * @description Portfolio-Dashboard (UC-014 Schritt 1, PC.04.01): je Projekt der sichtbaren Portfolios Status, Status der Vorperiode, Trend, Phase mit «Abschluss per», nächster Meilenstein und Projektleitung; Meldung «gemeldet», «ausstehend» bzw. nach dem Abschluss «nicht gemeldet» (A-11); Badge «Eskalation». Dazu der Funnel nach Phase. Ohne `periode` die letzte abgeschlossene Periode (ab dem 1. für die Gremien, UC-005), sonst die laufende. Mit `format=csv` als Export der Projekte (optional nach `phase` und `auswahl`, wie die Liste der Oberfläche). Recht `auswertung:read` an der Organisation oder am Portfolio.
          */
         get: {
             parameters: {
@@ -30488,6 +30703,12 @@ export interface paths {
                     periode?: string;
                     /** @description Darstellung der Oberfläche; die Antwort enthält Liste und Funnel. */
                     ansicht?: "liste" | "funnel";
+                    /** @description Nur für den Export: Projekte dieser Phase. */
+                    phase?: "P0" | "P1" | "P2" | "P3" | "P4";
+                    /** @description Nur für den Export: Projekte hinter einer Zahl (wie die Oberfläche, `dashboard.ts`). */
+                    auswahl?: "im_plan" | "kritisch" | "ohne_status" | "offen" | "nicht_gemeldet" | "ausstehend" | "eskalation";
+                    /** @description Export der Projekte als CSV (mit `phase` und `auswahl`). */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;
@@ -30577,13 +30798,21 @@ export interface paths {
         };
         /**
          * Risikolage des Portfolios
-         * @description Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Recht `auswertung:read` an der Organisation oder am Portfolio.
+         * @description Risikolage (UC-014 Schritt 2, PC.02.02): Projektrisiken der aktiven Projekte und Portfoliorisiken mit Wahrscheinlichkeit, Auswirkung und Massnahme, Verteilung über die 3 × 3-Matrix, Abhängigkeiten zwischen den Projekten und offene Eskalationen. Mit `format=csv` als Export der Risiken (optional nach Feld der Matrix `w`, `a` und `massnahme=offen`). Recht `auswertung:read` an der Organisation oder am Portfolio.
          */
         get: {
             parameters: {
                 query?: {
                     /** @description Schlüssel des Portfolios (I-N5), z. B. `transformation`. */
                     portfolio?: string;
+                    /** @description Nur für den Export: Wahrscheinlichkeit (Feld der Matrix). */
+                    w?: "hoch" | "mittel" | "tief";
+                    /** @description Nur für den Export: Auswirkung (Feld der Matrix). */
+                    a?: "hoch" | "mittel" | "tief";
+                    /** @description Nur für den Export: Risiken mit offener Massnahme. */
+                    massnahme?: "offen";
+                    /** @description Export der Risiken als CSV (mit `w`, `a`, `massnahme` wie die Tabelle der Oberfläche). */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;
@@ -32976,6 +33205,135 @@ export interface paths {
                 cookie?: never;
             };
             requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragVersionDetail"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vertragsversionen/{id}/zurueckziehen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Projekt zurückziehen
+         * @description Der Sponsor (`vertrag:decide`) zieht das Vorhaben mit Begründung zurück (DM.02.04, UC-002 A4): erster Vertrag als Entwurf (in Arbeit bis traktandiert) eines aktiven Projekts. Vertrag und Projekt sind danach «zurückgezogen», offene Aufgaben zum Vertrag entfallen, ein Gate-Traktandum wird zurückgenommen (versendet: 409 `traktandiert`), der Ressourcenbedarf zählt nicht mehr (A-63), die Unternehmensentwicklung wird informiert. Begründung fehlt: 422. `If-Match` Pflicht.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VertragZurueckziehen"];
+                };
+            };
             responses: {
                 /** @description Default Response */
                 200: {
@@ -42710,7 +43068,7 @@ export interface paths {
         };
         /**
          * Jahresrückblick
-         * @description Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`. ETag = Fassung (W/"0", solange nichts gespeichert ist).
+         * @description Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404. ETag = Fassung (W/"0", solange nichts gespeichert ist).
          */
         get: {
             parameters: {
@@ -44163,7 +44521,7 @@ export interface paths {
         };
         /**
          * Änderungsprotokoll
-         * @description Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5).
+         * @description Änderungen aus dem Audit mit Person, Zeitpunkt, altem und neuem Wert; neueste zuerst, filterbar nach Objekt (Typ, Kennung) und Zeitraum (Kalendertage, Europe/Zurich; UC-018 Schritt 5). Mit `format=csv` als Export aller Einträge zum Filter (eine Zeile je geändertes Feld, höchstens 10 000 Einträge, sonst 422).
          */
         get: {
             parameters: {
@@ -44177,6 +44535,8 @@ export interface paths {
                     cursor?: string;
                     /** @description Seitengrösse (höchstens 200). */
                     limit?: number;
+                    /** @description Export als CSV: alle Einträge zum Filter, eine Zeile je geändertes Feld. */
+                    format?: "csv";
                 };
                 header?: never;
                 path?: never;
@@ -45367,27 +45727,27 @@ export interface components {
         };
         /** AccessEntry */
         AccessEntry: {
-            id: string | null;
+            id: null | string;
             subject: {
                 /** @description `user:<id>`, `client:<id>`, `group:<entra-object-id>` oder `org:members` */
                 ref: string;
                 kind: "user" | "client" | "group" | "members";
                 /** @description Name der Person bzw. des Clients, Anzeigename der Gruppe (sonst Objekt-ID), «Alle Mitglieder» */
                 name: string;
-                scopes?: string[] | null;
+                scopes?: null | string[];
             };
             /** @description Rolle, `member` oder `owner`; bei `data` der Name der Fachbeziehung */
             relation: string;
             place: {
                 type: string;
-                id: string | null;
+                id: null | string;
             };
             /** @description `data`: zuständig als Person über Fachdaten der App (nicht entfernbar) */
             via: "direct" | "inherited" | "scope" | "data";
             unit?: {
                 ref: {
                     type: string;
-                    id: string | null;
+                    id: null | string;
                 };
                 /** @description Name der Kante (Zuständigkeit) */
                 relation: string;
@@ -45398,9 +45758,9 @@ export interface components {
                 relation: string;
                 grants: "read" | "edit";
             };
-            expiresAt: string | null;
-            createdAt: string | null;
-            createdBy: string | null;
+            expiresAt: null | string;
+            createdAt: null | string;
+            createdBy: null | string;
             /** @description Ich darf entfernen und den Ablauf ändern (nur `direct`) */
             removable: boolean;
         };
@@ -45416,7 +45776,7 @@ export interface components {
             principalId: string;
             username: string;
             name: string;
-            email: string | null;
+            email: null | string;
             /**
              * @description `invited`: Passwort noch nicht gesetzt, noch nie angemeldet (aus Entra ID: noch nie zugegriffen); `disabled`: Konto in Keycloak gesperrt
              * @enum {string}
@@ -45425,15 +45785,15 @@ export interface components {
             /** @description Rollen an der Organisation (Tupel) */
             roles: string[];
             clearance: 0 | 1 | 2;
-            breakGlassUntil: string | null;
+            breakGlassUntil: null | string;
             /** @description Freigaben an anderen Orten als der Organisation («+3 Orte») */
             places: number;
-            lastSeenAt: string | null;
-            createdAt: string | null;
-            loginPath: string | null;
-            clientId: string | null;
-            scopes: string[] | null;
-            description: string | null;
+            lastSeenAt: null | string;
+            createdAt: null | string;
+            loginPath: null | string;
+            clientId: null | string;
+            scopes: null | string[];
+            description: null | string;
         };
         /** Organization */
         Organization: {
@@ -45441,17 +45801,17 @@ export interface components {
             id: string;
             alias: string;
             name: string;
-            description: string | null;
+            description: null | string;
             /** @description In Keycloak aktiv */
             enabled: boolean;
             domains: string[];
-            tenant: {
+            tenant: null | {
                 id: string;
                 /** @description `active` oder `suspended` */
                 status: string;
                 /** Format: date-time */
                 createdAt: string;
-            } | null;
+            };
         };
         /** EntraConnection */
         EntraConnection: {
@@ -45462,8 +45822,8 @@ export interface components {
              * @enum {string}
              */
             method: "platform" | "own";
-            clientId: string | null;
-            secretExpiresAt: string | null;
+            clientId: null | string;
+            secretExpiresAt: null | string;
             /** @description Geheimnis läuft in höchstens 30 Tagen ab oder ist abgelaufen: in der App ein neues anlegen und eintragen */
             secretExpiresSoon: boolean;
             /** @description Redirect-URI des Anbieters (bei eigener App in der App eingetragen) */
@@ -45479,10 +45839,10 @@ export interface components {
              * @enum {string}
              */
             stage: "pending" | "enforced";
-            testedAt: string | null;
-            testedBy: string | null;
-            enforcedAt: string | null;
-            enforcedBy: string | null;
+            testedAt: null | string;
+            testedBy: null | string;
+            enforcedAt: null | string;
+            enforcedBy: null | string;
             /** @description Testanmeldung über Microsoft (Navigation im Browser, auch als Link für andere Personen der Domänen); führt auf `testPath` zurück */
             testLoginPath: string;
             /**
@@ -45490,7 +45850,7 @@ export interface components {
              * @enum {string}
              */
             status: "active" | "error";
-            lastError: string | null;
+            lastError: null | string;
             /** Format: date-time */
             connectedAt: string;
             connectedBy: string;
@@ -45515,12 +45875,12 @@ export interface components {
             expiresAt: string;
             /** @description `in-progress`: Rückkehr von Microsoft wird gerade eingelöst (Frist 5 Minuten). `revoked` mit `error.reason` `creator-lost-access` (erzeugende Person darf nicht mehr) bzw. `disconnected` (Verbindung getrennt), von Hand widerrufen ohne `error`; `failed` mit dem Fehler des letzten Versuchs */
             status: "open" | "in-progress" | "expired" | "revoked" | "connected" | "failed";
-            usedAt: string | null;
-            approverName: string | null;
-            error: {
+            usedAt: null | string;
+            approverName: null | string;
+            error: null | {
                 reason: string;
                 detail: string;
-            } | null;
+            };
         };
         /**
          * Client
@@ -45539,9 +45899,9 @@ export interface components {
             places: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
-            lastUsedAt: string | null;
-            lastScopes: string[] | null;
+            createdBy: null | string;
+            lastUsedAt: null | string;
+            lastScopes: null | string[];
         };
         /**
          * Person
@@ -45556,9 +45916,9 @@ export interface components {
              */
             kind: "user" | "client";
             name: string;
-            email: string | null;
-            clientId: string | null;
-            lastSeenAt: string | null;
+            email: null | string;
+            clientId: null | string;
+            lastSeenAt: null | string;
         };
         /** CustomRole */
         CustomRole: {
@@ -45583,18 +45943,18 @@ export interface components {
             /** @description Art der Aufgabe `<modul>.<verb>` (Fachmodell 4.2), z. B. `statusbericht.erstellen`. */
             art: string;
             titel: string;
-            kontext: string | null;
+            kontext: null | string;
             /** @description Adresse in der Oberfläche, die direkt zur Aktion führt (I-B1). */
             link: string;
-            frist: string | null;
-            fristArt: ("kalendertage" | "arbeitstage") | null;
+            frist: null | string;
+            fristArt: null | ("kalendertage" | "arbeitstage");
             bezug: {
                 typ: string;
                 id: string;
             };
             /** @description `person`: an dich persönlich (oder die vertretene Person); `recht`: an alle mit dem Recht am Ort. */
             empfaenger: "person" | "recht";
-            vertretung: {
+            vertretung: null | {
                 person: {
                     /** Format: uuid */
                     id: string;
@@ -45606,7 +45966,7 @@ export interface components {
                  * @example 2026-10-25
                  */
                 bis: string;
-            } | null;
+            };
             /** Format: date-time */
             createdAt: string;
             can: {
@@ -45616,30 +45976,30 @@ export interface components {
         };
         AufgabeList: {
             items: components["schemas"]["Aufgabe"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         AufgabeAnzahl: {
             /** @description Offene Aufgaben der Person (Zähler an «Eingang», I-N3). */
             offen: number;
             ueberfaellig: number;
-            naechsteFrist: string | null;
+            naechsteFrist: null | string;
         };
         Mitteilung: {
             /** Format: uuid */
             id: string;
             text: string;
-            link: string | null;
+            link: null | string;
             bezug: {
                 typ: string;
                 id: string;
             };
-            gelesenAt: string | null;
+            gelesenAt: null | string;
             /** Format: date-time */
             createdAt: string;
         };
         MitteilungList: {
             items: components["schemas"]["Mitteilung"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             ungelesen: number;
         };
         Stellvertretung: {
@@ -45737,11 +46097,11 @@ export interface components {
                 id: string;
                 art: string;
                 titel: string;
-                kontext: string | null;
+                kontext: null | string;
                 /** @description Adresse der Aufgabe in der Oberfläche. */
                 link: string;
-                frist: string | null;
-                fristArt: ("kalendertage" | "arbeitstage") | null;
+                frist: null | string;
+                fristArt: null | ("kalendertage" | "arbeitstage");
             }[];
             can: {
                 /** @description Nicht für sich selbst. */
@@ -45765,11 +46125,11 @@ export interface components {
             };
             /** Format: date-time */
             entzogenAt: string;
-            entzogenVon: {
+            entzogenVon: null | {
                 /** Format: uuid */
                 id: string;
                 name: string;
-            } | null;
+            };
             rollen: number;
             /** @description Rollen, die am Ort noch niemand wieder hat. */
             offeneRollen: number;
@@ -45778,7 +46138,7 @@ export interface components {
         };
         NeubesetzungList: {
             items: components["schemas"]["Neubesetzung"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         NeubesetzungDetail: {
             neubesetzung: components["schemas"]["Neubesetzung"];
@@ -45803,17 +46163,17 @@ export interface components {
                 id: string;
                 art: string;
                 titel: string;
-                kontext: string | null;
+                kontext: null | string;
                 /** @description Adresse der Aufgabe in der Oberfläche. */
                 link: string;
-                frist: string | null;
-                fristArt: ("kalendertage" | "arbeitstage") | null;
+                frist: null | string;
+                fristArt: null | ("kalendertage" | "arbeitstage");
             }[];
         };
         OrgEinheit: {
             /** Format: uuid */
             id: string;
-            parentId: string | null;
+            parentId: null | string;
             kuerzel: string;
             name: string;
             /** @description Art der Einheit. */
@@ -45822,10 +46182,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf; löschen nur ohne untergeordnete Einheiten. */
             can: {
                 write: boolean;
@@ -45834,7 +46194,7 @@ export interface components {
         };
         OrgEinheitList: {
             items: components["schemas"]["OrgEinheit"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
@@ -45853,7 +46213,7 @@ export interface components {
             name: string;
             /** @description Art der Einheit. */
             art?: "direktion" | "bereich";
-            parentId?: string | null;
+            parentId?: null | string;
             aktiv?: boolean;
         };
         OrgEinheitPatch: {
@@ -45869,7 +46229,7 @@ export interface components {
             name?: string;
             /** @description Art der Einheit. */
             art?: "direktion" | "bereich";
-            parentId?: string | null;
+            parentId?: null | string;
             aktiv?: boolean;
         };
         Codetabelle: {
@@ -45903,10 +46263,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
@@ -45914,7 +46274,7 @@ export interface components {
         };
         CodewertList: {
             items: components["schemas"]["Codewert"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
@@ -45952,10 +46312,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
@@ -45964,7 +46324,7 @@ export interface components {
         };
         FeiertagList: {
             items: components["schemas"]["Feiertag"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
@@ -46006,10 +46366,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
@@ -46018,7 +46378,7 @@ export interface components {
         };
         HandlungsfeldList: {
             items: components["schemas"]["Handlungsfeld"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         HandlungsfeldVersion: {
             version: number;
@@ -46029,7 +46389,7 @@ export interface components {
             position: number;
             /** Format: date-time */
             changedAt: string;
-            changedBy: string | null;
+            changedBy: null | string;
         };
         HandlungsfeldHistory: {
             items: components["schemas"]["HandlungsfeldVersion"][];
@@ -46069,16 +46429,16 @@ export interface components {
             stand: "entwurf" | "in_kraft" | "abgeloest";
             /** @description Was sich mit dieser Version ändert. */
             beschreibung: string;
-            inKraftAb: string | null;
-            inKraftVon: string | null;
+            inKraftAb: null | string;
+            inKraftVon: null | string;
             /** @description Bearbeitungsstand (ETag). */
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             phasen: {
                 /** @description Code der Phase (fest). */
                 code: "PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4";
@@ -46103,7 +46463,7 @@ export interface components {
                 name: string;
                 /** @description Code der Phase (fest). */
                 vonPhase: "PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4";
-                nachPhase: ("PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4") | null;
+                nachPhase: null | ("PRE_P0" | "P0" | "P1" | "P2" | "P3" | "P4");
                 position: number;
                 leitfragen: {
                     /** @description Schlüssel des Werts in der Codetabelle «Werteströme». */
@@ -46143,7 +46503,7 @@ export interface components {
                 text: string;
                 ort: {
                     art: "phase" | "gate" | "frist" | "toleranz" | "wirkung";
-                    code: string | null;
+                    code: null | string;
                 };
             }[];
             /** @description Was die anfragende Person damit darf (Recht und Stand). */
@@ -46163,20 +46523,20 @@ export interface components {
             stand: "entwurf" | "in_kraft" | "abgeloest";
             /** @description Was sich mit dieser Version ändert. */
             beschreibung: string;
-            inKraftAb: string | null;
-            inKraftVon: string | null;
+            inKraftAb: null | string;
+            inKraftVon: null | string;
             /** @description Bearbeitungsstand (ETag). */
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
         };
         PhasenmodellList: {
             items: components["schemas"]["PhasenmodellKurz"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             can: {
                 /** @description Entwurf anlegen. */
                 create: boolean;
@@ -46252,14 +46612,14 @@ export interface components {
             name: string;
             /** @description Vertrag, Quality-Check, Gates und Monatsbericht sind Pflicht (A und B, A-07); bei C freiwillig (A-08). */
             pflichten: boolean;
-            orgEinheitId: string | null;
+            orgEinheitId: null | string;
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 admin: boolean;
@@ -46267,7 +46627,7 @@ export interface components {
         };
         PortfolioList: {
             items: components["schemas"]["Portfolio"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         PortfolioCreate: {
             /** @description A Transformationsprogramm, B Geschäftsleitung, C Direktion. */
@@ -46276,12 +46636,12 @@ export interface components {
             schluessel: string;
             /** @description Bezeichnung. */
             name: string;
-            orgEinheitId?: string | null;
+            orgEinheitId?: null | string;
         };
         PortfolioPatch: {
             /** @description Bezeichnung. */
             name?: string;
-            orgEinheitId?: string | null;
+            orgEinheitId?: null | string;
         };
         Gremium: {
             /** Format: uuid */
@@ -46297,10 +46657,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 admin: boolean;
@@ -46308,7 +46668,7 @@ export interface components {
         };
         GremiumList: {
             items: components["schemas"]["Gremium"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         GremiumCreate: {
             /** Format: uuid */
@@ -46339,14 +46699,14 @@ export interface components {
                 /** @description `entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02). */
                 art: "entscheidend" | "extern";
             };
-            zusaetzlich: {
+            zusaetzlich: null | {
                 /** Format: uuid */
                 id: string;
                 kuerzel: string;
                 name: string;
                 /** @description `entscheidend`: entscheidet am Gate, Mitglieder mit der Rolle «Gremium» am Portfolio (genau eines je Portfolio, A-45). `extern`: ohne Benutzer, die UE erfasst Vorlage und Entscheid (SNS-VR, A-02). */
                 art: "entscheidend" | "extern";
-            } | null;
+            };
             /** @description Geschäfte an diesem Gate laufen zusätzlich über das externe Gremium (SNS-VR, UC-006 A1). */
             viaSns: boolean;
         };
@@ -46368,7 +46728,7 @@ export interface components {
                 gate: "EINTRITT_P0" | "P0_P1" | "P1_P2" | "P2_P3" | "P3_P4" | "EXIT_P4";
                 /** Format: uuid */
                 gremiumId: string;
-                zusaetzlichGremiumId?: string | null;
+                zusaetzlichGremiumId?: null | string;
             }[];
         };
         Sitzungstermin: {
@@ -46383,7 +46743,7 @@ export interface components {
             datum: string;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
         };
         SitzungsterminList: {
             items: components["schemas"]["Sitzungstermin"][];
@@ -46410,7 +46770,7 @@ export interface components {
             name: string;
             /** Format: uuid */
             portfolioId: string;
-            portfolio: {
+            portfolio: null | {
                 schluessel: string;
                 name: string;
                 /**
@@ -46418,16 +46778,16 @@ export interface components {
                  * @enum {string}
                  */
                 kategorie: "A" | "B" | "C";
-            } | null;
-            orgEinheitId: string | null;
-            handlungsfeldId: string | null;
-            handlungsfeld: string | null;
+            };
+            orgEinheitId: null | string;
+            handlungsfeldId: null | string;
+            handlungsfeld: null | string;
             /**
              * @description Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss).
              * @enum {string}
              */
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
-            phasenmodellId: string | null;
+            phasenmodellId: null | string;
             /**
              * @description `aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`).
              * @enum {string}
@@ -46435,9 +46795,9 @@ export interface components {
             lebenszyklus: "aktiv" | "sistiert" | "abgebrochen" | "abgeschlossen" | "zurueckgezogen";
             /** @description Sichtbar nur für Projektrollen, UE und Gremium des Portfolios (A-34). */
             vertraulich: boolean;
-            sponsor: string | null;
-            projektleitung: string | null;
-            controlling: string | null;
+            sponsor: null | string;
+            projektleitung: null | string;
+            controlling: null | string;
             /** @description Eigene Funktionen der anfragenden Person in der Projektorganisation. */
             rollen: ("sp" | "pl" | "ctl" | "kt" | "koalition")[];
             version: number;
@@ -46453,7 +46813,7 @@ export interface components {
         };
         ProjektList: {
             items: components["schemas"]["Projekt"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         ProjektCreate: {
             /**
@@ -46468,8 +46828,8 @@ export interface components {
              * @enum {string}
              */
             phase?: "P0" | "P1" | "P2" | "P3" | "P4";
-            orgEinheitId?: string | null;
-            handlungsfeldId?: string | null;
+            orgEinheitId?: null | string;
+            handlungsfeldId?: null | string;
             vertraulich?: boolean;
         };
         ProjektPatch: {
@@ -46478,8 +46838,8 @@ export interface components {
              * @example Digitale Patientenaufnahme
              */
             name?: string;
-            orgEinheitId?: string | null;
-            handlungsfeldId?: string | null;
+            orgEinheitId?: null | string;
+            handlungsfeldId?: null | string;
             vertraulich?: boolean;
         };
         Mitglied: {
@@ -46604,19 +46964,19 @@ export interface components {
             adressat: string;
             /** @description Ziel einer Kommunikationsmassnahme (Q7 Kap. 11.2). */
             ziel: string;
-            terminAktuell: string | null;
-            erreichtAm: string | null;
+            terminAktuell: null | string;
+            erreichtAm: null | string;
             /**
              * @description `gremium`: Abnahme durch das Gremium (PS.02.03).
              * @enum {string}
              */
             abnahme: "keine" | "gremium";
-            terminBaseline: string | null;
-            abgenommenAm: string | null;
+            terminBaseline: null | string;
+            abgenommenAm: null | string;
         };
         MeilensteinList: {
             items: components["schemas"]["Meilenstein"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -46639,8 +46999,8 @@ export interface components {
             adressat?: string;
             /** @description Ziel einer Kommunikationsmassnahme (Q7 Kap. 11.2). */
             ziel?: string;
-            terminAktuell?: string | null;
-            erreichtAm?: string | null;
+            terminAktuell?: null | string;
+            erreichtAm?: null | string;
             /**
              * @description `gremium`: Abnahme durch das Gremium (PS.02.03).
              * @enum {string}
@@ -46664,8 +47024,8 @@ export interface components {
             adressat?: string;
             /** @description Ziel einer Kommunikationsmassnahme (Q7 Kap. 11.2). */
             ziel?: string;
-            terminAktuell?: string | null;
-            erreichtAm?: string | null;
+            terminAktuell?: null | string;
+            erreichtAm?: null | string;
             /**
              * @description `gremium`: Abnahme durch das Gremium (PS.02.03).
              * @enum {string}
@@ -46703,12 +47063,12 @@ export interface components {
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
             prognose: null | number;
-            budgetBaseline: number | null;
-            ist: number | null;
+            budgetBaseline: null | number;
+            ist: null | number;
         };
         KostenList: {
             items: components["schemas"]["Kosten"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -46755,7 +47115,7 @@ export interface components {
         Risiko: {
             /** Format: uuid */
             id: string;
-            projektId: string | null;
+            projektId: null | string;
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -46786,11 +47146,11 @@ export interface components {
             massnahmeStand: "offen" | "umgesetzt";
             /** @description Verantwortlich für die Massnahme. */
             verantwortlich: string;
-            portfolioId: string | null;
+            portfolioId: null | string;
         };
         RisikoList: {
             items: components["schemas"]["Risiko"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -46870,7 +47230,7 @@ export interface components {
         };
         KpiList: {
             items: components["schemas"]["Kpi"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -46927,7 +47287,7 @@ export interface components {
         };
         StakeholderList: {
             items: components["schemas"]["Stakeholder"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -46978,16 +47338,16 @@ export interface components {
              * @enum {string}
              */
             richtung: "ausgehend" | "eingehend";
-            anderesProjekt: {
+            anderesProjekt: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: string;
                 name: string;
-            } | null;
+            };
         };
         AbhaengigkeitList: {
             items: components["schemas"]["Abhaengigkeit"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -47028,19 +47388,19 @@ export interface components {
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description Schlüssel der Rolle (Codetabelle `ressourcenrolle`, A-20: Pool = Rolle). */
             rolle: string;
-            groesse: ("S" | "M" | "L") | null;
-            fte: number | null;
-            vonMonat: string | null;
-            bisMonat: string | null;
+            groesse: null | ("S" | "M" | "L");
+            fte: null | number;
+            vonMonat: null | string;
+            bisMonat: null | string;
             /** @description Benötigte Ressourcen inkl. Zeitraum (Q7 Kap. 9.2). */
             bemerkung: string;
-            monate: number | null;
+            monate: null | number;
             /** @description Durch Zuteilung gedeckt (Modul ressource, RK.02.04). */
             gedeckt: boolean;
         };
         RessourcenbedarfList: {
             items: components["schemas"]["Ressourcenbedarf"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Einträge anlegen darf. */
             can: {
                 write: boolean;
@@ -47054,10 +47414,10 @@ export interface components {
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description Schlüssel der Rolle (Codetabelle `ressourcenrolle`, A-20: Pool = Rolle). */
             rolle: string;
-            groesse?: ("S" | "M" | "L") | null;
-            fte?: number | null;
-            vonMonat?: string | null;
-            bisMonat?: string | null;
+            groesse?: null | ("S" | "M" | "L");
+            fte?: null | number;
+            vonMonat?: null | string;
+            bisMonat?: null | string;
             /** @description Benötigte Ressourcen inkl. Zeitraum (Q7 Kap. 9.2). */
             bemerkung?: string;
         };
@@ -47069,10 +47429,10 @@ export interface components {
             phase?: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description Schlüssel der Rolle (Codetabelle `ressourcenrolle`, A-20: Pool = Rolle). */
             rolle?: string;
-            groesse?: ("S" | "M" | "L") | null;
-            fte?: number | null;
-            vonMonat?: string | null;
-            bisMonat?: string | null;
+            groesse?: null | ("S" | "M" | "L");
+            fte?: null | number;
+            vonMonat?: null | string;
+            bisMonat?: null | string;
             /** @description Benötigte Ressourcen inkl. Zeitraum (Q7 Kap. 9.2). */
             bemerkung?: string;
         };
@@ -47097,7 +47457,7 @@ export interface components {
         KpiWertList: {
             /** @description Werte des KPI, neueste Periode zuerst. */
             items: components["schemas"]["KpiWert"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person Werte erfassen darf (kpi:write, ab P2). */
             can: {
                 write: boolean;
@@ -47121,12 +47481,12 @@ export interface components {
             text: string;
             /** Format: date-time */
             gemeldetAt: string;
-            gemeldetBy: string | null;
+            gemeldetBy: null | string;
         };
         MeldungList: {
             /** @description Neueste zuerst. */
             items: components["schemas"]["Meldung"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Ob die anfragende Person melden darf. */
             can: {
                 write: boolean;
@@ -47154,10 +47514,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             /** @description Was die anfragende Person damit darf (ändern und löschen). */
             can: {
                 write: boolean;
@@ -47165,7 +47525,7 @@ export interface components {
         };
         StrategischesZielList: {
             items: components["schemas"]["StrategischesZiel"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         StrategischesZielVersion: {
             version: number;
@@ -47179,7 +47539,7 @@ export interface components {
             zielwert: string;
             /** Format: date-time */
             changedAt: string;
-            changedBy: string | null;
+            changedBy: null | string;
         };
         StrategischesZielHistory: {
             items: components["schemas"]["StrategischesZielVersion"][];
@@ -47222,9 +47582,9 @@ export interface components {
             jahr: number;
             /** @description Bearbeitungsstand der Jahresziele; ab «zur_freigabe» gesperrt. */
             stand: "in_arbeit" | "zur_freigabe" | "in_kraft";
-            vorlageBis: string | null;
-            vorgelegtAt: string | null;
-            freigabeAt: string | null;
+            vorlageBis: null | string;
+            vorgelegtAt: null | string;
+            freigabeAt: null | string;
             freigabeText: string;
             version: number;
             /** Format: date-time */
@@ -47237,16 +47597,16 @@ export interface components {
             };
         };
         ZieljahrCreate: {
-            vorlageBis?: string | null;
+            vorlageBis?: null | string;
         };
         ZieljahrPatch: {
-            vorlageBis: string | null;
+            vorlageBis: null | string;
         };
         /** @description Person mit Anzeigename. */
         ZielPerson: {
             /** Format: uuid */
             id: string;
-            name: string | null;
+            name: null | string;
         };
         ZielProjekt: {
             /** Format: uuid */
@@ -47261,7 +47621,7 @@ export interface components {
         };
         Zielzyklus: {
             jahr: number;
-            zieljahr: components["schemas"]["Zieljahr"] | null;
+            zieljahr: null | components["schemas"]["Zieljahr"];
             /** @description Alle strategischen Ziele, sortiert nach Nummer; Handlungsfelder über /v1/handlungsfelder. */
             strategischeZiele: {
                 /** Format: uuid */
@@ -47286,7 +47646,7 @@ export interface components {
                         /** Format: uuid */
                         id: string;
                         text: string;
-                        verantwortlich: components["schemas"]["ZielPerson"] | null;
+                        verantwortlich: null | components["schemas"]["ZielPerson"];
                         position: number;
                         version: number;
                     }[];
@@ -47330,10 +47690,10 @@ export interface components {
             version: number;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
             /** Format: date-time */
             updatedAt: string;
-            updatedBy: string | null;
+            updatedBy: null | string;
             can: {
                 /** @description Ändern und löschen (nur solange das Jahr «in Arbeit» ist). */
                 write: boolean;
@@ -47370,7 +47730,7 @@ export interface components {
         };
         JahreszielList: {
             items: components["schemas"]["Jahresziel"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         Hauptaktivitaet: {
             /** Format: uuid */
@@ -47378,7 +47738,7 @@ export interface components {
             /** Format: uuid */
             jahreszielId: string;
             text: string;
-            verantwortlich: components["schemas"]["ZielPerson"] | null;
+            verantwortlich: null | components["schemas"]["ZielPerson"];
             position: number;
             version: number;
             /** Format: date-time */
@@ -47394,13 +47754,13 @@ export interface components {
             jahreszielId: string;
             /** @description Formulierung. */
             text: string;
-            verantwortlich?: string | null;
+            verantwortlich?: null | string;
             position?: number;
         };
         HauptaktivitaetPatch: {
             /** @description Formulierung. */
             text?: string;
-            verantwortlich?: string | null;
+            verantwortlich?: null | string;
             position?: number;
         };
         HauptaktivitaetList: {
@@ -47417,13 +47777,13 @@ export interface components {
                 nummer: string;
                 text: string;
             };
-            jahresziel: {
+            jahresziel: null | {
                 /** Format: uuid */
                 id: string;
                 jahr: number;
                 nummer: string;
                 text: string;
-            } | null;
+            };
             /** @description Adresse des Ziels im Arbeitsraum Ziele. */
             link: string;
             /** Format: date-time */
@@ -47455,7 +47815,7 @@ export interface components {
             beurteilung: string;
             /** Format: date-time */
             erfasstAt: string;
-            erfasstVon: components["schemas"]["ZielPerson"] | null;
+            erfasstVon: null | components["schemas"]["ZielPerson"];
             version: number;
         };
         ZielerreichungZiel: {
@@ -47469,8 +47829,8 @@ export interface components {
             text: string;
             metrik: string;
             zielwert: string;
-            eintrag: components["schemas"]["ZielerreichungEintrag"] | null;
-            letzter: components["schemas"]["ZielerreichungEintrag"] | null;
+            eintrag: null | components["schemas"]["ZielerreichungEintrag"];
+            letzter: null | components["schemas"]["ZielerreichungEintrag"];
         };
         ZielerreichungQuartal: {
             quartal: string;
@@ -47511,11 +47871,11 @@ export interface components {
             version: number;
             /** @description Jahresziele des Jahres. */
             anzahl: number;
-            anzahlVorjahr: number | null;
+            anzahlVorjahr: null | number;
             jeHandlungsfeld: {
                 /** Format: uuid */
                 handlungsfeldId: string;
-                label: string | null;
+                label: null | string;
                 anzahl: number;
                 anzahlVorjahr: number;
             }[];
@@ -47576,7 +47936,7 @@ export interface components {
                         zielwert: string;
                         hauptaktivitaeten: {
                             text: string;
-                            verantwortlich: string | null;
+                            verantwortlich: null | string;
                         }[];
                         projekte: {
                             /** @description Projektnummer (Adresse der Projektakte). */
@@ -47593,7 +47953,7 @@ export interface components {
             jahr: number;
             /** Format: date-time */
             publiziertAt: string;
-            publiziertBy: string | null;
+            publiziertBy: null | string;
             version: number;
             inhalt: components["schemas"]["RoadmapInhalt"];
             can: {
@@ -47611,8 +47971,8 @@ export interface components {
         };
         RoadmapVorschau: {
             jahr: number;
-            stand: ("in_arbeit" | "zur_freigabe" | "in_kraft") | null;
-            publiziertAt: string | null;
+            stand: null | ("in_arbeit" | "zur_freigabe" | "in_kraft");
+            publiziertAt: null | string;
             inhalt: components["schemas"]["RoadmapInhalt"];
             can: {
                 /** @description Publizieren möglich (Jahresziele in Kraft). */
@@ -47633,9 +47993,9 @@ export interface components {
                     text: string;
                     metrik: string;
                     zielwert: string;
-                    stand: string | null;
+                    stand: null | string;
                     beurteilung: string;
-                    quartal: string | null;
+                    quartal: null | string;
                 }[];
             };
             /** @description Je Portfolio mit Berichtspflicht der Portfoliobericht des letzten Quartalsmonats (Herkunft der Zahlen, G11). */
@@ -47645,7 +48005,7 @@ export interface components {
                 name: string;
                 /** @description Letzter Monat des Quartals. */
                 periode: string;
-                berichtId: string | null;
+                berichtId: null | string;
                 bereitgestellt: boolean;
                 projekte: number;
                 imPlan: number;
@@ -47655,7 +48015,7 @@ export interface components {
                     nummer: string;
                     name: string;
                     phase: string;
-                    trend: string | null;
+                    trend: null | string;
                 }[];
                 meilensteine: {
                     projekt: {
@@ -47663,13 +48023,13 @@ export interface components {
                         name: string;
                     };
                     text: string;
-                    termin: string | null;
+                    termin: null | string;
                 }[];
                 risiken: {
-                    projekt: {
+                    projekt: null | {
                         nummer: string;
                         name: string;
-                    } | null;
+                    };
                     text: string;
                     wahrscheinlichkeit: string;
                     auswirkung: string;
@@ -47709,7 +48069,7 @@ export interface components {
                 titel: string;
                 ergebnis: string;
                 begruendung: string;
-                ausserordentlichAm: string | null;
+                ausserordentlichAm: null | string;
             }[];
         };
         VrAuftrag: {
@@ -47718,8 +48078,8 @@ export interface components {
             text: string;
             /** Format: uuid */
             verantwortlich: string;
-            termin: string | null;
-            erledigtAt: string | null;
+            termin: null | string;
+            erledigtAt: null | string;
         };
         Quartalsbericht: {
             /** Format: uuid */
@@ -47729,8 +48089,8 @@ export interface components {
             stand: "in_arbeit" | "traktandiert" | "verabschiedet";
             /** Format: date-time */
             erzeugtAt: string;
-            traktandiertAt: string | null;
-            verabschiedetAt: string | null;
+            traktandiertAt: null | string;
+            verabschiedetAt: null | string;
             version: number;
             inhalt: components["schemas"]["QuartalsInhalt"];
             /** @description Kommentar der UE je Abschnitt: Gesamtstatus, wesentliche Entwicklungen, Risiken, Abhängigkeiten und Eskalationen, finanzielle und organisatorische Auswirkungen, Weiterleitungen. */
@@ -47745,7 +48105,7 @@ export interface components {
             /** @description Rückmeldungen des PRAT bei «Anpassungen verlangt» (UC-012 A1). */
             rueckmeldungPrat: string;
             vrRueckmeldung: string;
-            vrRueckmeldungAt: string | null;
+            vrRueckmeldungAt: null | string;
             auftraege: components["schemas"]["VrAuftrag"][];
             can: {
                 erzeugen: boolean;
@@ -47764,7 +48124,7 @@ export interface components {
                 stand: "in_arbeit" | "traktandiert" | "verabschiedet";
                 /** Format: date-time */
                 erzeugtAt: string;
-                verabschiedetAt: string | null;
+                verabschiedetAt: null | string;
             }[];
         };
         QuartalsberichtPatch: {
@@ -47785,7 +48145,7 @@ export interface components {
             text: string;
             /** Format: uuid */
             verantwortlich: string;
-            termin?: string | null;
+            termin?: null | string;
         };
         VrWeiterleitung: {
             /** Format: uuid */
@@ -47795,7 +48155,7 @@ export interface components {
             gremium: string;
             titel: string;
             ergebnis: string;
-            ausserordentlichAm: string | null;
+            ausserordentlichAm: null | string;
             bemerkung: string;
         };
         VrWeiterleitungListe: {
@@ -47810,6 +48170,39 @@ export interface components {
              */
             weitergeleitetAm?: string;
             bemerkung?: string;
+        };
+        /** @description Je Projekt das nächste traktandierte Geschäft in einer Sitzung ab heute («Gate P1–P2 im PRAT Mi 10.12.»). */
+        NaechsteTraktanden: {
+            items: {
+                /** Format: uuid */
+                projektId: string;
+                /** Format: uuid */
+                traktandumId: string;
+                /**
+                 * @description Art des Traktandums (fachmodell.md 2.9).
+                 * @enum {string}
+                 */
+                art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
+                artLabel: string;
+                titel: string;
+                /** @description Die anfragende Person ist zu diesem Traktandum eingeladen (stellt vor, K3 Schritt 2). */
+                eingeladen: boolean;
+                sitzung: {
+                    /** Format: uuid */
+                    id: string;
+                    /**
+                     * @description Datum (JJJJ-MM-TT).
+                     * @example 2026-11-12
+                     */
+                    datum: string;
+                    gremium: {
+                        /** Format: uuid */
+                        id: string;
+                        kuerzel: string;
+                        name: string;
+                    };
+                };
+            }[];
         };
         Versandfrist: {
             /** @description Versand spätestens (Q8 Kap. 8.1); ohne Phasenmodell in Kraft null. */
@@ -47840,7 +48233,7 @@ export interface components {
         Einladung: {
             /** Format: uuid */
             personId: string;
-            name: string | null;
+            name: null | string;
             /**
              * @description Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person.
              * @enum {string}
@@ -47850,7 +48243,7 @@ export interface components {
         Traktandum: {
             /** Format: uuid */
             id: string;
-            sitzungId: string | null;
+            sitzungId: null | string;
             /**
              * @description Art des Traktandums (fachmodell.md 2.9).
              * @enum {string}
@@ -47863,18 +48256,18 @@ export interface components {
                 typ: string;
                 id: string;
             };
-            projekt: {
+            projekt: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: string;
                 name: string;
                 phase: string;
-            } | null;
+            };
             titel: string;
             /** @description Antrag in einem Satz (K3 Schritt 6). */
             antrag: string;
-            position: number | null;
-            dauerMin: number | null;
+            position: null | number;
+            dauerMin: null | number;
             /** @description Beginn des Traktandums, gerechnet ab Beginn der Sitzung. */
             zeit: string | null;
             /**
@@ -47916,16 +48309,16 @@ export interface components {
              * @example 2026-11-12
              */
             datum: string;
-            beginn: string | null;
-            dauerMin: number | null;
+            beginn: null | string;
+            dauerMin: null | number;
             ort: string;
             /**
              * @description Bearbeitungsstand: geplant, in Vorbereitung, Unterlagen versendet, laufend, geschlossen, Protokoll versendet.
              * @enum {string}
              */
             stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
-            versendetAt: string | null;
-            versandVorlauf: number | null;
+            versendetAt: null | string;
+            versandVorlauf: null | number;
             frist: components["schemas"]["Versandfrist"];
             /** @description Summe des Zeitbedarfs der Traktanden. */
             zeitbedarfMin: number;
@@ -47942,8 +48335,8 @@ export interface components {
             };
         };
         SitzungPatch: {
-            beginn?: string | null;
-            dauerMin?: number | null;
+            beginn?: null | string;
+            dauerMin?: null | number;
             ort?: string;
         };
         SitzungEintrag: {
@@ -47960,7 +48353,7 @@ export interface components {
              */
             stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
             traktanden: number;
-            versendetAt: string | null;
+            versendetAt: null | string;
         };
         SitzungList: {
             gremium: {
@@ -47970,7 +48363,7 @@ export interface components {
                 name: string;
             };
             items: components["schemas"]["SitzungEintrag"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Was die anfragende Person damit darf. */
             can: {
                 /** @description Traktandenliste bearbeiten und versenden (sitzung:write, nur bis zum Versand). */
@@ -48005,7 +48398,7 @@ export interface components {
              * @enum {string}
              */
             art: "portfoliobericht" | "gate" | "aenderung" | "meilenstein" | "eskalation" | "idee" | "priorisierung" | "quartalsreporting" | "abschluss" | "jahresrueckblick";
-            projektId?: string | null;
+            projektId?: null | string;
             titel?: string;
             antrag?: string;
         };
@@ -48016,7 +48409,7 @@ export interface components {
         TraktandumPatch: {
             titel?: string;
             antrag?: string;
-            dauerMin?: number | null;
+            dauerMin?: null | number;
         };
         EinladungenPut: {
             einladungen: {
@@ -48087,7 +48480,7 @@ export interface components {
                  */
                 stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
                 traktanden: number;
-                versandBis: string | null;
+                versandBis: null | string;
                 /** @description Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste. */
                 unterlagenBereit: number;
             }[];
@@ -48105,7 +48498,7 @@ export interface components {
             verantwortlich: {
                 /** Format: uuid */
                 id: string;
-                name: string | null;
+                name: null | string;
             };
             /**
              * @description Datum (JJJJ-MM-TT).
@@ -48117,7 +48510,7 @@ export interface components {
              * @enum {string}
              */
             stand: "offen" | "erfuellt";
-            erfuelltAt: string | null;
+            erfuelltAt: null | string;
             can: {
                 /** @description Erledigt melden (verantwortliche Person, Vertretung oder sitzung:write). */
                 erfuellen: boolean;
@@ -48148,7 +48541,7 @@ export interface components {
             } | null;
             /** Format: date-time */
             erfasstAt: string;
-            erfasstVon: string | null;
+            erfasstVon: null | string;
             auflagen: components["schemas"]["Auflage"][];
             version: number;
             /** @description Erfassung und Korrekturen (A-30). */
@@ -48158,10 +48551,10 @@ export interface components {
                 label: string;
                 begruendung: string;
                 anVr: boolean;
-                snsErgebnis: string | null;
+                snsErgebnis: null | string;
                 /** Format: date-time */
                 at: string;
-                von: string | null;
+                von: null | string;
             }[];
             can: {
                 /** @description Korrektur bis zum Schliessen der Sitzung (A-30). */
@@ -48218,13 +48611,13 @@ export interface components {
              * @enum {string}
              */
             stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
-            geschlossenAt: string | null;
+            geschlossenAt: null | string;
             /** @description Version der Sitzung (If-Match für Starten und Schliessen). */
             version: number;
             traktanden: {
                 /** Format: uuid */
                 traktandumId: string;
-                position: number | null;
+                position: null | number;
                 /**
                  * @description Art des Traktandums (fachmodell.md 2.9).
                  * @enum {string}
@@ -48233,17 +48626,17 @@ export interface components {
                 artLabel: string;
                 titel: string;
                 antrag: string;
-                projekt: {
+                projekt: null | {
                     /** Format: uuid */
                     id: string;
                     nummer: string;
                     name: string;
-                } | null;
+                };
                 viaSns: boolean;
                 vertraulich: boolean;
                 /** @description Ergebnisse der Art; leer = Kenntnisnahme ohne Entscheid. */
                 optionen: components["schemas"]["EntscheidErgebnis"][];
-                entscheid: components["schemas"]["Entscheid"] | null;
+                entscheid: null | components["schemas"]["Entscheid"];
             }[];
             /** @description Traktanden ohne Entscheid: werden beim Schliessen für die nächste Sitzung vorgeschlagen (K3 Schritt 9). */
             ohneEntscheid: number;
@@ -48290,7 +48683,7 @@ export interface components {
             } | null;
             /** Format: date-time */
             erfasstAt: string;
-            erfasstVon: string | null;
+            erfasstVon: null | string;
             auflagen: components["schemas"]["Auflage"][];
             version: number;
             traktandum: {
@@ -48306,12 +48699,12 @@ export interface components {
                 antrag: string;
                 viaSns: boolean;
             };
-            projekt: {
+            projekt: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: string;
                 name: string;
-            } | null;
+            };
             sitzung: {
                 /** Format: uuid */
                 id: string;
@@ -48328,7 +48721,7 @@ export interface components {
         };
         EntscheidList: {
             items: components["schemas"]["EntscheidEintrag"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         Protokollfrist: {
             /** @description Versand spätestens (Q8 Kap. 8.1, A-27); ohne Phasenmodell in Kraft null. */
@@ -48358,14 +48751,14 @@ export interface components {
                      * @example 2026-11-12
                      */
                     datum: string;
-                    beginn: string | null;
+                    beginn: null | string;
                     ort: string;
                 };
                 anwesende: string;
                 traktanden: {
                     /** Format: uuid */
                     traktandumId: string;
-                    position: number | null;
+                    position: null | number;
                     /**
                      * @description Art des Traktandums (fachmodell.md 2.9).
                      * @enum {string}
@@ -48374,10 +48767,10 @@ export interface components {
                     artLabel: string;
                     titel: string;
                     antrag: string;
-                    projekt: {
+                    projekt: null | {
                         nummer: string;
                         name: string;
-                    } | null;
+                    };
                     vertraulich: boolean;
                     viaSns: boolean;
                     /**
@@ -48385,7 +48778,7 @@ export interface components {
                      * @enum {string}
                      */
                     behandlung: "entschieden" | "kenntnisnahme" | "nicht_behandelt";
-                    entscheid: {
+                    entscheid: null | {
                         ergebnis: string;
                         label: string;
                         begruendung: string;
@@ -48393,21 +48786,21 @@ export interface components {
                         anVr: boolean;
                         auflagen: {
                             text: string;
-                            verantwortlich: string | null;
+                            verantwortlich: null | string;
                             /**
                              * @description Datum (JJJJ-MM-TT).
                              * @example 2026-11-12
                              */
                             termin: string;
                         }[];
-                    } | null;
+                    };
                     /** @description Diskussion in Kürze, von der UE ergänzt. */
                     notiz: string;
                 }[];
                 bemerkungen: string;
             };
             frist: components["schemas"]["Protokollfrist"];
-            versendetAt: string | null;
+            versendetAt: null | string;
             version: number;
             /** Format: date-time */
             updatedAt: string;
@@ -48432,25 +48825,25 @@ export interface components {
             beteiligte: {
                 /** Format: uuid */
                 personId: string;
-                name: string | null;
+                name: null | string;
             }[];
         };
         /** @description Beurteilung der Abweichung je Dimension. */
         StatusberichtAbweichung: {
             inhalt: {
-                stufe: string | null;
+                stufe: null | string;
                 kommentar: string;
             };
             termin: {
-                stufe: string | null;
+                stufe: null | string;
                 kommentar: string;
             };
             ressourcen: {
-                stufe: string | null;
+                stufe: null | string;
                 kommentar: string;
             };
             budget: {
-                stufe: string | null;
+                stufe: null | string;
                 kommentar: string;
             };
         };
@@ -48458,18 +48851,20 @@ export interface components {
             items: {
                 /** Format: uuid */
                 projektId: string;
-                letzter: {
+                letzter: null | {
                     periode: string;
-                    status: ("im_plan" | "kritisch") | null;
-                    trend: string | null;
+                    status: null | ("im_plan" | "kritisch");
+                    trend: null | string;
                     /** @description Begründung des Status (Pflicht bei «kritisch»). */
                     begruendung: string;
-                } | null;
-                laufend: {
+                    /** @description Nächster Meilenstein laut Bericht (Freitext, leer ohne Angabe). */
+                    naechsterMeilenstein: string;
+                };
+                laufend: null | {
                     periode: string;
-                    stand: ("entwurf" | "eingereicht" | "zurueckgegeben" | "geprueft") | null;
-                    stichtag: string | null;
-                } | null;
+                    stand: null | ("entwurf" | "eingereicht" | "zurueckgegeben" | "geprueft");
+                    stichtag: null | string;
+                };
             }[];
         };
         StatusberichtEskalationNeu: {
@@ -48484,7 +48879,7 @@ export interface components {
             text: string;
         };
         Statusbericht: {
-            id: string | null;
+            id: null | string;
             /** Format: uuid */
             projektId: string;
             projektNummer: string;
@@ -48495,9 +48890,9 @@ export interface components {
             phase: string;
             /** @description Monatlich oder ausserhalb des Rhythmus (UC-004 Ausgangslage). */
             anlass: "monatlich" | "ausserordentlich";
-            status: ("im_plan" | "kritisch") | null;
-            trend: string | null;
-            abschlussPer: string | null;
+            status: null | ("im_plan" | "kritisch");
+            trend: null | string;
+            abschlussPer: null | string;
             naechsterMeilenstein: string;
             abweichung: components["schemas"]["StatusberichtAbweichung"];
             abhaengigkeiten: string;
@@ -48509,21 +48904,21 @@ export interface components {
             massnahme: string;
             /** @description Entscheid des PRAT nötig (UC-004 A2.2); nur bei «kritisch». */
             entscheidNoetig: boolean;
-            vorperiode: {
+            vorperiode: null | {
                 periode: string;
-                status: ("im_plan" | "kritisch") | null;
-                trend: string | null;
+                status: null | ("im_plan" | "kritisch");
+                trend: null | string;
                 stand: string;
-            } | null;
+            };
             /** @description Fehlende Pflichtangaben für das Einreichen (Seitenpanel «Bereit zum Einreichen», I-P4). */
             fehlend: components["schemas"]["StatusberichtFehlend"][];
-            eingereichtAt: string | null;
-            eingereichtBy: string | null;
-            geprueftAt: string | null;
+            eingereichtAt: null | string;
+            eingereichtBy: null | string;
+            geprueftAt: null | string;
             /** @description 0: noch nicht gespeichert; mit `If-Match: W/"0"` anlegen. */
             version: number;
-            updatedAt: string | null;
-            eskalation: {
+            updatedAt: null | string;
+            eskalation: null | {
                 /** Format: uuid */
                 id: string;
                 /** @description `kritisch`: beim Einreichen; `abweichung`: von der PL aus der Warnung gestartet. */
@@ -48533,7 +48928,7 @@ export interface components {
                 vorgeschlagen: boolean;
                 /** Format: date-time */
                 angelegtAt: string;
-            } | null;
+            };
             can: {
                 /** @description Entwurf speichern. */
                 write: boolean;
@@ -48551,10 +48946,10 @@ export interface components {
             /** @description Monatlich oder ausserhalb des Rhythmus (UC-004 Ausgangslage). */
             anlass: "monatlich" | "ausserordentlich";
             stand: "entwurf" | "eingereicht" | "zurueckgegeben" | "geprueft";
-            status: ("im_plan" | "kritisch") | null;
-            trend: string | null;
+            status: null | ("im_plan" | "kritisch");
+            trend: null | string;
             phase: string;
-            eingereichtAt: string | null;
+            eingereichtAt: null | string;
             version: number;
         };
         StatusberichtList: {
@@ -48563,9 +48958,9 @@ export interface components {
         StatusberichtPut: {
             /** @description Monatlich oder ausserhalb des Rhythmus (UC-004 Ausgangslage). */
             anlass?: "monatlich" | "ausserordentlich";
-            status?: ("im_plan" | "kritisch") | null;
-            trend?: string | null;
-            abschlussPer?: string | null;
+            status?: null | ("im_plan" | "kritisch");
+            trend?: null | string;
+            abschlussPer?: null | string;
             naechsterMeilenstein?: string;
             abweichung?: components["schemas"]["StatusberichtAbweichung"];
             abhaengigkeiten?: string;
@@ -48610,25 +49005,25 @@ export interface components {
             phase: string;
             stand: "eingereicht" | "zurueckgegeben" | "geprueft" | "ausstehend" | "nicht_gemeldet";
             entwurf: boolean;
-            status: ("im_plan" | "kritisch") | null;
-            trend: string | null;
-            abschlussPer: string | null;
+            status: null | ("im_plan" | "kritisch");
+            trend: null | string;
+            abschlussPer: null | string;
             naechsterMeilenstein: string;
-            vorperiode: {
+            vorperiode: null | {
                 periode: string;
-                status: ("im_plan" | "kritisch") | null;
-                trend: string | null;
-            } | null;
+                status: null | ("im_plan" | "kritisch");
+                trend: null | string;
+            };
             auffaelligkeiten: components["schemas"]["Auffaelligkeit"][];
             nachRueckfrage: boolean;
-            rueckfrage: {
+            rueckfrage: null | {
                 text: string;
                 /** Format: date-time */
                 gestelltAt: string;
-            } | null;
-            eingereichtAt: string | null;
-            geprueftAt: string | null;
-            eingefordertAt: string | null;
+            };
+            eingereichtAt: null | string;
+            geprueftAt: null | string;
+            eingefordertAt: null | string;
             version: number;
             can: {
                 bestaetigen: boolean;
@@ -48641,12 +49036,12 @@ export interface components {
         Periodenstand: {
             periode: string;
             stand: "offen" | "abgeschlossen";
-            abgeschlossenAt: string | null;
-            abgeschlossenBy: {
+            abgeschlossenAt: null | string;
+            abgeschlossenBy: null | {
                 /** Format: uuid */
                 id: string;
                 name: string;
-            } | null;
+            };
             version: number;
             /** @description Über alle berichtspflichtigen Projekte der Periode (ohne Filter). */
             anzahl: {
@@ -48659,8 +49054,8 @@ export interface components {
                 auffaellig: number;
             };
             fristen: {
-                berichtAufgabe: string | null;
-                stichtag: string | null;
+                berichtAufgabe: null | string;
+                stichtag: null | string;
                 /**
                  * Format: date
                  * @description Monatsende: Abschluss durch die Unternehmensentwicklung (UC-005 Schritt 5).
@@ -48670,7 +49065,7 @@ export interface components {
             vorperiode: string;
             abschluss: {
                 moeglich: boolean;
-                sperre: string | null;
+                sperre: null | string;
                 geprueft: number;
                 /** @description Projekte, für die die Werte der Vorperiode mit «nicht gemeldet» übernommen werden. */
                 nichtGemeldet: number;
@@ -48683,7 +49078,7 @@ export interface components {
         PeriodeUebersicht: {
             kopf: components["schemas"]["Periodenstand"];
             items: components["schemas"]["PeriodeZeile"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         PeriodeAuswahl: {
             projekte: string[];
@@ -48709,15 +49104,15 @@ export interface components {
             /** Format: uuid */
             id: string;
             text: string;
-            antwort: string | null;
-            gestelltBy: {
+            antwort: null | string;
+            gestelltBy: null | {
                 /** Format: uuid */
                 id: string;
                 name: string;
-            } | null;
+            };
             /** Format: date-time */
             gestelltAt: string;
-            beantwortetAt: string | null;
+            beantwortetAt: null | string;
         };
         RueckfrageList: {
             items: components["schemas"]["Rueckfrage"][];
@@ -48738,15 +49133,29 @@ export interface components {
                 /** @description Abweichung in Kalendertagen (positiv = später). */
                 tage: number;
             }[];
-            abschluss: {
+            abschluss: null | {
                 /** Format: date */
                 baseline: string;
                 /** Format: date */
                 aktuell: string;
                 /** @description Abweichung in Kalendertagen (positiv = später). */
                 tage: number;
-            } | null;
+            };
             maxTage: number;
+            /** @description Einzelwerte: Meilensteine und Lieferergebnisse mit Termin der Baseline, nach Phase und Termin (Seitentyp Bericht). */
+            meilensteine: {
+                phase: string;
+                art: "meilenstein" | "lieferergebnis";
+                text: string;
+                /** @description Erreicht (aktuell = Datum erreicht). */
+                erreicht: boolean;
+                /** Format: date */
+                baseline: string;
+                /** Format: date */
+                aktuell: string;
+                /** @description Abweichung in Kalendertagen (positiv = später). */
+                tage: number;
+            }[];
         };
         TerminabweichungList: {
             items: components["schemas"]["Terminabweichung"][];
@@ -48759,7 +49168,7 @@ export interface components {
             }[];
         };
         StatusberichteKopf: {
-            pruefen: {
+            pruefen: null | {
                 /** @description Periode, an der die Unternehmensentwicklung arbeitet: die Vorperiode, solange sie offen ist und Berichte hat, sonst die laufende. */
                 periode: string;
                 eingereicht: number;
@@ -48771,8 +49180,8 @@ export interface components {
                 projekte: number;
                 zurueckgegeben: number;
                 geprueft: number;
-                stichtag: string | null;
-            } | null;
+                stichtag: null | string;
+            };
         };
         DashboardZeile: {
             /** Format: uuid */
@@ -48783,19 +49192,19 @@ export interface components {
             portfolioId: string;
             /** @description Name des Portfolios. */
             portfolio: string;
-            handlungsfeld: string | null;
-            projektleitung: string | null;
+            handlungsfeld: null | string;
+            projektleitung: null | string;
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
-            abschlussPer: string | null;
-            naechsterMeilenstein: {
-                termin: string | null;
+            abschlussPer: null | string;
+            naechsterMeilenstein: null | {
+                termin: null | string;
                 text: string;
-            } | null;
-            status: ("im_plan" | "kritisch") | null;
-            statusVorperiode: ("im_plan" | "kritisch") | null;
-            trend: string | null;
+            };
+            status: null | ("im_plan" | "kritisch");
+            statusVorperiode: null | ("im_plan" | "kritisch");
+            trend: null | string;
             meldung: "gemeldet" | "ausstehend" | "nicht_gemeldet" | "ohne_pflicht";
-            werteAus: string | null;
+            werteAus: null | string;
             /** @description «Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4). */
             merkmale: "eskalation"[];
         };
@@ -48812,7 +49221,7 @@ export interface components {
         Dashboard: {
             periode: string;
             periodeStand: "offen" | "abgeschlossen";
-            abgeschlossenAt: string | null;
+            abgeschlossenAt: null | string;
             /** @description Perioden zur Auswahl, neueste zuerst. */
             perioden: {
                 periode: string;
@@ -48826,7 +49235,7 @@ export interface components {
                 name: string;
                 kategorie: string;
             }[];
-            portfolio: string | null;
+            portfolio: null | string;
             /** @description Kritische zuerst, dann nicht gemeldete, sonst nach Nummer. */
             items: components["schemas"]["DashboardZeile"][];
             funnel: components["schemas"]["FunnelStufe"][];
@@ -48836,12 +49245,12 @@ export interface components {
             id: string;
             /** @description Projektrisiko (PC.02.04) oder Portfoliorisiko (PC.02.01). */
             ebene: "projekt" | "portfolio";
-            projekt: {
+            projekt: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: string;
                 name: string;
-            } | null;
+            };
             /** Format: uuid */
             portfolioId: string;
             text: string;
@@ -48860,7 +49269,7 @@ export interface components {
                 name: string;
                 kategorie: string;
             }[];
-            portfolio: string | null;
+            portfolio: null | string;
             /** Format: date-time */
             stand: string;
             /** @description Projekt- und Portfoliorisiken der aktiven Projekte bzw. der Portfolios; höchste Auswirkung und Wahrscheinlichkeit zuerst, offene Massnahmen vor umgesetzten. */
@@ -48919,7 +49328,7 @@ export interface components {
             stand: "entwurf" | "bereitgestellt";
             /** Format: date-time */
             erzeugtAt: string;
-            bereitgestelltAt: string | null;
+            bereitgestelltAt: null | string;
             version: number;
         };
         Portfoliobericht: {
@@ -48936,13 +49345,13 @@ export interface components {
             stand: "entwurf" | "bereitgestellt";
             /** Format: date-time */
             erzeugtAt: string;
-            bereitgestelltAt: string | null;
+            bereitgestelltAt: null | string;
             version: number;
             /** @description Kommentar der UE («Bericht der Programmleitung», K3 Schritt 4). */
             kommentar: string;
             /** @description Abgeschlossenes Dashboard der Periode bei Erzeugung. */
             dashboard: {
-                abgeschlossenAt: string | null;
+                abgeschlossenAt: null | string;
                 items: components["schemas"]["DashboardZeile"][];
                 funnel: components["schemas"]["FunnelStufe"][];
             };
@@ -49021,8 +49430,8 @@ export interface components {
             portfolio: string;
             phase: string;
             lebenszyklus: string;
-            status: ("im_plan" | "kritisch") | null;
-            handlungsfeld: string | null;
+            status: null | ("im_plan" | "kritisch");
+            handlungsfeld: null | string;
             /** @description Schlüssel der Gruppe, zu der das Projekt zählt. */
             gruppe: string;
             /** @description Wert je gewählter Kennzahl (Beträge in CHF). */
@@ -49100,19 +49509,19 @@ export interface components {
             platzhalter: string[];
             /** @description Platzhalter → Datenfeld (null = offen). */
             zuordnung: {
-                [key: string]: string | null;
+                [key: string]: null | string;
             };
             /** @description Die Vorlage nennt «Personendaten» (G12). */
             personendaten: boolean;
             bemerkung: string;
-            aktivAt: string | null;
+            aktivAt: null | string;
             /** Format: date-time */
             erstelltAt: string;
-            erstelltVon: {
+            erstelltVon: null | {
                 /** Format: uuid */
                 id: string;
-                name: string | null;
-            } | null;
+                name: null | string;
+            };
             /** @description Stand der Zeile für `If-Match`. */
             rev: number;
             pruefung: components["schemas"]["VorlagePruefung"];
@@ -49129,8 +49538,8 @@ export interface components {
             /** @description Dokumentart (UC-018 Schritt 1). */
             art: "projektidee" | "vorstudie" | "business_case" | "projektvertrag" | "loesungskonzept" | "abschlussbericht" | "statusbericht" | "portfoliobericht" | "quartalsreporting";
             name: string;
-            grundbestand: components["schemas"]["VorlageGrundbestand"] | null;
-            aktiv: number | null;
+            grundbestand: null | components["schemas"]["VorlageGrundbestand"];
+            aktiv: null | number;
             entwuerfe: number;
             versionen: number;
             /** @description Ein Modul liefert Daten für diese Art (Feldkatalog registriert); sonst nur als Zuordnungsziel vorbereitet. */
@@ -49143,8 +49552,8 @@ export interface components {
             /** @description Dokumentart (UC-018 Schritt 1). */
             art: "projektidee" | "vorstudie" | "business_case" | "projektvertrag" | "loesungskonzept" | "abschlussbericht" | "statusbericht" | "portfoliobericht" | "quartalsreporting";
             name: string;
-            grundbestand: components["schemas"]["VorlageGrundbestand"] | null;
-            felder: components["schemas"]["VorlageFeld"][] | null;
+            grundbestand: null | components["schemas"]["VorlageGrundbestand"];
+            felder: null | components["schemas"]["VorlageFeld"][];
             /** @description Neueste zuerst. */
             versionen: components["schemas"]["VorlageVersion"][];
         };
@@ -49162,12 +49571,12 @@ export interface components {
         VorlageVersionPatch: {
             /** @description Ganze Zuordnung: Platzhalter → Feld oder null. */
             zuordnung?: {
-                [key: string]: string | null;
+                [key: string]: null | string;
             };
             bemerkung?: string;
         };
         KpiPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Klinischer, nicht-klinischer oder Projekt-KPI. */
             art: "klinisch" | "nicht_klinisch" | "projekt";
             /** @description Bezeichnung des KPI. */
@@ -49178,7 +49587,7 @@ export interface components {
             zielwert: string;
         };
         AbhaengigkeitPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /**
              * Format: uuid
              * @description Anderes Projekt (muss sichtbar sein).
@@ -49190,14 +49599,14 @@ export interface components {
             ansprechperson: string;
         };
         MeilensteinPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description Meilenstein oder Lieferergebnis. */
             art: "meilenstein" | "lieferergebnis";
             /** @description Tätigkeit, Lieferergebnis bzw. Meilenstein. */
             text: string;
-            termin: string | null;
+            termin: null | string;
         };
         ToleranzPlan: {
             /** @description Termin, Kosten oder Umfang. */
@@ -49219,7 +49628,7 @@ export interface components {
             akv: string;
         };
         KostenPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description CAPEX oder OPEX. */
@@ -49230,23 +49639,23 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
-            betrag: number | null;
+            betrag: null | number;
         };
         PersonalPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description Rolle (Codetabelle «Rollen des Ressourcenbedarfs»). */
             rolle: string;
-            groesse: ("S" | "M" | "L") | null;
-            fte: number | null;
-            vonMonat: string | null;
-            bisMonat: string | null;
+            groesse: null | ("S" | "M" | "L");
+            fte: null | number;
+            vonMonat: null | string;
+            bisMonat: null | string;
             /** @description Benötigte Ressourcen inkl. Zeitraum. */
             bemerkung: string;
         };
         RisikoPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Risiko. */
             text: string;
             /** @description Eintrittswahrscheinlichkeit (EW). */
@@ -49259,7 +49668,7 @@ export interface components {
             verantwortlich: string;
         };
         StakeholderPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Stakeholder. */
             gruppe: string;
             /** @description Interesse. */
@@ -49270,7 +49679,7 @@ export interface components {
             massnahmen: string;
         };
         KommunikationPlan: {
-            registerId: string | null;
+            registerId: null | string;
             /** @description Phase (P0 Initialisierung bis P4 Abschluss). */
             phase: "P0" | "P1" | "P2" | "P3" | "P4";
             /** @description Massnahme. */
@@ -49279,7 +49688,7 @@ export interface components {
             adressat: string;
             /** @description Ziel. */
             ziel: string;
-            termin: string | null;
+            termin: null | string;
         };
         BeilagePlan: {
             /** @description Bezeichnung. */
@@ -49304,9 +49713,9 @@ export interface components {
         };
         /** Strategiebezug */
         Kapitel2: {
-            handlungsfeldId: string | null;
-            strategischesZielId: string | null;
-            jahreszielId: string | null;
+            handlungsfeldId: null | string;
+            strategischesZielId: null | string;
+            jahreszielId: null | string;
             /** @description Wie das Projekt zum Ziel beiträgt. */
             beitrag: string;
         };
@@ -49350,11 +49759,11 @@ export interface components {
             meilensteine: components["schemas"]["MeilensteinPlan"][];
             /** @description Zusammenfassung Projektplanung (7.2). */
             termine: {
-                projektStart: string | null;
-                phasenStart: string | null;
-                phasenExit: string | null;
+                projektStart: null | string;
+                phasenStart: null | string;
+                phasenExit: null | string;
                 /** @description Erwarteter Projektabschluss (ab Phase 2). */
-                projektabschluss: string | null;
+                projektabschluss: null | string;
             };
             /** @description Toleranzen des Projekts je Dimension; übersteuern ab der Baseline den Standard des Phasenmodells (A-10). */
             toleranzen?: components["schemas"]["ToleranzPlan"][];
@@ -49417,11 +49826,11 @@ export interface components {
             stand: "in_arbeit" | "in_pruefung" | "zur_unterzeichnung" | "unterzeichnet" | "traktandiert" | "abgenommen" | "abgelehnt" | "verworfen" | "zurueckgezogen";
             /** @description Verbindliche, abgenommene Version. */
             baseline: boolean;
-            baselineAt: string | null;
-            basisVersionId: string | null;
+            baselineAt: null | string;
+            basisVersionId: null | string;
             /** @description Begründung einer Änderung (UC-007 Schritt 2). */
             begruendung: string;
-            eingereichtAt: string | null;
+            eingereichtAt: null | string;
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -49432,6 +49841,8 @@ export interface components {
                 write: boolean;
                 /** @description Zur Prüfung einreichen (Entwurf in Arbeit, vertrag:write); Pflichtangaben prüft die Route. */
                 einreichen: boolean;
+                /** @description Projekt zurückziehen (erster Vertrag als Entwurf, aktives Projekt, vertrag:decide; UC-002 A4). */
+                zurueckziehen: boolean;
             };
         };
         VertragKapitelKopf: {
@@ -49454,8 +49865,8 @@ export interface components {
             projektId: string;
             /** @description Alle Versionen, neueste zuerst. */
             versionen: components["schemas"]["VertragVersion"][];
-            entwurf: string | null;
-            baseline: string | null;
+            entwurf: null | string;
+            baseline: null | string;
             can: {
                 /** @description Anlässe, für die die Person jetzt einen Entwurf anlegen kann. */
                 entwerfen: ("initial" | "gate" | "aenderung")[];
@@ -49479,9 +49890,9 @@ export interface components {
             inhalt: {
                 [key: string]: unknown;
             };
-            basis: {
+            basis: null | {
                 [key: string]: unknown;
-            } | null;
+            };
             geaendert: boolean;
             version: number;
             /** Format: date-time */
@@ -49521,8 +49932,12 @@ export interface components {
                     code: string;
                 };
                 erfuellt: boolean;
-                grund: string | null;
+                grund: null | string;
             }[];
+        };
+        VertragZurueckziehen: {
+            /** @description Begründung des Sponsors (Pflicht, UC-002 A4.1). */
+            begruendung: string;
         };
         VertragZielauswahl: {
             ziele: {
@@ -49577,7 +49992,7 @@ export interface components {
                 /** Format: uuid */
                 personId: string;
             }[];
-            unterzeichnung: {
+            unterzeichnung: null | {
                 /** Format: uuid */
                 qualityCheckId: string;
                 /** @description Unterzeichnete Funktionen («2 von 3»). */
@@ -49591,10 +50006,10 @@ export interface components {
                     funktion: "sp" | "pl" | "ctl";
                     /** @description Inhaber der Funktion in der Projektorganisation. */
                     personen: string[];
-                    unterschrift: {
+                    unterschrift: null | {
                         /** Format: uuid */
                         personId: string;
-                        inVertretungVon: string | null;
+                        inVertretungVon: null | string;
                         /**
                          * @description Ergebnis.
                          * @enum {string}
@@ -49603,9 +50018,9 @@ export interface components {
                         begruendung: string;
                         /** Format: date-time */
                         at: string;
-                    } | null;
+                    };
                 }[];
-            } | null;
+            };
             can: {
                 /** @description Quality-Check erfassen (in Prüfung, vertrag:review). */
                 qualityCheck: boolean;
@@ -49616,7 +50031,7 @@ export interface components {
                      * @enum {string}
                      */
                     funktion: "sp" | "pl" | "ctl";
-                    inVertretungVon: string | null;
+                    inVertretungVon: null | string;
                 }[];
             };
         };
@@ -49649,14 +50064,14 @@ export interface components {
             /** @description Schlüssel des Werts in der Codetabelle «Werteströme» (Nutzen, Projekt, Klinik, ICT, Infrastruktur). */
             wertestrom: string;
             text: string;
-            antwort: {
+            antwort: null | {
                 text: string;
                 zutreffend: boolean;
                 version: number;
                 /** Format: date-time */
                 updatedAt: string;
-                updatedBy: string | null;
-            } | null;
+                updatedBy: null | string;
+            };
         };
         VertragGate: {
             /** Format: uuid */
@@ -49686,18 +50101,18 @@ export interface components {
                  */
                 nach: "P0" | "P1" | "P2" | "P3" | "P4";
             };
-            gremienweg: {
+            gremienweg: null | {
                 gremium: {
                     kuerzel: string;
                     name: string;
                 };
-                zusaetzlich: {
+                zusaetzlich: null | {
                     kuerzel: string;
                     name: string;
-                } | null;
+                };
                 /** @description Das Gate läuft zusätzlich über den SNS-VR (UC-006 A1). */
                 viaSns: boolean;
-            } | null;
+            };
             /** @description Leitfragen des Gates je Wertestrom in der Version des Phasenmodells ab diesem Gate (A-13). */
             leitfragen: components["schemas"]["VertragLeitfrage"][];
             /** @description «18 von 25 beantwortet» (K2 Schritt 2). */
@@ -49718,9 +50133,9 @@ export interface components {
                  */
                 art: "lieferergebnis" | "meilenstein";
                 text: string;
-                erreichtAm: string | null;
+                erreichtAm: null | string;
             }[];
-            nutzen: {
+            nutzen: null | {
                 beurteilung: string;
                 werte: {
                     /** Format: uuid */
@@ -49734,12 +50149,12 @@ export interface components {
                     id: string;
                     text: string;
                     einheit: string;
-                    zielwert: string | null;
+                    zielwert: null | string;
                 }[];
                 /** @description Stand für If-Match; 0 = noch nicht erfasst. */
                 version: number;
-            } | null;
-            entscheid: {
+            };
+            entscheid: null | {
                 /**
                  * @description Entscheid des Gremiums.
                  * @enum {string}
@@ -49748,7 +50163,7 @@ export interface components {
                 begruendung: string;
                 /** Format: date-time */
                 at: string;
-            } | null;
+            };
             can: {
                 /** @description Leitfragen beantworten (PL, Entwurf in Arbeit). */
                 antworten: boolean;
@@ -49782,8 +50197,8 @@ export interface components {
             feld: string;
             /** @description Bezeichnung des Felds bzw. der Liste. */
             label: string;
-            eintrag: string | null;
-            eintragFeld: string | null;
+            eintrag: null | string;
+            eintragFeld: null | string;
             /**
              * @description Kennzeichnung zusätzlich zur Farbe (Q-B5).
              * @enum {string}
@@ -49793,7 +50208,7 @@ export interface components {
             alt: unknown;
             /** @description Wert in dieser Version; bei «entfernt» null. */
             neu: unknown;
-            differenz: number | null;
+            differenz: null | number;
         };
         VertragVergleich: {
             /** Format: uuid */
@@ -49814,7 +50229,7 @@ export interface components {
         VertragHauptaenderungen: {
             /** Format: uuid */
             versionId: string;
-            basisVersionId: string | null;
+            basisVersionId: null | string;
             rubriken: {
                 /**
                  * @description Rubrik der Hauptänderungen (Q7 Kopf).
@@ -49824,7 +50239,7 @@ export interface components {
                 label: string;
                 /** @description Vom System aus dem Vergleich zur Basis erzeugte Sätze. */
                 erzeugt: string[];
-                text: string | null;
+                text: null | string;
             }[];
             /** @description Weitere Hauptänderungen («Andere»), von der Projektleitung erfasst. */
             andere: string;
@@ -49838,11 +50253,11 @@ export interface components {
         VertragHauptaenderungenPut: {
             /** @description Umformulierung je Rubrik; null oder leer übernimmt wieder die erzeugten Sätze. */
             rubriken: {
-                scope?: string | null;
-                zeitplan?: string | null;
-                ressourcen_budget?: string | null;
-                annahmen?: string | null;
-                key_risiken?: string | null;
+                scope?: null | string;
+                zeitplan?: null | string;
+                ressourcen_budget?: null | string;
+                annahmen?: null | string;
+                key_risiken?: null | string;
             };
             andere: string;
         };
@@ -49852,8 +50267,8 @@ export interface components {
             /** Format: uuid */
             projektId: string;
             nummer: string;
-            basisVersionId: string | null;
-            basisNummer: string | null;
+            basisVersionId: null | string;
+            basisNummer: null | string;
             /**
              * @description Bearbeitungsstand; «in_pruefung» heisst hier: beim Sponsor zum Entscheid.
              * @enum {string}
@@ -49861,16 +50276,16 @@ export interface components {
             stand: "in_arbeit" | "in_pruefung" | "zur_unterzeichnung" | "unterzeichnet" | "traktandiert" | "abgenommen" | "abgelehnt" | "verworfen" | "zurueckgezogen";
             /** @description Begründung der Projektleitung (UC-007 Schritt 2). */
             begruendung: string;
-            eingereichtAt: string | null;
+            eingereichtAt: null | string;
             wirkung: {
                 /** @description Freigabe durch den PRAT nötig (UC-007 A1): ein geändertes Kapitel wirkt auf Scope, Budget oder Ressourcen. */
                 prat: boolean;
                 dimensionen: ("scope" | "budget" | "ressourcen")[];
                 /** @description Geänderte Kapitel mit dieser Wirkung. */
                 kapitel: number[];
-                hinweis: string | null;
+                hinweis: null | string;
             };
-            entscheid: {
+            entscheid: null | {
                 /**
                  * @description Entscheid des Sponsors: freigeben (Schritt 4), ablehnen (A2) oder Antrag an den PRAT unterstützen (A1).
                  * @enum {string}
@@ -49879,8 +50294,8 @@ export interface components {
                 begruendung: string;
                 /** Format: date-time */
                 at: string;
-                personId: string | null;
-            } | null;
+                personId: null | string;
+            };
             /** @description Version der Vertragsversion (ETag). */
             version: number;
             can: {
@@ -49909,20 +50324,20 @@ export interface components {
             /** @description Termin, Kosten und Umfang in dieser Reihenfolge. */
             toleranzen: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: number | null;
-                einheit: ("prozent" | "kalendertage" | "arbeitstage") | null;
-                quelle: ("vertrag" | "phasenmodell") | null;
+                wert: null | number;
+                einheit: null | ("prozent" | "kalendertage" | "arbeitstage");
+                quelle: null | ("vertrag" | "phasenmodell");
             }[];
         };
         IdeeRueckfrage: {
             /** Format: uuid */
             id: string;
-            feld: ("titel" | "ausgangslage" | "zielsetzung" | "handlungsfeld" | "strategischesZiel" | "bereiche" | "nutzen" | "aufwand" | "relevanz" | "herkunft") | null;
+            feld: null | ("titel" | "ausgangslage" | "zielsetzung" | "handlungsfeld" | "strategischesZiel" | "bereiche" | "nutzen" | "aufwand" | "relevanz" | "herkunft");
             text: string;
-            antwort: string | null;
+            antwort: null | string;
             /** Format: date-time */
             gestelltAt: string;
-            beantwortetAt: string | null;
+            beantwortetAt: null | string;
         };
         Idee: {
             /** Format: uuid */
@@ -49933,7 +50348,7 @@ export interface components {
             stand: "entwurf" | "eingereicht" | "in_pruefung" | "in_ergaenzung" | "traktandiert" | "freigegeben" | "zurueckgestellt" | "zurueckgewiesen" | "zusammengefuehrt";
             /** Format: date-time */
             standAt: string;
-            eingereichtAt: string | null;
+            eingereichtAt: null | string;
             /** Format: uuid */
             erfasstVon: string;
             /** @description Von der anfragenden Person erfasst. */
@@ -49944,18 +50359,18 @@ export interface components {
             ausgangslage: string;
             /** @description Zielsetzung: was erreicht werden soll. */
             zielsetzung: string;
-            handlungsfeldId: string | null;
-            strategischesZielId: string | null;
+            handlungsfeldId: null | string;
+            strategischesZielId: null | string;
             /** @description Betroffene Bereiche (Organisationseinheiten). */
             bereiche: string[];
-            nutzen: ("hoch" | "mittel" | "tief") | null;
+            nutzen: null | ("hoch" | "mittel" | "tief");
             nutzenText: string;
-            aufwand: ("hoch" | "mittel" | "tief") | null;
+            aufwand: null | ("hoch" | "mittel" | "tief");
             aufwandText: string;
-            relevanz: ("hoch" | "mittel" | "tief") | null;
+            relevanz: null | ("hoch" | "mittel" | "tief");
             relevanzText: string;
-            herkunft: string | null;
-            fuehrendeIdeeId: string | null;
+            herkunft: null | string;
+            fuehrendeIdeeId: null | string;
             /** @description Begründung der Zurückweisung (nur für Betroffene, UE und Gremium). */
             begruendung: string;
             rueckfragen: components["schemas"]["IdeeRueckfrage"][];
@@ -49983,9 +50398,9 @@ export interface components {
             stand: "entwurf" | "eingereicht" | "in_pruefung" | "in_ergaenzung" | "traktandiert" | "freigegeben" | "zurueckgestellt" | "zurueckgewiesen" | "zusammengefuehrt";
             /** Format: date-time */
             standAt: string;
-            eingereichtAt: string | null;
+            eingereichtAt: null | string;
             eigene: boolean;
-            handlungsfeldId: string | null;
+            handlungsfeldId: null | string;
             /** @description Rückfragen ohne Antwort. */
             rueckfragenOffen: number;
             /** Format: date-time */
@@ -49993,7 +50408,7 @@ export interface components {
         };
         IdeeList: {
             items: components["schemas"]["IdeeZeile"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         /** @description Neuer Entwurf; alle Angaben optional (Vorbelegung z. B. aus einer Hauptaktivität, Herkunft aus dem Direktlink). */
         IdeeCreate: {
@@ -50003,17 +50418,17 @@ export interface components {
             ausgangslage?: string;
             /** @description Zielsetzung: was erreicht werden soll. */
             zielsetzung?: string;
-            handlungsfeldId?: string | null;
-            strategischesZielId?: string | null;
+            handlungsfeldId?: null | string;
+            strategischesZielId?: null | string;
             /** @description Betroffene Bereiche (Organisationseinheiten). */
             bereiche?: string[];
-            nutzen?: ("hoch" | "mittel" | "tief") | null;
+            nutzen?: null | ("hoch" | "mittel" | "tief");
             nutzenText?: string;
-            aufwand?: ("hoch" | "mittel" | "tief") | null;
+            aufwand?: null | ("hoch" | "mittel" | "tief");
             aufwandText?: string;
-            relevanz?: ("hoch" | "mittel" | "tief") | null;
+            relevanz?: null | ("hoch" | "mittel" | "tief");
             relevanzText?: string;
-            herkunft?: string | null;
+            herkunft?: null | string;
         };
         IdeePatch: {
             /** @description Kurzer Titel der Idee. */
@@ -50022,17 +50437,17 @@ export interface components {
             ausgangslage?: string;
             /** @description Zielsetzung: was erreicht werden soll. */
             zielsetzung?: string;
-            handlungsfeldId?: string | null;
-            strategischesZielId?: string | null;
+            handlungsfeldId?: null | string;
+            strategischesZielId?: null | string;
             /** @description Betroffene Bereiche (Organisationseinheiten). */
             bereiche?: string[];
-            nutzen?: ("hoch" | "mittel" | "tief") | null;
+            nutzen?: null | ("hoch" | "mittel" | "tief");
             nutzenText?: string;
-            aufwand?: ("hoch" | "mittel" | "tief") | null;
+            aufwand?: null | ("hoch" | "mittel" | "tief");
             aufwandText?: string;
-            relevanz?: ("hoch" | "mittel" | "tief") | null;
+            relevanz?: null | ("hoch" | "mittel" | "tief");
             relevanzText?: string;
-            herkunft?: string | null;
+            herkunft?: null | string;
         };
         IdeeRueckfrageAntwort: {
             antwort: string;
@@ -50055,7 +50470,7 @@ export interface components {
                 id: string;
                 kuerzel: string;
                 name: string;
-                parentId: string | null;
+                parentId: null | string;
             }[];
             herkunft: {
                 schluessel: string;
@@ -50070,7 +50485,7 @@ export interface components {
                 /** @description Eingereicht, in Prüfung oder dem Gremium vorgelegt. */
                 laufend: number;
             };
-            zuPruefen: number | null;
+            zuPruefen: null | number;
         };
         IdeePoolZeile: {
             /** Format: uuid */
@@ -50080,25 +50495,25 @@ export interface components {
             stand: "entwurf" | "eingereicht" | "in_pruefung" | "in_ergaenzung" | "traktandiert" | "freigegeben" | "zurueckgestellt" | "zurueckgewiesen" | "zusammengefuehrt";
             /** Format: date-time */
             standAt: string;
-            eingereichtAt: string | null;
+            eingereichtAt: null | string;
             /** Format: uuid */
             erfasstVon: string;
-            handlungsfeldId: string | null;
+            handlungsfeldId: null | string;
             bereiche: string[];
-            herkunft: string | null;
-            kategorie: ("A" | "B" | "C") | null;
+            herkunft: null | string;
+            kategorie: null | ("A" | "B" | "C");
             rueckfragenOffen: number;
         };
         IdeePoolList: {
             items: components["schemas"]["IdeePoolZeile"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         IdeeFunnel: {
             stufen: {
                 stand: "entwurf" | "eingereicht" | "in_pruefung" | "in_ergaenzung" | "traktandiert" | "freigegeben" | "zurueckgestellt" | "zurueckgewiesen" | "zusammengefuehrt";
                 anzahl: number;
             }[];
-            letzteEinreichung: string | null;
+            letzteEinreichung: null | string;
         };
         IdeeAehnliche: {
             items: {
@@ -50115,24 +50530,24 @@ export interface components {
                 frage: string;
                 antwort: string;
             }[];
-            vorgesehenerSponsor: string | null;
+            vorgesehenerSponsor: null | string;
             raster: {
                 kriterium: "relevanz" | "direktionen" | "abhaengigkeiten" | "priorisierung" | "change";
-                einschaetzung: ("hoch" | "mittel" | "tief") | null;
+                einschaetzung: null | ("hoch" | "mittel" | "tief");
             }[];
-            vorschlag: {
+            vorschlag: null | {
                 kategorie: "A" | "B" | "C";
                 hoch: number;
                 mittel: number;
                 tief: number;
-            } | null;
-            kategorie: ("A" | "B" | "C") | null;
+            };
+            kategorie: null | ("A" | "B" | "C");
             kategorieBegruendung: string;
-            portfolioId: string | null;
-            zustaendig: {
+            portfolioId: null | string;
+            zustaendig: null | {
                 kuerzel: string;
                 name: string;
-            } | null;
+            };
             can: {
                 /** @description Leitfragen, Raster, Kategorie und Rückfragen (`idee:write`, Idee eingereicht oder in Prüfung). */
                 pruefen: boolean;
@@ -50145,12 +50560,12 @@ export interface components {
                 position: number;
                 antwort: string;
             }[];
-            vorgesehenerSponsor?: string | null;
+            vorgesehenerSponsor?: null | string;
         };
         IdeeRasterIn: {
             raster: {
                 kriterium: "relevanz" | "direktionen" | "abhaengigkeiten" | "priorisierung" | "change";
-                einschaetzung: ("hoch" | "mittel" | "tief") | null;
+                einschaetzung: null | ("hoch" | "mittel" | "tief");
             }[];
         };
         IdeeKategorieIn: {
@@ -50161,7 +50576,7 @@ export interface components {
         };
         IdeeRueckfragenIn: {
             fragen: {
-                feld?: ("titel" | "ausgangslage" | "zielsetzung" | "handlungsfeld" | "strategischesZiel" | "bereiche" | "nutzen" | "aufwand" | "relevanz" | "herkunft") | null;
+                feld?: null | ("titel" | "ausgangslage" | "zielsetzung" | "handlungsfeld" | "strategischesZiel" | "bereiche" | "nutzen" | "aufwand" | "relevanz" | "herkunft");
                 text: string;
             }[];
         };
@@ -50173,18 +50588,18 @@ export interface components {
             fuehrendeIdeeId: string;
         };
         IdeeFreigabe: {
-            weg: ("gremium" | "direktion") | null;
-            zustaendig: string | null;
-            vorgesehenerSponsor: string | null;
-            sponsor: string | null;
-            projektleitung: string | null;
-            freigegebenAt: string | null;
-            projekt: {
+            weg: null | ("gremium" | "direktion");
+            zustaendig: null | string;
+            vorgesehenerSponsor: null | string;
+            sponsor: null | string;
+            projektleitung: null | string;
+            freigegebenAt: null | string;
+            projekt: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: string;
                 name: string;
-            } | null;
+            };
             can: {
                 /** @description UE: dem Gremium vorlegen bzw. der Direktion übergeben. */
                 traktandieren: boolean;
@@ -50195,8 +50610,8 @@ export interface components {
             };
         };
         IdeeFreigabeAngabenIn: {
-            sponsor: string | null;
-            projektleitung: string | null;
+            sponsor: null | string;
+            projektleitung: null | string;
         };
         IdeeFreigebenIn: {
             /** Format: uuid */
@@ -50211,8 +50626,8 @@ export interface components {
         KapazitaetZelle: {
             rolle: string;
             monat: string;
-            fte: number | null;
-            version: number | null;
+            fte: null | number;
+            version: null | number;
         };
         Kapazitaet: {
             von: string;
@@ -50236,7 +50651,6 @@ export interface components {
                  * @example 2027-04
                  */
                 monat: string;
-                /** @description null entfernt das Angebot der Zelle. */
                 fte: null | number;
                 /** @description Gelesene Version der Zelle; Pflicht, wenn die Zelle schon ein Angebot hat (sonst 412). */
                 version?: number;
@@ -50248,7 +50662,7 @@ export interface components {
         };
         AuslastungZelle: {
             monat: string;
-            angebot: number | null;
+            angebot: null | number;
             /** @description Summe des Bedarfs in FTE der sichtbaren Projekte. */
             bedarf: number;
             /** @description Angebot minus Bedarf (negativ = überbucht). */
@@ -50268,11 +50682,11 @@ export interface components {
             von: string;
             bis: string;
             monate: string[];
-            szenario: {
+            szenario: null | {
                 /** Format: uuid */
                 id: string;
                 name: string;
-            } | null;
+            };
             /** @description Rollen mit Angebot oder Bedarf im Zeitraum, nach Schlüssel. */
             rollen: {
                 rolle: string;
@@ -50304,17 +50718,17 @@ export interface components {
             text: string;
             /** Format: date-time */
             gemeldetAt: string;
-            gemeldetBy: string | null;
+            gemeldetBy: null | string;
         };
         Bedarf: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
             projektId: string;
-            projekt: {
+            projekt: null | {
                 nummer: string;
                 name: string;
-            } | null;
+            };
             phase: string;
             /** @description Rolle = Pool (A-20). */
             rolle: string;
@@ -50332,17 +50746,17 @@ export interface components {
              * @enum {string}
              */
             stand: "offen" | "teilweise" | "gedeckt" | "ungedeckt";
-            prioritaet: {
+            prioritaet: null | {
                 /** @description 1 = höchste Priorität. */
                 rang: number;
                 /** @description Herkunft der Rangfolge (Priorisierung). */
                 quelle: string;
-            } | null;
-            luecke: components["schemas"]["Luecke"] | null;
+            };
+            luecke: null | components["schemas"]["Luecke"];
         };
         BedarfList: {
             items: components["schemas"]["Bedarf"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Anzahl je Stand (ohne Filter nach Stand). */
             anzahl: {
                 offen: number;
@@ -50378,7 +50792,7 @@ export interface components {
             projektId: string;
             /** Format: uuid */
             personId: string;
-            personName: string | null;
+            personName: null | string;
             monat: string;
             fte: number;
             version: number;
@@ -50414,22 +50828,22 @@ export interface components {
             zuteilungId: string;
             /** Format: uuid */
             projektId: string;
-            projekt: {
+            projekt: null | {
                 nummer: string;
                 name: string;
-            } | null;
+            };
             /** Format: uuid */
             personId: string;
-            personName: string | null;
+            personName: null | string;
             rolle: string;
             fte: number;
             version: number;
-            prioritaet: {
+            prioritaet: null | {
                 /** @description 1 = höchste Priorität. */
                 rang: number;
                 /** @description Herkunft der Rangfolge (Priorisierung). */
                 quelle: string;
-            } | null;
+            };
         };
         Konflikt: {
             /**
@@ -50438,9 +50852,9 @@ export interface components {
              */
             art: "person" | "pool";
             monat: string;
-            personId: string | null;
-            personName: string | null;
-            rolle: string | null;
+            personId: null | string;
+            personName: null | string;
+            rolle: null | string;
             /** @description Zugeteilt in FTE. */
             summe: number;
             /** @description Höchstens: eine Stelle bzw. das Angebot der Rolle. */
@@ -50500,13 +50914,13 @@ export interface components {
                 /** @description Anzahl Personen der Rolle im Monat. */
                 personen: number;
             }[];
-            uebernommenAt: string | null;
+            uebernommenAt: null | string;
         };
         Kriterium: {
             schluessel: string;
             text: string;
             beschreibung: string;
-            dimension: ("nutzen" | "risiko") | null;
+            dimension: null | ("nutzen" | "risiko");
             position: number;
         };
         Budgetrahmen: {
@@ -50528,8 +50942,8 @@ export interface components {
             beschreibung: string;
             /** @description Entscheid des Gremiums, mit dem das Modell in Kraft gesetzt wurde (UC-008 A1.2). */
             beschluss: string;
-            inKraftAt: string | null;
-            inKraftBy: string | null;
+            inKraftAt: null | string;
+            inKraftBy: null | string;
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -50547,8 +50961,8 @@ export interface components {
             beschreibung: string;
             /** @description Entscheid des Gremiums, mit dem das Modell in Kraft gesetzt wurde (UC-008 A1.2). */
             beschluss: string;
-            inKraftAt: string | null;
-            inKraftBy: string | null;
+            inKraftAt: null | string;
+            inKraftBy: null | string;
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -50585,7 +50999,7 @@ export interface components {
                 schluessel?: string;
                 text: string;
                 beschreibung?: string;
-                dimension?: ("nutzen" | "risiko") | null;
+                dimension?: null | ("nutzen" | "risiko");
             }[];
             /** @description Alle Budgetrahmen (ersetzt die bisherigen); je Portfolio höchstens einer. */
             budgetrahmen?: {
@@ -50609,7 +51023,7 @@ export interface components {
                 name: string;
                 kategorie: string;
             };
-            modell: {
+            modell: null | {
                 /** Format: uuid */
                 id: string;
                 /** @description Laufende Nummer der Modellversion in der Organisation. */
@@ -50620,15 +51034,15 @@ export interface components {
                 beschreibung: string;
                 /** @description Entscheid des Gremiums, mit dem das Modell in Kraft gesetzt wurde (UC-008 A1.2). */
                 beschluss: string;
-                inKraftAt: string | null;
-                inKraftBy: string | null;
+                inKraftAt: null | string;
+                inKraftBy: null | string;
                 version: number;
                 /** Format: date-time */
                 createdAt: string;
                 /** Format: date-time */
                 updatedAt: string;
                 kriterien: components["schemas"]["Kriterium"][];
-            } | null;
+            };
             /** @description Aktive Projekte des Portfolios, die die Person sieht (bei einem früheren Modell auch die damals bewerteten), nach Nummer. */
             projekte: {
                 /** Format: uuid */
@@ -50644,9 +51058,9 @@ export interface components {
                 /** Format: uuid */
                 projektId: string;
                 kriterium: string;
-                einschaetzung: ("hoch" | "mittel" | "tief") | null;
+                einschaetzung: null | ("hoch" | "mittel" | "tief");
                 kommentar: string;
-                version: number | null;
+                version: null | number;
             }[];
             fortschritt: {
                 /** @description Projekte mit allen Kriterien bewertet. */
@@ -50664,7 +51078,6 @@ export interface components {
                 projektId: string;
                 /** @description Fester Schlüssel des Kriteriums (Kleinbuchstaben, Ziffern, Unterstrich); bleibt über Modellversionen gleich. */
                 kriterium: string;
-                /** @description null entfernt die Bewertung des Kriteriums. */
                 einschaetzung: null | ("hoch" | "mittel" | "tief");
                 kommentar?: string;
                 /** @description Gelesene Version; Pflicht, wenn die Zelle schon bewertet ist (sonst 412). */
@@ -50676,9 +51089,9 @@ export interface components {
                 /** Format: uuid */
                 projektId: string;
                 kriterium: string;
-                einschaetzung: ("hoch" | "mittel" | "tief") | null;
+                einschaetzung: null | ("hoch" | "mittel" | "tief");
                 kommentar: string;
-                version: number | null;
+                version: null | number;
             }[];
         };
         Matrix: {
@@ -50689,17 +51102,17 @@ export interface components {
                 name: string;
                 kategorie: string;
             };
-            modell: {
+            modell: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: number;
-                inKraftAt: string | null;
+                inKraftAt: null | string;
                 kriterien: {
                     schluessel: string;
                     text: string;
-                    dimension: ("nutzen" | "risiko") | null;
+                    dimension: null | ("nutzen" | "risiko");
                 }[];
-            } | null;
+            };
             /** @description Beträge nur mit finanzen:read (A-33); sonst ist `kosten` null. */
             kostenSichtbar: boolean;
             /** @description Aktive Projekte des Portfolios, die die Person sieht, nach Nummer. */
@@ -50710,29 +51123,29 @@ export interface components {
                 name: string;
                 phase: string;
                 nutzen: {
-                    wert: number | null;
-                    stufe: ("hoch" | "tief" | "grenze") | null;
+                    wert: null | number;
+                    stufe: null | ("hoch" | "tief" | "grenze");
                     /** @description Bewertete Kriterien dieser Achse. */
                     bewertet: number;
                     /** @description Kriterien, die dieser Achse zugeordnet sind. */
                     von: number;
                 };
                 risiko: {
-                    wert: number | null;
-                    stufe: ("hoch" | "tief" | "grenze") | null;
+                    wert: null | number;
+                    stufe: null | ("hoch" | "tief" | "grenze");
                     /** @description Bewertete Kriterien dieser Achse. */
                     bewertet: number;
                     /** @description Kriterien, die dieser Achse zugeordnet sind. */
                     von: number;
                 };
-                feld: ("priorisieren" | "rasch_umsetzen" | "opportunistisch" | "hinterfragen") | null;
+                feld: null | ("priorisieren" | "rasch_umsetzen" | "opportunistisch" | "hinterfragen");
                 ressourcen: {
-                    fteMonate: number | null;
-                    groesse: ("S" | "M" | "L") | null;
+                    fteMonate: null | number;
+                    groesse: null | ("S" | "M" | "L");
                 };
-                kosten: number | null;
-                rang: number | null;
-                rangEntwurf: number | null;
+                kosten: null | number;
+                rang: null | number;
+                rangEntwurf: null | number;
                 /** @description Projekte dieses Portfolios, die das Projekt braucht (PP.02.03, Linien in der Matrix). */
                 abhaengigVon: string[];
             }[];
@@ -50754,7 +51167,7 @@ export interface components {
             }[];
             /** @description Fassung des Entwurfs für If-Match (0 ohne Entwurf). */
             version: number;
-            geaendertAt: string | null;
+            geaendertAt: null | string;
             can: {
                 write: boolean;
             };
@@ -50784,10 +51197,10 @@ export interface components {
                 id: string;
                 name: string;
                 stand: "entwurf" | "beantragt" | "entschieden" | "verworfen";
-                kosten: number | null;
+                kosten: null | number;
                 budget: {
-                    rahmen: number | null;
-                    bedarf: number | null;
+                    rahmen: null | number;
+                    bedarf: null | number;
                 };
                 /** @description Projekte über der Wasserlinie nach Nutzen (Matrix, A-39; ohne Score, A-01). */
                 nutzen: {
@@ -50812,17 +51225,17 @@ export interface components {
                 ueber: string[];
                 unter: string[];
                 wasserlinie: {
-                    beiRang: number | null;
-                    grund: ("budget" | "kapazitaet") | null;
-                    text: string | null;
-                    kapazitaet: {
+                    beiRang: null | number;
+                    grund: null | ("budget" | "kapazitaet");
+                    text: null | string;
+                    kapazitaet: null | {
                         rolle: string;
                         /** @description Monat «JJJJ-MM». */
                         monat: string;
                         bedarf: number;
                         angebot: number;
                         projekte: number;
-                    } | null;
+                    };
                 };
                 engpaesse: {
                     rolle: string;
@@ -50850,12 +51263,12 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            beantragtAt: string | null;
-            modell: {
+            beantragtAt: null | string;
+            modell: null | {
                 /** Format: uuid */
                 id: string;
                 nummer: number;
-            } | null;
+            };
             kostenSichtbar: boolean;
             /** @description Nach Rang. */
             positionen: {
@@ -50867,18 +51280,18 @@ export interface components {
                 rang: number;
                 /** @description Im Szenario enthalten (sonst zählt das Projekt nicht und liegt ausserhalb der Wasserlinie). */
                 aktiv: boolean;
-                startMonat: string | null;
-                startGeplant: string | null;
-                kosten: number | null;
-                kostenKumuliert: number | null;
-                fteMonate: number | null;
-                groesse: ("S" | "M" | "L") | null;
-                nutzen: ("hoch" | "tief" | "grenze") | null;
-                risiko: ("hoch" | "tief" | "grenze") | null;
-                strategiebeitrag: ("hoch" | "mittel" | "tief") | null;
+                startMonat: null | string;
+                startGeplant: null | string;
+                kosten: null | number;
+                kostenKumuliert: null | number;
+                fteMonate: null | number;
+                groesse: null | ("S" | "M" | "L");
+                nutzen: null | ("hoch" | "tief" | "grenze");
+                risiko: null | ("hoch" | "tief" | "grenze");
+                strategiebeitrag: null | ("hoch" | "mittel" | "tief");
                 /** @description Mindestens ein Kriterium nach dem Modell in Kraft bewertet. */
                 bewertet: boolean;
-                ueberWasserlinie: boolean | null;
+                ueberWasserlinie: null | boolean;
                 /** @description Aktives Projekt des Portfolios, das seit Anlage des Szenarios dazugekommen ist (am Ende eingereiht). */
                 neu: boolean;
                 warnungen: {
@@ -50888,10 +51301,10 @@ export interface components {
             }[];
             rechnung: {
                 wasserlinie: {
-                    beiRang: number | null;
-                    grund: ("budget" | "kapazitaet") | null;
-                    text: string | null;
-                    kapazitaet: {
+                    beiRang: null | number;
+                    grund: null | ("budget" | "kapazitaet");
+                    text: null | string;
+                    kapazitaet: null | {
                         rolle: string;
                         /** @description Monat «JJJJ-MM». */
                         monat: string;
@@ -50899,11 +51312,11 @@ export interface components {
                         angebot: number;
                         /** @description Projekte mit Bedarf in diesem Monat und dieser Rolle. */
                         projekte: number;
-                    } | null;
+                    };
                 };
                 budget: {
-                    rahmen: number | null;
-                    bedarf: number | null;
+                    rahmen: null | number;
+                    bedarf: null | number;
                 };
                 /** @description Engpässe je Quartal und Rolle aus der Auslastung nach Szenario (UC-009 Schritt 5). */
                 engpaesse: {
@@ -50921,13 +51334,13 @@ export interface components {
                 unter: number;
                 hinweise: string[];
             };
-            vorlage: {
+            vorlage: null | {
                 /** Format: date-time */
                 erstelltAt: string;
                 vergleich: components["schemas"]["SzenarioVergleich"];
                 /** @description Nummern der Projekte ohne Bewertung; in der Vorlage «nicht bewertet». */
                 nichtBewertet: string[];
-            } | null;
+            };
             can: {
                 write: boolean;
             };
@@ -50944,7 +51357,7 @@ export interface components {
                 createdAt: string;
                 /** Format: date-time */
                 updatedAt: string;
-                beantragtAt: string | null;
+                beantragtAt: null | string;
             }[];
             can: {
                 write: boolean;
@@ -50964,7 +51377,7 @@ export interface components {
                 projektId: string;
                 /** @default true */
                 aktiv: boolean;
-                startMonat?: string | null;
+                startMonat?: null | string;
             }[];
         };
         SzenarioBeantragen: {
@@ -50984,7 +51397,7 @@ export interface components {
                 nummer: string;
                 name: string;
                 phase: string;
-                folge: ("zurueckstellen" | "sistieren" | "abbrechen") | null;
+                folge: null | ("zurueckstellen" | "sistieren" | "abbrechen");
                 begruendung: string;
             }[];
             /** @description Antrag gewählt und Folgeentscheid für jedes laufende Projekt unter der Wasserlinie beantragt. */
@@ -51023,7 +51436,7 @@ export interface components {
             text: string;
             /** @description Verantwortliche Person oder Stelle in der Linie. */
             verantwortlich: string;
-            termin: string | null;
+            termin: null | string;
         };
         AbschlussIn: {
             /** @description Stand des Vorhabens bei Sistierung oder Abbruch (UC-015 A1.1). */
@@ -51073,23 +51486,23 @@ export interface components {
             offenePunkte: components["schemas"]["AbschlussOffenerPunkt"][];
             /** @description Beurteilung der Nutzenrealisierung (nur Abschluss). */
             nutzen: {
-                sp: {
+                sp: null | {
                     text: string;
                     /** Format: date-time */
                     at: string;
                     /** @description Name der Person. */
                     von: string;
-                } | null;
-                ue: {
+                };
+                ue: null | {
                     text: string;
                     /** Format: date-time */
                     at: string;
                     /** @description Name der Person. */
                     von: string;
-                } | null;
+                };
             };
-            eingereichtAt: string | null;
-            abgenommenAt: string | null;
+            eingereichtAt: null | string;
+            abgenommenAt: null | string;
             version: number;
             /** Format: date-time */
             updatedAt: string;
@@ -51136,7 +51549,7 @@ export interface components {
              * @enum {string}
              */
             lage: "abschluss" | "sistierung" | "abbruch" | "abgeschlossen" | "keine";
-            bericht: components["schemas"]["AbschlussBericht"] | null;
+            bericht: null | components["schemas"]["AbschlussBericht"];
             /** @description Alle Berichte des Projekts, neueste zuerst. */
             berichte: {
                 /** Format: uuid */
@@ -51151,12 +51564,12 @@ export interface components {
                  * @enum {string}
                  */
                 stand: "entwurf" | "eingereicht" | "traktandiert" | "abgenommen" | "nacharbeit";
-                eingereichtAt: string | null;
-                abgenommenAt: string | null;
+                eingereichtAt: null | string;
+                abgenommenAt: null | string;
             }[];
             /** @description Was das System zum Abschluss zeigt (UC-015 Schritt 1). */
             grundlagen: {
-                baseline: string | null;
+                baseline: null | string;
                 /** @description Ziele aus Kap. 3 der Baseline. */
                 ziele: string;
                 /** @description Nutzenbeitrag aus Kap. 3 der Baseline. */
@@ -51170,17 +51583,17 @@ export interface components {
                     art: string;
                     text: string;
                     einheit: string;
-                    zielwert: string | null;
-                    ist: {
+                    zielwert: null | string;
+                    ist: null | {
                         periode: string;
                         wert: number;
-                    } | null;
+                    };
                 }[];
-                kosten: {
+                kosten: null | {
                     budgetBaseline: number;
                     prognose: number;
                     ist: number;
-                } | null;
+                };
                 /** @description Meilensteine und Lieferergebnisse ohne «erreicht am». */
                 offeneMeilensteine: {
                     /** Format: uuid */
@@ -51188,18 +51601,18 @@ export interface components {
                     phase: string;
                     art: string;
                     text: string;
-                    terminBaseline: string | null;
-                    terminAktuell: string | null;
+                    terminBaseline: null | string;
+                    terminAktuell: null | string;
                 }[];
-                nutzenpruefung: {
+                nutzenpruefung: null | {
                     /** @description Vertragsversion des Gates. */
                     version: string;
                     beurteilung: string;
                     werte: components["schemas"]["AbschlussKpiWert"][];
-                } | null;
+                };
             };
             lessonsLearned: components["schemas"]["AbschlussLessonLearned"][];
-            entscheid: {
+            entscheid: null | {
                 /**
                  * @description Letzter Entscheid des Gremiums zu Abschluss, Sistierung, Abbruch oder Wiederaufnahme.
                  * @enum {string}
@@ -51207,7 +51620,7 @@ export interface components {
                 ergebnis: "abgeschlossen" | "nacharbeiten" | "sistiert" | "abgebrochen" | "weiterfuehren";
                 /** Format: date-time */
                 at: string;
-            } | null;
+            };
             can: {
                 /** @description Bericht erfassen (PL, Entwurf oder Nacharbeit). */
                 bearbeiten: boolean;
@@ -51238,7 +51651,7 @@ export interface components {
         };
         AbschlussLessonList: {
             items: components["schemas"]["AbschlussLessonLearned"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
             /** @description Kategorien in Gebrauch (Filter). */
             kategorien: string[];
         };
@@ -51256,9 +51669,9 @@ export interface components {
                     text: string;
                     metrik: string;
                     zielwert: string;
-                    stand: string | null;
+                    stand: null | string;
                     beurteilung: string;
-                    quartal: string | null;
+                    quartal: null | string;
                 }[];
             };
             vorhaben: {
@@ -51272,7 +51685,7 @@ export interface components {
                     phase: string;
                     /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
                     lebenszyklus: string;
-                    seit: string | null;
+                    seit: null | string;
                 }[];
                 /** @description Im Jahr abgebrochen. */
                 abgebrochen: {
@@ -51284,7 +51697,7 @@ export interface components {
                     phase: string;
                     /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
                     lebenszyklus: string;
-                    seit: string | null;
+                    seit: null | string;
                 }[];
                 /** @description Aktive und sistierte Vorhaben. */
                 laufend: {
@@ -51296,7 +51709,7 @@ export interface components {
                     phase: string;
                     /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
                     lebenszyklus: string;
-                    seit: string | null;
+                    seit: null | string;
                 }[];
             };
             /** @description Lessons Learned des Jahres (UC-013 Schritte 1–2). */
@@ -51324,7 +51737,7 @@ export interface components {
                     phase: string;
                     /** @description `aktiv`, `sistiert`, `abgeschlossen` oder `abgebrochen`. */
                     lebenszyklus: string;
-                    seit: string | null;
+                    seit: null | string;
                 }[];
             };
         };
@@ -51336,8 +51749,8 @@ export interface components {
             massnahmen: string;
             /** @description Rückmeldung des PRAT bei «Anpassungen verlangt». */
             rueckmeldung: string;
-            traktandiertAt: string | null;
-            ausgewertetAt: string | null;
+            traktandiertAt: null | string;
+            ausgewertetAt: null | string;
             /** @description 0, solange nichts gespeichert ist (If-Match W/"0" beim ersten Speichern). */
             version: number;
             auswertung: components["schemas"]["Jahresauswertung"];
@@ -51359,7 +51772,7 @@ export interface components {
             active: boolean;
             /** Format: date-time */
             createdAt: string;
-            createdBy: string | null;
+            createdBy: null | string;
         };
         WebhookSubscriptionCreated: {
             subscription: components["schemas"]["WebhookSubscription"];
@@ -51400,14 +51813,14 @@ export interface components {
             stand: "laeuft" | "erfolgreich" | "fehlgeschlagen";
             /** Format: date-time */
             start: string;
-            ende: string | null;
-            umfang: number | null;
-            fehler: string | null;
-            gestartetVon: {
+            ende: null | string;
+            umfang: null | number;
+            fehler: null | string;
+            gestartetVon: null | {
                 /** Format: uuid */
                 id: string;
-                name: string | null;
-            } | null;
+                name: null | string;
+            };
         };
         Schnittstelle: {
             /** Format: uuid */
@@ -51430,7 +51843,7 @@ export interface components {
             aktiv: boolean;
             /** @description Verarbeitung der Daten vorhanden. */
             verfuegbar: boolean;
-            letzterLauf: components["schemas"]["SchnittstelleLauf"] | null;
+            letzterLauf: null | components["schemas"]["SchnittstelleLauf"];
             version: number;
             /** Format: date-time */
             updatedAt: string;
@@ -51442,7 +51855,7 @@ export interface components {
         };
         SchnittstelleErgebnis: {
             schnittstelle: components["schemas"]["Schnittstelle"];
-            testlauf: components["schemas"]["SchnittstelleLauf"] | null;
+            testlauf: null | components["schemas"]["SchnittstelleLauf"];
         };
         SchnittstelleCreate: {
             umsystem: string;
@@ -51475,19 +51888,19 @@ export interface components {
         };
         SchnittstelleLaufList: {
             items: components["schemas"]["SchnittstelleLauf"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         AenderungsprotokollEintrag: {
             /** @description Folge im Audit (aufsteigend). */
             id: string;
             /** Format: date-time */
             zeit: string;
-            person: {
-                id: string | null;
-                name: string | null;
+            person: null | {
+                id: null | string;
+                name: null | string;
                 /** @description `user` oder `client` (Maschinen-Client). */
                 art: string;
-            } | null;
+            };
             /** @description `ui`, `api`, `mcp`, `worker`, `webhook` oder `system`. */
             quelle: string;
             /** @description Aktion im Audit, z. B. `org_einheit.updated`. */
@@ -51495,8 +51908,8 @@ export interface components {
             /** @enum {string} */
             art: "angelegt" | "geaendert" | "geloescht" | "sonstig";
             objekt: {
-                typ: string | null;
-                id: string | null;
+                typ: null | string;
+                id: null | string;
             };
             /** @description Alter und neuer Wert je Feld (beim Anlegen nur neu, beim Löschen nur alt). */
             aenderungen: {
@@ -51507,7 +51920,7 @@ export interface components {
         };
         AenderungsprotokollList: {
             items: components["schemas"]["AenderungsprotokollEintrag"][];
-            nextCursor: string | null;
+            nextCursor: null | string;
         };
         AenderungsprotokollObjekte: {
             items: string[];
@@ -51520,27 +51933,27 @@ export interface components {
             phase: string;
             /** Format: uuid */
             portfolioId: string;
-            kostentraeger: string | null;
-            budget: number | null;
-            prognose: number | null;
-            ist: number | null;
-            istBis: string | null;
+            kostentraeger: null | string;
+            budget: null | number;
+            prognose: null | number;
+            ist: null | number;
+            istBis: null | string;
             istJeArt: {
-                capex: number | null;
-                opex: number | null;
+                capex: null | number;
+                opex: null | number;
             };
             abweichung: {
-                betrag: number | null;
-                prozent: number | null;
+                betrag: null | number;
+                prozent: null | number;
                 /** @description Über der gültigen Toleranz «Kosten» (A-10: Baseline des Projektvertrags, sonst Phasenmodell); ohne Toleranz nie. */
                 wesentlich: boolean;
             };
-            toleranzProzent: number | null;
+            toleranzProzent: null | number;
             phasen: {
                 phase: string;
                 art: "capex" | "opex";
-                budget: number | null;
-                prognose: number | null;
+                budget: null | number;
+                prognose: null | number;
             }[];
             /** @description Ist-Kosten je Monat (UC-010 Schritt 3). */
             verlauf: {
@@ -51549,31 +51962,31 @@ export interface components {
                 capex: number;
                 opex: number;
             }[];
-            begruendung: {
+            begruendung: null | {
                 /** @description Monat «JJJJ-MM». */
                 periode: string;
                 text: string;
                 version: number;
                 /** Format: date-time */
                 geaendertAt: string;
-            } | null;
+            };
         };
         Finanzuebersicht: {
-            portfolio: {
+            portfolio: null | {
                 /** Format: uuid */
                 id: string;
                 schluessel: string;
                 name: string;
                 kategorie: string;
-            } | null;
+            };
             projekte: components["schemas"]["FinanzProjekt"][];
             summe: {
                 budget: number;
                 prognose: number;
-                ist: number | null;
+                ist: null | number;
                 abweichung: number;
             };
-            istStand: string | null;
+            istStand: null | string;
             /** @description Ist-Kosten von Kostenträgern ohne zugeordnetes Projekt (UC-010 A1); nur mit finanzen:write. */
             ohneProjekt: {
                 kostentraeger: string;
@@ -51611,7 +52024,7 @@ export interface components {
             stand: "neu" | "entwurf" | "uebergeben";
             /** @description 0, solange nichts gespeichert ist (If-Match W/"0"). */
             version: number;
-            uebergebenAt: string | null;
+            uebergebenAt: null | string;
             positionen: {
                 /** Format: uuid */
                 projektId: string;
@@ -51623,11 +52036,11 @@ export interface components {
                     capex: number;
                     opex: number;
                 };
-                korrektur: {
-                    capex: number | null;
-                    opex: number | null;
+                korrektur: null | {
+                    capex: null | number;
+                    opex: null | number;
                     bemerkung: string;
-                } | null;
+                };
                 wert: {
                     capex: number;
                     opex: number;
@@ -51635,11 +52048,11 @@ export interface components {
                 /** @description Phasen mit Kosten, aber ohne Termine (zählen nicht, A-17). */
                 ohneTermine: string[];
             }[];
-            vertraulich: {
+            vertraulich: null | {
                 anzahl: number;
                 capex: number;
                 opex: number;
-            } | null;
+            };
             summe: {
                 capex: number;
                 opex: number;

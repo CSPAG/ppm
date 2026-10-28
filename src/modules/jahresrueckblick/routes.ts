@@ -4,8 +4,8 @@
  * Traktandenliste des PRAT. Lesen mit `ziel:read`, erfassen mit `quartalsbericht:write` (UE).
  */
 import { Type } from '@sinclair/typebox';
-import type { FastifyInstance } from 'fastify';
-import { actorOf, conflict, etag, notFound, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps } from '@vollholz/platform';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
+import { actorOf, conflict, etag, forbidden, notFound, IfMatchHeaders, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import { MIME, vorlage, type Format } from '../vorlage/index.ts';
 import { dateiname, rueckblickDokument } from './dokument.ts';
@@ -17,19 +17,37 @@ import * as store from './store.ts';
 export const TAG = 'Jahresrückblick';
 const SCHREIBEN = 'quartalsbericht:write';
 
+/**
+ * Lesen mit `ziel:read` oder `quartalsbericht:write`; sonst mit `sitzung:read` an einem Portfolio (A-67): Mitglieder
+ * des PRAT sehen den Rückblick ab «traktandiert», welchen Stand und welches Gremium, entscheidet die Lesesicht (381).
+ * Liefert, ob die Person die Ziele der Organisation liest.
+ */
+async function lesend(req: FastifyRequest, tx: Tx, schreiben: boolean): Promise<boolean> {
+  if (schreiben || await req.can('ziel:read')) return true;
+  // nur Mitglieder des PRAT; andere Gremien erhalten 403 statt eines Wartezustands
+  const prat = await store.portfolioA(tx);
+  if (!prat || !(await req.can('sitzung:read', { type: 'portfolio', id: prat }))) throw forbidden();
+  return false;
+}
+
 export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   for (const s of [Jahresauswertung, Jahresrueckblick, JahresrueckblickPut]) app.addSchema(s);
 
   app.get('/v1/jahresrueckblicke/:jahr', {
     schema: {
       tags: [TAG], summary: 'Jahresrückblick', params: JahrParams, response: { 200: Type.Ref('Jahresrueckblick') },
-      description: 'Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`. ETag = Fassung (W/"0", solange nichts gespeichert ist).',
+      description: 'Jahresauswertung (UC-013 Schritt 1): Zielerreichung des Jahres, abgeschlossene, abgebrochene und laufende Vorhaben; Erkenntnisse und Massnahmen. In Arbeit live, ab dem Traktandieren der Stand bei Traktandierung. Recht `ziel:read` oder `quartalsbericht:write`; Mitglieder des PRAT (`sitzung:read` am Portfolio der Kategorie A) ab «traktandiert» (A-67), sonst 404. ETag = Fassung (W/"0", solange nichts gespeichert ist).',
     },
   }, async (req, reply): Promise<JahresrueckblickOut> => {
     const { jahr } = req.params as { jahr: number };
     const schreiben = await req.can(SCHREIBEN);
-    if (!schreiben) await req.need('ziel:read');
-    const out = await req.tx(async tx => antwort(tx, jahr, await store.lesen(tx, jahr), schreiben));
+    const out = await req.tx(async tx => {
+      const ziele = await lesend(req, tx, schreiben);
+      const r = await store.lesen(tx, jahr);
+      // Gremium (A-67): nur der traktandierte Stand, keine Auswertung live
+      if (!r && !ziele) throw notFound('Jahresrückblick');
+      return antwort(tx, jahr, r, schreiben);
+    });
     reply.header('etag', etag(out.version));
     return out;
   });
@@ -114,9 +132,9 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const { jahr } = req.params as { jahr: number };
     const format: Format = (req.query as { format?: Format }).format ?? 'pdf';
     const schreiben = await req.can(SCHREIBEN);
-    if (!schreiben) await req.need('ziel:read');
     const who = actorOf(req);
     const out = await req.tx(async tx => {
+      await lesend(req, tx, schreiben);
       const r = await store.lesen(tx, jahr);
       if (!r) throw notFound('Jahresrückblick');
       // Export eines Dokuments mit Personendaten im Audit (I-Z3); kein Ereignis

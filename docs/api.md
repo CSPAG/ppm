@@ -149,7 +149,7 @@ Prüfung und Abschluss der Periode durch die Unternehmensentwicklung (BC PS.01.0
 | `POST /v1/perioden/{periode}/bestaetigen` | `statusbericht:review` | Sammelbestätigung; auffällige und Berichte in anderem Stand werden übersprungen und genannt (A-28) |
 | `POST /v1/perioden/{periode}/einfordern` | `statusbericht:review` | ausstehende Berichte einfordern: Aufgabe `statusbericht.erstellen` an die Projektleitung |
 | `POST /v1/perioden/{periode}/abschliessen` | `periode:close` | 409 bei eingereichten, ungeprüften Berichten; sonst Stand je Projekt mit «nicht gemeldet» (A-11), Periode gesperrt (A-37); `If-Match` optional |
-| `GET /v1/perioden/{periode}/terminabweichungen` | `statusbericht:review` | Baseline und aufdatiert je Phase und Abschluss, nach grösster Verschiebung |
+| `GET /v1/perioden/{periode}/terminabweichungen` | `statusbericht:review` | Baseline und aufdatiert je Phase und Abschluss, nach grösster Verschiebung, mit den Einzelwerten (`meilensteine`); `format=csv`: Export, eine Zeile je Meilenstein bzw. Lieferergebnis |
 | `POST /v1/projekte/{id}/berichte/{periode}/pruefen` | `statusbericht:review` am Portfolio | Bericht bestätigen («geprüft»), `If-Match` Pflicht |
 | `POST /v1/projekte/{id}/berichte/{periode}/pruefung-zuruecknehmen` | `statusbericht:review` am Portfolio | Rückgängig: wieder «eingereicht» |
 | `GET /v1/projekte/{id}/berichte/{periode}/rueckfragen` | `projekt:read` am Projekt | Rückfragen, neueste zuerst |
@@ -166,7 +166,7 @@ Dashboard der Periode (BC PC.04.01, UC-014 Schritt 1, Kernablauf K1/K3; `src/mod
 
 | Methode und Pfad | Recht | Hinweis |
 |---|---|---|
-| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase |
+| `GET /v1/dashboard?portfolio=&periode=&ansicht=liste\|funnel&format=&phase=&auswahl=` | `auswertung:read` an der Organisation oder am Portfolio | Portfolios nach Recht (Gremium, Direktion nur ihr Portfolio; unbekanntes oder fremdes Portfolio 404); ohne `periode` die letzte abgeschlossene, sonst die laufende; abgeschlossen = Stand bei Abschluss mit «nicht gemeldet» (A-11), offen = aktueller Stand mit «ausstehend»; Badge `eskalation`; kritische zuerst; Funnel nach Phase; `format=csv` (mit `phase` und `auswahl` `im_plan`, `kritisch`, `ohne_status`, `offen`, `nicht_gemeldet`, `ausstehend`, `eskalation`): Export der Projekte wie die Liste der Oberfläche |
 
 ## Risikolage und Portfoliobericht
 
@@ -178,7 +178,7 @@ ohne Entscheid.
 
 | Methode und Pfad | Recht | Hinweis |
 |---|---|---|
-| `GET /v1/dashboard/risiken?portfolio=` | `auswertung:read` an der Organisation oder am Portfolio | Projektrisiken der aktiven Projekte und Portfoliorisiken, höchste Auswirkung und Wahrscheinlichkeit zuerst; Matrix 3 × 3; Abhängigkeiten; offene Eskalationen |
+| `GET /v1/dashboard/risiken?portfolio=&format=&w=&a=&massnahme=` | `auswertung:read` an der Organisation oder am Portfolio | Projektrisiken der aktiven Projekte und Portfoliorisiken, höchste Auswirkung und Wahrscheinlichkeit zuerst; Matrix 3 × 3; Abhängigkeiten; offene Eskalationen; `format=csv` (optional `w`, `a`, `massnahme=offen`): Export der Risiken wie die Tabelle |
 | `GET /v1/portfolioberichte?portfolio=` | `auswertung:read` | Entwürfe nur mit `auswertung:write`, sonst bereitgestellte Berichte der sichtbaren Portfolios |
 | `POST /v1/portfolioberichte` | `auswertung:write` | aus dem abgeschlossenen Dashboard (offene Periode 409); 201 neu, 200 im Entwurf neu erzeugt (Kommentar bleibt), bereitgestellt 409 |
 | `GET /v1/portfolioberichte/:id` | `auswertung:read` (Lesesicht) | Stand bei Erzeugung; ETag |
@@ -351,7 +351,7 @@ fehlgeschlagener Lauf (ausser Testlauf) öffnet die Aufgabe «Schnittstelle prü
 | `GET /v1/schnittstellen/{id}`, `PATCH …` | `schnittstelle:admin` | Rhythmus, Adresse, `aktiv` (deaktivieren statt löschen), `If-Match`; neue Adresse oder Aktivieren mit Testlauf |
 | `GET /v1/schnittstellen/{id}/laeufe` | `schnittstelle:admin` | je Lauf Art, Stand, Start, Ende, Umfang, Fehler; neueste zuerst, Cursor |
 | `POST /v1/schnittstellen/{id}/starten` | `schnittstelle:admin` | Lauf von Hand, auch erneut nach Fehler (A1.1), wartet auf das Ergebnis; nicht aktiv oder läuft schon 409 |
-| `GET /v1/aenderungsprotokoll?objekt=&objektId=&von=&bis=` | `audit:read` | Einträge des Audits mit Person, Zeitpunkt, Aktion, `aenderungen` (Feld, `vorher`, `nachher`; aus `before`/`after`); neueste zuerst, Cursor; `von`/`bis` Kalendertage |
+| `GET /v1/aenderungsprotokoll?objekt=&objektId=&von=&bis=&format=` | `audit:read` | Einträge des Audits mit Person, Zeitpunkt, Aktion, `aenderungen` (Feld, `vorher`, `nachher`; aus `before`/`after`); neueste zuerst, Cursor; `von`/`bis` Kalendertage; `format=csv`: Export aller Einträge zum Filter (eine Zeile je Feld, höchstens 10 000 Einträge, sonst 422) |
 | `GET /v1/aenderungsprotokoll/objekte` | `audit:read` | Objekttypen mit Einträgen (Filter) |
 
 ## Webhooks und Ereignisse
@@ -386,6 +386,7 @@ Ereignisse entstehen in derselben Transaktion wie die Änderung (Outbox) und wer
 | `ch.ppm.kpi_wert.recorded`, `ch.ppm.kpi_wert.deleted` | KPI-Wert einer Periode erfasst bzw. gelöscht |
 | `ch.ppm.meldung.created` | ICT- bzw. Infrastrukturbedarf gemeldet (A-22) |
 | `ch.ppm.vertrag.drafted`, `.chapter_updated`, `.submitted`, `.baselined` | Projektvertrag: Entwurf angelegt, Kapitel gespeichert, zur Prüfung eingereicht, Version Baseline |
+| `ch.ppm.vertrag.withdrawn` | Projektvertrag zurückgezogen (Sponsor, UC-002 A4); das Projekt ist danach `zurueckgezogen` (`ch.ppm.projekt.withdrawn`) |
 | `ch.ppm.meilenstein.baselined`, `.accepted`, `ch.ppm.kosten.baselined`, `.actuals_recorded`, `ch.ppm.ressourcenbedarf.coverage_changed` | Nachführung durch obere Module (Baseline, Abnahme, Ist-Kosten, Deckung) |
 | `ch.ppm.sitzung.created`, `ch.ppm.sitzung.updated` | Sitzung angelegt bzw. Beginn, Dauer, Ort geändert |
 | `ch.ppm.traktandum.scheduled`, `.unscheduled`, `.updated`, `.postponed`, `.invitations_changed` | Traktandum aufgenommen, entfernt, geändert, verschoben, Eingeladene geändert |

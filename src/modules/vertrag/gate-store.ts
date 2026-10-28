@@ -46,6 +46,11 @@ export async function traktandiert(tx: Tx, id: string, traktandumId: string): Pr
   await tx.query(`UPDATE ${A} SET stand = 'traktandiert', traktandum_id = $2 WHERE id = $1`, [id, traktandumId]);
 }
 
+/** Traktandum zurückgenommen (Vertrag zurückgezogen, DM.02.04): der Antrag ist wieder «in Arbeit». */
+export async function traktandumEntfernen(tx: Tx, id: string): Promise<void> {
+  await tx.query(`UPDATE ${A} SET stand = 'in_arbeit', traktandum_id = NULL, sitzung_id = NULL WHERE id = $1 AND stand = 'traktandiert'`, [id]);
+}
+
 /** Entscheid mit dem Stand davor festhalten (A-30: eine Korrektur nimmt die Folge mit diesen Werten zurück). */
 export async function entschieden(tx: Tx, id: string, e: {
   ergebnis: Ergebnis; begruendung: string; sitzungId: string | null;

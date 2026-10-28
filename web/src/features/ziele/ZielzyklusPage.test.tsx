@@ -152,6 +152,28 @@ describe('Zielzyklus', () => {
     expect(await api.calls.find(c => c.method === 'POST')!.json()).toEqual({ jahreszielId: JZ2, text: 'Inventur', verantwortlich: null });
   });
 
+  it('Hauptaktivität entfernen und Zuordnung lösen mit «Rückgängig» (I-R1 Stufe 1)', async () => {
+    const api = stub({
+      'GET /v1/ziele/2027': () => json(zyklus()),
+      'DELETE /v1/hauptaktivitaeten/h1': () => new Response(null, { status: 204 }),
+      'POST /v1/hauptaktivitaeten': () => json({ id: 'h3', jahreszielId: JZ1, text: 'Rahmenverträge verhandeln', verantwortlich: null, position: 0, version: 1, createdAt: '2026-10-02T08:00:00Z', updatedAt: '2026-10-02T08:00:00Z', can: { write: true } }, 201),
+      [`DELETE /v1/projekte/${PR}/ziele/z1`]: () => new Response(null, { status: 204 }),
+      [`POST /v1/projekte/${PR}/ziele`]: () => json({ id: 'z2', projektId: PR, strategischesZielId: SZ, jahreszielId: JZ1, jahr: 2027 }, 201),
+    });
+    renderWithIam(<Page initial={{ o: 'ziel:2.1.1' }} />);
+    await userEvent.click(await screen.findByRole('button', { name: TZZ.hauptaktivitaetEntfernen('Rahmenverträge verhandeln') }));
+    await userEvent.click(await screen.findByRole('button', { name: TZZ.rueckgaengig }));
+    await waitFor(() => expect(api.calls.some(c => c.method === 'POST' && c.url.endsWith('/v1/hauptaktivitaeten'))).toBe(true));
+    expect(await api.calls.find(c => c.method === 'POST' && c.url.endsWith('/v1/hauptaktivitaeten'))!.json())
+      .toEqual({ jahreszielId: JZ1, text: 'Rahmenverträge verhandeln', verantwortlich: null, position: 0 });
+
+    await userEvent.click(screen.getByRole('button', { name: TZZ.zuordnungLoesen('2026-014') }));
+    const rueck = await screen.findAllByRole('button', { name: TZZ.rueckgaengig });
+    await userEvent.click(rueck.at(-1)!);
+    await waitFor(() => expect(api.calls.some(c => c.method === 'POST' && c.url.endsWith(`/v1/projekte/${PR}/ziele`))).toBe(true));
+    expect(await api.calls.find(c => c.method === 'POST' && c.url.endsWith(`/v1/projekte/${PR}/ziele`))!.json()).toEqual({ jahreszielId: JZ1 });
+  });
+
   it('zwei Felder rasch nacheinander: das zweite speichert mit der Version aus der ersten Antwort (kein 412)', async () => {
     let n = 0;
     const antwort = (version: number) => json({ id: JZ2, jahr: 2027, strategischesZielId: SZ, nummer: '2.1.2', text: 'Lager reduzieren', metrik: 'Lagerwert', zielwert: '1', version, createdAt: '2026-10-01T08:00:00Z', createdBy: null, updatedAt: '2026-10-02T08:00:00Z', updatedBy: null, can: { write: true } });

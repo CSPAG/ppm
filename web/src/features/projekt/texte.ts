@@ -75,5 +75,8 @@ export const TP = {
     berichtFaellig: (monat: string, frist: string) => `Statusbericht ${monat} fällig ${frist}`,
     berichtOffen: (monat: string) => `Statusbericht ${monat} offen`,
     kritischGrund: (grund: string) => `Grund: ${grund}`,
+    meilenstein: (m: string) => `Nächster Meilenstein: ${m}`,
+    traktandum: (art: string, gremium: string, datum: string) => `${art} im ${gremium} ${datum}`,
+    vorstellen: (datum: string, gremium: string) => `Du stellst am ${datum} im ${gremium} vor`,
   },
 };

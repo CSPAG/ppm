@@ -144,6 +144,19 @@ describe('MatrixPage', () => {
     expect(await screen.findByText(/Entwurf, zuletzt gespeichert am/)).toBeInTheDocument();
   });
 
+  it('«Änderungen verwerfen» mit «Rückgängig» stellt Reihenfolge und Begründung wieder her (I-R1 Stufe 1)', async () => {
+    server();
+    renderWithIam(<Page />, UE);
+    await userEvent.click(await screen.findByRole('button', { name: '2026-002 Projekt 2 nach oben' }));
+    await userEvent.type(screen.getByRole('textbox', { name: 'Begründung für 2026-002 Projekt 2' }), 'Plattform zuerst');
+    await userEvent.click(screen.getByRole('button', { name: 'Änderungen verwerfen' }));
+    expect(screen.getByRole('button', { name: /^Rang 1: 2026-001 Projekt 1/ })).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'Rückgängig' }));
+    expect(screen.getByRole('button', { name: /^Rang 1: 2026-002 Projekt 2/ })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Begründung für 2026-002 Projekt 2' })).toHaveValue('Plattform zuerst');
+    expect(screen.getByText('Ungespeicherte Änderungen an der Rangfolge')).toBeInTheDocument();
+  });
+
   it('Konflikt (412, Z7): Hinweis mit «Neu laden»', async () => {
     const s = server();
     renderWithIam(<Page />, UE);

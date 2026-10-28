@@ -254,7 +254,12 @@ export async function nachGate(tx: Tx, g: GateEntscheid): Promise<void> {
       });
       return;
     }
-    if (vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') await zuruecknehmen(tx, who, vorher, p); // Abbruch zurücknehmen (A-30)
+    if (vorher?.ergebnis === 'abgebrochen' && p.lebenszyklus === 'abgebrochen') {
+      // Abbruch zurücknehmen (A-30); der Eintrag gilt danach als «weiterführen», damit ein späterer Abbruch aus einem
+      // anderen Geschäft nicht als Folge dieses Gates gilt und die Projektakte nicht mehr «abgebrochen» zeigt
+      await zuruecknehmen(tx, who, vorher, p);
+      await store.entscheidSetzen(tx, { ...vorher, kontext: 'aktiv', ergebnis: 'weiterfuehren', bericht_id: null, bericht_art_vorher: null });
+    }
     if (g.gate !== 'P3_P4') return;
     if (g.ergebnis === 'freigegeben' && p.phase === 'P4' && p.lebenszyklus === 'aktiv') await erstellenOeffnen(tx, p, 'abschluss');
     else if (!(await store.offenerBericht(tx, p.id))) await erstellenEntfallen(tx, p);

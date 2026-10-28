@@ -172,4 +172,13 @@ describe('Abschluss (UI-14)', () => {
     renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
     expect(await screen.findByText(TA.keine.titel)).toBeInTheDocument();
   });
+
+  it('vor dem ersten Speichern: die Projektleitung sieht die fehlenden Angaben, nicht «nur lesen»', async () => {
+    stub({ [`GET ${URL_A}`]: () => json(abschluss({ can: { ...abschluss().can, einreichen: false } }, null), 200, { etag: 'W/"0"' }) });
+    renderWithIam(<AbschlussPage nummer="2026-014" />, PL_ME);
+    expect(await screen.findByText('3 Angaben fehlen')).toBeInTheDocument();
+    expect(screen.queryByText(TA.banner.nurLesen)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TA.panel.einreichen }));
+    expect(screen.getByRole('textbox', { name: TA.felder.zielerreichung })).toHaveFocus();
+  });
 });

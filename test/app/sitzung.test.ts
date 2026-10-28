@@ -289,6 +289,9 @@ describe('Sitzungen vorbereiten', { skip }, () => {
     assert.equal(l2.items.length, 1);
     const k = await ok('GET', '/v1/sitzungen/kopf', ue);
     assert.equal(k.sitzungen[0].datum, termin1);
+    // Stand der Unterlagen wie in der Traktandenliste (Kopfkarte «Nächste Sitzung»)
+    const s1 = await ok('GET', `/v1/sitzungen/${k.sitzungen[0].id}`, ue);
+    assert.equal(k.sitzungen[0].unterlagenBereit, s1.traktanden.filter((t: { unterlagen: { stand: string } }) => ['bereit', 'keine'].includes(t.unterlagen.stand)).length);
     assert.equal((await call('GET', '/v1/gremien/unbekannt/sitzungen', ue)).statusCode, 404);
   });
 

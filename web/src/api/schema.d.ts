@@ -24833,7 +24833,7 @@ export interface paths {
         };
         /**
          * Kopf im Eingang
-         * @description Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).
+         * @description Nächste Sitzungen, die die Person sieht, mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).
          */
         get: {
             parameters: {
@@ -44997,6 +44997,8 @@ export interface components {
                 stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
                 traktanden: number;
                 versandBis: string | null;
+                /** @description Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste. */
+                unterlagenBereit: number;
             }[];
         };
         EntscheidErgebnis: {

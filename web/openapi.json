@@ -12048,7 +12048,8 @@
                 "datum",
                 "stand",
                 "traktanden",
-                "versandBis"
+                "versandBis",
+                "unterlagenBereit"
               ],
               "properties": {
                 "id": {
@@ -12113,6 +12114,10 @@
                       "type": "null"
                     }
                   ]
+                },
+                "unterlagenBereit": {
+                  "description": "Traktanden mit vollständigen Unterlagen (oder ohne nötige Unterlagen), Stand wie in der Traktandenliste.",
+                  "type": "integer"
                 }
               }
             }
@@ -58374,7 +58379,7 @@
         "tags": [
           "Sitzungen"
         ],
-        "description": "Nächste Sitzungen, die die Person sieht, mit Versandfrist (fachmodell.md 4.1).",
+        "description": "Nächste Sitzungen, die die Person sieht, mit Versandfrist und Stand der Unterlagen (fachmodell.md 4.1).",
         "responses": {
           "200": {
             "description": "Default Response",

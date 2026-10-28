@@ -24,7 +24,7 @@ const eingang = {
 };
 const projekt = (n: number, o: Record<string, unknown> = {}) => ({ id: uuid(n), nummer: `2026-0${10 + n}`, name: `Projekt ${n}`, phase: 'P1', lebenszyklus: 'aktiv', rollen: ['pl'], ...o });
 const gremium = (kuerzel: string, n: number) => ({ id: uuid(100 + n), kuerzel, name: kuerzel === 'prat' ? 'Projektrat' : 'GL Projektausschuss' });
-const sitzung = (n: number, g: ReturnType<typeof gremium>, datum: string, o: Record<string, unknown> = {}) => ({ id: uuid(200 + n), gremium: g, datum, stand: 'in_vorbereitung', traktanden: 6, versandBis: tag(3), ...o });
+const sitzung = (n: number, g: ReturnType<typeof gremium>, datum: string, o: Record<string, unknown> = {}) => ({ id: uuid(200 + n), gremium: g, datum, stand: 'in_vorbereitung', traktanden: 6, versandBis: tag(3), unterlagenBereit: 4, ...o });
 
 function stub(routes: Parameters<typeof mockIamApi>[0]) {
   const api = mockIamApi({ ...eingang, ...routes }, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
@@ -61,7 +61,7 @@ describe('Kopfkarten je Rolle', () => {
     const zeilen = within(sitzungen).getAllByRole('listitem');
     expect(zeilen).toHaveLength(2);
     expect(within(zeilen[0]!).getByRole('link', { name: /^PRAT / })).toHaveAttribute('href', `/gremien/prat/sitzungen/${tag(10)}`);
-    expect(within(zeilen[0]!).getByText(/^6 Traktanden · Versand bis /)).toBeInTheDocument();
+    expect(within(zeilen[0]!).getByText(/^6 Traktanden · 4 von 6 mit Unterlagen · Versand bis /)).toBeInTheDocument();
     expect(within(zeilen[1]!).getByText('6 Traktanden · Unterlagen versendet')).toBeInTheDocument();
 
     await expectNoAxe(container);

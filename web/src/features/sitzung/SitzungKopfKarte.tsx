@@ -1,6 +1,6 @@
 /**
  * Kopfkarte «Nächste Sitzung» auf der Startseite (fachmodell.md 4.1; informationsarchitektur.md «Startseite je Rolle»:
- * UE «PRAT Mi 12.11. · Versand bis Mi 5.11.», PRAT und GLPA mit Anzahl Traktanden und Stand der Unterlagen; K3): je
+ * UE «PRAT Mi 12.11. · Versand bis Mi 5.11. · 4 von 6 Traktanden mit Unterlagen», PRAT und GLPA mit Anzahl Traktanden und Stand der Unterlagen; K3): je
  * Gremium die nächste Sitzung, die die Person sieht, höchstens drei. Ohne Sitzung entfällt die Karte.
  */
 import { useIamConfig } from '@vollholz/iam-web';
@@ -24,13 +24,15 @@ export function SitzungKopfKarte() {
       <h2>{TS.kopfkarte.titel(naechste.length)}</h2>
       <ul>
         {naechste.map(s => {
-          // Vor dem Versand zählt die Versandfrist, danach der Stand der Unterlagen
+          // Vor dem Versand zählen Unterlagen und Versandfrist, danach der Stand der Sitzung
           const vorVersand = s.stand === 'geplant' || s.stand === 'in_vorbereitung';
           return (
             <li key={s.id}>
               <Link to={sitzungPfad(s.gremium.kuerzel, s.datum)}>{TS.kopfkarte.sitzung(s.gremium.kuerzel.toUpperCase(), fmtFrist(s.datum))}</Link>
               <span className="muted small">
-                {[TS.kopfkarte.traktanden(s.traktanden), vorVersand && s.versandBis ? TS.kopfkarte.versandBis(fmtFrist(s.versandBis)) : TS.stand[s.stand]].join(' · ')}
+                {(vorVersand
+                  ? [TS.kopfkarte.traktanden(s.traktanden), s.traktanden ? TS.kopfkarte.unterlagen(s.unterlagenBereit, s.traktanden) : '', s.versandBis ? TS.kopfkarte.versandBis(fmtFrist(s.versandBis)) : '']
+                  : [TS.kopfkarte.traktanden(s.traktanden), TS.stand[s.stand]]).filter(Boolean).join(' · ')}
               </span>
             </li>
           );

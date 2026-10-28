@@ -101,5 +101,6 @@ export const TS = {
     sitzung: (g: string, d: string) => `${g} ${d}`,
     traktanden: (n: number) => (n === 1 ? '1 Traktandum' : `${n} Traktanden`),
     versandBis: (d: string) => `Versand bis ${d}`,
+    unterlagen: (bereit: number, n: number) => `${bereit} von ${n} mit Unterlagen`,
   },
 };

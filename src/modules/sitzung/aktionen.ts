@@ -34,7 +34,7 @@ function pruefeNichtFest(t: store.TraktandumRow, was: string): void {
 export function pruefeReihenfolge(ts: readonly store.TraktandumRow[], reihenfolge: readonly string[]): void {
   const fest = ts.find(istFest);
   if (fest && reihenfolge[0] !== fest.id) {
-    throw conflict(`«${FEST.titel}» bleibt Traktandum 1 (K3 Schritt 4); ordnen Sie die übrigen Traktanden dahinter.`, { reason: 'fest' });
+    throw conflict(`«${FEST.titel}» bleibt Traktandum 1 (K3 Schritt 4); ordne die übrigen Traktanden dahinter.`, { reason: 'fest' });
   }
 }
 
@@ -102,7 +102,7 @@ export async function vorschlagen(tx: Tx, v: Vorschlag): Promise<string> {
       const e = portfolioId ? await entscheidendesGremium(tx, portfolioId) : null;
       g = e ? await store.gremium(tx, e.id) : null;
     }
-    if (!g) throw conflict('Für das Portfolio ist kein entscheidendes Gremium erfasst. Erfassen Sie es unter Administration › Portfolios und Gremien.');
+    if (!g) throw conflict('Für das Portfolio ist kein entscheidendes Gremium erfasst. Erfasse es unter Administration › Portfolios und Gremien.');
     return store.createTraktandum(tx, {
       portfolioId: g.portfolio_id, gremiumId: g.id, sitzungId: null, art: v.art, bezugTyp: v.bezug.typ, bezugId: v.bezug.id,
       projektId: p?.id ?? null, titel: v.titel, antrag: v.antrag ?? '', dauerMin: null, stand: 'vorgeschlagen', position: null,
@@ -185,7 +185,7 @@ export async function einplanen(tx: Tx, s: store.SitzungRow, e: { art: Art; proj
   if (e.projektId && !p) throw notFound('Projekt');
   if (p && p.portfolio_id !== s.portfolio_id) throw invalid('Das Projekt gehört zu einem anderen Portfolio.', [{ path: '/projektId', message: 'anderes Portfolio' }]);
   const bezug = p ? { typ: 'projekt', id: p.id } : { typ: 'sitzung', id: s.id };
-  if (await store.offenesTraktandum(tx, e.art, bezug.typ, bezug.id)) throw conflict('Dieses Geschäft ist bereits vorgeschlagen oder traktandiert. Nehmen Sie den Vorschlag auf.');
+  if (await store.offenesTraktandum(tx, e.art, bezug.typ, bezug.id)) throw conflict('Dieses Geschäft ist bereits vorgeschlagen oder traktandiert. Nimm den Vorschlag auf.');
   const z = await traktandenart(e.art)?.zusammenfassung?.(tx, { ...bezug, projektId: p?.id ?? null });
   const titel = e.titel?.trim() || z?.titel || (p ? `${artLabel(e.art)} ${p.nummer} ${p.name}` : artLabel(e.art));
   const id = await store.createTraktandum(tx, {
@@ -214,7 +214,7 @@ export async function verschieben(tx: Tx, s: store.SitzungRow, t: store.Traktand
   pruefeNichtFest(t, 'verschieben');
   if (t.sitzung_id !== s.id || (t.stand !== 'traktandiert' && t.stand !== 'verschoben')) throw conflict('Das Traktandum steht nicht auf dieser Sitzung.');
   const [naechster] = await store.termine(tx, s.gremium_id, { nach: s.datum });
-  if (!naechster) throw conflict('Für das Gremium ist kein weiterer Sitzungstermin geplant. Erfassen Sie zuerst den nächsten Termin.');
+  if (!naechster) throw conflict('Für das Gremium ist kein weiterer Sitzungstermin geplant. Erfasse zuerst den nächsten Termin.');
   const g = (await store.gremium(tx, s.gremium_id))!;
   const ziel = (await store.sitzungAm(tx, g.id, naechster)) ?? await sitzungAnlegen(tx, g, naechster);
   await store.verschieben(tx, t.id, s.id, ziel.id);
@@ -353,7 +353,7 @@ export async function versandvorschau(tx: Tx, s: store.SitzungRow): Promise<Vers
 export async function versenden(tx: Tx, s: store.SitzungRow, version: number): Promise<Versandvorschau> {
   pruefeVorbereitung(s);
   const ts = await store.traktanden(tx, s.id);
-  if (!ts.length) throw conflict('Die Traktandenliste ist leer. Nehmen Sie zuerst Traktanden auf.');
+  if (!ts.length) throw conflict('Die Traktandenliste ist leer. Nimm zuerst Traktanden auf.');
   const vorschau = await versandvorschau(tx, s);
   const stand = await unterlagenstand(tx, s, ts);
   for (const t of ts) {
@@ -361,7 +361,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
       await store.unterlageAnlegen(tx, t.id, { art: u.art, titel: u.titel, standOk: u.bereit, hinweis: u.hinweis ?? '', inhalt: u.inhalt ?? {} });
     }
   }
-  if (!(await store.markVersendet(tx, s.id, version, vorschau.frist.vorlauf))) throw conflict('Die Sitzung wurde inzwischen geändert. Laden Sie sie neu.');
+  if (!(await store.markVersendet(tx, s.id, version, vorschau.frist.vorlauf))) throw conflict('Die Sitzung wurde inzwischen geändert. Lade sie neu.');
 
   const g = s.gremium_kuerzel.toUpperCase();
   const datum = kurzDatum(s.datum);
@@ -376,7 +376,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
     link, frist: { datum: s.datum, art: 'kalendertage' }, manuell: true,
   });
 
-  // Einladungen gebündelt je Person (I-B3): «Sie stellen ‹Projekt› am Mi 12.11. im PRAT vor · ca. 14:20»
+  // Einladungen gebündelt je Person (I-B3): «Du stellst ‹Projekt› am Mi 12.11. im PRAT vor · ca. 14:20»
   const fenster = zeitfenster(s, ts);
   const einladungen = await store.einladungen(tx, { sitzungId: s.id });
   const jePerson = new Map<string, string[]>();
@@ -388,7 +388,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
     }
   }
   for (const [person, was] of jePerson) {
-    await mitteilung.senden(tx, { an: person, bezug, text: `Sie stellen am ${datum} im ${g} vor: ${was.join('; ')}.`, link });
+    await mitteilung.senden(tx, { an: person, bezug, text: `Du stellst am ${datum} im ${g} vor: ${was.join('; ')}.`, link });
   }
 
   // Verschobene Traktanden (A2): PL und SP informieren

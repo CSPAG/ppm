@@ -82,7 +82,7 @@ async function traktandumMitSitzung(req: FastifyRequest, tx: Tx, id: string): Pr
   const t = await store.getTraktandum(tx, id);
   if (!t) throw notFound('Traktandum');
   await req.need('sitzung:write', ort(t.portfolio_id));
-  if (!t.sitzung_id) throw conflict('Das Traktandum ist ein Vorschlag ohne Sitzung. Nehmen Sie es zuerst in eine Sitzung auf.');
+  if (!t.sitzung_id) throw conflict('Das Traktandum ist ein Vorschlag ohne Sitzung. Nimm es zuerst in eine Sitzung auf.');
   return { t, s: await lesen(tx, t.sitzung_id) };
 }
 

@@ -1,4 +1,4 @@
-/** Texte der Portfolio-Roadmap (UI-31, K6 Schritt 8; eigene Datei von AP-E6-2): Anrede «Sie», Schweizer Rechtschreibung. */
+/** Texte der Portfolio-Roadmap (UI-31, K6 Schritt 8; eigene Datei von AP-E6-2): Anrede «Du», Schweizer Rechtschreibung. */
 import { fmtDatum } from '../../ui/index.ts';
 
 export const TR = {
@@ -13,7 +13,7 @@ export const TR = {
   abbrechen: 'Abbrechen',
   wirkung: (jahr: number) => `Alle angemeldeten Personen sehen die Roadmap ${jahr} lesend. Vertrauliche Projekte erscheinen nicht.`,
   ersetzt: (d: string) => `Die Roadmap wurde zuletzt am ${fmtDatum(d)} publiziert; der neue Stand ersetzt ihn.`,
-  nichtInKraft: (jahr: number) => `Die Jahresziele ${jahr} sind noch nicht in Kraft. Publizieren Sie die Roadmap nach der Freigabe durch den VR.`,
+  nichtInKraft: (jahr: number) => `Die Jahresziele ${jahr} sind noch nicht in Kraft. Publiziere die Roadmap nach der Freigabe durch den VR.`,
   publiziertToast: (jahr: number) => `Roadmap ${jahr} publiziert.`,
   leer: (jahr: number) => `Für ${jahr} ist noch keine Roadmap publiziert.`,
   leerUe: 'Die Roadmap entsteht aus den freigegebenen Jahreszielen, ihren Hauptaktivitäten und den beitragenden Projekten.',

@@ -55,7 +55,7 @@ export async function pruefePersonen(tx: Tx, sponsor: string | null, projektleit
 export async function initialisieren(tx: Tx, who: Actor, principalId: string, r: store.Row, o: { sponsor: string; projektleitung: string; begruendung: string }): Promise<{ id: string; nummer: string; name: string }> {
   if (!umgebung) throw new Error('Modul idee ist nicht registriert (freigabeUmgebung fehlt).');
   const a = (await fs.angaben(tx, r.id))!;
-  if (!a.portfolio_id) throw invalid('Die Idee hat kein Portfolio.', [{ path: '/kategorie', message: 'Ordnen Sie zuerst die Kategorie zu.' }]);
+  if (!a.portfolio_id) throw invalid('Die Idee hat kein Portfolio.', [{ path: '/kategorie', message: 'Ordne zuerst die Kategorie zu.' }]);
   const pf = await fs.portfolio(tx, a.portfolio_id);
   const tenantId = (await tx.query<{ t: string }>('SELECT app.tenant_id() AS t')).rows[0]!.t;
   const p = await projekt.anlegen(tx, { db: umgebung.db, tenantId }, who, {
@@ -80,10 +80,10 @@ export async function initialisieren(tx: Tx, who: Actor, principalId: string, r:
   });
   await mitteilung.senden(tx, {
     an: r.erfasst_von, bezug: bezugVon(r.id),
-    text: `Ihre Projektidee «${titelVon(r)}» ist freigegeben: Das Projekt ${p.nummer} entsteht in Phase P0.`, link: link(r.nummer),
+    text: `Deine Projektidee «${titelVon(r)}» ist freigegeben: Das Projekt ${p.nummer} entsteht in Phase P0.`, link: link(r.nummer),
   });
   if (o.sponsor !== r.erfasst_von) {
-    await mitteilung.senden(tx, { an: o.sponsor, bezug: { typ: 'projekt', id: p.id }, text: `Sie sind Sponsor des Projekts ${p.nummer} ${p.name} (Initialisierung freigegeben).`, link: `/projekte/${p.nummer}` });
+    await mitteilung.senden(tx, { an: o.sponsor, bezug: { typ: 'projekt', id: p.id }, text: `Du bist Sponsor des Projekts ${p.nummer} ${p.name} (Initialisierung freigegeben).`, link: `/projekte/${p.nummer}` });
   }
   await record(tx, who, {
     action: 'idee.approved', resourceType: 'idee', resourceId: r.id,
@@ -111,8 +111,8 @@ export async function nichtFreigeben(tx: Tx, who: Actor, r: store.Row, stand: 'z
     await mitteilung.senden(tx, {
       an: r.erfasst_von, bezug: bezugVon(r.id), link: link(r.nummer),
       text: stand === 'zurueckgestellt'
-        ? `Ihre Projektidee «${titelVon(r)}» ist zurückgestellt; sie bleibt im Pool und kommt erneut zum Entscheid.`
-        : `Ihre Projektidee «${titelVon(r)}» wird nicht weiterverfolgt. Die Begründung steht bei der Idee.`,
+        ? `Deine Projektidee «${titelVon(r)}» ist zurückgestellt; sie bleibt im Pool und kommt erneut zum Entscheid.`
+        : `Deine Projektidee «${titelVon(r)}» wird nicht weiterverfolgt. Die Begründung steht bei der Idee.`,
     });
   }
   await record(tx, who, {
@@ -137,7 +137,7 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge): Promise<void> {
     try {
       await pruefePersonen(tx, a.sponsor, a.projektleitung);
     } catch {
-      throw invalid(`Für die Freigabe von «${titelVon(r)}» fehlen Sponsor oder Projektleitung. Erfassen Sie beide bei der Idee (Portfolio › Ideen ${r.nummer}) und erfassen Sie den Entscheid erneut.`,
+      throw invalid(`Für die Freigabe von «${titelVon(r)}» fehlen Sponsor oder Projektleitung. Erfasse beide bei der Idee (Portfolio › Ideen ${r.nummer}) und erfasse den Entscheid erneut.`,
         [{ path: '/ergebnis', message: 'Sponsor und Projektleitung fehlen (A-05).' }]);
     }
     const principal = (await tx.query<{ p: string | null }>('SELECT app.principal_id() AS p')).rows[0]!.p;

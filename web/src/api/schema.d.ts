@@ -45813,7 +45813,7 @@ export interface components {
             }[];
             toleranzen?: {
                 dimension: "termin" | "kosten" | "umfang";
-                wert: null | number;
+                wert: number | null;
                 einheit: "prozent" | "kalendertage" | "arbeitstage";
             }[];
         };
@@ -46276,6 +46276,7 @@ export interface components {
             lieferant: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte: string;
+            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
             prognose: null | number;
             budgetBaseline: number | null;
             ist: number | null;
@@ -46305,7 +46306,8 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: null | number;
+            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
+            prognose?: number | null;
         };
         KostenPatch: {
             /**
@@ -46324,7 +46326,8 @@ export interface components {
             lieferant?: string;
             /** @description Verweis auf Offerte bzw. Kostenkalkulation. */
             offerte?: string;
-            prognose?: null | number;
+            /** @description Erwartete Kosten (aufdatiert, PC.01.03), CHF inkl. MwSt. */
+            prognose?: number | null;
         };
         Risiko: {
             /** Format: uuid */

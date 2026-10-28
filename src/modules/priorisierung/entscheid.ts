@@ -45,7 +45,7 @@ export function pruefeFolgen(offen: Awaited<ReturnType<typeof unterWasserlinie>>
 
 /**
  * Folge des Entscheids (fachmodell.md 2.9; UC-008 Schritt 8, A2) in der Transaktion des Entscheids, idempotent: ein
- * zweites Erfassen (Korrektur) schreibt den Ist-Stand erneut, informiert aber nicht doppelt.
+ * zweites Erfassen (Korrektur, A-30) ändert den übernommenen Ist-Stand nicht und protokolliert nur die Korrektur.
  */
 export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   if (f.bezug.typ !== 'szenario' || f.ergebnis !== 'szenario_gewaehlt') return;
@@ -54,7 +54,13 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
   if (s.stand !== 'beantragt' && s.stand !== 'entschieden') {
     throw conflict(`Das Szenario «${s.name}» ist nicht als Antrag gewählt (${s.stand}). Wähle es als Antrag und erfasse den Entscheid erneut.`, { reason: 'stand', stand: s.stand });
   }
-  const erneut = s.stand === 'entschieden';
+  const who = k?.akteur ?? systemActor('system');
+  // Korrektur (A-30): das einzige Ergebnis ist schon übernommen; der Ist-Stand bleibt, wie entschieden (nicht neu gerechnet)
+  if (s.stand === 'entschieden') {
+    const daten = { id: s.id, traktandumId: f.traktandumId, begruendung: f.begruendung, vorher: k?.vorher ?? null };
+    await record(tx, who, { action: 'szenario.decision_corrected', resourceType: 'szenario', resourceId: s.id, data: daten, event: daten });
+    return;
+  }
   const g = await szenarioRechnen(tx, s, await es.kostenSichtbar(tx, s.portfolio_id));
   const unter = await unterWasserlinie(tx, s, g);
   try { pruefeFolgen(unter); } catch (e) {
@@ -64,22 +70,18 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
   const enthalten = g.positionen.filter(p => p.aktiv);
   const bisher = await es.rangfolgeEntscheiden(tx, s.portfolio_id, enthalten.map(p => ({ projektId: p.projektId, startMonat: p.startMonat })));
   await es.szenarioEntscheiden(tx, s.id);
-  // Akteur ist die Person, die den Entscheid erfasst (FolgeKontext); ohne Kontext (direkter Aufruf) das System
-  const who = k?.akteur ?? systemActor('system');
   const link = szenarioLink(pf.schluessel, s.id);
 
   // Sponsoren und Projektleitungen der Projekte mit geändertem Rang oder Start informieren (UC-008 Schritt 8)
   const geaendert = enthalten.filter((p, i) => { const b = bisher.get(p.projektId); return !b || b.rang !== i + 1 || b.start !== p.startMonat; });
   const personen = await es.verantwortliche(tx, enthalten.map(p => p.projektId));
-  if (!erneut) {
-    const an = new Map<string, string[]>();
-    for (const p of geaendert) for (const v of personen.filter(x => x.projekt_id === p.projektId)) an.set(v.person_id, [...(an.get(v.person_id) ?? []), p.nummer]);
-    for (const [person, nummern] of an) {
-      await mitteilung.senden(tx, {
-        an: person, bezug: bezugVon(s.id), link,
-        text: `Priorisierung ${pf.name}: Das Gremium hat das Szenario «${s.name}» gewählt. Rang oder Start ändern sich für ${nummern.join(', ')}.`,
-      });
-    }
+  const an = new Map<string, string[]>();
+  for (const p of geaendert) for (const v of personen.filter(x => x.projekt_id === p.projektId)) an.set(v.person_id, [...(an.get(v.person_id) ?? []), p.nummer]);
+  for (const [person, nummern] of an) {
+    await mitteilung.senden(tx, {
+      an: person, bezug: bezugVon(s.id), link,
+      text: `Priorisierung ${pf.name}: Das Gremium hat das Szenario «${s.name}» gewählt. Rang oder Start ändern sich für ${nummern.join(', ')}.`,
+    });
   }
   // Folgeentscheide (A2): Sistieren und Abbrechen leiten UC-015 ein (Aufgabe an die Projektleitung)
   for (const u of unter) {
@@ -94,13 +96,11 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
         });
       }
     }
-    if (!erneut) {
-      for (const v of personen.filter(x => x.projekt_id === u.projektId)) {
-        await mitteilung.senden(tx, {
-          an: v.person_id, bezug: { typ: 'projekt', id: u.projektId }, link: `/projekte/${u.nummer}`,
-          text: `Priorisierung ${pf.name}: ${u.nummer} ${u.name} liegt unter der Wasserlinie. Entscheid des Gremiums: ${FOLGE_TEXT[folge.folge]}.`,
-        });
-      }
+    for (const v of personen.filter(x => x.projekt_id === u.projektId)) {
+      await mitteilung.senden(tx, {
+        an: v.person_id, bezug: { typ: 'projekt', id: u.projektId }, link: `/projekte/${u.nummer}`,
+        text: `Priorisierung ${pf.name}: ${u.nummer} ${u.name} liegt unter der Wasserlinie. Entscheid des Gremiums: ${FOLGE_TEXT[folge.folge]}.`,
+      });
     }
   }
   const daten = {

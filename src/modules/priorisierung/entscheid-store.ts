@@ -1,6 +1,7 @@
 /** Datenzugriff des Priorisierungsentscheids (UC-008 Schritte 7–8, A2) unter der Lesesicht; die Abfragen kennen keine Rechte. */
-import type { Tx } from '@vollholz/platform';
+import { conflict, type Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
+import { traktandum } from '../sitzung/index.ts';
 
 const S = SCHEMA;
 
@@ -56,4 +57,25 @@ export async function istStart(tx: Tx, portfolioId: string): Promise<Map<string,
   return new Map((await tx.query<{ projekt_id: string; start_monat: string }>(
     `SELECT projekt_id, start_monat FROM ${S}.rangfolge WHERE portfolio_id = $1 AND stand = 'entschieden' AND start_monat IS NOT NULL`, [portfolioId])).rows
     .map(r => [r.projekt_id, r.start_monat]));
+}
+
+export async function traktandiertSetzen(tx: Tx, id: string, ja: boolean): Promise<void> {
+  await tx.query(`UPDATE ${S}.szenario SET traktandiert_at = CASE WHEN $2 THEN now() ELSE NULL END WHERE id = $1`, [id, ja]);
+}
+
+export async function traktandiert(tx: Tx, id: string): Promise<boolean> {
+  return (await tx.query<{ t: Date | null }>(`SELECT traktandiert_at AS t FROM ${S}.szenario WHERE id = $1`, [id])).rows[0]?.t != null;
+}
+
+/**
+ * Traktandum eines Antrags zurücknehmen, bevor der Antrag sich ändert (neue Folgeentscheide, neuer Antrag, Verwerfen):
+ * solange nicht versendet, entfällt das Traktandum (erneut traktandieren); versendet ist der Antrag fest bis zum
+ * Entscheid (409).
+ */
+export async function antragZuruecknehmen(tx: Tx, s: { id: string; name: string }): Promise<void> {
+  if (!(await traktandiert(tx, s.id))) return;
+  if (!(await traktandum.zuruecknehmen(tx, { art: 'priorisierung', bezug: { typ: 'szenario', id: s.id } }))) {
+    throw conflict(`Der Antrag «${s.name}» ist dem Gremium mit den Unterlagen versendet und bis zum Entscheid fest.`, { reason: 'versendet' });
+  }
+  await traktandiertSetzen(tx, s.id, false);
 }

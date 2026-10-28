@@ -46985,6 +46985,8 @@ export interface components {
             /** Format: uuid */
             szenarioId: string;
             stand: string;
+            /** @description Antrag traktandiert; geänderte Folgeentscheide nehmen das Traktandum zurück (versendet: 409). */
+            traktandiert: boolean;
             /** @description Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid. */
             unterWasserlinie: {
                 /** Format: uuid */

@@ -8,6 +8,8 @@
 ALTER TABLE ppm.rangfolge ADD COLUMN start_monat text CHECK (start_monat ~ '^[0-9]{4}-(0[1-9]|1[0-2])$');
 
 ALTER TABLE ppm.szenario ADD COLUMN entschieden_at timestamptz;
+-- Antrag traktandiert (K5 Schritt 7): Folgeentscheide und Antrag nur änderbar, solange das Traktandum zurückgenommen werden kann
+ALTER TABLE ppm.szenario ADD COLUMN traktandiert_at timestamptz;
 
 -- Folgeentscheid je laufendem Projekt unter der Wasserlinie (UC-008 A2), beantragt mit dem Szenario
 CREATE TABLE ppm.szenario_folge (

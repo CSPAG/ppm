@@ -7,6 +7,7 @@ const Folge = Type.Union([Type.Literal('zurueckstellen'), Type.Literal('sistiere
 export const SzenarioEntscheid = Type.Object({
   szenarioId: Uuid,
   stand: Type.String(),
+  traktandiert: Type.Boolean({ description: 'Antrag traktandiert; geänderte Folgeentscheide nehmen das Traktandum zurück (versendet: 409).' }),
   unterWasserlinie: Type.Array(Type.Object({
     projektId: Uuid, nummer: Type.String(), name: Type.String(), phase: Type.String(),
     folge: Nullable(Folge), begruendung: Type.String(),

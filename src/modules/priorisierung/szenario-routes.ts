@@ -11,7 +11,6 @@ import {
   actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
-import { traktandum } from '../sitzung/index.ts';
 import { projektdaten } from '../projektdaten/index.ts';
 import { auslastung, type AuslastungErgebnis } from '../ressource/index.ts';
 import { achse, ressourcen, type Einschaetzung } from './matrix.ts';
@@ -23,7 +22,7 @@ import {
   type SzenarioBeantragenIn, type SzenarioListeOut, type SzenarioOut, type SzenarioPositionenPutIn, type SzenarioVergleichOut,
 } from './szenario-schemas.ts';
 import * as sz from './szenario-store.ts';
-import { istStart } from './entscheid-store.ts';
+import { antragZuruecknehmen, istStart } from './entscheid-store.ts';
 import * as store from './store.ts';
 
 const NAME = 'Szenario';
@@ -422,8 +421,9 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
     },
   }, async (req, reply) => {
     const out = await aendern(req, 'szenario.discarded', async (tx, s) => {
-      await traktandum.zuruecknehmen(tx, { art: 'priorisierung', bezug: { typ: 'szenario', id: s.id } });
-      return sz.aendern(tx, s.id, s.version, { stand: 'verworfen', vorlage: null });
+      await antragZuruecknehmen(tx, s);
+      const s2 = (await sz.lesen(tx, s.id))!;
+      return sz.aendern(tx, s2.id, s2.version, { stand: 'verworfen', vorlage: null });
     }, ['entwurf', 'beantragt']);
     reply.header('etag', etag(out.version));
     return out;
@@ -446,9 +446,10 @@ export function registerSzenarioRoutes(app: FastifyInstance, _deps: Deps): void 
       }
       const bisher = await sz.beantragtes(tx, s.portfolio_id, s.id);
       if (bisher) {
-        await sz.aendern(tx, bisher.id, bisher.version, { stand: 'entwurf', vorlage: null });
-        // ein noch nicht versendetes Traktandum des bisherigen Antrags entfällt (AP-E5-5)
-        await traktandum.zuruecknehmen(tx, { art: 'priorisierung', bezug: { typ: 'szenario', id: bisher.id } });
+        // ein noch nicht versendetes Traktandum des bisherigen Antrags entfällt; versendet bleibt er fest (409, AP-E5-5)
+        await antragZuruecknehmen(tx, bisher);
+        const b = (await sz.lesen(tx, bisher.id))!;
+        await sz.aendern(tx, b.id, b.version, { stand: 'entwurf', vorlage: null });
       }
       const r = await rechnen(tx, g, s);
       const vergleich = await vergleichen(tx, g, [s, ...verglichen]);

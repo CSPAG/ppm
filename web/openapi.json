@@ -26267,6 +26267,7 @@
         "required": [
           "szenarioId",
           "stand",
+          "traktandiert",
           "unterWasserlinie",
           "traktandierbar",
           "pruefung",
@@ -26279,6 +26280,10 @@
           },
           "stand": {
             "type": "string"
+          },
+          "traktandiert": {
+            "description": "Antrag traktandiert; geänderte Folgeentscheide nehmen das Traktandum zurück (versendet: 409).",
+            "type": "boolean"
           },
           "unterWasserlinie": {
             "description": "Laufende Projekte (ab Phase P1) unter der Wasserlinie mit dem beantragten Folgeentscheid.",

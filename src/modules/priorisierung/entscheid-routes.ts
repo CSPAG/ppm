@@ -22,7 +22,7 @@ async function lade(tx: Tx, s: sz.SzenarioRow, write: boolean): Promise<Szenario
   try { pruefeFolgen(unter); } catch (e) { pruefung.push((e as Error).message); }
   if (s.stand !== 'beantragt') pruefung.push(`Antrag: Szenario «${s.name}» ist nicht als Antrag gewählt. Wähle es im Vergleich als Antrag.`);
   return {
-    szenarioId: s.id, stand: s.stand,
+    szenarioId: s.id, stand: s.stand, traktandiert: await es.traktandiert(tx, s.id),
     unterWasserlinie: unter.map(u => ({ projektId: u.projektId, nummer: u.nummer, name: u.name, phase: u.phase, folge: u.folge?.folge ?? null, begruendung: u.folge?.begruendung ?? '' })),
     traktandierbar: !pruefung.length,
     pruefung,
@@ -79,7 +79,10 @@ export function registerEntscheidRoutes(app: FastifyInstance, _deps: Deps): void
         if (body.folgen.findIndex(x => x.projektId === f.projektId) !== i) fehler.push({ path: `/folgen/${i}/projektId`, message: 'Projekt mehrfach genannt' });
       });
       if (fehler.length) throw invalid('Die Folgeentscheide passen nicht zum Szenario.', fehler);
-      const neu = await sz.aendern(tx, s.id, s.version, {});
+      // geänderte Folgen ändern den Antrag: Traktandum zurücknehmen (versendet: 409), danach erneut traktandieren
+      await es.antragZuruecknehmen(tx, s);
+      const s2 = (await sz.lesen(tx, s.id))!;
+      const neu = await sz.aendern(tx, s2.id, s2.version, {});
       if (!neu) throw preconditionFailed(s.version);
       await es.folgenSetzen(tx, s.id, body.folgen.map(f => ({ projektId: f.projektId, folge: f.folge, begruendung: f.begruendung ?? '' })));
       const daten = { id: s.id, version: neu.version, folgen: body.folgen.map(f => ({ projektId: f.projektId, folge: f.folge })) };
@@ -110,6 +113,7 @@ export function registerEntscheidRoutes(app: FastifyInstance, _deps: Deps): void
       pruefeFolgen(await unterWasserlinie(tx, s));
       const z = await zusammenfassung(tx, s);
       const traktandumId = await traktandum.vorschlagen(tx, { art: 'priorisierung', bezug: { typ: 'szenario', id: s.id }, portfolioId: s.portfolio_id, titel: z.titel, antrag: z.antrag });
+      await es.traktandiertSetzen(tx, s.id, true);
       const daten = { id: s.id, portfolioId: s.portfolio_id, traktandumId };
       await record(tx, who, { action: 'szenario.scheduled', resourceType: 'szenario', resourceId: s.id, data: daten, event: daten });
       return { traktandumId, ...z };

@@ -96,6 +96,15 @@ describe('Priorisierungsentscheid', { skip }, () => {
     let v = (await ok('POST', `/v1/sitzungen/${ss.id}/traktanden`, ue, { vorschlagId: t.traktandumId })).json();
     v = (await ok('POST', `/v1/sitzungen/${ss.id}/versenden`, mit(ue, `W/"${v.version}"`))).json();
     await ok('POST', `/v1/sitzungen/${ss.id}/starten`, mit(ue, `W/"${v.version}"`));
+    // versendet: Folgeentscheide und Antrag sind fest bis zum Entscheid
+    const vers = await ok('GET', `/v1/szenarien/${s.id}/entscheid`, ue);
+    assert.equal(vers.json().traktandiert, true);
+    const fest = await call('PUT', `/v1/szenarien/${s.id}/folgen`, mit(ue, vers.headers.etag as string), { folgen: [{ projektId: p.c, folge: 'abbrechen' }] });
+    assert.deepEqual([fest.statusCode, fest.json().reason], [409, 'versendet']);
+    const anderes = (await ok('POST', `/v1/portfolios/${pf}/szenarien`, ue, { name: 'Z' }, 201)).json();
+    const ersetzt = await call('POST', `/v1/szenarien/${anderes.id}/beantragen`, mit(ue, 'W/"1"'), {});
+    assert.deepEqual([ersetzt.statusCode, ersetzt.json().reason], [409, 'versendet']);
+    await ok('POST', `/v1/szenarien/${anderes.id}/verwerfen`, mit(ue, 'W/"1"'));
     await ok('PUT', `/v1/traktanden/${t.traktandumId}/entscheid`, ue, { ergebnis: 'szenario_gewaehlt', begruendung: 'Initialisierung hat Vorrang' });
 
     const ist = await sys(async tx => (await tx.query<{ projekt_id: string; rang: number; start_monat: string | null }>(
@@ -108,8 +117,17 @@ describe('Priorisierungsentscheid', { skip }, () => {
     const mt = await sys(async tx => (await tx.query<{ text: string }>('SELECT text FROM ppm.mitteilung WHERE empfaenger_person = $1 ORDER BY created_at', [pl])).rows.map(r => r.text));
     assert.ok(mt.some(x => x === 'Priorisierung Transformation: Das Gremium hat das Szenario «B: Initialisierung vorziehen» gewählt. Rang oder Start ändern sich für 2026-002, 2026-004, 2026-003.'), mt.join('\n'));
     assert.ok(mt.some(x => x === 'Priorisierung Transformation: 2026-003 2026-003 liegt unter der Wasserlinie. Entscheid des Gremiums: Sistieren.'), mt.join('\n'));
-    const audit = await sys(async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action IN ('szenario.consequences_proposed', 'szenario.scheduled', 'szenario.decided') ORDER BY seq")).rows.map(x => x.action));
+    const audit = await sys(async tx => (await tx.query<{ action: string }>("SELECT action FROM ppm.audit_log WHERE action IN ('szenario.consequences_proposed', 'szenario.scheduled', 'szenario.decided', 'szenario.decision_corrected') ORDER BY seq")).rows.map(x => x.action));
     assert.deepEqual(audit, ['szenario.consequences_proposed', 'szenario.scheduled', 'szenario.decided']);
+
+    // Korrektur in der Sitzung (A-30): der übernommene Ist-Stand bleibt, auch wenn sich Daten inzwischen ändern
+    await sys(tx => tx.query("UPDATE ppm.kosten SET prognose = 5000000 WHERE projekt_id = $1", [p.a]));
+    const ent = await sys(async tx => (await tx.query<{ version: number }>('SELECT version FROM ppm.entscheid WHERE traktandum_id = $1', [t.traktandumId])).rows[0]!);
+    await ok('PUT', `/v1/traktanden/${t.traktandumId}/entscheid`, mit(ue, `W/"${ent.version}"`), { ergebnis: 'szenario_gewaehlt', begruendung: 'Initialisierung hat Vorrang (präzisiert)' });
+    const nachher = await sys(async tx => (await tx.query<{ projekt_id: string }>(
+      "SELECT projekt_id FROM ppm.rangfolge WHERE portfolio_id = $1 AND stand = 'entschieden' ORDER BY rang", [pf])).rows.map(r => r.projekt_id));
+    assert.deepEqual(nachher, [p.a, p.b, p.d, p.c]);
+    await sys(tx => tx.query("UPDATE ppm.kosten SET prognose = 400000 WHERE projekt_id = $1", [p.a]));
 
     // ein neues Szenario kopiert den neuen Ist-Stand mit Start
     const neu = (await ok('POST', `/v1/portfolios/${pf}/szenarien`, ue, { name: 'C' }, 201)).json();

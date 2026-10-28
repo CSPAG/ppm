@@ -211,6 +211,12 @@ th.num{text-align:right}
   tbody tr:hover td{background:none}
   .dl-teil{padding:8px 14px}
 }
+/* Übersicht der Kürzel (interaktion.md Abschnitt 11) */
+.kz-tab{margin:0 0 14px}
+.kz-tab caption{text-align:left;font-weight:600;padding:0 0 6px}
+.kz-tab tbody tr{cursor:default}
+.kz-tab tbody tr:hover td{background:none}
+.kz-tab tbody td{white-space:normal;max-width:none;height:36px}
 /* Galerie (nur Entwicklungsbuild) */
 .galerie h2{font:600 15px var(--f-display);margin:24px 0 10px}
 .galerie-reihe{display:flex;flex-wrap:wrap;gap:12px;align-items:center}

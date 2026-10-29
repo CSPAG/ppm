@@ -13,7 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { AppPermission } from '../../auth/permissions.ts';
 import { expectNoAxe } from '../../test/axe.ts';
 import { CATALOG_PPM, renderWithIam } from '../../test/render.tsx';
-import { AenderungsprotokollPage } from './AenderungsprotokollPage.tsx';
+import { AenderungsprotokollPage, verweis } from './AenderungsprotokollPage.tsx';
 import { SchnittstellenPage } from './SchnittstellenPage.tsx';
 import type { ProtokollSearch, SchnittstellenSearch } from './search.ts';
 import { TX } from './texte.ts';
@@ -224,5 +224,17 @@ describe('Änderungsprotokoll (UI-50)', () => {
     expect(await screen.findByText(TX.p.leerGefiltert)).toBeInTheDocument();
     await userEvent.click(screen.getAllByRole('button', { name: TX.p.zuruecksetzen })[0]!);
     expect(screen.getByTestId('adresse').textContent).toBe('{}');
+  });
+});
+
+describe('Änderungsprotokoll: Verweise in Werten', () => {
+  const id = '1adad698-19ff-4b19-82b0-84af0dc9d188';
+  it('erkennt Kennungen und { id, typ }, sonst nichts', () => {
+    expect(verweis(id)).toEqual({ id });
+    expect(verweis(id.toUpperCase())).toEqual({ id });
+    expect(verweis({ id, typ: 'idee' })).toEqual({ id, typ: 'idee' });
+    expect(verweis({ id, typ: 'idee', titel: 'x' })).toBeNull();
+    expect(verweis('Sitzungszimmer')).toBeNull();
+    expect(verweis(null)).toBeNull();
   });
 });

@@ -42,7 +42,7 @@ function stub(routes: Parameters<typeof mockIamApi>[0]) {
 }
 
 describe('Eingang', () => {
-  it('zeigt Kopf und «Zu tun» mit Frist, Kontext, Vertretung und Direktaktion; Öffnen führt zum Link', async () => {
+  it('zeigt «Zu tun» mit Anzahl, Frist, Kontext, Vertretung; der Titel öffnet die Aufgabe', async () => {
     stub({
       'GET /v1/eingang/anzahl': () => json({ offen: 2, ueberfaellig: 1, naechsteFrist: tag(3) }),
       'GET /v1/eingang': () => json({ items: [
@@ -53,15 +53,16 @@ describe('Eingang', () => {
     });
     const gehe = vi.fn();
     const { container } = renderWithIam(<Page gehe={gehe} />);
-    expect(await screen.findByText(E.kopf.offen(2))).toBeInTheDocument();
-    expect(screen.getByText(`· ${E.kopf.ueberfaellig(1)}`)).toBeInTheDocument();
+    // Anzahl offen und überfällig im Kopf von «Zu tun» (keine eigene Karte «Deine Aufgaben»)
+    expect(await screen.findByText(E.zuTun.offen(2))).toBeInTheDocument();
+    expect(screen.getByText(`· ${E.zuTun.ueberfaellig(1)}`)).toBeInTheDocument();
     expect(await screen.findByText(/Du vertrittst Anna Muster/)).toBeInTheDocument();
     const liste = (await screen.findByRole('link', { name: 'Projektvertrag unterzeichnen' })).closest('ul')!;
     const zeilen = within(liste).getAllByRole('listitem');
     expect(within(zeilen[0]!).getByText(/überfällig seit/)).toBeInTheDocument();
     expect(within(zeilen[0]!).getByText(E.zuTun.inVertretung('Anna Muster'))).toBeInTheDocument();
     expect(within(zeilen[1]!).getByText('2026-014 · als PL')).toBeInTheDocument();
-    await userEvent.click(within(zeilen[1]!).getByRole('link', { name: E.zuTun.oeffnenAria('Statusbericht Oktober erstellen') }));
+    await userEvent.click(within(zeilen[1]!).getByRole('link', { name: 'Statusbericht Oktober erstellen' }));
     expect(gehe).toHaveBeenCalledWith('/projekte/2026-014/bericht');
     await expectNoAxe(container);
   });

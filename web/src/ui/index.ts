@@ -7,7 +7,7 @@ export { useToast } from './toasts.ts';
 export { applyTheme, themeMode, type ThemeMode } from './theme.ts';
 export {
   arbeitstageBis, avatarColor, fmtAbweichung, fmtAbweichungWochen, fmtBetrag, fmtBetragKurz, fmtDateTime, fmtDatum, fmtFrist,
-  fmtFristArbeitstage, fmtFte, fmtGate, fmtMonate, fmtPeriode, fmtPhase, fmtProzent, fmtQuartal, fmtZeitpunkt, tageBis,
+  fmtFristArbeitstage, fmtFte, fmtGate, fmtMonate, fmtPeriode, fmtPhase, fmtProzent, fmtQuartal, fmtZeitpunkt, satzende, tageBis,
   type Phase, type Tag,
 } from './format.ts';
 export { Status, statusText, TrendPfeil, type Projektstatus, type StatusProps, type Trend } from './Status.tsx';

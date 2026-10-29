@@ -2,6 +2,7 @@
  * Texte für Änderungsantrag und Versionsvergleich (UI-09, UI-10; Kernablauf K2 Schritte 1, 5, 6 und 9, «Texte»,
  * «Regeln»): Anrede «Du», Schweizer Rechtschreibung, Schaltflächen wie im Kernablauf.
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 type Rubrik = 'scope' | 'zeitplan' | 'ressourcen_budget' | 'annahmen' | 'key_risiken';
@@ -44,7 +45,7 @@ export const TA = {
   einreichenFrage: (nummer: string) => `Änderung (Version ${nummer}) einreichen?`,
   einreichenWirkung: 'Die Projektauftraggeber:in erhält die Änderung zum Entscheid. Bis dahin ist der Entwurf gesperrt.',
   eingereicht: 'Eingereicht. Die Projektauftraggeber:in entscheidet die Änderung.',
-  beimSponsor: (datum: string) => `Bei der Projektauftraggeber:in zum Entscheid seit ${datum}. Bis dahin ist der Entwurf gesperrt.`,
+  beimSponsor: (datum: string) => `Bei der Projektauftraggeber:in zum Entscheid seit ${satzende(datum)} Bis dahin ist der Entwurf gesperrt.`,
   weiterBearbeiten: 'Weiter bearbeiten',
   unveraendert: 'Die Änderung enthält noch keine Anpassung gegenüber der Baseline. Passe die betroffenen Kapitel an.',
   wirkungPrat: 'Betrifft Scope, Budget oder Ressourcen: Die Projektauftraggeber:in kann die Änderung nur an den PRAT unterstützen.',

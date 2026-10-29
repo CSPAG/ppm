@@ -61,6 +61,12 @@ a.btn,a.nav,a.row,a.iconbtn,a.pill{text-decoration:none}
 .rail-sub{display:flex;flex-direction:column;gap:1px;margin-top:1px}
 .bereiche{display:none;gap:2px;padding:6px 14px 0;border-bottom:1px solid var(--line);overflow-x:auto;flex:none}
 .bereiche .tab{text-decoration:none;white-space:nowrap}
+/* Weitere Bereiche ausserhalb der Breite: Kante ausblenden (Rail.tsx, BereichLeiste) */
+.bereiche{scrollbar-width:none}
+.bereiche::-webkit-scrollbar{display:none}
+.bereiche.mehr-rechts{mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
+.bereiche.mehr-links{mask-image:linear-gradient(to left,#000 calc(100% - 40px),transparent)}
+.bereiche.mehr-links.mehr-rechts{mask-image:linear-gradient(to right,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
 .bnav{display:none}
 /* Zähler an einem Arbeitsraum (I-N3, shell/Zahl.tsx): Akzent mit Kontrast in hell und dunkel; schmal am Symbol */
 .zahl{flex:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--accent-fg);font:600 11px/18px var(--f-mono);font-variant-numeric:tabular-nums;text-align:center}

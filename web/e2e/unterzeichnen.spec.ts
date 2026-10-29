@@ -57,8 +57,8 @@ test('Unterzeichnen ab dem Eingang bei 360 px in höchstens 3 Interaktionen (K2-
   let interaktionen = 0;
   // Je Funktion eine Aufgabe; eine Unterschrift deckt alle offenen Funktionen der Person
   const aufgabe = page.getByRole('listitem').filter({ hasText: nr }).filter({ hasText: /unterzeichnen/ }).first();
-  // «Öffnen» trägt als Namen den Titel der Aufgabe («… unterzeichnen öffnen»)
-  await aufgabe.getByRole('link', { name: /unterzeichnen öffnen$/ }).click();
+  // Die ganze Zeile öffnet die Aufgabe; der Link trägt ihren Titel («… unterzeichnen»)
+  await aufgabe.getByRole('link', { name: /unterzeichnen$/ }).click();
   interaktionen++;
   await expect(page).toHaveURL(new RegExp(`/projekte/${nr}/vertrag/unterzeichnen`));
   await expect(page.getByRole('heading', { name: 'Projektvertrag unterzeichnen' })).toBeVisible();

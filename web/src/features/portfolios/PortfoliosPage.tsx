@@ -42,7 +42,8 @@ export function PortfoliosPage({ search, setSearch }: { search: PortfoliosSearch
               <div className="sub">{TP.sub}</div>
             </div>
           </div>
-          {canAdmin ? <div className="acts"><button type="button" className="btn primary" onClick={() => setSearch({ o: 'neu', g: undefined })}><Icon name="plus" />{TP.create}</button></div> : null}
+          {/* Kopf-Button fehlt nur bei geladener, leerer Liste: sie bietet die erste Aktion selbst an (Z2) */}
+          {canAdmin && (!list.data || items.length) ? <div className="acts"><button type="button" className="btn primary" onClick={() => setSearch({ o: 'neu', g: undefined })}><Icon name="plus" />{TP.create}</button></div> : null}
         </div>
       </header>
       <div className="body">

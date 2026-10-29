@@ -134,6 +134,16 @@ und schreibt nur in diese Organisation.
    meldet sich niemand als diese Personen an. Die eigene Person handelt als Administration der Demo. Dauer einige
    Minuten (zwei Starts der Anwendung im Container).
 3. **Ansehen:** als eigene Person in der Organisation `demo` (mit `org-admin` alle Bereiche).
+4. **Optional, Anmeldung als Personen der Demo** (Entscheid der Betreiberin: ein bekanntes Passwort öffnet diese Konten
+   für alle, die es kennen): lokal in Git Bash als `ppm-iac`, nur Konten unter `@demo.example`, zuerst `--trocken`:
+
+   ```bash
+   KEYCLOAK_IAC_PRIVATE_KEY="$(sops -d --extract '["github"]["KEYCLOAK_IAC_PRIVATE_KEY"]' infra/hetzner/betrieb.sops.yaml)" \
+     node scripts/demo-passwoerter.ts --passwort <passwort>
+   ```
+
+   Setzt das Passwort dauerhaft, bestätigt die E-Mail und entfernt «Passwort setzen». Lehnt die Passwort-Regel des
+   Realms das Passwort ab, bricht das Skript bei der ersten Person ab, ohne etwas zu ändern.
 
 Das Skript läuft nur auf einer Organisation ohne Portfolios. Neu aufsetzen: Organisation sperren und löschen (oben),
 dann von vorn. Die Schnittstelle «ERP» der Demo zeigt auf einen Server des Skripts, der danach nicht mehr läuft

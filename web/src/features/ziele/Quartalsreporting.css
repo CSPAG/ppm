@@ -1,13 +1,15 @@
 /* Quartalsreporting (UI-41, AP-E6-4): Abschnitte untereinander, Tabellen scrollen in schmalen Ansichten */
-.qr-body { display: grid; gap: var(--s4, 16px); max-width: 1100px; }
+.qr-body { display: grid; align-content: start; gap: var(--s4, 16px); max-width: 1100px; padding: 16px 22px 24px; }
 .qr-acts { display: flex; flex-wrap: wrap; gap: var(--s4, 16px); }
 .qr-acts > div { flex: 1 1 260px; }
 .qr-abschnitt { display: grid; gap: var(--s2, 8px); }
 .qr-abschnitt h3 { margin: var(--s2, 8px) 0 0; font-size: 1rem; }
 .qr-tab { overflow-x: auto; }
+.qr-tab td { white-space: normal; max-width: none; height: auto; padding: 10px 12px; vertical-align: top; }
 .qr-kommentar { white-space: pre-wrap; }
 .qr-hinweise { margin: var(--s1, 4px) 0 0; padding-left: 1.2em; }
 .qr-dokument { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2, 8px); }
 .qr-dokument > p, .qr-dokument > div[role="status"] { flex-basis: 100%; margin: 0; }
 .qr-speichern { display: flex; justify-content: flex-end; align-items: center; gap: var(--s3, 12px); }
 .qr-auftraege { margin: 0; padding-left: 1.2em; }
+@media (max-width: 767px) { .qr-body { padding: 14px; } }

@@ -229,7 +229,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Grundlage:** Mitglied wie Entscheid 14 (Ziele lesen, Projekte auflisten, eingereichte Ideen lesen, eigene Ideen erfassen). Admin verwaltet Zugänge, Stammdaten, Schnittstellen und Webhooks.
    - **Technisch** sind steuern, Gremium, mitlesen und «alle Portfolios lesen» Leserechte, führen und «alle Portfolios führen» Bearbeitungsrechte (Entscheid 13 gilt für alle); die übergreifenden Rollen hängen an der Organisation. Die Oberfläche spricht von «alle Portfolios», nicht von «Organisation». PPMO und PMO sind keine eigenen Rollen: Wer mitführt, erhält «führen».
    - **Referenzkunde:** UE und PMO führen alle Portfolios, die GL liest alle Portfolios; Portfolio A mit Gremium PRAT, Portfolio B mit Gremium GLPA; je Direktion ein Portfolio C, das die Direktion steuert und dessen Gremium sie ist; führen kann sie es selbst oder über die UE.
-   - **Voraussetzungen in identity-kit:** (1) «Recht irgendwo» (Startseite, Navigation) zählt ein Recht nur an den Orttypen, für die es gilt. (2) In der Datenbank zählt `app.has_permission(recht, typ, id)` auch Rollen an Vorfahren; heute nur am Ort selbst, sodass «Portfolio führen» die Projektdetails nicht schreiben dürfte.
+   - **Bauplan, ohne Änderung an identity-kit:** (1) Jede Rolle enthält nur Rechte, die an ihrem Ort gelten; was nur an der Organisation gilt (Ziele, Monatsabschluss, Phasenmodell …), steckt allein in «alle Portfolios führen». So zeigen Startseite und Navigation («Recht irgendwo») nur, was die Person auch tun kann. (2) Damit «Portfolio führen» die Projektdetails schreiben darf, prüfen die Policies der Projektdetails (Muster KIND) zusätzlich das Recht am Portfolio des Projekts, wie es das Muster BETRAG schon tut; `app.has_permission(recht, typ, id)` zählt bewusst nur den Ort selbst.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -270,7 +270,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Entscheide 12 bis 18 nachführen: zuerst die zwei Voraussetzungen in identity-kit (Entscheid 18), dann Funktionsbaum und Use Cases (Generator), UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle, Bereich «Zugriff»), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
+1. Entscheide 12 bis 18 nachführen: Funktionsbaum und Use Cases (Generator), UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle, Bereich «Zugriff»), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
 2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 4. V10 mit der Insel Gruppe klären.

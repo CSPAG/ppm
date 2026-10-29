@@ -239,6 +239,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Funktionsbaum:** AM.01.02 ergänzt die vorgegebenen Rollen um eigene Rollen der Organisation; DM.02.06 und PP.04.04 beschreiben Vermerke bzw. die Projektorganisation ohne Zugriff; die Akteure der Business Cases folgen den Regeln oben.
    - **Offen:** PDFs neu erzeugen (Abschnitt 13); die Klärungsliste (Master-Session) und die UX-Schicht sind noch nicht angepasst.
 20. **UX-Schicht nach den Entscheiden 12 bis 19 nachgeführt** (29.10.2026; [ux/](ux/README.md)): neue Projektentscheide UX-E12 Vermerk statt Sperre, UX-E13 Verlauf am Objekt statt Sperre, UX-E14 Bereich «Zugriff» in Projektakte und Portfolio; Sperren bleiben nur für unvollständige Eingaben. Nutzungskontexte ohne CTL, FI und RM, AG statt SP; Sichtbarkeit je Rolle nach den Rollen von Entscheid 18 mit den Entscheiden 13 und 14; UI-51 Zugriff und UI-52 Alle Projekte; UX-OF-11, 12 und 13 entschieden, neu UX-OF-19 (viele Kopfkarten); Kernabläufe K1–K6 mit Vermerken, Versionen nach Einreichen, Versand und Vorlage und zwei Unterschriften (AG, PL).
+21. **Bauplan nach den Entscheiden 12 bis 20 nachgeführt** (29.10.2026; [fachmodell.md](fachmodell.md)): Rollen 3.3 nach Entscheid 18 mit Migration der Tupel (A-70); Rechte `projekt:list` und `idee:list`, Projektrechte auch am Portfolio (3.2); Lesesicht mit Auflisten und Rechten am Portfolio für die Projektdetails (3.4, A-73); Funktion und Zugriff getrennt (A-71, A-72); Vermerk statt Sperre (A-74) und Versionen statt Sperre (A-75); 16 abgelöste Annahmen als «ersetzt» markiert; neue Pakete AP-E8-1 bis AP-E8-5 (Migrationen 420–469).
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -279,7 +280,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Entscheide 12 bis 18 weiter nachführen (Funktionsbaum und Use Cases: Entscheid 19; UX-Schicht: Entscheid 20): Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
+1. Entscheide 12 bis 18 weiter nachführen (Funktionsbaum und Use Cases: Entscheid 19; UX-Schicht: Entscheid 20): Bauplan: Entscheid 21), zuletzt Code: Pakete AP-E8-1 bis AP-E8-5 ([fachmodell.md](fachmodell.md) Abschnitt 7.3).
 2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 4. V10 mit der Insel Gruppe klären.

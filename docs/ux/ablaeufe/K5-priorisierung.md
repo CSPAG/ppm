@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Rollen** | primär UE (bewertet, erstellt Szenarien, bereitet den Entscheid vor); beteiligt Gremium (legt Modell fest, entscheidet in [K3](K3-gremiumssitzung.md)), FI (Budgetrahmen), RM (Kapazität und Auslastung) |
+| **Rollen** | primär UE (bewertet, erstellt Szenarien, bereitet den Entscheid vor); beteiligt Gremium (legt Modell fest, entscheidet in [K3](K3-gremiumssitzung.md)); Budgetrahmen, Kapazität und Auslastung führt ebenfalls die UE (keine Rollen FI und RM, Master Entscheide 12, 15) |
 | **Gerät** | Desktop ab 1280 px (Arbeitsfläche); Gremiumsmitglieder lesen Matrix und Szenariovergleich auf Tablet und in der Projektion |
 | **Use Cases** | [UC-008](../../anhang/use-cases.md#uc-008-portfolio-priorisieren-und-ausbalancieren) (alle Schritte, A1–A2); Auslastung aus UC-009 Schritt 5 |
 | **Oberflächen** | UI-19 Bewertungsmodell, UI-20 Bewertungsmaske, UI-21 Portfolio-Matrix, UI-22 Szenarien, UI-23 Auslastung |
@@ -57,12 +57,12 @@ seit ‹Datum des letzten Entscheids›»; rechts das Seitenpanel mit Details zu
    als Vorschau.
 7. **Für das Gremium traktandieren** (Schritt 7): Vorschlag in der nächsten Sitzung (K3).
 8. **Entscheid** (Schritt 8) in K3: «Szenario ‹B› gewählt» mit Wirkung: «Rang und Start von 14 Projekten werden Ist-Stand.
-   9 Sponsoren und Projektleitungen werden informiert. 2 laufende Projekte liegen unter der Wasserlinie.» Für jedes laufende
+   9 Projektauftraggeber:innen und Projektleitungen werden informiert. 2 laufende Projekte liegen unter der Wasserlinie.» Für jedes laufende
    Projekt unter der Wasserlinie verlangt die Entscheidmaske «Zurückstellen», «Sistieren» oder «Abbrechen» (A2); Sistieren
    und Abbrechen leiten UC-015 ein.
 
 **Modell und Budgetrahmen** (A1, Reiter «Modell», Seitentyp Liste + Schublade): Kriterien und Budgetrahmen je Kategorie als
-Entwurf (mit FI), traktandieren, nach Entscheid «in Kraft ab ‹Datum›». Frühere Bewertungen zeigen die Version des Modells,
+Entwurf, traktandieren, nach Entscheid «in Kraft ab ‹Datum›». Frühere Bewertungen zeigen die Version des Modells,
 mit der sie entstanden (G11).
 
 ## Zustände
@@ -82,7 +82,7 @@ mit der sie entstanden (G11).
 | Kapazität überbucht (UC-008 Schritt 5, UC-009 A1) | *dabei* | Warnung | «Kapazität Q2 2027: 7,5 FTE Projektleitung statt höchstens 5,0. Betroffen: 3 Projekte.» | Start verschieben |
 | Abhängigkeit verletzt (UC-008 Schritt 3) | *vorher* am Projekt, *dabei* beim Umordnen | Warnung | «Abhängigkeit: ‹A› braucht ‹B›, liegt aber vor ‹B› bzw. startet früher.» | Reihenfolge anpassen |
 | Unvollständige Bewertung | *danach* bei «Als Antrag wählen» | Warnung | «Bewertung: 2 Projekte ohne Bewertung. Sie erscheinen in der Vorlage als ‹nicht bewertet›.» | bewerten oder so vorlegen |
-| Ungedeckter Bedarf (UC-009 A2) | *vorher* am Projekt | Hinweis | «Ressourcen: Bedarf CTL in P2 ungedeckt.» | – |
+| Ungedeckter Bedarf (UC-009 A2) | *vorher* am Projekt | Hinweis | «Ressourcen: Bedarf Projektleitung in P2 ungedeckt.» | – |
 
 ## Texte
 

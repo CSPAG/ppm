@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Rollen** | primär PL (erstellt), UE mit PMO (prüft, schliesst die Periode ab); beteiligt SP (wird bei «Kritisch» informiert) |
-| **Gerät** | Desktop; PL auch Laptop unterwegs, SP liest die Meldung «Kritisch» auf dem Telefon |
+| **Rollen** | primär PL (erstellt), UE mit PMO (prüft, schliesst die Periode ab); beteiligt AG (Projektauftraggeber:in; wird bei «Kritisch» informiert) |
+| **Gerät** | Desktop; PL auch Laptop unterwegs, AG liest die Meldung «Kritisch» auf dem Telefon |
 | **Use Cases** | [UC-004](../../anhang/use-cases.md#uc-004-monatlich-berichten) (alle Schritte, A1–A3), [UC-005](../../anhang/use-cases.md#uc-005-statusberichte-prüfen-und-nachverfolgen) (alle Schritte, A1–A3) |
 | **Oberflächen** | UI-01 Eingang, UI-13 Statusbericht, UI-15 Berichte der Periode, UI-16 Terminabweichungen, UI-17 Dashboard |
 | **Arbeitsraum** | Projekte › Projekt › Bericht `/projekte/<nr>/bericht?periode=2026-10`; Portfolio › Monatsabschluss `/portfolio/monatsabschluss?periode=2026-10` |
@@ -15,7 +15,7 @@
   Bericht in wenigen Minuten steht und ich keine Excel-Zeile mehr pflege.
 - **UE:** Wenn die Berichte eintreffen, will ich sofort sehen, welche auffällig sind und welche fehlen, damit das Dashboard
   bis Monatsende konsolidiert ist und die Gremien ab dem 1. damit arbeiten.
-- **SP:** Wenn eines meiner Projekte kritisch wird, will ich es sofort mit Grund und Massnahme erfahren, damit ich vor der
+- **AG:** Wenn eines meiner Projekte kritisch wird, will ich es sofort mit Grund und Massnahme erfahren, damit ich vor der
   PRAT-Sitzung handeln kann.
 
 ## Zielgrössen
@@ -65,7 +65,7 @@
    «gering», «wesentlich» mit Kommentar). Nächster Meilenstein (aus dem Plan vorausgefüllt), Abhängigkeiten (aus dem
    Vertrag, ergänzbar) und anstehende Entscheide.
    **Kritisch** (A2): Es erscheinen die Pflichtfelder «Begründung» und «Massnahme» und das Kontrollkästchen «Entscheid des
-   PRAT nötig». Die Wirkung steht darunter (I-F5): «Ihr Sponsor Daniel Keller und die Unternehmensentwicklung werden beim
+   PRAT nötig». Die Wirkung steht darunter (I-F5): «Projektauftraggeber Daniel Keller und die Unternehmensentwicklung werden beim
    Einreichen informiert. Mit ‹Entscheid des PRAT nötig› wird eine Eskalation für die PRAT-Sitzung vom Mi 12.11. angelegt.»
 8. **Statusbericht einreichen** (Schritt 8): Fehlt etwas, nennt die Sperre alle fehlenden Angaben mit Sprung zur Stelle.
    Sonst wird der Bericht gespeichert, das Dashboard nachgeführt, und die UE erhält ihn zur Prüfung. Toast «Statusbericht
@@ -99,7 +99,9 @@ PL erhält eine Erinnerung, die UE sieht den Bericht als «ausstehend» (UC-005 
 5. **Periode abschliessen** (Schritt 5): Die Schaltfläche zeigt vorher die Wirkung (I-R1 Stufe 3): «31 Projekte · 29
    geprüft · 2 nicht gemeldet: Für sie werden die Werte von September mit dem Vermerk ‹nicht gemeldet› übernommen (A3).
    Das Dashboard Oktober steht ab Sa 1.11. den Gremien PRAT und GLPA zur Verfügung.» Sind Berichte eingereicht, aber
-   nicht geprüft, sperrt die Regel den Abschluss. Nach dem Abschluss ist die Periode gesperrt (Z9).
+   nicht geprüft, warnt die Regel; schliesst die UE trotzdem ab, tragen diese Berichte den Vermerk «nicht geprüft» (UX-E12).
+   Nach dem Abschluss bleiben Änderungen möglich; sie tragen «geändert nach Abschluss» und erscheinen im Dashboard der
+   Periode (UC-005 A4, UX-E13).
 
 ## Zustände
 
@@ -107,8 +109,8 @@ PL erhält eine Erinnerung, die UE sieht den Bericht als «ausstehend» (UC-005 
 |---|---|
 | Z2 Leer (Monatsabschluss vor dem ersten Bericht) | «Noch keine Statusberichte für Oktober. Die Projektleitungen sind seit Sa 18.10. aufgefordert.» |
 | Z4 Teilweise (Bericht) | Ist-Kosten fehlen: Abschnitt Kosten zeigt Budget und Prognose, «Ist-Kosten noch nicht verfügbar» (UC-010 A1) |
-| Z8 Nur lesen (Bericht nach Einreichen) | Banner «In Prüfung bei der Unternehmensentwicklung seit Do 23.10. Ändern ist erst nach einer Rückfrage möglich.» |
-| Z9 Gesperrt (Periode abgeschlossen) | Banner «Oktober ist abgeschlossen (Fr 31.10., Sandra Frei). Das Dashboard ist für die Gremien freigegeben.» Verspätete Berichte: [UX-OF-16](../fahrplan.md#offene-fragen) |
+| Z8 Eingereicht (Bericht nach Einreichen) | Banner «In Prüfung bei der Unternehmensentwicklung seit Do 23.10.» Ändern bleibt möglich; die Änderung entsteht als Version «geändert nach Einreichen» und erscheint bei der UE (UC-004 A4, UX-E13) |
+| Z9 Abgeschlossen (Periode) | Banner «Oktober ist abgeschlossen (Fr 31.10., Sandra Frei). Das Dashboard ist für die Gremien freigegeben.» Spätere Änderungen tragen «geändert nach Abschluss» (UX-E13). Verspätete Berichte: [UX-OF-16](../fahrplan.md#offene-fragen) |
 | Zurückgegeben | Bericht der PL mit Banner «Rückfrage der Unternehmensentwicklung» und Text der Rückfrage; bleibt bis zum erneuten Einreichen |
 | Vertretung | Erstellt die Stellvertretung der PL den Bericht: Banner «Sie berichten in Vertretung von ‹Name› bis ‹Datum›» (I-Z2); der Bericht ist so vermerkt |
 | Phase P4 | keine Berichtsaufgabe (UC-004 Vorbedingung P0–P3); in der Projektübersicht ist «Statusbericht erstellen» nicht vorhanden |
@@ -119,10 +121,10 @@ PL erhält eine Erinnerung, die UE sieht den Bericht als «ausstehend» (UC-005 
 |---|---|---|---|---|
 | Pflichtangaben des Berichts (UC-004 Schritt 7) | *vorher* im Seitenpanel, *dabei* beim Einreichen | Sperre | «Angaben fehlen: Status, Trend und Beurteilung Budget sind leer. Ergänzen Sie sie, um den Bericht einzureichen.» | Sprung zum ersten fehlenden Feld |
 | Wesentliche Abweichung (UC-004 A1, Schwelle offen K11) | *dabei* an der Meilenstein- oder Kostenzeile | Warnung | «Termin: Abschluss P2 neu 15.05.2027 statt 31.03.2027 laut Baseline (+6 Wochen). Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantragen Sie eine Änderung oder eskalieren Sie.» | **Änderung beantragen** (K2), **Eskalieren**, oder Bericht trotzdem einreichen |
-| Status «Kritisch» (UC-004 A2) | *dabei* bei der Wahl | Sperre bis ausgefüllt | «Kritisch: Begründung und Massnahme fehlen. Sponsor und Unternehmensentwicklung brauchen beides, um handeln zu können.» | Begründung und Massnahme erfassen |
+| Status «Kritisch» (UC-004 A2) | *dabei* bei der Wahl | Sperre bis ausgefüllt | «Kritisch: Begründung und Massnahme fehlen. Projektauftraggeber:in und Unternehmensentwicklung brauchen beides, um handeln zu können.» | Begründung und Massnahme erfassen |
 | Frist 25. (UC-004 A3, Q8 Kap. 8.4) | *vorher* im Eingang («in 3 Tagen»), *danach* als überfällig | Hinweis, ab 26. Warnung | «Statusbericht Oktober: überfällig seit Sa 25.10. Die Unternehmensentwicklung konsolidiert bis Fr 31.10.» | Bericht erstellen |
 | Bericht nicht plausibel (UC-005 A2) | beim Prüfen | – (Handlung der UE) | Rückfrage im Wortlaut der UE | PL beantwortet oder korrigiert |
-| Abschluss mit ungeprüften Berichten (UC-005 Schritt 5) | *dabei* bei «Periode abschliessen» | Sperre | «Abschluss: 3 Berichte sind eingereicht, aber nicht geprüft. Prüfen Sie diese zuerst.» | Filter «eingereicht» mit einem Klick |
+| Abschluss mit ungeprüften Berichten (UC-005 Schritt 5; UX-E12) | *dabei* bei «Periode abschliessen» | Warnung | «Abschluss: 3 Berichte sind eingereicht, aber nicht geprüft. Sie tragen danach den Vermerk ‹nicht geprüft›.» | Filter «eingereicht» mit einem Klick, oder trotzdem abschliessen |
 | Abschluss mit fehlenden Berichten (UC-005 A3, K12) | *dabei* in der Wirkungsvorschau | Warnung | «Nicht gemeldet: 2 Projekte haben keinen Bericht. Für sie gelten die Werte von September mit Vermerk.» | einfordern oder trotzdem abschliessen |
 
 ## Texte
@@ -153,7 +155,8 @@ PL erhält eine Erinnerung, die UE sieht den Bericht als «ausstehend» (UC-005 
 - [ ] Nach dem Einreichen zeigt das Dashboard den neuen Status des Projekts, und die UE sieht den Bericht als «eingereicht».
 - [ ] Die Sammelbestätigung überspringt Berichte mit Auffälligkeit und nennt sie.
 - [ ] Ein zurückgegebener Bericht zeigt der PL die Rückfrage zuoberst und ist wieder bearbeitbar.
-- [ ] «Periode abschliessen» ist gesperrt, solange ein eingereichter Bericht ungeprüft ist, und nennt die Anzahl.
+- [ ] «Periode abschliessen» warnt, solange ein eingereichter Bericht ungeprüft ist, nennt die Anzahl und schliesst auf Bestätigung trotzdem ab; die Berichte tragen «nicht geprüft».
+- [ ] Ein eingereichter Bericht und ein Bericht einer abgeschlossenen Periode lassen sich ändern; die Änderung erscheint als Version mit Vermerk im Verlauf und bei der UE.
 - [ ] Nach dem Abschluss tragen fehlende Berichte im Dashboard den Vermerk «nicht gemeldet».
 - [ ] Der ganze Ablauf der PL und der UE ist nur mit Tastatur möglich; axe ohne Befund.
 

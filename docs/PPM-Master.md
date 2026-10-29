@@ -238,6 +238,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Rollen und Zugriff:** UC-002 Schritt 2 Projektorganisation ohne Wirkung auf den Zugriff, mit freien Funktionen (Entscheide 16, 17); UC-016 neu mit vorgegebenen Rollen, Zugriff direkt am Projekt (A2) und eigenen Rollen der Organisation (A3); UC-017 Portfolios je Direktion; UC-001 und UC-002 nutzen Entscheid 14.
    - **Funktionsbaum:** AM.01.02 ergänzt die vorgegebenen Rollen um eigene Rollen der Organisation; DM.02.06 und PP.04.04 beschreiben Vermerke bzw. die Projektorganisation ohne Zugriff; die Akteure der Business Cases folgen den Regeln oben.
    - **Offen:** PDFs neu erzeugen (Abschnitt 13); die Klärungsliste (Master-Session) und die UX-Schicht sind noch nicht angepasst.
+20. **UX-Schicht nach den Entscheiden 12 bis 19 nachgeführt** (29.10.2026; [ux/](ux/README.md)): neue Projektentscheide UX-E12 Vermerk statt Sperre, UX-E13 Verlauf am Objekt statt Sperre, UX-E14 Bereich «Zugriff» in Projektakte und Portfolio; Sperren bleiben nur für unvollständige Eingaben. Nutzungskontexte ohne CTL, FI und RM, AG statt SP; Sichtbarkeit je Rolle nach den Rollen von Entscheid 18 mit den Entscheiden 13 und 14; UI-51 Zugriff und UI-52 Alle Projekte; UX-OF-11, 12 und 13 entschieden, neu UX-OF-19 (viele Kopfkarten); Kernabläufe K1–K6 mit Vermerken, Versionen nach Einreichen, Versand und Vorlage und zwei Unterschriften (AG, PL).
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -278,7 +279,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Entscheide 12 bis 18 weiter nachführen (Funktionsbaum und Use Cases erledigt, Entscheid 19): UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle, Bereich «Zugriff»), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
+1. Entscheide 12 bis 18 weiter nachführen (Funktionsbaum und Use Cases: Entscheid 19; UX-Schicht: Entscheid 20): Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
 2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 4. V10 mit der Insel Gruppe klären.

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Rollen** | primär AS (reicht ein), UE (prüft, ordnet zu, traktandiert); beteiligt SP (vorgesehener Sponsor, qualifiziert mit), DIR (gibt Kategorie C frei), Gremium (entscheidet in [K3](K3-gremiumssitzung.md)) |
+| **Rollen** | primär AS (reicht ein), UE (prüft, ordnet zu, traktandiert); beteiligt AG (vorgesehene Projektauftraggeber:in, qualifiziert mit), DIR (gibt Kategorie C frei), Gremium (entscheidet in [K3](K3-gremiumssitzung.md)) |
 | **Gerät** | AS Desktop, auch Telefon; UE Desktop |
 | **Use Cases** | [UC-001](../../anhang/use-cases.md#uc-001-projektidee-erfassen-und-qualifizieren) (alle Schritte, A1–A5) |
 | **Oberflächen** | UI-01 Eingang, UI-02 Formular Projektidee, UI-03 Ideenpool, UI-04 Idee prüfen |
@@ -44,7 +44,8 @@
    Vorschlag, K01).
 4. **Zusammenfassung** mit Wirkung (I-F5): «Die Unternehmensentwicklung erhält Ihre Idee zur Prüfung. Sie sehen den Stand
    jederzeit unter ‹Meine Ideen›.» → **Projektidee einreichen** (Schritt 2). Fehlende Pflichtfelder: Sperre mit Sprung zum
-   Schritt. Danach Bestätigungsseite mit dem nächsten Schritt in einem Satz und Link auf «Meine Ideen».
+   Schritt. Schon beim Ausfüllen zeigt der Assistent eingereichte Ideen mit gleichem Handlungsfeld oder gleichen
+   Bereichen: «3 ähnliche Ideen im Ideenpool ansehen» (alle Mitglieder lesen eingereichte Ideen, Master Entscheid 14). Danach Bestätigungsseite mit dem nächsten Schritt in einem Satz und Link auf «Meine Ideen».
 
 **Stand verfolgen (AS):** Portfolio › Ideen zeigt Antragstellenden nur die eigenen Ideen mit Status (darstellung.md) und
 dem letzten Ereignis («in Prüfung seit Fr 3.10.»). Jede Änderung des Status erreicht die Person als Benachrichtigung (I-B1).
@@ -59,14 +60,14 @@ dem letzten Ereignis («in Prüfung seit Fr 3.10.»). Jede Änderung des Status 
      Vorschau der übernommenen Angaben, «Beide Antragstellenden werden informiert.» → **Ideen zusammenführen**. Die andere
      Idee steht danach als «zusammengeführt» mit Link auf die führende.
 7. **Leitfragen zum Eintritt P0** (Schritt 4): strategische Relevanz, Projektziel, klinische Fragestellung, ICT-Einbindung,
-   Infrastruktur, je Antwort als Text; das Feld «vorgesehener Sponsor» (Person). Der Sponsor sieht die Idee lesend und
-   kann die Antworten ergänzen, wenn die UE ihn einlädt (Vorschlag; wie der Sponsor mitwirkt, sagt UC-001 nicht).
+   Infrastruktur, je Antwort als Text; das Feld «vorgesehene Projektauftraggeber:in» (Person). Sie sieht die Idee lesend und
+   kann die Antworten ergänzen, wenn die UE sie einlädt (Vorschlag; wie sie mitwirkt, sagt UC-001 nicht).
    - **Rückfrage stellen** (A2): Textfeld, Status «in Ergänzung»; AS erhält «Rückfragen zu Ihrer Idee beantworten», der
      Assistent öffnet sich mit den Rückfragen über den betroffenen Feldern; **Erneut einreichen** legt die Prüfaufgabe
      wieder an (A2.2).
-   - **Zurückweisen** (A3): Dialog mit Begründung (Pflicht), Wirkung «‹Name› wird mit Ihrer Begründung informiert.» Ob die
-     UE allein zurückweisen darf, ist offen (K07); bis zur Klärung ist die Aktion vorhanden und protokolliert, und die
-     Zurückweisung erscheint im nächsten Portfoliobericht.
+   - **Zurückweisen** (A3): Dialog mit Begründung (Pflicht), Wirkung «‹Name› wird mit Ihrer Begründung informiert.» Das System
+     verlangt keinen Gremiumsentscheid (G1); ob die UE allein zurückweist, regelt die Organisation (K07). Die Aktion ist
+     protokolliert, und die Zurückweisung erscheint im nächsten Portfoliobericht.
 8. **Kategorie zuordnen** (Schritt 5): Kriterienraster (Relevanz, Anzahl betroffener Direktionen, Abhängigkeiten, Bedarf an
    zentraler Priorisierung und Finanzierung, Change-Aufwand) je «hoch / mittel / tief». Das System zeigt die naheliegende
    Kategorie als Vorschlag mit Herleitung (G11); die UE wählt A, B oder C als Gesamtbeurteilung (Q8 Kap. 6: keine starre
@@ -76,9 +77,13 @@ dem letzten Ereignis («in Prüfung seit Fr 3.10.»). Jede Änderung des Status 
      Direktion; weiter in [K2](K2-projektvertrag.md).
 9. **Für das Gremium traktandieren** (Schritt 6): Die Idee erscheint als Vorschlag in der nächsten Sitzung des zuständigen
    Gremiums ([K3](K3-gremiumssitzung.md)); Status «traktandiert».
-10. **Entscheid** (Schritt 7) in K3: «Initialisierung freigegeben» mit Sponsor und Projektleitung (wer benennt, offen K06).
+   **Initialisierung vor dem Entscheid** (UC-001 A6; UX-E12): «Projekt jetzt starten» zeigt vorher «Der Entscheid des
+   PRAT steht aus. Das Projekt entsteht in P0 mit dem Vermerk ‹Initialisierung nicht freigegeben›; das Traktandum
+   bleibt.» Der Entscheid wird in K3 nachgetragen.
+10. **Entscheid** (Schritt 7) in K3: «Initialisierung freigegeben» mit Projektauftraggeber:in und Projektleitung (wer benennt, offen K06).
     Wirkung: «Projekt ‹Titel› entsteht in Phase P0 mit den Angaben der Idee. ‹AS› wird informiert. ‹PL› erhält die
-    Aufgabe ‹Projektvertrag erstellen›.» **Zurückgestellt** (A5): Idee bleibt im Pool mit Auflagen, Status
+    Aufgabe ‹Projektvertrag erstellen›. Zugriff für Projektleitung und Projektauftraggeber:in ist vorgeschlagen.»
+    (Master Entscheid 16) **Zurückgestellt** (A5): Idee bleibt im Pool mit Auflagen, Status
     «zurückgestellt», weiter bei Schritt 7; **abgelehnt**: Status «zurückgewiesen», AS informiert.
 
 ## Zustände
@@ -127,10 +132,14 @@ dem letzten Ereignis («in Prüfung seit Fr 3.10.»). Jede Änderung des Status 
 - [ ] Nach einer Rückfrage sieht AS die Rückfragen über den betroffenen Feldern.
 - [ ] Kategorie C übergibt die Idee der Direktion; die Direktion gibt sie im Eingang frei, danach existiert ein Projekt in P0.
 - [ ] AS sieht weder Kriterienraster noch Bewertung der UE.
+- [ ] Beim Ausfüllen sieht AS eingereichte ähnliche Ideen, aber keine Entwürfe anderer.
+- [ ] «Projekt jetzt starten» vor dem Gremiumsentscheid legt das Projekt mit Vermerk an; das Traktandum bleibt.
 
 ## Entscheide und offene Fragen
 
 - Entscheid: Assistent statt langer Formularseite, weil Antragstellende selten und ungeübt sind (Seitentyp Assistent).
 - Entscheid: Das Kriterienraster schlägt eine Kategorie vor, die UE entscheidet (Q8 Kap. 6, G11).
-- Offen: Wer benennt Sponsor und Projektleitung (K06); darf die UE allein zurückweisen (K07); wie wirkt der Sponsor bei den
-  Leitfragen mit; sehen Antragstellende ähnliche Ideen anderer ([UX-OF-11](../fahrplan.md#offene-fragen); bis zur Klärung nein).
+- Entscheid: Antragstellende sehen ähnliche eingereichte Ideen schon beim Ausfüllen ([UX-OF-11](../fahrplan.md#offene-fragen),
+  Master Entscheid 14).
+- Offen: Wer benennt Projektauftraggeber:in und Projektleitung (K06); darf die UE allein zurückweisen (K07, Prozess der
+  Organisation); wie wirkt die vorgesehene Projektauftraggeber:in bei den Leitfragen mit.

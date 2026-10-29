@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Rollen** | primär GL (Ziele, Jahresziele, Metriken), UE (unterstützt, erfasst Freigaben, publiziert, erstellt Quartalsreporting); beteiligt PRAT (verabschiedet in [K3](K3-gremiumssitzung.md)), VR (über die UE), FI (Budgetbedarf) |
+| **Rollen** | primär GL (legt Ziele, Jahresziele, Metriken fest), UE (pflegt im System, erfasst Freigaben, publiziert, erstellt Quartalsreporting, übergibt den Budgetbedarf); im System pflegt, wer alle Portfolios führt (Master Entscheid 18); beteiligt PRAT (verabschiedet in [K3](K3-gremiumssitzung.md)), VR (über die UE) |
 | **Gerät** | Desktop; GL liest und beurteilt auch auf dem Tablet |
 | **Use Cases** | [UC-011](../../anhang/use-cases.md#uc-011-ziele-im-jahreszyklus-festlegen) (alle Schritte, A1–A2), [UC-012](../../anhang/use-cases.md#uc-012-quartalsreporting-an-den-vr-erstellen) (alle Schritte, A1) |
 | **Oberflächen** | UI-38 Zielzyklus, UI-39 Freigabe der Jahresziele, UI-31 Roadmap, UI-40 Zielerreichung, UI-41 Quartalsreporting |
@@ -51,13 +51,15 @@ Ziele, dieselbe Hierarchie, dieselben Metriken. Darum ein Kernablauf.
    führt in den Assistenten von [K4](K4-projektidee.md) mit vorausgefülltem Strategiebezug.
 5. **Metrik** (Schritt 5): je Ziel Metrik und Zielwert; ohne Metrik markiert der Baum das Ziel (G4).
 6. **Zur Freigabe vorlegen** (Schritt 6; Seitentyp Assistent): Prüfung (alle Ziele mit Metrik), Zusammenfassung (Anzahl
-   Ziele je Handlungsfeld, Änderungen zum Vorjahr), Wirkung: «32 Jahresziele werden ‹zur Freigabe› gesetzt und sind bis
-   zum Entscheid des VR gesperrt.» Danach Z9. Die Unterlagen für den VR lassen sich als Dokument herunterladen (der VR ist
+   Ziele je Handlungsfeld, Änderungen zum Vorjahr), Wirkung: «32 Jahresziele werden ‹zur Freigabe› gesetzt. Änderungen
+   danach sind als ‹geändert nach Vorlage› markiert.» Danach Z9 (UX-E13). Die Unterlagen für den VR lassen sich als Dokument herunterladen (der VR ist
    kein Benutzer, UX-E8).
 7. **Freigabe erfassen** (Schritt 7, UE): Datum und Entscheid des VR. «Freigegeben» setzt die Jahresziele in Kraft.
    «Anpassungen verlangt» (A2) mit Rückmeldungen setzt sie auf «in Arbeit» zurück und informiert die GL; weiter bei Schritt 3.
 8. **Roadmap publizieren** (Schritt 8, UE): Vorschau der Roadmap (Zeitplan der Projekte je Handlungsfeld und Ziel), Wirkung
    «Alle angemeldeten Personen sehen die Roadmap 2027 lesend.» (Kreis offen, [UX-OF-14](../fahrplan.md#offene-fragen)).
+   **Vor der Freigabe publizieren** (UC-011 A3; UX-E12): Sind die Jahresziele noch nicht in Kraft, zeigt die Aktion vorher
+   «Die Roadmap erscheint mit dem Vermerk ‹Jahresziele noch nicht freigegeben›.» Der Vermerk entfällt mit der Freigabe.
 9. **Budgetbedarf übergeben** (Schritt 9): Verweis auf Portfolio › Finanzen › Budgetprozess (UC-010, Seitentyp Assistent,
    ohne eigene Spezifikation).
 
@@ -80,7 +82,7 @@ Ziele, dieselbe Hierarchie, dieselben Metriken. Darum ein Kernablauf.
 
 | Zustand | Gestaltung |
 |---|---|
-| Z9 Zur Freigabe | Banner «Jahresziele 2027 liegen dem VR zur Freigabe vor (seit ‹Datum›). Ändern erst nach dem Entscheid.» |
+| Z9 Zur Freigabe | Banner «Jahresziele 2027 liegen dem VR zur Freigabe vor (seit ‹Datum›).» Ändern bleibt möglich; Änderungen sind «geändert nach Vorlage» markiert und im Verlauf sichtbar (UX-E13) |
 | Z9 In Kraft | Banner «Jahresziele 2027 in Kraft seit ‹Datum›»; Änderungen über eine neue Version mit Verlauf |
 | Z4 Teilweise (Quartalsreporting) | Dashboard des Quartalsendes noch nicht abgeschlossen: Entwurf möglich, Hinweis «Statusberichte September noch nicht abgeschlossen; Zahlen können sich ändern.» |
 | Z2 Leer (neuer Zyklus) | «Zielzyklus 2028 ist leer. Übernehmen Sie die strategischen Ziele und die nicht erreichten Jahresziele von 2027.» mit **Aus 2027 übernehmen** |

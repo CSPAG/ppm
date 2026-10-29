@@ -2,7 +2,7 @@
 
 Einen UI-Katalog gibt es in der Fachgrundlage nicht. Er ist hier aus dem Feld «User Interfaces» der 18 Use Cases
 **abgeleitet** ([anhang/use-cases.md](../anhang/use-cases.md)): gleiche Oberflächen sind zusammengefasst, IDs `UI-01` …
-neu vergeben. Die 50 Oberflächen werden zu **sechs Arbeitsräumen** zusammengefasst, wie im UX-Prinzip des Masterdokuments
+neu vergeben. Die 52 Oberflächen werden zu **sechs Arbeitsräumen** zusammengefasst, wie im UX-Prinzip des Masterdokuments
 festgelegt ([PPM-Master.md, Abschnitt 7](../PPM-Master.md#7-ux-prinzip-arbeitsräume); UX-E2). Jede Rolle sieht davon
 höchstens sechs (I-N1).
 
@@ -14,11 +14,11 @@ mit dem Seitentyp «Arbeitsfläche» (interaktion.md Abschnitt 2), der eine einz
 | Arbeitsraum | Adresse | Wofür | Bereiche |
 |---|---|---|---|
 | **Eingang** | `/eingang` | Startseite jeder Rolle: was jetzt gilt und zu tun ist (G1, UX-E3) | Kopf je Rolle, «Zu tun», Mitteilungen |
-| **Projekte** | `/projekte` | ein Projekt führen: Vertrag erarbeiten und fortschreiben, berichten, ändern, abschliessen | Meine Projekte; je Projekt die Projektakte mit Übersicht, Vertrag, Bericht, Versionen, Abschluss |
-| **Portfolio** | `/portfolio` | das Portfolio überblicken und steuern: Ideen aufnehmen, Monatszyklus abschliessen, priorisieren, Ressourcen und Finanzen | Dashboard, Ideen, Monatsabschluss, Priorisierung, Ressourcen, Finanzen, Auswertungen |
+| **Projekte** | `/projekte` | ein Projekt führen: Vertrag erarbeiten und fortschreiben, berichten, ändern, abschliessen | Meine Projekte, Alle Projekte; je Projekt die Projektakte mit Übersicht, Vertrag, Bericht, Versionen, Abschluss, Zugriff |
+| **Portfolio** | `/portfolio` | das Portfolio überblicken und steuern: Ideen aufnehmen, Monatszyklus abschliessen, priorisieren, Ressourcen und Finanzen | Dashboard, Ideen, Monatsabschluss, Priorisierung, Ressourcen, Finanzen, Auswertungen, Zugriff |
 | **Gremien** | `/gremien` | im Gremium entscheiden: Sitzungen vorbereiten, durchführen, protokollieren | Sitzungen, Entscheide, Jahresrückblick |
 | **Ziele** | `/ziele` | Ziele im Jahreszyklus setzen und ihre Erreichung berichten | Zielzyklus, Zielerreichung, Quartalsreporting |
-| **Administration** | `/administration` | einrichten nach PM-Handbuch und Organisation | Benutzer und Rollen, Organisation, Codetabellen, Phasenmodell, Portfolios und Gremien, Vorlagen, Schnittstellen, Änderungsprotokoll |
+| **Administration** | `/administration` | einrichten nach PM-Handbuch und Organisation | Zugänge und Rollen, Organisation, Codetabellen, Phasenmodell, Portfolios und Gremien, Vorlagen, Schnittstellen, Änderungsprotokoll |
 
 Persönliches liegt im **Kontomenü**: Profil und Stellvertretung (UC-016 Schritt 4), Benachrichtigungen, Sprache,
 Farbschema, Feedback, Abmelden.
@@ -28,18 +28,20 @@ Farbschema, Feedback, Abmelden.
 ● sichtbar · ○ teilweise (nur Bereiche oder Objekte der Rolle, meist lesend) · – nicht sichtbar. Massgebend ist das Recht,
 nicht der Rollenname (I-N2); Projektrollen gelten je Projekt (UC-016 Schritt 2).
 
-| Arbeitsraum | PL, CTL, KT | SP | AS | UE, PMO | PRAT, GLPA | GL | DIR | FI | RM | ADM |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Eingang | ● | ● | ● | ● | ● | ● | ● | ● | ● | ● |
-| Projekte | ● eigene | ● eigene | – | ● | ○ lesend | ○ lesend | ○ Direktion | ○ lesend | ○ lesend | – |
-| Portfolio | ○ Ideen | ○ Dashboard, Ideen | ○ eigene Ideen | ● | ○ Dashboard, Priorisierung, Auswertungen | ○ Dashboard, Auswertungen | ○ Direktion | ○ Finanzen, Dashboard, Auswertungen | ○ Ressourcen, Dashboard | – |
-| Gremien | ○ eigene Traktanden | ○ eigene Traktanden | – | ● | ● eigenes Gremium | ○ lesend | – | – | – | – |
-| Ziele | ○ lesend | ○ lesend | – | ● | ○ lesend | ● | ○ lesend | – | – | – |
-| Administration | – | – | – | ○ Phasenmodell, Portfolios und Gremien, Vorlagen, Änderungsprotokoll | – | – | – | – | – | ● |
-| **Anzahl** | 5 | 5 | 2 | 6 | 5 | 5 | 4 | 3 | 3 | 2 |
+| Arbeitsraum | PL, KT (Projekt führen bzw. mitlesen) | AG (Projekt steuern) | Mitglied (auch AS) | UE, PMO (alle Portfolios führen) | PRAT, GLPA (Gremium) | GL (alle Portfolios lesen) | DIR (Portfolio C) | ADM |
+|---|---|---|---|---|---|---|---|---|
+| Eingang | ● | ● | ● | ● | ● | ● | ● | ● |
+| Projekte | ● eigene; alle auflisten | ● eigene, lesend; alle auflisten | ○ alle auflisten (Kopfdaten) | ● | ○ Portfolio lesend | ○ alle lesend | ● Direktion | ○ alle auflisten |
+| Portfolio | ○ Ideen | ○ Dashboard eigener Projekte, Ideen | ○ Ideen (eingereichte lesen, eigene erfassen) | ● | ○ Dashboard, Priorisierung, Auswertungen des Portfolios | ○ Dashboard, Auswertungen aller Portfolios | ○ Direktion | ○ Ideen |
+| Gremien | ○ eigene Traktanden | ○ eigene Traktanden | – | ● | ● eigenes Gremium | ○ lesend | – | – |
+| Ziele | ○ lesend | ○ lesend | ○ lesend | ● | ○ lesend | ○ lesend | ○ lesend | ○ lesend |
+| Administration | – | – | – | ○ Phasenmodell, Portfolios und Gremien, Vorlagen, Änderungsprotokoll | – | – | – | ● |
+| **Anzahl** | 5 | 5 | 4 | 6 | 5 | 5 | 4 | 5 |
 
-Ob Projektleitungen das Dashboard des ganzen Portfolios sehen und wer Beträge sieht, ist offen
-([UX-OF-12](fahrplan.md#offene-fragen)); bis zur Klärung sehen Projektrollen nur ihre Projekte.
+Spalten nach den Rollen des Produkts (Master Entscheid 18) mit den Akteuren des Referenzkunden. Beträge und vertrauliche
+Projekte sieht, wer am Ort eine Rolle hat, Mitglieder ohne weitere Rolle nicht (Entscheid 13). Alle Mitglieder listen
+Projekte auf und lesen eingereichte Ideen (Entscheid 14). Wer an einem Projekt oder Portfolio führt, verwaltet dort den
+Zugriff (Entscheid 16, UX-E14).
 
 ## Navigation
 
@@ -47,11 +49,11 @@ Ob Projektleitungen das Dashboard des ganzen Portfolios sehen und wer Beträge s
   Aufgaben an «Eingang» (I-N3).
 - **Tablet (768–1023 px):** schmale Leiste links mit Symbol und Kurzname.
 - **Telefon:** Leiste unten mit **Eingang, Projekte, Gremien, Mehr**; unter «Mehr» Portfolio, Ziele, Administration und das
-  Kontomenü. Wer einen Arbeitsraum nicht sieht, erhält das nächste sichtbare Ziel; Antragstellende sehen unten nur
-  **Eingang** und **Ideen**.
+  Kontomenü. Wer einen Arbeitsraum nicht sieht, erhält das nächste sichtbare Ziel; Mitglieder ohne weitere Rolle sehen
+  unten **Eingang**, **Projekte** und **Ideen**.
 - **Befehlspalette (Strg+K / ⌘K, I-N4):** Aktionen «Statusbericht erstellen», «Projektidee einreichen», «Änderung
   beantragen», «Stellvertretung erfassen», «Nächste Sitzung öffnen», «Dashboard öffnen»; Suche nach Projekten (Name,
-  Nummer), Ideen, Sitzungen, Zielen und Personen, gefiltert nach Recht.
+  Nummer; alle aufgelisteten), Ideen, Sitzungen, Zielen und Personen, gefiltert nach Recht.
 - **Kontext im Kopf:** In Portfolio und Gremien steht das gewählte **Portfolio** (Transformation, Geschäftsleitung oder eine
   Direktion) bzw. das **Gremium** im Kopf und in der Adresse (`?portfolio=transformation`, `/gremien/prat`). Im
   Monatsabschluss steht die **Periode** (`?periode=2026-10`), in Ziele das **Jahr** (`/ziele/2027`).
@@ -66,16 +68,16 @@ Frist sortiert, je mit Direktaktion, dann Mitteilungen. Wer mehrere Rollen hat, 
 | Rolle | Kopf | «Zu tun» (Beispiele) |
 |---|---|---|
 | PL | je eigenes Projekt: Phase, Status und Trend, nächster Meilenstein, nächste Frist («Statusbericht Oktober fällig Sa 25.10. · in 3 Tagen»; «Gate P1–P2 im PRAT Mi 10.12.») | «Statusbericht Oktober erstellen» → Bericht; «Rückfrage zum Statusbericht beantworten»; «Gate P1–P2 vorbereiten · Unterlagen bis Mi 3.12.»; «Projektvertrag unterzeichnen» |
-| CTL | eigene Projekte mit Phase und nächstem Gremientermin («Sie stellen am Mi 10.12. im PRAT vor») | «Projektvertrag Version 2.0 unterzeichnen» → Zusammenfassung mit «Unterzeichnen» |
-| SP | eigene Projekte, kritische zuerst: Status, Trend, Grund («Kritisch seit Oktober: Lieferverzug Hauptsystem») | «Änderung am Projektvertrag entscheiden»; «Projektvertrag unterzeichnen»; «Projekt kritisch: Massnahme ansehen» |
+| AG | eigene Projekte, kritische zuerst: Status, Trend, Grund («Kritisch seit Oktober: Lieferverzug Hauptsystem») | «Änderung am Projektvertrag entscheiden»; «Projektvertrag unterzeichnen»; «Projekt kritisch: Massnahme ansehen»; offene Vermerke bleiben, bis sie gesetzt sind (UX-E12) |
 | AS | eigene Ideen mit Stand («Ideenpool: in Prüfung seit 3.10.») und Schaltfläche **Projektidee einreichen** | «Rückfragen zu Ihrer Idee beantworten» |
-| UE, PMO | Monatszyklus: «Statusberichte Oktober: 23 von 31 eingereicht, 15 geprüft · Stichtag Sa 25.10. · Abschluss bis Fr 31.10.»; nächste Sitzung: «PRAT Mi 12.11. · Versand bis Mi 5.11. · 4 von 6 Traktanden mit Unterlagen» | «Statusbericht prüfen» (Sammelaufgabe je Periode); «Quality-Check Projektvertrag ‹Projekt›»; «Projektidee prüfen»; «Sitzung vorbereiten»; «Protokoll versenden · bis Mo 17.11.» |
+| UE, PMO | Monatszyklus: «Statusberichte Oktober: 23 von 31 eingereicht, 15 geprüft · Stichtag Sa 25.10. · Abschluss bis Fr 31.10.»; nächste Sitzung: «PRAT Mi 12.11. · Versand bis Mi 5.11. · 4 von 6 Traktanden mit Unterlagen» | «Statusbericht prüfen» (Sammelaufgabe je Periode); «Quality-Check Projektvertrag ‹Projekt›»; «Projektidee prüfen»; «Sitzung vorbereiten»; «Protokoll versenden · bis Mo 17.11.»; dazu Finanzen («Abweichung klären», «Jahresbedarf übergeben») und Ressourcen («Bedarf ‹Projekt› decken», «Konflikt auflösen») |
 | PRAT, GLPA | nächste Sitzung mit Anzahl Traktanden und Stand der Unterlagen («Unterlagen bereit seit Mi 5.11.»); Gesamtstatus des Portfolios («27 im Plan · 4 kritisch · 2 Eskalationen») | «Unterlagen PRAT 12.11. lesen»; Auflagen, für die man verantwortlich ist |
-| GL | Zielzyklus («Jahresziele 2027: 28 von 32 mit Metrik · Vorlage an den VR bis 15.11.»); Zielerreichung des letzten Quartals | «Jahresziele 2027 vervollständigen»; «Zielerreichung Q3 beurteilen» |
+| GL | Zielzyklus, wenn die GL alle Portfolios führt («Jahresziele 2027: 28 von 32 mit Metrik · Vorlage an den VR bis 15.11.»); Zielerreichung des letzten Quartals | «Jahresziele 2027 vervollständigen»; «Zielerreichung Q3 beurteilen» |
 | DIR | Projekte der Direktion mit Status und Trend | «Initialisierung freigeben» (UC-001 A4) |
-| FI | Prognose gegenüber Budget über das Portfolio, Anzahl Projekte mit Überschreitung, letzter Lauf der Ist-Kosten | «Abweichung klären»; «Jahresbedarf an den Budgetprozess übergeben» |
-| RM | offene Bedarfe, Konflikte, Auslastung der nächsten drei Monate | «Bedarf ‹Projekt› decken»; «Konflikt auflösen» |
 | ADM | Schnittstellenläufe mit Fehler, Zugänge zu entziehen | «Lauf ‹ERP Ist-Kosten› fehlgeschlagen»; «Rollen von ‹Person› neu besetzen» |
+
+Die UE erhält mit Finanzen und Ressourcen (Master Entscheide 12, 15) bis zu sechs Kopfkarten. Vorschlag: Jede Person kann
+Kopfkarten einklappen; die Wahl bleibt gespeichert, Aufgaben in «Zu tun» erscheinen trotzdem ([UX-OF-19](fahrplan.md#offene-fragen)).
 
 ## Zuordnung UI-Katalog → Arbeitsräume
 
@@ -124,7 +126,7 @@ Abgeleitet aus den Use Cases. Jede Oberfläche genau einmal.
 | UI-39 | Freigabe der Jahresziele | UC-011 | Ziele › Zielzyklus, «Zur Freigabe vorlegen» / «Freigabe erfassen» | Assistent | K6 |
 | UI-40 | Zielerreichung | UC-012 | Ziele › Zielerreichung | Arbeitsfläche | K6 |
 | UI-41 | Quartalsreporting (Berichtsentwurf) | UC-012 | Ziele › Quartalsreporting | Arbeitsfläche | K6 |
-| UI-42 | Benutzer, Rollen und Berechtigungen | UC-016 | Administration › Benutzer und Rollen | Liste + Schublade | – |
+| UI-42 | Zugänge und Rollen (vorgegebene und eigene Rollen) | UC-016 | Administration › Zugänge und Rollen | Liste + Schublade | – |
 | UI-43 | Profil mit Stellvertretung | UC-016 | Kontomenü › Profil | Liste + Schublade | – |
 | UI-44 | Organisation | UC-017 | Administration › Organisation | Liste + Schublade | – |
 | UI-45 | Codetabellen | UC-017 | Administration › Codetabellen | Liste + Schublade | – |
@@ -133,6 +135,8 @@ Abgeleitet aus den Use Cases. Jede Oberfläche genau einmal.
 | UI-48 | Vorlagen | UC-018 | Administration › Vorlagen | Liste + Schublade | – |
 | UI-49 | Schnittstellen mit Laufprotokoll | UC-018 | Administration › Schnittstellen | Liste + Schublade | – |
 | UI-50 | Änderungsprotokoll | UC-018 | Administration › Änderungsprotokoll | Bericht | – |
+| UI-51 | Zugriff am Projekt bzw. Portfolio (wer führt, steuert, mitliest; «Warum?») | UC-016 A2 | Projekte › Projekt › Zugriff; Portfolio › Zugriff | Liste + Schublade | – |
+| UI-52 | Alle Projekte (Kopfdaten für alle Mitglieder) | UC-014; Master Entscheid 14 | Projekte › Alle Projekte | Liste + Schublade | – |
 
 Anmerkung zu UI-06: Die Projektübersicht ist ein Bericht über ein einzelnes Projekt (Kopf mit Status, Phasenleiste,
 Meilensteine, letzte Entscheide) und der Einstieg in die Projektakte; sie ist keine Startseite im Sinn des Rahmens.
@@ -142,7 +146,9 @@ Meilensteine, letzte Entscheide) und der Einstieg in die Projektakte; sie ist ke
 | Adresse | Inhalt |
 |---|---|
 | `/eingang?filter=frist` | Eingang, «Zu tun» gefiltert |
-| `/projekte?rolle=sponsor` | eigene Projekte, gefiltert nach eigener Rolle |
+| `/projekte?funktion=auftraggeber` | eigene Projekte, gefiltert nach eigener Funktion |
+| `/projekte/alle` | alle aufgelisteten Projekte (Kopfdaten) |
+| `/projekte/<nr>/zugriff` | Zugriff am Projekt |
 | `/projekte/<nr>` | Projektübersicht, z. B. `/projekte/2026-014` |
 | `/projekte/<nr>/vertrag?kapitel=7&version=entwurf` | Projektakte, Kapitel 7 des Entwurfs |
 | `/projekte/<nr>/vertrag?gate=p1-p2` | Projektakte im Gate-Modus |

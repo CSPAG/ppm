@@ -82,6 +82,13 @@ describe('Portfolios und Gremien', () => {
     expect(screen.getAllByRole('button', { name: new RegExp(TP.create) }).length).toBe(1);
   });
 
+  it('Fehler beim Laden: Anlegen bleibt im Kopf erreichbar (Z5)', async () => {
+    stub({ 'GET /v1/portfolios': () => json({ type: 'about:blank', title: 'Interner Fehler', status: 500 }, 500, { 'Content-Type': 'application/problem+json' }) });
+    renderWithIam(<Page />, UE);
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: new RegExp(TP.create) }).length).toBe(1);
+  });
+
   it('Schublade: Gremien und Gremienweg mit «via SNS-VR»', async () => {
     stub({});
     renderWithIam(<Page initial={{ o: 'transformation' }} />, UE);

@@ -43,8 +43,8 @@ export function IdeenPage({ gehe }: { gehe: Gehe }) {
               <div className="sub">{TI.sub}</div>
             </div>
           </div>
-          {/* Kopf-Button nur mit Einträgen; die leere Liste bietet die erste Aktion selbst an (Z2) */}
-          {items.length ? <div className="acts">{einreichen}</div> : null}
+          {/* Kopf-Button fehlt nur bei geladener, leerer Liste: sie bietet die erste Aktion selbst an (Z2) */}
+          {!list.data || items.length ? <div className="acts">{einreichen}</div> : null}
         </div>
       </header>
       <div className="body">

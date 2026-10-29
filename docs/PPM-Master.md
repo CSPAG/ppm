@@ -90,7 +90,7 @@ Die Eckpunkte beschreiben Organisation und Governance des Referenzkunden. Das Pr
 
 VR Verwaltungsrat (Programmauftraggeber) · SNS Strategie-, Nominations- und Strukturausschuss des VR (Schnittstelle PRAT ↔ VR; Gates in P0 und P1) · CEO Programmsponsor · PRAT Programmausschuss Transformation (GL) · UE Unternehmensentwicklung (Programmleitung) · PMO Project Management Office (unterstützt die Programmleitung bei Reporting und Dokumentation) · GL Geschäftsleitung · GLPA GL Portfolio Ausschuss (Portfolio B) · DIR Direktionen (Portfolio C; im Kernteam vertreten als AeD, DPF, DLF, DMS, DTI, DP, DIB) · AG/SP Projektauftraggeber und -sponsor, eine Rolle (GL-Mitglied, bei B die GL, bei C die Direktion; Q8 Kap. 1) · PL Projektleitung · CTL Clinical Transformation Lead · KT Kernteam · AS Antragsteller/in · KOM Unternehmenskommunikation (Change und Kommunikation, mit UE) · DTI/DBI zuständige Stellen für ICT und Infrastruktur · FI Finanzen [OFFEN] · RM Ressourcenmanagement [OFFEN] · ADM Administrator/in
 
-Die Akteure sind Personen und Gremien des Referenzkunden, keine Rollen im System: Was jemand im System darf, bestimmt die Rolle (G3); wer im Projekt verantwortlich ist, die Funktion (G4). Im Produkt heisst AG/SP **Projektauftraggeber:in**; die CTL wird nicht geführt, Finanzen ist keine eigene Rolle (Entscheid 12).
+Die Akteure sind Personen und Gremien des Referenzkunden, keine Rollen im System: Was jemand im System darf, bestimmt die Rolle (G3); wer im Projekt verantwortlich ist, die Funktion (G4). Im Produkt heisst AG/SP **Projektauftraggeber:in**; die CTL wird nicht geführt; Finanzen und Ressourcenmanagement sind keine eigenen Rollen (Entscheide 12 und 15).
 
 ## 6. Systemgrenze
 
@@ -206,6 +206,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Projekte:** Alle Mitglieder listen die Kopfdaten aller nicht vertraulichen Projekte auf: Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektmanager:in, Projektauftraggeber:in. Status, Trend, Beträge und Inhalte (Projektvertrag, Berichte, Register) brauchen «Lesen». Ohne «Lesen» führt ein Eintrag zu einer Kopfansicht, nicht zur Akte. Auch Auswahlfelder (z. B. Abhängigkeiten im Projektvertrag) und die Suche bieten alle aufgelisteten Projekte an.
    - **Ideen:** Alle Mitglieder lesen eingereichte Ideen vollständig nach Vorlage (Titel, Ausgangslage, Zielsetzung, Handlungsfeld, betroffene Bereiche, Einschätzungen, Stand, eingereicht von). Nicht sichtbar sind Entwürfe anderer und die Prüfung durch die UE (Rückfragen, Tiering-Raster, Leitfragen). Wer eine Idee erfasst, sieht so ähnliche Ideen schon vor dem Einreichen.
    - **Bauplan:** Die Lesesicht der Projektdetails hängt an der Sichtbarkeit der Projektzeile (`ppm.projekt_sichtbar()`); «Auflisten» braucht deshalb einen eigenen Weg (neues Muster in [fachmodell.md](fachmodell.md) 3.4). Bei Ideen braucht die Lesesicht der Rückfragen eine eigene Bedingung, weil sie heute an der Sichtbarkeit der Idee hängt.
+15. **Keine Rolle Ressourcenmanagement** (29.10.2026, zu G1 und V14): Kapazität, Bedarf und Zuteilung pflegen Projektportfoliomanager:in und PPMO, wie die Finanzen (Entscheid 12). Wer nur Ressourcen plant, erhält PPMO. UC-009 erhält diese Primärakteure statt RM; im Bauplan heisst es in A-69 «das manuell festgelegte Angebot geht vor». Die Rechte `ressource:read` und `ressource:write` bleiben; braucht eine Organisation eine eng gefasste Rolle, genügt eine Zusatzvorlage «Ressourcen pflegen» (Lesen und `ressource:write`). Hinweis für die UX-Schicht: Projektportfoliomanager:in und PPMO erhalten damit alle Kopfkarten der Startseite (Einrichten, Monatszyklus, Ziele, Finanzen, Ressourcen, Sitzung); die Startseite braucht eine Lösung dafür, z. B. ausblendbare Karten.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -230,7 +231,6 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 
 **Produkt** (nicht in der Klärungsliste, die sich an den Referenzkunden richtet), zu V14:
 
-- **Ressourcenmanagement:** Bleibt es eine eigene Rolle, oder planen Projektportfoliomanager:in und PPMO die Ressourcen?
 - **PMO am Projekt:** Als Funktion in der Projektorganisation geführt (die Projektmanager:in setzt sie selbst) oder nur über Zugänge vergeben?
 - **Direktion:** Pflegt sie ihr Portfolio C selbst («Bearbeiten» am Portfolio), oder liest sie nur, und Projektportfoliomanager:in und PPMO erfassen ihre Entscheide?
 

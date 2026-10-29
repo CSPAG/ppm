@@ -51,7 +51,8 @@ eine Darstellung im Stil der Beschränkungen von Confluence und die Kennzeichnun
   1. dein Zugriff mit Grund, z. B. «Du kannst bearbeiten, weil du das Projekt führst.» (`GET /v1/access/explain`);
   2. die Stufe, bei Vererbung mit «geerbt von Portfolio ‹Name›»;
   3. je Rolle die Anzahl Personen, aufklappbar zu den Namen: am Projekt (führen, steuern, mitlesen), über das Portfolio
-     (führen, steuern, Gremium), für alle Portfolios (führen, lesen), Mitglieder (auflisten oder kein Zugriff);
+     (führen, steuern, Gremium), für alle Portfolios (führen, lesen), Mitglieder (auflisten oder kein Zugriff); am
+     Portfolio zusätzlich «über seine Projekte» (siehe Abschnitt 2);
   4. «Alle anzeigen» führt in den Bereich «Zugriff»; «Zugriff geben» für alle, die hier führen.
 - Wer nur auflisten darf, sieht in der Kopfansicht keine Schaltfläche; dort steht schon der Hinweis, wer Zugriff gibt.
 - Das ist der Wunsch nach einem Schloss wie in Confluence: Der Zugriff ist von jeder Stelle des Objekts einen Klick
@@ -65,6 +66,10 @@ Ergänzungen zum heutigen Bereich (Seitentyp Liste + Schublade bleibt):
   sehen sie als Text. Ist sie geerbt, steht «Vertraulich, weil das Portfolio ‹Name› vertraulich ist» ohne Auswahl.
 - **Spalte «Darf»** neben «Rolle», in Worten aus der Rolle: «auflisten», «lesen», «lesen und bearbeiten»,
   dazu «verwaltet Zugriff». So beantwortet die Liste direkt, wer auflisten, lesen und bearbeiten darf.
+- **Am Portfolio eine Gruppe «über seine Projekte»:** wer nur an einem Projekt des Portfolios eine Rolle hat, mit
+  «Darf» = «Portfolio auflisten» (Name, dazu das eigene Projekt). Ohne diese Gruppe fehlten bei einem vertraulichen
+  Portfolio Personen, die es sehen: `GET /v1/access` liefert nur Rollen am Ort und an den Orten darüber, nicht an den
+  Projekten darunter.
 - **Letzte Zeile «Alle Mitglieder»** wie «Jeder» in Confluence: «Kopfdaten auflisten», bei vertraulich «kein Zugriff».
 - Einträge über das Portfolio oder für alle Portfolios bleiben ohne «Entfernen» und nennen, wo sie geändert werden (heute
   schon so).
@@ -126,8 +131,14 @@ Ergänzungen zum heutigen Bereich (Seitentyp Liste + Schublade bleibt):
 
 Paket mit eigenem Migrationsbereich ([fachmodell.md 7](../fachmodell.md#7-arbeitspakete)).
 
-- Datenmodell: `portfolio.vertraulich` ([fachmodell.md 2.4](../fachmodell.md#24-portfolio)); Änderung über
-  `PATCH /v1/portfolios/{id}` mit `portfolio:admin` am Ort.
+- Datenmodell: `portfolio.vertraulich` ([fachmodell.md 2.4](../fachmodell.md#24-portfolio)).
+- Setzen über eine eigene Route, z. B. `PUT /v1/portfolios/{id}/vertraulich`, geprüft am Ort mit
+  `req.need('projekt:write', { type: 'portfolio', id })`: Dieses Recht haben «Portfolio führen» und «alle Portfolios
+  führen». `PATCH /v1/portfolios/{id}` prüft `portfolio:admin`, und das gilt nur übergreifend (Ort `org`); wer ein
+  Portfolio führt, soll damit nicht alle Portfolios verwalten. Will die Master-Session ein eigenes Recht, dann eines mit
+  Ort `portfolio` in [fachmodell.md 3.2](../fachmodell.md#32-rechte).
+- Zugriff «über seine Projekte»: eigene Abfrage der App über die Rollen an den Projekten des Portfolios, weil
+  `GET /v1/access` nur den Ort und die Orte darüber liefert; alternativ eine Erweiterung im Baukasten.
 - Lesesicht ([fachmodell.md 3.4](../fachmodell.md#34-policies-der-lesesicht)): `portfolio_read` lässt Mitglieder ein
   vertrauliches Portfolio nur sehen, wenn sie am Portfolio, an einem seiner Projekte oder übergreifend eine Rolle haben;
   in `projekt_read` gilt ein Projekt als vertraulich, wenn es selbst oder sein Portfolio vertraulich ist; dazu Ideen mit
@@ -153,7 +164,9 @@ Paket mit eigenem Migrationsbereich ([fachmodell.md 7](../fachmodell.md#7-arbeit
 - [ ] Der Bereich «Zugriff» zeigt oben die Stufe, je Zeile, was die Person darf, und als letzte Zeile die Mitglieder.
 - [ ] Ein Mitglied ohne Rolle findet ein vertrauliches Portfolio und seine Projekte nirgends: Listen, Suche,
       Befehlspalette, Roadmap, Ideen, Exporte, MCP.
-- [ ] Wer nur an einem Projekt im vertraulichen Portfolio eine Rolle hat, sieht sein Projekt und den Namen des Portfolios.
+- [ ] Wer nur an einem Projekt im vertraulichen Portfolio eine Rolle hat, sieht sein Projekt und den Namen des Portfolios
+      und steht im Zugriff des Portfolios unter «über seine Projekte».
+- [ ] Wer ein Portfolio führt, aber nicht alle Portfolios, kann es vertraulich machen.
 - [ ] Vor dem Setzen von «vertraulich» steht die Wirkung; die Änderung steht im Änderungsprotokoll.
 - [ ] Das Schloss erscheint nur bei vertraulichen Objekten.
 

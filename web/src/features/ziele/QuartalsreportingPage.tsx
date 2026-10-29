@@ -25,6 +25,21 @@ export interface QuartalsreportingPageProps {
 }
 
 const qLabel = (q: string) => fmtQuartal(Number(q.slice(0, 4)), Number(q.slice(6)) as QuartalNr);
+/** Quartalsende «JJJJ-MM-TT» zu «JJJJ-Qn». */
+const quartalsende = (q: string) => { const j = Number(q.slice(0, 4)); const m = Number(q.slice(6)) * 3; return new Date(Date.UTC(j, m, 0)).toISOString().slice(0, 10); };
+
+/**
+ * Nächste Meilensteine über alle Portfolios nach Termin (ohne Termin zuletzt), wie im Dokument; ein Termin vor dem
+ * Quartalsende gilt als überfällig.
+ */
+function naechsteMeilensteine(pf: { meilensteine: { projekt: { nummer: string; name: string }; text: string; termin: string | null }[] }[], quartal: string) {
+  const ende = quartalsende(quartal);
+  return pf.flatMap(x => x.meilensteine)
+    .sort((a, b) => (a.termin ?? '9999').localeCompare(b.termin ?? '9999'))
+    .slice(0, 30)
+    .map(m => ({ ...m, ueberfaellig: !!m.termin && m.termin.slice(0, 10) < ende }));
+}
+
 /** Stand des Berichts → Familie der Standanzeige */
 const FAMILIE: Record<string, StandFamilie> = { in_arbeit: 'wartet', traktandiert: 'traktandiert', verabschiedet: 'positiv' };
 
@@ -215,7 +230,8 @@ function Bericht({ l, busy, neuLaden, erzeugen, speichern, traktandieren, vrSpei
           zeilen={pf.flatMap(p => p.kritischeProjekte.map(c => [`${c.nummer} ${c.name}`, p.name, c.phase, c.trend ?? '–']))} />
         <h3>{TQR.meilensteine}</h3>
         <Tabelle caption={TQR.meilensteine} kopf={[TQR.projekt, TQR.meilenstein, TQR.termin]} leer={TQR.keineMeilensteine}
-          zeilen={pf.flatMap(p => p.meilensteine).slice(0, 30).map(x => [`${x.projekt.nummer} ${x.projekt.name}`, x.text, x.termin ? fmtDatum(x.termin) : '–'])} />
+          zeilen={naechsteMeilensteine(pf, b.quartal).map(x => [`${x.projekt.nummer} ${x.projekt.name}`, x.text,
+            x.termin ? `${fmtDatum(x.termin)}${x.ueberfaellig ? ` ${TQR.ueberfaellig}` : ''}` : '–'])} />
       </Teil>
 
       <Teil id="zielerreichung">

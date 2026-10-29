@@ -18,3 +18,4 @@
 .jr-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 .jr-dokument { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2, 8px); }
 .jr-dokument > p, .jr-dokument > div[role="status"] { flex-basis: 100%; margin: 0; }
+@media (max-width: 767px) { .jr-body { padding: 14px; } }

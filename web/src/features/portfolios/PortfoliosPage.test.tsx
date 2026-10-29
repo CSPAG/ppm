@@ -78,7 +78,8 @@ describe('Portfolios und Gremien', () => {
     stub({ 'GET /v1/portfolios': () => json({ items: [], nextCursor: null }) });
     renderWithIam(<Page />, UE);
     expect(await screen.findByText(TP.empty)).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: new RegExp(TP.create) }).length).toBe(2);
+    // nur die Aktion der leeren Liste (Z2), kein zweiter Button im Kopf
+    expect(screen.getAllByRole('button', { name: new RegExp(TP.create) }).length).toBe(1);
   });
 
   it('Schublade: Gremien und Gremienweg mit «via SNS-VR»', async () => {

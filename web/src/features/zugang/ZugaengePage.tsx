@@ -42,7 +42,8 @@ export function ZugaengePage({ search, setSearch, gehe }: { search: ZugaengeSear
               <div className="sub">{Z.sub}</div>
             </div>
           </div>
-          {darf ? <div className="acts"><button type="button" className="btn primary" onClick={() => setSearch({ o: 'entziehen' })}>{Z.entziehen}</button></div> : null}
+          {/* Kopf-Button nur mit Einträgen; die leere Liste bietet die erste Aktion selbst an (Z2) */}
+          {darf && (offen || !!list.data?.items.length) ? <div className="acts"><button type="button" className="btn primary" onClick={() => setSearch({ o: 'entziehen' })}>{Z.entziehen}</button></div> : null}
         </div>
       </header>
       <div className="body">

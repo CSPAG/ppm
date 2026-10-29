@@ -5,13 +5,25 @@
  * Eskalationen, Auswirkungen, Weiterleitungen (UC-006 A4). Kopfzeile «Intern · enthält Personendaten» (G12).
  */
 import { PERSONENDATEN, type Block, type Dokument, type Format } from '../vorlage/index.ts';
-import { monat, quartalLabel } from './quartal.ts';
+import { monat, quartalLabel, zeitraum } from './quartal.ts';
 import type { KommentareOut, QuartalsInhaltOut } from './quartal-schemas.ts';
 import type { BerichtRow } from './quartal-store.ts';
 
 const STAND: Record<string, string> = { in_arbeit: 'in Arbeit', traktandiert: 'traktandiert', verabschiedet: 'verabschiedet' };
 const datum = (iso: string | Date | null) => (iso ? new Intl.DateTimeFormat('de-CH', { timeZone: 'Europe/Zurich', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(iso)) : '–');
 const p = (x: { nummer: string; name: string }) => `${x.nummer} ${x.name}`;
+
+/**
+ * Nächste Meilensteine über alle Portfolios nach Termin (ohne Termin zuletzt); ein Termin vor dem Quartalsende gilt als
+ * überfällig (der Statusbericht nennt noch einen vergangenen Meilenstein).
+ */
+export function naechsteMeilensteine(pf: QuartalsInhaltOut['portfolios'], quartal: string) {
+  const ende = zeitraum(quartal).bis;
+  return pf.flatMap(x => x.meilensteine)
+    .sort((a, b) => (a.termin ?? '9999').localeCompare(b.termin ?? '9999'))
+    .slice(0, 30)
+    .map(m => ({ ...m, ueberfaellig: !!m.termin && m.termin.slice(0, 10) < ende }));
+}
 
 export function quartalDokument(b: BerichtRow): Dokument {
   const i = b.inhalt as unknown as QuartalsInhaltOut;
@@ -36,7 +48,7 @@ export function quartalDokument(b: BerichtRow): Dokument {
       zeilen: pf.flatMap(x => x.kritischeProjekte.map(c => [p(c), x.name, c.phase, c.trend ?? '–'])) },
     { art: 'ueberschrift', text: 'Nächste Meilensteine', ebene: 2 },
     { art: 'tabelle', kopf: ['Projekt', 'Meilenstein', 'Termin'], breiten: [30, 50, 20], leer: 'Keine Meilensteine.',
-      zeilen: pf.flatMap(x => x.meilensteine).slice(0, 30).map(m => [p(m.projekt), m.text, datum(m.termin)]) },
+      zeilen: naechsteMeilensteine(pf, b.quartal).map(m => [p(m.projekt), m.text, `${datum(m.termin)}${m.ueberfaellig ? ' (überfällig)' : ''}`]) },
     { art: 'ueberschrift', text: '2 Zielerreichung', ebene: 1 },
     { art: 'felder', zeilen: [['Nachgeführt', `${i.zielerreichung.nachgefuehrt} von ${i.zielerreichung.gesamt} Zielen`]] },
     { art: 'tabelle', kopf: ['Nr.', 'Ziel', 'Metrik', 'Zielwert', 'Stand', 'Beurteilung'], breiten: [7, 28, 15, 12, 13, 25], leer: 'Keine Ziele erfasst.',

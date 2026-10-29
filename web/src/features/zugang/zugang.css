@@ -9,7 +9,8 @@
 .zg-vorschau h3{font-size:13.5px;color:var(--fg-2);margin:12px 0 4px}
 .zg-liste{margin:0;padding-left:1.2em}
 .zg-liste li{margin:2px 0;overflow-wrap:anywhere}
+.zg-body{padding:12px 22px 22px}
 .zg-sektion{margin-top:24px}
 .zg-sektion h2{font-size:16px;margin:0 0 8px}
 @media (max-width:900px){ .field .zg-treffer,.field .zg-wahl{grid-column:1} }
-@media (max-width:767px){ .zg-treffer .btn,.zg-wahl .btn{height:44px} }
+@media (max-width:767px){ .zg-treffer .btn,.zg-wahl .btn{height:44px} .zg-filter{padding:12px 14px} .zg-body{padding:12px 14px 22px} }

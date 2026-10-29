@@ -13,3 +13,7 @@
 .sx-aend .feld{color:var(--fg-2)}
 .sx-aend del{color:var(--fg-3)}
 .sx-aend ins{text-decoration:none}
+.sx-ref{border:0;background:var(--surface-2);border-radius:5px;padding:0 5px;color:var(--fg);font-size:12px;cursor:pointer}
+.sx-ref:hover{background:var(--hover)}
+.sx-aend li{overflow-wrap:anywhere}
+@media (max-width:767px){ .sx-body{padding:12px 14px 22px} }

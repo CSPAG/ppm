@@ -48,9 +48,9 @@ export const matrix: Matrix = {
     "ppm.hauptaktivitaet.hauptaktivitaet_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ziel:write'::text) CHECK -",
     // Muster KIND: sichtbar mit dem Projekt; schreiben mit ziel:write oder projekt:write am Projekt (301)
     'ppm.ziel_projekt.ziel_projekt_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.ziel_projekt.ziel_projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id))",
-    "ppm.ziel_projekt.ziel_projekt_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id))",
-    "ppm.ziel_projekt.ziel_projekt_delete RESTRICTIVE DELETE ppm_app USING (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK -",
+    "ppm.ziel_projekt.ziel_projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id))",
+    "ppm.ziel_projekt.ziel_projekt_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id)) CHECK (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id))",
+    "ppm.ziel_projekt.ziel_projekt_delete RESTRICTIVE DELETE ppm_app USING (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id)) CHECK -",
   ],
   seed: async (api, a, mark) => {
     const call = async (method: string, url: string, payload?: unknown) => {

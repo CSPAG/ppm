@@ -13,8 +13,13 @@ export const ENDZUSTAENDE: readonly Lebenszyklus[] = ['abgebrochen', 'abgeschlos
 /** Funktionen der Projektorganisation (Q7 Kap. 8); `koalition` = Sponsoren-Koalition ohne eigene Rolle (A-04). */
 export const FUNKTIONEN = ['sp', 'pl', 'ctl', 'kt', 'koalition'] as const;
 export type Funktion = (typeof FUNKTIONEN)[number];
-/** Funktionen, die zugleich Rolle am Projekt sind (Tupel, fachmodell.md 3.3). */
-export const ROLLEN: readonly Funktion[] = ['sp', 'pl', 'ctl', 'kt'];
+/**
+ * Rolle am Projekt je Funktion (A-70), bis AP-E8-2 die Projektorganisation vom Zugriff trennt (Master Entscheid 16, A-71):
+ * Sponsor steuert, Projektleitung und CTL führen, Kernteam liest mit; die Sponsoren-Koalition erhält keine Rolle.
+ */
+export const ROLLE_JE_FUNKTION: Partial<Record<Funktion, 'projekt-steuern' | 'projekt-fuehren' | 'projekt-mitlesen'>> = {
+  sp: 'projekt-steuern', pl: 'projekt-fuehren', ctl: 'projekt-fuehren', kt: 'projekt-mitlesen',
+};
 
 const enumOf = <T extends string>(values: readonly T[], description: string) => Type.Unsafe<T>({ type: 'string', enum: [...values], description });
 

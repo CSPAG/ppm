@@ -13,7 +13,7 @@ describe('Kodierte Pfade', () => {
   let editor: Record<string, string>;
   before(async () => {
     api = await testApi({ API_RATE_LIMIT: '3', SHARED_STATE: 'memory' });
-    editor = { authorization: (await login(api, 'demo', 'k-editor', 'gl')).authorization };
+    editor = { authorization: (await login(api, 'demo', 'k-editor', 'alle-fuehren')).authorization };
   });
   after(async () => { await api?.close(); });
 
@@ -31,7 +31,7 @@ describe('Kodierte Pfade', () => {
   test('Idempotency-Key gilt auch für kodierte Pfade, gleich wie für den normalen Pfad', async () => {
     const other = await testApi();
     try {
-      const h = { authorization: (await login(other, 'demo', 'k-idem', 'gl')).authorization, 'idempotency-key': 'kodiert-1' };
+      const h = { authorization: (await login(other, 'demo', 'k-idem', 'alle-fuehren')).authorization, 'idempotency-key': 'kodiert-1' };
       const a = await other.app.inject({ method: 'POST', url: '/%761/handlungsfelder', headers: h, payload: { label: 'Kodiert' } });
       const b = await other.app.inject({ method: 'POST', url: '/v1/handlungsfelder', headers: h, payload: { label: 'Kodiert' } });
       assert.equal(a.statusCode, 201, a.body);

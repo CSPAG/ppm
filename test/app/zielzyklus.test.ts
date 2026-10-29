@@ -20,11 +20,11 @@ describe('Zielzyklus', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-gl', 'gl');
+    const e = await login(api, 'demo', 'u-gl', 'alle-fuehren');
     tenantId = e.tenantId;
     gl = { authorization: e.authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
     verantwortlich = await person(api, tenantId, 'Anna Muster');
     const feld = (await call('POST', '/v1/handlungsfelder', gl, { label: 'Wirtschaftlichkeit', position: 2 })).json().id;
     ziel21 = (await call('POST', '/v1/strategische-ziele', gl, { handlungsfeldId: feld, nummer: '2.1', text: 'Kosten senken' })).json().id;
@@ -128,9 +128,8 @@ describe('Zielzyklus', () => {
     const z2 = (await call('POST', `/v1/projekte/${id}/ziele`, gl, { strategischesZielId: ziel22 })).json();
     assert.equal(z2.link, '/ziele/strategische-ziele?o=ziel:2.2');
     assert.equal((await call('POST', `/v1/projekte/${randomUUID()}/ziele`, gl, { strategischesZielId: ziel22 })).statusCode, 404);
-    // vertrauliches Projekt (A-34): die GL sieht es nicht und kann es nicht zuordnen
-    assert.equal((await call('POST', `/v1/projekte/${projekt['2026-015']}/ziele`, gl, { strategischesZielId: ziel21 })).statusCode, 404);
-    await full(api.t.runtime, tenantId, tx => tx.query('INSERT INTO ppm.ziel_projekt (tenant_id, projekt_id, strategisches_ziel_id) VALUES ($1, $2, $3)', [tenantId, projekt['2026-015'], ziel21]));
+    // vertrauliches Projekt: «alle Portfolios führen» sieht es und ordnet es zu (Master Entscheid 13)
+    assert.equal((await call('POST', `/v1/projekte/${projekt['2026-015']}/ziele`, gl, { strategischesZielId: ziel21 })).statusCode, 201);
 
     // vom Projekt zum Ziel: ein Aufruf liefert die Adresse des Ziels
     const vonProjekt = (await call('GET', `/v1/projekte/${id}/ziele`, gl)).json();
@@ -141,10 +140,10 @@ describe('Zielzyklus', () => {
     const baum = (await call('GET', '/v1/ziele/2027', gl)).json();
     const s21 = baum.strategischeZiele.find((x: { nummer: string }) => x.nummer === '2.1');
     assert.deepEqual(s21.jahresziele[0].projekte.map((p: { nummer: string }) => p.nummer), ['2026-014']);
-    assert.deepEqual(s21.projekte, [], 'vertrauliches Projekt bleibt unsichtbar');
+    assert.deepEqual(s21.projekte.map((p: { nummer: string }) => p.nummer), ['2026-015'], 'vertrauliches Projekt sichtbar für «alle Portfolios führen» (Master Entscheid 13)');
     assert.deepEqual(baum.strategischeZiele.find((x: { nummer: string }) => x.nummer === '2.2').projekte.map((p: { nummer: string }) => p.nummer), ['2026-014']);
     assert.ok(!baum.pruefung.ohneUmsetzung.some((x: { nummer: string }) => x.nummer === '2.1.1'));
-    // die UE (projekt:vertraulich) sieht auch das vertrauliche Projekt
+    // die UE sieht es ebenso
     const baumUe = (await call('GET', '/v1/ziele/2027', ue)).json();
     assert.deepEqual(baumUe.strategischeZiele.find((x: { nummer: string }) => x.nummer === '2.1').projekte.map((p: { nummer: string }) => p.nummer), ['2026-015']);
 

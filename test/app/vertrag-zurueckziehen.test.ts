@@ -55,14 +55,14 @@ describe('Projektvertrag: zurückziehen', () => {
 
   before(async () => {
     api = await testApi();
-    const ue = await login(api, 'acme', 'z-ue', 'ue');
+    const ue = await login(api, 'acme', 'z-ue', 'alle-fuehren');
     T = ue.tenantId;
     id.ue = ue.principalId;
     h.ue = { authorization: ue.authorization };
     h.adm = { authorization: (await login(api, 'acme', 'z-adm', 'org-admin')).authorization };
     for (const f of ['sp', 'pl', 'ctl']) {
       id[f] = await person(api, T, `z-${f}`);
-      h[f] = { authorization: (await login(api, 'acme', `z-${f}`, 'antragsteller')).authorization };
+      h[f] = { authorization: (await login(api, 'acme', `z-${f}`, 'mitglied')).authorization };
     }
     const m = await ok('ue', 'POST', '/v1/phasenmodelle', {}, {}, 201);
     await ok('adm', 'POST', `/v1/phasenmodelle/${m.body.id}/in-kraft-setzen`, undefined, { 'if-match': m.etag });

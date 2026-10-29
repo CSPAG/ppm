@@ -24,13 +24,14 @@ type Nr = keyof typeof PROJEKTE;
 /** Personen mit ihren Tupeln und dem, was sie lesen und ändern sollen (fachmodell.md 3.3). */
 const FAELLE: { sub: string; tupel: { rolle: string; ort: 'org' | 'portfolio:a' | 'portfolio:c' | `projekt:${Nr}` }[]; liest: Nr[]; aendert: Nr[]; legtAn: ('a' | 'c')[] }[] = [
   { sub: 'ohne', tupel: [], liest: [], aendert: [], legtAn: [] },
-  { sub: 'ue', tupel: [{ rolle: 'ue', ort: 'org' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: ['2026-001', '2026-002', '2026-003', '2026-004'], legtAn: ['a', 'c'] },
-  { sub: 'gl', tupel: [{ rolle: 'gl', ort: 'org' }], liest: ['2026-001', '2026-003'], aendert: [], legtAn: [] },
+  { sub: 'ue', tupel: [{ rolle: 'alle-fuehren', ort: 'org' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: ['2026-001', '2026-002', '2026-003', '2026-004'], legtAn: ['a', 'c'] },
+  { sub: 'gl', tupel: [{ rolle: 'alle-lesen', ort: 'org' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: [], legtAn: [] },
   { sub: 'gremium-a', tupel: [{ rolle: 'gremium', ort: 'portfolio:a' }], liest: ['2026-001', '2026-002'], aendert: [], legtAn: [] },
-  { sub: 'direktion-c', tupel: [{ rolle: 'direktion', ort: 'portfolio:c' }], liest: ['2026-003'], aendert: [], legtAn: ['c'] },
-  { sub: 'pl-002', tupel: [{ rolle: 'pl', ort: 'projekt:2026-002' }], liest: ['2026-002'], aendert: ['2026-002'], legtAn: [] },
-  { sub: 'kt-004', tupel: [{ rolle: 'kt', ort: 'projekt:2026-004' }], liest: ['2026-004'], aendert: [], legtAn: [] },
-  { sub: 'gl-sp-004', tupel: [{ rolle: 'gl', ort: 'org' }, { rolle: 'sp', ort: 'projekt:2026-004' }], liest: ['2026-001', '2026-003', '2026-004'], aendert: [], legtAn: [] },
+  { sub: 'direktion-c', tupel: [{ rolle: 'portfolio-steuern', ort: 'portfolio:c' }], liest: ['2026-003', '2026-004'], aendert: [], legtAn: [] },
+  { sub: 'fuehrt-c', tupel: [{ rolle: 'portfolio-fuehren', ort: 'portfolio:c' }], liest: ['2026-003', '2026-004'], aendert: ['2026-003', '2026-004'], legtAn: ['c'] },
+  { sub: 'pl-002', tupel: [{ rolle: 'projekt-fuehren', ort: 'projekt:2026-002' }], liest: ['2026-002'], aendert: ['2026-002'], legtAn: [] },
+  { sub: 'kt-004', tupel: [{ rolle: 'projekt-mitlesen', ort: 'projekt:2026-004' }], liest: ['2026-004'], aendert: [], legtAn: [] },
+  { sub: 'gl-sp-004', tupel: [{ rolle: 'alle-lesen', ort: 'org' }, { rolle: 'projekt-steuern', ort: 'projekt:2026-004' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: [], legtAn: [] },
 ];
 
 describe('Lesesicht = can: Projekte', () => {

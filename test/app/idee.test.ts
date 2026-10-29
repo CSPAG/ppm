@@ -33,14 +33,14 @@ describe('Projektidee einreichen', () => {
 
   before(async () => {
     api = await testApi();
-    const a = await login(api, 'demo', 'u-as1', 'antragsteller');
+    const a = await login(api, 'demo', 'u-as1', 'mitglied');
     tenantId = a.tenantId;
     as1Id = a.principalId;
     as1 = { authorization: a.authorization };
-    as2 = { authorization: (await login(api, 'demo', 'u-as2', 'antragsteller')).authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
+    as2 = { authorization: (await login(api, 'demo', 'u-as2', 'mitglied')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-fuehren')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
     const admin = { authorization: (await login(api, 'demo', 'u-admin', 'org-admin')).authorization };
     feld1 = (await call('POST', '/v1/handlungsfelder', gl, { label: 'Patientenorientierung', leitsatz: 'Der Mensch im Mittelpunkt.', position: 1 })).json().id;
@@ -54,8 +54,8 @@ describe('Projektidee einreichen', () => {
   });
   after(async () => { await api?.close(); });
 
-  test('Auswahl für den Assistenten: Handlungsfelder mit Leitsatz und Zielen, Bereiche, Herkunft – ohne Leserecht auf Ziele', async () => {
-    assert.equal((await call('GET', '/v1/strategische-ziele', as1)).statusCode, 403, 'Antragstellende lesen Ziele nicht direkt');
+  test('Auswahl für den Assistenten: Handlungsfelder mit Leitsatz und Zielen, Bereiche, Herkunft', async () => {
+    assert.equal((await call('GET', '/v1/strategische-ziele', as1)).statusCode, 200, 'Mitglieder lesen Ziele (Master Entscheid 18)');
     const r = await call('GET', '/v1/ideen/auswahl', as1);
     assert.equal(r.statusCode, 200, r.body);
     const a = r.json();
@@ -93,7 +93,7 @@ describe('Projektidee einreichen', () => {
     assert.deepEqual(await fehler({ bereiche: [randomUUID()] }), ['/bereiche']);
     assert.deepEqual(await fehler({ herkunft: 'erfunden' }), ['/herkunft']);
     assert.deepEqual(await fehler({ handlungsfeldId: randomUUID(), strategischesZielId: null }), ['/handlungsfeldId']);
-    const fremd = (await call('POST', '/v1/handlungsfelder', { authorization: (await login(api, 'andere', 'u-gl-andere', 'gl')).authorization }, { label: 'Fremd' })).json().id;
+    const fremd = (await call('POST', '/v1/handlungsfelder', { authorization: (await login(api, 'andere', 'u-gl-andere', 'alle-fuehren')).authorization }, { label: 'Fremd' })).json().id;
     assert.deepEqual(await fehler({ handlungsfeldId: fremd, strategischesZielId: null }), ['/handlungsfeldId'], 'Handlungsfeld einer anderen Organisation wie unbekannt');
     assert.equal((await call('PATCH', `/v1/ideen/${e.id}`, mit(as1, 2), { farbe: 'rot' })).statusCode, 422, 'unbekannte Felder');
 
@@ -150,7 +150,7 @@ describe('Projektidee einreichen', () => {
     const e = (await call('POST', '/v1/ideen', as1, vollstaendig())).json();
     assert.equal((await call('POST', `/v1/ideen/${e.id}/einreichen`, mit(as1, 1))).statusCode, 200);
     // Rückfrage der UE (Route mit AP-E4-2): Stand, Rückfrage und Aufgaben wie dort vorgesehen
-    const ueId = (await login(api, 'demo', 'u-ue', 'ue')).principalId;
+    const ueId = (await login(api, 'demo', 'u-ue', 'alle-fuehren')).principalId;
     const frage = await full(api.t.runtime, tenantId, async tx => {
       await tx.query("UPDATE ppm.idee SET stand = 'in_ergaenzung' WHERE id = $1", [e.id]);
       const id = (await tx.query<{ id: string }>("INSERT INTO ppm.idee_rueckfrage (tenant_id, idee_id, feld, text, gestellt_von) VALUES ($1, $2, 'zielsetzung', 'Woran misst du den Erfolg?', $3) RETURNING id", [tenantId, e.id, ueId])).rows[0]!.id;
@@ -190,8 +190,9 @@ describe('Projektidee einreichen', () => {
     assert.ok((await call('GET', '/v1/ideen/kopf', ue)).json().zuPruefen >= 2);
 
     assert.equal((await call('POST', '/v1/ideen', nobody, {})).statusCode, 403);
-    assert.equal((await call('GET', '/v1/ideen', leser)).statusCode, 403);
-    assert.equal((await call('POST', '/v1/ideen', ue, {})).statusCode, 403, 'UE ohne Rolle «antragsteller» erfasst nicht (A-46: alle Mitglieder)');
+    // Mitglieder erfassen Ideen und lesen eingereichte (Master Entscheid 14); «alle Portfolios führen» erfasst auch
+    assert.equal((await call('GET', '/v1/ideen', leser)).statusCode, 200);
+    assert.equal((await call('POST', '/v1/ideen', ue, {})).statusCode, 201);
     assert.equal((await call('GET', '/v1/ideen?nummer=1', ue)).statusCode, 200);
   });
 });

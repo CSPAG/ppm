@@ -63,7 +63,7 @@ describe('Eskalation und Meilensteinabnahme', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     const adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
@@ -77,7 +77,7 @@ describe('Eskalation und Meilensteinabnahme', () => {
 
     // Projekt in P2 mit PL; alle Mitglieder sind Antragstellende an der Organisation (A-46)
     const plId = await person(api, T, 'u-pl');
-    pl = { authorization: (await login(api, 'demo', 'u-pl', 'antragsteller')).authorization };
+    pl = { authorization: (await login(api, 'demo', 'u-pl', 'mitglied')).authorization };
     const p = (await ok('POST', '/v1/projekte', ue, { name: 'Neues Labor', portfolioId: portfolio, phase: 'P2' }, 201)).json();
     projekt = { id: p.id, nummer: p.nummer };
     await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [{ personId: plId, funktion: 'pl', akv: '' }] });
@@ -168,7 +168,7 @@ describe('Eskalation und Meilensteinabnahme', () => {
     const vorher = (await ok('GET', b2(), pl)).json();
     assert.deepEqual([vorher.id, vorher.eskalation, vorher.can.eskalieren], [null, null, true]);
     // ohne Recht am Projekt: 403; leerer Grund: 422
-    const fremd = { authorization: (await login(api, 'demo', 'u-fremd', 'antragsteller')).authorization };
+    const fremd = { authorization: (await login(api, 'demo', 'u-fremd', 'mitglied')).authorization };
     assert.equal((await call('POST', b2('/eskalation'), fremd, { grund })).statusCode, 403);
     assert.equal((await call('POST', b2('/eskalation'), pl, { grund: '  ' })).statusCode, 422);
 

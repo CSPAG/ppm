@@ -7,10 +7,10 @@ import type { Matrix } from './typ.ts';
 const PROBE = "(SELECT id FROM ppm.projekt WHERE nummer = '2026-001')";
 
 /** Schreiben mit `vertrag:write` oder als Folge eines Gremiumsentscheids (`app.vertrag_intern`, 200_vertrag_aenderung). */
-const SCHREIBEN = "(app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text))";
+const SCHREIBEN = "(ppm.recht_am_projekt('vertrag:write'::text, projekt_id) OR (current_setting('app.vertrag_intern'::text, true) = 'on'::text))";
 const ueberEltern = (tabelle: string) => [
   `ppm.${tabelle}.${tabelle}_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -`,
-  `ppm.${tabelle}.${tabelle}_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id)`,
+  `ppm.${tabelle}.${tabelle}_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('vertrag:write'::text, projekt_id)`,
   `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING ${SCHREIBEN} CHECK ${SCHREIBEN}`,
 ];
 

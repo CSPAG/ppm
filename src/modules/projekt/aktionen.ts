@@ -7,7 +7,7 @@
 import type { TupleStore } from '@vollholz/iam';
 import { conflict, invalid, notFound, preconditionFailed, type Actor, type Db, type Tx } from '@vollholz/platform';
 import { record } from '../../platform.ts';
-import { ENDZUSTAENDE, ROLLEN, type Funktion, type Lebenszyklus, type Phase, type ProjektCreateIn } from './schemas.ts';
+import { ENDZUSTAENDE, ROLLE_JE_FUNKTION, type Funktion, type Lebenszyklus, type Phase, type ProjektCreateIn } from './schemas.ts';
 import * as store from './store.ts';
 
 /** Daten für Audit und Ereignis. */
@@ -141,23 +141,23 @@ export async function organisationFestlegen(tx: Tx, o: { tuples: TupleStore; who
   await pruefe(tx, liste);
   await store.ersetzen(tx, id, stand + 1, liste.map(m => ({ personId: m.personId, funktion: m.funktion, akv: (m.akv ?? '').trim() })));
 
-  const rolle = (r: { funktion: Funktion }) => ROLLEN.includes(r.funktion);
-  const key = (person: string, funktion: string) => `${person}:${funktion}`;
-  const alt = new Set(before.filter(rolle).map(r => key(r.person_id, r.funktion)));
-  const neu = new Set(liste.filter(rolle).map(m => key(m.personId, m.funktion)));
-  const tupel = async (person: string, funktion: string) =>
-    (await o.tuples.ofSubject(tx, `user:${person}`)).find(t => t.object_type === 'projekt' && t.object_id === id && t.relation === funktion) ?? null;
+  // Schlüssel Person und Rolle: Projektleitung und CTL derselben Person ergeben ein Tupel «projekt-fuehren»
+  const schluessel = (person: string, funktion: Funktion) => { const r = ROLLE_JE_FUNKTION[funktion]; return r ? `${person}:${r}` : null; };
+  const alt = new Set(before.map(r => schluessel(r.person_id, r.funktion)).filter((k): k is string => k !== null));
+  const neu = new Set(liste.map(m => schluessel(m.personId, m.funktion)).filter((k): k is string => k !== null));
+  const tupel = async (person: string, rolle: string) =>
+    (await o.tuples.ofSubject(tx, `user:${person}`)).find(t => t.object_type === 'projekt' && t.object_id === id && t.relation === rolle) ?? null;
   for (const k of alt) {
     if (neu.has(k)) continue;
-    const [person, funktion] = k.split(':') as [string, string];
-    const t = await tupel(person, funktion);
+    const [person, rolle] = k.split(':') as [string, string];
+    const t = await tupel(person, rolle);
     if (t && !t.expires_at) await o.tuples.revoke(tx, t.id, o.who);
   }
   for (const k of neu) {
     if (alt.has(k)) continue;
-    const [person, funktion] = k.split(':') as [string, string];
-    const t = await tupel(person, funktion);
-    if (!t) await o.tuples.grant(tx, { subject: `user:${person}`, relation: funktion, place: { type: 'projekt', id }, createdBy: o.principalId }, o.who);
+    const [person, rolle] = k.split(':') as [string, string];
+    const t = await tupel(person, rolle);
+    if (!t) await o.tuples.grant(tx, { subject: `user:${person}`, relation: rolle, place: { type: 'projekt', id }, createdBy: o.principalId }, o.who);
     else if (t.expires_at) await o.tuples.setExpiry(tx, t.id, null, o.who);
   }
 

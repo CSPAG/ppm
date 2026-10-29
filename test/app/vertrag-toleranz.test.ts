@@ -38,9 +38,9 @@ describe('Toleranzen im Projektvertrag', () => {
         p[k] = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, $2, $2, $3, 'P1') RETURNING id", [T, nr, pf])).rows[0]!.id;
       }
     });
-    for (const [sub, rolle] of [['adm', 'org-admin'], ['ue', 'ue']] as const) h[sub] = { authorization: (await login(api, 'acme', sub, rolle)).authorization };
+    for (const [sub, rolle] of [['adm', 'org-admin'], ['ue', 'alle-fuehren']] as const) h[sub] = { authorization: (await login(api, 'acme', sub, rolle)).authorization };
     const pl = await login(api, 'acme', 'pl', null);
-    await grant(api, T, `user:${pl.principalId}`, 'pl', { type: 'projekt', id: p.a });
+    await grant(api, T, `user:${pl.principalId}`, 'projekt-fuehren', { type: 'projekt', id: p.a });
     h.pl = { authorization: pl.authorization };
     h.fremd = { authorization: (await login(api, 'acme', 'fremd', null)).authorization };
 

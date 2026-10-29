@@ -66,12 +66,12 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
 
   before(async () => {
     api = await testApi();
-    const ue = await login(api, 'acme', 'a-ue', 'ue');
+    const ue = await login(api, 'acme', 'a-ue', 'alle-fuehren');
     T = ue.tenantId;
     h.ue = { authorization: ue.authorization };
     for (const f of ['sp', 'pl', 'kt']) {
       id[f] = await person(api, T, `a-${f}`);
-      h[f] = { authorization: (await login(api, 'acme', `a-${f}`, 'antragsteller')).authorization };
+      h[f] = { authorization: (await login(api, 'acme', `a-${f}`, 'mitglied')).authorization };
     }
     const portfolio = (await ok('ue', 'POST', '/v1/portfolios', { kategorie: 'A', schluessel: 'abschluss', name: 'Abschluss' }, {}, 201)).body.id;
     const prat = (await ok('ue', 'POST', '/v1/gremien', { portfolioId: portfolio, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, {}, 201)).body.id;
@@ -101,7 +101,7 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
     g = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
     assert.deepEqual(g.body.grundlagen.nutzenpruefung, { version: '4.0', beurteilung: 'Nutzen stabil', werte: [] });
     const kt = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
-    assert.deepEqual([kt.body.can.bearbeiten, kt.body.grundlagen.kosten], [false, null], 'Kernteam liest, ohne Beträge (A-33)');
+    assert.deepEqual([kt.body.can.bearbeiten, kt.body.grundlagen.kosten], [false, { budgetBaseline: 0, prognose: 0, ist: 0 }], 'Kernteam liest mit Beträgen (Master Entscheid 13)');
     assert.equal((await call('kt', 'PUT', `/v1/projekte/${pj.exit!.id}/abschluss`, LEER, { 'if-match': 'W/"0"' })).statusCode, 403);
     const p2 = await call('pl', 'PUT', `/v1/projekte/${pj.stopp!.id}/abschluss`, LEER, { 'if-match': 'W/"0"' });
     assert.equal(p2.statusCode, 409, p2.body);

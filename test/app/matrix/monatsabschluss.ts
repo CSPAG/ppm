@@ -24,7 +24,7 @@ export const matrix: Matrix = {
     // Rückfrage, Muster KIND (stellen statusbericht:review am Portfolio, beantworten statusbericht:write am Projekt)
     'ppm.rueckfrage.rueckfrage_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
     "ppm.rueckfrage.rueckfrage_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))",
-    "ppm.rueckfrage.rueckfrage_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
+    "ppm.rueckfrage.rueckfrage_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('statusbericht:write'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (ppm.recht_am_projekt('statusbericht:write'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
     // Einforderung, Muster KIND (statusbericht:review)
     'ppm.einforderung.einforderung_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
     "ppm.einforderung.einforderung_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))",

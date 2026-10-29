@@ -64,11 +64,11 @@ describe('Projektvertrag: Quality-Check und Unterschriften', () => {
       }
     });
     await person('adm', [['org-admin', null]]);
-    await person('ue', [['ue', null]]);
-    await person('sp', [['sp', projekt.a], ['sp', projekt.b], ['sp', projekt.ohne]]);
-    await person('pl', [['pl', projekt.a], ['pl', projekt.b], ['pl', projekt.ohne]]);
-    await person('ctl', [['ctl', projekt.a], ['ctl', projekt.b]]);
-    await person('kt', [['kt', projekt.a]]);
+    await person('ue', [['alle-fuehren', null]]);
+    await person('sp', [['projekt-steuern', projekt.a], ['projekt-steuern', projekt.b], ['projekt-steuern', projekt.ohne]]);
+    await person('pl', [['projekt-fuehren', projekt.a], ['projekt-fuehren', projekt.b], ['projekt-fuehren', projekt.ohne]]);
+    await person('ctl', [['projekt-fuehren', projekt.a], ['projekt-fuehren', projekt.b]]);
+    await person('kt', [['projekt-mitlesen', projekt.a]]);
     await person('vertretung', []);
     await person('ohneRecht', []);
     // Projektorganisation (PP.04.04): im Projekt «ohne» fehlt die CTL

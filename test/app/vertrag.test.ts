@@ -29,7 +29,7 @@ describe('Projektvertrag', () => {
   async function person(sub: string, rollen: [string, Ort][]): Promise<H> {
     const l = await login(api, 'acme', sub, null);
     id[sub] = l.principalId;
-    for (const [rolle, ort] of [...rollen, ['antragsteller', { type: 'org' }] as [string, Ort]]) await grant(api, T, `user:${l.principalId}`, rolle, ort);
+    for (const [rolle, ort] of [...rollen, ['mitglied', { type: 'org' }] as [string, Ort]]) await grant(api, T, `user:${l.principalId}`, rolle, ort);
     return { authorization: l.authorization };
   }
   const call = (who: string, method: string, url: string, payload?: unknown, headers: H = {}) =>
@@ -58,10 +58,10 @@ describe('Projektvertrag', () => {
       }
     });
     h.adm = await person('adm', [['org-admin', { type: 'org' }]]);
-    h.ue = await person('ue', [['ue', { type: 'org' }]]);
-    h.pl = await person('pl', [['pl', { type: 'projekt', id: projekt.p0 }], ['pl', { type: 'projekt', id: projekt.p2 }], ['kt', { type: 'projekt', id: projekt.andere }]]);
-    h.kt = await person('kt', [['kt', { type: 'projekt', id: projekt.p0 }]]);
-    h.ctl = await person('ctl', [['ctl', { type: 'projekt', id: projekt.p0 }]]);
+    h.ue = await person('ue', [['alle-fuehren', { type: 'org' }]]);
+    h.pl = await person('pl', [['projekt-fuehren', { type: 'projekt', id: projekt.p0 }], ['projekt-fuehren', { type: 'projekt', id: projekt.p2 }], ['projekt-mitlesen', { type: 'projekt', id: projekt.andere }]]);
+    h.kt = await person('kt', [['projekt-mitlesen', { type: 'projekt', id: projekt.p0 }]]);
+    h.ctl = await person('ctl', [['projekt-fuehren', { type: 'projekt', id: projekt.p0 }]]);
 
     // Phasenmodell nach der Vorgabe, am Gate P0–P1 mit Pflichtangaben (die UE legt sie fest, K13, A-12)
     const m = await call('ue', 'POST', '/v1/phasenmodelle', {});
@@ -160,8 +160,7 @@ describe('Projektvertrag', () => {
     assert.equal(k9.statusCode, 200, k9.body);
     assert.equal(k9.json().inhalt.kosten[0].betrag, 120000.56);
     const kt9 = await call('kt', 'GET', `/v1/vertragsversionen/${entwurf}/kapitel/9`);
-    assert.equal(kt9.json().inhalt.kosten[0].betrag, null);
-    assert.ok(!kt9.body.includes('120000'));
+    assert.equal(kt9.json().inhalt.kosten[0].betrag, 120000.56, 'Kernteam sieht Beträge (Master Entscheid 13)');
     assert.equal((await call('ctl', 'GET', `/v1/vertragsversionen/${entwurf}/kapitel/9`)).json().inhalt.kosten[0].betrag, 120000.56);
     assert.equal((await speichern('kt', entwurf, 9, () => {})).statusCode, 403);
     // Grösse und FTE zugleich ist ungültig (A-20)

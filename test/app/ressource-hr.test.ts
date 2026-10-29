@@ -58,7 +58,7 @@ db.describe('Personal- und Abwesenheitsdaten über die Schnittstelle', () => {
     await new Promise<void>(r => server.listen(0, '127.0.0.1', r));
     basis = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
     api = await testApi();
-    for (const [sub, rolle] of [['adm', 'org-admin'], ['rm', 'rm'], ['ue', 'ue'], ['antrag', 'antragsteller']] as const) {
+    for (const [sub, rolle] of [['adm', 'org-admin'], ['rm', 'alle-fuehren'], ['ue', 'alle-fuehren'], ['antrag', 'mitglied']] as const) {
       h[sub] = { authorization: (await login(api, 'acme', `hr-${sub}`, rolle)).authorization };
     }
     for (const [schluessel, label] of [['pl', 'Projektleitung'], ['arch', 'Architektur']]) {

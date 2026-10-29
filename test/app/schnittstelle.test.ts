@@ -49,7 +49,7 @@ describe('Schnittstellen und Änderungsprotokoll (AP-E7-3)', () => {
     verarbeitungSetzen('jahresbedarf', null);
     verarbeitungSetzen('personal', null);
     T = await tenant(api.t.runtime, 'acme');
-    for (const [sub, rolle] of [['adm', 'org-admin'], ['ue', 'ue'], ['gl', 'gl']] as const) {
+    for (const [sub, rolle] of [['adm', 'org-admin'], ['ue', 'alle-fuehren'], ['gl', 'alle-lesen']] as const) {
       h[sub] = { authorization: (await login(api, 'acme', sub, rolle)).authorization };
     }
   });

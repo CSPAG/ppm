@@ -20,11 +20,11 @@ import * as store from './store.ts';
 
 const TAG = 'Projekte';
 
-type Caps = (kind: string, id: string) => Record<string, boolean>;
+type Caps = (kind: string, id: string, hint?: string | null) => Record<string, boolean>;
 const ort = (id: string) => ({ type: 'projekt', id });
 
 function out(r: store.Row, caps: Caps): ProjektOut {
-  const c = caps('projekt', r.id);
+  const c = caps('projekt', r.id, r.portfolio_id);
   return {
     id: r.id, nummer: r.nummer, name: r.name, portfolioId: r.portfolio_id,
     portfolio: r.pf_schluessel ? { schluessel: r.pf_schluessel, name: r.pf_name!, kategorie: r.pf_kategorie! } : null,
@@ -43,7 +43,7 @@ function organisation(r: store.Row, rows: store.MitgliedRow[], caps: Caps): Orga
   return {
     version: standVon(rows),
     mitglieder: rows.map(m => ({ personId: m.person_id, funktion: m.funktion, akv: m.akv })),
-    can: { write: !!caps('projekt', r.id).organisation && aenderbar(r) },
+    can: { write: !!caps('projekt', r.id, r.portfolio_id).organisation && aenderbar(r) },
   };
 }
 

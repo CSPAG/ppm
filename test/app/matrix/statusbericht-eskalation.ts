@@ -21,8 +21,8 @@ export const matrix: Matrix = {
     // Muster KIND: lesen wer das Projekt sieht; anlegen und (solange offen) löschen mit statusbericht:write am Projekt;
     // Entscheid nachführen mit sitzung:write an der Organisation oder am Portfolio (UC-006 Schritt 7)
     'ppm.eskalation.eskalation_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.eskalation.eskalation_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id)",
+    "ppm.eskalation.eskalation_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('statusbericht:write'::text, projekt_id)",
     "ppm.eskalation.eskalation_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('sitzung:write'::text) OR app.has_permission('sitzung:write'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (app.has_permission('sitzung:write'::text) OR app.has_permission('sitzung:write'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
-    "ppm.eskalation.eskalation_delete RESTRICTIVE DELETE ppm_app USING ((stand = 'offen'::text) AND app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id)) CHECK -",
+    "ppm.eskalation.eskalation_delete RESTRICTIVE DELETE ppm_app USING ((stand = 'offen'::text) AND ppm.recht_am_projekt('statusbericht:write'::text, projekt_id)) CHECK -",
   ],
 };

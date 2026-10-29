@@ -39,11 +39,11 @@ describe('Ideenpool und Prüfung', () => {
 
   before(async () => {
     api = await testApi();
-    const a = await login(api, 'demo', 'u-as1', 'antragsteller');
+    const a = await login(api, 'demo', 'u-as1', 'mitglied');
     tenantId = a.tenantId; as1Id = a.principalId; as1 = { authorization: a.authorization };
-    const b = await login(api, 'demo', 'u-as2', 'antragsteller');
+    const b = await login(api, 'demo', 'u-as2', 'mitglied');
     as2Id = b.principalId; as2 = { authorization: b.authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
     adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
     const g = await login(api, 'demo', 'u-gremium', null);
     gremiumId = g.principalId; gremium = { authorization: g.authorization };

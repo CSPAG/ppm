@@ -34,7 +34,7 @@ describe('Statusbericht erfassen', () => {
   before(async () => {
     api = await testApi();
     folgen.beimEinreichen(async (_tx, r) => { eingereicht.push(r.id); });
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     await full(api.t.runtime, T, async tx => {
@@ -46,14 +46,14 @@ describe('Statusbericht erfassen', () => {
     const p = await login(api, 'demo', 'u-pl', null);
     plId = p.principalId;
     pl = { authorization: p.authorization };
-    for (const nr of ['2026-001', '2026-003']) await grant(api, T, `user:${p.principalId}`, 'pl', { type: 'projekt', id: projekt[nr] });
+    for (const nr of ['2026-001', '2026-003']) await grant(api, T, `user:${p.principalId}`, 'projekt-fuehren', { type: 'projekt', id: projekt[nr] });
     const k = await login(api, 'demo', 'u-kt', null);
-    await grant(api, T, `user:${k.principalId}`, 'kt', { type: 'projekt', id: projekt['2026-001'] });
+    await grant(api, T, `user:${k.principalId}`, 'projekt-mitlesen', { type: 'projekt', id: projekt['2026-001'] });
     kt = { authorization: k.authorization };
     fremd = { authorization: (await login(api, 'demo', 'u-fremd', null)).authorization };
     admin = { authorization: (await login(api, 'demo', 'u-admin', 'org-admin')).authorization };
     const p2 = await login(api, 'demo', 'u-pl2', null);
-    await grant(api, T, `user:${p2.principalId}`, 'pl', { type: 'projekt', id: projekt['2026-001'] });
+    await grant(api, T, `user:${p2.principalId}`, 'projekt-fuehren', { type: 'projekt', id: projekt['2026-001'] });
     pl2 = { authorization: p2.authorization };
   });
   after(async () => { await api?.close(); });
@@ -188,8 +188,9 @@ describe('Statusbericht erfassen', () => {
     assert.deepEqual([g.periodeStand, g.can.write], ['abgeschlossen', false]);
   });
 
-  test('Recht an der Organisation erfasst für jedes Projekt, auch ausserordentlich; UE prüft nur', async () => {
-    assert.equal((await call('PUT', url('2026-002'), { ...ue, 'if-match': 'W/"0"' }, VOLL)).statusCode, 403, 'UE: statusbericht:review, nicht :write');
+  test('Recht an der Organisation erfasst für jedes Projekt, auch ausserordentlich; wer nur liest, nicht', async () => {
+    const lesend = { authorization: (await login(api, 'demo', 'u-lesend', 'alle-lesen')).authorization };
+    assert.equal((await call('PUT', url('2026-002'), { ...lesend, 'if-match': 'W/"0"' }, VOLL)).statusCode, 403, 'alle lesen: kein statusbericht:write');
     const u = await call('PUT', url('2026-002'), { ...admin, 'if-match': 'W/"0"' }, { ...VOLL, anlass: 'ausserordentlich' });
     assert.equal(u.statusCode, 200, u.body);
     assert.equal(u.json().anlass, 'ausserordentlich');

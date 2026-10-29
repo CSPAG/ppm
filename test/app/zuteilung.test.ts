@@ -40,11 +40,11 @@ describe('Zuteilung (AP-E7-2)', () => {
         projekt[k] = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, $2, $2, $3, 'P2') RETURNING id", [T, nr, pf])).rows[0]!.id;
       }
     });
-    await person('rm', 'rm');
-    await person('ue', 'ue');
-    await person('gl', 'gl');
-    await person('pl-x', 'pl', { type: 'projekt', id: projekt.x });
-    await person('pl-y', 'pl', { type: 'projekt', id: projekt.y });
+    await person('rm', 'alle-fuehren');
+    await person('ue', 'alle-fuehren');
+    await person('gl', 'alle-lesen');
+    await person('pl-x', 'projekt-fuehren', { type: 'projekt', id: projekt.x });
+    await person('pl-y', 'projekt-fuehren', { type: 'projekt', id: projekt.y });
     await person('anna', null);
     await person('ben', null);
     // Projektleitung in der Projektorganisation (für Mitteilungen)
@@ -59,14 +59,14 @@ describe('Zuteilung (AP-E7-2)', () => {
   });
   after(async () => { prioritaetQuelleSetzen(null); await api?.close(); });
 
-  test('Bedarfsliste: offen, Rechte (RM, UE lesen; nur RM teilt zu)', async () => {
+  test('Bedarfsliste: offen, Rechte (alle Portfolios führen liest und teilt zu; GL nicht)', async () => {
     const l = await call('rm', 'GET', '/v1/bedarfe');
     assert.equal(l.statusCode, 200, l.body);
     assert.deepEqual(l.json().items.map((b: { projekt: { nummer: string }; stand: string; benoetigt: number }) => [b.projekt.nummer, b.stand, b.benoetigt]), [['2026-001', 'offen', 3], ['2026-002', 'offen', 1.5]]);
     assert.deepEqual([l.json().anzahl.offen, l.json().can.write], [2, true]);
-    assert.equal((await call('ue', 'GET', '/v1/bedarfe')).json().can.write, false);
+    assert.equal((await call('ue', 'GET', '/v1/bedarfe')).json().can.write, true);
     assert.equal((await call('gl', 'GET', '/v1/bedarfe')).statusCode, 403);
-    assert.equal((await call('ue', 'POST', `/v1/bedarfe/${bedarfX}/zuteilungen`, { personId: id.anna, fte: 0.5 })).statusCode, 403);
+    assert.equal((await call('gl', 'POST', `/v1/bedarfe/${bedarfX}/zuteilungen`, { personId: id.anna, fte: 0.5 })).statusCode, 403);
   });
 
   test('Zuteilen deckt den Bedarf, führt «gedeckt» im Register nach und informiert Person und Projektleitung', async () => {

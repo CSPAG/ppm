@@ -16,10 +16,10 @@ describe('Handlungsfelder', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-editor', 'gl');
+    const e = await login(api, 'demo', 'u-editor', 'alle-fuehren');
     tenantId = e.tenantId;
     editor = { authorization: e.authorization };
-    viewer = { authorization: (await login(api, 'demo', 'u-viewer', 'leser')).authorization };
+    viewer = { authorization: (await login(api, 'demo', 'u-viewer', 'mitglied')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
   });
   after(async () => { await api?.close(); });
@@ -92,8 +92,8 @@ describe('Handlungsfelder', () => {
   });
 
   test('Scope: Rolle ∩ Scope bei Maschinen-Clients', async () => {
-    const reader = await machine(api, 'demo', 'lesesystem', 'gl', ['ppm:read']);
-    const writer = await machine(api, 'demo', 'schreibsystem', 'gl', ['ppm:read', 'handlungsfeld:write']);
+    const reader = await machine(api, 'demo', 'lesesystem', 'alle-fuehren', ['ppm:read']);
+    const writer = await machine(api, 'demo', 'schreibsystem', 'alle-fuehren', ['ppm:read', 'handlungsfeld:write']);
     assert.equal((await call('GET', '/v1/handlungsfelder', reader)).statusCode, 200);
     assert.equal((await call('POST', '/v1/handlungsfelder', reader, { label: 'Vom Lesesystem' })).statusCode, 403, 'Rolle gl, aber Scope nur lesen');
     const w = await call('POST', '/v1/handlungsfelder', writer, { label: 'Vom Schreibsystem' });

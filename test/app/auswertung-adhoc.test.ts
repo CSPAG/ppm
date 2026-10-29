@@ -37,11 +37,11 @@ describe('Ad-hoc-Auswertungen', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
-    fi = { authorization: (await login(api, 'demo', 'u-fi', 'fi')).authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
+    fi = { authorization: (await login(api, 'demo', 'u-fi', 'alle-fuehren')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-lesen')).authorization };
     await full(api.t.runtime, T, async tx => {
       hf = (await tx.query<{ id: string }>("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Digitalisierung') RETURNING id", [T])).rows[0]!.id;
       pfA = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'transformation', 'Transformation', true) RETURNING id", [T])).rows[0]!.id;
@@ -119,8 +119,8 @@ describe('Ad-hoc-Auswertungen', () => {
 
   test('Rechte: UE und FI erstellen; Gremium und GL nicht; vertrauliche Projekte nur mit Recht (Lesesicht)', async () => {
     const f = await ok('/v1/auswertungen?kennzahlen=projekte,budget', fi);
-    assert.deepEqual(f.einzelwerte.map(e => e.nummer), ['2026-001', '2026-002', '2026-003'], 'FI ohne projekt:vertraulich sieht 2026-005 nicht');
-    assert.equal(f.summe.budget, 170000.5);
+    assert.deepEqual(f.einzelwerte.map(e => e.nummer), ['2026-001', '2026-002', '2026-003', '2026-005'], 'sieht auch das vertrauliche 2026-005 (Master Entscheid 13)');
+    assert.equal(f.summe.budget, 1169999.5, 'mit dem vertraulichen Projekt');
     for (const h of [gremium, gl]) assert.equal((await get('/v1/auswertungen', h)).statusCode, 403);
   });
 

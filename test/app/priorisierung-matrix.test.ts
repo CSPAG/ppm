@@ -68,9 +68,9 @@ db.describe('Matrix und Rangfolge (API)', () => {
       await tx.query("INSERT INTO ppm.kosten (tenant_id, projekt_id, phase, art, text, prognose) VALUES ($1, $2, 'P1', 'capex', 'Server', 120000), ($1, $2, 'P2', 'opex', 'Betrieb', 30000)", [T, p.a]);
       await tx.query("INSERT INTO ppm.abhaengigkeit (tenant_id, projekt_id, zu_projekt_id, text) VALUES ($1, $2, $3, 'braucht die Plattform'), ($1, $2, $4, 'ausserhalb')", [T, p.a, p.b, p.z]);
     });
-    h.ue = await person('ue', 'ue');
+    h.ue = await person('ue', 'alle-fuehren');
     h.gremium = await person('gremium', 'gremium', { type: 'portfolio', id: pf });
-    h.rm = await person('rm', 'rm');
+    h.rm = await person('rm', 'mitglied');
     // Modell in Kraft: zwei Kriterien Nutzen, zwei Risiko, eines ohne Zuordnung
     const m = (await call('ue', 'POST', '/v1/bewertungsmodelle', {})).json();
     const k = await call('ue', 'PATCH', `/v1/bewertungsmodelle/${m.id}`, { kriterien: [

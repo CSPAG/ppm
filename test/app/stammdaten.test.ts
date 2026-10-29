@@ -43,7 +43,7 @@ describe('Stammdaten', () => {
     const a = await login(api, 'demo', 'u-adm', 'org-admin');
     tenantId = a.tenantId;
     adm = { authorization: a.authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
   });
   after(async () => { await api?.close(); });

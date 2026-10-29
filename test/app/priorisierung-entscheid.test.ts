@@ -41,7 +41,7 @@ describe('Priorisierungsentscheid', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     tenantId = u.tenantId; ue = { authorization: u.authorization };
     adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
     [sp, pl] = [await person(api, tenantId, 'u-sp'), await person(api, tenantId, 'u-pl')];

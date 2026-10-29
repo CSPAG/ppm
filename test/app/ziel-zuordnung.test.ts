@@ -48,7 +48,7 @@ describe('Zuordnung Projekt ↔ Ziel aus oberen Modulen', () => {
   const who = systemActor('system', 'test-zuordnung');
 
   test('PL ohne ziel:write ordnet sein Projekt zu, idempotent, mit Audit und Ereignis', async () => {
-    const pl = await mit('pl-1', 'pl', id.p1!);
+    const pl = await mit('pl-1', 'projekt-fuehren', id.p1!);
     assert.equal(await api.iam.access.can(pl, 'ziel:write'), false);
     const a = await api.iam.tx(pl, tx => projektZuordnen(tx, who, id.p1!, { strategischesZielId: id.s21!, jahreszielId: id.j211 }));
     assert.equal(a.neu, true);
@@ -67,10 +67,10 @@ describe('Zuordnung Projekt ↔ Ziel aus oberen Modulen', () => {
   });
 
   test('Kernteam (nur lesen) darf nicht; fremdes Projekt, unbekanntes Ziel, unpassendes Jahresziel: 404', async () => {
-    const kt = await mit('kt-1', 'kt', id.p1!);
+    const kt = await mit('kt-1', 'projekt-mitlesen', id.p1!);
     await assert.rejects(api.iam.tx(kt, tx => projektZuordnen(tx, who, id.p1!, { strategischesZielId: id.s21!, jahreszielId: null })),
       (e: { code?: string }) => e.code === '42501');
-    const pl = await mit('pl-2', 'pl', id.p2!);
+    const pl = await mit('pl-2', 'projekt-fuehren', id.p2!);
     await assert.rejects(api.iam.tx(pl, tx => projektZuordnen(tx, who, id.p1!, { strategischesZielId: id.s21! })), (e: { status?: number }) => e.status === 404);
     await assert.rejects(api.iam.tx(pl, tx => projektZuordnen(tx, who, id.p2!, { strategischesZielId: randomUUID() })), (e: { status?: number }) => e.status === 404);
     await assert.rejects(api.iam.tx(pl, tx => projektZuordnen(tx, who, id.p2!, { strategischesZielId: id.s22!, jahreszielId: id.j211 })), (e: { status?: number }) => e.status === 404);

@@ -24,12 +24,12 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-gl', 'gl');
+    const e = await login(api, 'demo', 'u-gl', 'alle-fuehren');
     tenantId = e.tenantId;
     gl = { authorization: e.authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
-    ohneZiele = { authorization: (await login(api, 'demo', 'u-kt', 'antragsteller')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
+    ohneZiele = { authorization: (await login(api, 'demo', 'u-kt', 'mitglied')).authorization };
     felder = [
       (await call('POST', '/v1/handlungsfelder', gl, { label: 'Wirtschaftlichkeit', position: 1 })).json().id,
       (await call('POST', '/v1/handlungsfelder', gl, { label: 'Innovation', position: 2 })).json().id,
@@ -92,8 +92,8 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
     assert.equal((await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${jz.version}"` }, { text: 'neu' })).statusCode, 409);
     assert.equal((await call('POST', '/v1/ziele/2027/vorlegen', { ...gl, 'if-match': `W/"${await version(2027)}"` })).statusCode, 409, 'schon vorgelegt');
 
-    // Freigabe erfassen: nur ziel:freigabe (UE), nicht die GL
-    assert.equal((await call('POST', '/v1/ziele/2027/freigabe', { ...gl, 'if-match': `W/"${await version(2027)}"` }, { entscheid: 'freigegeben', datum: '2026-12-01' })).statusCode, 403);
+    // Freigabe erfassen: nur ziel:freigabe («alle Portfolios führen»), nicht wer nur liest
+    assert.equal((await call('POST', '/v1/ziele/2027/freigabe', { ...leser, 'if-match': `W/"${await version(2027)}"` }, { entscheid: 'freigegeben', datum: '2026-12-01' })).statusCode, 403);
     assert.equal((await call('GET', '/v1/ziele/2027/vorlage', ue)).json().can.freigabe, true);
   });
 
@@ -129,7 +129,7 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
       }
     });
     assert.equal((await call('POST', '/v1/roadmap/2026', ue)).statusCode, 409, 'Jahresziele 2026 nicht in Kraft');
-    assert.equal((await call('POST', '/v1/roadmap/2027', gl)).statusCode, 403, 'publizieren nur ziel:freigabe');
+    assert.equal((await call('POST', '/v1/roadmap/2027', leser)).statusCode, 403, 'publizieren nur ziel:freigabe');
     assert.equal((await call('GET', '/v1/roadmap/2027', leser)).statusCode, 404, 'noch nicht publiziert');
 
     const vorschau = (await call('GET', '/v1/roadmap/2027/vorschau', ue)).json();

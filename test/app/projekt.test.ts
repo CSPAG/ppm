@@ -39,7 +39,7 @@ describe('Projekte', () => {
 
   before(async () => {
     api = await testApi();
-    ue = await wer('u-ue', 'ue');
+    ue = await wer('u-ue', 'alle-fuehren');
     pl = await wer('u-pl', null);
     sp = await wer('u-sp', null);
     kt = await wer('u-kt', null);
@@ -55,7 +55,7 @@ describe('Projekte', () => {
       }
     });
     await grant(api, T, `user:${gremiumC.id}`, 'gremium', { type: 'portfolio', id: portfolio.c });
-    await grant(api, T, `user:${direktionC.id}`, 'direktion', { type: 'portfolio', id: portfolio.c });
+    await grant(api, T, `user:${direktionC.id}`, 'portfolio-fuehren', { type: 'portfolio', id: portfolio.c });
   });
   after(async () => { await api?.close(); });
 
@@ -66,19 +66,19 @@ describe('Projekte', () => {
     assert.deepEqual(a.portfolio, { schluessel: 'transformation', name: 'Transformation', kategorie: 'A' });
     assert.deepEqual(a.can, { write: true, organisation: true });
 
-    // Direktion C legt in ihrem Portfolio an; sie sieht die Projekte in A nicht, die Nummer zählt sie trotzdem
+    // Direktion C führt ihr Portfolio und legt dort an; sie sieht die Projekte in A nicht, die Nummer zählt sie trotzdem
     const c = await anlegen({ name: 'Direktionsprojekt', portfolioId: portfolio.c }, direktionC.h);
     assert.equal(Number(c.nummer.split('-')[1]), Number(a.nummer.split('-')[1]) + 1);
-    assert.deepEqual(c.can, { write: false, organisation: false });
+    assert.deepEqual(c.can, { write: true, organisation: true }, 'Portfolio führen pflegt die Projekte (Master Entscheid 18)');
     const sichtbar = (await call('GET', '/v1/projekte', direktionC.h)).json().items.map((x: { nummer: string }) => x.nummer);
     assert.deepEqual(sichtbar, [c.nummer]);
 
     // nicht im eigenen Portfolio: kein Recht
     assert.equal((await call('POST', '/v1/projekte', direktionC.h, { name: 'X', portfolioId: portfolio.a })).statusCode, 403);
-    // vertraulich anlegen, das die Direktion danach nicht sehen dürfte: abgewiesen, nichts angelegt
+    // vertraulich anlegen: wer am Portfolio eine Rolle hat, sieht vertrauliche Projekte (Master Entscheid 13)
     const v = await call('POST', '/v1/projekte', direktionC.h, { name: 'Geheim', portfolioId: portfolio.c, vertraulich: true });
-    assert.equal(v.statusCode, 409, v.body);
-    assert.equal((await call('GET', `/v1/projekte?q=Geheim`, ue.h)).json().items.length, 0);
+    assert.equal(v.statusCode, 201, v.body);
+    assert.equal((await call('GET', `/v1/projekte?q=Geheim`, ue.h)).json().items.length, 1);
     // ungültige Eingaben
     assert.equal((await call('POST', '/v1/projekte', ue.h, { name: '', portfolioId: portfolio.a })).statusCode, 422);
     assert.equal((await call('POST', '/v1/projekte', ue.h, { name: 'X', portfolioId: portfolio.a, phase: 'P9' })).statusCode, 422);
@@ -143,7 +143,9 @@ describe('Projekte', () => {
       [['sp', 'Auftrag, Budget'], ['koalition', ''], ['pl', 'Führt das Projekt'], ['ctl', ''], ['kt', 'Fachbereich']]);
     const tupel = await full(api.t.runtime, T, async tx => (await tx.query<{ s: string; r: string }>(
       "SELECT subject AS s, relation AS r FROM ppm.authz_tuple WHERE object_type = 'projekt' AND object_id = $1 ORDER BY relation", [eigenes.id])).rows);
-    assert.deepEqual(tupel.map(t => [t.r, t.s]), [['ctl', `user:${ctl.id}`], ['kt', `user:${kt.id}`], ['pl', `user:${pl.id}`], ['sp', `user:${sp.id}`]]);
+    // Rolle je Funktion (A-70): PL und CTL führen, Sponsor steuert, Kernteam liest mit
+    const soll = [['projekt-fuehren', `user:${ctl.id}`], ['projekt-fuehren', `user:${pl.id}`], ['projekt-mitlesen', `user:${kt.id}`], ['projekt-steuern', `user:${sp.id}`]];
+    assert.deepEqual(tupel.map(t => [t.r, t.s]).sort(), soll.sort());
 
     // eigenes Projekt: lesen alle Rollen, ändern nur PL, Organisation PL und SP; Koalition ohne Rolle (A-04)
     const lesen = async (p: Person, id: string) => (await call('GET', `/v1/projekte/${id}`, p.h)).statusCode;
@@ -217,16 +219,17 @@ describe('Projekte', () => {
     assert.equal((await organisation(p.id, 0, [{ personId: pl.id, funktion: 'pl' }, { personId: pl.id, funktion: 'kt' }])).statusCode, 200);
   });
 
-  test('vertraulich: nur Projektrollen, UE und Gremium des Portfolios (A-34)', async () => {
+  test('vertraulich: alle mit einer Rolle am Projekt, am Portfolio oder übergreifend, nicht andere Portfolios (Master Entscheid 13)', async () => {
     const p = await anlegen({ name: 'Reorganisation', portfolioId: portfolio.c, vertraulich: true });
     assert.equal((await organisation(p.id, 0, [{ personId: kt.id, funktion: 'kt' }])).statusCode, 200);
     const sieht = async (x: Person) => (await call('GET', `/v1/projekte?nummer=${p.nummer}`, x.h)).json().items.length === 1;
     assert.equal(await sieht(ue), true);
     assert.equal(await sieht(gremiumC), true);
     assert.equal(await sieht(kt), true);
-    assert.equal(await sieht(direktionC), false);
-    // Direktion: Recht am Portfolio, das vertrauliche Projekt bleibt aber unsichtbar wie ein unbekanntes
-    assert.equal((await call('GET', `/v1/projekte/${p.id}`, direktionC.h)).statusCode, 404);
+    assert.equal(await sieht(direktionC), true);
+    assert.equal((await call('GET', `/v1/projekte/${p.id}`, direktionC.h)).statusCode, 200);
+    // ohne Rolle an diesem Portfolio bleibt es unsichtbar wie ein unbekanntes
+    assert.equal(await sieht(pl), false);
   });
 
   test('Liste: Filter und Cursor', async () => {

@@ -73,14 +73,14 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', () => {
 
   before(async () => {
     api = await testApi();
-    const ue = await login(api, 'acme', 'g-ue', 'ue');
+    const ue = await login(api, 'acme', 'g-ue', 'alle-fuehren');
     T = ue.tenantId;
     h.ue = { authorization: ue.authorization };
     h.adm = { authorization: (await login(api, 'acme', 'g-adm', 'org-admin')).authorization };
     for (const f of ['sp', 'pl', 'ctl', 'kt']) {
       id[f] = await person(api, T, `g-${f}`);
       // alle Mitglieder sind Antragstellende (A-46) und lesen Portfolios und Gremienweg (fachmodell.md 3.3)
-      h[f] = { authorization: (await login(api, 'acme', `g-${f}`, 'antragsteller')).authorization };
+      h[f] = { authorization: (await login(api, 'acme', `g-${f}`, 'mitglied')).authorization };
     }
     // Phasenmodell nach der Vorgabe (Leitfragen je Gate, Standard-Ergebnisse); am Gate P1–P2 ohne Pflichtangaben
     const m = await ok('ue', 'POST', '/v1/phasenmodelle', { quelle: 'vorgabe' }, {}, 201);
@@ -199,7 +199,6 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', () => {
     assert.equal((await call('pl', 'PUT', url(f1!), { antwort: 'neu' }, { 'if-match': 'W/"0"' })).statusCode, 412);
     assert.equal((await call('pl', 'PUT', url(f2!), { antwort: ' ', zutreffend: false }, { 'if-match': 'W/"0"' })).statusCode, 422);
     assert.equal((await call('kt', 'PUT', url(f2!), { antwort: 'x' }, { 'if-match': 'W/"0"' })).statusCode, 403);
-    assert.equal((await call('ue', 'PUT', url(f2!), { antwort: 'x' }, { 'if-match': 'W/"0"' })).statusCode, 403);
     await ok('pl', 'PUT', url(f2!), { antwort: 'Finanzierung erst 2027', zutreffend: false }, { 'if-match': 'W/"0"' });
     assert.equal((await call('pl', 'PUT', `/v1/vertragsversionen/${id.v2}/gate/nutzen`, { beurteilung: 'x', werte: [] }, { 'if-match': 'W/"0"' })).statusCode, 409, 'Nutzenprüfung erst ab P3');
     assert.deepEqual((await ok('pl', 'GET', `/v1/vertragsversionen/${id.v2}/gate`)).body.fortschritt, { beantwortet: 2, gesamt: 5 });

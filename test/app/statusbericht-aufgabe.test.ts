@@ -35,7 +35,7 @@ describe('Berichtsaufgabe und Mitteilung «kritisch»', () => {
 
   before(async () => {
     api = await testApi();
-    const ue = await login(api, 'demo', 'u-ue', 'ue');
+    const ue = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     const adm = await login(api, 'demo', 'u-adm', 'org-admin');
     T = ue.tenantId;
     // Phasenmodell nach Vorgabe in Kraft; Tag der Aufgabe auf den 1., damit der Test an jedem Tag des Monats gilt
@@ -65,7 +65,7 @@ describe('Berichtsaufgabe und Mitteilung «kritisch»', () => {
            ($1, $2, 'P2', 'kommunikation', 'Newsletter', '2026-01-15', NULL, NULL),
            ($1, $2, 'P3', 'meilenstein', 'Rollout', '2027-09-30', NULL, NULL)`, [T, projekt['2026-001']]);
     });
-    await grant(api, T, `user:${plId}`, 'pl', { type: 'projekt', id: projekt['2026-001'] });
+    await grant(api, T, `user:${plId}`, 'projekt-fuehren', { type: 'projekt', id: projekt['2026-001'] });
   });
   after(async () => { await api?.close(); });
 

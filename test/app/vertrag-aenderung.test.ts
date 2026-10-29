@@ -63,7 +63,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     id.ue = u.principalId;
     h.ue = { authorization: u.authorization };
@@ -78,7 +78,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
 
     for (const sub of ['pl', 'sp', 'ctl', 'kt']) {
       id[sub] = await person(api, T, `u-${sub}`);
-      h[sub] = { authorization: (await login(api, 'demo', `u-${sub}`, 'antragsteller')).authorization };
+      h[sub] = { authorization: (await login(api, 'demo', `u-${sub}`, 'mitglied')).authorization };
     }
     const p = (await ok('ue', 'POST', '/v1/projekte', { name: 'Digitale Aufnahme', portfolioId: portfolio, phase: 'P1' }, {}, 201)).json();
     projekt = { id: p.id, nummer: p.nummer };
@@ -183,12 +183,10 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
     assert.equal(mitErster.mitNummer, '0.2');
     assert.equal((await call('pl', 'GET', `/v1/vertragsversionen/${v2}/vergleich?mit=00000000-0000-4000-8000-000000000000`)).statusCode, 422);
 
-    // Kernteam ohne Recht auf Beträge: keine Beträge im Vergleich, kein Budget in den Hauptänderungen
+    // Kernteam sieht Beträge wie jede Rolle am Projekt (Master Entscheid 13)
     const kt = (await ok('kt', 'GET', `/v1/vertragsversionen/${v2}/vergleich`)).json();
-    assert.deepEqual([kt.betraege, kt.kapitel[8].geaendert], [false, false]);
-    const kth = (await ok('kt', 'GET', `/v1/vertragsversionen/${v2}/hauptaenderungen`)).json();
-    assert.deepEqual(kth.rubriken.find((r: { rubrik: string }) => r.rubrik === 'ressourcen_budget').erzeugt, []);
-    assert.equal(kth.can.write, false);
+    assert.deepEqual([kt.betraege, kt.kapitel[8].geaendert], [true, true]);
+    assert.equal((await ok('kt', 'GET', `/v1/vertragsversionen/${v2}/hauptaenderungen`)).json().can.write, false);
 
     // PL formuliert um und ergänzt «Andere» (K2 Schritt 5); If-Match auf die Version
     const g = await ok('pl', 'GET', `/v1/vertragsversionen/${v2}/hauptaenderungen`);

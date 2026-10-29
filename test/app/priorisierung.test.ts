@@ -52,9 +52,9 @@ db.describe('Priorisierung: Bewertungsmodell und Bewertung', () => {
       projekt.geheim = await neu('2026-004', pf, { vertraulich: true });
       projekt.z = await neu('2026-010', pfB);
     });
-    h.ue = await person('ue', 'ue');
-    h.gl = await person('gl', 'gl');
-    h.rm = await person('rm', 'rm');
+    h.ue = await person('ue', 'alle-fuehren');
+    h.gl = await person('gl', 'mitglied');
+    h.rm = await person('rm', 'mitglied');
     h.gremium = await person('gremium', 'gremium', { type: 'portfolio', id: pf });
   });
   db.after(async () => { await api?.close(); });

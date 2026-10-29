@@ -56,9 +56,9 @@ describe('Freigabe der Initialisierung', () => {
 
   before(async () => {
     api = await testApi();
-    const a = await login(api, 'demo', 'u-as1', 'antragsteller');
+    const a = await login(api, 'demo', 'u-as1', 'mitglied');
     tenantId = a.tenantId; as1Id = a.principalId; as1 = { authorization: a.authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
     adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
     [sp, pl] = [await person(api, tenantId, 'u-sp'), await person(api, tenantId, 'u-pl')];
     feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
@@ -72,10 +72,10 @@ describe('Freigabe der Initialisierung', () => {
     portfolioC = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'C', schluessel: 'dpf', name: 'Direktion Pflege', orgEinheitId: direktionPflege }, 201)).json().id;
     portfolioC2 = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'C', schluessel: 'dms', name: 'Direktion Medizin', orgEinheitId: bereich }, 201)).json().id;
     const d = await login(api, 'demo', 'u-direktion', null);
-    await grant(api, tenantId, `user:${d.principalId}`, 'direktion', { type: 'portfolio', id: portfolioC });
+    await grant(api, tenantId, `user:${d.principalId}`, 'portfolio-steuern', { type: 'portfolio', id: portfolioC });
     direktion = { authorization: d.authorization };
     const d2 = await login(api, 'demo', 'u-direktion2', null);
-    await grant(api, tenantId, `user:${d2.principalId}`, 'direktion', { type: 'portfolio', id: portfolioC2 });
+    await grant(api, tenantId, `user:${d2.principalId}`, 'portfolio-steuern', { type: 'portfolio', id: portfolioC2 });
     fremdeDirektion = { authorization: d2.authorization };
   });
   after(async () => { await api?.close(); });
@@ -150,11 +150,10 @@ describe('Freigabe der Initialisierung', () => {
     assert.deepEqual(auf.map(x => [x.empfaenger_recht, x.stand, x.link]), [['idee:decide', 'offen', `/portfolio/ideen/${i.nummer}`]]);
     assert.ok((await mitteilungen(as1Id)).some(t => t.includes('der Direktion (Direktion Pflege) zum Entscheid vorgelegt')));
 
-    // Direktion sieht die Idee und darf entscheiden; die UE und eine fremde Direktion nicht
+    // Direktion sieht die Idee und darf entscheiden; eine fremde Direktion nicht
     const d = await ok('GET', `/v1/ideen/${i.id}/freigabe`, direktion);
     assert.equal(d.json().can.entscheiden, true);
     const etag = d.headers.etag as string;
-    assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(ue, etag), { sponsor: sp, projektleitung: pl })).statusCode, 403);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(fremdeDirektion, etag), { sponsor: sp, projektleitung: pl })).statusCode, 404);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(direktion, 'W/"1"'), { sponsor: sp, projektleitung: pl })).statusCode, 412);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(direktion, etag), { sponsor: sp, projektleitung: '00000000-0000-4000-8000-000000000009' })).statusCode, 422);

@@ -35,7 +35,7 @@ describe('Monatsabschluss', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     let pfA = '';
@@ -55,8 +55,8 @@ describe('Monatsabschluss', () => {
         [T, p['2026-202'], VORPERIODE]);
     });
     const l = await login(api, 'demo', 'u-pl', null);
-    for (const nr of ['2026-201', '2026-202']) await grant(api, T, `user:${l.principalId}`, 'pl', { type: 'projekt', id: p[nr]! });
-    await grant(api, T, `user:${l.principalId}`, 'pl', { type: 'projekt', id: daten.projekte['2026-104']! });
+    for (const nr of ['2026-201', '2026-202']) await grant(api, T, `user:${l.principalId}`, 'projekt-fuehren', { type: 'projekt', id: p[nr]! });
+    await grant(api, T, `user:${l.principalId}`, 'projekt-fuehren', { type: 'projekt', id: daten.projekte['2026-104']! });
     pl = { authorization: l.authorization };
     const g = await login(api, 'demo', 'u-gremium', null);
     await grant(api, T, `user:${g.principalId}`, 'gremium', { type: 'portfolio', id: pfA });

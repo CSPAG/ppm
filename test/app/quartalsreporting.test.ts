@@ -61,11 +61,11 @@ describe('Quartalsreporting an den VR', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     tenantId = u.tenantId;
     ue = { authorization: u.authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-lesen')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
     const v = await login(api, 'demo', 'u-verantwortlich', null);
     verantwortlichId = v.principalId; verantwortlich = { authorization: v.authorization };
     await person(api, tenantId, 'u-andere');
@@ -87,8 +87,8 @@ describe('Quartalsreporting an den VR', () => {
 
     // Ziel mit Stand im Quartal
     const feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
-    zielId = (await ok('POST', '/v1/strategische-ziele', gl, { handlungsfeldId: feld, nummer: '1.1', text: 'Wartezeit senken', metrik: 'Median Wartezeit', zielwert: '−10 %' }, 201)).json().id;
-    await ok('POST', `/v1/zielerreichung/${quartal}`, gl, { zielTyp: 'strategisch', zielId, stand: '−4 %', beurteilung: 'auf Kurs' }, 201);
+    zielId = (await ok('POST', '/v1/strategische-ziele', ue, { handlungsfeldId: feld, nummer: '1.1', text: 'Wartezeit senken', metrik: 'Median Wartezeit', zielwert: '−10 %' }, 201)).json().id;
+    await ok('POST', `/v1/zielerreichung/${quartal}`, ue, { zielTyp: 'strategisch', zielId, stand: '−4 %', beurteilung: 'auf Kurs' }, 201);
 
     // Portfoliobericht des letzten Quartalsmonats (AP-E2-3), bereitgestellt
     const periode = letztePeriode(quartal);

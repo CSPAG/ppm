@@ -6,9 +6,9 @@ import type { Matrix } from './typ.ts';
 /** Projekt «Probe» (2026-001) aus matrix/projekt.ts. */
 const PROBE = "(SELECT id FROM ppm.projekt WHERE nummer = '2026-001')";
 
-const PL = "app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)";
+const PL = "ppm.recht_am_projekt('projekt:write'::text, projekt_id)";
 const INTERN = "(current_setting('app.abschluss_intern'::text, true) = 'on'::text)";
-const NUTZEN = `(${PL} OR app.has_permission('vertrag:decide'::text, 'projekt'::text, projekt_id) OR app.has_permission('vertrag:review'::text) OR ${INTERN})`;
+const NUTZEN = `(${PL} OR ppm.recht_am_projekt('vertrag:decide'::text, projekt_id) OR app.has_permission('vertrag:review'::text) OR ${INTERN})`;
 
 export const matrix: Matrix = {
   tables: {

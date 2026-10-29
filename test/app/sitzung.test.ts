@@ -47,10 +47,10 @@ describe('Sitzungen vorbereiten', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     tenantId = u.tenantId;
     ue = { authorization: u.authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-lesen')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
     const adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
 
@@ -71,7 +71,7 @@ describe('Sitzungen vorbereiten', () => {
     // Projekte in P1 und P2 mit Projektorganisation
     [pl, ctl, sp] = [await person(api, tenantId, 'u-pl'), await person(api, tenantId, 'u-ctl'), await person(api, tenantId, 'u-sp')];
     // alle Mitglieder sind Antragstellende an der Organisation (A-46), Projektrollen setzt die Projektorganisation
-    plH = { authorization: (await login(api, 'demo', 'u-pl', 'antragsteller')).authorization };
+    plH = { authorization: (await login(api, 'demo', 'u-pl', 'mitglied')).authorization };
     for (const [phase, set] of [['P1', (x: typeof p1) => { p1 = x; }], ['P2', (x: typeof p1) => { p2 = x; }]] as const) {
       const p = await ok('POST', '/v1/projekte', ue, { name: `Projekt ${phase}`, portfolioId: portfolio, phase }, 201);
       await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [

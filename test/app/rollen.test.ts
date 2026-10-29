@@ -18,7 +18,7 @@ describe('Rollen zur Laufzeit', () => {
     api = await testApi();
     A = { authorization: (await login(api, 'acme', 'u-rollen-a', 'org-admin')).authorization };
     B = { authorization: (await login(api, 'globex', 'u-rollen-b', 'org-admin')).authorization };
-    leser = { authorization: (await login(api, 'acme', 'u-rollen-leser', 'leser')).authorization };
+    leser = { authorization: (await login(api, 'acme', 'u-rollen-leser', 'mitglied')).authorization };
   });
   after(async () => { await api?.close(); });
 

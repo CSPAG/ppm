@@ -16,8 +16,8 @@ describe('Problem-JSON und OpenAPI', () => {
   let editor: Record<string, string>, viewer: Record<string, string>;
   before(async () => {
     api = await testApi();
-    editor = { authorization: (await login(api, 'demo', 'p-editor', 'gl')).authorization };
-    viewer = { authorization: (await login(api, 'demo', 'p-viewer', 'leser')).authorization };
+    editor = { authorization: (await login(api, 'demo', 'p-editor', 'alle-fuehren')).authorization };
+    viewer = { authorization: (await login(api, 'demo', 'p-viewer', 'mitglied')).authorization };
     // Absichtlicher Fehler für 500 (nur in diesem Test)
   });
   after(async () => { await api?.close(); });

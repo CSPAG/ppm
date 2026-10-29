@@ -49,7 +49,7 @@ export const matrix: Matrix = {
       assert.ok(r.statusCode < 300, `${method} ${url}: ${r.statusCode} ${r.body}`);
       return r.json();
     };
-    const verantwortlich = (await login(api, 'acme', 'u-a-auflage', 'leser')).principalId;
+    const verantwortlich = (await login(api, 'acme', 'u-a-auflage', 'mitglied')).principalId;
     const p = await inject('POST', '/v1/portfolios', { kategorie: 'B', schluessel: 'sitzung-b', name: mark });
     const g = await inject('POST', '/v1/gremien', { portfolioId: p.id, kuerzel: 'gremium-b', name: mark, art: 'entscheidend' });
     for (const datum of ['2026-12-09', '2026-12-16', '2027-01-20']) await inject('POST', `/v1/gremien/${g.id}/termine`, { datum });

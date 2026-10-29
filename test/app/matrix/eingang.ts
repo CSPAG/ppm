@@ -54,10 +54,10 @@ export const matrix: Matrix = {
       aufgabe: await aufgabe.oeffnen(tx, { art: 'probe.lesen', bezug: { typ: 'probe', id: 'a' }, empfaenger: { person: me }, titel: mark, link: '/eingang', manuell: true }),
       mitteilung: await mitteilung.senden(tx, { an: me, bezug: { typ: 'probe', id: 'a' }, text: mark }),
     }));
-    const vertreterA = (await login(api, 'acme', 'u-a-vertretung', 'leser')).principalId;
+    const vertreterA = (await login(api, 'acme', 'u-a-vertretung', 'mitglied')).principalId;
     const s = await api.app.inject({ method: 'POST', url: '/v1/stellvertretungen', headers: a, payload: { vertreter: vertreterA, von: '2099-01-01', bis: '2099-01-31' } });
     assert.equal(s.statusCode, 201, s.body);
-    const vertreterB = (await login(api, 'globex', 'u-b-vertretung', 'leser')).principalId;
+    const vertreterB = (await login(api, 'globex', 'u-b-vertretung', 'mitglied')).principalId;
     return { ...ids, stellvertretung: s.json().id, vertreterB };
   },
   cases: {

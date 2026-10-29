@@ -35,7 +35,7 @@ describe('Risikolage und Portfoliobericht', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     const l = await login(api, 'demo', 'u-pl', null);
@@ -66,11 +66,11 @@ describe('Risikolage und Portfoliobericht', () => {
       await tx.query("INSERT INTO ppm.eskalation (tenant_id, projekt_id, statusbericht_id, grund, massnahme) VALUES ($1, $2, $3, 'Lieferverzug', 'Zweitlieferant')", [T, p['2026-001'], b]);
     });
     pl = { authorization: l.authorization };
-    await grant(api, T, `user:${l.principalId}`, 'pl', { type: 'projekt', id: p['2026-001']! });
+    await grant(api, T, `user:${l.principalId}`, 'projekt-fuehren', { type: 'projekt', id: p['2026-001']! });
     const g = await login(api, 'demo', 'u-gremium', null);
     await grant(api, T, `user:${g.principalId}`, 'gremium', { type: 'portfolio', id: pfA });
     gremium = { authorization: g.authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-lesen')).authorization };
   });
   after(async () => { await api?.close(); });
 
@@ -161,11 +161,10 @@ describe('Risikolage und Portfoliobericht', () => {
     assert.deepEqual([g.stand, g.can.bearbeiten], ['bereitgestellt', false]);
     assert.deepEqual((await ok('GET', '/v1/portfolioberichte?portfolio=transformation', gremium)).items.map((x: { id: string }) => x.id), [id]);
     assert.equal((await call('GET', '/v1/portfolioberichte', pl)).statusCode, 403);
-    // gespeicherter Stand in der Sicht der Person: GL ohne projekt:vertraulich sieht 2026-002 weder als Zeile noch über
-    // Risiken oder Abhängigkeiten; Funnel und Matrix neu gezählt
+    // gespeicherter Stand in der Sicht der Person: «alle Portfolios lesen» sieht auch das vertrauliche 2026-002 (Master
+    // Entscheid 13); Funnel und Matrix gezählt wie die Zeilen
     const l = await ok('GET', `/v1/portfolioberichte/${id}`, gl);
-    assert.ok(!JSON.stringify(l).includes('2026-002'));
-    assert.deepEqual([l.risikolage.risiken.length, l.risikolage.abhaengigkeiten.length], [2, 0]);
+    assert.ok(JSON.stringify(l).includes('2026-002'));
     assert.equal(l.dashboard.funnel.reduce((n: number, f: { anzahl: number }) => n + f.anzahl, 0), l.dashboard.items.length);
     assert.ok(JSON.stringify(await ok('GET', `/v1/portfolioberichte/${id}`, ue)).includes('2026-002'));
   });

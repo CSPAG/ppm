@@ -168,7 +168,7 @@ export async function portfolios(k: Kontext): Promise<void> {
   // Rollen am Portfolio: Mitglieder der Gremien, Direktion Pflege
   for (const [wer, relation, pf] of [
     ['claudia', 'gremium', 'A'], ['thomas', 'gremium', 'A'], ['martina', 'gremium', 'B'], ['claudia', 'gremium', 'B'],
-    ['eva', 'direktion', 'C'], ['eva', 'gremium', 'C'],
+    ['eva', 'portfolio-fuehren', 'C'], ['eva', 'gremium', 'C'],
   ] as const) await k.p.anna.post('/v1/access', { subject: `user:${pid(k, wer)}`, relation, type: 'portfolio', id: k.portfolios[pf].id });
 
   for (const [pf, text, wahrscheinlichkeit, auswirkung, massnahme, verantwortlich] of [

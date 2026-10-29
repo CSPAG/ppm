@@ -4,9 +4,9 @@ import type { Matrix } from './typ.ts';
 /** Version «Probe» aus matrix/vertrag.ts. */
 const PROBE = "FROM ppm.vertrag_version WHERE begruendung = 'Probe'";
 
-const SCHREIBEN = "app.has_permission('vertrag:write'::text, 'projekt'::text, projekt_id)";
+const SCHREIBEN = "ppm.recht_am_projekt('vertrag:write'::text, projekt_id)";
 const INTERN = "(current_setting('app.vertrag_intern'::text, true) = 'on'::text)";
-const SP = "app.has_permission('vertrag:decide'::text, 'projekt'::text, projekt_id)";
+const SP = "ppm.recht_am_projekt('vertrag:decide'::text, projekt_id)";
 
 export const matrix: Matrix = {
   tables: {

@@ -24,8 +24,8 @@ export const matrix: Matrix = {
     "ppm.periode.periode_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('periode:close'::text) CHECK app.has_permission('periode:close'::text)",
     // Statusbericht, Muster KIND (Schreiben statusbericht:write, Prüfung statusbericht:review)
     'ppm.statusbericht.statusbericht_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.statusbericht.statusbericht_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id)",
-    "ppm.statusbericht.statusbericht_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
+    "ppm.statusbericht.statusbericht_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('statusbericht:write'::text, projekt_id)",
+    "ppm.statusbericht.statusbericht_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('statusbericht:write'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (ppm.recht_am_projekt('statusbericht:write'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
   ],
   tags: ['Statusberichte'],
   seed: async (api, a, mark) => {

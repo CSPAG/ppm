@@ -64,7 +64,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     tenantId = u.tenantId;
     ueId = u.principalId;
     ue = { authorization: u.authorization };
@@ -84,7 +84,7 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', () => {
 
     const ctl = await person(api, tenantId, 'u-ctl');
     [pl, sp] = [await person(api, tenantId, 'u-pl'), await person(api, tenantId, 'u-sp')];
-    plH = { authorization: (await login(api, 'demo', 'u-pl', 'antragsteller')).authorization };
+    plH = { authorization: (await login(api, 'demo', 'u-pl', 'mitglied')).authorization };
     for (const [phase, set] of [['P1', (x: typeof p1) => { p1 = x; }], ['P2', (x: typeof p1) => { p2 = x; }]] as const) {
       const p = await ok('POST', '/v1/projekte', ue, { name: `Projekt ${phase}`, portfolioId: portfolio, phase }, 201);
       await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [

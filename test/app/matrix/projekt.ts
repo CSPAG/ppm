@@ -31,8 +31,8 @@ export const matrix: Matrix = {
     "ppm.projekt.projekt_delete RESTRICTIVE DELETE ppm_app USING (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations())) CHECK -",
     // Projektorganisation, Muster KIND: lesen wer das Projekt sieht, schreiben mit projekt:organisation (org oder Rolle am Projekt)
     'ppm.projekt_person.projekt_person_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.projekt_person.projekt_person_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('projekt:organisation'::text, 'projekt'::text, projekt_id)",
-    "ppm.projekt_person.projekt_person_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('projekt:organisation'::text, 'projekt'::text, projekt_id) CHECK -",
+    "ppm.projekt_person.projekt_person_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('projekt:organisation'::text, projekt_id)",
+    "ppm.projekt_person.projekt_person_delete RESTRICTIVE DELETE ppm_app USING ppm.recht_am_projekt('projekt:organisation'::text, projekt_id) CHECK -",
     // Verlauf, Muster STAND
     'ppm.projekt_version.projekt_version_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
   ],

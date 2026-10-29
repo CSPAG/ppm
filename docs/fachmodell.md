@@ -394,12 +394,12 @@ Rollen nach Master Entscheid 18 (A-70), Rechte aus der Sichtbarkeitstabelle in
 |---|---|---|---|
 | `org-admin` | org | ADM | alle (Paket) |
 | `mitglied` | org (an «Alle Mitglieder») | alle; AS | `handlungsfeld:read`, `ziel:read`, `projekt:list`, `idee:list`, `idee:create` (eigene Ideen über Policy) |
-| `alle-lesen` | org | GL | alle Leserechte: `handlungsfeld:read`, `ziel:read`, `projekt:list/read/vertraulich`, `finanzen:read`, `sitzung:read`, `idee:list/read`, `priorisierung:read`, `ressource:read`, `auswertung:read` |
+| `alle-lesen` | org | GL | alle Leserechte ausser Ressourcen (Zuteilung einzelner Personen ist sensibel, darstellung.md): `handlungsfeld:read`, `ziel:read`, `projekt:list/read/vertraulich`, `finanzen:read`, `sitzung:read`, `idee:list/read`, `priorisierung:read`, `auswertung:read` |
 | `alle-fuehren` | org | UE, PMO | alle Fachrechte aus 3.2 ausser `stammdaten:write`, `phasenmodell:activate`, `schnittstelle:admin`, `webhook:admin` und den reservierten; dazu `access:admin` und `audit:read` |
 | `portfolio-steuern` | portfolio | Direktion für ihr Portfolio C | `projekt:read/vertraulich`, `finanzen:read`, `sitzung:read`, `idee:read`, `idee:decide`, `priorisierung:read`, `auswertung:read`, `vertrag:sign`, `vertrag:decide` |
 | `portfolio-fuehren` | portfolio | Direktion, wenn sie ihr Portfolio selbst führt | wie `portfolio-steuern`, dazu `projekt:create/write/organisation`, `statusbericht:write/review`, `kpi:write`, `vertrag:write`, `sitzung:write`, `access:admin` |
 | `gremium` | portfolio | PRAT, GLPA | wie `portfolio-steuern` ohne `idee:decide`, `vertrag:sign`, `vertrag:decide` (Entscheide erfasst, wer führt) |
-| `projekt-steuern` | projekt | Projektauftraggeber:in | `projekt:read`, `finanzen:read`, `vertrag:sign`, `vertrag:decide` |
+| `projekt-steuern` | projekt | Projektauftraggeber:in | `projekt:read`, `projekt:organisation` (UC-002 Schritt 2), `finanzen:read`, `vertrag:sign`, `vertrag:decide` |
 | `projekt-fuehren` | projekt | Projektleitung, PMO | `projekt:read/write/organisation`, `finanzen:read`, `statusbericht:write`, `kpi:write`, `vertrag:write`, `vertrag:sign`, `access:admin` |
 | `projekt-mitlesen` | projekt | Kernteam | `projekt:read`, `finanzen:read` |
 

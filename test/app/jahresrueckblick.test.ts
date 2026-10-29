@@ -45,10 +45,10 @@ describe('Jahresrückblick', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     tenantId = u.tenantId;
     ue = { authorization: u.authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-lesen')).authorization };
     ohne = { authorization: (await login(api, 'demo', 'u-ohne', null)).authorization };
     const adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
     const pm = await ok('POST', '/v1/phasenmodelle', ue, { quelle: 'vorgabe' }, 201);
@@ -72,9 +72,9 @@ describe('Jahresrückblick', () => {
 
     // Ziel mit Stand im Jahr
     const feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
-    const zielId = (await ok('POST', '/v1/strategische-ziele', gl, { handlungsfeldId: feld, nummer: '1.1', text: 'Wartezeit senken', metrik: 'Median Wartezeit', zielwert: '−10 %' }, 201)).json().id;
-    await ok('POST', `/v1/strategische-ziele`, gl, { handlungsfeldId: feld, nummer: '1.2', text: 'Ohne Stand', metrik: 'x', zielwert: 'y' }, 201);
-    await ok('POST', `/v1/zielerreichung/${quartal}`, gl, { zielTyp: 'strategisch', zielId, stand: '−4 %', beurteilung: 'auf Kurs' }, 201);
+    const zielId = (await ok('POST', '/v1/strategische-ziele', ue, { handlungsfeldId: feld, nummer: '1.1', text: 'Wartezeit senken', metrik: 'Median Wartezeit', zielwert: '−10 %' }, 201)).json().id;
+    await ok('POST', `/v1/strategische-ziele`, ue, { handlungsfeldId: feld, nummer: '1.2', text: 'Ohne Stand', metrik: 'x', zielwert: 'y' }, 201);
+    await ok('POST', `/v1/zielerreichung/${quartal}`, ue, { zielTyp: 'strategisch', zielId, stand: '−4 %', beurteilung: 'auf Kurs' }, 201);
 
     // Vorhaben: im Jahr abgeschlossen, früher abgeschlossen, im Jahr abgebrochen, laufend
     await sys(async tx => {

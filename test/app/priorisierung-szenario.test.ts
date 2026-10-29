@@ -95,9 +95,9 @@ db.describe('Szenarien (API)', () => {
       // Ist-Stand: entschiedene Rangfolge b, a (c ohne Rang)
       await tx.query("INSERT INTO ppm.rangfolge (tenant_id, portfolio_id, projekt_id, rang, stand) VALUES ($1, $2, $3, 1, 'entschieden'), ($1, $2, $4, 2, 'entschieden')", [T, pf, p.b, p.a]);
     });
-    h.ue = await person('ue', 'ue');
+    h.ue = await person('ue', 'alle-fuehren');
     h.gremium = await person('gremium', 'gremium', { type: 'portfolio', id: pf });
-    h.rm = await person('rm', 'rm');
+    h.rm = await person('rm', 'mitglied');
     const m = (await call('ue', 'POST', '/v1/bewertungsmodelle', {})).json();
     const k = await call('ue', 'PATCH', `/v1/bewertungsmodelle/${m.id}`, {
       kriterien: [{ schluessel: 'strategiebeitrag', text: 'Strategiebeitrag', dimension: 'nutzen' }, { schluessel: 'komplexitaet', text: 'Komplexität', dimension: 'risiko' }],

@@ -28,10 +28,10 @@ export const matrix: Matrix = {
   },
   policies: [
     // BETRAG (fachmodell.md 3.4) über ppm.betrag_sichtbar; schreiben FI (finanzen:write), PL begründet, die Schnittstelle übernimmt
-    "ppm.abweichung_begruendung.abweichung_begruendung_delete RESTRICTIVE DELETE ppm_app USING (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('finanzen:write'::text)) CHECK -",
-    "ppm.abweichung_begruendung.abweichung_begruendung_insert RESTRICTIVE INSERT ppm_app USING - CHECK (ppm.betrag_sichtbar(projekt_id) AND (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('finanzen:write'::text)))",
+    "ppm.abweichung_begruendung.abweichung_begruendung_delete RESTRICTIVE DELETE ppm_app USING (ppm.recht_am_projekt('projekt:write'::text, projekt_id) OR app.has_permission('finanzen:write'::text)) CHECK -",
+    "ppm.abweichung_begruendung.abweichung_begruendung_insert RESTRICTIVE INSERT ppm_app USING - CHECK (ppm.betrag_sichtbar(projekt_id) AND (ppm.recht_am_projekt('projekt:write'::text, projekt_id) OR app.has_permission('finanzen:write'::text)))",
     'ppm.abweichung_begruendung.abweichung_begruendung_read RESTRICTIVE SELECT ppm_app USING ppm.betrag_sichtbar(projekt_id) CHECK -',
-    "ppm.abweichung_begruendung.abweichung_begruendung_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('finanzen:write'::text)) CHECK (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('finanzen:write'::text))",
+    "ppm.abweichung_begruendung.abweichung_begruendung_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('projekt:write'::text, projekt_id) OR app.has_permission('finanzen:write'::text)) CHECK (ppm.recht_am_projekt('projekt:write'::text, projekt_id) OR app.has_permission('finanzen:write'::text))",
     "ppm.budgetuebergabe.budgetuebergabe_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('finanzen:write'::text) CHECK -",
     "ppm.budgetuebergabe.budgetuebergabe_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('finanzen:write'::text)",
     "ppm.budgetuebergabe.budgetuebergabe_read RESTRICTIVE SELECT ppm_app USING (app.has_permission('finanzen:read'::text) OR app.has_permission('schnittstelle:admin'::text)) CHECK -",

@@ -14602,6 +14602,7 @@
           "eingereichtAt",
           "eingereichtBy",
           "geprueftAt",
+          "geaendertNach",
           "version",
           "updatedAt",
           "eskalation",
@@ -14890,6 +14891,50 @@
               {
                 "type": "string",
                 "format": "date-time"
+              }
+            ]
+          },
+          "geaendertNach": {
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "additionalProperties": false,
+                "description": "Markierung «geändert nach Einreichen» bzw. «geändert nach Abschluss» (A-75, UX-E13); Einzelheiten im Verlauf.",
+                "type": "object",
+                "required": [
+                  "art",
+                  "text",
+                  "at"
+                ],
+                "properties": {
+                  "art": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "einreichen"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "abschluss"
+                        ]
+                      }
+                    ]
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
               }
             ]
           },
@@ -15259,6 +15304,50 @@
           }
         },
         "additionalProperties": false
+      },
+      "StatusberichtVerlauf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "at",
+                "person",
+                "aktion",
+                "text"
+              ],
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "person": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "aktion": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       },
       "Auffaelligkeit": {
         "anyOf": [
@@ -67953,6 +68042,119 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/berichte/{periode}/verlauf": {
+      "get": {
+        "summary": "Verlauf des Statusberichts",
+        "tags": [
+          "Statusberichte"
+        ],
+        "description": "Erfassen, Einreichen, Prüfen, Rückfragen und Änderungen nach dem Einreichen bzw. nach dem Abschluss («geändert nach …», A-75, UX-E13), älteste zuerst. Mit `projekt:read` am Projekt.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            },
+            "example": "2026-10",
+            "in": "path",
+            "name": "periode",
+            "required": true,
+            "description": "Periode des Monatszyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusberichtVerlauf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

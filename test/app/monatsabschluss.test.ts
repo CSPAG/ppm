@@ -261,8 +261,9 @@ describe('Monatsabschluss', () => {
     assert.ok(!(await aufgaben(ue)).some(x => x.art === 'periode.abschliessen'));
     assert.ok((await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen'), 'Prüfaufgabe bleibt offen (A-74)');
     assert.ok(!(await aufgaben(pl)).some(x => x.art === 'statusbericht.erstellen'));
-    // Gesperrt (Z9): kein Bericht, keine Prüfung, kein zweiter Abschluss
-    assert.equal((await call('PUT', bericht(p['2026-202']!), { ...pl, 'if-match': 'W/"0"' }, VOLL)).json().reason, 'periode');
+    // nach dem Abschluss (A-75): ein später Bericht ist möglich und markiert; kein zweiter Abschluss, keine Sammelprüfung
+    const spaet = await call('PUT', bericht(p['2026-202']!), { ...pl, 'if-match': 'W/"0"' }, VOLL);
+    assert.equal(spaet.statusCode, 200, spaet.body);
     assert.equal((await call('POST', `/v1/perioden/${PERIODE}/abschliessen`, ue)).statusCode, 409);
     assert.equal((await call('POST', `/v1/perioden/${PERIODE}/bestaetigen`, ue, { projekte: [p['2026-201']] })).statusCode, 409);
     assert.ok(u.items.filter(i => i.projektId !== rest!.projektId).every(i => !Object.values(i.can).some(Boolean)));
@@ -274,5 +275,14 @@ describe('Monatsabschluss', () => {
     assert.equal(nach.statusCode, 200, nach.body);
     assert.deepEqual([nach.json().stand, nach.json().vermerke], ['geprueft', []]);
     assert.ok(!(await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen'));
+
+    // Änderung nach dem Abschluss (UC-005 A4.1, A-75): markiert, Dashboard der Periode nachgeführt, die UE prüft erneut
+    const g = await call('GET', bericht(rest!.projektId), pl);
+    const n = await call('PUT', bericht(rest!.projektId), { ...pl, 'if-match': g.headers.etag as string }, { naechsterMeilenstein: 'Nachgeführt' });
+    assert.equal(n.statusCode, 200, n.body);
+    assert.deepEqual([n.json().geaendertNach.text, n.json().stand], ['geändert nach Abschluss', 'eingereicht']);
+    const dz = await full(api.t.runtime, T, tx => tx.query<{ naechster_meilenstein: string }>('SELECT naechster_meilenstein FROM ppm.dashboard_zeile WHERE periode = $1 AND projekt_id = $2', [PERIODE, rest!.projektId]));
+    assert.equal(dz.rows[0]!.naechster_meilenstein, 'Nachgeführt');
+    assert.ok((await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen'), 'die UE sieht die Änderung');
   });
 });

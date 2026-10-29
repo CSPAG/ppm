@@ -15,6 +15,7 @@ import { statusberichtTools } from './mcp.ts';
 import { pruefungTools } from './pruefung-mcp.ts';
 import { registerPruefungRoutes, TAG_MONATSABSCHLUSS } from './pruefung-routes.ts';
 import { registerRoutes } from './routes.ts';
+import { registerVerlaufRoutes } from './verlauf.ts';
 // Übernahme aus dem Excel-Dashboard (AP-E0-7): Bericht der Vorperiode je übernommenem Projekt (registriert sich selbst)
 import './uebernahme.ts';
 
@@ -24,6 +25,7 @@ export const statusberichtModule = defineModule({
     { name: TAG_MONATSABSCHLUSS, description: 'Prüfung und Abschluss der Periode durch die Unternehmensentwicklung: Posteingang mit Auffälligkeiten, Bestätigen, Rückfrage, Einfordern, Terminabweichungen, «nicht gemeldet» (AP-E1-2).' }],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerVerlaufRoutes(app, deps);
     registerPruefungRoutes(app, deps);
     registerAbschlussRoutes(app, deps);
   },

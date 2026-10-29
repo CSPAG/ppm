@@ -31,6 +31,8 @@ export const matrix: Matrix = {
     "ppm.einforderung.einforderung_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)) CHECK app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))",
     // Stand der Periode, Muster STAND (anhängen mit periode:close)
     'ppm.dashboard_zeile.dashboard_zeile_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
+    // nachführen nach dem Abschluss (A-75): nur in voller Sicht
+    'ppm.dashboard_zeile.dashboard_zeile_update RESTRICTIVE UPDATE ppm_app USING app.write_all() CHECK app.write_all()',
     "ppm.dashboard_zeile.dashboard_zeile_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('periode:close'::text)",
   ],
   tags: ['Monatsabschluss'],

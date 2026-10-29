@@ -46,6 +46,7 @@ export const matrix: Matrix = {
     'GET /v1/statusberichte/stand': i => ({ method: 'GET', url: `/v1/statusberichte/stand?projektId=${i.berichtProjekt}`, kind: 'list' }),
     'GET /v1/projekte/:id/berichte': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte`, kind: 'foreign' }),
     'GET /v1/projekte/:id/berichte/:periode': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}`, kind: 'foreign' }),
+    'GET /v1/projekte/:id/berichte/:periode/verlauf': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/verlauf`, kind: 'foreign' }),
     'PUT /v1/projekte/:id/berichte/:periode': i => ({ method: 'PUT', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}`, body: { entscheide: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'POST /v1/projekte/:id/berichte/:periode/einreichen': i => ({ method: 'POST', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/einreichen`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'POST /v1/projekte/:id/berichte/:periode/zurueckziehen': i => ({ method: 'POST', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/zurueckziehen`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),

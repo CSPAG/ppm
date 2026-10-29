@@ -29700,6 +29700,115 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/{id}/berichte/{periode}/verlauf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verlauf des Statusberichts
+         * @description Erfassen, Einreichen, Prüfen, Rückfragen und Änderungen nach dem Einreichen bzw. nach dem Abschluss («geändert nach …», A-75, UX-E13), älteste zuerst. Mit `projekt:read` am Projekt.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    /**
+                     * @description Periode des Monatszyklus.
+                     * @example 2026-10
+                     */
+                    periode: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StatusberichtVerlauf"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/perioden/{periode}": {
         parameters: {
             query?: never;
@@ -50005,6 +50114,12 @@ export interface components {
             eingereichtAt: null | string;
             eingereichtBy: null | string;
             geprueftAt: null | string;
+            geaendertNach: null | {
+                art: "einreichen" | "abschluss";
+                text: string;
+                /** Format: date-time */
+                at: string;
+            };
             /** @description 0: noch nicht gespeichert; mit `If-Match: W/"0"` anlegen. */
             version: number;
             updatedAt: null | string;
@@ -50062,6 +50177,15 @@ export interface components {
             massnahme?: string;
             /** @description Entscheid des PRAT nötig (UC-004 A2.2); nur bei «kritisch». */
             entscheidNoetig?: boolean;
+        };
+        StatusberichtVerlauf: {
+            items: {
+                /** Format: date-time */
+                at: string;
+                person: string | null;
+                aktion: string;
+                text: string;
+            }[];
         };
         Auffaelligkeit: {
             /** @enum {string} */

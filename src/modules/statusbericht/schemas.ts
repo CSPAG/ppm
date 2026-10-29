@@ -87,6 +87,8 @@ export const Statusbericht = Type.Object({
   eingereichtAt: Nullable(DateTime),
   eingereichtBy: Nullable(Uuid),
   geprueftAt: Nullable(DateTime),
+  geaendertNach: Nullable(Type.Object({ art: Type.Union([Type.Literal('einreichen'), Type.Literal('abschluss')]), text: Type.String(), at: DateTime },
+    { additionalProperties: false, description: 'Markierung «geändert nach Einreichen» bzw. «geändert nach Abschluss» (A-75, UX-E13); Einzelheiten im Verlauf.' })),
   version: Type.Integer({ minimum: 0, description: '0: noch nicht gespeichert; mit `If-Match: W/"0"` anlegen.' }),
   updatedAt: Nullable(DateTime),
   eskalation: Nullable(EskalationKurz),

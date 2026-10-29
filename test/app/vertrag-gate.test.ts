@@ -1,6 +1,6 @@
 /**
  * Gate-Modus und Gate-Entscheid (AP-E3-3; PS.02.01, PS.02.02, PS.02.05; UC-002 Schritte 10–11, UC-003 Schritte 1–10,
- * A6; K2, K3): Nach der dritten Unterschrift steht das Gate-Review beim Gremium des Gremienwegs; der Entscheid in der
+ * A6; K2, K3): Nach der letzten Unterschrift steht das Gate-Review beim Gremium des Gremienwegs; der Entscheid in der
  * Sitzung setzt Baseline, Phase und Phasenmodell, bevor die Sitzung geschlossen ist (Abnahme «Phase und Baseline nach
  * Entscheid»), eine Korrektur nimmt die Folge zurück (A-30), auch «Gestoppt» → «freigegeben» nach dem Abbruch. Danach
  * Entwurf für das Gate P1–P2 aus der Baseline mit Leitfragen, Aufgabe «Gate vorbereiten» 30 Arbeitstage vor der
@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { traktandenart } from '../../src/modules/sitzung/arten.ts';
 import { gateVorbereitenPruefen } from '../../src/modules/vertrag/gate-job.ts';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
@@ -55,7 +55,7 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', () => {
   async function bisUnterzeichnet(v: string, etag: string): Promise<void> {
     const e = await ok('pl', 'POST', `/v1/vertragsversionen/${v}/einreichen`, undefined, { 'if-match': etag });
     await ok('ue', 'POST', `/v1/vertragsversionen/${v}/quality-check`, { ergebnis: 'bestaetigt' }, { 'if-match': e.etag });
-    for (const who of ['sp', 'pl', 'ctl']) {
+    for (const who of ['sp', 'pl']) {
       const p = await ok(who, 'GET', `/v1/vertragsversionen/${v}/pruefung`);
       await ok(who, 'POST', `/v1/vertragsversionen/${v}/unterschriften`, { ergebnis: 'unterzeichnet' }, { 'if-match': p.etag });
     }
@@ -97,12 +97,17 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', () => {
     const pj = (await ok('ue', 'POST', '/v1/projekte', { name: 'Digitale Patientenaufnahme', portfolioId: portfolio, phase: 'P0' }, {}, 201)).body;
     projekt = { id: pj.id, nummer: pj.nummer };
     await ok('ue', 'PUT', `/v1/projekte/${pj.id}/organisation`, { mitglieder: [
-      { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.ctl, funktion: 'ctl', akv: '' }, { personId: id.kt, funktion: 'kt', akv: '' },
+      { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' },
+      { personId: id.ctl, funktion: 'weitere', funktionText: 'CTL', akv: '' }, { personId: id.kt, funktion: 'weitere', funktionText: 'Kernteam', akv: '' },
     ] }, { 'if-match': 'W/"0"' });
+    // Zugriff getrennt von der Projektorganisation (Master Entscheid 16)
+    for (const [f, rolle] of [['sp', 'projekt-steuern'], ['pl', 'projekt-fuehren'], ['ctl', 'projekt-fuehren'], ['kt', 'projekt-mitlesen']] as const) {
+      await grant(api, T, `user:${id[f]}`, rolle, { type: 'projekt', id: pj.id });
+    }
   });
   after(async () => { await api?.close(); });
 
-  test('Erster Vertrag: nach der dritten Unterschrift traktandiert beim PRAT, Packet mit Leitfragen P0–P1 (UC-002 Schritt 10, UC-003 Schritt 9)', async () => {
+  test('Erster Vertrag: nach der letzten Unterschrift traktandiert beim PRAT, Packet mit Leitfragen P0–P1 (UC-002 Schritt 10, UC-003 Schritt 9)', async () => {
     const e = await ok('pl', 'POST', `/v1/projekte/${projekt.id}/vertrag/entwuerfe`, { anlass: 'initial' }, {}, 201);
     id.v1 = e.body.version.id;
     const g = await ok('kt', 'GET', `/v1/vertragsversionen/${id.v1}/gate`);

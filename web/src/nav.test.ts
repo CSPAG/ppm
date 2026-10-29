@@ -42,13 +42,13 @@ describe('Navigation der Antragstellenden', () => {
   it('Personensuche: Name mit Funktion und Projekt, ohne E-Mail; Treffer führt ins Projekt', async () => {
     const api = mockIamApi({
       'GET /v1/projekte/personen': () => json({ items: [
-        { id: 'p1', name: 'Sabine Sponsorin', kontexte: [{ projektId: 'x1', nummer: '2026-014', name: 'Digitale Aufnahme', funktion: 'sp' }, { projektId: 'x2', nummer: '2026-020', name: 'Labor', funktion: 'kt' }] },
+        { id: 'p1', name: 'Sabine Sponsorin', kontexte: [{ projektId: 'x1', nummer: '2026-014', name: 'Digitale Aufnahme', funktion: 'sp' }, { projektId: 'x2', nummer: '2026-020', name: 'Labor', funktion: 'weitere' }] },
       ] }),
     }, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
     vi.stubGlobal('fetch', api.fetch);
     const suche = navigation.suchen.find(s => s.id === 'personen-projekte')!;
     const t = await suche.suchen('sab', new AbortController().signal);
-    expect(t).toEqual([{ id: 'projekt-person:p1', label: 'Sabine Sponsorin', detail: 'Sponsor · 2026-014, Kernteam · 2026-020', icon: 'user', pfad: '/projekte/2026-014' }]);
+    expect(t).toEqual([{ id: 'projekt-person:p1', label: 'Sabine Sponsorin', detail: 'Projektauftraggeber:in · 2026-014, weitere Funktion · 2026-020', icon: 'user', pfad: '/projekte/2026-014' }]);
     expect(new URL(api.calls[0]!.url).searchParams.get('q')).toBe('sab');
   });
 

@@ -10,7 +10,7 @@ import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { systemActor } from '@vollholz/platform';
 import { vertrag } from '../../src/modules/vertrag/index.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
@@ -82,10 +82,18 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
     }
     const p = (await ok('ue', 'POST', '/v1/projekte', { name: 'Digitale Aufnahme', portfolioId: portfolio, phase: 'P1' }, {}, 201)).json();
     projekt = { id: p.id, nummer: p.nummer };
-    await ok('ue', 'PUT', `/v1/projekte/${p.id}/organisation`, { mitglieder: ['pl', 'sp', 'ctl', 'kt'].map(f => ({ personId: id[f], funktion: f, akv: '' })) }, { 'if-match': 'W/"0"' });
+    await ok('ue', 'PUT', `/v1/projekte/${p.id}/organisation`, { mitglieder: [
+      { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.sp, funktion: 'sp', akv: '' },
+      { personId: id.ctl, funktion: 'weitere', funktionText: 'CTL', akv: '' }, { personId: id.kt, funktion: 'weitere', funktionText: 'Kernteam', akv: '' },
+    ] }, { 'if-match': 'W/"0"' });
+    // Zugriff getrennt von der Projektorganisation (Master Entscheid 16)
+    for (const [f, rolle] of [['pl', 'projekt-fuehren'], ['sp', 'projekt-steuern'], ['ctl', 'projekt-fuehren'], ['kt', 'projekt-mitlesen']] as const) {
+      await grant(api, T, `user:${id[f]}`, rolle, { type: 'projekt', id: p.id });
+    }
     const q = (await ok('ue', 'POST', '/v1/projekte', { name: 'Ohne Vertrag', portfolioId: portfolio, phase: 'P1' }, {}, 201)).json();
     ohneBaseline = q.id;
     await ok('ue', 'PUT', `/v1/projekte/${q.id}/organisation`, { mitglieder: [{ personId: id.pl, funktion: 'pl', akv: '' }] }, { 'if-match': 'W/"0"' });
+    await grant(api, T, `user:${id.pl}`, 'projekt-fuehren', { type: 'projekt', id: q.id });
 
     // Erster Vertrag mit Kosten, Personal, Meilenstein und Risiko, eingereicht und als Baseline gesetzt (Gate-Entscheid, AP-E3-3)
     const v = (await ok('pl', 'POST', `/v1/projekte/${p.id}/vertrag/entwuerfe`, { anlass: 'initial' }, {}, 201)).json().version.id as string;

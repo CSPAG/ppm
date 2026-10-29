@@ -30,7 +30,7 @@ function out(r: store.Row, caps: Caps): ProjektOut {
     portfolio: r.pf_schluessel ? { schluessel: r.pf_schluessel, name: r.pf_name!, kategorie: r.pf_kategorie! } : null,
     orgEinheitId: r.org_einheit_id, handlungsfeldId: r.handlungsfeld_id, handlungsfeld: r.hf_label,
     phase: r.phase, phasenmodellId: r.phasenmodell_id, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
-    sponsor: r.sponsor, projektleitung: r.projektleitung, controlling: r.controlling, rollen: r.rollen,
+    sponsor: r.sponsor, projektleitung: r.projektleitung, rollen: r.rollen,
     version: r.version, createdAt: r.created_at, updatedAt: r.updated_at,
     // Endzustände sind lesend (UC-015 Schritt 6)
     can: { write: !!c.write && aenderbar(r), organisation: !!c.organisation && aenderbar(r) },
@@ -39,10 +39,11 @@ function out(r: store.Row, caps: Caps): ProjektOut {
 
 const aenderbar = (r: store.Row) => r.lebenszyklus === 'aktiv' || r.lebenszyklus === 'sistiert';
 
-function organisation(r: store.Row, rows: store.MitgliedRow[], caps: Caps): OrganisationOut {
+function organisation(r: store.Row, rows: store.MitgliedRow[], vorschlaege: string[], caps: Caps): OrganisationOut {
   return {
     version: standVon(rows),
-    mitglieder: rows.map(m => ({ personId: m.person_id, funktion: m.funktion, akv: m.akv })),
+    mitglieder: rows.map(m => ({ personId: m.person_id, funktion: m.funktion, funktionText: m.funktion_text, akv: m.akv })),
+    vorschlaege,
     can: { write: !!caps('projekt', r.id, r.portfolio_id).organisation && aenderbar(r) },
   };
 }
@@ -149,16 +150,16 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
 
   app.get('/v1/projekte/:id/organisation', {
     schema: {
-      tags: [TAG], summary: 'Projektorganisation lesen', description: 'Sponsor, Sponsoren-Koalition, Projektleitung, CTL und Kernteam mit AKV (PP.04.04).',
+      tags: [TAG], summary: 'Projektorganisation lesen', description: 'Projektauftraggeber:in, Projektleitung und weitere Funktionen (freier Text) mit AKV (PP.04.04, A-72); dazu Vorschläge für weitere Funktionen. Die Projektorganisation ist ein Projektergebnis und vergibt keinen Zugriff (Master Entscheid 16).',
       params: IdParams, response: { 200: Type.Ref('Organisation') },
     },
   }, async (req, reply) => {
     const { id } = req.params as { id: string };
     await req.need('projekt:read', ort(id));
-    const [row, rows] = await req.tx(async tx => [await store.get(tx, id), await store.mitglieder(tx, id)] as const);
+    const [row, rows, vorschlaege] = await req.tx(async tx => [await store.get(tx, id), await store.mitglieder(tx, id), await store.funktionstexte(tx)] as const);
     if (!row) throw notFound('Projekt');
     const caps = await req.capabilities();
-    const o = organisation(row, rows, caps);
+    const o = organisation(row, rows, vorschlaege, caps);
     reply.header('etag', etag(o.version));
     return o;
   });
@@ -166,7 +167,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   app.put('/v1/projekte/:id/organisation', {
     schema: {
       tags: [TAG], summary: 'Projektorganisation festlegen',
-      description: 'Ersetzt die Projektorganisation (UC-002 Schritt 2) und gibt den benannten Personen ihre Rolle am Projekt (Sponsor, Projektleitung, CTL, Kernteam); entfernte verlieren sie. Nur mit `If-Match` (Stand der Projektorganisation).',
+      description: 'Ersetzt die Projektorganisation (UC-002 Schritt 2): Projektauftraggeber:in und Projektleitung je höchstens eine Person, weitere Funktionen mit `funktionText`. Ändert den Zugriff nicht (Master Entscheid 16); den vergibt `/v1/access`. Nur mit `If-Match` (Stand der Projektorganisation).',
       params: IdParams, headers: IfMatchHeaders, body: Type.Ref('OrganisationPut'), response: { 200: Type.Ref('Organisation') },
     },
   }, async (req, reply) => {
@@ -175,12 +176,12 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     await req.need('projekt:organisation', ort(id));
     const p = req.requirePrincipal();
     const body = req.body as OrganisationPutIn;
-    const [row, rows] = await req.tx(async tx => {
-      const r = await organisationFestlegen(tx, { tuples: deps.iam.tuples, who: actorOf(req), principalId: p.principalId }, id, version, body.mitglieder);
-      return [(await store.get(tx, id))!, r] as const;
+    const [row, rows, vorschlaege] = await req.tx(async tx => {
+      const r = await organisationFestlegen(tx, { who: actorOf(req) }, id, version, body.mitglieder);
+      return [(await store.get(tx, id))!, r, await store.funktionstexte(tx)] as const;
     });
     const caps = await req.capabilities();
-    const o = organisation(row, rows, caps);
+    const o = organisation(row, rows, vorschlaege, caps);
     reply.header('etag', etag(o.version));
     return o;
   });

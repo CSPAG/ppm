@@ -62,10 +62,12 @@ export async function initialisieren(tx: Tx, zugang: Zugang, who: Actor, princip
       nutzen: r.nutzen_text, aufwand: r.aufwand_text, relevanz: r.relevanz_text, herkunft: r.herkunft, kategorie: a.kategorie,
     },
   });
-  await projekt.organisationFestlegen(tx, { tuples: zugang.tuples, who, principalId }, p.id, 0, [
-    { personId: o.sponsor, funktion: 'sp', akv: '' },
-    { personId: o.projektleitung, funktion: 'pl', akv: '' },
-  ]);
+  const organisation = [
+    { personId: o.sponsor, funktion: 'sp' as const, akv: '' },
+    { personId: o.projektleitung, funktion: 'pl' as const, akv: '' },
+  ];
+  await projekt.organisationFestlegen(tx, { who }, p.id, 0, organisation);
+  await projekt.zugriffVorschlagen(tx, { tuples: zugang.tuples, who, principalId }, p.id, organisation);
   await ps.setzen(tx, r.id, { stand: 'freigegeben', projekt_id: p.id, sponsor: o.sponsor, projektleitung: o.projektleitung, freigegeben_at: new Date(), begruendung: o.begruendung });
   await aufgabe.erledigen(tx, { art: 'idee.freigeben', bezug: bezugVon(r.id) });
   await aufgabe.oeffnen(tx, {

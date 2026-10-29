@@ -86,7 +86,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     schema: {
       tags: [TAG], summary: 'Quality-Check erfassen', params: IdParams, headers: IfMatchHeaders,
       body: Type.Ref('VertragQualityCheckIn'), response: { 200: Type.Ref('VertragPruefung') },
-      description: 'Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Sponsor, Projektleitung und CTL erhalten je eine Aufgabe (UC-002 Schritt 9); '
+      description: 'Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Projektauftraggeber:in und Projektleitung erhalten je eine Aufgabe (UC-002 Schritt 9); '
         + 'fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). '
         + '`If-Match` = Version der Vertragsversion.',
     },
@@ -130,7 +130,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     schema: {
       tags: [TAG], summary: 'Unterzeichnen oder verweigern', params: IdParams, headers: IfMatchHeaders,
       body: Type.Ref('VertragUnterschriftIn'), response: { 200: Type.Ref('VertragPruefung') },
-      description: 'Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (SP, PL, CTL), die sie innehat oder in Vertretung mit '
+      description: 'Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (Projektauftraggeber:in, Projektleitung), die sie innehat oder in Vertretung mit '
         + 'Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit '
         + 'Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.',
     },

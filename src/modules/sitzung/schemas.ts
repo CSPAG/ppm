@@ -15,7 +15,7 @@ const SitzungStandT = enumOf(['geplant', 'in_vorbereitung', 'versendet', 'laufen
 const TraktandumStandT = enumOf(['vorgeschlagen', 'traktandiert', 'verschoben', 'entschieden'] as const, 'Stand des Traktandums.');
 const UnterlagenStandT = enumOf(['bereit', 'quality_check_offen', 'fehlt', 'keine'] as const,
   'Stand der Unterlagen (UC-006 Schritt 3): bereit, Quality-Check offen, Unterlagen fehlen, keine Unterlagen nötig.');
-const FunktionT = enumOf(['sp', 'pl', 'ctl', 'weitere'] as const, 'Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person.');
+const FunktionT = enumOf(['sp', 'pl', 'weitere'] as const, 'Funktion im Projekt: `sp` Projektauftraggeber:in, `pl` Projektleitung oder `weitere` Person.');
 
 const SitzungCan = Type.Object({ write: Type.Boolean({ description: 'Traktandenliste bearbeiten und versenden (sitzung:write, nur bis zum Versand).' }) },
   { description: 'Was die anfragende Person damit darf.' });

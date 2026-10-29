@@ -70,13 +70,16 @@ describe('Sitzungen vorbereiten', () => {
 
     // Projekte in P1 und P2 mit Projektorganisation
     [pl, ctl, sp] = [await person(api, tenantId, 'u-pl'), await person(api, tenantId, 'u-ctl'), await person(api, tenantId, 'u-sp')];
-    // alle Mitglieder sind Antragstellende an der Organisation (A-46), Projektrollen setzt die Projektorganisation
+    // alle sind Mitglied der Organisation; Projektrollen vergibt der Test getrennt von der Projektorganisation (Master Entscheid 16)
     plH = { authorization: (await login(api, 'demo', 'u-pl', 'mitglied')).authorization };
     for (const [phase, set] of [['P1', (x: typeof p1) => { p1 = x; }], ['P2', (x: typeof p1) => { p2 = x; }]] as const) {
       const p = await ok('POST', '/v1/projekte', ue, { name: `Projekt ${phase}`, portfolioId: portfolio, phase }, 201);
       await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [
-        { personId: pl, funktion: 'pl', akv: '' }, { personId: ctl, funktion: 'ctl', akv: '' }, { personId: sp, funktion: 'sp', akv: '' },
+        { personId: pl, funktion: 'pl', akv: '' }, { personId: ctl, funktion: 'weitere', funktionText: 'CTL', akv: '' }, { personId: sp, funktion: 'sp', akv: '' },
       ] });
+      for (const [wer, rolle] of [[pl, 'projekt-fuehren'], [ctl, 'projekt-fuehren'], [sp, 'projekt-steuern']] as const) {
+        await grant(api, tenantId, `user:${wer}`, rolle, { type: 'projekt', id: p.id });
+      }
       set({ id: p.id, nummer: p.nummer });
     }
 
@@ -110,7 +113,7 @@ describe('Sitzungen vorbereiten', () => {
 
   let sitzung: { id: string; version: number };
 
-  test('Vorschläge aufnehmen: Gate-Review 35 Min. mit PL, CTL, SP; «via SNS-VR» aus dem Gremienweg (K3 Abnahme 1–3)', async () => {
+  test('Vorschläge aufnehmen: Gate-Review 35 Min. mit PL und SP; «via SNS-VR» aus dem Gremienweg (K3 Abnahme 1–3)', async () => {
     // Module schlagen vor (in ihrer Transaktion, ohne sitzung:write), idempotent je Geschäft
     const g1 = await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p1' }, projektId: p1.id, titel: `Gate P1–P2 ${p1.nummer}` }));
     assert.equal(await sys(tx => traktandum.vorschlagen(tx, { art: 'gate', bezug: { typ: 'gate_antrag', id: 'g-p1' }, projektId: p1.id, titel: `Gate P1–P2 ${p1.nummer}`, antrag: 'Freigabe Phase P2' })), g1);
@@ -132,7 +135,7 @@ describe('Sitzungen vorbereiten', () => {
     let r = await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: g1 });
     const t1 = r.traktanden[1];
     assert.deepEqual([t1.dauerMin, t1.viaSns, t1.position, t1.zeit, r.stand, t1.fest], [35, true, 2, null, 'in_vorbereitung', false]);
-    assert.deepEqual(t1.einladungen.map((e: { funktion: string; personId: string }) => [e.funktion, e.personId]), [['pl', pl], ['ctl', ctl], ['sp', sp]]);
+    assert.deepEqual(t1.einladungen.map((e: { funktion: string; personId: string }) => [e.funktion, e.personId]), [['pl', pl], ['sp', sp]]);
     assert.deepEqual([t1.unterlagen.stand, t1.unterlagen.liste[0].titel], ['bereit', 'Gate Review Packet']);
 
     const g2 = v.gruppen[0].traktanden[1].id;
@@ -225,7 +228,7 @@ describe('Sitzungen vorbereiten', () => {
 
     const vor = await ok('GET', `/v1/sitzungen/${sitzung.id}/versand`, ue);
     assert.deepEqual([vor.traktanden, vor.unterlagen, vor.eingeladene, vor.warnungen.map((w: { titel: string; stand: string }) => [w.titel, w.stand]), vor.verschoben, vor.frist.eingehalten],
-      [3, { packet: 1, bericht: 0, beilage: 0 }, 3, [['Bericht der Programmleitung', 'fehlt']], 1, true]);
+      [3, { packet: 1, bericht: 0, beilage: 0 }, 2, [['Bericht der Programmleitung', 'fehlt']], 1, true]);
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, ue)).statusCode, 428);
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': 'W/"1"' })).statusCode, 412);
     const s = await ok('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${sitzung.version}"` });
@@ -246,13 +249,11 @@ describe('Sitzungen vorbereiten', () => {
     ] as const);
     assert.deepEqual([audit.length, audit[0]!.data.vorlauf, audit[0]!.data.fristEingehalten], [1, s.versandVorlauf, true]);
     const an = (p: string) => mitteilungen.filter(x => x.empfaenger_person === p).map(x => x.text);
-    assert.equal(an(ctl).length, 1, 'je Person gebündelt');
-    assert.equal(an(ctl)[0], `Du stellst am ${kurz(termin1)} im PRAT vor: ${p1.nummer} Projekt P1 · ca. 14:00.`);
+    assert.deepEqual(an(ctl), [], 'weitere Funktionen werden nicht vorgesetzt (Master Entscheid 17)');
     // SP ist zu beiden Geschäften eingeladen: eine Mitteilung (Eskalation ohne Zeitbedarf zuerst)
     assert.ok(an(sp).includes(`Du stellst am ${kurz(termin1)} im PRAT vor: ${p2.nummer} Projekt P2 · ca. 14:00; ${p1.nummer} Projekt P1 · ca. 14:00.`), JSON.stringify(an(sp)));
     assert.equal(an(pl).length, 2, 'Einladung und Verschiebung');
     assert.ok(an(sp).some(t => t.includes('verschoben auf')), 'SP über die Verschiebung informiert');
-    assert.ok(!an(ctl).some(t => t.includes('verschoben')), 'CTL nicht');
 
     const eingang = (await ok('GET', '/v1/eingang', mitglied)).items.map((a: { titel: string }) => a.titel);
     assert.ok(eingang.some((t: string) => t.startsWith('Unterlagen PRAT') && t.endsWith('lesen')), JSON.stringify(eingang));

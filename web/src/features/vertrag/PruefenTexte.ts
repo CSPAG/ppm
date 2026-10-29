@@ -2,10 +2,10 @@
  * Texte für Prüfen und Unterzeichnen (UI-12; Kernablauf K2 Schritte 7–8, «Texte»): Anrede «Du», Schweizer
  * Rechtschreibung, Schaltflächen wie im Kernablauf.
  */
-type Funktion = 'sp' | 'pl' | 'ctl';
+type Funktion = 'sp' | 'pl';
 
 export const TP = {
-  funktion: { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL' } satisfies Record<Funktion, string>,
+  funktion: { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' } satisfies Record<Funktion, string>,
   zurueckZumVertrag: 'Ganzen Vertrag ansehen',
   version: (nummer: string, phase: string) => `Version ${nummer} für ${phase}`,
   keinEntwurf: 'Für dieses Projekt gibt es keinen Entwurf, der geprüft oder unterzeichnet wird.',
@@ -23,18 +23,18 @@ export const TP = {
   entwurfBleibt: 'Deine Kommentare bleiben erhalten, bis du sie sendest, auch wenn du dazwischen ein Kapitel ansiehst.',
   kommentareAnzahl: (n: number) => (n === 1 ? '1 Kapitel mit Rückmeldung' : `${n} Kapitel mit Rückmeldung`),
   bestaetigen: 'Quality-Check bestätigen',
-  bestaetigenWirkung: 'Sponsor, Projektleitung und CTL erhalten je eine Unterzeichnungsaufgabe.',
+  bestaetigenWirkung: 'Projektauftraggeber:in und Projektleitung erhalten je eine Unterzeichnungsaufgabe.',
   zurueckgeben: 'Zurück an die Projektleitung',
   zurueckgebenWirkung: 'Der Entwurf geht mit deinen Rückmeldungen zurück an die Projektleitung und ist wieder in Arbeit.',
   zurueckgebenFehlt: 'Rückmeldung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist. Kommentiere mindestens ein Kapitel.',
-  bestaetigt: 'Quality-Check bestätigt. Sponsor, Projektleitung und CTL unterzeichnen.',
+  bestaetigt: 'Quality-Check bestätigt. Projektauftraggeber:in und Projektleitung unterzeichnen.',
   zurueckgegeben: 'Zurück an die Projektleitung.',
   nichtInPruefung: (stand: string) => `Diese Version ist ${stand}; ein Quality-Check ist nur «in Prüfung» möglich.`,
   nurUe: 'Den Quality-Check führt die Unternehmensentwicklung durch.',
   fruehere: 'Frühere Rückmeldungen',
   rueckmeldungVom: (datum: string) => `Rückmeldung vom ${datum}`,
   bestaetigtAm: (datum: string) => `Bestätigt am ${datum}`,
-  organisationFehlt: 'Die Projektorganisation ist unvollständig. Sponsor und Projektleitung legen sie in der Projektübersicht fest.',
+  organisationFehlt: 'Die Projektorganisation ist unvollständig. Projektauftraggeber:in und Projektleitung legen sie in der Projektübersicht fest.',
   konflikt: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und sende danach erneut; deine Kommentare bleiben erhalten.',
   neuLaden: 'Neu laden',
   konfliktUnterzeichnen: 'Der Stand hat sich inzwischen geändert. Lade ihn neu und prüfe, was du unterzeichnest.',
@@ -43,7 +43,7 @@ export const TP = {
   unterzeichnenTitel: 'Projektvertrag unterzeichnen',
   anlass: { initial: 'erster Vertrag', gate: 'Gate', aenderung: 'Änderung' } as Record<string, string>,
   unterschriften: 'Unterschriften',
-  stand: (n: number) => `${n} von 3`,
+  stand: (n: number, von: number) => `${n} von ${von}`,
   unterzeichnet: 'unterzeichnet',
   verweigert: 'nicht unterzeichnet',
   ausstehend: 'ausstehend',

@@ -26,12 +26,15 @@ const projekt = (o: Record<string, unknown> = {}) => ({
   id: ID, nummer: '2026-014', name: 'Digitale Patientenaufnahme', portfolioId: '00000000-0000-4000-8000-0000000000f1',
   portfolio: { schluessel: 'transformation', name: 'Transformation', kategorie: 'A' }, orgEinheitId: null, handlungsfeldId: null,
   handlungsfeld: 'Patientenorientierung', phase: 'P1', phasenmodellId: null, lebenszyklus: 'aktiv', vertraulich: false,
-  sponsor: SP, projektleitung: PL, controlling: null, rollen: ['pl'], version: 2, createdAt: '2026-10-01T08:00:00Z', updatedAt: '2026-10-02T08:00:00Z',
+  sponsor: SP, projektleitung: PL, rollen: ['pl'], version: 2, createdAt: '2026-10-01T08:00:00Z', updatedAt: '2026-10-02T08:00:00Z',
   can: { write: true, organisation: true }, ...o,
 });
 const organisation = (o: Record<string, unknown> = {}) => ({
-  version: 1, can: { write: true },
-  mitglieder: [{ personId: SP, funktion: 'sp', akv: 'Auftrag' }, { personId: PL, funktion: 'pl', akv: '' }, { personId: KT, funktion: 'kt', akv: 'Fachbereich' }],
+  version: 1, can: { write: true }, vorschlaege: ['Kernteam', 'CTL'],
+  mitglieder: [
+    { personId: SP, funktion: 'sp', funktionText: '', akv: 'Auftrag' }, { personId: PL, funktion: 'pl', funktionText: '', akv: '' },
+    { personId: KT, funktion: 'weitere', funktionText: 'Kernteam', akv: 'Fachbereich' },
+  ],
   ...o,
 });
 
@@ -67,9 +70,9 @@ describe('Meine Projekte (UI-05)', () => {
     stub({ 'GET /v1/projekte': () => json({ items: [], nextCursor: null }) });
     renderWithIam(<Liste />, PL_ME);
     expect(await screen.findByText(TP.leer)).toBeInTheDocument();
-    await userEvent.selectOptions(screen.getByLabelText(TP.filter.rolle), 'sponsor');
+    await userEvent.selectOptions(screen.getByLabelText(TP.filter.rolle), 'auftraggeber');
     expect(await screen.findByText(TP.leerGefiltert)).toBeInTheDocument();
-    expect(screen.getByTestId('adresse')).toHaveTextContent('"rolle":"sponsor"');
+    expect(screen.getByTestId('adresse')).toHaveTextContent('"rolle":"auftraggeber"');
     await userEvent.click(screen.getAllByRole('button', { name: T.liste.filterZuruecksetzen })[0]!);
     await waitFor(() => expect(screen.getByTestId('adresse')).toHaveTextContent('{}'));
   });
@@ -117,7 +120,7 @@ describe('Projektakte und Projektübersicht (UI-06)', () => {
     expect(await screen.findByRole('heading', { level: 1, name: '2026-014 Digitale Patientenaufnahme' })).toBeInTheDocument();
     const phasen = screen.getByRole('list', { name: TP.uebersicht.phasen });
     expect(within(phasen).getAllByRole('listitem').map(li => li.getAttribute('aria-current'))).toEqual([null, 'step', null, null, null]);
-    expect(await screen.findByText(TP.funktionLang.kt)).toBeInTheDocument();
+    expect(await screen.findByText('Kernteam')).toBeInTheDocument();
     expect(screen.getByText(/Fachbereich/)).toBeInTheDocument();
     expect(screen.queryByRole('navigation', { name: TP.akte.reiter })).not.toBeInTheDocument();
     await expectNoAxe(container);
@@ -146,11 +149,11 @@ describe('Projektakte und Projektübersicht (UI-06)', () => {
     });
     renderWithIam(akte(), PL_ME);
     expect(await screen.findByText(TP.akte.beendet('abgeschlossen'))).toBeInTheDocument();
-    await screen.findByText(TP.funktionLang.kt);
+    await screen.findByText('Kernteam');
     expect(screen.queryByRole('button', { name: TP.org.bearbeiten })).not.toBeInTheDocument();
   });
 
-  it('Projektorganisation bearbeiten: Prüfung am Feld, Wirkung, Konflikt (412) mit neu laden, Speichern mit If-Match', async () => {
+  it('Projektorganisation bearbeiten: Prüfung am Feld, kein Zugriff, Konflikt (412) mit neu laden, Speichern mit If-Match', async () => {
     let version = 1;
     const api = stub({
       'GET /v1/projekte': () => json({ items: [projekt()], nextCursor: null }),
@@ -169,9 +172,14 @@ describe('Projektakte und Projektübersicht (UI-06)', () => {
     expect(await within(drawer).findByText(TP.org.einzeln(TP.funktion.pl))).toBeInTheDocument();
     expect(funktionen[2]).toHaveFocus();
     expect(api.calls.some(c => c.method === 'PUT')).toBe(false);
-    // Kernteam entfernen: die Wirkung nennt, wer die Rolle verliert
+    // die Projektorganisation vergibt keinen Zugriff (Master Entscheid 16)
+    expect(within(drawer).getByText(TP.org.keinZugriff)).toBeInTheDocument();
+    // weitere Funktion ohne Bezeichnung: Meldung am Feld (A-72)
+    await userEvent.click(within(drawer).getByRole('button', { name: TP.org.hinzufuegen }));
+    await userEvent.click(within(drawer).getByRole('button', { name: T.common.save }));
+    expect(await within(drawer).findByText(TP.org.textFehlt)).toBeInTheDocument();
+    await userEvent.click(within(drawer).getByRole('button', { name: TP.org.entfernen(4) }));
     await userEvent.click(within(drawer).getByRole('button', { name: TP.org.entfernen(3) }));
-    expect(within(drawer).getByText(new RegExp(TP.org.verlieren))).toBeInTheDocument();
     await userEvent.click(within(drawer).getByRole('button', { name: T.common.save }));
     expect(await within(drawer).findByText(TP.org.konflikt)).toBeInTheDocument();
     version = 2;

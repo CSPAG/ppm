@@ -6,6 +6,6 @@ export const NAV = {
   bereich: 'Meine Projekte',
   palette: { detail: 'Projekt' },
   /** Funktion in der Projektorganisation (auch Personensuche der Befehlspalette) */
-  funktion: { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL', kt: 'Kernteam', koalition: 'Sponsoren-Koalition' },
+  funktion: { sp: 'Projektauftraggeber:in', pl: 'Projektleitung', weitere: 'weitere Funktion' },
   uebersicht: 'Übersicht',
 };

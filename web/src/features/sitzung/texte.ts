@@ -61,7 +61,7 @@ export const TS = {
   rueckgaengig: 'Rückgängig',
   eingeladen: 'Eingeladen',
   keineEinladung: 'niemand eingeladen',
-  funktion: { pl: 'PL', ctl: 'CTL', sp: 'SP', weitere: 'weitere' } as Record<string, string>,
+  funktion: { pl: 'PL', sp: 'Projektauftraggeber:in', weitere: 'weitere' } as Record<string, string>,
   antrag: 'Antrag',
   minuten: (n: number) => `${n} Min.`,
   ohneZeit: 'Zeitbedarf offen',

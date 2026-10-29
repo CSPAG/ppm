@@ -77,11 +77,12 @@ export const KAPITEL: readonly { nr: number; titel: string; felder: readonly Fel
       ], neu: () => ({ dimension: 'termin', wert: null, einheit: 'kalendertage' }) },
   ] },
   { nr: 8, titel: 'Projektstruktur und Organisation', felder: [
-    { key: 'mitglieder', label: 'Rollen im Projekt', art: 'liste', eintrag: 'Rolle', hilfe: 'Sponsor, Projektleitung und CTL je höchstens eine Person; die Sponsoren-Koalition ist eine Liste (A-04).', spalten: [
-      { key: 'funktion', label: 'Rolle', art: 'auswahl', optionen: [['sp', 'Sponsor'], ['koalition', 'Sponsoren-Koalition'], ['pl', 'Projektleitung'], ['ctl', 'Clinical Transformation Lead (CTL)'], ['kt', 'Kernteam']] },
+    { key: 'mitglieder', label: 'Funktionen im Projekt', art: 'liste', eintrag: 'Funktion', hilfe: 'Projektauftraggeber:in und Projektleitung je höchstens eine Person (A-04); weitere Funktionen mit Bezeichnung, z. B. Kernteam (A-72).', spalten: [
+      { key: 'funktion', label: 'Funktion', art: 'auswahl', optionen: [['sp', 'Projektauftraggeber:in'], ['pl', 'Projektleitung'], ['weitere', 'Weitere Funktion']] },
+      { key: 'funktionText', label: 'Bezeichnung (weitere Funktion)', art: 'kurz', optional: true, max: 100 },
       { key: 'personId', label: 'Person', art: 'person' },
       { key: 'akv', label: 'AKV und Verpflichtung', art: 'kurz', optional: true, max: 2000 },
-    ], neu: () => ({ personId: '', funktion: 'kt', akv: '' }) },
+    ], neu: () => ({ personId: '', funktion: 'weitere', funktionText: '', akv: '' }) },
   ] },
   { nr: 9, titel: 'Ressourcen', felder: [
     { key: 'kosten', label: 'Kosten je Phase', art: 'liste', eintrag: 'Kostenposition', spalten: [

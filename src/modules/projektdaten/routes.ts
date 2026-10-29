@@ -279,7 +279,7 @@ function kpiWertRoutes(app: FastifyInstance): void {
   app.put('/v1/projekte/:id/kpis/:kpiId/werte/:periode', {
     schema: {
       tags: [TAG], summary: 'KPI-Wert erfassen',
-      description: 'Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, PL und CTL mit `kpi:write`, ab Phase P2, sonst 409). `If-Match: W/"0"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).',
+      description: 'Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, mit `kpi:write` am Projekt, ab Phase P2, sonst 409). `If-Match: W/"0"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).',
       params: KpiWertParams, headers: IfMatchHeaders, body: Type.Ref('KpiWertPut'), response: { 200: Type.Ref('KpiWert') },
     },
   }, async (req, reply) => {

@@ -150,7 +150,7 @@ export async function snsNachtragen(tx: Tx, s: store.SitzungRow, t: store.Trakta
   await folge(tx, t, e.ergebnis, e.begruendung, true, u && { ...u, sitzungId: s.id, vorher: null });
   if (t.projekt_id) {
     const text = `${t.titel}: Entscheid SNS-VR ${ergebnisLabel(t.art, e.ergebnis)}.`;
-    for (const p of (await store.projektleitung(tx, t.projekt_id)).filter(x => x.funktion !== 'ctl')) {
+    for (const p of await store.projektleitung(tx, t.projekt_id)) {
       await mitteilung.senden(tx, { an: p.person_id, bezug: { typ: 'traktandum', id: t.id }, text, link: sitzungLink(s.gremium_kuerzel, s.datum) });
     }
   }
@@ -190,7 +190,7 @@ export async function schliessen(tx: Tx, s: store.SitzungRow, version: number): 
   const link = sitzungLink(s.gremium_kuerzel, s.datum);
   const zeilen = new Map<string, string[]>();
   const melde = (person: string, zeile: string) => zeilen.set(person, [...(zeilen.get(person) ?? []), zeile]);
-  const leitung = async (t: store.TraktandumRow) => t.projekt_id ? (await store.projektleitung(tx, t.projekt_id)).filter(x => x.funktion !== 'ctl') : [];
+  const leitung = async (t: store.TraktandumRow) => t.projekt_id ? await store.projektleitung(tx, t.projekt_id) : [];
 
   // Protokollentwurf vor dem Umhängen der nicht behandelten Traktanden (sie erscheinen darin als «nicht behandelt»)
   await protokollErzeugen(tx, s, ts, ent, auflagen, { hatOptionen: art => optionen(art).length > 0, label: ergebnisLabel });

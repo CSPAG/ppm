@@ -13,21 +13,20 @@ export interface Row {
   phase: Phase; phasenmodell_id: string | null; lebenszyklus: Lebenszyklus; vertraulich: boolean; herkunft: Record<string, unknown>;
   version: number; created_at: Date; updated_at: Date;
   pf_schluessel: string | null; pf_name: string | null; pf_kategorie: 'A' | 'B' | 'C' | null; hf_label: string | null;
-  sponsor: string | null; projektleitung: string | null; controlling: string | null; rollen: Funktion[];
+  sponsor: string | null; projektleitung: string | null; rollen: Funktion[];
 }
 
 const T = `${SCHEMA}.projekt`;
 const P = `${SCHEMA}.projekt_person`;
 const COLS = 'id, nummer, name, portfolio_id, org_einheit_id, handlungsfeld_id, phase, phasenmodell_id, lebenszyklus, vertraulich, herkunft, version, created_at, updated_at';
 
-/** Projekt mit Portfolio, Handlungsfeld (falls sichtbar), Sponsor, Projektleitung, CTL und eigenen Funktionen. */
+/** Projekt mit Portfolio, Handlungsfeld (falls sichtbar), Projektauftraggeber:in, Projektleitung und eigenen Funktionen. */
 const SELECT = `
   SELECT ${COLS.split(', ').map(c => `p.${c}`).join(', ')},
          pf.schluessel AS pf_schluessel, pf.name AS pf_name, pf.kategorie AS pf_kategorie, hf.label AS hf_label,
          (SELECT x.person_id FROM ${P} x WHERE x.projekt_id = p.id AND x.funktion = 'sp') AS sponsor,
          (SELECT x.person_id FROM ${P} x WHERE x.projekt_id = p.id AND x.funktion = 'pl') AS projektleitung,
-         (SELECT x.person_id FROM ${P} x WHERE x.projekt_id = p.id AND x.funktion = 'ctl') AS controlling,
-         ARRAY(SELECT x.funktion FROM ${P} x WHERE x.projekt_id = p.id AND x.person_id = app.principal_id() ORDER BY x.funktion) AS rollen
+         ARRAY(SELECT DISTINCT x.funktion FROM ${P} x WHERE x.projekt_id = p.id AND x.person_id = app.principal_id() ORDER BY x.funktion) AS rollen
     FROM ${T} p
     LEFT JOIN ${SCHEMA}.portfolio pf ON pf.tenant_id = p.tenant_id AND pf.id = p.portfolio_id
     LEFT JOIN ${SCHEMA}.handlungsfeld hf ON hf.tenant_id = p.tenant_id AND hf.id = p.handlungsfeld_id`;
@@ -106,25 +105,32 @@ export async function setzen(tx: Tx, id: string, werte: { phase?: Phase; phasenm
 
 // ---------------------------------------------------------------- Projektorganisation
 
-export interface MitgliedRow { person_id: string; funktion: Funktion; akv: string; stand: number }
+export interface MitgliedRow { person_id: string; funktion: Funktion; funktion_text: string; akv: string; stand: number }
 
-/** Reihenfolge der Darstellung: Sponsor, Koalition, Projektleitung, CTL, Kernteam (Q7 Kap. 8). */
-const ORDNUNG = "array_position(ARRAY['sp', 'koalition', 'pl', 'ctl', 'kt'], funktion)";
+/** Reihenfolge der Darstellung: Projektauftraggeber:in, Projektleitung, weitere (Q7 Kap. 8). */
+const ORDNUNG = "array_position(ARRAY['sp', 'pl', 'weitere'], funktion)";
 
 export async function mitglieder(tx: Tx, projektId: string): Promise<MitgliedRow[]> {
   return (await tx.query<MitgliedRow>(
-    `SELECT person_id, funktion, akv, stand FROM ${P} WHERE projekt_id = $1 ORDER BY ${ORDNUNG}, position, created_at`, [projektId])).rows;
+    `SELECT person_id, funktion, funktion_text, akv, stand FROM ${P} WHERE projekt_id = $1 ORDER BY ${ORDNUNG}, position, created_at`, [projektId])).rows;
 }
 
 /** Ersetzt die Projektorganisation; alle Zeilen erhalten den Stand `stand`. */
-export async function ersetzen(tx: Tx, projektId: string, stand: number, liste: { personId: string; funktion: Funktion; akv: string }[]): Promise<void> {
+export async function ersetzen(tx: Tx, projektId: string, stand: number,
+  liste: { personId: string; funktion: Funktion; funktionText: string; akv: string }[]): Promise<void> {
   await tx.query(`DELETE FROM ${P} WHERE projekt_id = $1`, [projektId]);
   if (!liste.length) return;
   await tx.query(
-    `INSERT INTO ${P} (tenant_id, projekt_id, person_id, funktion, akv, position, stand)
-     SELECT app.tenant_id(), $1, x.person_id, x.funktion, x.akv, x.pos - 1, $2
-       FROM unnest($3::uuid[], $4::text[], $5::text[]) WITH ORDINALITY AS x (person_id, funktion, akv, pos)`,
-    [projektId, stand, liste.map(m => m.personId), liste.map(m => m.funktion), liste.map(m => m.akv)]);
+    `INSERT INTO ${P} (tenant_id, projekt_id, person_id, funktion, funktion_text, akv, position, stand)
+     SELECT app.tenant_id(), $1, x.person_id, x.funktion, x.funktion_text, x.akv, x.pos - 1, $2
+       FROM unnest($3::uuid[], $4::text[], $5::text[], $6::text[]) WITH ORDINALITY AS x (person_id, funktion, funktion_text, akv, pos)`,
+    [projektId, stand, liste.map(m => m.personId), liste.map(m => m.funktion), liste.map(m => m.funktionText), liste.map(m => m.akv)]);
+}
+
+/** Bisher verwendete Bezeichnungen weiterer Funktionen der Organisation, häufigste zuerst (Vorschläge, A-72). */
+export async function funktionstexte(tx: Tx, limit = 20): Promise<string[]> {
+  return (await tx.query<{ t: string }>(
+    `SELECT min(funktion_text) AS t FROM ${P} WHERE funktion = 'weitere' GROUP BY lower(funktion_text) ORDER BY count(*) DESC, 1 LIMIT $1`, [limit])).rows.map(r => r.t);
 }
 
 /** Personen, die es in der Organisation gibt und die nicht entfernt sind (Benutzer, keine Maschinen-Clients). */

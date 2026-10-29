@@ -5618,7 +5618,6 @@
           "vertraulich",
           "sponsor",
           "projektleitung",
-          "controlling",
           "rollen",
           "version",
           "createdAt",
@@ -5754,7 +5753,7 @@
             "description": "`aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`)."
           },
           "vertraulich": {
-            "description": "Sichtbar nur für Projektrollen, UE und Gremium des Portfolios (A-34).",
+            "description": "Sichtbar nur für Personen mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13).",
             "type": "boolean"
           },
           "sponsor": {
@@ -5783,19 +5782,6 @@
               }
             ]
           },
-          "controlling": {
-            "anyOf": [
-              {
-                "enum": [
-                  null
-                ]
-              },
-              {
-                "format": "uuid",
-                "type": "string"
-              }
-            ]
-          },
           "rollen": {
             "description": "Eigene Funktionen der anfragenden Person in der Projektorganisation.",
             "type": "array",
@@ -5804,11 +5790,9 @@
               "enum": [
                 "sp",
                 "pl",
-                "ctl",
-                "kt",
-                "koalition"
+                "weitere"
               ],
-              "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+              "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
             }
           },
           "version": {
@@ -5984,6 +5968,7 @@
         "required": [
           "personId",
           "funktion",
+          "funktionText",
           "akv"
         ],
         "properties": {
@@ -5996,11 +5981,14 @@
             "enum": [
               "sp",
               "pl",
-              "ctl",
-              "kt",
-              "koalition"
+              "weitere"
             ],
-            "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+            "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
+          },
+          "funktionText": {
+            "maxLength": 100,
+            "description": "Bezeichnung der Funktion bei `weitere`, z. B. «Kernteam» oder «PMO»; sonst leer.",
+            "type": "string"
           },
           "akv": {
             "description": "Aufgaben, Kompetenzen, Verantwortung.",
@@ -6014,6 +6002,7 @@
         "required": [
           "version",
           "mitglieder",
+          "vorschlaege",
           "can"
         ],
         "properties": {
@@ -6023,10 +6012,17 @@
             "type": "integer"
           },
           "mitglieder": {
-            "description": "In der Reihenfolge Sponsor, Koalition, Projektleitung, CTL, Kernteam.",
+            "description": "In der Reihenfolge Projektauftraggeber:in, Projektleitung, weitere.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Mitglied"
+            }
+          },
+          "vorschlaege": {
+            "description": "Bisher verwendete Bezeichnungen weiterer Funktionen in der Organisation, häufigste zuerst (Vorschläge für `funktionText`, A-72).",
+            "type": "array",
+            "items": {
+              "type": "string"
             }
           },
           "can": {
@@ -6052,7 +6048,7 @@
         "properties": {
           "mitglieder": {
             "maxItems": 100,
-            "description": "Sponsor, Projektleitung und CTL höchstens je eine Person.",
+            "description": "Projektauftraggeber:in und Projektleitung höchstens je eine Person; `weitere` mit Text.",
             "type": "array",
             "items": {
               "additionalProperties": false,
@@ -6071,11 +6067,14 @@
                   "enum": [
                     "sp",
                     "pl",
-                    "ctl",
-                    "kt",
-                    "koalition"
+                    "weitere"
                   ],
-                  "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+                  "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
+                },
+                "funktionText": {
+                  "maxLength": 100,
+                  "description": "Bezeichnung der Funktion bei `weitere`, z. B. «Kernteam» oder «PMO»; sonst leer.",
+                  "type": "string"
                 },
                 "akv": {
                   "maxLength": 2000,
@@ -6137,11 +6136,9 @@
               "enum": [
                 "sp",
                 "pl",
-                "ctl",
-                "kt",
-                "koalition"
+                "weitere"
               ],
-              "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+              "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
             }
           }
         }
@@ -6223,11 +6220,9 @@
                         "enum": [
                           "sp",
                           "pl",
-                          "ctl",
-                          "kt",
-                          "koalition"
+                          "weitere"
                         ],
-                        "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+                        "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
                       }
                     }
                   }
@@ -11741,10 +11736,9 @@
             "enum": [
               "sp",
               "pl",
-              "ctl",
               "weitere"
             ],
-            "description": "Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person."
+            "description": "Funktion im Projekt: `sp` Projektauftraggeber:in, `pl` Projektleitung oder `weitere` Person."
           }
         }
       },
@@ -12533,10 +12527,9 @@
                   "enum": [
                     "sp",
                     "pl",
-                    "ctl",
                     "weitere"
                   ],
-                  "description": "Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person."
+                  "description": "Funktion im Projekt: `sp` Projektauftraggeber:in, `pl` Projektleitung oder `weitere` Person."
                 }
               }
             }
@@ -18865,18 +18858,12 @@
             "description": "Person aus dem Verzeichnis."
           },
           "funktion": {
-            "description": "Sponsor, Sponsoren-Koalition, Projektleitung, CTL oder Kernteam.",
+            "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText`.",
             "anyOf": [
               {
                 "type": "string",
                 "enum": [
                   "sp"
-                ]
-              },
-              {
-                "type": "string",
-                "enum": [
-                  "koalition"
                 ]
               },
               {
@@ -18888,16 +18875,15 @@
               {
                 "type": "string",
                 "enum": [
-                  "ctl"
-                ]
-              },
-              {
-                "type": "string",
-                "enum": [
-                  "kt"
+                  "weitere"
                 ]
               }
             ]
+          },
+          "funktionText": {
+            "maxLength": 100,
+            "description": "Bezeichnung der weiteren Funktion (z. B. Kernteam); nur bei `weitere`, dort Pflicht.",
+            "type": "string"
           },
           "akv": {
             "maxLength": 2000,
@@ -19740,7 +19726,7 @@
         "properties": {
           "mitglieder": {
             "maxItems": 200,
-            "description": "Wer welche Rolle im Projekt übernimmt.",
+            "description": "Wer welche Funktion im Projekt übernimmt.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MitgliedPlan"
@@ -20562,7 +20548,7 @@
                   },
                   "anzahl": {
                     "minimum": 0,
-                    "description": "Unterzeichnete Funktionen («2 von 3»).",
+                    "description": "Unterzeichnete Funktionen («1 von 2»).",
                     "type": "integer"
                   },
                   "vollstaendig": {
@@ -20583,10 +20569,9 @@
                           "type": "string",
                           "enum": [
                             "sp",
-                            "pl",
-                            "ctl"
+                            "pl"
                           ],
-                          "description": "Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10)."
+                          "description": "Funktion der Unterschrift: `sp` Projektauftraggeber:in, `pl` Projektleitung (UC-002 Schritt 10)."
                         },
                         "personen": {
                           "description": "Inhaber der Funktion in der Projektorganisation.",
@@ -20684,10 +20669,9 @@
                       "type": "string",
                       "enum": [
                         "sp",
-                        "pl",
-                        "ctl"
+                        "pl"
                       ],
-                      "description": "Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10)."
+                      "description": "Funktion der Unterschrift: `sp` Projektauftraggeber:in, `pl` Projektleitung (UC-002 Schritt 10)."
                     },
                     "inVertretungVon": {
                       "anyOf": [
@@ -51696,15 +51680,13 @@
               "enum": [
                 "sp",
                 "pl",
-                "ctl",
-                "kt",
-                "koalition"
+                "weitere"
               ]
             },
             "in": "query",
             "name": "rolle",
             "required": false,
-            "description": "`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition."
+            "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
           },
           {
             "schema": {
@@ -52405,7 +52387,7 @@
         "tags": [
           "Projekte"
         ],
-        "description": "Sponsor, Sponsoren-Koalition, Projektleitung, CTL und Kernteam mit AKV (PP.04.04).",
+        "description": "Projektauftraggeber:in, Projektleitung und weitere Funktionen (freier Text) mit AKV (PP.04.04, A-72); dazu Vorschläge für weitere Funktionen. Die Projektorganisation ist ein Projektergebnis und vergibt keinen Zugriff (Master Entscheid 16).",
         "parameters": [
           {
             "schema": {
@@ -52505,7 +52487,7 @@
         "tags": [
           "Projekte"
         ],
-        "description": "Ersetzt die Projektorganisation (UC-002 Schritt 2) und gibt den benannten Personen ihre Rolle am Projekt (Sponsor, Projektleitung, CTL, Kernteam); entfernte verlieren sie. Nur mit `If-Match` (Stand der Projektorganisation).",
+        "description": "Ersetzt die Projektorganisation (UC-002 Schritt 2): Projektauftraggeber:in und Projektleitung je höchstens eine Person, weitere Funktionen mit `funktionText`. Ändert den Zugriff nicht (Master Entscheid 16); den vergibt `/v1/access`. Nur mit `If-Match` (Stand der Projektorganisation).",
         "requestBody": {
           "required": true,
           "content": {
@@ -56707,7 +56689,7 @@
         "tags": [
           "Projektdaten"
         ],
-        "description": "Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, PL und CTL mit `kpi:write`, ab Phase P2, sonst 409). `If-Match: W/\"0\"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).",
+        "description": "Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, mit `kpi:write` am Projekt, ab Phase P2, sonst 409). `If-Match: W/\"0\"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).",
         "requestBody": {
           "required": true,
           "content": {
@@ -64041,7 +64023,7 @@
         "tags": [
           "Sitzungen"
         ],
-        "description": "Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an PL, CTL, SP werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.",
+        "description": "Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an Projektleitung und Projektauftraggeber:in werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.",
         "requestBody": {
           "required": true,
           "content": {
@@ -65033,7 +65015,7 @@
         "tags": [
           "Sitzungen"
         ],
-        "description": "Ersetzt die Eingeladenen des Traktandums (vorgesetzt PL, CTL, SP, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.",
+        "description": "Ersetzt die Eingeladenen des Traktandums (vorgesetzt Projektleitung und Projektauftraggeber:in, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.",
         "requestBody": {
           "required": true,
           "content": {
@@ -72896,7 +72878,7 @@
         "tags": [
           "Projektvertrag"
         ],
-        "description": "Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Sponsor, Projektleitung und CTL erhalten je eine Aufgabe (UC-002 Schritt 9); fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). `If-Match` = Version der Vertragsversion.",
+        "description": "Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Projektauftraggeber:in und Projektleitung erhalten je eine Aufgabe (UC-002 Schritt 9); fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). `If-Match` = Version der Vertragsversion.",
         "requestBody": {
           "required": true,
           "content": {
@@ -73037,7 +73019,7 @@
         "tags": [
           "Projektvertrag"
         ],
-        "description": "Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (SP, PL, CTL), die sie innehat oder in Vertretung mit Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.",
+        "description": "Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (Projektauftraggeber:in, Projektleitung), die sie innehat oder in Vertretung mit Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.",
         "requestBody": {
           "required": true,
           "content": {
@@ -86178,7 +86160,7 @@
     },
     {
       "name": "Projekte",
-      "description": "Projekte mit Nummer, Portfolio, Phase und Lebenszyklus, Projektorganisation mit Sponsor, Projektleitung, CTL und Kernteam."
+      "description": "Projekte mit Nummer, Portfolio, Phase und Lebenszyklus, Projektorganisation mit Projektauftraggeber:in, Projektleitung und weiteren Funktionen."
     },
     {
       "name": "Projektdaten",

@@ -32,18 +32,28 @@ function Phasenleiste({ phase }: { phase: Phase }) {
   );
 }
 
-const ORDNUNG = ['sp', 'koalition', 'pl', 'ctl', 'kt'] as const;
+/** Gruppen der Projektorganisation: Projektauftraggeber:in, Projektleitung, danach je Bezeichnung (A-72) in der Reihenfolge der Liste. */
+function gruppen(org: Organisation): { titel: string; mitglieder: Organisation['mitglieder'] }[] {
+  const out = new Map<string, { titel: string; mitglieder: Organisation['mitglieder'] }>();
+  for (const m of [...org.mitglieder].sort((a, b) => Number(a.funktion !== 'sp') - Number(b.funktion !== 'sp') || Number(a.funktion !== 'pl') - Number(b.funktion !== 'pl'))) {
+    const titel = m.funktion === 'weitere' ? m.funktionText : TP.funktionLang[m.funktion];
+    const k = titel.toLowerCase();
+    if (!out.has(k)) out.set(k, { titel, mitglieder: [] });
+    out.get(k)!.mitglieder.push(m);
+  }
+  return [...out.values()];
+}
 
 function OrganisationListe({ org }: { org: Organisation }) {
   if (!org.mitglieder.length) return <p className="empty">{TP.org.leer}</p>;
   return (
     <dl className="attrs pj-org">
-      {ORDNUNG.filter(f => org.mitglieder.some(m => m.funktion === f)).map(f => (
-        <div key={f} className="pj-org-g">
-          <dt>{TP.funktionLang[f]}</dt>
+      {gruppen(org).map(g => (
+        <div key={g.titel} className="pj-org-g">
+          <dt>{g.titel}</dt>
           <dd>
             <ul>
-              {org.mitglieder.filter(m => m.funktion === f).map(m => (
+              {g.mitglieder.map(m => (
                 <li key={m.personId}><PersonName id={m.personId} />{m.akv ? <span className="muted small"> · {m.akv}</span> : null}</li>
               ))}
             </ul>

@@ -4,24 +4,27 @@
  * (`vertrag:review`, `vertrag:sign`) prüft die Route vorher.
  *
  * Stände (fachmodell.md 2.10): «in Prüfung» → bestätigt: «zur Unterzeichnung» | Rückmeldung: «in Arbeit»;
- * «zur Unterzeichnung» → alle drei (SP, PL, CTL): «unterzeichnet» | verweigert: «in Arbeit».
+ * «zur Unterzeichnung» → beide (Projektauftraggeber:in, Projektleitung): «unterzeichnet» | verweigert: «in Arbeit».
  */
 import { conflict, type Tx } from '@vollholz/platform';
 import { aufgabe, stellvertretung } from '../eingang/index.ts';
 import { SCHEMA } from '../../platform.ts';
 import * as store from './store.ts';
 
-/** Funktionen, die den Vertrag unterzeichnen (UC-002 Schritt 10; A-04: eine Unterschrift für Auftraggeber/Sponsor). */
-export const FUNKTIONEN = ['sp', 'pl', 'ctl'] as const;
+/**
+ * Funktionen, die den Vertrag unterzeichnen (UC-002 Schritt 10; A-04): Projektauftraggeber:in und Projektleitung. Die CTL
+ * unterzeichnet nicht mehr (Master Entscheid 17); ihre früheren Unterschriften bleiben im Verlauf.
+ */
+export const FUNKTIONEN = ['sp', 'pl'] as const;
 export type Funktion = (typeof FUNKTIONEN)[number];
-export const FUNKTION_TEXT: Record<Funktion, string> = { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL' };
+export const FUNKTION_TEXT: Record<Funktion, string> = { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' };
 
 const Q = `${SCHEMA}.quality_check`;
 const U = `${SCHEMA}.unterschrift`;
 
 export interface QualityCheckRow { id: string; version_id: string; ergebnis: 'bestaetigt' | 'rueckmeldung'; kommentare: Record<string, string>; at: Date; by_person: string }
 export interface UnterschriftRow {
-  id: string; quality_check_id: string; funktion: Funktion; person_id: string; in_vertretung_von: string | null;
+  id: string; quality_check_id: string; funktion: Funktion | 'ctl'; person_id: string; in_vertretung_von: string | null;
   ergebnis: 'unterzeichnet' | 'verweigert'; begruendung: string; at: Date;
 }
 
@@ -45,14 +48,14 @@ export async function durchgang(tx: Tx, versionId: string): Promise<QualityCheck
 }
 
 /**
- * Wer unterzeichnet: Personen der Projektorganisation in den Funktionen SP, PL, CTL (PP.04.04, Tabelle von AP-E0-4).
+ * Wer unterzeichnet: Personen der Projektorganisation in den Funktionen Projektauftraggeber:in und Projektleitung (PP.04.04).
  * Nur lesend; das Modul projekt bietet dafür (noch) keine Abfrage über `index.ts`.
  */
 export async function unterzeichnende(tx: Tx, projektId: string): Promise<Record<Funktion, string[]>> {
   const rows = (await tx.query<{ funktion: Funktion; person_id: string }>(
     `SELECT funktion, person_id FROM ${SCHEMA}.projekt_person WHERE projekt_id = $1 AND funktion = ANY ($2::text[]) ORDER BY position, created_at`,
     [projektId, FUNKTIONEN])).rows;
-  const out: Record<Funktion, string[]> = { sp: [], pl: [], ctl: [] };
+  const out: Record<Funktion, string[]> = { sp: [], pl: [] };
   for (const r of rows) out[r.funktion].push(r.person_id);
   return out;
 }
@@ -105,7 +108,7 @@ async function ueberarbeitenOeffnen(tx: Tx, p: store.ProjektKopf, v: store.Versi
 }
 
 /**
- * Quality-Check erfassen (DM.02.05): bestätigt → Unterzeichnungsaufgaben an SP, PL und CTL (UC-002 Schritt 9, UC-003
+ * Quality-Check erfassen (DM.02.05): bestätigt → Unterzeichnungsaufgaben an Projektauftraggeber:in und PL (UC-002 Schritt 9, UC-003
  * Schritt 7); Rückmeldung → zurück an die Projektleitung mit den Kommentaren je Kapitel (UC-002 A5, UC-003 A4).
  */
 export async function qualityCheckErfassen(tx: Tx, o: {
@@ -157,7 +160,7 @@ export async function unterzeichnen(tx: Tx, o: {
   const vorher = await unterschriften(tx, dg.id);
   const funktionen = await offeneFunktionen(tx, o.person, soll, vorher);
   if (!funktionen.length) {
-    throw conflict('Du hast keine offene Unterschrift für diese Version: Du hast bereits unterzeichnet, oder du bist weder Sponsor, Projektleitung noch CTL des Projekts.',
+    throw conflict('Du hast keine offene Unterschrift für diese Version: Du hast bereits unterzeichnet, oder du bist weder Projektauftraggeber:in noch Projektleitung des Projekts.',
       { reason: 'unterschrift' });
   }
   // Version ändert sich mit jeder Unterschrift (If-Match schützt vor gleichzeitigem Entscheid)

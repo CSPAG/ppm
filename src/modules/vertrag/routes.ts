@@ -132,13 +132,16 @@ async function pruefeInhalt(tx: Tx, nr: number, inhalt: unknown, zielLesen: Ziel
     });
   }
   if (nr === 8) {
-    const liste = i.mitglieder as { personId: string; funktion: string }[];
+    const liste = i.mitglieder as { personId: string; funktion: string; funktionText?: string }[];
     const da = await store.personenVorhanden(tx, [...new Set(liste.map(m => m.personId))]);
     const einzeln = new Set<string>();
     liste.forEach((m, n) => {
       if (!da.has(m.personId)) fehler.push({ path: `/inhalt/mitglieder/${n}/personId`, message: 'Diese Person gibt es in der Organisation nicht.' });
-      if (['sp', 'pl', 'ctl'].includes(m.funktion)) {
-        if (einzeln.has(m.funktion)) fehler.push({ path: `/inhalt/mitglieder/${n}/funktion`, message: 'Sponsor, Projektleitung und CTL je höchstens eine Person (A-04).' });
+      const text = (m.funktionText ?? '').trim();
+      if (m.funktion === 'weitere' && !text) fehler.push({ path: `/inhalt/mitglieder/${n}/funktionText`, message: 'Gib die Funktion an, z. B. Kernteam.' });
+      if (m.funktion !== 'weitere' && text) fehler.push({ path: `/inhalt/mitglieder/${n}/funktionText`, message: 'Text nur bei weiteren Funktionen.' });
+      if (m.funktion === 'sp' || m.funktion === 'pl') {
+        if (einzeln.has(m.funktion)) fehler.push({ path: `/inhalt/mitglieder/${n}/funktion`, message: 'Projektauftraggeber:in und Projektleitung je höchstens eine Person (A-04).' });
         einzeln.add(m.funktion);
       }
     });

@@ -1,13 +1,13 @@
 /**
  * Fachaktionen am Projekt, gemeinsam für die Routen und die oberen Module (über `index.ts`): Anlegen mit Nummer (A-47),
- * Projektorganisation mit Tupeln (PP.04.04, UC-002 Schritt 2, UC-016 Schritt 2), Lebenszyklus und Phase. Jede Aktion
+ * Projektorganisation (PP.04.04, UC-002 Schritt 2), Zugriff beim Anlegen vorschlagen (UC-016), Lebenszyklus und Phase. Jede Aktion
  * schreibt Audit und Ereignis in der Transaktion des Aufrufers; die Rechte prüft der Aufrufer (Route bzw. Modul), die
  * Lesesicht (RLS) gilt zusätzlich.
  */
 import type { TupleStore } from '@vollholz/iam';
 import { conflict, invalid, notFound, preconditionFailed, type Actor, type Db, type Tx } from '@vollholz/platform';
 import { record } from '../../platform.ts';
-import { ENDZUSTAENDE, ROLLE_JE_FUNKTION, type Funktion, type Lebenszyklus, type Phase, type ProjektCreateIn } from './schemas.ts';
+import { ENDZUSTAENDE, VORSCHLAG_JE_FUNKTION, type Funktion, type Lebenszyklus, type Phase, type ProjektCreateIn } from './schemas.ts';
 import * as store from './store.ts';
 
 /** Daten für Audit und Ereignis. */
@@ -99,23 +99,35 @@ export async function phaseSetzen(tx: Tx, who: Actor, id: string, phase: Phase, 
 
 // ---------------------------------------------------------------- Projektorganisation
 
-export interface Mitglied { personId: string; funktion: Funktion; akv?: string }
+export interface Mitglied { personId: string; funktion: Funktion; funktionText?: string; akv?: string }
 
 /** Stand der Projektorganisation (ETag): höchster Stand der Zeilen, 0 ohne Mitglieder. */
 export const standVon = (rows: store.MitgliedRow[]) => rows.reduce((m, r) => Math.max(m, r.stand), 0);
 
-/** Eingaben prüfen: Sponsor, Projektleitung und CTL je höchstens einmal (A-04), keine Doppel, nur bestehende Personen. */
+/** Bezeichnung der Funktion: fest für `sp` und `pl`, sonst der freie Text (A-72). */
+export const funktionBezeichnung = (funktion: Funktion, text = '') => funktion === 'weitere' ? text : FUNKTION_TEXT[funktion];
+const FUNKTION_TEXT: Record<'sp' | 'pl', string> = { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' };
+
+/** Text der Funktion bereinigen: nur bei `weitere`, ohne Rand. */
+const textVon = (m: Mitglied) => m.funktion === 'weitere' ? (m.funktionText ?? '').trim() : '';
+
+/**
+ * Eingaben prüfen: Projektauftraggeber:in und Projektleitung je höchstens einmal (A-04), weitere Funktionen mit Text
+ * (A-72), keine Doppel, nur bestehende Personen.
+ */
 async function pruefe(tx: Tx, liste: Mitglied[]): Promise<void> {
   const fehler: { path: string; message: string }[] = [];
   const gesehen = new Set<string>();
-  const einzeln = new Map<Funktion, number>();
+  const einzeln = new Set<Funktion>();
   liste.forEach((m, i) => {
-    const k = `${m.funktion}:${m.personId}`;
+    const text = textVon(m);
+    if (m.funktion === 'weitere' && !text) fehler.push({ path: `/mitglieder/${i}/funktionText`, message: 'Gib die Funktion an, z. B. Kernteam.' });
+    const k = `${m.funktion}:${text.toLowerCase()}:${m.personId}`;
     if (gesehen.has(k)) fehler.push({ path: `/mitglieder/${i}`, message: 'Diese Person steht schon mit dieser Funktion in der Projektorganisation.' });
     gesehen.add(k);
-    if (m.funktion === 'sp' || m.funktion === 'pl' || m.funktion === 'ctl') {
+    if (m.funktion === 'sp' || m.funktion === 'pl') {
       if (einzeln.has(m.funktion)) fehler.push({ path: `/mitglieder/${i}/funktion`, message: `${FUNKTION_TEXT[m.funktion]}: höchstens eine Person.` });
-      einzeln.set(m.funktion, i);
+      einzeln.add(m.funktion);
     }
   });
   const vorhanden = await store.personenVorhanden(tx, [...new Set(liste.map(m => m.personId))]);
@@ -123,15 +135,12 @@ async function pruefe(tx: Tx, liste: Mitglied[]): Promise<void> {
   if (fehler.length) throw invalid('Die Projektorganisation ist nicht vollständig gültig.', fehler);
 }
 
-const FUNKTION_TEXT: Record<Funktion, string> = { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL', kt: 'Kernteam', koalition: 'Sponsoren-Koalition' };
-
 /**
- * Projektorganisation festlegen (PP.04.04, UC-002 Schritt 2): ersetzt die Liste und gleicht die Rollen am Projekt als
- * Tupel ab (fachmodell.md 3.3) – neue Funktionen erhalten das Tupel, entfernte verlieren es. Befristete Tupel (Stellvertretung)
- * bleiben unberührt; besteht für eine neue Funktion schon ein befristetes, gilt es danach unbefristet.
+ * Projektorganisation festlegen (PP.04.04, UC-002 Schritt 2): ersetzt die Liste. Sie ist ein Projektergebnis und
+ * vergibt keinen Zugriff (Master Entscheid 16, A-71); den Zugriff regelt der Bereich «Zugriff» (UC-016).
  * `version`: erwarteter Stand (If-Match), sonst 412.
  */
-export async function organisationFestlegen(tx: Tx, o: { tuples: TupleStore; who: Actor; principalId: string }, id: string, version: number, liste: Mitglied[]): Promise<store.MitgliedRow[]> {
+export async function organisationFestlegen(tx: Tx, o: { who: Actor }, id: string, version: number, liste: Mitglied[]): Promise<store.MitgliedRow[]> {
   const projekt = await store.get(tx, id);
   if (!projekt) throw notFound('Projekt');
   pruefeAenderbar(projekt);
@@ -139,34 +148,31 @@ export async function organisationFestlegen(tx: Tx, o: { tuples: TupleStore; who
   const stand = standVon(before);
   if (stand !== version) throw preconditionFailed(stand);
   await pruefe(tx, liste);
-  await store.ersetzen(tx, id, stand + 1, liste.map(m => ({ personId: m.personId, funktion: m.funktion, akv: (m.akv ?? '').trim() })));
-
-  // Schlüssel Person und Rolle: Projektleitung und CTL derselben Person ergeben ein Tupel «projekt-fuehren»
-  const schluessel = (person: string, funktion: Funktion) => { const r = ROLLE_JE_FUNKTION[funktion]; return r ? `${person}:${r}` : null; };
-  const alt = new Set(before.map(r => schluessel(r.person_id, r.funktion)).filter((k): k is string => k !== null));
-  const neu = new Set(liste.map(m => schluessel(m.personId, m.funktion)).filter((k): k is string => k !== null));
-  const tupel = async (person: string, rolle: string) =>
-    (await o.tuples.ofSubject(tx, `user:${person}`)).find(t => t.object_type === 'projekt' && t.object_id === id && t.relation === rolle) ?? null;
-  for (const k of alt) {
-    if (neu.has(k)) continue;
-    const [person, rolle] = k.split(':') as [string, string];
-    const t = await tupel(person, rolle);
-    if (t && !t.expires_at) await o.tuples.revoke(tx, t.id, o.who);
-  }
-  for (const k of neu) {
-    if (alt.has(k)) continue;
-    const [person, rolle] = k.split(':') as [string, string];
-    const t = await tupel(person, rolle);
-    if (!t) await o.tuples.grant(tx, { subject: `user:${person}`, relation: rolle, place: { type: 'projekt', id }, createdBy: o.principalId }, o.who);
-    else if (t.expires_at) await o.tuples.setExpiry(tx, t.id, null, o.who);
-  }
+  await store.ersetzen(tx, id, stand + 1, liste.map(m => ({ personId: m.personId, funktion: m.funktion, funktionText: textVon(m), akv: (m.akv ?? '').trim() })));
 
   const after = await store.mitglieder(tx, id);
-  const daten = (rows: store.MitgliedRow[]) => rows.map(r => ({ personId: r.person_id, funktion: r.funktion, akv: r.akv }));
+  const daten = (rows: store.MitgliedRow[]) => rows.map(r => ({ personId: r.person_id, funktion: r.funktion, funktionText: r.funktion_text, akv: r.akv }));
   await record(tx, o.who, {
     action: 'projekt.organisation_changed', resourceType: 'projekt', resourceId: id,
     data: { nummer: projekt.nummer, before: daten(before), after: daten(after) },
     event: { id, nummer: projekt.nummer, version: standVon(after), mitglieder: daten(after) },
   });
   return after;
+}
+
+/**
+ * Zugriff beim Anlegen vorschlagen (UC-016, A-71): Projektauftraggeber:in erhält «Projekt steuern», die Projektleitung
+ * «Projekt führen» am Projekt; besteht die Freigabe schon, bleibt sie. Nur beim Anlegen (Freigabe, Übernahme); spätere
+ * Änderungen der Projektorganisation ändern den Zugriff nicht.
+ */
+export async function zugriffVorschlagen(tx: Tx, o: { tuples: TupleStore; who: Actor; principalId: string }, id: string, liste: Mitglied[]): Promise<void> {
+  for (const m of liste) {
+    if (m.funktion === 'weitere') continue;
+    try {
+      await o.tuples.grant(tx, { subject: `user:${m.personId}`, relation: VORSCHLAG_JE_FUNKTION[m.funktion], place: { type: 'projekt', id }, createdBy: o.principalId }, o.who);
+    } catch (e) {
+      // gleiche Freigabe besteht (der Baukasten prüft nach dem Einfügen, die Transaktion bleibt gültig)
+      if ((e as { status?: number }).status !== 409) throw e;
+    }
+  }
 }

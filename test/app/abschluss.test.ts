@@ -11,7 +11,7 @@ import { abschlussPruefen } from '../../src/modules/abschluss/aufgabe-job.ts';
 import { nachGate } from '../../src/modules/abschluss/folge.ts';
 import { _abmelden } from '../../src/modules/abschluss/lessons-haken.ts';
 import { lessonsLearned } from '../../src/modules/abschluss/index.ts';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
@@ -80,8 +80,12 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
       const p = (await ok('ue', 'POST', '/v1/projekte', { name, portfolioId: portfolio, phase }, {}, 201)).body;
       pj[k] = { id: p.id, nummer: p.nummer };
       await ok('ue', 'PUT', `/v1/projekte/${p.id}/organisation`, { mitglieder: [
-        { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.kt, funktion: 'kt', akv: '' },
+        { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.kt, funktion: 'weitere', funktionText: 'Kernteam', akv: '' },
       ] }, { 'if-match': 'W/"0"' });
+      // Zugriff getrennt von der Projektorganisation (Master Entscheid 16)
+      for (const [f, rolle] of [['sp', 'projekt-steuern'], ['pl', 'projekt-fuehren'], ['kt', 'projekt-mitlesen']] as const) {
+        await grant(api, T, `user:${id[f]}`, rolle, { type: 'projekt', id: p.id });
+      }
     }
   });
   after(async () => { await api?.close(); });

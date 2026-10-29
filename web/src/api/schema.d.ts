@@ -15587,8 +15587,8 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description `sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition. */
-                    rolle?: "sp" | "pl" | "ctl" | "kt" | "koalition";
+                    /** @description `sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO). */
+                    rolle?: "sp" | "pl" | "weitere";
                     /** @description Schlüssel des Portfolios (z. B. `transformation`). */
                     portfolio?: string;
                     /** @description Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss). */
@@ -16183,7 +16183,7 @@ export interface paths {
         };
         /**
          * Projektorganisation lesen
-         * @description Sponsor, Sponsoren-Koalition, Projektleitung, CTL und Kernteam mit AKV (PP.04.04).
+         * @description Projektauftraggeber:in, Projektleitung und weitere Funktionen (freier Text) mit AKV (PP.04.04, A-72); dazu Vorschläge für weitere Funktionen. Die Projektorganisation ist ein Projektergebnis und vergibt keinen Zugriff (Master Entscheid 16).
          */
         get: {
             parameters: {
@@ -16272,7 +16272,7 @@ export interface paths {
         };
         /**
          * Projektorganisation festlegen
-         * @description Ersetzt die Projektorganisation (UC-002 Schritt 2) und gibt den benannten Personen ihre Rolle am Projekt (Sponsor, Projektleitung, CTL, Kernteam); entfernte verlieren sie. Nur mit `If-Match` (Stand der Projektorganisation).
+         * @description Ersetzt die Projektorganisation (UC-002 Schritt 2): Projektauftraggeber:in und Projektleitung je höchstens eine Person, weitere Funktionen mit `funktionText`. Ändert den Zugriff nicht (Master Entscheid 16); den vergibt `/v1/access`. Nur mit `If-Match` (Stand der Projektorganisation).
          */
         put: {
             parameters: {
@@ -19785,7 +19785,7 @@ export interface paths {
         get?: never;
         /**
          * KPI-Wert erfassen
-         * @description Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, PL und CTL mit `kpi:write`, ab Phase P2, sonst 409). `If-Match: W/"0"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).
+         * @description Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, mit `kpi:write` am Projekt, ab Phase P2, sonst 409). `If-Match: W/"0"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).
          */
         put: {
             parameters: {
@@ -26503,7 +26503,7 @@ export interface paths {
         };
         /**
          * Traktandum aufnehmen oder einplanen
-         * @description Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an PL, CTL, SP werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.
+         * @description Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an Projektleitung und Projektauftraggeber:in werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.
          */
         post: {
             parameters: {
@@ -27300,7 +27300,7 @@ export interface paths {
         get?: never;
         /**
          * Eingeladene festlegen
-         * @description Ersetzt die Eingeladenen des Traktandums (vorgesetzt PL, CTL, SP, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.
+         * @description Ersetzt die Eingeladenen des Traktandums (vorgesetzt Projektleitung und Projektauftraggeber:in, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.
          */
         put: {
             parameters: {
@@ -33847,7 +33847,7 @@ export interface paths {
         put?: never;
         /**
          * Quality-Check erfassen
-         * @description Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Sponsor, Projektleitung und CTL erhalten je eine Aufgabe (UC-002 Schritt 9); fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). `If-Match` = Version der Vertragsversion.
+         * @description Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Projektauftraggeber:in und Projektleitung erhalten je eine Aufgabe (UC-002 Schritt 9); fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). `If-Match` = Version der Vertragsversion.
          */
         post: {
             parameters: {
@@ -33976,7 +33976,7 @@ export interface paths {
         put?: never;
         /**
          * Unterzeichnen oder verweigern
-         * @description Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (SP, PL, CTL), die sie innehat oder in Vertretung mit Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.
+         * @description Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (Projektauftraggeber:in, Projektleitung), die sie innehat oder in Vertretung mit Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.
          */
         post: {
             parameters: {
@@ -46988,13 +46988,12 @@ export interface components {
              * @enum {string}
              */
             lebenszyklus: "aktiv" | "sistiert" | "abgebrochen" | "abgeschlossen" | "zurueckgezogen";
-            /** @description Sichtbar nur für Projektrollen, UE und Gremium des Portfolios (A-34). */
+            /** @description Sichtbar nur für Personen mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13). */
             vertraulich: boolean;
             sponsor: null | string;
             projektleitung: null | string;
-            controlling: null | string;
             /** @description Eigene Funktionen der anfragenden Person in der Projektorganisation. */
-            rollen: ("sp" | "pl" | "ctl" | "kt" | "koalition")[];
+            rollen: ("sp" | "pl" | "weitere")[];
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -47041,33 +47040,39 @@ export interface components {
             /** Format: uuid */
             personId: string;
             /**
-             * @description `sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition.
+             * @description `sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO).
              * @enum {string}
              */
-            funktion: "sp" | "pl" | "ctl" | "kt" | "koalition";
+            funktion: "sp" | "pl" | "weitere";
+            /** @description Bezeichnung der Funktion bei `weitere`, z. B. «Kernteam» oder «PMO»; sonst leer. */
+            funktionText: string;
             /** @description Aufgaben, Kompetenzen, Verantwortung. */
             akv: string;
         };
         Organisation: {
             /** @description Stand der Projektorganisation (ETag); 0 ohne Mitglieder. */
             version: number;
-            /** @description In der Reihenfolge Sponsor, Koalition, Projektleitung, CTL, Kernteam. */
+            /** @description In der Reihenfolge Projektauftraggeber:in, Projektleitung, weitere. */
             mitglieder: components["schemas"]["Mitglied"][];
+            /** @description Bisher verwendete Bezeichnungen weiterer Funktionen in der Organisation, häufigste zuerst (Vorschläge für `funktionText`, A-72). */
+            vorschlaege: string[];
             /** @description Was die anfragende Person damit darf. */
             can: {
                 write: boolean;
             };
         };
         OrganisationPut: {
-            /** @description Sponsor, Projektleitung und CTL höchstens je eine Person. */
+            /** @description Projektauftraggeber:in und Projektleitung höchstens je eine Person; `weitere` mit Text. */
             mitglieder: {
                 /** Format: uuid */
                 personId: string;
                 /**
-                 * @description `sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition.
+                 * @description `sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO).
                  * @enum {string}
                  */
-                funktion: "sp" | "pl" | "ctl" | "kt" | "koalition";
+                funktion: "sp" | "pl" | "weitere";
+                /** @description Bezeichnung der Funktion bei `weitere`, z. B. «Kernteam» oder «PMO»; sonst leer. */
+                funktionText?: string;
                 akv?: string;
             }[];
         };
@@ -47086,7 +47091,7 @@ export interface components {
              * @enum {string}
              */
             lebenszyklus: "aktiv" | "sistiert" | "abgebrochen" | "abgeschlossen" | "zurueckgezogen";
-            rollen: ("sp" | "pl" | "ctl" | "kt" | "koalition")[];
+            rollen: ("sp" | "pl" | "weitere")[];
         };
         ProjektKopf: {
             /** @description Laufende Projekte, in denen die Person eine Funktion hat (höchstens 20). */
@@ -47107,10 +47112,10 @@ export interface components {
                     nummer: string;
                     name: string;
                     /**
-                     * @description `sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition.
+                     * @description `sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO).
                      * @enum {string}
                      */
-                    funktion: "sp" | "pl" | "ctl" | "kt" | "koalition";
+                    funktion: "sp" | "pl" | "weitere";
                 }[];
             }[];
         };
@@ -48450,10 +48455,10 @@ export interface components {
             personId: string;
             name: null | string;
             /**
-             * @description Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person.
+             * @description Funktion im Projekt: `sp` Projektauftraggeber:in, `pl` Projektleitung oder `weitere` Person.
              * @enum {string}
              */
-            funktion: "sp" | "pl" | "ctl" | "weitere";
+            funktion: "sp" | "pl" | "weitere";
         };
         Traktandum: {
             /** Format: uuid */
@@ -48631,10 +48636,10 @@ export interface components {
                 /** Format: uuid */
                 personId: string;
                 /**
-                 * @description Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person.
+                 * @description Funktion im Projekt: `sp` Projektauftraggeber:in, `pl` Projektleitung oder `weitere` Person.
                  * @enum {string}
                  */
-                funktion: "sp" | "pl" | "ctl" | "weitere";
+                funktion: "sp" | "pl" | "weitere";
             }[];
         };
         Verschoben: {
@@ -49857,8 +49862,10 @@ export interface components {
              * @description Person aus dem Verzeichnis.
              */
             personId: string;
-            /** @description Sponsor, Sponsoren-Koalition, Projektleitung, CTL oder Kernteam. */
-            funktion: "sp" | "koalition" | "pl" | "ctl" | "kt";
+            /** @description `sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText`. */
+            funktion: "sp" | "pl" | "weitere";
+            /** @description Bezeichnung der weiteren Funktion (z. B. Kernteam); nur bei `weitere`, dort Pflicht. */
+            funktionText?: string;
             /** @description Aufgaben, Kompetenzen, Verantwortung und Verpflichtung. */
             akv: string;
         };
@@ -50005,7 +50012,7 @@ export interface components {
         };
         /** Projektstruktur und Organisation */
         Kapitel8: {
-            /** @description Wer welche Rolle im Projekt übernimmt. */
+            /** @description Wer welche Funktion im Projekt übernimmt. */
             mitglieder: components["schemas"]["MitgliedPlan"][];
         };
         /** Ressourcen */
@@ -50230,15 +50237,15 @@ export interface components {
             unterzeichnung: null | {
                 /** Format: uuid */
                 qualityCheckId: string;
-                /** @description Unterzeichnete Funktionen («2 von 3»). */
+                /** @description Unterzeichnete Funktionen («1 von 2»). */
                 anzahl: number;
                 vollstaendig: boolean;
                 funktionen: {
                     /**
-                     * @description Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10).
+                     * @description Funktion der Unterschrift: `sp` Projektauftraggeber:in, `pl` Projektleitung (UC-002 Schritt 10).
                      * @enum {string}
                      */
-                    funktion: "sp" | "pl" | "ctl";
+                    funktion: "sp" | "pl";
                     /** @description Inhaber der Funktion in der Projektorganisation. */
                     personen: string[];
                     unterschrift: null | {
@@ -50262,10 +50269,10 @@ export interface components {
                 /** @description Funktionen, die die Person jetzt unterzeichnen kann (eigene oder in Vertretung, A-31). */
                 unterzeichnen: {
                     /**
-                     * @description Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10).
+                     * @description Funktion der Unterschrift: `sp` Projektauftraggeber:in, `pl` Projektleitung (UC-002 Schritt 10).
                      * @enum {string}
                      */
-                    funktion: "sp" | "pl" | "ctl";
+                    funktion: "sp" | "pl";
                     inVertretungVon: null | string;
                 }[];
             };

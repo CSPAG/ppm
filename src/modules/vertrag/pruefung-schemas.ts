@@ -5,7 +5,7 @@ import { FUNKTIONEN } from './pruefung.ts';
 import { STAENDE } from './store.ts';
 
 const enumOf = <T extends string>(values: readonly T[], description: string) => Type.Unsafe<T>({ type: 'string', enum: [...values], description });
-const Funktion = enumOf(FUNKTIONEN, 'Funktion der Unterschrift: Sponsor, Projektleitung, CTL (UC-002 Schritt 10).');
+const Funktion = enumOf(FUNKTIONEN, 'Funktion der Unterschrift: `sp` Projektauftraggeber:in, `pl` Projektleitung (UC-002 Schritt 10).');
 
 const Kommentar = Type.Object({
   kapitel: Type.Integer({ minimum: 1, maximum: 13, description: 'Kapitel des Projektvertrags (Q7).' }),
@@ -50,7 +50,7 @@ export const Pruefung = Type.Object({
   qualityChecks: Type.Array(QualityCheck, { description: 'Quality-Checks, neueste zuerst.' }),
   unterzeichnung: Nullable(Type.Object({
     qualityCheckId: Uuid,
-    anzahl: Type.Integer({ minimum: 0, description: 'Unterzeichnete Funktionen («2 von 3»).' }),
+    anzahl: Type.Integer({ minimum: 0, description: 'Unterzeichnete Funktionen («1 von 2»).' }),
     vollstaendig: Type.Boolean(),
     funktionen: Type.Array(Type.Object({
       funktion: Funktion,

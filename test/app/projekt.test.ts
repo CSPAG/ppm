@@ -1,7 +1,7 @@
 /**
  * Modul Projekte (AP-E0-4; BC PP.04.04, UC-002 Schritt 2, UC-014 A1, UC-016 Schritt 2): Anlegen mit Nummer «JJJJ-NNN»
- * (A-47), Ändern mit ETag, Lebenszyklus mit lesenden Endzuständen, Projektorganisation mit Tupeln – Abnahme: eine
- * Projektrolle wirkt nur im eigenen Projekt –, «vertraulich» (A-34), Filter, Cursor und Kopf.
+ * (A-47), Ändern mit ETag, Lebenszyklus mit lesenden Endzuständen, Projektorganisation ohne Tupel (Master Entscheid 16)
+ * – Abnahme: eine Projektrolle wirkt nur im eigenen Projekt –, «vertraulich» (A-34), Filter, Cursor und Kopf.
  */
 import assert from 'node:assert/strict';
 import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
@@ -121,7 +121,7 @@ describe('Projekte', () => {
     await assert.rejects(full(api.t.runtime, T, tx => aktionen.phaseSetzen(tx, systemActor('system'), p.id, 'P2')), { status: 409 });
   });
 
-  test('Projektorganisation setzt Rollen am Projekt; eine Projektrolle wirkt nur im eigenen Projekt (Abnahme)', async () => {
+  test('Projektorganisation ändert keinen Zugriff (Master Entscheid 16); eine Projektrolle wirkt nur im eigenen Projekt (Abnahme)', async () => {
     const eigenes = await anlegen({ name: 'Eigenes Projekt' });
     const fremdes = await anlegen({ name: 'Fremdes Projekt' });
     // ohne Rolle sehen PL, SP, KT nichts
@@ -133,22 +133,29 @@ describe('Projekte', () => {
     const o = await organisation(eigenes.id, 0, [
       { personId: sp.id, funktion: 'sp', akv: ' Auftrag, Budget ' },
       { personId: pl.id, funktion: 'pl', akv: 'Führt das Projekt' },
-      { personId: ctl.id, funktion: 'ctl' },
-      { personId: kt.id, funktion: 'kt', akv: 'Fachbereich' },
-      { personId: ohne.id, funktion: 'koalition' },
+      { personId: ctl.id, funktion: 'weitere', funktionText: ' CTL ' },
+      { personId: kt.id, funktion: 'weitere', funktionText: 'Kernteam', akv: 'Fachbereich' },
+      { personId: ohne.id, funktion: 'weitere', funktionText: 'Sponsoren-Koalition' },
     ]);
     assert.equal(o.statusCode, 200, o.body);
     assert.equal(o.headers.etag, 'W/"1"');
-    assert.deepEqual(o.json().mitglieder.map((m: { funktion: string; akv: string }) => [m.funktion, m.akv]),
-      [['sp', 'Auftrag, Budget'], ['koalition', ''], ['pl', 'Führt das Projekt'], ['ctl', ''], ['kt', 'Fachbereich']]);
-    const tupel = await full(api.t.runtime, T, async tx => (await tx.query<{ s: string; r: string }>(
+    assert.deepEqual(o.json().mitglieder.map((m: { funktion: string; funktionText: string; akv: string }) => [m.funktion, m.funktionText, m.akv]),
+      [['sp', '', 'Auftrag, Budget'], ['pl', '', 'Führt das Projekt'], ['weitere', 'CTL', ''], ['weitere', 'Kernteam', 'Fachbereich'], ['weitere', 'Sponsoren-Koalition', '']]);
+    // Vorschläge für weitere Funktionen: die verwendeten Texte der Organisation (A-72)
+    for (const text of ['CTL', 'Kernteam', 'Sponsoren-Koalition']) assert.ok(o.json().vorschlaege.includes(text), text);
+    const tupel = async () => full(api.t.runtime, T, async tx => (await tx.query<{ s: string; r: string }>(
       "SELECT subject AS s, relation AS r FROM ppm.authz_tuple WHERE object_type = 'projekt' AND object_id = $1 ORDER BY relation", [eigenes.id])).rows);
-    // Rolle je Funktion (A-70): PL und CTL führen, Sponsor steuert, Kernteam liest mit
-    const soll = [['projekt-fuehren', `user:${ctl.id}`], ['projekt-fuehren', `user:${pl.id}`], ['projekt-mitlesen', `user:${kt.id}`], ['projekt-steuern', `user:${sp.id}`]];
-    assert.deepEqual(tupel.map(t => [t.r, t.s]).sort(), soll.sort());
+    // die Projektorganisation ist ein Projektergebnis: kein Tupel, niemand sieht das Projekt dadurch (Master Entscheid 16)
+    assert.deepEqual(await tupel(), []);
+    const lesen = async (p: Person, id: string) => (await call('GET', `/v1/projekte/${id}`, p.h)).statusCode;
+    for (const p of [pl, sp, ctl, kt]) assert.equal(await lesen(p, eigenes.id), 403);
+
+    // Zugriff am Projekt getrennt vergeben (UC-016): PL und CTL führen, Projektauftraggeber:in steuert, Kernteam liest mit
+    for (const [p, rolle] of [[pl, 'projekt-fuehren'], [ctl, 'projekt-fuehren'], [sp, 'projekt-steuern'], [kt, 'projekt-mitlesen']] as const) {
+      await grant(api, T, `user:${p.id}`, rolle, { type: 'projekt', id: eigenes.id });
+    }
 
     // eigenes Projekt: lesen alle Rollen, ändern nur PL, Organisation PL und SP; Koalition ohne Rolle (A-04)
-    const lesen = async (p: Person, id: string) => (await call('GET', `/v1/projekte/${id}`, p.h)).statusCode;
     for (const p of [pl, sp, ctl, kt]) assert.equal(await lesen(p, eigenes.id), 200);
     assert.equal(await lesen(ohne, eigenes.id), 403);
     assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, pl.h)).json().can, { write: true, organisation: true });
@@ -169,11 +176,11 @@ describe('Projekte', () => {
 
     // Rollen in der Liste und Filter «rolle»
     const meine = (await call('GET', '/v1/projekte?rolle=pl', pl.h)).json().items;
-    assert.deepEqual(meine.map((x: { id: string; rollen: string[]; projektleitung: string; sponsor: string; controlling: string }) => [x.id, x.rollen, x.projektleitung, x.sponsor, x.controlling]),
-      [[eigenes.id, ['pl'], pl.id, sp.id, ctl.id]]);
+    assert.deepEqual(meine.map((x: { id: string; rollen: string[]; projektleitung: string; sponsor: string }) => [x.id, x.rollen, x.projektleitung, x.sponsor]),
+      [[eigenes.id, ['pl'], pl.id, sp.id]]);
     assert.deepEqual((await call('GET', '/v1/projekte?rolle=sp', pl.h)).json().items, []);
     assert.deepEqual((await call('GET', '/v1/projekte/kopf', kt.h)).json(), {
-      projekte: [{ id: eigenes.id, nummer: eigenes.nummer, name: 'Eigenes Projekt (PL)', phase: 'P0', lebenszyklus: 'aktiv', rollen: ['kt'] }], anzahl: 1,
+      projekte: [{ id: eigenes.id, nummer: eigenes.nummer, name: 'Eigenes Projekt (PL)', phase: 'P0', lebenszyklus: 'aktiv', rollen: ['weitere'] }], anzahl: 1,
     });
 
     // Personensuche der Befehlspalette (I-N4): nur Personen in Projekten, die die suchende Person sieht; ohne E-Mail
@@ -192,15 +199,14 @@ describe('Projekte', () => {
     assert.equal((await suche('sabine', ohne)).statusCode, 403);
     assert.equal((await suche('s', kt)).statusCode, 422);
 
-    // SP wechselt die Projektleitung: alte PL verliert die Rolle sofort, neue erhält sie
+    // SP wechselt die Projektleitung: der Zugriff bleibt, bis ihn jemand im Bereich «Zugriff» ändert (Master Entscheid 16)
     const stale = await organisation(eigenes.id, 0, [], sp.h);
     assert.equal(stale.statusCode, 412);
-    const w = await organisation(eigenes.id, 1, [{ personId: sp.id, funktion: 'sp' }, { personId: ctl.id, funktion: 'pl' }, { personId: kt.id, funktion: 'kt' }], sp.h);
+    const w = await organisation(eigenes.id, 1, [{ personId: sp.id, funktion: 'sp' }, { personId: ctl.id, funktion: 'pl' }, { personId: kt.id, funktion: 'weitere', funktionText: 'Kernteam' }], sp.h);
     assert.equal(w.statusCode, 200, w.body);
     assert.equal(w.json().version, 2);
-    assert.equal(await lesen(pl, eigenes.id), 403);
-    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, ctl.h)).json().can, { write: true, organisation: true });
-    // die Organisation festzulegen ist eine Fachaktion: die Rolle darf an Personen gehen, die selbst weniger haben (fachmodell.md 3.3)
+    assert.equal(await lesen(pl, eigenes.id), 200);
+    assert.equal((await tupel()).length, 4);
     assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}/organisation`, kt.h)).json().can, { write: false });
   });
 
@@ -209,19 +215,24 @@ describe('Projekte', () => {
     const zwei = await organisation(p.id, 0, [{ personId: pl.id, funktion: 'pl' }, { personId: sp.id, funktion: 'pl' }]);
     assert.equal(zwei.statusCode, 422, zwei.body);
     assert.deepEqual(zwei.json().errors.map((e: { path: string }) => e.path), ['/mitglieder/1/funktion']);
-    const doppelt = await organisation(p.id, 0, [{ personId: kt.id, funktion: 'kt' }, { personId: kt.id, funktion: 'kt' }]);
+    const doppelt = await organisation(p.id, 0, [{ personId: kt.id, funktion: 'weitere', funktionText: 'Kernteam' }, { personId: kt.id, funktion: 'weitere', funktionText: 'kernteam ' }]);
     assert.deepEqual(doppelt.json().errors.map((e: { path: string }) => e.path), ['/mitglieder/1']);
-    const unbekannt = await organisation(p.id, 0, [{ personId: '00000000-0000-4000-8000-000000000000', funktion: 'kt' }]);
+    // weitere Funktion ohne Text (A-72)
+    const ohneText = await organisation(p.id, 0, [{ personId: kt.id, funktion: 'weitere', funktionText: '  ' }]);
+    assert.deepEqual([ohneText.statusCode, ohneText.json().errors[0].path], [422, '/mitglieder/0/funktionText']);
+    const alt = await organisation(p.id, 0, [{ personId: kt.id, funktion: 'kt' }]);
+    assert.equal(alt.statusCode, 422, 'CTL, Kernteam und Koalition sind keine festen Funktionen mehr');
+    const unbekannt = await organisation(p.id, 0, [{ personId: '00000000-0000-4000-8000-000000000000', funktion: 'weitere', funktionText: 'Kernteam' }]);
     assert.deepEqual([unbekannt.statusCode, unbekannt.json().errors[0].path], [422, '/mitglieder/0/personId']);
     // nichts gespeichert, keine Tupel
     assert.equal((await call('GET', `/v1/projekte/${p.id}/organisation`, ue.h)).json().version, 0);
     // zwei Funktionen derselben Person sind zulässig (PL im Kernteam)
-    assert.equal((await organisation(p.id, 0, [{ personId: pl.id, funktion: 'pl' }, { personId: pl.id, funktion: 'kt' }])).statusCode, 200);
+    assert.equal((await organisation(p.id, 0, [{ personId: pl.id, funktion: 'pl' }, { personId: pl.id, funktion: 'weitere', funktionText: 'Kernteam' }])).statusCode, 200);
   });
 
   test('vertraulich: alle mit einer Rolle am Projekt, am Portfolio oder übergreifend, nicht andere Portfolios (Master Entscheid 13)', async () => {
     const p = await anlegen({ name: 'Reorganisation', portfolioId: portfolio.c, vertraulich: true });
-    assert.equal((await organisation(p.id, 0, [{ personId: kt.id, funktion: 'kt' }])).statusCode, 200);
+    await grant(api, T, `user:${kt.id}`, 'projekt-mitlesen', { type: 'projekt', id: p.id });
     const sieht = async (x: Person) => (await call('GET', `/v1/projekte?nummer=${p.nummer}`, x.h)).json().items.length === 1;
     assert.equal(await sieht(ue), true);
     assert.equal(await sieht(gremiumC), true);

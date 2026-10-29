@@ -88,8 +88,11 @@ describe('Sitzung durchführen: Entscheide, Auflagen, Protokoll', () => {
     for (const [phase, set] of [['P1', (x: typeof p1) => { p1 = x; }], ['P2', (x: typeof p1) => { p2 = x; }]] as const) {
       const p = await ok('POST', '/v1/projekte', ue, { name: `Projekt ${phase}`, portfolioId: portfolio, phase }, 201);
       await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [
-        { personId: pl, funktion: 'pl', akv: '' }, { personId: ctl, funktion: 'ctl', akv: '' }, { personId: sp, funktion: 'sp', akv: '' },
+        { personId: pl, funktion: 'pl', akv: '' }, { personId: ctl, funktion: 'weitere', funktionText: 'CTL', akv: '' }, { personId: sp, funktion: 'sp', akv: '' },
       ] });
+      for (const [wer, rolle] of [[pl, 'projekt-fuehren'], [ctl, 'projekt-fuehren'], [sp, 'projekt-steuern']] as const) {
+        await grant(api, tenantId, `user:${wer}`, rolle, { type: 'projekt', id: p.id });
+      }
       set({ id: p.id, nummer: p.nummer });
     }
     const m = await login(api, 'demo', 'u-mitglied', null);

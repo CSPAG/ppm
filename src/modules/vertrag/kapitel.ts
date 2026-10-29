@@ -121,15 +121,19 @@ export const Kapitel7 = objekt('Kapitel7', 'Projektplanung und Lieferergebnisse'
   toleranzen: Type.Optional(liste(Type.Ref('ToleranzPlan'), 'Toleranzen des Projekts je Dimension; übersteuern ab der Baseline den Standard des Phasenmodells (A-10).', DIMENSIONEN_TOLERANZ.length)),
 });
 
-/** 8 Projektstruktur und Organisation (PP.04.04, UC-002 Schritt 2): Rollen mit AKV; die Sponsoren-Koalition als Liste (A-04). */
-export const FUNKTIONEN = ['sp', 'koalition', 'pl', 'ctl', 'kt'] as const;
+/**
+ * 8 Projektstruktur und Organisation (PP.04.04, UC-002 Schritt 2): Funktionen mit AKV; fest sind Projektauftraggeber:in
+ * und Projektleitung, weitere mit freiem Text (A-72).
+ */
+export const FUNKTIONEN = ['sp', 'pl', 'weitere'] as const;
 export const MitgliedPlan = Type.Object({
   personId: { ...Uuid, description: 'Person aus dem Verzeichnis.' },
-  funktion: enumOf(FUNKTIONEN, 'Sponsor, Sponsoren-Koalition, Projektleitung, CTL oder Kernteam.'),
+  funktion: enumOf(FUNKTIONEN, '`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText`.'),
+  funktionText: Type.Optional(text(100, 'Bezeichnung der weiteren Funktion (z. B. Kernteam); nur bei `weitere`, dort Pflicht.')),
   akv: text(2000, 'Aufgaben, Kompetenzen, Verantwortung und Verpflichtung.'),
 }, { $id: 'MitgliedPlan', additionalProperties: false });
 export const Kapitel8 = objekt('Kapitel8', 'Projektstruktur und Organisation', {
-  mitglieder: liste(Type.Ref('MitgliedPlan'), 'Wer welche Rolle im Projekt übernimmt.'),
+  mitglieder: liste(Type.Ref('MitgliedPlan'), 'Wer welche Funktion im Projekt übernimmt.'),
 });
 
 /** 9 Ressourcen: 9.1 Kosten je Phase CAPEX/OPEX (PC.01.01), 9.2 Personal (RK.02.01; Grösse S/M/L oder FTE, A-20). */

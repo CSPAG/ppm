@@ -1,6 +1,6 @@
 /**
  * Projektakte › Vertrag › Unterzeichnen (UI-12; Kernablauf K2 Schritt 8; DM.02.06; UC-002 Schritt 10, UC-003 Schritt 8,
- * A5): Zusammenfassung für Sponsor, Projektleitung und CTL, primär auf dem Telefon. Stand der Unterschriften («2 von
+ * A5): Zusammenfassung für Projektauftraggeber:in und Projektleitung, primär auf dem Telefon. Stand der Unterschriften («2 von
  * 3»), Wirkung vor dem Klick (I-R1 Stufe 3), «Unterzeichnen» in der Daumenzone (I-M1), bestätigt durch den Server
  * (I-R2). «Nicht unterzeichnen» mit Pflichtbegründung im Dialog. Abnahme K2-1: ab der Aufgabe höchstens 3 Interaktionen.
  */
@@ -32,7 +32,7 @@ export function UnterzeichnenPage({ nummer }: { nummer: string }) {
   return <Zusammenfassung nummer={nummer} projektId={projekt.data.id} projektName={projekt.data.name} version={version} geladen={pruefung.data} neuLaden={() => pruefung.refetch()} />;
 }
 
-/** Funktionen ohne Unterschrift als Text («Lea Brunner (CTL)» geht nur mit Namen; hier die Funktion). */
+/** Funktionen ohne Unterschrift als Text («Lea Brunner (Projektleitung)» geht nur mit Namen; hier die Funktion). */
 const fehlendText = (p: Pruefung, ohne: readonly Funktion[]) =>
   (p.unterzeichnung?.funktionen ?? []).filter(f => !f.unterschrift && !ohne.includes(f.funktion)).map(f => TP.funktion[f.funktion]).join(', ');
 
@@ -72,7 +72,7 @@ function Zusammenfassung({ nummer, projektId, projektName, version, geladen, neu
 
       {p.unterzeichnung ? (
         <section aria-labelledby={`${id}-u`} className="uz-block">
-          <h3 id={`${id}-u`} className="grp-h">{TP.unterschriften} · {TP.stand(p.unterzeichnung.anzahl)}</h3>
+          <h3 id={`${id}-u`} className="grp-h">{TP.unterschriften} · {TP.stand(p.unterzeichnung.anzahl, p.unterzeichnung.funktionen.length)}</h3>
           <ul className="uz-liste">
             {p.unterzeichnung.funktionen.map(f => {
               const u = f.unterschrift;

@@ -52,11 +52,11 @@ export async function projekt(tx: Tx, id: string): Promise<ProjektKurz | null> {
   return (await tx.query<ProjektKurz>(`SELECT id, nummer, name, phase, portfolio_id, vertraulich FROM ${SCHEMA}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
-/** Sponsor, Projektleitung und CTL des Projekts (Einladung je Geschäft, UC-006 Schritt 2). */
-export async function projektleitung(tx: Tx, projektId: string): Promise<{ person_id: string; funktion: 'sp' | 'pl' | 'ctl' }[]> {
-  return (await tx.query<{ person_id: string; funktion: 'sp' | 'pl' | 'ctl' }>(
-    `SELECT person_id, funktion FROM ${SCHEMA}.projekt_person WHERE projekt_id = $1 AND funktion IN ('pl', 'ctl', 'sp')
-      ORDER BY array_position(ARRAY['pl', 'ctl', 'sp'], funktion)`, [projektId])).rows;
+/** Projektleitung und Projektauftraggeber:in des Projekts (Einladung je Geschäft, UC-006 Schritt 2). */
+export async function projektleitung(tx: Tx, projektId: string): Promise<{ person_id: string; funktion: 'sp' | 'pl' }[]> {
+  return (await tx.query<{ person_id: string; funktion: 'sp' | 'pl' }>(
+    `SELECT person_id, funktion FROM ${SCHEMA}.projekt_person WHERE projekt_id = $1 AND funktion IN ('pl', 'sp')
+      ORDER BY array_position(ARRAY['pl', 'sp'], funktion)`, [projektId])).rows;
 }
 
 /**
@@ -272,14 +272,14 @@ export async function verschobeneVon(tx: Tx, sitzungId: string): Promise<Traktan
 
 // --- Einladung, Unterlage -----------------------------------------------------------------------------------------
 
-export interface EinladungRow { id: string; traktandum_id: string; person_id: string; funktion: 'sp' | 'pl' | 'ctl' | 'weitere'; name: string | null }
+export interface EinladungRow { id: string; traktandum_id: string; person_id: string; funktion: 'sp' | 'pl' | 'weitere'; name: string | null }
 
 export async function einladungen(tx: Tx, o: { traktandumId?: string; sitzungId?: string }): Promise<EinladungRow[]> {
   const [col, v] = o.traktandumId ? ['e.traktandum_id', o.traktandumId] : ['e.sitzung_id', o.sitzungId];
   return (await tx.query<EinladungRow>(
     `SELECT e.id, e.traktandum_id, e.person_id, e.funktion, p.display_name AS name
        FROM ${E} e LEFT JOIN ${SCHEMA}.principal p ON p.tenant_id = e.tenant_id AND p.id = e.person_id
-      WHERE ${col} = $1 ORDER BY array_position(ARRAY['pl', 'ctl', 'sp', 'weitere'], e.funktion), p.display_name, e.id`, [v])).rows;
+      WHERE ${col} = $1 ORDER BY array_position(ARRAY['pl', 'sp', 'weitere'], e.funktion), p.display_name, e.id`, [v])).rows;
 }
 
 /** Einladungen eines Traktandums ersetzen. */

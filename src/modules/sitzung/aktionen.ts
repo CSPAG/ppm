@@ -137,7 +137,7 @@ export function pruefeVorbereitung(s: store.SitzungRow): void {
   if (s.stand !== 'geplant' && s.stand !== 'in_vorbereitung') throw conflict('Die Unterlagen sind versendet; die Traktandenliste ist fest.');
 }
 
-/** Einladungen nach Projektorganisation vorsetzen: PL, CTL, SP (UC-006 Schritt 2, I-F2). */
+/** Einladungen nach Projektorganisation vorsetzen: Projektleitung, Projektauftraggeber:in (UC-006 Schritt 2, I-F2). */
 async function einladungenVorsetzen(tx: Tx, t: store.TraktandumRow, sitzungId: string): Promise<void> {
   if (!t.projekt_id) return;
   const personen = (await store.projektleitung(tx, t.projekt_id)).map(p => ({ personId: p.person_id, funktion: p.funktion }));
@@ -146,7 +146,7 @@ async function einladungenVorsetzen(tx: Tx, t: store.TraktandumRow, sitzungId: s
 
 /**
  * Traktandum aufnehmen (UC-006 Schritt 2): Vorschlag dieses Gremiums (auch von der vorherigen Sitzung verschoben) wird
- * zuunterst traktandiert, mit Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» (A1) und Einladungen an PL, CTL, SP.
+ * zuunterst traktandiert, mit Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» (A1) und Einladungen an Projektleitung und Projektauftraggeber:in.
  */
 export async function aufnehmen(tx: Tx, s: store.SitzungRow, traktandumId: string): Promise<store.TraktandumRow> {
   pruefeVorbereitung(s);
@@ -395,7 +395,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
   for (const t of await store.verschobeneVon(tx, s.id)) {
     if (!t.projekt_id) continue;
     const ziel = await store.getSitzung(tx, t.sitzung_id!);
-    for (const p of (await store.projektleitung(tx, t.projekt_id)).filter(x => x.funktion !== 'ctl')) {
+    for (const p of await store.projektleitung(tx, t.projekt_id)) {
       await mitteilung.senden(tx, {
         an: p.person_id, bezug: { typ: 'traktandum', id: t.id },
         text: `${t.titel}: im ${g} vom ${datum} nicht traktandiert, verschoben auf ${ziel ? `die Sitzung vom ${kurzDatum(ziel.datum)}` : 'die nächste Sitzung'}`,

@@ -11,7 +11,7 @@
 import assert from 'node:assert/strict';
 import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { full } from './harness.ts';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { traktandenart, type EntscheidFolge } from '../../src/modules/sitzung/arten.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
 
@@ -81,6 +81,7 @@ describe('Eskalation und Meilensteinabnahme', () => {
     const p = (await ok('POST', '/v1/projekte', ue, { name: 'Neues Labor', portfolioId: portfolio, phase: 'P2' }, 201)).json();
     projekt = { id: p.id, nummer: p.nummer };
     await ok('PUT', `/v1/projekte/${p.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [{ personId: plId, funktion: 'pl', akv: '' }] });
+    await grant(api, T, `user:${plId}`, 'projekt-fuehren', { type: 'projekt', id: p.id });
 
     // Meilenstein mit Abnahme durch das Gremium, von der PL als erreicht gemeldet (UC-004 Schritt 2)
     const m = (await ok('POST', `/v1/projekte/${p.id}/meilensteine`, pl, { phase: 'P2', art: 'meilenstein', text: 'Pilot abgeschlossen', terminAktuell: heute(), abnahme: 'gremium' }, 201)).json();
@@ -161,6 +162,7 @@ describe('Eskalation und Meilensteinabnahme', () => {
   test('aus der Warnung «wesentliche Abweichung»: Eskalation im Entwurf, verknüpft mit dem Bericht, bleibt beim Zurückziehen (UC-004 A1.2)', async () => {
     const p2 = (await ok('POST', '/v1/projekte', ue, { name: 'Neues Archiv', portfolioId: portfolio, phase: 'P2' }, 201)).json();
     await ok('PUT', `/v1/projekte/${p2.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [{ personId: await person(api, T, 'u-pl'), funktion: 'pl', akv: '' }] });
+    await grant(api, T, `user:${await person(api, T, 'u-pl')}`, 'projekt-fuehren', { type: 'projekt', id: p2.id });
     const b2 = (nach = '') => `/v1/projekte/${p2.id}/berichte/${PERIODE}${nach}`;
     const grund = 'Termin: Pilot neu 15.05.2027 statt 31.03.2027 laut Baseline (+6 Wochen)';
 
@@ -202,6 +204,7 @@ describe('Eskalation und Meilensteinabnahme', () => {
     const pf = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'B', schluessel: 'ohne-gremium', name: 'Ohne Gremium' }, 201)).json().id;
     const p3 = (await ok('POST', '/v1/projekte', ue, { name: 'Ohne Gremium', portfolioId: pf, phase: 'P2' }, 201)).json();
     await ok('PUT', `/v1/projekte/${p3.id}/organisation`, { ...ue, 'if-match': 'W/"0"' }, { mitglieder: [{ personId: await person(api, T, 'u-pl'), funktion: 'pl', akv: '' }] });
+    await grant(api, T, `user:${await person(api, T, 'u-pl')}`, 'projekt-fuehren', { type: 'projekt', id: p3.id });
     const b = (await ok('POST', `/v1/projekte/${p3.id}/berichte/${PERIODE}/eskalation`, pl, { grund: 'Kosten P2 12 % über Budget' })).json();
     assert.deepEqual([b.eskalation.stand, b.eskalation.vorgeschlagen], ['offen', false]);
     assert.equal((await sys(async tx => (await tx.query('SELECT 1 FROM ppm.traktandum WHERE bezug_id = $1', [b.eskalation.id])).rowCount)), 0);

@@ -279,7 +279,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   app.post('/v1/sitzungen/:id/traktanden', {
     schema: {
       tags: [TAG], summary: 'Traktandum aufnehmen oder einplanen',
-      description: 'Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an PL, CTL, SP werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.',
+      description: 'Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an Projektleitung und Projektauftraggeber:in werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.',
       params: IdParams, headers: IdempotencyHeaders, body: Type.Ref('TraktandumCreate'), response: { 200: Type.Ref('Sitzung') },
     },
   }, async (req, reply) => {
@@ -446,7 +446,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   app.put('/v1/traktanden/:id/einladungen', {
     schema: {
       tags: [TAG], summary: 'Eingeladene festlegen',
-      description: 'Ersetzt die Eingeladenen des Traktandums (vorgesetzt PL, CTL, SP, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.',
+      description: 'Ersetzt die Eingeladenen des Traktandums (vorgesetzt Projektleitung und Projektauftraggeber:in, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.',
       params: IdParams, headers: IfMatchHeaders, body: Type.Ref('EinladungenPut'), response: { 200: Type.Ref('Traktandum') },
     },
   }, async (req, reply) => {

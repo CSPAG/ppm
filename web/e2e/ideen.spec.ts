@@ -60,7 +60,7 @@ test('Projektidee in vier Schritten einreichen und unter «Meine Ideen» verfolg
 
 test('Mitglied sieht den Bereich «Ideen» und kann einreichen (Master Entscheid 14, A-73)', async ({ page }) => {
   await login(page, BRUNO, '/ziele/handlungsfelder');
-  // auf dem Telefon liegt «Portfolio» im Blatt «Mehr»
-  if (page.viewportSize()!.width < 768) await page.getByRole('navigation', { name: 'Navigation' }).getByRole('button', { name: 'Mehr' }).click();
-  await expect(page.getByRole('link', { name: 'Portfolio', exact: true }).first()).toBeVisible();
+  // auf dem Telefon heisst das Portfolio mit nur einem Bereich unten wie dieser (IA «Navigation»)
+  const name = page.viewportSize()!.width < 768 ? 'Ideen' : 'Portfolio';
+  await expect(page.getByRole('navigation', { name: 'Navigation' }).getByRole('link', { name, exact: true })).toBeVisible();
 });

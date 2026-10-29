@@ -60,7 +60,8 @@ test('Mitglied sieht nur die Arbeitsräume mit Recht (Master Entscheid 14, 18)',
   // Eingang hat jede Rolle (UX-E3); Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
   await expect(nav.getByRole('link', { name: /^Eingang/ }).first()).toBeVisible();
   // Projekte auflisten und Ideen einreichen alle Mitglieder (A-73); Gremien nur mit Recht
-  for (const name of ['Projekte', 'Portfolio']) await expect(nav.getByRole('link', { name, exact: true }).first()).toBeVisible();
+  // auf dem Telefon heisst das Portfolio mit nur einem Bereich unten wie dieser («Ideen», IA «Navigation»)
+  for (const name of ['Projekte', telefon ? 'Ideen' : 'Portfolio']) await expect(nav.getByRole('link', { name, exact: true }).first()).toBeVisible();
   await expect(nav.getByRole('link', { name: 'Gremien' })).toHaveCount(0);
 });
 

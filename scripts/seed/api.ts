@@ -1,12 +1,12 @@
 /**
  * API für das Seed-Skript: die vollständige Anwendung im Prozess (`app.createApi`, Aufrufe über `inject`), angemeldet mit
- * Token eines eigenen Anmeldedienstes (Test-Kit) für die Personen der Organisation. So entstehen die Demo-Daten nur über
+ * Token eines eigenen Anmeldedienstes (anmeldung.ts) für die Personen der Organisation. So entstehen die Demo-Daten nur über
  * die öffentlichen Routen, mit allen Regeln und Rechten wie in der Oberfläche (keine Daten an der RLS vorbei).
  */
 import type pg from 'pg';
-import { claimsFor, startMockIdp, type MockIdp } from '@vollholz/iam-testkit';
 import type { App } from '@vollholz/platform';
 import { app as ppm } from '../../src/app.ts';
+import { anmeldung } from './anmeldung.ts';
 
 export interface Antwort<T> { status: number; body: T; etag: string }
 
@@ -59,28 +59,39 @@ export class Als {
   }
 }
 
-export interface Person { subject: string; id: string; first: string; last: string; email: string }
+export interface Person { subject: string; id: string; name: string; email: string | null; first: string; last: string }
 
-export interface SeedApi { api: App; idp: MockIdp; als(p: Person): Promise<Als>; close(): Promise<void> }
+export interface SeedApi { api: App; als(p: Person): Als; close(): Promise<void> }
 
-/** Anwendung mit eigenem Anmeldedienst; Datenbank wie die API (`DATABASE_URL`, Laufzeit-Rolle). */
+/**
+ * Anwendung mit dem Anmeldedienst des Skripts (anmeldung.ts); Datenbank wie die API (`DATABASE_URL`, Laufzeit-Rolle).
+ * Alles Übrige aus der Umgebung der API; im Prozess gelten Entwicklungsmodus und private Adressen (Schnittstellen der
+ * Demo gegen einen Server dieses Prozesses).
+ */
 export async function seedApi(db: pg.Pool, org: string, env: NodeJS.ProcessEnv): Promise<SeedApi> {
-  const idp = await startMockIdp({ audience: 'ppm-api', realm: 'ppm' });
+  const idp = await anmeldung();
   const cfg = ppm.loadConfig({
     ...env, NODE_ENV: 'development', OIDC_ISSUER_URL: idp.issuer, PUBLIC_BASE_URL: 'http://seed.invalid', DPOP_MODE: 'optional',
-    // Schnittstellen der Demo laufen gegen einen Server dieses Prozesses (127.0.0.1)
     WEBHOOK_ALLOW_PRIVATE: 'true', API_RATE_LIMIT: '1000000', LOG_LEVEL: env.LOG_LEVEL ?? 'warn',
     SESSION_SECRET: env.SESSION_SECRET || 's'.repeat(32),
   }, 'api');
   const { app } = await ppm.createApi(cfg, db);
   await app.ready();
-  const claims = claimsFor({ personClientId: 'ppm-platform' });
+  const o = { org, aud: env.OIDC_API_AUDIENCE || 'ppm-api', azp: env.OIDC_BFF_CLIENT_ID || 'ppm-platform' };
   return {
-    api: app, idp,
-    // Name und E-Mail wie im Token von Keycloak: die Anmeldung gleicht sie im Principal ab
-    als: async p => new Als(app, await idp.token({
-      ...claims.user({ sub: p.subject, org, name: `${p.first} ${p.last}`, email: p.email }), given_name: p.first, family_name: p.last, preferred_username: p.email,
-    }, { aud: 'ppm-api' }), `${p.first} ${p.last}`, p.id),
+    api: app,
+    als: p => new Als(app, idp.token(p, o), p.name, p.id),
     close: async () => { await app.close(); await idp.close(); },
   };
+}
+
+/**
+ * Verwaltung der Mitglieder mit der unveränderten Konfiguration der API (echter Issuer, `KEYCLOAK_MGMT_*`): lädt wie die
+ * Oberfläche ein (Konto ohne Passwort in Keycloak, Principal und Rollen sofort). null ohne Verwaltung (lokal).
+ */
+export async function verwaltung(db: pg.Pool, env: NodeJS.ProcessEnv): Promise<{ admin: NonNullable<Awaited<ReturnType<typeof ppm.createApi>>['iam']['admin']>; close(): Promise<void> } | null> {
+  if (!env.KEYCLOAK_MGMT_CLIENT_ID) return null;
+  const { app, iam } = await ppm.createApi(ppm.loadConfig(env, 'api'), db);
+  if (!iam.admin) { await app.close(); return null; }
+  return { admin: iam.admin, close: () => app.close() };
 }

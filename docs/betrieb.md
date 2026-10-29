@@ -88,6 +88,7 @@ Jede Aufgabe läuft über alle Instanzen höchstens einmal gleichzeitig. Fachjob
 | Migration | läuft vor jedem Deploy als `migrate` (nur vorwärts, idempotent); einzeln: `docker run … migrate` |
 | Neue Version, Rollback, Wartung, Zustand | Workflow «Deploy» (`.github/workflows/deploy.yml`, nur manuell mit Freigabe): `deploy` (Image-Digest), `rollback`, `maintenance-on`, `maintenance-off`, `status` |
 | Backup und PITR | pgBackRest auf der DB-VM: [deploy/hetzner/README.md](../deploy/hetzner/README.md#backup-und-wiederherstellung-pitr) |
+| Demo-Organisation | [Demo-Daten im Betrieb](#demo-daten-im-betrieb) |
 | Rauchtest | `npm run smoke` (Betriebs-Endpunkt, OpenAPI, 401 ohne Token, mit Maschinen-Client `GET /v1/handlungsfelder`) |
 
 ## CI und Lieferkette
@@ -105,3 +106,32 @@ Jede Aufgabe läuft über alle Instanzen höchstens einmal gleichzeitig. Fachjob
 Weitere Workflows: `deploy.yml`, `infra.yml` (OpenTofu Hetzner: Plan im PR, Apply nur manuell; danach DNS bei Infomaniak über `infra/dns/`),
 `keycloak.yml` und `identity-conformity.yml` (verwaltet von identity-kit). Renovate (`renovate.json`): wöchentlich,
 14 Tage Mindestalter, Sicherheitsupdates sofort, Gruppe «identity-kit» ohne Automerge, Digests gepinnt.
+
+## Demo-Daten im Betrieb
+
+Eine eigene Organisation `demo` mit dem Spitalbeispiel aus `scripts/seed-demo.ts` (Inhalt:
+[einrichtung.md](einrichtung.md)), getrennt von den Organisationen der Kundschaft. Das Skript läuft im
+Image als Einmal-Container des Dienstes `api` (dessen Geheimnisse und Verwaltung), handelt über die öffentlichen Routen
+und schreibt nur in diese Organisation.
+
+1. **Organisation anlegen** (Plattform-Administration): in der Oberfläche unter Plattform › Organisationen, Alias `demo`,
+   Name z. B. «Demo Spital». Sich selbst als `org-admin` mit Freigabestufe 2 einladen, die Einladung annehmen und sich
+   einmal in `demo` anmelden.
+2. **Seed** auf der App-VM als `betrieb` (Image mit dem Skript ist deployt):
+
+   ```sh
+   cd /opt/ppm
+   sudo docker compose -f compose.prod.yaml --env-file prod.env run --rm --no-deps api \
+     node scripts/seed-demo.ts --org demo --admin <eigene E-Mail> --einladen
+   ```
+
+   `--einladen` lädt die 16 Personen der Demo (`scripts/seed/personen.ts`) über die Verwaltung ein: Keycloak legt Konten
+   ohne Passwort unter `…@demo.example` an; die Mail «Passwort setzen» erreicht niemanden (`.example`, RFC 2606), also
+   meldet sich niemand als diese Personen an. Die eigene Person handelt als Administration der Demo. Dauer einige
+   Minuten (zwei Starts der Anwendung im Container).
+3. **Ansehen:** als eigene Person in der Organisation `demo` (mit `org-admin` alle Bereiche).
+
+Das Skript läuft nur auf einer Organisation ohne Portfolios. Neu aufsetzen: Organisation sperren und löschen (oben),
+dann von vorn. Die Schnittstelle «ERP» der Demo zeigt auf einen Server des Skripts, der danach nicht mehr läuft
+(Rhythmus manuell, ein neuer Lauf scheitert mit Hinweis); die Ist-Kosten bleiben.
+

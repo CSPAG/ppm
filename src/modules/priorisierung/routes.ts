@@ -42,7 +42,10 @@ function pruefe(k: readonly store.KriteriumRow[], b: readonly store.BudgetRow[])
 }
 
 async function lade(tx: Tx, r: store.ModellRow, write: boolean): Promise<BewertungsmodellOut> {
-  const [k, b, a] = await Promise.all([store.kriterien(tx, r.id), store.budgetrahmen(tx, r.id), store.aktuell(tx)]);
+  // nacheinander: eine Transaktion, eine Verbindung
+  const k = await store.kriterien(tx, r.id);
+  const b = await store.budgetrahmen(tx, r.id);
+  const a = await store.aktuell(tx);
   return {
     ...kurz(r, a?.id ?? null),
     kriterien: k,

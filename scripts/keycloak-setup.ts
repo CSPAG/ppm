@@ -11,6 +11,7 @@
  *
  *   anna@demo.example       demo, org-admin
  *   bruno@demo.example      demo, viewer
+ *   …@demo.example          demo, Personen der Demo-Daten (scripts/seed/personen.ts, npm run seed:demo)
  *   max@muster.example      muster, org-admin
  *   betrieb@ppm.example   platform-admin, ohne Organisation
  *
@@ -23,6 +24,7 @@ import pg from 'pg';
 import { createTenant, findTenant, pgAudit, withTenant } from '@vollholz/iam';
 import { SCHEMA } from '../src/product.ts';
 import { ROOT } from './lib.ts';
+import { DEMO_PERSONEN } from './seed/personen.ts';
 
 const P = 'ppm';
 const REALM = P;
@@ -36,12 +38,11 @@ const UI = (process.env.PUBLIC_BASE_URL ?? 'http://localhost:8080').replace(/\/+
 const adminPassword = env('KEYCLOAK_ADMIN_PASSWORD') || fail('KEYCLOAK_ADMIN_PASSWORD fehlt (npm run dev:env)');
 
 const ORGS = [{ alias: 'demo', name: 'Demo AG', domain: 'demo.example' }, { alias: 'muster', name: 'Muster GmbH', domain: 'muster.example' }];
-const PEOPLE = [
-  { email: 'anna@demo.example', first: 'Anna', last: 'Admin', org: 'demo', role: 'org-admin', clearance: 2 },
-  { email: 'bruno@demo.example', first: 'Bruno', last: 'Leser', org: 'demo', role: 'leser', clearance: 0 },
+const PEOPLE: readonly { email: string; first: string; last: string; org: string | null; role: string; clearance: number }[] = [
+  ...DEMO_PERSONEN.map(p => ({ email: p.email, first: p.first, last: p.last, org: 'demo', role: p.role, clearance: p.clearance })),
   { email: 'max@muster.example', first: 'Max', last: 'Muster', org: 'muster', role: 'org-admin', clearance: 2 },
   { email: 'betrieb@ppm.example', first: 'Bea', last: 'Betrieb', org: null, role: 'platform-admin', clearance: 0 },
-] as const;
+];
 
 // ---------- Admin-API (Anmeldung als admin am Realm master, nur lokal)
 let token = '';

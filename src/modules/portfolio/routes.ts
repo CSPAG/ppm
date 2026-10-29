@@ -169,7 +169,9 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   // --- Gremienweg ---------------------------------------------------------------------------------------------------
 
   const gremienwegOut = async (req: FastifyRequest, p: store.PortfolioRow, tx: Tx) => {
-    const [weg, gremien] = await Promise.all([store.gremienweg(tx, p.id), store.listGremien(tx, { portfolioId: p.id })]);
+    // nacheinander: eine Transaktion, eine Verbindung
+    const weg = await store.gremienweg(tx, p.id);
+    const gremien = await store.listGremien(tx, { portfolioId: p.id });
     return { portfolioId: p.id, version: p.version, schritte: schritte(weg, gremien), can: await capabilities(req) };
   };
 

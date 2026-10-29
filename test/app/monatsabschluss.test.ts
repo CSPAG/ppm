@@ -197,7 +197,10 @@ describe('Monatsabschluss', () => {
     const k = (await call('GET', '/v1/statusberichte/kopf', ue)).json().pruefen;
     assert.deepEqual([k.periode, k.eingereicht, k.ausstehend], [PERIODE, 4, 1], '5 auffällige, davon 2026-129 einzeln bestätigt');
     // Kopfkarte «Monatszyklus»: gleiche Zahlen und Fristen wie der Kopf der Periode
-    const u = (await call('GET', `/v1/perioden/${PERIODE}`, ue)).json().kopf;
+    const g = await call('GET', `/v1/perioden/${PERIODE}`, ue);
+    const u = g.json().kopf;
+    // ETag = Version der Periode für `If-Match` beim Abschluss
+    assert.equal(g.headers['etag'], `W/"${u.version}"`);
     assert.deepEqual([k.projekte, k.zurueckgegeben, k.geprueft, k.stichtag, k.abschlussBis],
       [u.anzahl.projekte, u.anzahl.zurueckgegeben, u.anzahl.geprueft, u.fristen.stichtag, u.fristen.abschlussBis]);
   });

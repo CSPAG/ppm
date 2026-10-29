@@ -32,10 +32,23 @@ Testpersonen (Passwort `ppm-demo`, nur lokal):
 |---|---|---|
 | `anna@demo.example` | demo | org-admin, Freigabestufe 2 |
 | `bruno@demo.example` | demo | leser |
+| `…@demo.example` | demo | Personen der Demo-Daten mit Rollen `ue`, `pmo`, `gl`, `fi`, `rm`, `antragsteller`, `leser` ([scripts/seed/personen.ts](../scripts/seed/personen.ts)), z. B. `ursula.egli@` (UE), `claudia.keller@` (GL), `sandra.huber@` (Projektleitung) |
 | `max@muster.example` | muster | org-admin, Freigabestufe 2 |
 | `betrieb@ppm.example` | – | platform-admin (Realm-Rolle, ohne Organisation) |
 
-Demo-Daten für `demo` (die fünf Handlungsfelder der Strategie 2035, ohne Leitsatz): `npm run seed:demo`.
+Demo-Daten für `demo`: `npm run seed:demo` (nach `keycloak:setup`, auf einer Organisation ohne Portfolios). Ein
+Spitalbeispiel relativ zum heutigen Datum, ausschliesslich über die öffentlichen Routen (Anwendung im Prozess):
+
+- Stammdaten, Strategie 2035 mit Leitsätzen und strategischen Zielen, Jahresziele (laufendes Jahr in Kraft mit Roadmap,
+  Folgejahr in Arbeit), Phasenmodell mit Toleranzen
+- Portfolios A (PRAT, SNS-VR), B (GLPA) und C (Direktion Pflege) mit Terminen, Gremienweg und Rollen am Portfolio
+- 15 Projekte in allen Phasen und Lebenszyklen, mit Projektvertrag, Baselines und Registern
+- Statusberichte und abgeschlossene Perioden der letzten sechs Monate, Portfolioberichte
+- Gremiumssitzungen mit Gate-, Ideen-, Eskalations-, Änderungs-, Sistierungs-, Abschluss- und Priorisierungsentscheiden,
+  Auflagen und versendetem Protokoll; die nächsten Sitzungen in Vorbereitung
+- im laufenden Monat offene Stände: Berichte, Rückfrage, Eskalation, Verträge in Prüfung, Ideen in allen Ständen
+- Priorisierung mit Szenarien, Kapazität und Zuteilungen, Kostenträger mit Ist aus dem ERP (Schnittstelle gegen einen
+  Server des Skripts), Zielerreichung, Quartalsbericht, Jahresrückblick, Lessons Learned, Stellvertretung
 
 ## Tests
 

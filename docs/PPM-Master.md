@@ -202,6 +202,10 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Strategie und Ziele** dürfen auch Projektportfoliomanager:in und PPMO bearbeiten.
    - **Noch nicht nachgeführt:** Funktionsbaum und Use Cases (Generator), UX-Schicht, Bauplan ([fachmodell.md](fachmodell.md): Rollen 3.3, Lesesicht 3.4, Annahmen, u. a. A-04, A-31, A-33, A-34, A-41, A-42, A-45) und Code. Abgelöstes wird dort als «ersetzt durch» markiert, nicht gelöscht. Betroffen sind vor allem Abläufe, die heute anhalten: UC-001 (Projekt erst nach Freigabe der Initialisierung), UC-002 und UC-003 (Gate erst nach Quality-Check und allen Unterschriften, Phase erst nach Gate-Entscheid), UC-004 und UC-005 (Bericht nach Einreichen gesperrt, Monatsabschluss erst nach Prüfung aller Berichte), UC-006 und UC-008 (Traktanden und Antrag nach Versand gesperrt), UC-007 (Änderung nur durch den Sponsor, mit Wirkung nur über den PRAT), UC-011 (Roadmap erst nach Freigabe durch den VR), UC-015 (Abschluss erst nach Abnahme durch das Gremium), UC-016 (Rollen).
 13. **Beträge und vertrauliche Projekte** ohne eigenes Recht (29.10.2026, zu G3 und V14): Wer an einem Ort eine Rolle hat (Bearbeiten oder Lesen an Organisation, Portfolio oder Projekt), sieht dort auch Beträge und vertrauliche Projekte. Mitglieder ohne weitere Rolle sehen beides nicht: keine Beträge, und vertrauliche Projekte fehlen in jeder Liste und Auswertung für Mitglieder. Die Kennzeichnung «vertraulich» am Projekt bleibt. Gegenüber heute sehen neu Projektmitglieder Beträge (A-33) und die Geschäftsleitung vertrauliche Projekte (A-34). Im Bauplan bleiben die Rechte `finanzen:read` und `projekt:vertraulich` mit ihren Policies bestehen; sie stecken in jeder Vorlage ausser «Mitglied». Reicht das später nicht, sind die Freigabestufen von identity-kit (intern, vertraulich, streng vertraulich) der Weg, ohne die Rollen zu ändern.
+14. **Projekte auflisten und Ideen lesen für alle Mitglieder** (29.10.2026, zu G3 und V14):
+   - **Projekte:** Alle Mitglieder listen die Kopfdaten aller nicht vertraulichen Projekte auf: Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektmanager:in, Projektauftraggeber:in. Status, Trend, Beträge und Inhalte (Projektvertrag, Berichte, Register) brauchen «Lesen». Ohne «Lesen» führt ein Eintrag zu einer Kopfansicht, nicht zur Akte. Auch Auswahlfelder (z. B. Abhängigkeiten im Projektvertrag) und die Suche bieten alle aufgelisteten Projekte an.
+   - **Ideen:** Alle Mitglieder lesen eingereichte Ideen vollständig nach Vorlage (Titel, Ausgangslage, Zielsetzung, Handlungsfeld, betroffene Bereiche, Einschätzungen, Stand, eingereicht von). Nicht sichtbar sind Entwürfe anderer und die Prüfung durch die UE (Rückfragen, Tiering-Raster, Leitfragen). Wer eine Idee erfasst, sieht so ähnliche Ideen schon vor dem Einreichen.
+   - **Bauplan:** Die Lesesicht der Projektdetails hängt an der Sichtbarkeit der Projektzeile (`ppm.projekt_sichtbar()`); «Auflisten» braucht deshalb einen eigenen Weg (neues Muster in [fachmodell.md](fachmodell.md) 3.4). Bei Ideen braucht die Lesesicht der Rückfragen eine eigene Bedingung, weil sie heute an der Sichtbarkeit der Idee hängt.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -210,7 +214,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
   - **Organisations-Admin:** alles, dazu Zugänge, Schnittstellen und Webhooks.
   - **Bearbeiten:** auflisten, lesen, anlegen und ändern in allen Fachbereichen am Ort. An der Organisation heisst sie Projektportfoliomanager:in oder PPMO, am Projekt Projektmanager:in (mit Funktion) oder PMO (ohne Funktion).
   - **Lesen:** alles am Ort lesen. An der Organisation für die Geschäftsleitung, am Portfolio für Gremien (PRAT, GLPA, Direktion), am Projekt für Projektauftraggeber:in und Projektmitglieder.
-  - **Mitglied:** für alle Mitglieder der Organisation; Ziele lesen und eigene Ideen erfassen.
+  - **Mitglied:** für alle Mitglieder der Organisation; Ziele lesen, Projekte auflisten, eingereichte Ideen lesen (Entscheid 14) und eigene Ideen erfassen.
 
   Voraussetzung: identity-kit zählt «Recht irgendwo» (Startseite, Navigation) nur an den Orttypen, für die ein Recht gilt; sonst braucht «Bearbeiten» je eine Vorlage für Organisation und Projekt. Offene Fragen dazu in Abschnitt 12.
 
@@ -226,7 +230,6 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 
 **Produkt** (nicht in der Klärungsliste, die sich an den Referenzkunden richtet), zu V14:
 
-- **Auflisten:** Dürfen alle Mitglieder Projekte und Ideen auflisten (Kopfdaten wie Nummer, Name, Phase, Status, Verantwortliche), mit Details nur über «Lesen»? Vertrauliche Projekte erscheinen auch in der Liste nicht.
 - **Ressourcenmanagement:** Bleibt es eine eigene Rolle, oder planen Projektportfoliomanager:in und PPMO die Ressourcen?
 - **PMO am Projekt:** Als Funktion in der Projektorganisation geführt (die Projektmanager:in setzt sie selbst) oder nur über Zugänge vergeben?
 - **Direktion:** Pflegt sie ihr Portfolio C selbst («Bearbeiten» am Portfolio), oder liest sie nur, und Projektportfoliomanager:in und PPMO erfassen ihre Entscheide?

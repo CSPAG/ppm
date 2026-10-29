@@ -280,7 +280,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Entscheide 12 bis 18 weiter nachführen (Funktionsbaum und Use Cases: Entscheid 19; UX-Schicht: Entscheid 20): Bauplan: Entscheid 21), zuletzt Code: Pakete AP-E8-1 bis AP-E8-5 ([fachmodell.md](fachmodell.md) Abschnitt 7.3).
+1. Entscheide 12 bis 18 umsetzen: Funktionsbaum und Use Cases (Entscheid 19), UX-Schicht (Entscheid 20) und Bauplan (Entscheid 21) sind nachgeführt; offen ist der Code mit den Paketen AP-E8-1 bis AP-E8-5 ([fachmodell.md](fachmodell.md) Abschnitt 7.3).
 2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 4. V10 mit der Insel Gruppe klären.

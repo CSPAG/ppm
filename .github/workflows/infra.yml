@@ -1,4 +1,4 @@
-# Infrastruktur auf Hetzner (infra/hetzner) mit OpenTofu und DNS bei Infomaniak (infra/dns, nur der Name «ppm»).
+# Infrastruktur auf Hetzner (infra/hetzner) mit OpenTofu und DNS bei Infomaniak (infra/dns, nur die Namen «ppm» und «www.ppm»).
 #   pull_request: nur fmt und validate (ohne Geheimnisse); die DNS-Logik prüft «CI» (test/infra/dns.test.ts)
 #   «Run workflow»: plan (mit DNS-Probelauf) oder apply; apply nur mit Freigabe im Environment «production», genau den
 #   Plan, danach DNS abgleichen
@@ -139,5 +139,5 @@ jobs:
           printf '%s\n' "$BACKEND_HCL" > backend.hcl
           tofu init -input=false -backend-config=backend.hcl
           tofu apply -input=false -lock-timeout=5m tfplan
-      - name: DNS abgleichen (nur Einträge aus `tofu output dns`, nur Name ppm)
+      - name: DNS abgleichen (nur Einträge aus `tofu output dns`, nur Namen ppm und www.ppm)
         run: ../dns/dns.sh apply

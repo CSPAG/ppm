@@ -1,4 +1,4 @@
-# Caddy vor PPM: TLS (ACME), genau ein Host, HTTP/3. Routen:
+# Caddy vor PPM: TLS (ACME), genau ein Host (www. davor leitet dauerhaft dorthin um), HTTP/3. Routen:
 #   /mcp*           → mcp:8081   (MCP über Streamable HTTP; Metadaten RFC 9728 unter /.well-known/oauth-protected-resource/mcp)
 #   alles andere    → api:8080   (REST-API /v1, BFF /auth, Webapp)
 # Der Betriebs-Endpunkt (OPS_PORT 9090) ist nie öffentlich.
@@ -67,4 +67,10 @@
 		output stdout
 		format json
 	}
+}
+
+# www. vor dem Host (DNS: infra/dns, Name «www.ppm»): eigenes Zertifikat, nur Umleitung, keine Inhalte
+www.{$DOMAIN:ppm.project-suite.ch} {
+	header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+	redir https://{$DOMAIN:ppm.project-suite.ch}{uri} permanent
 }

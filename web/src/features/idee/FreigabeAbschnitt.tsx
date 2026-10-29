@@ -7,7 +7,7 @@
 import { PersonName, PersonPick } from '@vollholz/iam-web';
 import { useId, useState } from 'react';
 import { isConflict } from '../../api/index.ts';
-import { Dialog, ErrorState, Hinweis, Icon, Loading, T, useToast } from '../../ui/index.ts';
+import { Dialog, ErrorState, Hinweis, Icon, Loading, T, useToast, Vermerke, VorabAktion } from '../../ui/index.ts';
 import type { Idee } from './api.ts';
 import { useFreigabe, useFreigabeMutations, type FreigabeLoaded } from './FreigabeApi.ts';
 import { TF } from './FreigabeTexte.ts';
@@ -60,6 +60,14 @@ export function FreigabeAbschnitt({ idee, gehe, titleId }: { idee: Idee; gehe: G
               {item.weg === 'gremium' ? TF.traktandieren : TF.uebergeben(wer)}
             </button>
           </div>
+        </div>
+      ) : null}
+
+      {item.vermerke.length ? <p><Vermerke vermerke={item.vermerke} /></p> : null}
+      {item.can.initialisieren ? (
+        <div className="acts">
+          <VorabAktion label={TF.vorab.aktion} frage={TF.vorab.frage} wirkung={TF.vorab.wirkung} laeuft={m.initialisieren.isPending} fehler={m.initialisieren.error}
+            ausfuehren={fertig => m.initialisieren.mutate({ etag }, { onSuccess: () => { fertig(); toast.show(TF.vorab.erledigt); } })} />
         </div>
       ) : null}
 

@@ -121,13 +121,16 @@ async function anwenden(tx: Tx, who: Actor, p: store.ProjektKopf, lage: store.Ko
       // UC-015 Schritt 6: Abschlussbericht abgenommen, Vorhaben abgeschlossen, Projektakte lesend
       const b = await exitBericht(tx, p);
       await store.standSetzen(tx, b.id, ['eingereicht', 'traktandiert'], 'abgenommen');
-      await wechseln(tx, who, p, 'abgeschlossen', grund);
+      // vorab abgeschlossen (UC-015 A3): die Abnahme löst nur den Vermerk
+      if (p.lebenszyklus !== 'abgeschlossen') await wechseln(tx, who, p, 'abgeschlossen', grund);
       await erstellenErledigen(tx, p);
       return { berichtId: b.id, artVorher: null };
     }
     case 'nacharbeiten': {
       // UC-015 A2: Auflagen erfasst die UE in der Sitzung; die PL überarbeitet den Bericht (weiter bei Schritt 2)
       const b = await exitBericht(tx, p);
+      // vorab abgeschlossen (UC-015 A3): für die Nacharbeit wieder aktiv, sonst bliebe der Bericht lesend
+      if (p.lebenszyklus === 'abgeschlossen') await projektAktion.endzustandZuruecknehmen(tx, who, p.id, 'abgeschlossen', 'aktiv', { ...grund, vorabAbgeschlossen: true });
       await store.standSetzen(tx, b.id, ['eingereicht', 'traktandiert'], 'nacharbeit');
       const t = kurz(begruendung);
       await erstellenOeffnen(tx, p, 'abschluss', t ? `Nacharbeiten verlangt: ${t}` : 'Nacharbeiten verlangt');
@@ -227,7 +230,8 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
       await zuruecknehmen(tx, who, vorher, p);
       p = (await store.projekt(tx, p.id))!;
     }
-    const vorherLz = p.lebenszyklus as 'aktiv' | 'sistiert';
+    // vor der Abnahme abgeschlossen (UC-015 A3) zählt wie aktiv: die Abnahme steht noch aus
+    const vorherLz = (p.lebenszyklus === 'abgeschlossen' ? 'aktiv' : p.lebenszyklus) as 'aktiv' | 'sistiert';
     const folge = await anwenden(tx, who, p, lage, ergebnis, { traktandumId: f.traktandumId, ergebnis }, f.begruendung);
     await store.entscheidSetzen(tx, {
       projekt_id: p.id, quelle: 'traktandum', quelle_id: f.traktandumId, kontext: lage, ergebnis, vorher_lebenszyklus: vorherLz,

@@ -7,6 +7,13 @@ import { NAV } from './nav.ts';
 type Rubrik = 'scope' | 'zeitplan' | 'ressourcen_budget' | 'annahmen' | 'key_risiken';
 
 export const TA = {
+  // Vor dem Entscheid übernehmen (UC-007 A3, UX-E12)
+  vorab: {
+    aktion: 'Vor dem Entscheid übernehmen',
+    frage: 'Änderung vor dem Entscheid übernehmen?',
+    wirkung: 'Die Version wird Baseline und das Register wird nachgeführt, mit dem Vermerk «nicht freigegeben». Der Entscheid der Projektauftraggeber:in bzw. des PRAT bleibt offen; eine spätere Ablehnung bleibt an der Baseline sichtbar.',
+    erledigt: 'Übernommen, mit Vermerk «nicht freigegeben».',
+  },
   // Beantragen (UC-007 Schritt 1, K2 Einstieg «Projektakte»)
   beantragen: 'Änderung beantragen',
   palette: NAV.palette,

@@ -35469,6 +35469,131 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/vertragsversionen/{id}/aenderung/uebernehmen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Änderung vor dem Entscheid übernehmen
+         * @description UC-007 A3 (A-74): Die Projektleitung setzt die eingereichte Änderung als Baseline, bevor Projektauftraggeber:in bzw. PRAT entschieden haben; das Register wird nachgeführt, die Version trägt den Vermerk «nicht freigegeben», Aufgabe bzw. Traktandum bleiben offen. Der spätere Entscheid ersetzt den Vermerk; eine Ablehnung bleibt an der Baseline sichtbar. `vertrag:write`; `If-Match` Pflicht.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VertragAenderung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/vertragsversionen/{id}/aenderung/entscheiden": {
         parameters: {
             query?: never;
@@ -38210,6 +38335,133 @@ export interface paths {
                     "application/json": components["schemas"]["IdeeFreigebenIn"];
                 };
             };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdeeFreigabe"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ideen/{id}/initialisieren": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Initialisierung vor dem Entscheid starten
+         * @description UC-001 A6 (A-74): Die UE legt das Projekt in P0 an wie bei der Freigabe, solange die Idee traktandiert ist; die Idee trägt den Vermerk «Initialisierung nicht freigegeben», Traktandum bzw. Aufgabe der Direktion bleiben offen. Der spätere Entscheid ersetzt den Vermerk; bei Ablehnung läuft das Projekt weiter, Projektleitung und Projektauftraggeber:in werden informiert. Recht `idee:write`; Projektauftraggeber:in und Projektleitung müssen erfasst sein (422); schon initialisiert: 409. Nur mit `If-Match`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                    /** @description Schlüssel für sichere Wiederholung (empfohlen). */
+                    "idempotency-key"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
             responses: {
                 /** @description Default Response */
                 200: {
@@ -42903,6 +43155,131 @@ export interface paths {
         /**
          * Bericht einreichen
          * @description Abschlussbericht: zum Exit-Gate P4 beim entscheidenden Gremium des Portfolios vorgeschlagen (Art `abschluss`, UC-015 Schritt 5), Stand «traktandiert»; ohne Gremium «eingereicht» (die UE plant ein). Bericht zu Sistierung oder Abbruch: «eingereicht» (A1). Erledigt «Abschlussbericht erstellen». Fehlende Angaben: 422 mit je einem Fehler. `If-Match` Pflicht.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Abschluss"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projekte/{id}/abschluss/abschliessen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Vor der Abnahme abschliessen
+         * @description UC-015 A3 (A-74): PL oder UE schliessen das Vorhaben, bevor das Gremium den Abschlussbericht abnimmt. Das Projekt ist «abgeschlossen» und lesend, mit dem Vermerk «Abnahme offen»; das Traktandum bleibt offen. Die Abnahme löst den Vermerk; «Nacharbeiten» nimmt den Abschluss zurück. Voraussetzung: eingereichter Abschlussbericht (sonst 409). `projekt:write`; `If-Match` = Stand des Berichts.
          */
         post: {
             parameters: {
@@ -51059,7 +51436,14 @@ export interface components {
                 ablehnen: boolean;
                 /** @description «Antrag an den PRAT unterstützen» (eingereicht, vertrag:decide, mit Wirkung). */
                 anPrat: boolean;
+                /** @description «Vor dem Entscheid übernehmen» (eingereicht oder beim PRAT, vertrag:write; UC-007 A3, A-74). */
+                uebernehmen: boolean;
             };
+            /** @description Offene Vermerke (A-74): «nicht freigegeben» nach einer vorab übernommenen Änderung, «Änderung abgelehnt» an der Baseline. */
+            vermerke: {
+                art: string;
+                text: string;
+            }[];
         };
         VertragAenderungEntscheid: {
             /**
@@ -51359,7 +51743,14 @@ export interface components {
                 angaben: boolean;
                 /** @description Direktion (Kategorie C): Initialisierung freigeben oder zurückweisen. */
                 entscheiden: boolean;
+                /** @description UE: Initialisierung vor dem Entscheid starten (UC-001 A6, A-74); Projektauftraggeber:in und Projektleitung erfasst. */
+                initialisieren: boolean;
             };
+            /** @description Offene Vermerke (A-74): «Initialisierung nicht freigegeben», solange der Entscheid fehlt. */
+            vermerke: {
+                art: string;
+                text: string;
+            }[];
         };
         IdeeFreigabeAngabenIn: {
             sponsor: null | string;
@@ -52388,7 +52779,14 @@ export interface components {
                 lessons: boolean;
                 /** @description Bericht als Dokument herunterladen. */
                 dokument: boolean;
+                /** @description Vorhaben vor der Abnahme durch das Gremium abschliessen (UC-015 A3, A-74; projekt:write). */
+                abschliessen: boolean;
             };
+            /** @description Offene Vermerke (A-74): «Abnahme offen», wenn das Vorhaben vor der Abnahme abgeschlossen wurde. */
+            vermerke: {
+                art: string;
+                text: string;
+            }[];
         };
         AbschlussLessonIn: {
             /** @description Erkenntnis für künftige Vorhaben. */

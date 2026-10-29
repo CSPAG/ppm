@@ -141,6 +141,15 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
   });
 
   test('Exit-Gate: Nacharbeiten, Korrektur zu «Abgeschlossen»; Endzustand lesend (UC-015 Schritt 6, A2; A-30)', async () => {
+    // vor der Abnahme abschliessen (UC-015 A3, A-74): läuft weiter, Vermerk «Abnahme offen», Traktandum bleibt
+    const v0 = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
+    assert.deepEqual([v0.body.can.abschliessen, v0.body.vermerke], [true, []]);
+    assert.equal((await call('kt', 'POST', `/v1/projekte/${pj.exit!.id}/abschluss/abschliessen`, undefined, { 'if-match': `W/"${v0.body.bericht.version}"` })).statusCode, 403);
+    const vorab = await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/abschluss/abschliessen`, undefined, { 'if-match': `W/"${v0.body.bericht.version}"` });
+    assert.deepEqual([vorab.body.projekt.lebenszyklus, vorab.body.bericht.stand, vorab.body.vermerke.map((x: { art: string }) => x.art), vorab.body.can.abschliessen],
+      ['abgeschlossen', 'traktandiert', ['abnahme_offen'], false]);
+    assert.ok(await sys(async tx => (await tx.query("SELECT 1 FROM ppm.traktandum WHERE id = $1 AND stand <> 'entschieden'", [id.tExit])).rowCount), 'Traktandum offen');
+
     id.s1 = await sitzungLaufend(termine[0]!, { vorschlagId: id.tExit! });
     const falsch = await call('ue', 'PUT', `/v1/traktanden/${id.tExit}/entscheid`, { ergebnis: 'sistiert', begruendung: 'x' });
     assert.equal(falsch.statusCode, 422, falsch.body);
@@ -152,7 +161,7 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
 
     await entscheiden(id.tExit!, 'abgeschlossen');
     g = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
-    assert.deepEqual([g.body.lage, g.body.projekt.lebenszyklus, g.body.bericht.stand], ['abgeschlossen', 'abgeschlossen', 'abgenommen']);
+    assert.deepEqual([g.body.lage, g.body.projekt.lebenszyklus, g.body.bericht.stand, g.body.vermerke], ['abgeschlossen', 'abgeschlossen', 'abgenommen', []]);
     assert.ok(g.body.bericht.abgenommenAt);
     assert.ok((await aufgaben(pj.exit!.id)).every(a => a.stand !== 'offen'));
 
@@ -164,7 +173,7 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
     assert.ok((await aufgaben(pj.exit!.id)).some(a => a.stand === 'offen'));
     const audit = await sys(async tx => (await tx.query<{ action: string }>(
       "SELECT action FROM ppm.audit_log WHERE resource_type = 'projekt' AND resource_id = $1 AND action = 'projekt.reopened'", [pj.exit!.id])).rows);
-    assert.equal(audit.length, 1);
+    assert.equal(audit.length, 2, 'Nacharbeit nach dem Abschluss vor der Abnahme und Korrektur');
 
     // und wieder zurück: abgeschlossen
     await entscheiden(id.tExit!, 'abgeschlossen');

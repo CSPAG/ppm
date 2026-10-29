@@ -27,3 +27,6 @@ export const ideeModule = defineModule({
 
 // Freigabe der Initialisierung (AP-E4-3): Traktandenart `idee` in der Registry der Sitzung
 registriereIdee();
+
+// Vermerk «Initialisierung nicht freigegeben» am Projekt (AP-E8-4, UC-001 A6) für die Anzeige im Projektvertrag
+export { vermerkeZumProjekt as initialisierungsvermerke } from './vermerk.ts';

@@ -148,7 +148,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
 
     const r = await einreichen(v1);
     const a = r.json();
-    assert.deepEqual([a.stand, a.wirkung, a.can], ['in_pruefung', { prat: false, dimensionen: [], kapitel: [], hinweis: null }, { einreichen: false, freigeben: false, ablehnen: false, anPrat: false }]);
+    assert.deepEqual([a.stand, a.wirkung, a.can], ['in_pruefung', { prat: false, dimensionen: [], kapitel: [], hinweis: null }, { einreichen: false, freigeben: false, ablehnen: false, anPrat: false, uebernehmen: true }]);
     assert.deepEqual((await aufgaben('aenderung.entscheiden', v1)).map(x => [x.person, x.stand, x.titel]), [[id.sp, 'offen', 'Änderung am Projektvertrag Digitale Aufnahme entscheiden']]);
     // kein Quality-Check für eine Änderung (UC-007 Schritt 3)
     const pr = await ok('ue', 'GET', `/v1/vertragsversionen/${v1}/pruefung`);
@@ -156,7 +156,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
     assert.equal((await call('ue', 'POST', `/v1/vertragsversionen/${v1}/quality-check`, { ergebnis: 'bestaetigt' }, { 'if-match': pr.headers.etag as string })).statusCode, 409);
 
     const s = (await aenderung('sp', v1)).json();
-    assert.deepEqual(s.can, { einreichen: false, freigeben: true, ablehnen: true, anPrat: false });
+    assert.deepEqual(s.can, { einreichen: false, freigeben: true, ablehnen: true, anPrat: false, uebernehmen: false });
     assert.equal((await call('pl', 'POST', `/v1/vertragsversionen/${v1}/aenderung/entscheiden`, { ergebnis: 'freigegeben' }, { 'if-match': `W/"${s.version}"` })).statusCode, 403, 'nur vertrag:decide');
     assert.equal((await call('sp', 'POST', `/v1/vertragsversionen/${v1}/aenderung/entscheiden`, { ergebnis: 'freigegeben' }, { 'if-match': 'W/"99"' })).statusCode, 412);
     assert.equal((await entscheiden(v1, 'an_prat')).statusCode, 409, 'ohne Wirkung entscheidet der SP');
@@ -214,7 +214,7 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
       prat: true, dimensionen: ['budget', 'ressourcen'], kapitel: [9],
       hinweis: 'Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Du kannst sie unterstützen; entscheiden wird der PRAT.',
     });
-    assert.deepEqual(s.can, { einreichen: false, freigeben: false, ablehnen: true, anPrat: true });
+    assert.deepEqual(s.can, { einreichen: false, freigeben: false, ablehnen: true, anPrat: true, uebernehmen: false });
     const f = await entscheiden(v2, 'freigegeben');
     assert.equal(f.statusCode, 409, f.body);
     assert.deepEqual([f.json().reason, f.json().detail], ['prat', s.wirkung.hinweis]);
@@ -260,5 +260,28 @@ describe('Projektvertrag: Änderungsantrag und Versionsvergleich', () => {
     assert.ok((await mitteilungen(id.pl!)).some(m => m.startsWith('Änderung abgelehnt: Version 0.4')));
     assert.equal((await entscheiden(v3, 'freigegeben')).statusCode, 409, 'bereits entschieden');
     assert.equal((await entwurf('Neuer Anlauf')).nummer, '0.5');
+  });
+
+  test('Vor dem Entscheid übernehmen: Baseline mit Vermerk, Aufgabe des SP offen; späte Ablehnung bleibt an der Baseline sichtbar (UC-007 A3, A-74)', async () => {
+    const v5 = (await sys(async tx => (await tx.query<{ id: string }>("SELECT id FROM ppm.vertrag_version WHERE projekt_id = $1 AND nummer = '0.5'", [projekt.id])).rows[0]!)).id;
+    await speichern(v5, 4, i => { i.loesungsansatz = 'Tablet-Lösung im Pilot'; });
+    await einreichen(v5);
+    let a = await aenderung('pl', v5);
+    assert.deepEqual([a.json().can.uebernehmen, a.json().vermerke], [true, []]);
+    assert.equal((await call('sp', 'POST', `/v1/vertragsversionen/${v5}/aenderung/uebernehmen`, undefined, { 'if-match': a.headers.etag as string })).statusCode, 403, 'übernimmt die PL');
+    const u = await ok('pl', 'POST', `/v1/vertragsversionen/${v5}/aenderung/uebernehmen`, undefined, { 'if-match': a.headers.etag as string });
+    assert.deepEqual([u.json().stand, u.json().vermerke], ['abgenommen', [{ art: 'aenderung_nicht_freigegeben', text: 'nicht freigegeben' }]]);
+    assert.equal(await baseline(), v5);
+    assert.deepEqual((await aufgaben('aenderung.entscheiden', v5)).map(x => x.stand), ['offen'], 'Entscheid bleibt offen');
+
+    // der SP entscheidet nachträglich: Ablehnung bleibt an der Baseline, die PL beantragt eine Gegenänderung
+    a = await aenderung('sp', v5);
+    assert.equal(a.json().can.ablehnen, true);
+    const r = await entscheiden(v5, 'abgelehnt', 'Tablets nicht budgetiert');
+    assert.equal(r.statusCode, 200, r.body);
+    assert.deepEqual([r.json().stand, r.json().entscheid.ergebnis, r.json().vermerke.map((x: { art: string }) => x.art)], ['abgenommen', 'abgelehnt', ['aenderung_abgelehnt']]);
+    assert.equal(await baseline(), v5);
+    assert.deepEqual((await aufgaben('aenderung.entscheiden', v5)).map(x => x.stand), ['erledigt']);
+    assert.ok((await mitteilungen(id.pl!)).some(m => m.includes('ist bereits Baseline. Beantrage eine Gegenänderung')));
   });
 });

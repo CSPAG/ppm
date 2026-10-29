@@ -132,7 +132,10 @@ export const Abschluss = Type.Object({
     wiederaufnahme: Type.Boolean({ description: 'Wiederaufnahme beim Gremium beantragen (sistiertes Projekt).' }),
     lessons: Type.Boolean({ description: 'Lessons Learned erfassen (projekt:write am Projekt).' }),
     dokument: Type.Boolean({ description: 'Bericht als Dokument herunterladen.' }),
+    abschliessen: Type.Boolean({ description: 'Vorhaben vor der Abnahme durch das Gremium abschliessen (UC-015 A3, A-74; projekt:write).' }),
   }),
+  vermerke: Type.Array(Type.Object({ art: Type.String(), text: Type.String() }, { additionalProperties: false }),
+    { description: 'Offene Vermerke (A-74): «Abnahme offen», wenn das Vorhaben vor der Abnahme abgeschlossen wurde.' }),
 }, { $id: 'Abschluss', additionalProperties: false });
 type BerichtT = Omit<Static<typeof Bericht>, 'kpiWerte' | 'offenePunkte'> & { kpiWerte: KpiWertT[]; offenePunkte: OffenerPunktT[] };
 type Grundlagen = Static<typeof Abschluss>['grundlagen'];

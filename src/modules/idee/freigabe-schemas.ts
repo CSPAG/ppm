@@ -18,7 +18,9 @@ export const Freigabe = Type.Object({
     traktandieren: Type.Boolean({ description: 'UE: dem Gremium vorlegen bzw. der Direktion übergeben.' }),
     angaben: Type.Boolean({ description: 'UE: Sponsor und Projektleitung für den Entscheid erfassen (A-05).' }),
     entscheiden: Type.Boolean({ description: 'Direktion (Kategorie C): Initialisierung freigeben oder zurückweisen.' }),
+    initialisieren: Type.Boolean({ description: 'UE: Initialisierung vor dem Entscheid starten (UC-001 A6, A-74); Projektauftraggeber:in und Projektleitung erfasst.' }),
   }, { additionalProperties: false }),
+  vermerke: Type.Array(Type.Object({ art: Type.String(), text: Type.String() }, { additionalProperties: false }), { description: 'Offene Vermerke (A-74): «Initialisierung nicht freigegeben», solange der Entscheid fehlt.' }),
 }, { $id: 'IdeeFreigabe', additionalProperties: false });
 export type FreigabeOut = Static<typeof Freigabe>;
 

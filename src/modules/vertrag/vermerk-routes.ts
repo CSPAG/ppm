@@ -6,6 +6,7 @@
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
+import { initialisierungsvermerke } from '../idee/index.ts';
 import { projekt as projektAktion } from '../projekt/index.ts';
 import { fullTx, record } from '../../platform.ts';
 import { STAND_TEXT } from './entwurf.ts';
@@ -57,7 +58,7 @@ async function vermerkeVon(req: FastifyRequest, tx: Tx, p: store.ProjektKopf) {
   // vorlegbar: eingereichter Erstvertrag bzw. Gate-Vertrag, der noch nicht beim Gremium liegt
   const vorlegbar = (await store.versionen(tx, p.id)).find(v => v.anlass !== 'aenderung' && VORLEGBAR.includes(v.stand));
   return {
-    projekt: await phaseVermerke(tx, p),
+    projekt: [...await initialisierungsvermerke(tx, p.id), ...await phaseVermerke(tx, p)],
     versionen,
     can: {
       phaseBeginnen: naechste && await req.can('projekt:write', projektOrt(p.id)) ? naechste.zielphase : null,

@@ -23,7 +23,7 @@ const version = { id: V, projektId: P, nummer: '1.1', anlass: 'aenderung', zielp
   begruendung: 'Lizenzkosten gestiegen', eingereichtAt: null, version: 3, createdAt: '2026-10-20T08:00:00Z', updatedAt: '2026-10-27T08:00:00Z', can: { write: true, einreichen: false } } as Version;
 const aenderung = (stand = 'in_arbeit', v = 3) => ({
   versionId: V, projektId: P, nummer: '1.1', basisVersionId: B, basisNummer: '1.0', stand, begruendung: 'Lizenzkosten gestiegen', eingereichtAt: null, version: v, entscheid: null,
-  wirkung: { prat: true, dimensionen: ['budget'], kapitel: [9], hinweis: 'x' }, can: { einreichen: stand === 'in_arbeit', freigeben: false, ablehnen: false, anPrat: false },
+  wirkung: { prat: true, dimensionen: ['budget'], kapitel: [9], hinweis: 'x' }, can: { einreichen: stand === 'in_arbeit', freigeben: false, ablehnen: false, anPrat: false, uebernehmen: false }, vermerke: [],
 });
 const haupt = (o: { text?: string | null; v?: number } = {}) => ({
   versionId: V, basisVersionId: B, andere: '', version: o.v ?? 3, can: { write: true },

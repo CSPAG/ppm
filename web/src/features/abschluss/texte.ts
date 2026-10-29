@@ -6,6 +6,13 @@
 import { NAV } from './nav.ts';
 
 export const TA = {
+  // Vor der Abnahme abschliessen (UC-015 A3, UX-E12)
+  vorab: {
+    aktion: 'Vor der Abnahme abschliessen',
+    frage: 'Vorhaben vor der Abnahme abschliessen?',
+    wirkung: 'Das Projekt wird «abgeschlossen» und lesend, mit dem Vermerk «Abnahme offen». Das Traktandum beim Gremium bleibt; die Abnahme löst den Vermerk, verlangt das Gremium Nacharbeiten, ist das Projekt wieder aktiv.',
+    erledigt: 'Abgeschlossen, mit Vermerk «Abnahme offen».',
+  },
   reiter: NAV.reiter,
   projektFehlt: 'Dieses Projekt gibt es nicht oder du hast keinen Zugriff darauf.',
   titel: { abschluss: 'Abschlussbericht', sistierung: 'Bericht zur Sistierung', abbruch: 'Bericht zum Abbruch' } as Record<string, string>,

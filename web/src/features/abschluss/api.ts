@@ -74,6 +74,16 @@ export function useEinreichen(id: string) {
   });
 }
 
+/** Vor der Abnahme abschliessen (UC-015 A3, A-74). */
+export function useVorabAbschliessen(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ etag }: { etag: string }) =>
+      (await api.POST('/v1/projekte/{id}/abschluss/abschliessen', { params: { path: { id }, header: { 'if-match': etag } } })).data!,
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: abschlussKeys.all }); void qc.invalidateQueries({ queryKey: ['projekt'] }); },
+  });
+}
+
 export function useWiederaufnahme(id: string) {
   const qc = useQueryClient();
   return useMutation({

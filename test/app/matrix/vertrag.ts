@@ -65,6 +65,7 @@ export const matrix: Matrix = {
       'GET /v1/vertragsversionen/:id/aenderung': f('GET', i => `${v(i)}/aenderung`),
       'POST /v1/vertragsversionen/:id/aenderung/einreichen': f('POST', i => `${v(i)}/aenderung/einreichen`, { ifMatch: true }),
       'POST /v1/vertragsversionen/:id/aenderung/entscheiden': f('POST', i => `${v(i)}/aenderung/entscheiden`, { body: { ergebnis: 'abgelehnt', begruendung: 'gehackt' }, ifMatch: true }),
+      'POST /v1/vertragsversionen/:id/aenderung/uebernehmen': f('POST', i => `${v(i)}/aenderung/uebernehmen`, { ifMatch: true }),
       // Weiter ohne Vermerk (AP-E8-4): vorlegen, Phase beginnen, Vermerke lesen
       'GET /v1/projekte/:id/vermerke': f('GET', i => `/v1/projekte/${i.vertragProjekt}/vermerke`),
       'POST /v1/projekte/:id/phase-beginnen': f('POST', i => `/v1/projekte/${i.vertragProjekt}/phase-beginnen`, { body: { phase: 'P1' } }),

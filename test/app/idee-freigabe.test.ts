@@ -10,6 +10,7 @@ import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
+import { traktandenart } from '../../src/modules/sitzung/arten.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
 
@@ -83,7 +84,7 @@ describe('Freigabe der Initialisierung', () => {
   test('Kategorie A: dem Gremium vorlegen, Entscheid in der Sitzung legt das Projekt in P0 mit den Angaben der Idee an', async () => {
     const i = await zugeordnet('Digitale Patientenaufnahme', 'A', portfolioA);
     let f = await ok('GET', `/v1/ideen/${i.id}/freigabe`, ue);
-    assert.deepEqual([f.json().weg, f.json().zustaendig, f.json().can], ['gremium', 'PRAT Programmausschuss', { traktandieren: true, angaben: true, entscheiden: false }]);
+    assert.deepEqual([f.json().weg, f.json().zustaendig, f.json().can], ['gremium', 'PRAT Programmausschuss', { traktandieren: true, angaben: true, entscheiden: false, initialisieren: false }]);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/traktandieren`, mit(as1, i.etag))).statusCode, 403);
     f = await ok('POST', `/v1/ideen/${i.id}/traktandieren`, mit(ue, i.etag));
     assert.equal((await ok('GET', `/v1/ideen/${i.id}`, as1)).json().stand, 'traktandiert');
@@ -123,7 +124,7 @@ describe('Freigabe der Initialisierung', () => {
     const vertrag = await aufgaben('vertrag.erstellen', projekt.id);
     assert.deepEqual(vertrag.map(x => [x.empfaenger_person, x.stand, x.link]), [[pl, 'offen', `/projekte/${projekt.nummer}/vertrag`]]);
     assert.ok((await mitteilungen(as1Id)).some(x => x.includes(`Das Projekt ${projekt.nummer} entsteht in Phase P0`)));
-    assert.ok((await mitteilungen(sp)).some(x => x.includes('Du bist Sponsor')));
+    assert.ok((await mitteilungen(sp)).some(x => x.includes('Du bist Projektauftraggeber:in')));
 
     // je Idee ein Projekt
     const anzahl = async () => sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.projekt WHERE herkunft->>'ideeId' = $1", [i.id])).rows[0]!.n);
@@ -138,6 +139,43 @@ describe('Freigabe der Initialisierung', () => {
     assert.equal(f.json().projekt, null);
     assert.equal((await ok('GET', `/v1/ideen/${i.id}`, as1)).json().stand, 'zurueckgewiesen');
     assert.equal(await anzahl(), 1);
+  });
+
+  test('Initialisierung vor dem Entscheid: läuft weiter, Vermerk gesetzt, Entscheid offen; Freigabe ersetzt den Vermerk, Ablehnung lässt das Projekt laufen (UC-001 A6, A-74)', async () => {
+    const vorab = async (titel: string) => {
+      const i = await zugeordnet(titel, 'A', portfolioA);
+      let f = await ok('PUT', `/v1/ideen/${i.id}/freigabe/angaben`, mit(ue, i.etag), { sponsor: sp, projektleitung: pl });
+      f = await ok('POST', `/v1/ideen/${i.id}/traktandieren`, mit(ue, f.headers.etag as string));
+      assert.equal(f.json().can.initialisieren, true);
+      assert.equal((await call('POST', `/v1/ideen/${i.id}/initialisieren`, mit(as1, f.headers.etag as string))).statusCode, 403);
+      const r = await ok('POST', `/v1/ideen/${i.id}/initialisieren`, mit(ue, f.headers.etag as string));
+      assert.deepEqual(r.json().vermerke, [{ art: 'initialisierung_nicht_freigegeben', text: 'Initialisierung nicht freigegeben' }]);
+      assert.equal((await call('POST', `/v1/ideen/${i.id}/initialisieren`, mit(ue, r.headers.etag as string))).statusCode, 409, 'nur einmal');
+      const projekt = r.json().projekt as { id: string; nummer: string };
+      assert.equal((await ok('GET', `/v1/ideen/${i.id}`, as1)).json().stand, 'traktandiert', 'Entscheid offen');
+      assert.deepEqual((await aufgaben('vertrag.erstellen', projekt.id)).map(x => [x.empfaenger_person, x.stand]), [[pl, 'offen']]);
+      // Vermerk auch am Projekt (Reiter Vertrag)
+      assert.deepEqual((await ok('GET', `/v1/projekte/${projekt.id}/vermerke`, ue)).json().projekt.map((x: { art: string }) => x.art), ['initialisierung_nicht_freigegeben']);
+      const t = await sys(async tx => (await tx.query<{ id: string }>("SELECT id FROM ppm.traktandum WHERE art = 'idee' AND bezug_id = $1", [i.id])).rows[0]!);
+      return { i, projekt, traktandum: t.id };
+    };
+    const entscheid = (o: { i: { id: string }; traktandum: string }, ergebnis: string) => sys(tx => traktandenart('idee')!.beiEntscheid!(tx,
+      { traktandumId: o.traktandum, bezug: { typ: 'idee', id: o.i.id }, ergebnis, begruendung: 'Gremium', viaSns: false } as Parameters<NonNullable<NonNullable<ReturnType<typeof traktandenart>>['beiEntscheid']>>[1]));
+
+    // Freigabe nachgetragen: Vermerk weg, kein zweites Projekt
+    const a = await vorab('Vorab freigegeben');
+    await entscheid(a, 'freigegeben');
+    const fa = (await ok('GET', `/v1/ideen/${a.i.id}/freigabe`, ue)).json();
+    assert.deepEqual([fa.vermerke, fa.projekt.id], [[], a.projekt.id]);
+    assert.equal((await ok('GET', `/v1/ideen/${a.i.id}`, as1)).json().stand, 'freigegeben');
+    assert.equal((await sys(tx => tx.query("SELECT 1 FROM ppm.projekt WHERE herkunft->>'ideeId' = $1", [a.i.id]))).rowCount, 1);
+
+    // Ablehnung: das Projekt läuft weiter, Projektleitung informiert, Vermerk «abgelehnt»
+    const b = await vorab('Vorab abgelehnt');
+    await entscheid(b, 'abgelehnt');
+    assert.equal((await ok('GET', `/v1/projekte/${b.projekt.id}`, ue)).json().lebenszyklus, 'aktiv');
+    assert.deepEqual((await ok('GET', `/v1/ideen/${b.i.id}/freigabe`, ue)).json().vermerke.map((x: { art: string }) => x.art), ['initialisierung_abgelehnt']);
+    assert.ok((await mitteilungen(pl)).some(x => x.includes('nicht freigegeben') && x.includes('läuft bereits')));
   });
 
   test('Kategorie C: der Direktion übergeben, Freigabe im Eingang legt das Projekt im Portfolio der Direktion an', async () => {
@@ -185,6 +223,6 @@ describe('Freigabe der Initialisierung', () => {
     const e = await ok('POST', `/v1/ideen/${c.json().id}/einreichen`, mit(as1, 'W/"1"'));
     assert.equal((await call('POST', `/v1/ideen/${c.json().id}/traktandieren`, mit(ue, e.headers.etag as string))).statusCode, 409);
     const f = await ok('GET', `/v1/ideen/${c.json().id}/freigabe`, as1);
-    assert.deepEqual([f.json().weg, f.json().can], [null, { traktandieren: false, angaben: false, entscheiden: false }]);
+    assert.deepEqual([f.json().weg, f.json().can], [null, { traktandieren: false, angaben: false, entscheiden: false, initialisieren: false }]);
   });
 });

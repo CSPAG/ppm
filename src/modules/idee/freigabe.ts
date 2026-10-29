@@ -48,7 +48,8 @@ export async function pruefePersonen(tx: Tx, sponsor: string | null, projektleit
  * Vorbelegung des Projektvertrags, UC-002 Schritt 1); Sponsor und Projektleitung als Projektorganisation mit Rollen.
  * Liefert das Projekt. Rechte prüft der Aufrufer; `principalId` ist die entscheidende Person (Tupel «erstellt von»).
  */
-export async function initialisieren(tx: Tx, zugang: Zugang, who: Actor, principalId: string, r: store.Row, o: { sponsor: string; projektleitung: string; begruendung: string }): Promise<{ id: string; nummer: string; name: string }> {
+export async function initialisieren(tx: Tx, zugang: Zugang, who: Actor, principalId: string, r: store.Row,
+  o: { sponsor: string; projektleitung: string; begruendung: string; vorab?: boolean }): Promise<{ id: string; nummer: string; name: string }> {
   const a = (await fs.angaben(tx, r.id))!;
   if (!a.portfolio_id) throw invalid('Die Idee hat kein Portfolio.', [{ path: '/kategorie', message: 'Ordne zuerst die Kategorie zu.' }]);
   const pf = await fs.portfolio(tx, a.portfolio_id);
@@ -68,26 +69,44 @@ export async function initialisieren(tx: Tx, zugang: Zugang, who: Actor, princip
   ];
   await projekt.organisationFestlegen(tx, { who }, p.id, 0, organisation);
   await projekt.zugriffVorschlagen(tx, { tuples: zugang.tuples, who, principalId }, p.id, organisation);
-  await ps.setzen(tx, r.id, { stand: 'freigegeben', projekt_id: p.id, sponsor: o.sponsor, projektleitung: o.projektleitung, freigegeben_at: new Date(), begruendung: o.begruendung });
-  await aufgabe.erledigen(tx, { art: 'idee.freigeben', bezug: bezugVon(r.id) });
+  // vorab (UC-001 A6, A-74): die Idee bleibt «traktandiert» mit dem Projekt, der Entscheid und seine Aufgabe bleiben offen
+  if (o.vorab) await ps.setzen(tx, r.id, { projekt_id: p.id, sponsor: o.sponsor, projektleitung: o.projektleitung });
+  else {
+    await ps.setzen(tx, r.id, { stand: 'freigegeben', projekt_id: p.id, sponsor: o.sponsor, projektleitung: o.projektleitung, freigegeben_at: new Date(), begruendung: o.begruendung });
+    await aufgabe.erledigen(tx, { art: 'idee.freigeben', bezug: bezugVon(r.id) });
+  }
+  const wie = o.vorab ? 'Initialisierung vor dem Entscheid gestartet' : 'Initialisierung freigegeben';
   await aufgabe.oeffnen(tx, {
     art: 'vertrag.erstellen', bezug: { typ: 'projekt', id: p.id }, empfaenger: { person: o.projektleitung },
-    titel: `Projektvertrag ${p.nummer} ${p.name} erstellen`, kontext: `${p.nummer} ${p.name} · als PL · Initialisierung freigegeben`,
+    titel: `Projektvertrag ${p.nummer} ${p.name} erstellen`, kontext: `${p.nummer} ${p.name} · als PL · ${wie}`,
     link: `/projekte/${p.nummer}/vertrag`,
   });
   await mitteilung.senden(tx, {
-    an: r.erfasst_von, bezug: bezugVon(r.id),
-    text: `Deine Projektidee «${titelVon(r)}» ist freigegeben: Das Projekt ${p.nummer} entsteht in Phase P0.`, link: link(r.nummer),
+    an: r.erfasst_von, bezug: bezugVon(r.id), link: link(r.nummer),
+    text: o.vorab
+      ? `Zu deiner Projektidee «${titelVon(r)}» startet die Initialisierung schon vor dem Entscheid: Das Projekt ${p.nummer} entsteht in Phase P0, der Entscheid folgt.`
+      : `Deine Projektidee «${titelVon(r)}» ist freigegeben: Das Projekt ${p.nummer} entsteht in Phase P0.`,
   });
   if (o.sponsor !== r.erfasst_von) {
-    await mitteilung.senden(tx, { an: o.sponsor, bezug: { typ: 'projekt', id: p.id }, text: `Du bist Sponsor des Projekts ${p.nummer} ${p.name} (Initialisierung freigegeben).`, link: `/projekte/${p.nummer}` });
+    await mitteilung.senden(tx, { an: o.sponsor, bezug: { typ: 'projekt', id: p.id }, text: `Du bist Projektauftraggeber:in des Projekts ${p.nummer} ${p.name} (${wie}).`, link: `/projekte/${p.nummer}` });
   }
   await record(tx, who, {
-    action: 'idee.approved', resourceType: 'idee', resourceId: r.id,
+    action: o.vorab ? 'idee.initialized_early' : 'idee.approved', resourceType: 'idee', resourceId: r.id,
     data: { id: r.id, nummer: r.nummer, projektId: p.id, projektNummer: p.nummer, sponsor: o.sponsor, projektleitung: o.projektleitung, begruendung: o.begruendung },
-    event: { id: r.id, nummer: r.nummer, stand: 'freigegeben', projektId: p.id },
+    event: { id: r.id, nummer: r.nummer, stand: o.vorab ? r.stand : 'freigegeben', projektId: p.id },
   });
   return { id: p.id, nummer: p.nummer, name: p.name };
+}
+
+/** Freigabe nachgetragen (UC-001 A6.2): das Projekt läuft schon; der Vermerk entfällt, die Aufgabe ist erledigt. */
+async function freigabeNachtragen(tx: Tx, who: Actor, r: store.Row, projektId: string, begruendung: string): Promise<void> {
+  await ps.setzen(tx, r.id, { stand: 'freigegeben', freigegeben_at: new Date(), begruendung });
+  await aufgabe.erledigen(tx, { art: 'idee.freigeben', bezug: bezugVon(r.id) });
+  await mitteilung.senden(tx, { an: r.erfasst_von, bezug: bezugVon(r.id), text: `Deine Projektidee «${titelVon(r)}» ist freigegeben; das Projekt läuft bereits.`, link: link(r.nummer) });
+  await record(tx, who, {
+    action: 'idee.approved', resourceType: 'idee', resourceId: r.id,
+    data: { id: r.id, nummer: r.nummer, projektId, begruendung, nachgetragen: true }, event: { id: r.id, nummer: r.nummer, stand: 'freigegeben', projektId },
+  });
 }
 
 /**
@@ -97,6 +116,23 @@ export async function initialisieren(tx: Tx, zugang: Zugang, who: Actor, princip
  */
 export async function nichtFreigeben(tx: Tx, who: Actor, r: store.Row, stand: 'zurueckgestellt' | 'zurueckgewiesen', begruendung: string): Promise<void> {
   const a = (await fs.angaben(tx, r.id))!;
+  // vorab gestartet (UC-001 A6.2, A-74): das Vorhaben läuft weiter; Projektleitung und Auftraggeber:in erfahren den Entscheid
+  if (a.projekt_id && r.stand !== 'freigegeben') {
+    const p = await fs.projekt(tx, a.projekt_id);
+    for (const an of new Set([a.sponsor, a.projektleitung].filter((x): x is string => !!x))) {
+      await mitteilung.senden(tx, {
+        an, bezug: { typ: 'projekt', id: a.projekt_id }, link: p ? `/projekte/${p.nummer}` : link(r.nummer),
+        text: `Das Gremium hat die Initialisierung von «${titelVon(r)}» ${stand === 'zurueckgestellt' ? 'zurückgestellt' : 'nicht freigegeben'}; das Projekt${p ? ` ${p.nummer}` : ''} läuft bereits. Entscheidet, ob ihr es weiterführt oder zurückzieht.`,
+      });
+    }
+    await ps.setzen(tx, r.id, { stand, begruendung });
+    await aufgabe.erledigen(tx, { art: 'idee.freigeben', bezug: bezugVon(r.id) });
+    await record(tx, who, {
+      action: stand === 'zurueckgestellt' ? 'idee.deferred' : 'idee.rejected', resourceType: 'idee', resourceId: r.id,
+      data: { id: r.id, nummer: r.nummer, begruendung, projektId: a.projekt_id, projektLaeuft: true }, event: { id: r.id, nummer: r.nummer, stand },
+    });
+    return;
+  }
   if (a.projekt_id) {
     const p = await fs.projekt(tx, a.projekt_id);
     if (p && p.lebenszyklus === 'aktiv') await projekt.lebenszyklusWechseln(tx, who, p.id, 'zurueckgezogen', { grund: 'Entscheid zur Initialisierung korrigiert', ideeId: r.id });
@@ -132,6 +168,8 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
   if (FREIGEGEBEN.has(f.ergebnis)) {
     const a = (await fs.angaben(tx, r.id))!;
     if (a.projekt_id && r.stand === 'freigegeben') return;
+    // vorab gestartet (UC-001 A6.2): nur den Entscheid nachtragen
+    if (a.projekt_id) { await freigabeNachtragen(tx, who, r, a.projekt_id, f.begruendung); return; }
     try {
       await pruefePersonen(tx, a.sponsor, a.projektleitung);
     } catch {

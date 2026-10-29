@@ -37,6 +37,12 @@ export function useFreigabeMutations(id: string) {
         return geladen(r.data, r.response);
       },
     }),
+    initialisieren: useMutation({
+      mutationFn: async ({ etag }: { etag: string }) => {
+        const r = await api.POST('/v1/ideen/{id}/initialisieren', { params: { path: { id }, header: header(etag) } });
+        return geladen(r.data, r.response);
+      },
+    }),
     traktandieren: useMutation({
       mutationFn: async ({ etag }: { etag: string }) => {
         const r = await api.POST('/v1/ideen/{id}/traktandieren', { params: { path: { id }, header: header(etag) } });

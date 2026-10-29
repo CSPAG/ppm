@@ -52,6 +52,16 @@ export function useVergleich(neu: string | null, alt: string | null) {
 }
 
 /** Übergänge des Antrags; danach Version, Vertrag, Antrag und Hauptänderungen neu (bestätigt durch den Server, I-R2). */
+/** Vor dem Entscheid übernehmen (UC-007 A3, A-74). */
+export function useAenderungUebernehmen(projektId: string, versionId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ etag }: { etag: string }) =>
+      (await api.POST('/v1/vertragsversionen/{id}/aenderung/uebernehmen', { params: { path: { id: versionId }, header: { 'if-match': etag } } })).data!,
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ['vertrag'] }); void qc.invalidateQueries({ queryKey: vertragKeys.vertrag(projektId) }); },
+  });
+}
+
 export function useAenderungMutations(projektId: string | undefined) {
   const qc = useQueryClient();
   const neu = async (versionId: string) => {

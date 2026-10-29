@@ -4,6 +4,7 @@
  * Quality-Check, Unterschriften und Phase abgeleitet und verschwinden, sobald sie nachgetragen sind.
  */
 import type { Tx } from '@vollholz/platform';
+import { entscheidVon, vorabUebernommen } from './aenderung.ts';
 import { durchgang, FUNKTIONEN, NACHTRAG, unterschriften } from './pruefung.ts';
 import * as store from './store.ts';
 
@@ -16,12 +17,21 @@ const OHNE_GATE: Vermerk = { art: 'ohne_gate_entscheid', text: 'ohne Gate-Entsch
 
 /** Vermerke einer Version, die dem Gremium vorliegt oder freigegeben ist (Erstvertrag und Gate; Änderungen ohne QC). */
 export async function versionVermerke(tx: Tx, v: store.VersionRow): Promise<Vermerk[]> {
-  if (!NACHTRAG.includes(v.stand) || v.anlass === 'aenderung') return [];
+  if (v.anlass === 'aenderung') return aenderungVermerke(tx, v);
+  if (!NACHTRAG.includes(v.stand)) return [];
   const dg = await durchgang(tx, v.id);
   if (!dg) return [QC_OFFEN];
   const us = await unterschriften(tx, dg.id);
   if (us.some(u => u.ergebnis === 'verweigert')) return [UNTERSCHRIFT_VERWEIGERT];
   return FUNKTIONEN.every(f => us.some(u => u.funktion === f && u.ergebnis === 'unterzeichnet')) ? [] : [UNTERSCHRIFT_OFFEN];
+}
+
+/** Änderung (UC-007 A3): als Baseline übernommen ohne Entscheid bzw. trotz Ablehnung. */
+async function aenderungVermerke(tx: Tx, v: store.VersionRow): Promise<Vermerk[]> {
+  if (v.stand !== 'abgenommen' || !v.baseline) return [];
+  const e = await entscheidVon(tx, v.id);
+  if (vorabUebernommen(v, e)) return [{ art: 'aenderung_nicht_freigegeben', text: e?.entscheid === 'an_prat' ? 'nicht freigegeben (PRAT offen)' : 'nicht freigegeben' }];
+  return e?.entscheid === 'abgelehnt' ? [{ art: 'aenderung_abgelehnt', text: 'Änderung abgelehnt' }] : [];
 }
 
 /**

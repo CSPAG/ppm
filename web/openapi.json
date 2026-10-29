@@ -21863,7 +21863,8 @@
           "wirkung",
           "entscheid",
           "version",
-          "can"
+          "can",
+          "vermerke"
         ],
         "properties": {
           "versionId": {
@@ -22047,7 +22048,8 @@
               "einreichen",
               "freigeben",
               "ablehnen",
-              "anPrat"
+              "anPrat",
+              "uebernehmen"
             ],
             "properties": {
               "einreichen": {
@@ -22065,6 +22067,30 @@
               "anPrat": {
                 "description": "«Antrag an den PRAT unterstützen» (eingereicht, vertrag:decide, mit Wirkung).",
                 "type": "boolean"
+              },
+              "uebernehmen": {
+                "description": "«Vor dem Entscheid übernehmen» (eingereicht oder beim PRAT, vertrag:write; UC-007 A3, A-74).",
+                "type": "boolean"
+              }
+            }
+          },
+          "vermerke": {
+            "description": "Offene Vermerke (A-74): «nicht freigegeben» nach einer vorab übernommenen Änderung, «Änderung abgelehnt» an der Baseline.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -24319,7 +24345,8 @@
           "projektleitung",
           "freigegebenAt",
           "projekt",
-          "can"
+          "can",
+          "vermerke"
         ],
         "properties": {
           "weg": {
@@ -24449,7 +24476,8 @@
             "required": [
               "traktandieren",
               "angaben",
-              "entscheiden"
+              "entscheiden",
+              "initialisieren"
             ],
             "properties": {
               "traktandieren": {
@@ -24463,6 +24491,30 @@
               "entscheiden": {
                 "description": "Direktion (Kategorie C): Initialisierung freigeben oder zurückweisen.",
                 "type": "boolean"
+              },
+              "initialisieren": {
+                "description": "UE: Initialisierung vor dem Entscheid starten (UC-001 A6, A-74); Projektauftraggeber:in und Projektleitung erfasst.",
+                "type": "boolean"
+              }
+            }
+          },
+          "vermerke": {
+            "description": "Offene Vermerke (A-74): «Initialisierung nicht freigegeben», solange der Entscheid fehlt.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -29065,7 +29117,8 @@
           "grundlagen",
           "lessonsLearned",
           "entscheid",
-          "can"
+          "can",
+          "vermerke"
         ],
         "properties": {
           "projekt": {
@@ -29467,7 +29520,8 @@
               "nutzenUe",
               "wiederaufnahme",
               "lessons",
-              "dokument"
+              "dokument",
+              "abschliessen"
             ],
             "properties": {
               "bearbeiten": {
@@ -29497,6 +29551,30 @@
               "dokument": {
                 "description": "Bericht als Dokument herunterladen.",
                 "type": "boolean"
+              },
+              "abschliessen": {
+                "description": "Vorhaben vor der Abnahme durch das Gremium abschliessen (UC-015 A3, A-74; projekt:write).",
+                "type": "boolean"
+              }
+            }
+          },
+          "vermerke": {
+            "description": "Offene Vermerke (A-74): «Abnahme offen», wenn das Vorhaben vor der Abnahme abgeschlossen wurde.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -74923,6 +75001,137 @@
         }
       }
     },
+    "/v1/vertragsversionen/{id}/aenderung/uebernehmen": {
+      "post": {
+        "summary": "Änderung vor dem Entscheid übernehmen",
+        "tags": [
+          "Projektvertrag"
+        ],
+        "description": "UC-007 A3 (A-74): Die Projektleitung setzt die eingereichte Änderung als Baseline, bevor Projektauftraggeber:in bzw. PRAT entschieden haben; das Register wird nachgeführt, die Version trägt den Vermerk «nicht freigegeben», Aufgabe bzw. Traktandum bleiben offen. Der spätere Entscheid ersetzt den Vermerk; eine Ablehnung bleibt an der Baseline sichtbar. `vertrag:write`; `If-Match` Pflicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VertragAenderung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/vertragsversionen/{id}/aenderung/entscheiden": {
       "post": {
         "summary": "Änderung entscheiden",
@@ -78049,6 +78258,148 @@
             }
           }
         },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "description": "Schlüssel für sichere Wiederholung (empfohlen)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeeFreigabe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/{id}/initialisieren": {
+      "post": {
+        "summary": "Initialisierung vor dem Entscheid starten",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "UC-001 A6 (A-74): Die UE legt das Projekt in P0 an wie bei der Freigabe, solange die Idee traktandiert ist; die Idee trägt den Vermerk «Initialisierung nicht freigegeben», Traktandum bzw. Aufgabe der Direktion bleiben offen. Der spätere Entscheid ersetzt den Vermerk; bei Ablehnung läuft das Projekt weiter, Projektleitung und Projektauftraggeber:in werden informiert. Recht `idee:write`; Projektauftraggeber:in und Projektleitung müssen erfasst sein (422); schon initialisiert: 409. Nur mit `If-Match`.",
         "parameters": [
           {
             "schema": {
@@ -83203,6 +83554,137 @@
           "Abschluss"
         ],
         "description": "Abschlussbericht: zum Exit-Gate P4 beim entscheidenden Gremium des Portfolios vorgeschlagen (Art `abschluss`, UC-015 Schritt 5), Stand «traktandiert»; ohne Gremium «eingereicht» (die UE plant ein). Bericht zu Sistierung oder Abbruch: «eingereicht» (A1). Erledigt «Abschlussbericht erstellen». Fehlende Angaben: 422 mit je einem Fehler. `If-Match` Pflicht.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Abschluss"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/abschluss/abschliessen": {
+      "post": {
+        "summary": "Vor der Abnahme abschliessen",
+        "tags": [
+          "Abschluss"
+        ],
+        "description": "UC-015 A3 (A-74): PL oder UE schliessen das Vorhaben, bevor das Gremium den Abschlussbericht abnimmt. Das Projekt ist «abgeschlossen» und lesend, mit dem Vermerk «Abnahme offen»; das Traktandum bleibt offen. Die Abnahme löst den Vermerk; «Nacharbeiten» nimmt den Abschluss zurück. Voraussetzung: eingereichter Abschlussbericht (sonst 409). `projekt:write`; `If-Match` = Stand des Berichts.",
         "parameters": [
           {
             "schema": {

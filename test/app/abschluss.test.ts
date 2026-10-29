@@ -180,10 +180,15 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
     g = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
     assert.deepEqual([g.body.projekt.lebenszyklus, g.body.bericht.stand], ['abgeschlossen', 'abgenommen']);
 
-    // Abnahme «Endzustand lesend»: Projekt, Register und Bericht nur noch lesen; Lessons Learned bleiben möglich (UC-013 A1)
+    // nach der Abnahme: Projekt und Register bleiben änderbar, markiert «geändert nach Abschluss» (UC-015 Schritt 6, A-75);
+    // der abgenommene Bericht ist fest, Lessons Learned bleiben möglich (UC-013 A1)
     const projekt = await ok('ue', 'GET', `/v1/projekte/${pj.exit!.id}`);
-    assert.equal((await call('ue', 'PATCH', `/v1/projekte/${pj.exit!.id}`, { name: 'Anders' }, { 'if-match': projekt.etag })).statusCode, 409);
-    assert.equal((await call('pl', 'POST', `/v1/projekte/${pj.exit!.id}/meilensteine`, { phase: 'P4', art: 'meilenstein', text: 'Neu' })).statusCode, 409);
+    assert.equal(projekt.body.geaendertNachAbschluss, null);
+    await ok('ue', 'PATCH', `/v1/projekte/${pj.exit!.id}`, { name: 'Anders' }, { 'if-match': projekt.etag });
+    await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/meilensteine`, { phase: 'P4', art: 'meilenstein', text: 'Neu' }, {}, 201);
+    assert.ok((await ok('ue', 'GET', `/v1/projekte/${pj.exit!.id}`)).body.geaendertNachAbschluss);
+    const verlauf = (await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/verlauf`)).body.items as { aktion: string; nachAbschluss: boolean }[];
+    assert.ok(verlauf.some(e => e.aktion === 'projekt.updated.amended' && e.nachAbschluss), JSON.stringify(verlauf.slice(-5)));
     assert.equal((await call('pl', 'PUT', `/v1/projekte/${pj.exit!.id}/abschluss`, LEER, { 'if-match': `W/"${g.body.bericht.version}"` })).statusCode, 409);
     assert.equal((await call('pl', 'POST', `/v1/projekte/${pj.exit!.id}/abschluss/einreichen`, undefined, { 'if-match': 'W/"1"' })).statusCode, 409);
     await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/lessons-learned`, { text: 'Abnahme früh terminieren' }, {}, 201);

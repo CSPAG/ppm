@@ -63,6 +63,7 @@ export const matrix: Matrix = {
     'GET /v1/projekte/personen': () => ({ method: 'GET', url: '/v1/projekte/personen?q=an', kind: 'list' }),
     'POST /v1/projekte': () => ({ method: 'POST', url: '/v1/projekte', body: { name: 'Projekt B', portfolioId: portfolioB }, kind: 'create' }),
     'GET /v1/projekte/:id': i => ({ method: 'GET', url: `/v1/projekte/${i.projekt}`, kind: 'foreign' }),
+    'GET /v1/projekte/:id/verlauf': i => ({ method: 'GET', url: `/v1/projekte/${i.projekt}/verlauf`, kind: 'foreign' }),
     'PATCH /v1/projekte/:id': i => ({ method: 'PATCH', url: `/v1/projekte/${i.projekt}`, body: { name: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'GET /v1/projekte/:id/organisation': i => ({ method: 'GET', url: `/v1/projekte/${i.projekt}/organisation`, kind: 'foreign' }),
     // Übernahme (AP-E0-7): Prüflauf von B mit eigenem Portfolio, speichert nichts

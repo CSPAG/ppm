@@ -4,8 +4,10 @@
  * Status und letzte Entscheide ergänzen die Pakete der Register und der Gremien (projektdaten, sitzung).
  */
 import { PersonName, useAccessList, useIamConfig } from '@vollholz/iam-web';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { ErrorState, fmtPhase, Icon, Loading, type Phase } from '../../ui/index.ts';
+import { api } from '../../api/index.ts';
+import { ErrorState, fmtPhase, Icon, Loading, Verlauf, type Phase } from '../../ui/index.ts';
 import { useOrganisation, useProjektNachNummer, type Organisation, type Projekt } from './api.ts';
 import { OrganisationDrawer } from './OrganisationDrawer.tsx';
 import { RegisterUebersicht } from './RegisterUebersicht.tsx';
@@ -91,6 +93,15 @@ function Angaben({ p }: { p: Projekt }) {
   );
 }
 
+/** Verlauf der Projektakte nach dem Abschluss (UX-E13, A-75): Abschluss und alle Änderungen danach, markiert. */
+function ProjektVerlauf({ id, version }: { id: string; version: number }) {
+  const q = useQuery({
+    queryKey: ['projekt', 'verlauf', id, version] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/projekte/{id}/verlauf', { params: { path: { id } }, signal })).data!.items,
+  });
+  return <Verlauf titel={TP.akte.verlauf} eintraege={q.data} laedt={q.isPending} fehler={q.error} erneut={() => void q.refetch()} />;
+}
+
 export function ProjektUebersicht({ nummer }: { nummer: string }) {
   const projekt = useProjektNachNummer(nummer);
   const p = projekt.data ?? undefined;
@@ -120,6 +131,7 @@ export function ProjektUebersicht({ nummer }: { nummer: string }) {
         )}
       </section>
       <RegisterUebersicht projektId={p.id} />
+      {p.lebenszyklus === 'abgeschlossen' || p.lebenszyklus === 'abgebrochen' ? <ProjektVerlauf id={p.id} version={p.version} /> : null}
       {bearbeiten && org.data ? <OrganisationDrawer projektId={p.id} titel={`${p.nummer} · ${p.name}`} geladen={org.data}
         neuLaden={async () => (await org.refetch()).data} onClose={() => setBearbeiten(false)} /> : null}
     </div>

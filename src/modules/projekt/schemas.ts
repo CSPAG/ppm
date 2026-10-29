@@ -46,6 +46,7 @@ export const Projekt = Type.Object({
   sponsor: Nullable(Uuid),
   projektleitung: Nullable(Uuid),
   rollen: Type.Array(FunktionT, { description: 'Eigene Funktionen der anfragenden Person in der Projektorganisation.' }),
+  geaendertNachAbschluss: Nullable(DateTime),
   version: Type.Integer({ minimum: 1 }),
   createdAt: DateTime,
   updatedAt: DateTime,

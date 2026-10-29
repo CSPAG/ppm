@@ -142,15 +142,31 @@ describe('Projektakte und Projektübersicht (UI-06)', () => {
     expect(await screen.findByText(TP.akte.nichtGefunden)).toBeInTheDocument();
   });
 
-  it('Endzustand: Banner, nur lesen (Z8, Z9)', async () => {
+  it('Zurückgezogen: Banner, nur lesen (Z8, Z9)', async () => {
     stub({
-      'GET /v1/projekte': () => json({ items: [projekt({ lebenszyklus: 'abgeschlossen', can: { read: true, write: false, organisation: false } })], nextCursor: null }),
+      'GET /v1/projekte': () => json({ items: [projekt({ lebenszyklus: 'zurueckgezogen', can: { read: true, write: false, organisation: false } })], nextCursor: null }),
       [`GET /v1/projekte/${ID}/organisation`]: () => json(organisation({ can: { write: false } })),
     });
     renderWithIam(akte(), PL_ME);
-    expect(await screen.findByText(TP.akte.beendet('abgeschlossen'))).toBeInTheDocument();
+    expect(await screen.findByText(TP.akte.beendet('zurückgezogen'))).toBeInTheDocument();
     await screen.findByText('Kernteam');
     expect(screen.queryByRole('button', { name: TP.org.bearbeiten })).not.toBeInTheDocument();
+  });
+
+  it('Abgeschlossen: änderbar, «geändert nach Abschluss» markiert, Verlauf (UC-015 Schritt 6, A-75, UX-E13)', async () => {
+    stub({
+      'GET /v1/projekte': () => json({ items: [projekt({ lebenszyklus: 'abgeschlossen', geaendertNachAbschluss: '2026-10-20T09:00:00Z' })], nextCursor: null }),
+      [`GET /v1/projekte/${ID}/organisation`]: () => json(organisation()),
+      [`GET /v1/projekte/${ID}/verlauf`]: () => json({ items: [
+        { at: '2026-10-10T09:00:00Z', person: 'Kim Keller', aktion: 'projekt.completed', objekt: 'projekt', text: 'abgeschlossen', nachAbschluss: false },
+        { at: '2026-10-20T09:00:00Z', person: 'Pia Lehmann', aktion: 'projekt.updated.amended', objekt: 'projekt', text: 'Projekt geändert · geändert nach Abschluss', nachAbschluss: true },
+      ] }),
+    });
+    renderWithIam(akte(), PL_ME);
+    expect(await screen.findByText(TP.akte.nachAbschluss('abgeschlossen'))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`^${TP.akte.geaendertNachAbschluss} · `))).toBeInTheDocument();
+    expect(await screen.findByText('Projekt geändert · geändert nach Abschluss')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: TP.org.bearbeiten })).toBeInTheDocument();
   });
 
   it('Projektorganisation bearbeiten: Prüfung am Feld, kein Zugriff, Konflikt (412) mit neu laden, Speichern mit If-Match', async () => {

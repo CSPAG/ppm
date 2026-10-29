@@ -8,7 +8,7 @@ import { useIamConfig } from '@vollholz/iam-web';
 import type { ReactNode } from 'react';
 import { useSession } from '../../auth/index.ts';
 import type { AppPermission } from '../../auth/permissions.ts';
-import { Empty, ErrorState, fmtPhase, Hinweis, Icon, Skelett, T, useVerzoegert } from '../../ui/index.ts';
+import { Empty, ErrorState, fmtPhase, GeaendertNach, Hinweis, Icon, Skelett, T, useVerzoegert } from '../../ui/index.ts';
 import { useProjektNachNummer } from './api.ts';
 import { ProjektStand } from './ProjektStand.tsx';
 import { TP } from './texte.ts';
@@ -33,7 +33,8 @@ export function ProjektAkte({ nummer, reiter, children }: { nummer: string; reit
 
   const sichtbar = reiter.filter(r => !r.recht || canSomewhere(r.recht));
   const aktiv = (r: Reiter) => (r.pfad ? path === `${basis}/${r.pfad}` || path.startsWith(`${basis}/${r.pfad}/`) : path === basis || path === `${basis}/`);
-  const beendet = p.lebenszyklus === 'abgebrochen' || p.lebenszyklus === 'abgeschlossen' || p.lebenszyklus === 'zurueckgezogen';
+  // zurückgezogen ist lesend; abgeschlossen und abgebrochen bleiben änderbar, markiert (UC-015 Schritt 6, A-75)
+  const beendet = p.lebenszyklus === 'abgebrochen' || p.lebenszyklus === 'abgeschlossen';
   return (
     <section aria-labelledby="page-title" className="pj-akte">
       <header className="mh">
@@ -42,7 +43,8 @@ export function ProjektAkte({ nummer, reiter, children }: { nummer: string; reit
             <div className="type-ico neutral"><Icon name="folder" /></div>
             <div className="minw0">
               <h1 id="page-title"><span className="mono pj-nr">{p.nummer}</span> {p.name}</h1>
-              <div className="sub">{[p.portfolio?.name, fmtPhase(p.phase)].filter(Boolean).join(' · ')} <ProjektStand projekt={p} /></div>
+              <div className="sub">{[p.portfolio?.name, fmtPhase(p.phase)].filter(Boolean).join(' · ')} <ProjektStand projekt={p} />
+                {p.geaendertNachAbschluss ? <> <GeaendertNach text={TP.akte.geaendertNachAbschluss} at={p.geaendertNachAbschluss} /></> : null}</div>
             </div>
           </div>
           <div className="acts">{zurueck}</div>
@@ -55,7 +57,8 @@ export function ProjektAkte({ nummer, reiter, children }: { nummer: string; reit
           </nav>
         ) : null}
       </header>
-      {beendet ? <div className="pj-banner"><Hinweis stufe="hinweis">{TP.akte.beendet(TP.lebenszyklus[p.lebenszyklus])}</Hinweis></div> : null}
+      {p.lebenszyklus === 'zurueckgezogen' ? <div className="pj-banner"><Hinweis stufe="hinweis">{TP.akte.beendet(TP.lebenszyklus[p.lebenszyklus])}</Hinweis></div> : null}
+      {beendet ? <div className="pj-banner"><Hinweis stufe="hinweis">{TP.akte.nachAbschluss(TP.lebenszyklus[p.lebenszyklus])}</Hinweis></div> : null}
       {p.lebenszyklus === 'sistiert' ? <div className="pj-banner"><Hinweis stufe="hinweis">{TP.akte.sistiert}</Hinweis></div> : null}
       {/* scrollbarer Bereich mit der Tastatur erreichbar (axe scrollable-region-focusable) */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1) */}

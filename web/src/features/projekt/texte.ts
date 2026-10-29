@@ -43,6 +43,10 @@ export const TP = {
     reiter: 'Bereiche der Projektakte', inhalt: 'Inhalt der Projektakte', uebersicht: NAV.uebersicht, zurueck: 'Zu den Projekten',
     nichtGefunden: 'Dieses Projekt gibt es nicht, oder du siehst es nicht.',
     beendet: (stand: string) => `Das Projekt ist ${stand}. Die Projektakte kann nur noch gelesen werden.`,
+    // abgeschlossen, abgebrochen: änderbar, markiert (UC-015 Schritt 6, A-75)
+    nachAbschluss: (stand: string) => `Das Projekt ist ${stand}. Änderungen bleiben möglich; sie sind als «geändert nach Abschluss» markiert und stehen im Verlauf.`,
+    geaendertNachAbschluss: 'geändert nach Abschluss',
+    verlauf: 'Verlauf',
     sistiert: 'Das Projekt ist sistiert. Es wird mit einem Entscheid des Gremiums wieder aufgenommen.',
   },
   // Projektübersicht (UI-06, Bericht)

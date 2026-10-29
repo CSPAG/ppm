@@ -132,8 +132,8 @@ describe('Projektdaten', () => {
     assert.deepEqual([s1.items.length, s2.items.length, s2.nextCursor], [1, 1, null]);
     assert.notEqual(s1.items[0].id, s2.items[0].id);
 
-    // Endzustand: lesend (409), Lesen bleibt möglich
-    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgebrochen' WHERE id = $1", [projekt.x]));
+    // zurückgezogen: lesend (409), Lesen bleibt möglich
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'zurueckgezogen' WHERE id = $1", [projekt.x]));
     try {
       const r = await call('plx', 'PATCH', url, { text: 'neu' }, { 'if-match': 'W/"2"' });
       assert.equal(r.statusCode, 409, r.body);
@@ -144,7 +144,17 @@ describe('Projektdaten', () => {
     } finally {
       await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'aktiv' WHERE id = $1", [projekt.x]));
     }
-    assert.equal((await call('plx', 'DELETE', url, undefined, { 'if-match': 'W/"2"' })).statusCode, 204);
+    // abgebrochen: änderbar, das Projekt ist markiert «geändert nach Abschluss» (UC-015 Schritt 6, A-75)
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgebrochen' WHERE id = $1", [projekt.x]));
+    try {
+      assert.equal((await call('plx', 'PATCH', url, { text: 'nachgetragen' }, { 'if-match': 'W/"2"' })).statusCode, 200);
+      const m = await full(api.t.runtime, T, async tx => (await tx.query<{ m: Date | null }>(
+        'SELECT geaendert_nach_abschluss_at AS m FROM ppm.projekt WHERE id = $1', [projekt.x])).rows[0]!.m);
+      assert.ok(m);
+    } finally {
+      await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'aktiv', geaendert_nach_abschluss_at = NULL WHERE id = $1", [projekt.x]));
+    }
+    assert.equal((await call('plx', 'DELETE', url, undefined, { 'if-match': 'W/"3"' })).statusCode, 204);
   });
 
   test('Ressourcenbedarf: Grösse oder FTE × Monate je Rolle und Phase (A-20)', async () => {

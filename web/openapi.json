@@ -5619,6 +5619,7 @@
           "sponsor",
           "projektleitung",
           "rollen",
+          "geaendertNachAbschluss",
           "version",
           "createdAt",
           "updatedAt",
@@ -5794,6 +5795,19 @@
               ],
               "description": "`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO)."
             }
+          },
+          "geaendertNachAbschluss": {
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
           },
           "version": {
             "minimum": 1,
@@ -6389,6 +6403,60 @@
               },
               "fehlerhaft": {
                 "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "ProjektVerlauf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "at",
+                "person",
+                "aktion",
+                "objekt",
+                "text",
+                "nachAbschluss"
+              ],
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "person": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "aktion": {
+                  "description": "Aktion aus dem Audit; nach dem Abschluss mit Zusatz «.amended».",
+                  "type": "string"
+                },
+                "objekt": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "nachAbschluss": {
+                  "description": "Nach dem Abschluss («geändert nach Abschluss», A-75).",
+                  "type": "boolean"
+                }
               }
             }
           }
@@ -53305,6 +53373,108 @@
           },
           "409": {
             "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projekte/{id}/verlauf": {
+      "get": {
+        "summary": "Verlauf der Projektakte",
+        "tags": [
+          "Projekte"
+        ],
+        "description": "Wer wann was an der Projektakte geändert hat (Projekt und Objekte mit Bezug zum Projekt), älteste zuerst, höchstens die jüngsten 500; Einträge nach dem Abschluss markiert (A-75, UX-E13). Mit `projekt:read` am Projekt.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjektVerlauf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
             "content": {
               "application/problem+json": {
                 "schema": {

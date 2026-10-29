@@ -16,11 +16,21 @@ export const snapshot = (r: store.Row) => ({
   phase: r.phase, phasenmodellId: r.phasenmodell_id, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich, version: r.version,
 });
 
-/** Endzustände sind lesend (UC-015 Schritt 6): Änderungen am Projekt und an der Projektorganisation werden abgewiesen. */
-export function pruefeAenderbar(r: store.Row): void {
-  if (ENDZUSTAENDE.includes(r.lebenszyklus)) {
-    throw conflict(`Das Projekt ${r.nummer} ist ${LEBENSZYKLUS_TEXT[r.lebenszyklus]} und kann nur noch gelesen werden.`, { reason: 'lebenszyklus', lebenszyklus: r.lebenszyklus });
+/**
+ * Zurückgezogene Projekte sind lesend. Abgeschlossene und abgebrochene bleiben änderbar (UC-015 Schritt 6, A-75); die
+ * Änderung markiert das Projekt «geändert nach Abschluss» (`nachAbschluss` nach der Änderung).
+ */
+export function pruefeAenderbar(r: { nummer: string; lebenszyklus: string }): void {
+  if (r.lebenszyklus === 'zurueckgezogen') {
+    throw conflict(`Das Projekt ${r.nummer} ist ${LEBENSZYKLUS_TEXT.zurueckgezogen} und kann nur noch gelesen werden.`, { reason: 'lebenszyklus', lebenszyklus: r.lebenszyklus });
   }
+}
+
+/** Nach dem Abschluss geändert (A-75): Markierung am Projekt; liefert, ob markiert wurde. Aktive Projekte: nichts. */
+export async function nachAbschluss(tx: Tx, p: { id: string; lebenszyklus: string }): Promise<boolean> {
+  if (p.lebenszyklus !== 'abgeschlossen' && p.lebenszyklus !== 'abgebrochen') return false;
+  await store.nachAbschlussMarkieren(tx, p.id);
+  return true;
 }
 
 const LEBENSZYKLUS_TEXT: Record<Lebenszyklus, string> = {
@@ -149,6 +159,7 @@ export async function organisationFestlegen(tx: Tx, o: { who: Actor }, id: strin
   if (stand !== version) throw preconditionFailed(stand);
   await pruefe(tx, liste);
   await store.ersetzen(tx, id, stand + 1, liste.map(m => ({ personId: m.personId, funktion: m.funktion, funktionText: textVon(m), akv: (m.akv ?? '').trim() })));
+  await nachAbschluss(tx, projekt);
 
   const after = await store.mitglieder(tx, id);
   const daten = (rows: store.MitgliedRow[]) => rows.map(r => ({ personId: r.person_id, funktion: r.funktion, funktionText: r.funktion_text, akv: r.akv }));

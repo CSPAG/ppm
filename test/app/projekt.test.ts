@@ -84,7 +84,7 @@ describe('Projekte', () => {
     assert.equal((await call('POST', '/v1/projekte', ue.h, { name: 'X', portfolioId: portfolio.a, phase: 'P9' })).statusCode, 422);
   });
 
-  test('ändern mit ETag; Endzustand ist lesend (UC-015 Schritt 6)', async () => {
+  test('ändern mit ETag; nach Abschluss markiert, zurückgezogen lesend (UC-015 Schritt 6, A-75)', async () => {
     const p = await anlegen({ name: 'Ändern' });
     assert.equal((await call('PATCH', `/v1/projekte/${p.id}`, ue.h, { name: 'x' })).statusCode, 428);
     const r = await call('PATCH', `/v1/projekte/${p.id}`, { ...ue.h, 'if-match': 'W/"1"' }, { name: ' Neu ', vertraulich: true });
@@ -94,16 +94,26 @@ describe('Projekte', () => {
 
     await full(api.t.runtime, T, tx => aktionen.lebenszyklusWechseln(tx, systemActor('system'), p.id, 'abgeschlossen'));
     const g = (await call('GET', `/v1/projekte/${p.id}`, ue.h)).json();
-    assert.deepEqual([g.lebenszyklus, g.can], ['abgeschlossen', { read: true, write: false, organisation: false }]);
-    const z = await call('PATCH', `/v1/projekte/${p.id}`, { ...ue.h, 'if-match': `W/"${g.version}"` }, { name: 'Zu spät' });
-    assert.equal(z.statusCode, 409, z.body);
-    assert.match(z.json().detail, /abgeschlossen und kann nur noch gelesen werden/);
-    assert.equal((await organisation(p.id, 0, [])).statusCode, 409);
+    assert.deepEqual([g.lebenszyklus, g.can, g.geaendertNachAbschluss], ['abgeschlossen', { read: true, write: true, organisation: true }, null]);
+    const z = await call('PATCH', `/v1/projekte/${p.id}`, { ...ue.h, 'if-match': `W/"${g.version}"` }, { name: 'Nachgetragen' });
+    assert.equal(z.statusCode, 200, z.body);
+    assert.ok(z.json().geaendertNachAbschluss);
 
-    // Verlauf: Anlegen, Ändern, Abschluss
+    // Verlauf: Anlegen, Ändern, Abschluss, Änderung danach (markiert)
     const v = await full(api.t.runtime, T, async tx => (await tx.query<{ version: number; lebenszyklus: string; name: string }>(
       'SELECT version, lebenszyklus, name FROM ppm.projekt_version WHERE projekt_id = $1 ORDER BY version', [p.id])).rows);
-    assert.deepEqual(v.map(x => [x.version, x.name, x.lebenszyklus]), [[1, 'Ändern', 'aktiv'], [2, 'Neu', 'aktiv'], [3, 'Neu', 'abgeschlossen']]);
+    assert.deepEqual(v.map(x => [x.version, x.name, x.lebenszyklus]),
+      [[1, 'Ändern', 'aktiv'], [2, 'Neu', 'aktiv'], [3, 'Neu', 'abgeschlossen'], [4, 'Nachgetragen', 'abgeschlossen']]);
+    const verlauf = (await call('GET', `/v1/projekte/${p.id}/verlauf`, ue.h)).json().items as { aktion: string; nachAbschluss: boolean }[];
+    assert.deepEqual(verlauf.filter(e => e.aktion.startsWith('projekt.updated')).map(e => e.nachAbschluss), [false, true]);
+
+    // zurückgezogen bleibt lesend
+    const q = await anlegen({ name: 'Zurückgezogen' });
+    await full(api.t.runtime, T, tx => aktionen.lebenszyklusWechseln(tx, systemActor('system'), q.id, 'zurueckgezogen'));
+    const w = await call('PATCH', `/v1/projekte/${q.id}`, { ...ue.h, 'if-match': 'W/"2"' }, { name: 'Zu spät' });
+    assert.equal(w.statusCode, 409, w.body);
+    assert.match(w.json().detail, /zurückgezogen und kann nur noch gelesen werden/);
+    assert.equal((await organisation(q.id, 0, [])).statusCode, 409);
   });
 
   test('Lebenszyklus: nur erlaubte Übergänge; Phase nachführen', async () => {

@@ -16502,6 +16502,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projekte/{id}/verlauf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verlauf der Projektakte
+         * @description Wer wann was an der Projektakte geändert hat (Projekt und Objekte mit Bezug zum Projekt), älteste zuerst, höchstens die jüngsten 500; Einträge nach dem Abschluss markiert (A-75, UX-E13). Mit `projekt:read` am Projekt.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProjektVerlauf"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projekte/{id}/meilensteine": {
         parameters: {
             query?: never;
@@ -48264,6 +48368,7 @@ export interface components {
             projektleitung: null | string;
             /** @description Eigene Funktionen der anfragenden Person in der Projektorganisation. */
             rollen: ("sp" | "pl" | "weitere")[];
+            geaendertNachAbschluss: null | string;
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -48425,6 +48530,19 @@ export interface components {
                 zeilen: number;
                 fehlerhaft: number;
             };
+        };
+        ProjektVerlauf: {
+            items: {
+                /** Format: date-time */
+                at: string;
+                person: string | null;
+                /** @description Aktion aus dem Audit; nach dem Abschluss mit Zusatz «.amended». */
+                aktion: string;
+                objekt: string;
+                text: string;
+                /** @description Nach dem Abschluss («geändert nach Abschluss», A-75). */
+                nachAbschluss: boolean;
+            }[];
         };
         Meilenstein: {
             /** Format: uuid */

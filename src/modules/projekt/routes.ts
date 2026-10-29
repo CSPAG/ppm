@@ -10,7 +10,7 @@ import {
   requireIfMatch, type Deps,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
-import { anlegen, organisationFestlegen, pruefeAenderbar, snapshot, standVon } from './aktionen.ts';
+import { anlegen, nachAbschluss, organisationFestlegen, pruefeAenderbar, snapshot, standVon } from './aktionen.ts';
 import {
   Kopf, KopfProjekt, ListQuery, Mitglied, Organisation, OrganisationPut, PersonenQuery, Projekt, ProjektCreate, ProjektList, ProjektPatch, ProjektPersonen,
   type Funktion, type Lebenszyklus, type OrganisationOut, type OrganisationPutIn, type Phase, type ProjektCreateIn, type ProjektOut,
@@ -33,13 +33,15 @@ function out(r: store.Row, caps: Caps): ProjektOut {
     orgEinheitId: l ? r.org_einheit_id : null, handlungsfeldId: l ? r.handlungsfeld_id : null, handlungsfeld: l ? r.hf_label : null,
     phase: r.phase, phasenmodellId: l ? r.phasenmodell_id : null, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
     sponsor: r.sponsor, projektleitung: r.projektleitung, rollen: r.rollen,
+    geaendertNachAbschluss: l ? r.geaendert_nach_abschluss_at : null,
     version: r.version, createdAt: r.created_at, updatedAt: r.updated_at,
-    // Endzustände sind lesend (UC-015 Schritt 6)
+    // zurückgezogen ist lesend; nach dem Abschluss markiert (UC-015 Schritt 6, A-75)
     can: { read: l, write: l && !!c.write && aenderbar(r), organisation: l && !!c.organisation && aenderbar(r) },
   };
 }
 
-const aenderbar = (r: store.Row) => r.lebenszyklus === 'aktiv' || r.lebenszyklus === 'sistiert';
+/** Änderbar ausser zurückgezogen; nach dem Abschluss markiert (UC-015 Schritt 6, A-75). */
+const aenderbar = (r: store.Row) => r.lebenszyklus !== 'zurueckgezogen';
 
 function organisation(r: store.Row, rows: store.MitgliedRow[], vorschlaege: string[], caps: Caps): OrganisationOut {
   return {
@@ -141,6 +143,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       if (before.version !== version) throw preconditionFailed(before.version);
       pruefeAenderbar(before);
       if (!(await store.update(tx, id, version, req.body as ProjektPatchIn))) throw preconditionFailed(before.version);
+      await nachAbschluss(tx, before);
       const r = (await store.get(tx, id))!;
       await record(tx, who, { action: 'projekt.updated', resourceType: 'projekt', resourceId: id, data: { before: snapshot(before), after: snapshot(r) }, event: snapshot(r) });
       return r;

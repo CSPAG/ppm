@@ -16,11 +16,13 @@ export interface Row {
   sponsor: string | null; projektleitung: string | null; rollen: Funktion[];
   /** Leserecht (nicht nur auflisten, A-73). */
   lesbar: boolean;
+  /** Zuletzt nach dem Abschluss geändert (A-75). */
+  geaendert_nach_abschluss_at: Date | null;
 }
 
 const T = `${SCHEMA}.projekt`;
 const P = `${SCHEMA}.projekt_person`;
-const COLS = 'id, nummer, name, portfolio_id, org_einheit_id, handlungsfeld_id, phase, phasenmodell_id, lebenszyklus, vertraulich, herkunft, version, created_at, updated_at';
+const COLS = 'id, nummer, name, portfolio_id, org_einheit_id, handlungsfeld_id, phase, phasenmodell_id, lebenszyklus, vertraulich, herkunft, version, created_at, updated_at, geaendert_nach_abschluss_at';
 
 /** Projekt mit Portfolio, Handlungsfeld (falls sichtbar), Projektauftraggeber:in, Projektleitung und eigenen Funktionen. */
 const SELECT = `
@@ -167,4 +169,9 @@ export async function kopf(tx: Tx, limit: number): Promise<{ rows: Row[]; anzahl
   const rows = (await tx.query<Row>(`${SELECT} WHERE ${eigene} ORDER BY p.nummer LIMIT $1`, [limit])).rows;
   const anzahl = (await tx.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${T} p WHERE ${eigene}`)).rows[0]!.n;
   return { rows, anzahl };
+}
+
+/** Nach dem Abschluss geändert (A-75): Zeitpunkt der letzten Änderung am Projekt oder an seiner Akte. */
+export async function nachAbschlussMarkieren(tx: Tx, id: string): Promise<void> {
+  await tx.query(`UPDATE ${T} SET geaendert_nach_abschluss_at = now() WHERE id = $1`, [id]);
 }

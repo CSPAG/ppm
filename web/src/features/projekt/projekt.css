@@ -26,3 +26,9 @@
   .pj-phasen{grid-template-columns:1fr}
   .pj-banner,.pj-inhalt{padding-left:16px;padding-right:16px}
 }
+
+/* Bereich «Zugriff» (UI-51) und Hinweis «kein Zugriff» an der Projektorganisation (UX-E14) */
+.pj-ohne-zugriff{display:inline-flex;gap:8px;align-items:center;margin-left:8px}
+.pj-zugriff{display:flex;flex-direction:column;gap:16px}
+.pj-zugriff-kopf{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;justify-content:space-between}
+.pj-zugriff-kopf .acts{display:flex;gap:8px;flex-wrap:wrap}

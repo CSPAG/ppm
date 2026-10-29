@@ -57,6 +57,7 @@ const AuswertungenPage = seite(() => import('./features/dashboard/AuswertungenPa
 const MonatsabschlussPage = seite(() => import('./features/monatsabschluss/MonatsabschlussPage.tsx'), 'MonatsabschlussPage');
 const PhasenmodellPage = seite(() => import('./features/phasenmodell/PhasenmodellPage.tsx'), 'PhasenmodellPage');
 const PortfoliosPage = seite(() => import('./features/portfolios/PortfoliosPage.tsx'), 'PortfoliosPage');
+const PortfolioZugriffPage = seite(() => import('./features/projekt/Zugriff.tsx'), 'PortfolioZugriffPage');
 const SchnittstellenPage = seite(() => import('./features/schnittstellen/SchnittstellenPage.tsx'), 'SchnittstellenPage');
 const AenderungsprotokollPage = seite(() => import('./features/schnittstellen/AenderungsprotokollPage.tsx'), 'AenderungsprotokollPage');
 const SitzungenPage = seite(() => import('./features/sitzung/SitzungenPage.tsx'), 'SitzungenPage');
@@ -183,6 +184,19 @@ function FreigabeRoute() {
   const { jahr } = freigabeRoute.useParams();
   const navigate = useNavigate({ from: freigabeRoute.fullPath });
   return <FreigabePage jahr={Number(jahr)} zumZyklus={nr => void navigate({ to: '/ziele/$jahr', params: { jahr }, search: nr ? { o: `ziel:${nr}` } : {} })} />;
+}
+
+// Portfolio › Zugriff (UI-51, UC-016 A2): `/portfolio/zugriff?portfolio=transformation`
+const portfolioZugriffRoute = createRoute({
+  getParentRoute: () => rootRoute, path: '/portfolio/zugriff', component: PortfolioZugriffRoute,
+  validateSearch: (raw: Record<string, unknown>): { portfolio?: string } =>
+    (typeof raw.portfolio === 'string' && /^[a-z0-9][a-z0-9-]{0,39}$/.test(raw.portfolio) ? { portfolio: raw.portfolio } : {}),
+});
+
+function PortfolioZugriffRoute() {
+  const { portfolio } = portfolioZugriffRoute.useSearch();
+  const navigate = useNavigate({ from: portfolioZugriffRoute.fullPath });
+  return <PortfolioZugriffPage portfolio={portfolio} setPortfolio={p => void navigate({ search: p ? { portfolio: p } : {} })} />;
 }
 
 // Portfolio › Auswertungen › Roadmap (UI-31, K6 Schritt 8; AP-E6-2): `/portfolio/roadmap?jahr=2027`
@@ -748,6 +762,7 @@ const routeTree = rootRoute.addChildren([
   zielzyklusRoute,
   freigabeRoute,
   roadmapRoute,
+  portfolioZugriffRoute,
   ideenRoute,
   ideeNeuRoute,
   ideeRoute,

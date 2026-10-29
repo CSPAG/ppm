@@ -8,4 +8,6 @@ export const NAV = {
   /** Funktion in der Projektorganisation (auch Personensuche der Befehlspalette) */
   funktion: { sp: 'Projektauftraggeber:in', pl: 'Projektleitung', weitere: 'weitere Funktion' },
   uebersicht: 'Übersicht',
+  /** Reiter der Projektakte und Bereich im Portfolio (UI-51) */
+  zugriff: 'Zugriff',
 };

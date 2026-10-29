@@ -3,7 +3,7 @@
  * mit Bearbeiten in der Schublade für Sponsor, Projektleitung und Programmleitung (`can.organisation`). Meilensteine,
  * Status und letzte Entscheide ergänzen die Pakete der Register und der Gremien (projektdaten, sitzung).
  */
-import { PersonName } from '@vollholz/iam-web';
+import { PersonName, useAccessList, useIamConfig } from '@vollholz/iam-web';
 import { useState } from 'react';
 import { ErrorState, fmtPhase, Icon, Loading, type Phase } from '../../ui/index.ts';
 import { useOrganisation, useProjektNachNummer, type Organisation, type Projekt } from './api.ts';
@@ -44,7 +44,16 @@ function gruppen(org: Organisation): { titel: string; mitglieder: Organisation['
   return [...out.values()];
 }
 
-function OrganisationListe({ org }: { org: Organisation }) {
+/**
+ * Projektorganisation mit dem Hinweis «kein Zugriff» an Personen, die das Projekt nicht sehen (K2 Schritt 3, UX-E14):
+ * die Projektorganisation vergibt keinen Zugriff (Master Entscheid 16); wer hier Zugriff gibt, erhält die Aktion
+ * «Zugriff geben», die in den Bereich «Zugriff» führt. Ohne Liste der Zugriffe (Fehler, Laden) kein Hinweis.
+ */
+function OrganisationListe({ org, projekt }: { org: Organisation; projekt: Projekt }) {
+  const { router: { Link } } = useIamConfig();
+  const zugriff = useAccessList({ type: 'projekt', id: projekt.id }, org.mitglieder.length > 0);
+  const mit = zugriff.data ? new Set(zugriff.data.items.map(e => e.subject.ref)) : null;
+  const darf = !!zugriff.data?.grantable.length;
   if (!org.mitglieder.length) return <p className="empty">{TP.org.leer}</p>;
   return (
     <dl className="attrs pj-org">
@@ -54,7 +63,15 @@ function OrganisationListe({ org }: { org: Organisation }) {
           <dd>
             <ul>
               {g.mitglieder.map(m => (
-                <li key={m.personId}><PersonName id={m.personId} />{m.akv ? <span className="muted small"> · {m.akv}</span> : null}</li>
+                <li key={m.personId}>
+                  <PersonName id={m.personId} />{m.akv ? <span className="muted small"> · {m.akv}</span> : null}
+                  {mit && !mit.has(`user:${m.personId}`) ? (
+                    <span className="pj-ohne-zugriff">
+                      <span className="stand stand-neutral">{TP.org.ohneZugriff}</span>
+                      {darf ? <Link to={`/projekte/${projekt.nummer}/zugriff`} className="linkbtn">{TP.org.zugriffGeben}</Link> : null}
+                    </span>
+                  ) : null}
+                </li>
               ))}
             </ul>
           </dd>
@@ -97,7 +114,7 @@ export function ProjektUebersicht({ nummer }: { nummer: string }) {
         </div>
         {org.isPending ? <Loading /> : org.error ? <ErrorState error={org.error} onRetry={() => void org.refetch()} /> : (
           <>
-            <OrganisationListe org={org.data.org} />
+            <OrganisationListe org={org.data.org} projekt={p} />
             {!org.data.org.can.write && (p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert') ? <p className="note">{TP.org.nurLesen}</p> : null}
           </>
         )}

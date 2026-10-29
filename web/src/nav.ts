@@ -72,6 +72,8 @@ export const navigation: NavRegistrierung = {
     { raum: 'portfolio', pfad: '/portfolio/auswertungen', label: dashboardNav.auswertungen, recht: 'auswertung:write', muster: /^\/portfolio\/auswertungen\/?$/ },
     { raum: 'portfolio', pfad: '/portfolio/roadmap', label: zieleNav.roadmap, recht: 'auswertung:read' },
     { raum: 'portfolio', pfad: '/portfolio/monatsabschluss', label: monatsabschlussNav.bereich, recht: 'statusbericht:review' },
+    // Portfolio › Zugriff (UI-51, UX-E14): wer ein Portfolio führt, verwaltet dort den Zugriff (Master Entscheid 16)
+    { raum: 'portfolio', pfad: '/portfolio/zugriff', label: projektNav.zugriff, recht: 'access:admin' },
     // Arbeitsraum «Administration»: Organisation und Codetabellen (UI-44, UI-45; UC-017) sieht nur, wer sie pflegt (IA:
     // Administration nur ADM; lesen dürfen alle Rollen für Auswahllisten); die Verwalten-Seiten des Baukastens kommen nach
     // Recht aus `useIamNav()` dazu (UC-016)

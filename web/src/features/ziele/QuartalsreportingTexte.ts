@@ -53,7 +53,7 @@ export const TQR = {
   bereitgestellt: 'bereitgestellt', entwurf: 'Entwurf', fehlt: 'fehlt',
   kritischeProjekte: 'Kritische Projekte', keineKritischen: 'Keine kritischen Projekte.',
   meilensteine: 'Nächste Meilensteine', keineMeilensteine: 'Keine Meilensteine.',
-  projekt: 'Projekt', phase: 'Phase', trend: 'Trend', meilenstein: 'Meilenstein', termin: 'Termin', ueberfaellig: '(überfällig)',
+  projekt: 'Projekt', phase: 'Phase', trend: 'Trend', meilenstein: 'Meilenstein', termin: 'Termin', ueberfaellig: '(überfällig)', tabelleRegion: (c: string) => `Tabelle ${c}`,
   nummer: 'Nr.', ziel: 'Ziel', metrik: 'Metrik', zielwert: 'Zielwert', standZiel: 'Stand', beurteilung: 'Beurteilung',
   nachgefuehrt: (n: number, g: number) => `${n} von ${g} ${g === 1 ? 'Ziel' : 'Zielen'} im Quartal nachgeführt`,
   ausQuartal: (q: string) => `(Stand ${q})`,

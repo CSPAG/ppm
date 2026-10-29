@@ -301,7 +301,9 @@ function KommentarFeld({ abschnitt, wert, darf, onChange }: { abschnitt: Abschni
 function Tabelle({ caption, kopf, zeilen, leer }: { caption: string; kopf: string[]; zeilen: string[][]; leer: string }) {
   if (!zeilen.length) return <p className="muted">{leer}</p>;
   return (
-    <div className="qr-tab">
+    // scrollt in schmalen Ansichten: mit der Tastatur erreichbar (axe scrollable-region-focusable, WCAG 2.1.1)
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region
+    <div className="qr-tab" tabIndex={0} role="region" aria-label={TQR.tabelleRegion(caption)}>
       <table>
         <caption className="sr">{caption}</caption>
         <thead><tr>{kopf.map(k => <th key={k} scope="col"><span className="th">{k}</span></th>)}</tr></thead>

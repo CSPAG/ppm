@@ -161,11 +161,11 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 | UC-004 | Monatlich berichten | ● | Projekt | PL |
 | UC-005 | Statusberichte prüfen und nachverfolgen |  | Portfolio | UE |
 | UC-006 | PRAT-Sitzung vorbereiten und durchführen | ● | Gremium (+ Portfolio) | UE, PRAT |
-| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt | PL, SP |
+| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt | PL, AG |
 | UC-008 | Portfolio priorisieren und ausbalancieren | ● | Portfolio (+ Gremium) | UE, PRAT |
-| UC-009 | Ressourcen planen und zuteilen |  | Portfolio (+ Projekt) | RM |
-| UC-010 | Portfoliofinanzen überwachen |  | Portfolio | FI, UE |
-| UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele (+ Portfolio) | GL, VR |
+| UC-009 | Ressourcen planen und zuteilen |  | Portfolio (+ Projekt) | UE |
+| UC-010 | Portfoliofinanzen überwachen |  | Portfolio | UE |
+| UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele (+ Portfolio) | GL, UE |
 | UC-012 | Quartalsreporting an den VR erstellen |  | Ziele (+ Portfolio) | UE, PRAT |
 | UC-013 | Jahresrückblick auswerten |  | Gremium (+ Ziele) | PRAT |
 | UC-014 | Portfolio auswerten |  | Portfolio | PRAT, GLPA, DIR, UE |
@@ -206,7 +206,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Projekte:** Alle Mitglieder listen die Kopfdaten aller nicht vertraulichen Projekte auf: Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektmanager:in, Projektauftraggeber:in. Status, Trend, Beträge und Inhalte (Projektvertrag, Berichte, Register) brauchen «Lesen». Ohne «Lesen» führt ein Eintrag zu einer Kopfansicht, nicht zur Akte. Auch Auswahlfelder (z. B. Abhängigkeiten im Projektvertrag) und die Suche bieten alle aufgelisteten Projekte an.
    - **Ideen:** Alle Mitglieder lesen eingereichte Ideen vollständig nach Vorlage (Titel, Ausgangslage, Zielsetzung, Handlungsfeld, betroffene Bereiche, Einschätzungen, Stand, eingereicht von). Nicht sichtbar sind Entwürfe anderer und die Prüfung durch die UE (Rückfragen, Tiering-Raster, Leitfragen). Wer eine Idee erfasst, sieht so ähnliche Ideen schon vor dem Einreichen.
    - **Bauplan:** Die Lesesicht der Projektdetails hängt an der Sichtbarkeit der Projektzeile (`ppm.projekt_sichtbar()`); «Auflisten» braucht deshalb einen eigenen Weg (neues Muster in [fachmodell.md](fachmodell.md) 3.4). Bei Ideen braucht die Lesesicht der Rückfragen eine eigene Bedingung, weil sie heute an der Sichtbarkeit der Idee hängt.
-15. **Keine Rolle Ressourcenmanagement** (29.10.2026, zu G1 und V14): Kapazität, Bedarf und Zuteilung pflegen Projektportfoliomanager:in und PPMO, wie die Finanzen (Entscheid 12). Wer nur Ressourcen plant, erhält PPMO. UC-009 erhält diese Primärakteure statt RM; im Bauplan heisst es in A-69 «das manuell festgelegte Angebot geht vor». Die Rechte `ressource:read` und `ressource:write` bleiben; braucht eine Organisation eine eng gefasste Rolle, genügt eine Zusatzvorlage «Ressourcen pflegen» (Lesen und `ressource:write`). Hinweis für die UX-Schicht: Projektportfoliomanager:in und PPMO erhalten damit alle Kopfkarten der Startseite (Einrichten, Monatszyklus, Ziele, Finanzen, Ressourcen, Sitzung); die Startseite braucht eine Lösung dafür, z. B. ausblendbare Karten.
+15. **Keine Rolle Ressourcenmanagement** (29.10.2026, zu G1 und V14): Kapazität, Bedarf und Zuteilung pflegen Projektportfoliomanager:in und PPMO, wie die Finanzen (Entscheid 12). Wer nur Ressourcen plant, erhält PPMO. UC-009 erhält diese Primärakteure statt RM; im Bauplan heisst es in A-69 «das manuell festgelegte Angebot geht vor». Die Rechte `ressource:read` und `ressource:write` bleiben; braucht eine Organisation eine eng gefasste Rolle, definiert sie selbst eine eigene Rolle «Ressourcen pflegen» (Lesen und `ressource:write`; UC-016 A3, eigene Rollen von identity-kit 5.0). Hinweis für die UX-Schicht: Projektportfoliomanager:in und PPMO erhalten damit alle Kopfkarten der Startseite (Einrichten, Monatszyklus, Ziele, Finanzen, Ressourcen, Sitzung); die Startseite braucht eine Lösung dafür, z. B. ausblendbare Karten.
 16. **Zugriff am Projekt getrennt von der Projektorganisation** (29.10.2026, zu G3, G4 und V14):
    - **Projektorganisation:** ein Projektergebnis (Personen, Funktionen, AKV; Projektvertrag Kap. 8), ohne Wirkung auf Rechte. Aufgaben im Eingang, Vermerke, Einladungen und Angaben im Dokument hängen weiter an der Funktion.
    - **Zugriff:** Ein eigener Bereich «Zugriff» in der Projektakte zeigt, wer «Bearbeiten» oder «Lesen» direkt am Projekt hat und wer über Portfolio oder Organisation, mit «Warum?». Zugriffe lassen sich dort hinzufügen, befristen und entfernen. Administration › Zugänge (UC-016) bleibt zweiter Einstieg.
@@ -226,10 +226,18 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Steuern:** alles am Ort lesen, Entscheide und Freigaben vermerken (G1). **Führen:** alles am Ort bearbeiten und den Zugriff verwalten (Entscheid 16); auch wer nicht die offizielle Funktion hat, z. B. ein PMO. **Gremium:** steuert ein Portfolio gemeinsam, liest es und entscheidet in Sitzungen; die Entscheide erfasst, wer das Portfolio führt. **Mitlesen:** liest ein Projekt, z. B. das Kernteam.
    - **Je Portfolio:** Eine Organisation kann mehrere Portfolios haben; die Rollen werden je Portfolio vergeben, nicht für «eines oder alle».
    - **Übergreifend:** «Alle Portfolios lesen» liest jedes Portfolio. «Alle Portfolios führen» führt jedes Portfolio und pflegt, was keinem Portfolio gehört: Strategie und Ziele, Ideenpool bis zur Zuordnung zu einem Portfolio, Monatsabschluss, Phasenmodell und Vorlagen.
+   - **Eigene Rollen:** Die Rollen oben sind die Vorgabe und bleiben unverändert; eine Organisation kann sie um eigene Rollen ergänzen (AM.01.02, UC-016 A3).
    - **Grundlage:** Mitglied wie Entscheid 14 (Ziele lesen, Projekte auflisten, eingereichte Ideen lesen, eigene Ideen erfassen). Admin verwaltet Zugänge, Stammdaten, Schnittstellen und Webhooks.
    - **Technisch** sind steuern, Gremium, mitlesen und «alle Portfolios lesen» Leserechte, führen und «alle Portfolios führen» Bearbeitungsrechte (Entscheid 13 gilt für alle); die übergreifenden Rollen hängen an der Organisation. Die Oberfläche spricht von «alle Portfolios», nicht von «Organisation». PPMO und PMO sind keine eigenen Rollen: Wer mitführt, erhält «führen».
    - **Referenzkunde:** UE und PMO führen alle Portfolios, die GL liest alle Portfolios; Portfolio A mit Gremium PRAT, Portfolio B mit Gremium GLPA; je Direktion ein Portfolio C, das die Direktion steuert und dessen Gremium sie ist; führen kann sie es selbst oder über die UE.
    - **Bauplan, ohne Änderung an identity-kit:** (1) Jede Rolle enthält nur Rechte, die an ihrem Ort gelten; was nur an der Organisation gilt (Ziele, Monatsabschluss, Phasenmodell …), steckt allein in «alle Portfolios führen». So zeigen Startseite und Navigation («Recht irgendwo») nur, was die Person auch tun kann. (2) Damit «Portfolio führen» die Projektdetails schreiben darf, prüfen die Policies der Projektdetails (Muster KIND) zusätzlich das Recht am Portfolio des Projekts, wie es das Muster BETRAG schon tut; `app.has_permission(recht, typ, id)` zählt bewusst nur den Ort selbst.
+19. **Funktionsbaum und Use Cases nach den Entscheiden 12 bis 18 nachgeführt** (29.10.2026; Generator `anhang/generator/`):
+   - **Akteure:** Die Use Cases behalten die Akteure des Referenzkunden (PL, UE, PRAT …). SP heisst neu **AG** (Projektauftraggeber:in); die CTL fällt weg; FI und RM gehen in der UE auf. Primärakteure: UC-007 PL, AG; UC-009 UE; UC-010 UE; UC-011 GL, UE.
+   - **Vermerk statt Sperre (G1):** Der Standardablauf beschreibt weiterhin den Weg mit Quality-Check, Unterschrift und Entscheid; neue Alternativabläufe zeigen, wie es ohne Vermerk weitergeht: UC-001 A6 Initialisierung vor dem Entscheid, UC-002 A7 und UC-003 A7 «Weiter ohne Vermerk», UC-007 A3 Änderung vor dem Entscheid übernehmen, UC-011 A3 Roadmap vor der Freigabe, UC-015 A3 Abschliessen vor der Abnahme. UC-003 A5: Eine verweigerte Unterschrift ist ein Vermerk und schickt den Vertrag nicht zurück. UC-005: Der Monatsabschluss ist auch mit ungeprüften Berichten möglich; UC-006 A2: Ein Traktandum mit unvollständigen Unterlagen kann mit Vermerk behandelt werden.
+   - **Nachvollziehbarkeit statt Sperre (G2):** UC-004 A4 Bericht nach dem Einreichen ändern, UC-005 A4 Änderung nach dem Abschluss, UC-006 Änderungen nach dem Versand, UC-011 Änderungen nach der Vorlage, UC-015 Änderungen nach dem Abschluss, UC-018 Verlauf am Objekt.
+   - **Rollen und Zugriff:** UC-002 Schritt 2 Projektorganisation ohne Wirkung auf den Zugriff, mit freien Funktionen (Entscheide 16, 17); UC-016 neu mit vorgegebenen Rollen, Zugriff direkt am Projekt (A2) und eigenen Rollen der Organisation (A3); UC-017 Portfolios je Direktion; UC-001 und UC-002 nutzen Entscheid 14.
+   - **Funktionsbaum:** AM.01.02 ergänzt die vorgegebenen Rollen um eigene Rollen der Organisation; DM.02.06 und PP.04.04 beschreiben Vermerke bzw. die Projektorganisation ohne Zugriff; die Akteure der Business Cases folgen den Regeln oben.
+   - **Offen:** PDFs neu erzeugen (Abschnitt 13); die Klärungsliste (Master-Session) und die UX-Schicht sind noch nicht angepasst.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -270,7 +278,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Entscheide 12 bis 18 nachführen: Funktionsbaum und Use Cases (Generator), UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle, Bereich «Zugriff»), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
+1. Entscheide 12 bis 18 weiter nachführen (Funktionsbaum und Use Cases erledigt, Entscheid 19): UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle, Bereich «Zugriff»), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
 2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 4. V10 mit der Insel Gruppe klären.

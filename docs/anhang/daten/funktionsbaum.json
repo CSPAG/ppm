@@ -145,7 +145,7 @@
       "id": "DM.01.02",
       "name": "Projektidee qualifizieren",
       "ziel": "Am Eintritt P0 prüfen: strategisch relevant, Ziel klar, klinische Frage, ICT, Infrastruktur; als strategisch, taktisch-operativ oder operativ einstufen.",
-      "akteure": "UE, SP",
+      "akteure": "UE, AG",
       "herleitung": "Q6 F6 Eintritt P0; Q8 Kap. 6.1",
       "entfaellt": false,
       "use_cases": [
@@ -184,7 +184,7 @@
       "id": "DM.02.01",
       "name": "Projektvertrag erstellen",
       "ziel": "Ausgangslage, Strategiebezug, Ziele, Lösung, Planung, Organisation, Ressourcen, Risiken und Change für Phase 1 erfassen.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q7 Kap. 1–11; Q6 F8",
       "entfaellt": false,
       "use_cases": [
@@ -218,7 +218,7 @@
       "id": "DM.02.04",
       "name": "Projektvertrag zurückziehen",
       "ziel": "Ein nicht mehr verfolgtes Vorhaben aus dem Prozess nehmen.",
-      "akteure": "SP",
+      "akteure": "AG",
       "herleitung": "Q1",
       "entfaellt": false,
       "use_cases": [
@@ -240,8 +240,8 @@
      {
       "id": "DM.02.06",
       "name": "Projektvertrag freigeben",
-      "ziel": "Auftraggeber/Sponsor, PL und CTL unterzeichnen; der PRAT gibt den Vertrag für die nächste Phase im Gate-Entscheid frei; die Version wird zur Baseline.",
-      "akteure": "SP, PL, CTL, PRAT",
+      "ziel": "Projektauftraggeber:in und PL unterzeichnen; der PRAT gibt den Vertrag für die nächste Phase im Gate-Entscheid frei; beides sind Vermerke, die den Ablauf nicht anhalten (G1); die Version wird zur Baseline.",
+      "akteure": "AG, PL, PRAT",
       "herleitung": "Q7 Kap. 12, Handhabung; Q8 Kap. 5.1, 8.1",
       "entfaellt": false,
       "use_cases": [
@@ -296,7 +296,7 @@
       "id": "PP.01.03",
       "name": "Portfoliokategorien und Budgetrahmen festlegen",
       "ziel": "Investitionen steuern: Kategorien mit Budgetrahmen definieren.",
-      "akteure": "UE, FI, PRAT",
+      "akteure": "UE, PRAT",
       "herleitung": "Q5 [OFFEN]",
       "entfaellt": false,
       "use_cases": [
@@ -358,7 +358,7 @@
       "id": "PP.02.05",
       "name": "Vorhaben mit strategischen Zielen verknüpfen",
       "ziel": "Handlungsfeld, strategisches Ziel und allenfalls Jahresziel zuordnen.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q7 Kap. 2; Q6 F3, F7",
       "entfaellt": false,
       "use_cases": [
@@ -386,7 +386,7 @@
       "id": "PP.03.02",
       "name": "Szenario gegen Budget und Kapazität prüfen",
       "ziel": "Die Wasserlinie ziehen: was mit den verfügbaren Mitteln umsetzbar ist.",
-      "akteure": "UE, FI",
+      "akteure": "UE",
       "herleitung": "Q6 F8 «Waterline»",
       "entfaellt": false,
       "use_cases": [
@@ -457,8 +457,8 @@
      {
       "id": "PP.04.04",
       "name": "Projektorganisation festlegen",
-      "ziel": "Sponsor, Sponsoren-Koalition, PL, CTL und Kernteam mit AKV benennen.",
-      "akteure": "SP, UE",
+      "ziel": "Projektauftraggeber:in, Projektleitung und weitere Personen mit Funktion und AKV benennen; ohne Wirkung auf den Zugriff (Entscheid 16).",
+      "akteure": "PL, AG",
       "herleitung": "Q7 Kap. 8; Q6 F4, F5",
       "entfaellt": false,
       "use_cases": [
@@ -542,7 +542,7 @@
       "id": "PS.02.01",
       "name": "Phasenfreigabe beantragen",
       "ziel": "Den Gate-Übergang mit Antworten auf die Leitfragen beantragen.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q6 F6; Q8 Kap. 8.1, 8.6",
       "entfaellt": false,
       "use_cases": [
@@ -565,7 +565,7 @@
       "id": "PS.02.03",
       "name": "Meilenstein abnehmen",
       "ziel": "Meilensteine und Ergebnisse im monatlichen Review abnehmen.",
-      "akteure": "PRAT, SP",
+      "akteure": "PRAT, AG",
       "herleitung": "Q6 F2 Monatlicher Review; Q8 Kap. 5.1",
       "entfaellt": false,
       "use_cases": [
@@ -616,7 +616,7 @@
       "id": "PS.03.02",
       "name": "Änderung am Projektvertrag entscheiden",
       "ziel": "Die Änderung freigeben oder ablehnen; Änderungen an Scope, Budget oder Ressourcen gibt der PRAT frei; die Baseline wird nachgeführt.",
-      "akteure": "SP, PRAT",
+      "akteure": "AG, PRAT",
       "herleitung": "Q7 Kap. 12; Q8 Kap. 8.5",
       "entfaellt": false,
       "use_cases": [
@@ -627,7 +627,7 @@
       "id": "PS.03.03",
       "name": "Eskalation behandeln",
       "ziel": "Kritische Entwicklungen (Status «kritisch») frühzeitig dem Ausschuss zum Entscheid vorlegen.",
-      "akteure": "PL, SP, PRAT",
+      "akteure": "PL, AG, PRAT",
       "herleitung": "Q6 F2, F4; Q8 Kap. 9",
       "entfaellt": false,
       "use_cases": [
@@ -657,7 +657,7 @@
       "id": "PS.04.01",
       "name": "Vorhaben abschliessen",
       "ziel": "Am Exit-Gate P4 Kosten/Nutzen prüfen und an die Linie übergeben.",
-      "akteure": "PL, SP, PRAT",
+      "akteure": "PL, AG, PRAT",
       "herleitung": "Q6 F6 Exit P4; Q8 Kap. 7.5",
       "entfaellt": false,
       "use_cases": [
@@ -698,7 +698,7 @@
       "id": "PS.05.01",
       "name": "Stakeholder erfassen",
       "ziel": "Betroffene Gruppen mit Interesse, Einfluss und geplanten Massnahmen festhalten.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q7 Kap. 11.1; Q6 F2; Q8 Kap. 11",
       "entfaellt": false,
       "use_cases": [
@@ -709,7 +709,7 @@
       "id": "PS.05.02",
       "name": "Kommunikationsplan erstellen",
       "ziel": "Massnahmen mit Adressat und Ziel planen.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q7 Kap. 11.2; Q6 F2; Q8 Kap. 11.2",
       "entfaellt": false,
       "use_cases": [
@@ -743,7 +743,7 @@
       "id": "PC.01.01",
       "name": "Projektbudget planen",
       "ziel": "Kosten je Phase mit Lieferant, Offerte und CAPEX/OPEX planen.",
-      "akteure": "PL, FI",
+      "akteure": "PL",
       "herleitung": "Q7 Kap. 9.1",
       "entfaellt": false,
       "use_cases": [
@@ -754,7 +754,7 @@
       "id": "PC.01.02",
       "name": "Ist-Kosten übernehmen",
       "ziel": "Aktuelle Ist-Kosten aus dem ERP verfügbar haben, ohne Handerfassung.",
-      "akteure": "FI (System)",
+      "akteure": "UE (System)",
       "herleitung": "Q2 [OFFEN]",
       "entfaellt": false,
       "use_cases": [
@@ -776,7 +776,7 @@
       "id": "PC.01.04",
       "name": "Budgetabweichungen analysieren",
       "ziel": "Überschreitungen im Portfolio früh erkennen und Ursachen klären.",
-      "akteure": "FI, UE",
+      "akteure": "UE",
       "herleitung": "Q3",
       "entfaellt": false,
       "use_cases": [
@@ -787,7 +787,7 @@
       "id": "PC.01.05",
       "name": "Budgetbedarf in den Budgetprozess übergeben",
       "ziel": "Aus den Kosten je Phase den Jahresbedarf CAPEX/OPEX ableiten und einspeisen.",
-      "akteure": "GL, FI",
+      "akteure": "GL, UE",
       "herleitung": "Q6 F2; Q7 Kap. 9.1 [OFFEN]",
       "entfaellt": false,
       "use_cases": [
@@ -857,7 +857,7 @@
       "id": "PC.03.01",
       "name": "Projekt-KPIs festlegen",
       "ziel": "Messbare Nutzen- und Projekt-KPIs mit Zielwert definieren (bisher «Nutzenziele festlegen»).",
-      "akteure": "SP, PL",
+      "akteure": "AG, PL",
       "herleitung": "Q6 F1, F2",
       "entfaellt": false,
       "use_cases": [
@@ -868,7 +868,7 @@
       "id": "PC.03.02",
       "name": "Nutzenrealisierung überprüfen",
       "ziel": "In Stabilisierung und am Exit prüfen, ob der Nutzen stabil erreicht ist.",
-      "akteure": "SP, UE",
+      "akteure": "AG, UE",
       "herleitung": "Q6 F6 P3–P4",
       "entfaellt": false,
       "use_cases": [
@@ -880,7 +880,7 @@
       "id": "PC.03.03",
       "name": "KPI-Werte nachführen",
       "ziel": "Ist-Werte der klinischen und nicht-klinischen Projekt-KPIs ab der Implementierung laufend melden.",
-      "akteure": "PL, CTL",
+      "akteure": "PL",
       "herleitung": "Q6 F1, F2; Q8 Anhang 1",
       "entfaellt": false,
       "use_cases": [
@@ -891,7 +891,7 @@
       "id": "PC.03.04",
       "name": "Business Case fortschreiben",
       "ziel": "Kosten und Nutzen je Phase führen: initial P0, Baseline P1, Update P2 und P3, Abschluss P4.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q8 Kap. 7, 13, Abb. 4, Anhang 1",
       "entfaellt": false,
       "use_cases": [
@@ -933,7 +933,7 @@
       "id": "PC.04.03",
       "name": "Ad-hoc-Auswertung erstellen",
       "ziel": "Spezifische Fragen mit Filtern und Auswertungen beantworten.",
-      "akteure": "UE, FI",
+      "akteure": "UE",
       "herleitung": "Q3",
       "entfaellt": false,
       "use_cases": [
@@ -956,7 +956,7 @@
       "id": "RK.01.01",
       "name": "Kapazitätsangebot planen",
       "ziel": "Die für Vorhaben verfügbare Kapazität je Ressourcenpool festlegen.",
-      "akteure": "RM",
+      "akteure": "UE",
       "herleitung": "Q4 [OFFEN]",
       "entfaellt": false,
       "use_cases": [
@@ -967,7 +967,7 @@
       "id": "RK.01.02",
       "name": "Personal- und Abwesenheitsdaten übernehmen",
       "ziel": "Das Kapazitätsangebot ohne Doppelerfassung aktuell halten.",
-      "akteure": "RM (System)",
+      "akteure": "UE (System)",
       "herleitung": "Q2 [OFFEN]",
       "entfaellt": false,
       "use_cases": [
@@ -995,7 +995,7 @@
       "id": "RK.02.02",
       "name": "Ressourcen zuteilen",
       "ziel": "Angemeldeten Bedarf mit konkreten Personen decken.",
-      "akteure": "RM",
+      "akteure": "UE",
       "herleitung": "Q3",
       "entfaellt": false,
       "use_cases": [
@@ -1006,7 +1006,7 @@
       "id": "RK.02.03",
       "name": "Ressourcenkonflikt auflösen",
       "ziel": "Überbuchungen zwischen Vorhaben gemäss Priorität bereinigen.",
-      "akteure": "RM, UE",
+      "akteure": "UE",
       "herleitung": "Q6 F9 «sofern Kapazität verfügbar»",
       "entfaellt": false,
       "use_cases": [
@@ -1017,7 +1017,7 @@
       "id": "RK.02.04",
       "name": "Auslastung analysieren",
       "ziel": "Engpässe und Unterauslastung erkennen.",
-      "akteure": "RM, UE",
+      "akteure": "UE",
       "herleitung": "Q6 F8 «Waterline»",
       "entfaellt": false,
       "use_cases": [
@@ -1040,7 +1040,7 @@
       "id": "RK.02.06",
       "name": "ICT- und Infrastrukturbedarf anmelden",
       "ziel": "Den Bedarf früh bei den zuständigen Stellen melden, damit die Gates ihn prüfen können.",
-      "akteure": "PL, SP",
+      "akteure": "PL, AG",
       "herleitung": "Q6 F6 Leitfragen ICT, Infrastruktur; Q8 Abb. 4",
       "entfaellt": false,
       "use_cases": [
@@ -1073,7 +1073,7 @@
      {
       "id": "AM.01.02",
       "name": "Rolle mit Berechtigungen definieren",
-      "ziel": "Die Rollen der Programm- und Projektebene abbilden.",
+      "ziel": "Die vorgegebenen Rollen (Entscheid 18) um eigene Rollen der Organisation ergänzen: Name, Rechte und Orte, an denen sie vergeben werden darf.",
       "akteure": "ADM",
       "herleitung": "Q6 F4",
       "entfaellt": false,

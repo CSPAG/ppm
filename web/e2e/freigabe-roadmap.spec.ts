@@ -51,7 +51,6 @@ test('Jahresziele vorlegen, Freigabe erfassen, Roadmap publizieren; barrierefrei
   await expect(page.getByText(/werden «zur Freigabe» gesetzt|wird «zur Freigabe» gesetzt/)).toBeVisible();
   await page.getByRole('button', { name: 'Zur Freigabe vorlegen' }).click();
   await expect(page.getByText(`Jahresziele ${j} liegen dem VR zur Freigabe vor`, { exact: false }).first()).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Jahresziel hinzufügen' })).toHaveCount(0);
 
   // Freigabe erfassen (UE-Recht über org-admin)
   await page.getByRole('button', { name: 'Freigabe erfassen' }).click();

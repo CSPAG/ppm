@@ -58,7 +58,7 @@ test('Projektidee in vier Schritten einreichen und unter «Meine Ideen» verfolg
   await expectNoOverflow(page);
 });
 
-test('Leser:in ohne Recht zum Erfassen sieht den Bereich «Ideen» nicht', async ({ page }) => {
+test('Mitglied sieht den Bereich «Ideen» und kann einreichen (Master Entscheid 14, A-73)', async ({ page }) => {
   await login(page, BRUNO, '/ziele/handlungsfelder');
-  await expect(page.getByRole('link', { name: 'Portfolio' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Portfolio' })).toHaveCount(1);
 });

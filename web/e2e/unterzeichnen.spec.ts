@@ -1,6 +1,6 @@
 /**
  * Projektvertrag unterzeichnen auf dem Telefon (UI-12, Kernablauf K2 Schritt 8; DM.02.06; UC-002 Schritt 10): Anna ist
- * Sponsor, Projektleitung und CTL eines über die API angelegten Projekts; Entwurf, Einreichen und Quality-Check laufen
+ * Projektauftraggeber:in und Projektleitung eines über die API angelegten Projekts; Entwurf, Einreichen und Quality-Check laufen
  * über die API. Abnahme K2-1: ab dem Eingang bei 360 px höchstens 3 Interaktionen und ≤ 60 s bis zur bestätigten
  * Unterschrift; axe ohne Befund hell und dunkel, kein Überlauf.
  */
@@ -25,7 +25,7 @@ async function apiAls(page: Page) {
   };
 }
 
-/** Projekt mit Anna als SP, PL und CTL, Entwurf eingereicht und Quality-Check bestätigt; liefert die Nummer. */
+/** Projekt mit Anna als Projektauftraggeber:in und Projektleitung, Entwurf eingereicht und Quality-Check bestätigt; liefert die Nummer. */
 async function zurUnterzeichnung(page: Page): Promise<string> {
   const a = await apiAls(page);
   const schluessel = `e2e-${Date.now().toString(36)}`;
@@ -34,7 +34,7 @@ async function zurUnterzeichnung(page: Page): Promise<string> {
   const people = await a.get<{ items: { id: string; email: string | null }[] }>(`/v1/people?q=${encodeURIComponent('Anna')}`);
   const anna = people.items.find(p => p.email === a.me.person.email) ?? people.items[0]!;
   await a.send('PUT', `/v1/projekte/${pj.body.id}/organisation`, {
-    mitglieder: (['sp', 'pl', 'ctl'] as const).map(funktion => ({ personId: anna.id, funktion, akv: '' })),
+    mitglieder: (['sp', 'pl'] as const).map(funktion => ({ personId: anna.id, funktion, akv: '' })),
   }, { 'if-match': 'W/"0"' });
   const e = await a.send<{ version: { id: string } }>('POST', `/v1/projekte/${pj.body.id}/vertrag/entwuerfe`, { anlass: 'initial' });
   const v = e.body.version.id;

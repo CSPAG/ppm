@@ -1,6 +1,6 @@
 /**
  * Gate-Modus (UI-08, Kernablauf K2 Schritte 1–4; UC-003 Schritte 1, 4) in hell, dunkel und 360 px: Max ist in der
- * Organisation «muster» Sponsor, Projektleitung und CTL eines über die API angelegten Projekts mit Entwurf für das Gate
+ * Organisation «muster» Projektauftraggeber:in und Projektleitung eines über die API angelegten Projekts mit Entwurf für das Gate
  * P0–P1. Eigene Organisation, damit das Phasenmodell in Kraft (Vorgabe des PM-Handbuchs mit Leitfragen je Wertestrom)
  * keine Specs der Organisation «demo» berührt. Leitfrage beantworten, speichern beim Verlassen, Fortschritt; axe ohne
  * Befund, kein Überlauf.
@@ -39,7 +39,7 @@ async function projektMitEntwurf(page: Page): Promise<string> {
   const people = await (await a.get(`/v1/people?q=${encodeURIComponent('Max')}`)).json() as { items: { id: string; email: string | null }[] };
   const max = people.items.find(p => p.email === a.me.person.email) ?? people.items[0]!;
   await a.send('PUT', `/v1/projekte/${pj.body.id}/organisation`, {
-    mitglieder: (['sp', 'pl', 'ctl'] as const).map(funktion => ({ personId: max.id, funktion, akv: '' })),
+    mitglieder: (['sp', 'pl'] as const).map(funktion => ({ personId: max.id, funktion, akv: '' })),
   }, { 'if-match': 'W/"0"' });
   await a.send('POST', `/v1/projekte/${pj.body.id}/vertrag/entwuerfe`, { anlass: 'initial' });
   return pj.body.nummer;

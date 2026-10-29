@@ -1,14 +1,14 @@
 /**
  * Änderungsantrag am Projektvertrag (UI-09, UI-10, UI-11; Kernablauf K2 Schritte 1, 5, 6, 9; UC-007; AP-E3-4) in hell,
- * dunkel und 360 px: Max ist in «muster» Sponsor, Projektleitung und CTL eines Projekts mit Baseline (über die API,
- * daten.ts). Änderung beantragen mit Begründung, Kapitel anpassen, Änderung einreichen, als Sponsor freigeben; danach
+ * dunkel und 360 px: Max ist in «muster» Projektauftraggeber:in und Projektleitung eines Projekts mit Baseline (über die API,
+ * daten.ts). Änderung beantragen mit Begründung, Kapitel anpassen, Änderung einreichen, als Projektauftraggeber:in freigeben; danach
  * ist die neue Version Baseline und der Vergleich zeigt die Änderung. axe ohne Befund, kein Überlauf.
  */
 import { expect, test } from '@playwright/test';
 import { projektMitBaseline } from './daten.ts';
 import { expectAccessible, expectNoOverflow, login, MAX } from './support.ts';
 
-test('Änderung beantragen, einreichen und als Sponsor freigeben (UC-007 Schritte 1–4)', async ({ page }) => {
+test('Änderung beantragen, einreichen und als Projektauftraggeber:in freigeben (UC-007 Schritte 1–4)', async ({ page }) => {
   await login(page, MAX, '/eingang');
   const p = await projektMitBaseline(page, `Änderung E2E ${Date.now()}`, { meilenstein: 'Pilot', meilensteinInTagen: 60 });
 
@@ -35,11 +35,11 @@ test('Änderung beantragen, einreichen und als Sponsor freigeben (UC-007 Schritt
 
   await page.getByRole('button', { name: 'Änderung einreichen' }).click();
   const einreichen = page.getByRole('dialog', { name: /^Änderung \(Version .+\) einreichen\?$/ });
-  await expect(einreichen.getByText('Der Sponsor erhält die Änderung zum Entscheid.', { exact: false })).toBeVisible();
+  await expect(einreichen.getByText('Die Projektauftraggeber:in erhält die Änderung zum Entscheid.', { exact: false })).toBeVisible();
   await einreichen.getByRole('button', { name: 'Änderung einreichen' }).click();
-  await expect(page.getByText('Eingereicht. Der Sponsor entscheidet die Änderung.')).toBeVisible();
+  await expect(page.getByText('Eingereicht. Die Projektauftraggeber:in entscheidet die Änderung.')).toBeVisible();
 
-  // Entscheid des Sponsors (Ziel der Aufgabe `aenderung.entscheiden`)
+  // Entscheid der Projektauftraggeber:in (Ziel der Aufgabe `aenderung.entscheiden`)
   await page.goto(`/projekte/${p.nummer}/vertrag/aenderung`);
   await expect(page.getByRole('heading', { name: 'Änderung am Projektvertrag entscheiden' })).toBeVisible();
   await expect(page.getByText('Annahmen zum Pilot haben sich geändert')).toBeVisible();

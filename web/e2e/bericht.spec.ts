@@ -70,7 +70,8 @@ test('Statusbericht nur mit der Tastatur einreichen und rückgängig machen (K1-
   await expect(page.getByText(/^Statusbericht \S+ eingereicht\./)).toBeVisible();
   expect(interaktionen).toBeLessThanOrEqual(15);
   await expect(page.getByText(/In Prüfung bei der Unternehmensentwicklung seit/)).toBeVisible();
-  await expect(imPlan).toBeDisabled();
+  // eingereicht bleibt änderbar, die Änderung ist markiert (A-75)
+  await expect(imPlan).toBeEnabled();
   await expectAccessible(page);
 
   await page.getByRole('button', { name: 'Rückgängig' }).click();

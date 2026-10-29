@@ -61,7 +61,9 @@ Ob Projektleitungen das Dashboard des ganzen Portfolios sehen und wer Beträge s
 Der Eingang hat für alle denselben Aufbau (Seitentyp Startseite): Kopf mit der Antwort auf die Kernfrage
 ([nutzungskontexte.md](nutzungskontexte.md)), darunter «Zu tun» mit allen Aufgaben der Person aus allen Rollen, nach
 Frist sortiert, je mit Direktaktion, dann Mitteilungen. Wer mehrere Rollen hat, sieht mehrere Kopfkarten nebeneinander
-(Telefon: untereinander, die erste offen).
+(Telefon: untereinander, die erste offen). Die Anzahl offener und überfälliger Aufgaben steht im Kopf von «Zu tun», nicht
+in einer eigenen Karte. Auf breiten Bildschirmen stehen die Mitteilungen neben «Zu tun», damit die Zeilen kurz genug zum
+Überfliegen bleiben.
 
 | Rolle | Kopf | «Zu tun» (Beispiele) |
 |---|---|---|

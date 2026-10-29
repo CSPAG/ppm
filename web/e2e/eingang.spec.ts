@@ -29,7 +29,6 @@ test('Eingang bei 768 und 1440 px: Leiste links statt unten, Kopfkarten, axe ohn
     await expect(page.locator('nav.rail')).toBeVisible();
     await expect(page.locator('nav.bnav')).toBeHidden();
     await expect(page.getByRole('link', { name: /^Eingang/ }).first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Deine Aufgaben' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Zu tun' })).toBeVisible();
     await expectAccessible(page);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth), { message: `kein Überlauf bei ${width} px` }).toBeLessThanOrEqual(width);

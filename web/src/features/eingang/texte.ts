@@ -7,13 +7,9 @@ import { NAV } from './nav.ts';
 
 export const E = {
   titel: NAV.titel,
-  sub: 'Was jetzt gilt und zu tun ist – aus allen deinen Rollen.',
   zaehler: NAV.zaehler,
   kopf: {
-    titel: 'Deine Aufgaben',
-    offen: (n: number) => (n === 0 ? 'Keine offenen Aufgaben' : n === 1 ? '1 offene Aufgabe' : `${n} offene Aufgaben`),
-    ueberfaellig: (n: number) => (n === 1 ? '1 überfällig' : `${n} überfällig`),
-    naechsteFrist: (frist: string) => `nächste Frist ${frist}`,
+    titel: 'Überblick',
   },
   vertretung: {
     sieVertreten: (name: string, bis: string) => `Du vertrittst ${name} bis ${satzende(bis)} Aufgaben dieser Person stehen in «Zu tun».`,
@@ -23,13 +19,13 @@ export const E = {
   },
   zuTun: {
     titel: 'Zu tun',
+    offen: (n: number) => `${n} offen`,
+    ueberfaellig: (n: number) => `${n} überfällig`,
     nurFrist: 'Nur mit Frist',
     alle: 'Alle',
     filter: 'Aufgaben filtern',
     leer: 'Keine offenen Aufgaben. Neue Aufgaben aus deinen Rollen erscheinen hier, sobald etwas zu tun ist.',
     leerFrist: 'Keine Aufgaben mit Frist.',
-    oeffnen: 'Öffnen',
-    oeffnenAria: (titel: string) => `${titel} öffnen`,
     erledigt: 'Erledigt',
     erledigtAria: (titel: string) => `${titel} als erledigt markieren`,
     erledigtToast: (titel: string) => `«${titel}» erledigt.`,
@@ -37,7 +33,6 @@ export const E = {
     rueckgaengig: 'Rückgängig',
     inVertretung: (name: string) => `in Vertretung von ${name}`,
     anAlle: 'an alle mit dieser Aufgabe',
-    ohneFrist: 'ohne Frist',
     frist: 'Frist',
   },
   mitteilungen: {
@@ -47,6 +42,5 @@ export const E = {
     gelesen: 'Als gelesen markieren',
     gelesenAria: (text: string) => `Mitteilung «${text}» als gelesen markieren`,
     neu: 'neu',
-    oeffnen: 'Öffnen',
   },
 };

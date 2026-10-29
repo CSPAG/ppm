@@ -2,6 +2,7 @@
  * Texte der Seite «Quartalsreporting» (UI-41; Kernablauf K6 Schritte 11–14, Regeln und Texte): Anrede «Du» (UX-OF-1, #121),
  * Schweizer Rechtschreibung; Aktionen aus K6 «Bericht erstellen», «Als Dokument herunterladen».
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 export const TQR = {
@@ -29,8 +30,8 @@ export const TQR = {
   leerNurLesen: (q: string) => `Für ${q} gibt es noch kein Quartalsreporting.`,
   laeuftNoch: 'Das Quartal läuft noch; das Quartalsreporting entsteht nach Quartalsende.',
   erzeugtAm: (d: string) => `Erstellt am ${d}`,
-  bannerTraktandiert: (d: string) => `Dem PRAT vorgelegt am ${d}. Der Entscheid fällt in der Sitzung.`,
-  bannerVerabschiedet: (d: string) => `Im PRAT verabschiedet am ${d}. Lade das Dokument für den VR herunter und erfasse danach dessen Rückmeldung.`,
+  bannerTraktandiert: (d: string) => `Dem PRAT vorgelegt am ${satzende(d)} Der Entscheid fällt in der Sitzung.`,
+  bannerVerabschiedet: (d: string) => `Im PRAT verabschiedet am ${satzende(d)} Lade das Dokument für den VR herunter und erfasse danach dessen Rückmeldung.`,
   rueckmeldungPrat: (t: string) => `Der PRAT verlangt Anpassungen: ${t}`,
   hinweise: 'Hinweise zum Entwurf',
   nurLesen: 'Du siehst den Bericht lesend; erstellen kann die Unternehmensentwicklung.',

@@ -215,7 +215,7 @@ function Tabelle({ caption, kopf, zeilen, leer }: { caption: string; kopf: strin
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- beschriftete, scrollbare Region (WCAG 2.1.1)
     <div className="jr-tab" tabIndex={0} role="region" aria-label={caption}>
-      <table className="dl">
+      <table>
         <caption className="sr">{caption}</caption>
         <thead><tr>{kopf.map(k => <th key={k} scope="col"><span className="th">{k}</span></th>)}</tr></thead>
         <tbody>{zeilen.map((z, n) => <tr key={n}>{z.map((c, k) => <td key={k}>{c}</td>)}</tr>)}</tbody>

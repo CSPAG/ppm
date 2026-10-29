@@ -84,7 +84,7 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
           ) : null}
         </div>
       </header>
-      <div className="body">
+      <div className="body sx-body">
         <form className="sx-filter" role="search" aria-label={TX.p.filter} onSubmit={e => { e.preventDefault(); kennungUebernehmen(); }}>
           <label htmlFor={`${id}-objekt`}>{TX.p.objekt}
             <select id={`${id}-objekt`} value={search.objekt ?? ''} onChange={e => setSearch({ objekt: e.target.value || undefined }, { replace: true })}>

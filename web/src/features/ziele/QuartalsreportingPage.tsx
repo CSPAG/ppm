@@ -10,7 +10,7 @@ import { describeError, PersonPick } from '@vollholz/iam-web';
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import { isConflict, statusOf } from '../../api/index.ts';
 import { useSession } from '../../auth/index.ts';
-import { Dialog, Empty, ErrorState, fmtDatum, fmtPeriode, fmtQuartal, Hinweis, Icon, Skelett, useToast, useVerzoegert } from '../../ui/index.ts';
+import { Dialog, Empty, ErrorState, fmtDatum, fmtPeriode, fmtQuartal, Hinweis, Icon, Skelett, Stand, useToast, useVerzoegert, type StandFamilie } from '../../ui/index.ts';
 import {
   dokumentLaden, useQuartalsbericht, useQuartalsberichtMutations, type Abschnitt, type Kommentare, type Quartalsbericht, type QuartalsberichtLoaded,
 } from './QuartalsreportingApi.ts';
@@ -25,6 +25,8 @@ export interface QuartalsreportingPageProps {
 }
 
 const qLabel = (q: string) => fmtQuartal(Number(q.slice(0, 4)), Number(q.slice(6)) as QuartalNr);
+/** Stand des Berichts → Familie der Standanzeige */
+const FAMILIE: Record<string, StandFamilie> = { in_arbeit: 'wartet', traktandiert: 'traktandiert', verabschiedet: 'positiv' };
 
 export function QuartalsreportingPage({ jahr, quartal, setQuartal }: QuartalsreportingPageProps) {
   const schluessel = quartalSchluessel(jahr, quartal);
@@ -50,7 +52,7 @@ export function QuartalsreportingPage({ jahr, quartal, setQuartal }: Quartalsrep
             <div className="type-ico neutral"><Icon name="target" /></div>
             <div className="minw0">
               <h1 id="page-title">{TQR.title(titel)}</h1>
-              <div className="sub">{b ? <><span className="badge">{TQR.stand[b.stand]}</span> {TQR.erzeugtAm(fmtDatum(b.erzeugtAt))}</> : TQR.sub}</div>
+              <div className="sub">{b ? <><Stand familie={FAMILIE[b.stand] ?? 'entwurf'} label={TQR.stand[b.stand] ?? b.stand} /> · {TQR.erzeugtAm(fmtDatum(b.erzeugtAt))}</> : TQR.sub}</div>
             </div>
           </div>
           <nav className="acts" aria-label={TQR.quartalWaehlen}>
@@ -284,7 +286,7 @@ function Tabelle({ caption, kopf, zeilen, leer }: { caption: string; kopf: strin
   if (!zeilen.length) return <p className="muted">{leer}</p>;
   return (
     <div className="qr-tab">
-      <table className="dl">
+      <table>
         <caption className="sr">{caption}</caption>
         <thead><tr>{kopf.map(k => <th key={k} scope="col"><span className="th">{k}</span></th>)}</tr></thead>
         <tbody>{zeilen.map((z, n) => <tr key={n}>{z.map((c, k) => <td key={k}>{c}</td>)}</tr>)}</tbody>

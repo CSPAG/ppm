@@ -1,5 +1,6 @@
 /* Zugänge und Neubesetzung (UC-016 A1); Tokens der Werkbank (styles/base.css). */
-.zg-filter{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.zg-filter{display:flex;gap:8px;flex-wrap:wrap;margin:0;padding:12px 22px}
+.zg-filter .btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
 .field .zg-treffer,.field .zg-wahl{grid-column:2;margin:0}
 .zg-treffer{list-style:none;padding:0;display:flex;flex-direction:column;gap:4px}
 .zg-treffer .btn{width:100%;justify-content:flex-start}

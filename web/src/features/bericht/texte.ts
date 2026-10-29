@@ -2,6 +2,7 @@
  * Texte des Features «Bericht» (UI-13, Kernablauf K1; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du»
  * (UX-E7), Schweizer Rechtschreibung, Texte aus K1 «Texte» und «Regeln und Rückmeldungen».
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 const NACHFUEHREN = 'Wesentliche Abweichungen sind im Projektvertrag nachzuführen. Beantrage eine Änderung oder eskaliere.';
@@ -97,7 +98,7 @@ export const TB = {
   rueckgaengig: 'Rückgängig',
   zurueckgezogen: 'Einreichen rückgängig gemacht. Der Bericht ist wieder ein Entwurf.',
   banner: {
-    eingereicht: (seit: string) => `In Prüfung bei der Unternehmensentwicklung seit ${seit}. Ändern ist erst nach einer Rückfrage möglich.`,
+    eingereicht: (seit: string) => `In Prüfung bei der Unternehmensentwicklung seit ${satzende(seit)} Ändern ist erst nach einer Rückfrage möglich.`,
     geprueft: 'Der Bericht ist geprüft. Er kann nicht mehr geändert werden.',
     zurueckgegeben: 'Rückfrage der Unternehmensentwicklung: Der Bericht ist wieder bearbeitbar. Reich ihn nach der Korrektur erneut ein.',
     abgeschlossen: (monat: string) => `${monat} ist abgeschlossen. Das Dashboard ist für die Gremien freigegeben.`,

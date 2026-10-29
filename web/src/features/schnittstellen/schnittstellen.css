@@ -1,4 +1,5 @@
 /* Schnittstellen (UI-49) und Änderungsprotokoll (UI-50), AP-E7-3: Laufprotokoll, Filter, Änderungen; Farben aus den Variablen der Werkbank */
+.sx-body{padding:12px 22px 22px}
 .sx-acts{display:flex;gap:8px;align-items:center;margin:10px 0}
 .sx-tab{margin:6px 0 12px}
 .sx-tab th,.sx-tab td{padding:6px 8px 6px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:normal;height:auto;max-width:none}

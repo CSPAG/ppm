@@ -3,6 +3,7 @@
  * Rechtschreibung, in sichtbaren Texten «Organisation»; Wortlaut der Ergebnisse aus K3 («Verabschiedet», «Anpassungen
  * verlangt»).
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 const mehr = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
@@ -69,8 +70,8 @@ export const TJ = {
     abbrechen: 'Abbrechen',
   },
   traktandiert: (j: number) => `Jahresrückblick ${j} traktandiert.`,
-  bannerTraktandiert: (d: string) => `Dem PRAT vorgelegt am ${d}. Der Entscheid fällt in der Sitzung; bis dahin ist der Rückblick gesperrt.`,
-  bannerAusgewertet: (d: string, j: number) => `Im PRAT verabschiedet am ${d}. Du kannst Erkenntnisse und Massnahmen für den Zielzyklus ${j} weiter nachführen.`,
+  bannerTraktandiert: (d: string) => `Dem PRAT vorgelegt am ${satzende(d)} Der Entscheid fällt in der Sitzung; bis dahin ist der Rückblick gesperrt.`,
+  bannerAusgewertet: (d: string, j: number) => `Im PRAT verabschiedet am ${satzende(d)} Du kannst Erkenntnisse und Massnahmen für den Zielzyklus ${j} weiter nachführen.`,
   rueckmeldung: (t: string) => `Der PRAT verlangt Anpassungen: ${t}`,
   nurLesen: 'Du siehst den Jahresrückblick lesend; zusammenstellen kann die Unternehmensentwicklung.',
   konflikt: 'Der Jahresrückblick wurde inzwischen geändert. Er ist neu geladen; prüfe deine Eingaben.',

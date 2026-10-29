@@ -54,6 +54,19 @@ test('abweichende Adresse und TTL werden geändert, überzählige gelöscht', ()
   assert.deepEqual(ops, ['create:-', 'delete:13', 'update:10', 'update:11']);
 });
 
+test('www vor dem Host ist ein eigener Name: ppm-Einträge bleiben, www.ppm wird angelegt', () => {
+  const mitWww: DesiredState = { ...soll, records: [...soll.records, ...soll.records.map(r => ({ ...r, name: 'www.ppm' }))] };
+  assert.equal(relativeName('www.ppm.project-suite.ch.', 'project-suite.ch'), 'www.ppm');
+  const ist: Existing[] = [...fremd,
+    { id: 10, source: 'ppm', type: 'A', target: '203.0.113.10', ttl: 3600 },
+    { id: 11, source: 'ppm', type: 'AAAA', target: '2001:db8:1::1', ttl: 3600 },
+    { id: 12, source: 'ppm', type: 'CAA', target: '0 issue "letsencrypt.org"', ttl: 3600 },
+  ];
+  const p = plan(mitWww, ist);
+  assert.deepEqual(p.conflicts, []);
+  assert.deepEqual(pending(p).map(c => c.op === 'create' ? `${c.rec.name} ${c.rec.type}` : c.op), ['www.ppm A', 'www.ppm AAAA', 'www.ppm CAA']);
+});
+
 test('CNAME unter verwaltetem Namen ist ein Konflikt', () => {
   const p = plan(soll, [{ id: 20, source: 'ppm', type: 'CNAME', target: 'x.example.ch', ttl: 3600 }]);
   assert.equal(p.conflicts.length, 1);

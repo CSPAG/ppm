@@ -82,7 +82,8 @@ die Schritte mit SSH für die lokale Session in [lokale-session.md](lokale-sessi
    pgBackRest (Stanza, Prüfung) und die Backup-Timer an. Den Inhalt von `/etc/postgresql/17/main/tls/ca.crt` als
    `app.database_ca` in die SOPS-Datei übernehmen (`sops edit deploy/hetzner/secrets.sops.yaml`).
 7. **DNS:** Die Zone `project-suite.ch` liegt bei Infomaniak. `infra/dns/dns.sh` setzt die Einträge aus
-   `tofu output dns` über die Infomaniak-API und verwaltet nur den Namen `ppm`; alle anderen Einträge der Zone
+   `tofu output dns` über die Infomaniak-API und verwaltet nur die Namen `ppm` und `www.ppm` (Caddy leitet von
+   `www.ppm.project-suite.ch` dauerhaft auf `ppm.project-suite.ch` um); alle anderen Einträge der Zone
    (z. B. `identity`) bleiben unberührt. API-Token (Infomaniak Manager › API, Recht nur «dns») als Secret
    `INFOMANIAK_API_TOKEN` (Environment `production`); der Workflow «Infrastruktur» gleicht nach jedem `apply` ab.
    Von Hand (im Verzeichnis `infra/hetzner` nach `tofu init`, Schritt 4):
@@ -98,6 +99,7 @@ die Schritte mit SSH für die lokale Session in [lokale-session.md](lokale-sessi
    | `ppm` | A | `‹app_ipv4›` | 300 |
    | `ppm` | AAAA | `‹app_ipv6›` | 300 |
    | `ppm` | CAA | `0 issue "letsencrypt.org"` (nur Let's Encrypt stellt Zertifikate aus) | 300 |
+   | `www.ppm` | A, AAAA, CAA | dieselben Werte wie `ppm` | 300 |
 
    Ändert sich die App-VM (neue IP), führt der nächste `apply` die Einträge nach. MCP läuft unter demselben Namen
    (`/mcp`). DNS muss vor dem ersten Rollout stimmen, sonst bekommt Caddy kein Zertifikat.

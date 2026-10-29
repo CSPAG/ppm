@@ -6,13 +6,16 @@
 locals {
   labels = { app = "ppm", managed_by = "opentofu" }
 
-  # Soll-Einträge für infra/dns (Infomaniak): A/AAAA der App-VM, CAA nur Let's Encrypt (Caddy holt das Zertifikat)
+  # Soll-Einträge für infra/dns (Infomaniak): A/AAAA der App-VM, CAA nur Let's Encrypt (Caddy holt das Zertifikat);
+  # dieselben Einträge unter «www.» davor, Caddy leitet von dort auf den Host um
   dns_name = trimsuffix(var.domain, ".${var.dns_zone}")
-  dns_records = [
-    { name = local.dns_name, type = "A", value = hcloud_server.app.ipv4_address, ttl = var.dns_ttl },
-    { name = local.dns_name, type = "AAAA", value = hcloud_server.app.ipv6_address, ttl = var.dns_ttl },
-    { name = local.dns_name, type = "CAA", value = "0 issue \"letsencrypt.org\"", ttl = var.dns_ttl },
-  ]
+  dns_records = flatten([
+    for n in [local.dns_name, "www.${local.dns_name}"] : [
+      { name = n, type = "A", value = hcloud_server.app.ipv4_address, ttl = var.dns_ttl },
+      { name = n, type = "AAAA", value = hcloud_server.app.ipv6_address, ttl = var.dns_ttl },
+      { name = n, type = "CAA", value = "0 issue \"letsencrypt.org\"", ttl = var.dns_ttl },
+    ]
+  ])
 }
 
 resource "hcloud_ssh_key" "ops" {

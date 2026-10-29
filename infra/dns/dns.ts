@@ -214,7 +214,7 @@ async function main(argv: string[]): Promise<number> {
   }
   const i = argv.indexOf('--input');
   const state = parseDesired(readFileSync(i >= 0 ? argv[i + 1]! : 0, 'utf8'));
-  // Schutz: nur ausdrücklich erlaubte Namen (dns.sh: --only ppm); alles andere in der Zone bleibt unberührt
+  // Schutz: nur ausdrücklich erlaubte Namen (dns.sh: --only ppm,www.ppm); alles andere in der Zone bleibt unberührt
   const o = argv.indexOf('--only');
   if (o >= 0) {
     const allowed = new Set((argv[o + 1] ?? '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean));

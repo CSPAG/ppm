@@ -5,7 +5,7 @@
 #   infra/dns/dns.sh apply          Abweichungen beheben
 #
 # Soll-Liste: `tofu output -json dns` in infra/hetzner (nach tofu init, mit S3-Zugang und TF_VAR_state_passphrase) oder
-# eine Datei in DNS_INPUT. Verwaltet nur Einträge unter den Namen in DNS_ONLY (Standard «ppm»); eine Soll-Liste
+# eine Datei in DNS_INPUT. Verwaltet nur Einträge unter den Namen in DNS_ONLY (Standard «ppm,www.ppm»); eine Soll-Liste
 # mit anderen Namen bricht ab, bevor die API gefragt wird. Alle anderen Einträge der Zone (z. B. identity) bleiben
 # unberührt. Token: INFOMANIAK_API_TOKEN aus der Umgebung (Rechte nur «dns», nie ausgegeben). Logik: infra/dns/dns.ts.
 set -eu
@@ -20,4 +20,4 @@ esac
 
 desired="$(mktemp)"; trap 'rm -f "$desired"' EXIT INT TERM
 if [ -n "${DNS_INPUT:-}" ]; then cp "$DNS_INPUT" "$desired"; else (cd "$here/../hetzner" && tofu output -json dns) > "$desired"; fi
-node "$here/dns.ts" "$mode" --input "$desired" --only "${DNS_ONLY:-ppm}"
+node "$here/dns.ts" "$mode" --input "$desired" --only "${DNS_ONLY:-ppm,www.ppm}"

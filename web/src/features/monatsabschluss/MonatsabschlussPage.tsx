@@ -137,7 +137,7 @@ function Periode({ periode, search, setSearch, heute, darfAbschliessen }: { peri
         <button type="button" onClick={() => setSearch({ periode: periodePlus(periode, 1), o: undefined })} aria-label={TM.periodeNach}><Icon name="chev" /></button>
       </div>
       {darfAbschliessen && kopf?.stand === 'offen' ? (
-        <button type="button" className="btn primary" onClick={() => setDialog(true)}><Icon name="lock" />{TM.aktion.abschliessen}</button>
+        <button type="button" className="btn primary" onClick={() => setDialog(true)}><Icon name="calendar-check" />{TM.aktion.abschliessen}</button>
       ) : null}
     </>
   );

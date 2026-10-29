@@ -18,3 +18,6 @@ export { GeaendertNach, Verlauf, type VerlaufEintrag } from './Verlauf.tsx';
 export { Hinweis, Regelmeldung, regelText, type HinweisProps, type Regel, type Stufe } from './Hinweis.tsx';
 export { Datenliste, type DatenlisteProps, type Spalte } from './Datenliste.tsx';
 export { Merkmale, PhaseKurz, ProjektKlein, ProjektListe, projektSpalten, type ProjektKurz, type ProjektMerkmal } from './Projekt.tsx';
+export {
+  ZugriffKurz, zugriffDarf, zugriffHerkunft, zugriffMitglieder, zugriffStufe, type ZugriffHerkunft, type ZugriffOrt,
+} from './Zugriff.tsx';

@@ -23,7 +23,7 @@ export function AbschlussDialog({ kopf, onClose, abschliessen, eingereichteZeige
   return (
     <Dialog title={TM.abschluss.titel(p)} onClose={onClose} footer={<>
       <button type="button" className="btn" onClick={onClose} data-autofocus>{TM.abschluss.weiter}</button>
-      {a.moeglich ? <button type="button" className="btn primary" onClick={abschliessen} disabled={beschaeftigt}><Icon name="lock" />{TM.aktion.abschliessen}</button> : null}
+      {a.moeglich ? <button type="button" className="btn primary" onClick={abschliessen} disabled={beschaeftigt}><Icon name="calendar-check" />{TM.aktion.abschliessen}</button> : null}
     </>}>
       {/* ungeprüfte Berichte: Warnung statt Sperre, abschliessen geht mit Vermerk (UC-005 Schritt 5, UX-E12) */}
       {a.hinweis ? (

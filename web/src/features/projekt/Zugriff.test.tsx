@@ -86,6 +86,46 @@ describe('Zugriff am Projekt (UI-51)', () => {
     await waitFor(() => expect(api.calls.some(c => c.method === 'DELETE')).toBe(true));
   });
 
+  it('Stufe oben: wer bearbeitet, macht das Projekt nach der Wirkung vertraulich; Spalte «Darf» und Zeile der Mitglieder', async () => {
+    // Katalog mit der Rolle «Projekt führen» (Master Entscheid 18) für die Spalte «Darf»
+    const catalog = {
+      ...CATALOG_PPM,
+      roles: [...CATALOG_PPM.roles, { key: 'projekt-fuehren', label: 'Projekt führen', description: '', permissions: ['projekt:read', 'projekt:write', 'access:admin'], adminOnly: false }],
+    } as unknown as AuthzCatalog;
+    const api = mockIamApi({
+      'GET /v1/projekte': () => json({ items: [projekt()], nextCursor: null }),
+      'GET /v1/access': () => json(liste([])),
+      [`PATCH /v1/projekte/${ID}`]: async req => json(projekt({ ...(await req.json() as object), version: 3 })),
+    }, { catalog });
+    vi.stubGlobal('fetch', api.fetch);
+    const { container } = renderWithIam(<ProjektZugriffPage nummer="2026-014" />, PL_ME);
+    expect(await screen.findByText(T.zugriff.stufe.offenProjekt)).toBeInTheDocument();
+    const hier = await screen.findByRole('region', { name: TP.zugriff.gruppeProjekt });
+    expect(await within(hier).findByText(`${T.zugriff.darf.bearbeiten}, ${T.zugriff.darf.verwalten}`)).toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: T.zugriff.mitglieder })).getByText(T.zugriff.mitgliederProjekt, { exact: false })).toBeInTheDocument();
+    await expectNoAxe(container);
+
+    await userEvent.selectOptions(screen.getByLabelText(TP.zugriff.stufe), 'vertraulich');
+    const frage = await screen.findByRole('dialog', { name: TP.zugriff.vertraulichFrage });
+    expect(within(frage).getByText(TP.zugriff.vertraulichWirkung)).toBeInTheDocument();
+    await userEvent.click(within(frage).getByRole('button', { name: TP.zugriff.vertraulichMachen }));
+    await waitFor(() => expect(api.calls.some(c => c.method === 'PATCH')).toBe(true));
+    const patch = api.calls.find(c => c.method === 'PATCH')!;
+    expect(patch.headers.get('if-match')).toBe('W/"2"');
+    expect(await patch.json()).toEqual({ vertraulich: true });
+  });
+
+  it('ohne Recht zum Bearbeiten: Stufe nur als Satz, ohne Auswahl', async () => {
+    stub({
+      'GET /v1/projekte': () => json({ items: [projekt({ vertraulich: true, can: { read: true, write: false, organisation: false } })], nextCursor: null }),
+      'GET /v1/access': () => json(liste([])),
+    });
+    renderWithIam(<ProjektZugriffPage nummer="2026-014" />, { roles: [], permissions: ['tenant:read', 'projekt:read'] });
+    expect(await screen.findByText(T.zugriff.stufe.vertraulichProjekt)).toBeInTheDocument();
+    expect(screen.queryByLabelText(TP.zugriff.stufe)).not.toBeInTheDocument();
+    expect(await screen.findByText(T.zugriff.mitgliederVertraulich, { exact: false })).toBeInTheDocument();
+  });
+
   it('ohne access:admin: nur lesen, keine Aktionen; geerbte Einträge nennen den Ursprung', async () => {
     stub({
       'GET /v1/projekte': () => json({ items: [projekt()], nextCursor: null }),

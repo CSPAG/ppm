@@ -98,6 +98,17 @@ export function useOrganisationSpeichern() {
   });
 }
 
+/** «vertraulich» am Projekt umstellen (`PATCH /v1/projekte/{id}`, `projekt:write`; docs/ux/zugriff.md, Stufe im Bereich «Zugriff»). */
+export function useProjektVertraulich() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, version, vertraulich }: { id: string; version: number; vertraulich: boolean }) =>
+      (await api.PATCH('/v1/projekte/{id}', { params: { path: { id }, header: { 'if-match': ifMatch(version)['If-Match']! } }, body: { vertraulich } })).data!,
+    // Kopf, Listen und Bereich zeigen die Stufe
+    onSuccess: () => qc.invalidateQueries({ queryKey: projektKeys.all }),
+  });
+}
+
 /** Suche für die Befehlspalette (I-N4): Projekte nach Name oder Nummer, nur die sichtbaren (API). */
 /** Personen in sichtbaren Projekten für die Befehlspalette (I-N4): Name und Funktionen, ohne E-Mail. */
 export async function suchePersonen(q: string, signal: AbortSignal) {

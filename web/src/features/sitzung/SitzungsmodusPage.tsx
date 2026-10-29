@@ -32,7 +32,7 @@ function SchliessenDialog({ m, busy, onClose, onSchliessen }: { m: Sitzungsmodus
     <Dialog title={TM.schliessenTitel} onClose={onClose} footer={(
       <>
         <button type="button" className="btn" onClick={onClose} data-autofocus>{TS.weiterBearbeiten}</button>
-        <button type="button" className="btn primary" disabled={busy} onClick={onSchliessen}><Icon name="lock" />{TM.schliessen}</button>
+        <button type="button" className="btn primary" disabled={busy} onClick={onSchliessen}><Icon name="calendar-check" />{TM.schliessen}</button>
       </>
     )}>
       <div className="sz-wirkung">
@@ -133,7 +133,7 @@ export function SitzungsmodusPage({ kuerzel, datum, search, setSearch, gehe: zu 
                 <Icon name="bolt" />{TM.starten}
               </button>
             ) : null}
-            {m.can.schliessen ? <button type="button" className="btn primary" disabled={busy} onClick={() => setSchliessen(true)}><Icon name="lock" />{TM.schliessen}</button> : null}
+            {m.can.schliessen ? <button type="button" className="btn primary" disabled={busy} onClick={() => setSchliessen(true)}><Icon name="calendar-check" />{TM.schliessen}</button> : null}
           </div>
         </div>
       </header>

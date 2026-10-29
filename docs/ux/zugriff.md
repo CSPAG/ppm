@@ -7,7 +7,7 @@ eine Darstellung im Stil der Beschränkungen von Confluence und die Kennzeichnun
 | | |
 |---|---|
 | Stand | 29. Oktober 2026 |
-| Status | Vorlage. Bis zur Übernahme gelten die [Master-Entscheide](../PPM-Master.md) 13, 14, 16 und 18 und UX-E14 unverändert. |
+| Status | Vorlage; Etappe 1 (Anzeigen) ist umgesetzt, Etappe 2 (vertraulich am Portfolio) wartet auf die Übernahme. Bis dahin gelten die [Master-Entscheide](../PPM-Master.md) 13, 14, 16 und 18 und UX-E14 unverändert. |
 | Betrifft | UI-51, UI-52, UC-016 A2, Master-Entscheide 13, 14, 16, 18, A-34, A-70, A-71, A-73, [darstellung.md](darstellung.md) |
 | Vorbild | Beschränkungen in Confluence ([Doku Cloud](https://support.atlassian.com/confluence-cloud/docs/add-or-remove-page-restrictions/)): Sehen wird an Unterseiten vererbt und kann dort nur enger werden |
 
@@ -111,7 +111,7 @@ Ergänzungen zum heutigen Bereich (Seitentyp Liste + Schublade bleibt):
 | Stelle | Text |
 |---|---|
 | Schaltfläche | «Zugriff» / «Zugriff · vertraulich» |
-| Dein Zugriff | «Du kannst bearbeiten, weil du das Projekt führst.» / «Du kannst lesen, weil du alle Portfolios liest.» / «Du kannst lesen, weil du im Gremium PRAT bist.» |
+| Dein Zugriff | «Du kannst das Projekt bearbeiten – Rolle «Projekt führen» am Projekt.» / «Du kannst das Projekt lesen – Rolle «Alle Portfolios lesen» für alle Portfolios.» / «Du kannst das Projekt lesen – Rolle «Gremium» über das Portfolio.» |
 | Stufe | «Alle Mitglieder sehen die Kopfdaten.» / «Vertraulich: Nur wer hier, am Portfolio oder für alle Portfolios eine Rolle hat, sieht das Projekt.» |
 | Geerbt | «Vertraulich, weil das Portfolio ‹Name› vertraulich ist.» |
 | Zeile Mitglieder | «Alle Mitglieder» · «Kopfdaten auflisten» bzw. «kein Zugriff» |
@@ -122,10 +122,16 @@ Ergänzungen zum heutigen Bereich (Seitentyp Liste + Schublade bleibt):
 
 ### Etappe 1: Anzeigen (nur Webapp)
 
-- Schaltfläche und Kurzübersicht im Kopf von Projektakte und Portfolio; Daten aus `useAccessList` und
-  `GET /v1/access/explain` (wie im Bereich), «Darf» aus `GET /v1/authz/catalog`.
-- Im Bereich «Zugriff»: Stufe oben (bei Projekten aus `projekt.vertraulich`), Spalte «Darf», Zeile «Alle Mitglieder».
-- Markierung in den Listen, Satz im Kopf von «Alle Projekte», Symbol «Abgeschlossen».
+Umgesetzt am 29.10.2026:
+
+- Schaltfläche und Kurzübersicht (gemeinsamer Baustein `web/src/ui/Zugriff.tsx`) im Kopf der Projektakte und in der
+  Schublade des Portfolios unter Administration › Portfolios und Gremien; ein eigener Kopf des Portfolios fehlt bisher.
+  Daten aus `useAccessList` und `GET /v1/access/explain`, «Darf» aus den Rechten der Rolle im Katalog.
+- Im Bereich «Zugriff»: Stufe oben; am Projekt stellt um, wer es bearbeitet (`can.write`, `PATCH /v1/projekte/{id}` mit
+  `vertraulich`), nach einer Bestätigung mit der Wirkung. Spalte «Darf», Zeile «Alle Mitglieder».
+- Symbol «Abgeschlossen» (Stand, «Monat abschliessen», «Sitzung schliessen») ist der Kalender mit Haken; der Hinweis
+  «zur Freigabe» im Zielzyklus zeigt die Uhr.
+- Markierung «vertraulich» in den Listen und der Satz im Kopf von «Alle Projekte» bestanden schon.
 
 ### Etappe 2: Vertraulich am Portfolio
 

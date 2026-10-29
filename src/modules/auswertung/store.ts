@@ -36,6 +36,8 @@ export interface ZeileRow {
   naechster_meilenstein: string | null; werte_aus: string | null; status_vorperiode: 'im_plan' | 'kritisch' | null;
   /** Bericht der Zeile (Stand bei Abschluss bzw. eingereicht in der offenen Periode), für den Badge «Eskalation». */
   statusbericht_id: string | null;
+  /** Mit dem eingereichten, ungeprüften Bericht abgeschlossen (Vermerk «nicht geprüft», A-74). */
+  ungeprueft: boolean;
   ms_termin: string | null; ms_text: string | null;
 }
 
@@ -57,7 +59,8 @@ export async function zeilenAbgeschlossen(tx: Tx, periode: string, portfolioIds:
     `SELECT p.id AS projekt_id, p.nummer, p.name, p.portfolio_id, p.lebenszyklus, p.phase AS projekt_phase, ${KOPF},
             true AS pflichtig, d.gemeldet, true AS abgeschlossen, d.status, d.trend, d.phase,
             to_char(d.abschluss_per, 'YYYY-MM-DD') AS abschluss_per, d.naechster_meilenstein, d.werte_aus, d.status_vorperiode,
-            d.statusbericht_id
+            d.statusbericht_id,
+            EXISTS (SELECT 1 FROM ${S}.statusbericht r WHERE r.id = d.statusbericht_id AND r.stand = 'eingereicht') AS ungeprueft
        FROM ${S}.dashboard_zeile d
        JOIN ${S}.projekt p ON p.id = d.projekt_id
        ${MEILENSTEIN}
@@ -77,7 +80,7 @@ export async function zeilenOffen(tx: Tx, periode: string, portfolioIds: string[
             to_char(coalesce(b.abschluss_per, v.abschluss_per), 'YYYY-MM-DD') AS abschluss_per,
             CASE WHEN b.id IS NOT NULL THEN b.naechster_meilenstein ELSE v.naechster_meilenstein END AS naechster_meilenstein,
             CASE WHEN b.id IS NOT NULL THEN $1 ELSE v.periode END AS werte_aus,
-            v.status AS status_vorperiode, b.id AS statusbericht_id
+            v.status AS status_vorperiode, b.id AS statusbericht_id, false AS ungeprueft
        FROM ${S}.projekt p
        JOIN ${S}.portfolio pf ON pf.id = p.portfolio_id
        LEFT JOIN ${S}.statusbericht b ON b.projekt_id = p.id AND b.periode = $1 AND b.stand <> 'entwurf'

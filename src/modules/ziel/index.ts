@@ -8,6 +8,7 @@ import type { FastifyInstance } from 'fastify';
 import { zielTools } from './mcp.ts';
 import { registerRoutes } from './routes.ts';
 import { registerZyklusRoutes } from './zyklus-routes.ts';
+import { registerVerlaufRoutes } from './verlauf.ts';
 import { registerErreichungRoutes } from './erreichung-routes.ts';
 import { zielerreichungTask } from './erreichung-aufgabe.ts';
 import { registerFreigabeRoutes } from './freigabe-routes.ts';
@@ -30,6 +31,7 @@ export const zielModule = defineModule({
   ],
   register: (app: FastifyInstance, deps: Deps) => {
     registerRoutes(app, deps);
+    registerVerlaufRoutes(app, deps);
     registerZyklusRoutes(app, deps); // Zielzyklus, Jahresziele, Hauptaktivitäten, Zuordnung der Projekte (AP-E6-1)
     registerErreichungRoutes(app, deps); // Zielerreichung je Quartal (AP-E6-3)
     registerFreigabeRoutes(app, deps); // Vorlage an den VR und Freigabe der Jahresziele (AP-E6-2)

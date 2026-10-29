@@ -6,7 +6,7 @@
  * Programmleitung» (K3 Schritt 4) hat weder Griff noch Entfernen und trägt einen Hinweis; ohne Bericht ist es ein Platzhalter.
  */
 import type { KeyboardEvent } from 'react';
-import { Hinweis, Icon, Stand, fmtDatum, type StandFamilie } from '../../ui/index.ts';
+import { Hinweis, Icon, Stand, fmtDatum, type StandFamilie, GeaendertNach } from '../../ui/index.ts';
 import type { Traktandum } from './api.ts';
 import { TS } from './texte.ts';
 
@@ -24,6 +24,9 @@ export function fmtMinuten(n: number): string {
 }
 
 export interface TraktandenlisteProps {
+  /** Nach dem Versand: Markierung und «Unterlagen nachführen» (A-75). */
+  versendet?: boolean;
+  onNachfuehren?(t: Traktandum): void;
   traktanden: Traktandum[];
   /** Bearbeiten erlaubt (sitzung:write bis zum Versand) */
   bearbeiten: boolean;
@@ -36,7 +39,7 @@ export interface TraktandenlisteProps {
   onAufNaechste(t: Traktandum): void;
 }
 
-export function Traktandenliste({ traktanden, bearbeiten, versandRest, busy, aktuell, onVerschieben, onEntfernen, onAufNaechste }: TraktandenlisteProps) {
+export function Traktandenliste({ traktanden, bearbeiten, versandRest, busy, aktuell, onVerschieben, onEntfernen, onAufNaechste, versendet = false, onNachfuehren }: TraktandenlisteProps) {
   const taste = (e: KeyboardEvent, t: Traktandum) => {
     if (!bearbeiten || t.fest || !e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
     e.preventDefault();
@@ -69,6 +72,10 @@ export function Traktandenliste({ traktanden, bearbeiten, versandRest, busy, akt
                   {t.viaSns ? <span className="pill st-pending" title={TS.viaSnsHinweis}>{TS.viaSns}</span> : null}
                   {t.vertraulich ? <span className="pill st-idle"><Icon name="lock" />{TS.vertraulich}</span> : null}
                   {t.verschobenVon ? <span className="pill st-idle">{TS.verschobenVon(fmtDatum(t.verschobenVon))}</span> : null}
+                  {t.geaendertNachVersand ? <GeaendertNach text={TS.geaendertNachVersand} at={t.geaendertNachVersand} /> : null}
+                  {bearbeiten && versendet && onNachfuehren && t.unterlagen.stand !== 'keine' ? (
+                    <button type="button" className="btn sm" disabled={busy} onClick={() => onNachfuehren(t)}><Icon name="doc" />{TS.unterlagenNachfuehren}</button>
+                  ) : null}
                 </div>
                 <p className="sz-einl">
                   <span className="sz-sub">{TS.eingeladen}: </span>

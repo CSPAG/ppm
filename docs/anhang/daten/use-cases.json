@@ -117,7 +117,7 @@
   "name": "Änderung am Projektvertrag beantragen und entscheiden",
   "heimat": "Projekt",
   "beruehrt": "",
-  "primaerakteur": "PL, SP",
+  "primaerakteur": "PL, AG",
   "kernablauf": false,
   "business_cases": [
    "PS.03.01",
@@ -151,7 +151,7 @@
   "name": "Ressourcen planen und zuteilen",
   "heimat": "Portfolio",
   "beruehrt": "Projekt",
-  "primaerakteur": "RM",
+  "primaerakteur": "UE",
   "kernablauf": false,
   "business_cases": [
    "RK.01.01",
@@ -166,7 +166,7 @@
   "name": "Portfoliofinanzen überwachen",
   "heimat": "Portfolio",
   "beruehrt": "",
-  "primaerakteur": "FI, UE",
+  "primaerakteur": "UE",
   "kernablauf": false,
   "business_cases": [
    "PC.01.02",
@@ -179,7 +179,7 @@
   "name": "Ziele im Jahreszyklus festlegen",
   "heimat": "Ziele",
   "beruehrt": "Portfolio",
-  "primaerakteur": "GL, VR",
+  "primaerakteur": "GL, UE",
   "kernablauf": true,
   "business_cases": [
    "ZM.01.01",

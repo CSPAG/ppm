@@ -10,7 +10,7 @@ import {
   requireIfMatch, type Deps,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
-import { anlegen, organisationFestlegen, pruefeAenderbar, snapshot, standVon } from './aktionen.ts';
+import { anlegen, nachAbschluss, organisationFestlegen, pruefeAenderbar, snapshot, standVon } from './aktionen.ts';
 import {
   Kopf, KopfProjekt, ListQuery, Mitglied, Organisation, OrganisationPut, PersonenQuery, Projekt, ProjektCreate, ProjektList, ProjektPatch, ProjektPersonen,
   type Funktion, type Lebenszyklus, type OrganisationOut, type OrganisationPutIn, type Phase, type ProjektCreateIn, type ProjektOut,
@@ -20,30 +20,35 @@ import * as store from './store.ts';
 
 const TAG = 'Projekte';
 
-type Caps = (kind: string, id: string) => Record<string, boolean>;
+type Caps = (kind: string, id: string, hint?: string | null) => Record<string, boolean>;
 const ort = (id: string) => ({ type: 'projekt', id });
 
 function out(r: store.Row, caps: Caps): ProjektOut {
-  const c = caps('projekt', r.id);
+  const c = caps('projekt', r.id, r.portfolio_id);
+  // ohne Leserecht nur die Kopfdaten (A-73): Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektleitung, Projektauftraggeber:in
+  const l = r.lesbar;
   return {
     id: r.id, nummer: r.nummer, name: r.name, portfolioId: r.portfolio_id,
     portfolio: r.pf_schluessel ? { schluessel: r.pf_schluessel, name: r.pf_name!, kategorie: r.pf_kategorie! } : null,
-    orgEinheitId: r.org_einheit_id, handlungsfeldId: r.handlungsfeld_id, handlungsfeld: r.hf_label,
-    phase: r.phase, phasenmodellId: r.phasenmodell_id, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
-    sponsor: r.sponsor, projektleitung: r.projektleitung, controlling: r.controlling, rollen: r.rollen,
+    orgEinheitId: l ? r.org_einheit_id : null, handlungsfeldId: l ? r.handlungsfeld_id : null, handlungsfeld: l ? r.hf_label : null,
+    phase: r.phase, phasenmodellId: l ? r.phasenmodell_id : null, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
+    sponsor: r.sponsor, projektleitung: r.projektleitung, rollen: r.rollen,
+    geaendertNachAbschluss: l ? r.geaendert_nach_abschluss_at : null,
     version: r.version, createdAt: r.created_at, updatedAt: r.updated_at,
-    // Endzustände sind lesend (UC-015 Schritt 6)
-    can: { write: !!c.write && aenderbar(r), organisation: !!c.organisation && aenderbar(r) },
+    // zurückgezogen ist lesend; nach dem Abschluss markiert (UC-015 Schritt 6, A-75)
+    can: { read: l, write: l && !!c.write && aenderbar(r), organisation: l && !!c.organisation && aenderbar(r) },
   };
 }
 
-const aenderbar = (r: store.Row) => r.lebenszyklus === 'aktiv' || r.lebenszyklus === 'sistiert';
+/** Änderbar ausser zurückgezogen; nach dem Abschluss markiert (UC-015 Schritt 6, A-75). */
+const aenderbar = (r: store.Row) => r.lebenszyklus !== 'zurueckgezogen';
 
-function organisation(r: store.Row, rows: store.MitgliedRow[], caps: Caps): OrganisationOut {
+function organisation(r: store.Row, rows: store.MitgliedRow[], vorschlaege: string[], caps: Caps): OrganisationOut {
   return {
     version: standVon(rows),
-    mitglieder: rows.map(m => ({ personId: m.person_id, funktion: m.funktion, akv: m.akv })),
-    can: { write: !!caps('projekt', r.id).organisation && aenderbar(r) },
+    mitglieder: rows.map(m => ({ personId: m.person_id, funktion: m.funktion, funktionText: m.funktion_text, akv: m.akv })),
+    vorschlaege,
+    can: { write: !!caps('projekt', r.id, r.portfolio_id).organisation && aenderbar(r) },
   };
 }
 
@@ -60,15 +65,15 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   app.get('/v1/projekte', {
     schema: {
       tags: [TAG], summary: 'Projekte auflisten',
-      description: 'Alle sichtbaren Projekte (Meine Projekte, UI-05), sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.',
+      description: 'Projekte mit Leserecht (Meine Projekte, UI-05), mit `alle` auch die nur aufgelisteten mit ihren Kopfdaten (Alle Projekte, UI-52; `projekt:list`, Master Entscheid 14); vertrauliche nur mit Rolle. Sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.',
       querystring: ListQuery, response: { 200: Type.Ref('ProjektList') },
     },
   }, async req => {
-    await req.needSomewhere('projekt:read');
-    const q = req.query as { rolle?: Funktion; portfolio?: string; phase?: Phase; lebenszyklus?: Lebenszyklus[]; nummer?: string; q?: string; cursor?: string; limit?: number };
+    if (!(await req.can('projekt:list'))) await req.needSomewhere('projekt:read');
+    const q = req.query as { rolle?: Funktion; portfolio?: string; phase?: Phase; lebenszyklus?: Lebenszyklus[]; nummer?: string; q?: string; alle?: boolean; cursor?: string; limit?: number };
     const limit = q.limit ?? 50;
     // Der Cursor gilt nur für dieselben Filter
-    const filter = JSON.stringify([q.rolle, q.portfolio, q.phase, q.lebenszyklus, q.nummer, q.q]);
+    const filter = JSON.stringify([q.rolle, q.portfolio, q.phase, q.lebenszyklus, q.nummer, q.q, q.alle]);
     const after = decodeCursor<{ n: string; f: string }>(q.cursor, v => typeof v.n === 'string' && v.f === filter);
     const rows = await req.tx(tx => store.list(tx, { ...q, after: after && { nummer: after.n }, limit }));
     const page = rows.slice(0, limit);
@@ -138,6 +143,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
       if (before.version !== version) throw preconditionFailed(before.version);
       pruefeAenderbar(before);
       if (!(await store.update(tx, id, version, req.body as ProjektPatchIn))) throw preconditionFailed(before.version);
+      await nachAbschluss(tx, before);
       const r = (await store.get(tx, id))!;
       await record(tx, who, { action: 'projekt.updated', resourceType: 'projekt', resourceId: id, data: { before: snapshot(before), after: snapshot(r) }, event: snapshot(r) });
       return r;
@@ -149,16 +155,16 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
 
   app.get('/v1/projekte/:id/organisation', {
     schema: {
-      tags: [TAG], summary: 'Projektorganisation lesen', description: 'Sponsor, Sponsoren-Koalition, Projektleitung, CTL und Kernteam mit AKV (PP.04.04).',
+      tags: [TAG], summary: 'Projektorganisation lesen', description: 'Projektauftraggeber:in, Projektleitung und weitere Funktionen (freier Text) mit AKV (PP.04.04, A-72); dazu Vorschläge für weitere Funktionen. Die Projektorganisation ist ein Projektergebnis und vergibt keinen Zugriff (Master Entscheid 16).',
       params: IdParams, response: { 200: Type.Ref('Organisation') },
     },
   }, async (req, reply) => {
     const { id } = req.params as { id: string };
     await req.need('projekt:read', ort(id));
-    const [row, rows] = await req.tx(async tx => [await store.get(tx, id), await store.mitglieder(tx, id)] as const);
+    const [row, rows, vorschlaege] = await req.tx(async tx => [await store.get(tx, id), await store.mitglieder(tx, id), await store.funktionstexte(tx)] as const);
     if (!row) throw notFound('Projekt');
     const caps = await req.capabilities();
-    const o = organisation(row, rows, caps);
+    const o = organisation(row, rows, vorschlaege, caps);
     reply.header('etag', etag(o.version));
     return o;
   });
@@ -166,7 +172,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   app.put('/v1/projekte/:id/organisation', {
     schema: {
       tags: [TAG], summary: 'Projektorganisation festlegen',
-      description: 'Ersetzt die Projektorganisation (UC-002 Schritt 2) und gibt den benannten Personen ihre Rolle am Projekt (Sponsor, Projektleitung, CTL, Kernteam); entfernte verlieren sie. Nur mit `If-Match` (Stand der Projektorganisation).',
+      description: 'Ersetzt die Projektorganisation (UC-002 Schritt 2): Projektauftraggeber:in und Projektleitung je höchstens eine Person, weitere Funktionen mit `funktionText`. Ändert den Zugriff nicht (Master Entscheid 16); den vergibt `/v1/access`. Nur mit `If-Match` (Stand der Projektorganisation).',
       params: IdParams, headers: IfMatchHeaders, body: Type.Ref('OrganisationPut'), response: { 200: Type.Ref('Organisation') },
     },
   }, async (req, reply) => {
@@ -175,12 +181,12 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
     await req.need('projekt:organisation', ort(id));
     const p = req.requirePrincipal();
     const body = req.body as OrganisationPutIn;
-    const [row, rows] = await req.tx(async tx => {
-      const r = await organisationFestlegen(tx, { tuples: deps.iam.tuples, who: actorOf(req), principalId: p.principalId }, id, version, body.mitglieder);
-      return [(await store.get(tx, id))!, r] as const;
+    const [row, rows, vorschlaege] = await req.tx(async tx => {
+      const r = await organisationFestlegen(tx, { who: actorOf(req) }, id, version, body.mitglieder);
+      return [(await store.get(tx, id))!, r, await store.funktionstexte(tx)] as const;
     });
     const caps = await req.capabilities();
-    const o = organisation(row, rows, caps);
+    const o = organisation(row, rows, vorschlaege, caps);
     reply.header('etag', etag(o.version));
     return o;
   });

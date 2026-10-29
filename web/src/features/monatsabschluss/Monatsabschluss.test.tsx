@@ -25,7 +25,7 @@ const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')
 const zeile = (n: number, o: Partial<Zeile> = {}): Zeile => ({
   projektId: id(n), projektNummer: `2026-${String(n).padStart(3, '0')}`, projektName: `Vorhaben ${n}`, portfolioId: PF, portfolioName: 'Transformation',
   phase: 'P2', stand: 'eingereicht', entwurf: false, status: 'im_plan', trend: 'gleichbleibend', abschlussPer: '2027-06-30', naechsterMeilenstein: 'Pilot',
-  vorperiode: { periode: '2026-09', status: 'im_plan', trend: 'gleichbleibend' }, auffaelligkeiten: [], nachRueckfrage: false, rueckfrage: null,
+  vorperiode: { periode: '2026-09', status: 'im_plan', trend: 'gleichbleibend' }, auffaelligkeiten: [], nachRueckfrage: false, rueckfrage: null, vermerke: [],
   eingereichtAt: '2026-10-22T08:00:00Z', geprueftAt: null, eingefordertAt: null, version: 3,
   can: { bestaetigen: true, rueckfrage: true, einfordern: false, zuruecknehmen: false }, ...o,
 });
@@ -34,7 +34,7 @@ const kopf = (o: Record<string, unknown> = {}) => ({
   periode: P, stand: 'offen', abgeschlossenAt: null, abgeschlossenBy: null, version: 1,
   anzahl: { projekte: 4, eingereicht: 3, zurueckgegeben: 0, geprueft: 0, ausstehend: 1, nichtGemeldet: 0, auffaellig: 1 },
   fristen: { berichtAufgabe: '2026-10-18', stichtag: '2026-10-25', abschlussBis: '2026-10-31' }, vorperiode: '2026-09',
-  abschluss: { moeglich: false, sperre: 'Abschluss: 3 Berichte sind eingereicht, aber nicht geprüft. Prüfe diese zuerst.', geprueft: 0, nichtGemeldet: 1 },
+  abschluss: { moeglich: true, hinweis: '3 Berichte sind eingereicht, aber nicht geprüft. Schliesst du ab, zählen sie mit dem Vermerk «nicht geprüft»; die Prüfung kannst du nachtragen.', geprueft: 0, ungeprueft: 3, nichtGemeldet: 1 },
   can: { pruefen: true, abschliessen: true }, ...o,
 });
 
@@ -193,17 +193,18 @@ describe('Monatsabschluss', () => {
     expect(within(dialog).getByRole('button', { name: new RegExp(TM.aktion.bestaetigen) })).toBeInTheDocument();
   });
 
-  it('Abschluss: Sperre mit Ausweg «Eingereichte anzeigen», sonst Wirkung und Abschluss mit If-Match', async () => {
+  it('Abschluss: Warnung mit Ausweg «Eingereichte anzeigen», abschliessen bleibt möglich (A-74); Wirkung und Abschluss mit If-Match', async () => {
     stub({});
     const r = renderWithIam(<Page />, UE);
     await userEvent.click(await screen.findByRole('button', { name: new RegExp(TM.aktion.abschliessen) }));
     expect(screen.getByText(/3 Berichte sind eingereicht, aber nicht geprüft/)).toBeInTheDocument();
+    expect(within(screen.getByRole('dialog')).getByRole('button', { name: new RegExp(TM.aktion.abschliessen) })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: TM.aktion.eingereichteZeigen }));
     expect(screen.getByTestId('s')).toHaveTextContent('"stand":"eingereicht"');
     r.unmount();
 
     const api = stub({ [`POST /v1/perioden/${P}/abschliessen`]: () => json(kopf({ stand: 'abgeschlossen' })) }, ZEILEN,
-      kopf({ abschluss: { moeglich: true, sperre: null, geprueft: 3, nichtGemeldet: 1 } }));
+      kopf({ abschluss: { moeglich: true, hinweis: null, geprueft: 3, ungeprueft: 0, nichtGemeldet: 1 } }));
     renderWithIam(<Page />, UE);
     await userEvent.click(await screen.findByRole('button', { name: new RegExp(TM.aktion.abschliessen) }));
     const d = screen.getByRole('dialog');

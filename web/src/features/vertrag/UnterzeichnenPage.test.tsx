@@ -1,5 +1,5 @@
 /**
- * Unterzeichnen (UI-12, K2 Schritt 8) gegen die nachgebildete API: Zusammenfassung mit «2 von 3», Wirkung vor dem Klick
+ * Unterzeichnen (UI-12, K2 Schritt 8) gegen die nachgebildete API: Zusammenfassung mit «1 von 2», Wirkung vor dem Klick
  * (I-R1 Stufe 3), Abnahme K2-1 (ab der geöffneten Aufgabe 1 Interaktion: «Unterzeichnen»), Vertretung (I-Z2), «Nicht
  * unterzeichnen» mit Pflichtbegründung, Konflikt (412), axe.
  */
@@ -17,14 +17,13 @@ const P = '00000000-0000-4000-8000-000000000001';
 const V = '00000000-0000-4000-8000-0000000000c1';
 const SP = '00000000-0000-4000-8000-0000000000a1';
 const PL = '00000000-0000-4000-8000-0000000000a2';
-const CTL = '00000000-0000-4000-8000-0000000000a3';
 
 const projekt = { id: P, nummer: '2026-014', name: 'Digitale Patientenaufnahme', phase: 'P0', lebenszyklus: 'aktiv' };
 const version = { id: V, projektId: P, nummer: '0.1', anlass: 'initial', zielphase: 'P1', stand: 'zur_unterzeichnung', baseline: false, baselineAt: null, basisVersionId: null,
   begruendung: '', eingereichtAt: '2026-10-20T08:00:00Z', version: 4, createdAt: '2026-10-20T08:00:00Z', updatedAt: '2026-10-20T08:00:00Z', can: { write: false, einreichen: false } };
 const unterschrift = (personId: string, o: Record<string, unknown> = {}) => ({ personId, inVertretungVon: null, ergebnis: 'unterzeichnet', begruendung: '', at: '2026-10-21T09:00:00Z', ...o });
-function pruefung(o: { anzahl?: number; offen?: unknown[]; stand?: string; version?: number; sp?: unknown; pl?: unknown; ctl?: unknown } = {}) {
-  const fs = [['sp', SP, o.sp ?? null], ['pl', PL, 'pl' in o ? o.pl : unterschrift(PL)], ['ctl', CTL, 'ctl' in o ? o.ctl : unterschrift(CTL)]] as const;
+function pruefung(o: { anzahl?: number; offen?: unknown[]; stand?: string; version?: number; sp?: unknown; pl?: unknown } = {}) {
+  const fs = [['sp', SP, o.sp ?? null], ['pl', PL, 'pl' in o ? o.pl : unterschrift(PL)]] as const;
   return {
     versionId: V, nummer: '0.1', stand: o.stand ?? 'zur_unterzeichnung', version: o.version ?? 4,
     qualityChecks: [{ id: 'q1', ergebnis: 'bestaetigt', kommentare: [], at: '2026-10-20T10:00:00Z', personId: PL }],
@@ -53,7 +52,7 @@ describe('Unterzeichnen', () => {
       [`POST /v1/vertragsversionen/${V}/unterschriften`]: () => json(pruefung({ sp: unterschrift(SP), offen: [], stand: 'unterzeichnet', version: 5 }), 200, { ETag: 'W/"5"' }),
     });
     const { container } = renderWithIam(<UnterzeichnenPage nummer="2026-014" />);
-    expect(await screen.findByText(`${TP.unterschriften} · ${TP.stand(2)}`)).toBeInTheDocument();
+    expect(await screen.findByText(`${TP.unterschriften} · ${TP.stand(1, 2)}`)).toBeInTheDocument();
     expect(screen.getByText(TP.wirkungLetzte)).toBeInTheDocument();
     expect(screen.getByText('Digitale Patientenaufnahme')).toBeInTheDocument();
     await expectNoAxe(container);
@@ -71,9 +70,9 @@ describe('Unterzeichnen', () => {
   });
 
   it('nennt, wer danach noch fehlt', async () => {
-    stub({ [`GET /v1/vertragsversionen/${V}/pruefung`]: () => json(pruefung({ ctl: null }), 200, { ETag: 'W/"4"' }) });
+    stub({ [`GET /v1/vertragsversionen/${V}/pruefung`]: () => json(pruefung({ pl: null }), 200, { ETag: 'W/"4"' }) });
     renderWithIam(<UnterzeichnenPage nummer="2026-014" />);
-    expect(await screen.findByText(TP.wirkungWeitere('CTL'))).toBeInTheDocument();
+    expect(await screen.findByText(TP.wirkungWeitere('Projektleitung'))).toBeInTheDocument();
   });
 
   it('in Vertretung: Banner (I-Z2)', async () => {

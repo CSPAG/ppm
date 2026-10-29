@@ -20,6 +20,20 @@ export const TI = {
     entwurf: 'Entwurf', eingereicht: 'eingereicht', in_pruefung: 'in Prüfung', in_ergaenzung: 'in Ergänzung', traktandiert: 'dem Gremium vorgelegt',
     freigegeben: 'freigegeben', zurueckgestellt: 'zurückgestellt', zurueckgewiesen: 'zurückgewiesen', zusammengefuehrt: 'zusammengeführt',
   } as Record<string, string>,
+  // eingereichte Ideen aller Mitglieder (Master Entscheid 14) und ähnliche Ideen beim Ausfüllen (K4 Schritt 2)
+  ansichten: { meine: 'Meine Ideen', eingereicht: 'Eingereichte Ideen' },
+  ansichtLabel: 'Ansicht',
+  alleEingereichten: {
+    titel: 'Eingereichte Ideen',
+    sub: 'Alle eingereichten Projektideen der Organisation mit ihrem Stand. Die Prüfung der Unternehmensentwicklung siehst du nur bei deinen eigenen.',
+    leer: 'Noch niemand hat eine Idee eingereicht.',
+  },
+  aehnlich: {
+    titel: (n: number) => (n === 1 ? '1 ähnliche Idee im Ideenpool ansehen' : `${n} ähnliche Ideen im Ideenpool ansehen`),
+    erklaerung: 'Eingereichte Ideen mit gleichem Handlungsfeld oder gleichen Bereichen. Vielleicht gibt es schon etwas, an das du anknüpfen kannst; die Ideen öffnen in einem neuen Tab.',
+    gleichesFeld: 'gleiches Handlungsfeld',
+    bereiche: (n: number) => (n === 1 ? '1 gemeinsamer Bereich' : `${n} gemeinsame Bereiche`),
+  },
   seit: (datum: string) => `seit ${datum}`,
   zuletzt: (datum: string) => `zuletzt bearbeitet ${datum}`,
 

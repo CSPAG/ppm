@@ -1,21 +1,20 @@
 /**
  * Projektorganisation bearbeiten (PP.04.04, UC-002 Schritt 2): Liste mit Funktion, Person und AKV in der Schublade.
- * Prüfung beim Absenden mit Meldung am Feld (I-F3): Sponsor, Projektleitung und CTL je höchstens eine Person, keine
- * Doppel, Person gewählt; der Server entscheidet (422 am Feld, I-P6). Vor dem Speichern zeigt die Schublade, wer Zugriff
- * erhält und wer ihn verliert (I-F5, I-R1 Stufe 3: wirkt auf andere). 412: Hinweis und neu laden (Z7).
+ * Fest sind Projektauftraggeber:in und Projektleitung (je höchstens eine Person, A-04); weitere Funktionen tragen eine
+ * Bezeichnung mit Vorschlägen aus der Organisation (A-72). Prüfung beim Absenden mit Meldung am Feld (I-F3); der Server
+ * entscheidet (422 am Feld, I-P6). Die Projektorganisation vergibt keinen Zugriff (Master Entscheid 16). 412: Hinweis
+ * und neu laden (Z7).
  */
-import { describeError, PersonName, PersonPick } from '@vollholz/iam-web';
-import { useId, useMemo, useState, type FormEvent } from 'react';
+import { describeError, PersonPick } from '@vollholz/iam-web';
+import { useId, useState, type FormEvent } from 'react';
 import { isConflict } from '../../api/index.ts';
 import { Drawer, ErrorState, Hinweis, Icon, T, useToast } from '../../ui/index.ts';
 import { useOrganisationSpeichern, type Funktion, type OrgLoaded } from './api.ts';
 import { TP } from './texte.ts';
 
-interface Zeile { key: number; funktion: Funktion; personId: string; akv: string }
+interface Zeile { key: number; funktion: Funktion; funktionText: string; personId: string; akv: string }
 
-const FUNKTIONEN: Funktion[] = ['sp', 'koalition', 'pl', 'ctl', 'kt'];
-const ROLLEN: Funktion[] = ['sp', 'pl', 'ctl', 'kt'];
-const EINZELN: Funktion[] = ['sp', 'pl', 'ctl'];
+const FUNKTIONEN: Funktion[] = ['sp', 'pl', 'weitere'];
 
 /** Fehler je Zeile und Feld (`<index>/<feld>`), lokal geprüft. */
 export function pruefe(zeilen: Zeile[]): Record<string, string> {
@@ -23,20 +22,19 @@ export function pruefe(zeilen: Zeile[]): Record<string, string> {
   const gesehen = new Set<string>();
   const einzeln = new Set<Funktion>();
   zeilen.forEach((z, i) => {
+    const text = z.funktion === 'weitere' ? z.funktionText.trim() : '';
+    if (z.funktion === 'weitere' && !text) e[`${i}/funktionText`] = TP.org.textFehlt;
     if (!z.personId) { e[`${i}/personId`] = TP.org.personFehlt; return; }
-    const k = `${z.funktion}:${z.personId}`;
+    const k = `${z.funktion}:${text.toLowerCase()}:${z.personId}`;
     if (gesehen.has(k)) e[`${i}/personId`] = TP.org.doppelt;
     gesehen.add(k);
-    if (EINZELN.includes(z.funktion)) {
+    if (z.funktion !== 'weitere') {
       if (einzeln.has(z.funktion)) e[`${i}/funktion`] = TP.org.einzeln(TP.funktion[z.funktion]);
       einzeln.add(z.funktion);
     }
   });
   return e;
 }
-
-/** Personen mit Rolle am Projekt (sp, pl, ctl, kt), für die Wirkung. */
-const mitRolle = (l: { funktion: Funktion; personId: string }[]) => new Set(l.filter(m => ROLLEN.includes(m.funktion) && m.personId).map(m => m.personId));
 
 export function OrganisationDrawer({ projektId, titel, geladen, neuLaden, onClose }: {
   projektId: string; titel: string; geladen: OrgLoaded; onClose(): void;
@@ -47,21 +45,15 @@ export function OrganisationDrawer({ projektId, titel, geladen, neuLaden, onClos
   const toast = useToast();
   const speichern = useOrganisationSpeichern();
   const [naechste, setNaechste] = useState(geladen.org.mitglieder.length);
-  const [zeilen, setZeilen] = useState<Zeile[]>(() => geladen.org.mitglieder.map((m, key) => ({ key, funktion: m.funktion, personId: m.personId, akv: m.akv })));
+  const [zeilen, setZeilen] = useState<Zeile[]>(() => geladen.org.mitglieder.map((m, key) => ({ key, funktion: m.funktion, funktionText: m.funktionText, personId: m.personId, akv: m.akv })));
   const [geprueft, setGeprueft] = useState(false);
   const [stand, setStand] = useState(geladen);
   const lokal = geprueft ? pruefe(zeilen) : {};
   const server = Object.fromEntries((describeError(speichern.error).fields ?? []).map(f => [f.path.replace(/^\/mitglieder\//, ''), f.message]));
   const fehler: Record<string, string> = { ...server, ...lokal };
 
-  const wirkung = useMemo(() => {
-    const vorher = mitRolle(stand.org.mitglieder);
-    const nachher = mitRolle(zeilen);
-    return { erhalten: [...nachher].filter(p => !vorher.has(p)), verlieren: [...vorher].filter(p => !nachher.has(p)) };
-  }, [stand, zeilen]);
-
   const setze = (key: number, teil: Partial<Zeile>) => setZeilen(zs => zs.map(z => (z.key === key ? { ...z, ...teil } : z)));
-  const hinzufuegen = () => { setZeilen(zs => [...zs, { key: naechste, funktion: 'kt', personId: '', akv: '' }]); setNaechste(n => n + 1); };
+  const hinzufuegen = () => { setZeilen(zs => [...zs, { key: naechste, funktion: 'weitere', funktionText: '', personId: '', akv: '' }]); setNaechste(n => n + 1); };
   const submit = (e: FormEvent) => {
     e.preventDefault();
     setGeprueft(true);
@@ -73,7 +65,10 @@ export function OrganisationDrawer({ projektId, titel, geladen, neuLaden, onClos
       return;
     }
     speichern.mutate(
-      { id: projektId, etag: stand.etag, mitglieder: zeilen.map(z => ({ personId: z.personId, funktion: z.funktion, akv: z.akv.trim() })) },
+      {
+        id: projektId, etag: stand.etag,
+        mitglieder: zeilen.map(z => ({ personId: z.personId, funktion: z.funktion, ...(z.funktion === 'weitere' ? { funktionText: z.funktionText.trim() } : {}), akv: z.akv.trim() })),
+      },
       { onSuccess: () => { toast.show(TP.org.gespeichert); onClose(); } },
     );
   };
@@ -89,6 +84,8 @@ export function OrganisationDrawer({ projektId, titel, geladen, neuLaden, onClos
         </Hinweis>
       ) : null}
       {speichern.error && !isConflict(speichern.error) && !Object.keys(server).length ? <ErrorState error={speichern.error} /> : null}
+      <Hinweis stufe="hinweis">{TP.org.keinZugriff}</Hinweis>
+      <datalist id={`${id}-vorschlaege`}>{stand.org.vorschlaege.map(v => <option key={v} value={v} />)}</datalist>
       <form id={id} className="form" onSubmit={submit} noValidate aria-busy={speichern.isPending}>
         {zeilen.map((z, i) => {
           const fid = (feld: string) => `${id}-${i}-${feld}`;
@@ -104,6 +101,15 @@ export function OrganisationDrawer({ projektId, titel, geladen, neuLaden, onClos
                 </select>
                 {err('funktion') ? <p id={`${fid('funktion')}-e`} className="ferr">{err('funktion')}</p> : null}
               </div>
+              {z.funktion === 'weitere' ? (
+                <div className="field">
+                  <label htmlFor={fid('funktionText')}>{TP.org.funktionText}</label>
+                  <input id={fid('funktionText')} value={z.funktionText} maxLength={100} list={`${id}-vorschlaege`} placeholder={TP.org.funktionTextHint}
+                    onChange={e => setze(z.key, { funktionText: e.target.value })}
+                    aria-invalid={err('funktionText') ? true : undefined} aria-describedby={err('funktionText') ? `${fid('funktionText')}-e` : undefined} />
+                  {err('funktionText') ? <p id={`${fid('funktionText')}-e`} className="ferr">{err('funktionText')}</p> : null}
+                </div>
+              ) : null}
               <div className="field">
                 <label htmlFor={fid('personId')}>{TP.org.person}</label>
                 <PersonPick id={fid('personId')} value={z.personId} onChange={v => setze(z.key, { personId: v })}
@@ -121,12 +127,6 @@ export function OrganisationDrawer({ projektId, titel, geladen, neuLaden, onClos
           );
         })}
         <div><button type="button" className="btn sm" onClick={hinzufuegen}><Icon name="plus" />{TP.org.hinzufuegen}</button></div>
-        <section className="pj-wirkung" aria-live="polite">
-          <h3 className="grp-h">{TP.org.wirkung}</h3>
-          {!wirkung.erhalten.length && !wirkung.verlieren.length ? <p className="muted">{TP.org.keineWirkung}</p> : null}
-          {wirkung.erhalten.length ? <p>{wirkung.erhalten.length} {TP.org.erhalten} {wirkung.erhalten.map((p, k) => <span key={p}>{k ? ', ' : ''}<PersonName id={p} /></span>)}</p> : null}
-          {wirkung.verlieren.length ? <p>{wirkung.verlieren.length} {TP.org.verlieren} {wirkung.verlieren.map((p, k) => <span key={p}>{k ? ', ' : ''}<PersonName id={p} /></span>)}</p> : null}
-        </section>
       </form>
     </Drawer>
   );

@@ -8,7 +8,7 @@ import json, os, re
 from daten import BAUM
 from uc_daten import UCS
 
-STAND = "26. Oktober 2026"
+STAND = "29. Oktober 2026"
 HIER = os.path.dirname(os.path.abspath(__file__))
 ANHANG = os.path.dirname(HIER)
 

@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Rollen** | primär PL (erarbeitet, reicht ein); beteiligt SP und CTL (stimmen ab, unterzeichnen; SP entscheidet Änderungen), UE (Quality-Check), Gremium (entscheidet in [K3](K3-gremiumssitzung.md)) |
-| **Gerät** | PL Desktop; Unterzeichnen und Änderung entscheiden: SP und CTL primär Telefon, auch Desktop; UE Desktop |
-| **Use Cases** | [UC-002](../../anhang/use-cases.md#uc-002-projektvertrag-erarbeiten-und-freigeben) (alle Schritte, A1–A6), [UC-003](../../anhang/use-cases.md#uc-003-gate-übergang-durchführen) (alle Schritte, A1–A6), [UC-007](../../anhang/use-cases.md#uc-007-änderung-am-projektvertrag-beantragen-und-entscheiden) (alle Schritte, A1–A2); Entscheid des Gremiums in K3 |
+| **Rollen** | primär PL (erarbeitet, reicht ein); beteiligt AG (Projektauftraggeber:in: stimmt ab, unterzeichnet, entscheidet Änderungen), UE (Quality-Check), Gremium (entscheidet in [K3](K3-gremiumssitzung.md)) |
+| **Gerät** | PL Desktop; Unterzeichnen und Änderung entscheiden: AG primär Telefon, auch Desktop; UE Desktop |
+| **Use Cases** | [UC-002](../../anhang/use-cases.md#uc-002-projektvertrag-erarbeiten-und-freigeben) (alle Schritte, A1–A7), [UC-003](../../anhang/use-cases.md#uc-003-gate-übergang-durchführen) (alle Schritte, A1–A7), [UC-007](../../anhang/use-cases.md#uc-007-änderung-am-projektvertrag-beantragen-und-entscheiden) (alle Schritte, A1–A3); Entscheid des Gremiums in K3 |
 | **Oberflächen** | UI-01 Eingang, UI-07 Projektakte, UI-08 Gate-Modus, UI-09 Änderungsantrag, UI-10 Versionsvergleich, UI-11 Dokumentausgabe, UI-12 Prüfen und Unterzeichnen |
 | **Arbeitsraum** | Projekte › Projekt › Vertrag `/projekte/<nr>/vertrag`, Versionen `/projekte/<nr>/versionen` |
 | **Etappe** | E3 |
@@ -18,7 +18,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 
 - **PL:** Wenn ein Gate naht, will ich sehen, was für die nächste Phase fehlt und was sich gegenüber der Baseline ändert,
   damit ich die Unterlagen einmal vollständig einreiche und nicht nach der Prüfung nachbessern muss.
-- **SP / CTL:** Wenn ich unterzeichnen oder eine Änderung entscheiden soll, will ich die Hauptänderungen und ihre Wirkung
+- **AG:** Wenn ich unterzeichnen oder eine Änderung entscheiden soll, will ich die Hauptänderungen und ihre Wirkung
   auf einen Blick sehen, auch auf dem Telefon, damit ich verantwortet entscheide, ohne 30 Seiten zu lesen.
 - **UE:** Wenn ein Vertrag zum Quality-Check kommt, will ich die Abweichungen vom PM-Handbuch direkt an der Stelle sehen und
   dort zurückmelden, damit Rückfragen nicht über E-Mail laufen.
@@ -27,7 +27,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 
 | Nr. | Grösse | Zielwert | Messung |
 |---|---|---|---|
-| K2-1 | Unterzeichnen ab Benachrichtigung auf dem Telefon (PPM-2) | ≤ 60 s, ≤ 3 Interaktionen | Aufgabentest mit SP und CTL auf dem Telefon |
+| K2-1 | Unterzeichnen ab Benachrichtigung auf dem Telefon (PPM-2) | ≤ 60 s, ≤ 3 Interaktionen | Aufgabentest mit AG auf dem Telefon |
 | K2-2 | Anteil Quality-Checks ohne Rückmeldung an die PL | ≥ 70 % (Vorschlag) | Betrieb |
 | K2-3 | Durchlaufzeit «zur Prüfung eingereicht» → «vollständig unterzeichnet» | Median ≤ 5 Arbeitstage | Betrieb |
 | K2-4 | Fehlende Pflichtangaben auffinden | PL erreicht jede fehlende Angabe mit 1 Klick aus dem Seitenpanel; 100 % im Test | automatischer Test, Aufgabentest |
@@ -41,7 +41,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 - **Projektakte:** «Änderung beantragen» (UC-007 Schritt 1).
 - **Statusbericht:** «Änderung beantragen» aus der Warnung zur wesentlichen Abweichung ([K1](K1-statusbericht.md), UC-004 A1); der
   Entwurf ist mit dem Bericht verknüpft.
-- **Eingang (UE, SP, CTL, PL):** «Quality-Check Projektvertrag ‹Projekt›», «Projektvertrag Version 2.0 unterzeichnen»,
+- **Eingang (UE, AG, PL):** «Quality-Check Projektvertrag ‹Projekt›», «Projektvertrag Version 2.0 unterzeichnen»,
   «Änderung am Projektvertrag entscheiden», je mit Benachrichtigung, die direkt die Ansicht öffnet (I-B1).
 
 ## Ablauf
@@ -63,13 +63,16 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
    Pflichtangaben (I-P4). Bei einer Änderung zeigt es die Hauptänderungen und den Vergleich zur Baseline.
 3. **Kapitel bearbeiten** (UC-002 Schritte 2–7, UC-003 Schritt 3, UC-007 Schritt 2). Die Abweichung zur Baseline steht
    laufend am Feld («CHF 2,40 Mio. statt 2,10 Mio. · +14 %», UC-003 Schritt 3). Besonderheiten:
-   - **Projektorganisation** (UC-002 Schritt 2): Personen aus dem Verzeichnis wählen; Wirkung «Erhalten Zugriff auf das
-     Projekt: Lea Brunner (CTL), Marc Huber (Kernteam)». Die Sponsoren-Koalition ist eine Liste (K05).
+   - **Projektorganisation** (UC-002 Schritt 2): Personen aus dem Verzeichnis wählen; Funktion Projektauftraggeber:in oder
+     Projektleitung aus der Auswahl, weitere Funktionen als freier Text mit Vorschlägen aus der Organisation («Kernteam»,
+     «PMO», «Sponsoren-Koalition»; Master Entscheid 17). Die Projektorganisation ist Inhalt des Vertrags und gibt keinen
+     Zugriff (Entscheid 16). Hat eine genannte Person keinen Zugriff, steht am Eintrag «kein Zugriff» mit der Aktion
+     «Zugriff geben», die in den Bereich «Zugriff» führt (UX-E14).
    - **Ziele und Strategiebezug** (Schritt 3): Wahl eines strategischen Ziels und optional eines Jahresziels aus dem
      Zielbaum, nur Ziele in Kraft; Hinweis «Das Projekt erscheint danach im Arbeitsraum Ziele unter Ziel 2.1».
    - **Business Case und KPIs** (Schritt 4): Kosten und Nutzen, KPIs mit Zielwert; die Vorstudie als Beilage (Datei oder
      Kamera, I-M4). Struktur des Business Case offen (K21).
-   - **Abhängigkeiten** (Schritt 5): Projekt wählen, Ansprechperson; Hinweis «Erscheint auch bei ‹anderes Projekt›».
+   - **Abhängigkeiten** (Schritt 5): Projekt aus allen aufgelisteten wählen (Entscheid 14), Ansprechperson; Hinweis «Erscheint auch bei ‹anderes Projekt›».
    - **Planung** (Schritt 6): Meilensteine und Lieferergebnisse der Phase sind aus dem Phasenmodell vorausgefüllt (I-F2);
      Kosten je Phase getrennt nach CAPEX und OPEX; Personalbedarf. In P0 als Grösse **S / M / L** (A1). Am Gate P1–P2
      verlangt das System Personal in FTE und Monaten je Rolle und Phase sowie Kosten P2–P4 (UC-003 A1) als Raster Rolle ×
@@ -78,7 +81,7 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
    - **ICT- und Infrastrukturbedarf** (A2): im Kapitel Ressourcen «ICT-Bedarf melden» bzw. «Infrastrukturbedarf melden»;
      Formular in der Schublade, Wirkung «Die Meldung geht an ICT (DTI)». Danach zeigt das Kapitel «gemeldet am Fr 14.11.»
      (Anbindung offen, K24).
-   - **Nutzen ab P3** (UC-003 A2): Das Kapitel zeigt KPIs mit Zielwert und nachgeführten Ist-Werten; PL und SP erfassen
+   - **Nutzen ab P3** (UC-003 A2): Das Kapitel zeigt KPIs mit Zielwert und nachgeführten Ist-Werten; PL und AG erfassen
      die erreichten Werte und ihre Beurteilung. Beim Exit-Gate führt «Abschluss vorbereiten» in die Projektakte › Abschluss
      (UC-015).
 4. **Leitfragen beantworten** (UC-003 Schritt 4) im Seitenpanel, je Wertestrom aufklappbar, Antwort als Text.
@@ -90,10 +93,11 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 
 6. **Zur Prüfung einreichen** (UC-002 Schritt 8, UC-003 Schritt 6). Fehlen Pflichtangaben der Phase (A3), sperrt die Regel
    und listet sie mit Sprung zur Stelle. Sonst zeigt die Schaltfläche vorher die Wirkung: «Die Unternehmensentwicklung
-   erhält den Quality-Check. Bis zum Ergebnis ist der Entwurf gesperrt.» Stand «in Prüfung» (Z8 für die PL).
-   Bei einer **Änderung** heisst die Aktion **Änderung einreichen** und geht direkt an den Sponsor (UC-007 Schritt 3;
+   erhält den Quality-Check.» Der Entwurf bleibt änderbar; Änderungen nach dem Einreichen zeigt das System der UE als
+   «geändert nach Einreichen» (UX-E13). Stand «in Prüfung» (Z8 für die PL).
+   Bei einer **Änderung** heisst die Aktion **Änderung einreichen** und geht direkt an die Projektauftraggeber:in (UC-007 Schritt 3;
    UC-007 kennt keinen Quality-Check).
-   **Zurückziehen** (UC-002 A4, nur SP, erster Vertrag bis «traktandiert»): im Kopf des Reiters «Vertrag» «Projekt zurückziehen» → Dialog (unumkehrbar, wirkt auf
+   **Zurückziehen** (UC-002 A4, nur AG, erster Vertrag bis «traktandiert»): im Kopf des Reiters «Vertrag» «Projekt zurückziehen» → Dialog (unumkehrbar, wirkt auf
    andere): «Projekt ‹Digitale Patientenaufnahme› zurückziehen? Vertrag und Projekt werden als ‹zurückgezogen›
    geschlossen, der Ressourcenbedarf (Grösse M) wird freigegeben, die Unternehmensentwicklung wird informiert.»
    Begründung Pflicht; Schaltflächen «Projekt zurückziehen» / «Abbrechen».
@@ -103,27 +107,32 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 7. Die Aufgabe öffnet die Projektakte in der Prüfansicht: Inhalte nur lesbar, Kommentar je Kapitel möglich, im Seitenpanel
    die Checkliste des Quality-Checks (Lieferergebnisse vorhanden, Leitfragen beantwortet, Pflichtangaben, Einhaltung
    PM-Handbuch) und die Hauptänderungen.
-   - **Quality-Check bestätigen** (UC-002 Schritt 9, UC-003 Schritt 7) → Wirkung «Sponsor, Projektleitung und CTL erhalten
-     je eine Unterzeichnungsaufgabe»; das System protokolliert den Check.
+   - **Quality-Check bestätigen** (UC-002 Schritt 9, UC-003 Schritt 7) → Wirkung «Projektauftraggeber:in und Projektleitung
+     erhalten je eine Unterzeichnungsaufgabe»; das System vermerkt den Check.
    - **Zurück an die Projektleitung** (UC-002 A5, UC-003 A4) mit den Kommentaren als Rückmeldungen; Stand «in Arbeit»;
      die PL sieht die Rückmeldungen am betroffenen Kapitel und im Seitenpanel. Weiter bei Schritt 3.
 
-**Unterzeichnen (SP, PL, CTL; Telefon und Desktop):**
+**Unterzeichnen (AG, PL; Telefon und Desktop):**
 
 8. Die Benachrichtigung öffnet die **Zusammenfassung** (UC-002 Schritt 10, UC-003 Schritt 8): Projekt, Phase, Anlass,
    Hauptänderungen in fünf Rubriken, Business Case in Kennzahlen, Kosten und Termine je Phase mit Differenz zur Baseline,
-   Stand der Unterschriften («2 von 3: ✓ Projektleitung, ✓ CTL, ◷ Sponsor»). Darunter «Ganzen Vertrag ansehen»
+   Stand der Unterschriften («1 von 2: ✓ Projektleitung, ◷ Projektauftraggeber:in»). Darunter «Ganzen Vertrag ansehen»
    (Projektakte) und «Als PDF ansehen».
    - **Unterzeichnen**: ein bewusster Klick mit Wirkung davor (I-R1 Stufe 3): «Mit Ihrer Unterschrift ist der Vertrag
      vollständig unterzeichnet und wird für die PRAT-Sitzung vom Mi 10.12. traktandiert.» Bestätigt durch den Server
      (I-R2); die Unterschrift wird mit Person und Zeitpunkt protokolliert.
-   - **Nicht unterzeichnen** (UC-003 A5): Begründung Pflicht; Stand «in Arbeit», die PL erhält die Begründung im Eingang.
-     Weiter bei Schritt 3.
-   Sind alle drei Unterschriften da, setzt das System das Traktandum auf die Liste des zuständigen Gremiums (UC-002 Schritt
+   - **Nicht unterzeichnen** (UC-003 A5): Begründung Pflicht; das System vermerkt die Verweigerung am Vertrag und am
+     Traktandum, die PL erhält die Begründung im Eingang und entscheidet, ob sie nachbessert (Schritt 3) oder den Vertrag
+     trotzdem vorlegt (UX-E12).
+   Sind beide Unterschriften da, setzt das System das Traktandum auf die Liste des zuständigen Gremiums (UC-002 Schritt
    10, UC-003 Schritt 8); der Gremienweg folgt der Konfiguration (Kategorie, Phase, SNS-VR). Weiter in
    [K3](K3-gremiumssitzung.md); dort stellt die UE das Gate Review Packet bereit (UC-003 Schritt 9).
+   **Weiter ohne Vermerk** (UC-002 A7, UC-003 A7; UX-E12): Die PL kann den Vertrag dem Gremium vorlegen oder die Phase
+   wechseln, bevor Quality-Check, Unterschriften oder Gate-Entscheid vorliegen. Die Aktion zeigt vorher, was fehlt:
+   «Ohne Unterschrift von Daniel Keller vorlegen? Das Traktandum trägt den Vermerk ‹Unterschrift offen›; die Aufgabe
+   bleibt bei Daniel Keller.» Danach tragen Vertrag bzw. Phase den Vermerk, bis er nachgetragen ist.
 
-**Änderung entscheiden (SP, UC-007):**
+**Änderung entscheiden (AG, UC-007):**
 
 9. Die Aufgabe öffnet dieselbe Zusammenfassung mit Begründung und Versionsvergleich. **Änderung freigeben** (Schritt 4)
    zeigt vorher die Wirkung: «Version 1.2 wird Baseline. Planung und Dashboard werden nachgeführt, Projektleitung und
@@ -132,12 +141,14 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
    **Wirkung auf Scope, Budget oder Ressourcen** (A1): Betrifft der Entwurf die Kapitel Scope, Kosten oder Personal, ersetzt
    das System «Änderung freigeben» durch **Antrag an den PRAT unterstützen** mit Hinweis (siehe Regeln). Das Traktandum
    entsteht im Gremium (K3); bei Freigabe dort gilt dieselbe Wirkung wie in Schritt 4, bei Ablehnung wie in A2.
+   **Vor dem Entscheid übernehmen** (UC-007 A3; UX-E12): Die PL kann die Änderung als Baseline übernehmen, bevor AG oder
+   PRAT entschieden haben; die Version trägt «nicht freigegeben», die Entscheidaufgabe bleibt offen.
 
 **Entscheid des Gremiums und danach:**
 
 10. Den Entscheid erfasst die UE in der Sitzung ([K3](K3-gremiumssitzung.md); UC-002 Schritt 11, UC-003 Schritt 10). In der Projektakte
     erscheint danach das Banner «Version 2.0 ist seit Mi 10.12. Baseline. Projekt in Phase P2 Implementierung.»; PL und
-    SP werden informiert.
+    AG werden informiert.
     - **Auflagen oder zurückgestellt** (UC-002 A6, UC-003 A6): Der Entwurf ist wieder «in Arbeit», die Auflagen stehen mit
       Termin im Seitenpanel und als Aufgaben im Eingang; die Baseline bleibt. Weiter bei Schritt 3.
     - **Abgelehnt oder gestoppt:** weiter in UC-015 (Projektakte › Abschluss).
@@ -150,11 +161,12 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 |---|---|
 | Kein Entwurf | Projektakte zeigt die Baseline (nur lesen) und die Aktionen «Änderung beantragen», bei fälligem Gate «Entwurf für Phase ‹n› anlegen» |
 | Entwurf vorhanden, anderer Anlass | «Änderung beantragen» bei laufendem Gate-Entwurf: Hinweis «Es gibt bereits einen Entwurf für Gate P1–P2 (in Arbeit). Nehmen Sie die Änderung dort auf.» mit Link (UX-E5) |
-| Z8 In Prüfung / zur Unterzeichnung | Banner «In Prüfung bei der Unternehmensentwicklung seit ‹Datum›» bzw. «Zur Unterzeichnung: 2 von 3»; keine Bearbeiten-Elemente |
-| Z9 Traktandiert | Banner «Traktandiert für PRAT Mi 10.12. · Unterlagen versendet Mi 3.12.»; Änderungen nur nach Rückweisung |
+| Z8 In Prüfung / zur Unterzeichnung | Banner «In Prüfung bei der Unternehmensentwicklung seit ‹Datum›» bzw. «Zur Unterzeichnung: 1 von 2»; Bearbeiten bleibt möglich, Änderungen tragen «geändert nach Einreichen» (UX-E13) |
+| Z9 Traktandiert | Banner «Traktandiert für PRAT Mi 10.12. · Unterlagen versendet Mi 3.12.»; Änderungen bleiben möglich und tragen «geändert nach Versand» (UX-E13) |
+| Vermerk offen | Banner «Ohne Gate-Entscheid in Phase P2 seit ‹Datum› · Entscheid PRAT ausstehend» bzw. «Unterschrift offen: ‹Name›»; verschwindet mit dem Vermerk (UX-E12) |
 | Z7 Konflikt | Zwei Personen bearbeiten dasselbe Kapitel (PL und Stellvertretung): «Kapitel 7 wurde von ‹Name› geändert. Neu laden – Ihre Änderungen bleiben erhalten.» |
-| Vertretung | Unterzeichnet die Stellvertretung des SP: Banner «Sie unterzeichnen in Vertretung von ‹Name›» (I-Z2); die Unterschrift trägt den Vermerk (UC-016 Schritt 4); ob Unterschriften vertretbar sind, ist offen ([UX-OF-10](../fahrplan.md#offene-fragen)) |
-| Via SNS-VR | Banner «Entscheid gilt erst mit dem SNS-VR» bis zu dessen Entscheid (UC-006 A1) |
+| Vertretung | Unterzeichnet die Stellvertretung der AG: Banner «Sie unterzeichnen in Vertretung von ‹Name›» (I-Z2); die Unterschrift trägt den Vermerk (UC-016 Schritt 4); ob Unterschriften vertretbar sind, ist offen ([UX-OF-10](../fahrplan.md#offene-fragen)) |
+| Via SNS-VR | Banner «Entscheid des SNS-VR ausstehend» bis zu dessen Entscheid (UC-006 A1, Vermerk) |
 
 ## Regeln und Rückmeldungen
 
@@ -164,18 +176,20 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 | Personal in FTE ab Gate P1–P2 (UC-003 A1) | *vorher* im Kapitel Ressourcen | Sperre (als Pflichtangabe) | «Gate P1–P2: Personal in FTE und Monaten je Rolle und Phase statt Grösse M. Die Ressourcenplanung braucht die Werte ab der Implementierung.» | Raster ausfüllen |
 | Unbeantwortete Leitfragen (UC-003 Schritt 4) | *vorher* im Seitenpanel, *dabei* beim Einreichen | Warnung | «Leitfragen: 3 von 25 unbeantwortet (Klinik 2, Infrastruktur 1). Beantworten Sie sie oder begründen Sie, warum sie nicht zutreffen.» | beantworten oder «trifft nicht zu» mit Begründung |
 | Wesentliche Abweichung zur Baseline (UC-003 Schritt 3; Schwelle K11) | *dabei* am Feld | Hinweis | «Budget P2: CHF 2,40 Mio. statt 2,10 Mio. (+14 %). Erscheint in den Hauptänderungen.» | – |
-| Änderung an Scope, Budget oder Ressourcen (UC-007 A1, Q8 Kap. 8.5) | *vorher* in der Zusammenfassung des SP | Sperre für «freigeben» | «Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Sie können sie unterstützen; entscheiden wird der PRAT.» | **Antrag an den PRAT unterstützen** |
+| Änderung an Scope, Budget oder Ressourcen (UC-007 A1, Q8 Kap. 8.5) | *vorher* in der Zusammenfassung der AG | Sperre für «freigeben» (die PL kann die Änderung trotzdem übernehmen, UC-007 A3) | «Freigabe durch den PRAT: Diese Änderung betrifft Budget und Ressourcen. Sie können sie unterstützen; entscheiden wird der PRAT.» | **Antrag an den PRAT unterstützen** |
+| Weiter ohne Quality-Check, Unterschrift oder Gate-Entscheid (UC-002 A7, UC-003 A7; UX-E12) | *vorher* bei «Vorlegen» bzw. «Phase wechseln» | Warnung | «Unterschrift der Projektauftraggeber:in fehlt. Das Traktandum trägt den Vermerk; die Aufgabe bleibt offen.» | trotzdem vorlegen oder warten |
 | Nicht unterzeichnen, Ablehnen, Zurückziehen ohne Begründung (UC-003 A5, UC-007 A2, UC-002 A4) | *dabei* | Sperre | «Begründung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist.» | Begründung erfassen |
 
 ## Texte
 
 - Schaltflächen: «Entwurf für Phase P2 anlegen», «Änderung beantragen», «Zur Prüfung einreichen», «Änderung einreichen»,
   «Quality-Check bestätigen», «Zurück an die Projektleitung», «Unterzeichnen», «Nicht unterzeichnen», «Änderung
-  freigeben», «Antrag an den PRAT unterstützen», «Ablehnen», «Projekt zurückziehen», «Als Dokument herunterladen»
+  freigeben», «Antrag an den PRAT unterstützen», «Ablehnen», «Projekt zurückziehen», «Als Dokument herunterladen», «Ohne Vermerk vorlegen», «Phase wechseln»,
+  «Änderung übernehmen»
 - Seitenpanel Gate: «Gate P1–P2 · Leitfragen 18 von 25 · Lieferergebnisse 4 von 5 · 2 Angaben fehlen»
 - Wirkung Unterzeichnen: «Mit Ihrer Unterschrift ist der Vertrag vollständig unterzeichnet und wird für die PRAT-Sitzung
   vom Mi 10.12. traktandiert.»
-- Toast nach Unterzeichnen: «Unterzeichnet. Es fehlt noch die Unterschrift von Lea Brunner (CTL).»
+- Toast nach Unterzeichnen: «Unterzeichnet. Es fehlt noch die Unterschrift von Daniel Keller (Projektauftraggeber:in).»
 
 ## Barrierefreiheit und Tastatur
 
@@ -191,10 +205,12 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
 - [ ] Die Hauptänderungen enthalten nach einer Budgeterhöhung den alten und den neuen Wert in der Rubrik Ressourcen/Budget.
 - [ ] Einreichen ohne Pflichtangaben ist gesperrt; jede gelistete Angabe führt mit einem Klick zur Stelle.
 - [ ] Am Gate P1–P2 lässt sich nicht mit Grösse S/M/L einreichen.
-- [ ] Nach «Quality-Check bestätigen» haben SP, PL und CTL je eine Unterzeichnungsaufgabe im Eingang.
-- [ ] Ein SP unterzeichnet auf einem Telefon (360 px) ab der Benachrichtigung mit höchstens 3 Interaktionen.
-- [ ] Nach der dritten Unterschrift erscheint das Traktandum als Vorschlag in der nächsten Sitzung des zuständigen Gremiums.
-- [ ] Eine Änderung, die das Kapitel Kosten betrifft, kann der SP nicht freigeben, nur an den PRAT unterstützen.
+- [ ] Nach «Quality-Check bestätigen» haben AG und PL je eine Unterzeichnungsaufgabe im Eingang.
+- [ ] Eine AG unterzeichnet auf einem Telefon (360 px) ab der Benachrichtigung mit höchstens 3 Interaktionen.
+- [ ] Nach der zweiten Unterschrift erscheint das Traktandum als Vorschlag in der nächsten Sitzung des zuständigen Gremiums.
+- [ ] Eine Änderung, die das Kapitel Kosten betrifft, kann die AG nicht freigeben, nur an den PRAT unterstützen.
+- [ ] Ohne Quality-Check oder Unterschrift lässt sich der Vertrag mit Warnung vorlegen; der Vermerk steht am Traktandum, die Aufgabe bleibt im Eingang.
+- [ ] Ein eingereichter oder traktandierter Entwurf bleibt änderbar; die Änderung ist im Verlauf markiert.
 - [ ] Ein zweiter Entwurf neben einem bestehenden lässt sich nicht anlegen; der Hinweis verlinkt den bestehenden.
 - [ ] Jede Version lässt sich als Dokument herunterladen; das Dokument trägt Versionsnummer und Unterschriften.
 
@@ -204,14 +220,14 @@ UC-002), nächste Phase (Gate, UC-003) oder Änderung während der Phase (UC-007
   Baseline fortschreiben und freigeben lassen (G3, Heuristik «näher am Bestehenden»).
 - Entscheid: Höchstens ein Entwurf je Projekt (UX-E5). Präzisiert UC-003 Schritt 2 und UC-007 Schritt 1; mit der UE
   bestätigen ([UX-OF-8](../fahrplan.md#offene-fragen)).
-- Entscheid: Ob eine Änderung an den PRAT muss, leitet das System aus den geänderten Kapiteln ab (UC-007 A1); der SP
-  sieht es, bevor er entscheidet (G4). Welche Kapitel Scope, Budget und Ressourcen bilden, legt die UE im Phasenmodell fest.
+- Entscheid: Ob eine Änderung an den PRAT muss, leitet das System aus den geänderten Kapiteln ab (UC-007 A1); die AG
+  sieht es, bevor sie entscheidet (G4). Welche Kapitel Scope, Budget und Ressourcen bilden, legt die UE im Phasenmodell fest.
 - Entscheid: Unterzeichnen als protokollierter Klick der angemeldeten Person; keine Rückfrage, aber Wirkung davor (G6, I-R1
   Stufe 3). Ob das rechtlich genügt, ist offen ([UX-OF-10](../fahrplan.md#offene-fragen)).
 - Annahme (A-10, K11): Die Toleranzen des Projekts je Dimension (Termin, Kosten, Umfang) stehen in Kapitel 7 bei der
   Zusammenfassung der Projektplanung, weil Q7 kein Kapitel dafür hat. Sie gelten ab der Baseline und ersetzen den Standard
   des Phasenmodells; ohne Eintrag gilt der Standard.
-- Offen: Pflichtangaben je Phase (K13), Struktur Business Case (K21), Sponsoren-Koalition (K05), Anbindung DTI/DBI (K24).
+- Offen: Pflichtangaben je Phase (K13), Struktur Business Case (K21), Sponsoren-Koalition (K05; im Produkt freie Funktion, Master Entscheid 17), Anbindung DTI/DBI (K24).
 - Offen: Zeitpunkt der Gate-Aufgabe ([UX-OF-5](../fahrplan.md#offene-fragen)); Dateiformat der Dokumentausgabe.
 - Umsetzung AP-E3-4: «Änderung freigeben» informiert die Projektleitung per Mitteilung; die Unternehmensentwicklung sieht
   die neue Baseline im Projekt (Mitteilungen gehen nur an Personen, eine Mitteilung an ein Recht fehlt im Eingang). Ein

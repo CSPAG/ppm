@@ -15,7 +15,7 @@ const SitzungStandT = enumOf(['geplant', 'in_vorbereitung', 'versendet', 'laufen
 const TraktandumStandT = enumOf(['vorgeschlagen', 'traktandiert', 'verschoben', 'entschieden'] as const, 'Stand des Traktandums.');
 const UnterlagenStandT = enumOf(['bereit', 'quality_check_offen', 'fehlt', 'keine'] as const,
   'Stand der Unterlagen (UC-006 Schritt 3): bereit, Quality-Check offen, Unterlagen fehlen, keine Unterlagen nötig.');
-const FunktionT = enumOf(['sp', 'pl', 'ctl', 'weitere'] as const, 'Funktion im Projekt: Sponsor, Projektleitung, CTL oder weitere Person.');
+const FunktionT = enumOf(['sp', 'pl', 'weitere'] as const, 'Funktion im Projekt: `sp` Projektauftraggeber:in, `pl` Projektleitung oder `weitere` Person.');
 
 const SitzungCan = Type.Object({ write: Type.Boolean({ description: 'Traktandenliste bearbeiten und versenden (sitzung:write, nur bis zum Versand).' }) },
   { description: 'Was die anfragende Person damit darf.' });
@@ -59,7 +59,10 @@ export const Traktandum = Type.Object({
   vertraulich: Type.Boolean(),
   fest: Type.Boolean({ description: 'Festes Traktandum 1 «Bericht der Programmleitung» (K3 Schritt 4): weder entfernen noch verschieben, bleibt an Position 1.' }),
   verschobenVon: Beschrieben(Datum, 'Datum der Sitzung, von der das Traktandum verschoben wurde (UC-006 A2).'),
+  geaendertNachVersand: Beschrieben(Nullable(DateTime), 'Zuletzt nach dem Versand geändert oder aufgenommen («geändert nach Versand», A-75, UX-E13); Einzelheiten im Verlauf.'),
   unterlagen: Type.Object({ stand: UnterlagenStandT, liste: Type.Array(Type.Ref('Unterlage')) }, { additionalProperties: false }),
+  vermerke: Type.Array(Type.Object({ art: Type.String(), text: Type.String() }, { additionalProperties: false }),
+    { description: 'Offene Vermerke (A-74): «Unterlagen fehlen», «Quality-Check offen»; das Traktandum bleibt stehen (UC-006 A2.2).' }),
   einladungen: Type.Array(Type.Ref('Einladung')),
   version: Type.Integer({ minimum: 1 }),
 }, { $id: 'Traktandum', additionalProperties: false });
@@ -76,6 +79,7 @@ export const Sitzung = Type.Object({
   dauerMin: Nullable(Type.Integer({ description: 'Sitzungsdauer in Minuten.' })),
   ort: Type.String(),
   stand: SitzungStandT,
+  geaendertNachVersand: Nullable(DateTime),
   versendetAt: Nullable(DateTime),
   versandVorlauf: Nullable(Type.Integer({ description: 'Arbeitstage zwischen Versand und Sitzung (Versandprotokoll, K3-1).' })),
   frist: Type.Ref('Versandfrist'),

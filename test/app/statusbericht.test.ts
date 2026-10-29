@@ -34,7 +34,7 @@ describe('Statusbericht erfassen', () => {
   before(async () => {
     api = await testApi();
     folgen.beimEinreichen(async (_tx, r) => { eingereicht.push(r.id); });
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     await full(api.t.runtime, T, async tx => {
@@ -46,14 +46,14 @@ describe('Statusbericht erfassen', () => {
     const p = await login(api, 'demo', 'u-pl', null);
     plId = p.principalId;
     pl = { authorization: p.authorization };
-    for (const nr of ['2026-001', '2026-003']) await grant(api, T, `user:${p.principalId}`, 'pl', { type: 'projekt', id: projekt[nr] });
+    for (const nr of ['2026-001', '2026-003']) await grant(api, T, `user:${p.principalId}`, 'projekt-fuehren', { type: 'projekt', id: projekt[nr] });
     const k = await login(api, 'demo', 'u-kt', null);
-    await grant(api, T, `user:${k.principalId}`, 'kt', { type: 'projekt', id: projekt['2026-001'] });
+    await grant(api, T, `user:${k.principalId}`, 'projekt-mitlesen', { type: 'projekt', id: projekt['2026-001'] });
     kt = { authorization: k.authorization };
     fremd = { authorization: (await login(api, 'demo', 'u-fremd', null)).authorization };
     admin = { authorization: (await login(api, 'demo', 'u-admin', 'org-admin')).authorization };
     const p2 = await login(api, 'demo', 'u-pl2', null);
-    await grant(api, T, `user:${p2.principalId}`, 'pl', { type: 'projekt', id: projekt['2026-001'] });
+    await grant(api, T, `user:${p2.principalId}`, 'projekt-fuehren', { type: 'projekt', id: projekt['2026-001'] });
     pl2 = { authorization: p2.authorization };
   });
   after(async () => { await api?.close(); });
@@ -91,7 +91,7 @@ describe('Statusbericht erfassen', () => {
     assert.equal((await call('GET', url('2026-001'), fremd)).statusCode, 403, 'ohne Rolle am Projekt');
   });
 
-  test('Entwurf speichern mit ETag, einreichen mit Pflichtangaben, danach nur lesbar', async () => {
+  test('Entwurf speichern mit ETag, einreichen mit Pflichtangaben, danach änderbar mit Markierung (A-75)', async () => {
     assert.equal((await call('PUT', url('2026-001'), pl, { trend: 'aufwaerts' })).statusCode, 428);
     assert.equal((await call('PUT', url('2026-001'), { ...kt, 'if-match': 'W/"0"' }, { trend: 'aufwaerts' })).statusCode, 403);
     const c = await call('PUT', url('2026-001'), { ...pl, 'if-match': 'W/"0"', 'x-request-id': 'req-bericht' }, { trend: 'aufwaerts', abhaengigkeiten: '  keine  ' });
@@ -122,12 +122,10 @@ describe('Statusbericht erfassen', () => {
     const s = e.json();
     assert.deepEqual([s.stand, s.version, s.eingereichtBy, s.phase], ['eingereicht', 4, plId, 'P2']);
     assert.ok(s.eingereichtAt);
-    assert.deepEqual(s.can, { write: false, einreichen: false, zurueckziehen: true, eskalieren: false });
+    // nach dem Einreichen bleibt der Bericht änderbar (UC-004 A4, A-75); einreichen und eskalieren nicht mehr
+    assert.deepEqual(s.can, { write: true, einreichen: false, zurueckziehen: true, eskalieren: false });
     assert.deepEqual(eingereicht, [s.id], 'Folgen der Erweiterungen in derselben Transaktion');
 
-    const z8 = await call('PUT', url('2026-001'), { ...pl, 'if-match': 'W/"4"' }, { trend: 'abwaerts' });
-    assert.equal(z8.statusCode, 409, 'nach dem Einreichen nur lesbar (Z8)');
-    assert.equal(z8.json().reason, 'stand');
 
     const rows = await full(api.t.runtime, T, async tx => ({
       audit: (await tx.query('SELECT action, correlation_id FROM ppm.audit_log WHERE resource_id = $1', [s.id])).rows,
@@ -166,9 +164,19 @@ describe('Statusbericht erfassen', () => {
     assert.equal(spaet.statusCode, 409, spaet.body);
     assert.equal(spaet.json().reason, 'rueckgaengig');
     assert.equal((await call('GET', url('2026-001'), pl)).json().can.zurueckziehen, false);
+
+    // Änderung nach dem Einreichen (UC-004 A4, A-75): gespeichert, markiert, Stand bleibt; zweites Einreichen nicht nötig
+    const g = await call('GET', url('2026-001'), pl);
+    const n = await call('PUT', url('2026-001'), { ...pl, 'if-match': g.headers.etag as string }, { trend: 'abwaerts' });
+    assert.equal(n.statusCode, 200, n.body);
+    assert.deepEqual([n.json().stand, n.json().trend, n.json().geaendertNach?.art, n.json().geaendertNach?.text], ['eingereicht', 'abwaerts', 'einreichen', 'geändert nach Einreichen']);
+    assert.equal((await call('POST', url('2026-001', PERIODE, '/einreichen'), { ...pl, 'if-match': `W/"${n.json().version}"` })).json().reason, 'stand');
+    const v = await call('GET', url('2026-001', PERIODE, '/verlauf'), kt);
+    assert.equal(v.statusCode, 200, v.body);
+    assert.ok(v.json().items.some((x: { text: string }) => x.text === 'geändert nach Einreichen'));
   });
 
-  test('Sperren: Rolle nur am eigenen Projekt, Phase P4, Zukunft, abgeschlossene Periode', async () => {
+  test('Sperren: Rolle nur am eigenen Projekt, Phase P4, Zukunft; nach dem Abschluss markiert statt gesperrt', async () => {
     assert.equal((await call('PUT', url('2026-002'), { ...pl, 'if-match': 'W/"0"' }, { trend: 'aufwaerts' })).statusCode, 403, 'Projekt ohne Rolle');
     const p4 = await call('PUT', url('2026-003'), { ...pl, 'if-match': 'W/"0"' }, { trend: 'aufwaerts' });
     assert.equal(p4.statusCode, 409);
@@ -179,17 +187,19 @@ describe('Statusbericht erfassen', () => {
     assert.equal(z.json().reason, 'zukunft');
     assert.equal((await call('GET', `/v1/projekte/${projekt['2026-001']}/berichte/2026-13`, pl)).statusCode, 422);
 
-    // Vorperiode abgeschlossen (AP-E1-2 schliesst ab): gesperrt (Z9)
+    // Vorperiode abgeschlossen: Änderung bleibt möglich, markiert «geändert nach Abschluss», geprüft → wieder eingereicht (UC-005 A4, A-75)
     await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.periode SET stand = 'abgeschlossen', abgeschlossen_at = now() WHERE periode = $1", [VORPERIODE]));
-    const zu = await call('PUT', url('2026-001', VORPERIODE), { ...pl, 'if-match': 'W/"1"' }, { trend: 'aufwaerts' });
-    assert.equal(zu.statusCode, 409);
-    assert.equal(zu.json().reason, 'periode');
-    const g = (await call('GET', url('2026-001', VORPERIODE), pl)).json();
-    assert.deepEqual([g.periodeStand, g.can.write], ['abgeschlossen', false]);
+    const vor = await call('GET', url('2026-001', VORPERIODE), pl);
+    assert.deepEqual([vor.json().periodeStand, vor.json().can.write], ['abgeschlossen', true]);
+    const zu = await call('PUT', url('2026-001', VORPERIODE), { ...pl, 'if-match': vor.headers.etag as string }, { trend: 'aufwaerts' });
+    assert.equal(zu.statusCode, 200, zu.body);
+    assert.deepEqual([zu.json().geaendertNach?.text, zu.json().stand], ['geändert nach Abschluss', 'eingereicht']);
+    assert.ok((await call('GET', url('2026-001', VORPERIODE, '/verlauf'), kt)).json().items.some((x: { text: string }) => x.text === 'geändert nach Abschluss'));
   });
 
-  test('Recht an der Organisation erfasst für jedes Projekt, auch ausserordentlich; UE prüft nur', async () => {
-    assert.equal((await call('PUT', url('2026-002'), { ...ue, 'if-match': 'W/"0"' }, VOLL)).statusCode, 403, 'UE: statusbericht:review, nicht :write');
+  test('Recht an der Organisation erfasst für jedes Projekt, auch ausserordentlich; wer nur liest, nicht', async () => {
+    const lesend = { authorization: (await login(api, 'demo', 'u-lesend', 'alle-lesen')).authorization };
+    assert.equal((await call('PUT', url('2026-002'), { ...lesend, 'if-match': 'W/"0"' }, VOLL)).statusCode, 403, 'alle lesen: kein statusbericht:write');
     const u = await call('PUT', url('2026-002'), { ...admin, 'if-match': 'W/"0"' }, { ...VOLL, anlass: 'ausserordentlich' });
     assert.equal(u.statusCode, 200, u.body);
     assert.equal(u.json().anlass, 'ausserordentlich');

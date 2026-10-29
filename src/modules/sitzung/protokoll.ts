@@ -24,6 +24,8 @@ export interface ProtokollTraktandum {
   projekt: { nummer: string; name: string } | null;
   vertraulich: boolean;
   viaSns: boolean;
+  /** Offene Vermerke beim Schliessen, z. B. «Unterlagen fehlen» (UC-006 A2.2, A-74); fehlt in älteren Protokollen. */
+  vermerke?: string[];
   /** entschieden, zur Kenntnis genommen (ohne Entscheid) oder nicht behandelt (für die nächste Sitzung vorgeschlagen) */
   behandlung: 'entschieden' | 'kenntnisnahme' | 'nicht_behandelt';
   entscheid: {
@@ -42,7 +44,7 @@ export interface ProtokollInhalt {
 
 /** Protokollentwurf beim Schliessen (UC-006 Schritt 8): je Traktandum Entscheid, Begründung und Auflagen. */
 export async function protokollErzeugen(tx: Tx, s: store.SitzungRow, ts: readonly store.TraktandumRow[], ent: Map<string, es.EntscheidRow>,
-  auflagen: readonly es.AuflageRow[], o: { hatOptionen: (art: Art) => boolean; label: (art: Art, schluessel: string) => string }): Promise<void> {
+  auflagen: readonly es.AuflageRow[], o: { hatOptionen: (art: Art) => boolean; label: (art: Art, schluessel: string) => string; vermerke: (t: store.TraktandumRow) => string[] }): Promise<void> {
   if (await es.protokollVon(tx, s.id)) throw conflict('Das Protokoll besteht bereits.');
   const inhalt: ProtokollInhalt = {
     kopf: { gremium: { kuerzel: s.gremium_kuerzel, name: s.gremium_name }, datum: s.datum, beginn: s.beginn, ort: s.ort },
@@ -53,7 +55,7 @@ export async function protokollErzeugen(tx: Tx, s: store.SitzungRow, ts: readonl
       return {
         traktandumId: t.id, position: t.position, art: t.art, artLabel: artLabel(t.art), titel: t.titel, antrag: t.antrag,
         projekt: t.projekt_nummer ? { nummer: t.projekt_nummer, name: t.projekt_name ?? '' } : null,
-        vertraulich: t.vertraulich, viaSns: t.via_sns,
+        vertraulich: t.vertraulich, viaSns: t.via_sns, vermerke: o.vermerke(t),
         behandlung: e ? 'entschieden' : o.hatOptionen(t.art) ? 'nicht_behandelt' : 'kenntnisnahme',
         entscheid: e ? {
           ergebnis: e.ergebnis, label: o.label(t.art, e.ergebnis), begruendung: e.begruendung, stellungnahme: e.stellungnahme, anVr: e.an_vr,

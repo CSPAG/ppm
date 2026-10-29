@@ -22,7 +22,7 @@ export const matrix: Matrix = {
   },
   policies: [
     // Lesesicht: RM und UE, die Person selbst, die Projektleitung (darstellung.md); schreiben ressource:write
-    "ppm.zuteilung.zuteilung_read RESTRICTIVE SELECT ppm_app USING (app.has_permission('ressource:read'::text) OR (person_id = app.principal_id()) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK -",
+    "ppm.zuteilung.zuteilung_read RESTRICTIVE SELECT ppm_app USING (app.has_permission('ressource:read'::text) OR (person_id = app.principal_id()) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id)) CHECK -",
     "ppm.zuteilung.zuteilung_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('ressource:write'::text)",
     "ppm.zuteilung.zuteilung_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('ressource:write'::text) CHECK app.has_permission('ressource:write'::text)",
     "ppm.zuteilung.zuteilung_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ressource:write'::text) CHECK -",

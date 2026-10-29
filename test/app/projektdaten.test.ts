@@ -39,14 +39,14 @@ describe('Projektdaten', () => {
         projekt[k] = (await tx.query<{ id: string }>('INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, phase) VALUES ($1, $2, $2, $3, $4) RETURNING id', [T, nr, p, phase])).rows[0]!.id;
       }
     });
-    h.ue = await person('ue', [['ue', { type: 'org' }]]);
-    h.gl = await person('gl', [['gl', { type: 'org' }]]);
-    h.rm = await person('rm', [['rm', { type: 'org' }]]);
+    h.ue = await person('ue', [['alle-fuehren', { type: 'org' }]]);
+    h.gl = await person('gl', [['alle-lesen', { type: 'org' }]]);
+    h.rm = await person('rm', [['alle-fuehren', { type: 'org' }]]);
     h.gremium = await person('gremium', [['gremium', { type: 'portfolio', id: pf }]]);
-    h.plx = await person('pl-x', [['pl', { type: 'projekt', id: projekt.x }]]);
-    h.ply = await person('pl-y', [['pl', { type: 'projekt', id: projekt.y }]]);
-    h.ctly = await person('ctl-y', [['ctl', { type: 'projekt', id: projekt.y }]]);
-    h.ktx = await person('kt-x', [['kt', { type: 'projekt', id: projekt.x }]]);
+    h.plx = await person('pl-x', [['projekt-fuehren', { type: 'projekt', id: projekt.x }]]);
+    h.ply = await person('pl-y', [['projekt-fuehren', { type: 'projekt', id: projekt.y }]]);
+    h.ctly = await person('ctl-y', [['projekt-fuehren', { type: 'projekt', id: projekt.y }]]);
+    h.ktx = await person('kt-x', [['projekt-mitlesen', { type: 'projekt', id: projekt.x }]]);
   });
   after(async () => { await api?.close(); });
 
@@ -59,7 +59,7 @@ describe('Projektdaten', () => {
     // Wer welche Kosten über die API sieht (fachmodell.md 3.3): Kernteam und RM nie, Gremium nur im eigenen Portfolio (403)
     const soll: Record<string, Record<'x' | 'z', number>> = {
       ue: { x: 200, z: 200 }, gl: { x: 200, z: 200 }, gremium: { x: 200, z: 403 }, plx: { x: 200, z: 403 },
-      ktx: { x: 403, z: 403 }, rm: { x: 403, z: 403 },
+      ktx: { x: 200, z: 403 }, rm: { x: 200, z: 200 },
     };
     for (const [wer, erwartet] of Object.entries(soll)) {
       for (const p of ['x', 'z'] as const) {
@@ -68,21 +68,21 @@ describe('Projektdaten', () => {
         if (r.statusCode !== 200) assert.ok(!r.body.includes('120000'), `${wer}: kein Betrag im Fehler`);
       }
     }
-    // Lesesicht direkt: auch ohne Route sieht das Kernteam keine Kostenzeile, sehr wohl aber das Projekt und die übrigen Register
+    // Lesesicht direkt: jede Rolle am Ort sieht auch die Kostenzeilen (Master Entscheid 13)
     const sicht = async (sub: string) => {
       const p = await full(api.t.runtime, T, async tx => (await tx.query<{ id: string }>('SELECT id FROM ppm.principal WHERE subject = $1', [sub])).rows[0]!.id);
       const wer = { tenantId: T, tenantAlias: 'acme', principalId: p, kind: 'user', subject: sub, name: sub, email: null, clientId: null, groups: [], subjects: [`user:${p}`, 'org:members'], scopes: [], platformAdmin: false, binding: null } as unknown as Principal;
       return api.iam.tx(wer, async tx => (await tx.query<{ n: number; p: number }>(
         'SELECT (SELECT count(*)::int FROM ppm.kosten) AS n, (SELECT count(*)::int FROM ppm.projekt) AS p')).rows[0]!);
     };
-    assert.deepEqual(await sicht('kt-x'), { n: 0, p: 1 });
-    assert.deepEqual(await sicht('rm'), { n: 0, p: 3 });
+    assert.deepEqual(await sicht('kt-x'), { n: 1, p: 1 });
+    assert.deepEqual(await sicht('rm'), { n: 2, p: 3 });
     assert.deepEqual(await sicht('pl-x'), { n: 1, p: 1 });
     assert.deepEqual(await sicht('gremium'), { n: 1, p: 2 });
     assert.deepEqual(await sicht('gl'), { n: 2, p: 3 });
-    // Ändern nur mit projekt:write; die Kontrolle (CTL) sieht Beträge, pflegt sie aber nicht
-    assert.equal((await call('ctly', 'POST', `/v1/projekte/${projekt.y}/kosten`, { phase: 'P2', art: 'opex', text: 'x' })).statusCode, 403);
-    assert.equal((await call('ctly', 'GET', `/v1/projekte/${projekt.y}/kosten`)).json().can.write, false);
+    // Ändern nur mit projekt:write: das Kernteam liest nur
+    assert.equal((await call('ktx', 'POST', `/v1/projekte/${projekt.x}/kosten`, { phase: 'P2', art: 'opex', text: 'x' })).statusCode, 403);
+    assert.equal((await call('ktx', 'GET', `/v1/projekte/${projekt.x}/kosten`)).json().can.write, false);
   });
 
   test('Abhängigkeit beidseitig sichtbar (UC-002 Schritt 5), gepflegt beim erfassenden Projekt', async () => {
@@ -132,8 +132,8 @@ describe('Projektdaten', () => {
     assert.deepEqual([s1.items.length, s2.items.length, s2.nextCursor], [1, 1, null]);
     assert.notEqual(s1.items[0].id, s2.items[0].id);
 
-    // Endzustand: lesend (409), Lesen bleibt möglich
-    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgebrochen' WHERE id = $1", [projekt.x]));
+    // zurückgezogen: lesend (409), Lesen bleibt möglich
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'zurueckgezogen' WHERE id = $1", [projekt.x]));
     try {
       const r = await call('plx', 'PATCH', url, { text: 'neu' }, { 'if-match': 'W/"2"' });
       assert.equal(r.statusCode, 409, r.body);
@@ -144,7 +144,17 @@ describe('Projektdaten', () => {
     } finally {
       await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'aktiv' WHERE id = $1", [projekt.x]));
     }
-    assert.equal((await call('plx', 'DELETE', url, undefined, { 'if-match': 'W/"2"' })).statusCode, 204);
+    // abgebrochen: änderbar, das Projekt ist markiert «geändert nach Abschluss» (UC-015 Schritt 6, A-75)
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'abgebrochen' WHERE id = $1", [projekt.x]));
+    try {
+      assert.equal((await call('plx', 'PATCH', url, { text: 'nachgetragen' }, { 'if-match': 'W/"2"' })).statusCode, 200);
+      const m = await full(api.t.runtime, T, async tx => (await tx.query<{ m: Date | null }>(
+        'SELECT geaendert_nach_abschluss_at AS m FROM ppm.projekt WHERE id = $1', [projekt.x])).rows[0]!.m);
+      assert.ok(m);
+    } finally {
+      await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET lebenszyklus = 'aktiv', geaendert_nach_abschluss_at = NULL WHERE id = $1", [projekt.x]));
+    }
+    assert.equal((await call('plx', 'DELETE', url, undefined, { 'if-match': 'W/"3"' })).statusCode, 204);
   });
 
   test('Ressourcenbedarf: Grösse oder FTE × Monate je Rolle und Phase (A-20)', async () => {
@@ -170,7 +180,7 @@ describe('Projektdaten', () => {
 
     const ky = await call('ply', 'POST', `/v1/projekte/${projekt.y}/kpis`, { art: 'projekt', text: 'Durchlaufzeit' });
     assert.equal(ky.statusCode, 201, ky.body);
-    assert.equal((await call('ctly', 'POST', `/v1/projekte/${projekt.y}/kpis`, { art: 'projekt', text: 'x' })).statusCode, 403, 'CTL legt keine KPIs an');
+    assert.equal((await call('ctly', 'POST', `/v1/projekte/${projekt.y}/kpis`, { art: 'projekt', text: 'x' })).statusCode, 201, 'CTL führt das Projekt mit (A-70)');
     const url = `/v1/projekte/${projekt.y}/kpis/${ky.json().id}/werte/2026-10`;
     const n = await call('ctly', 'PUT', url, { wert: 12.5, kommentar: 'Messung Oktober' }, { 'if-match': 'W/"0"' });
     assert.deepEqual([n.statusCode, n.json().wert, n.headers.etag], [200, 12.5, 'W/"1"'], n.body);

@@ -2,7 +2,7 @@
  * Darstellung im Monatsabschluss mit den gemeinsamen Bausteinen (docs/ux/darstellung.md): Status und Trend (Kreis mit
  * Symbol, Wechsel «Im Plan → Kritisch»), Bearbeitungsstand als Badge, Auffälligkeiten als Badge mit Text (Q-B5).
  */
-import { fmtAbweichungWochen, fmtDatum, fmtProzent, Icon, Stand, Status, type Projektstatus, type StandFamilie, type Trend } from '../../ui/index.ts';
+import { fmtAbweichungWochen, fmtDatum, fmtProzent, Icon, Stand, Status, type Projektstatus, type StandFamilie, type Trend, Vermerke } from '../../ui/index.ts';
 import type { Auffaelligkeit, Zeile } from './api.ts';
 import { TM } from './texte.ts';
 
@@ -31,7 +31,7 @@ export function StandZelle({ z, heute }: { z: Zeile; heute?: Date }) {
     : z.stand === 'zurueckgegeben' ? TM.standDetail.zurueckgegeben
       : z.stand === 'ausstehend' && z.eingefordertAt ? TM.eingefordert(fmtDatum(z.eingefordertAt.slice(0, 10), heute))
         : z.stand === 'ausstehend' && z.entwurf ? TM.standDetail.entwurf : undefined;
-  return <Stand familie={FAMILIE[z.stand]} label={TM.stand[z.stand]!} detail={detail} />;
+  return <><Stand familie={FAMILIE[z.stand]} label={TM.stand[z.stand]!} detail={detail} /> <Vermerke vermerke={z.vermerke} /></>;
 }
 
 /** «+3 Wochen» ab 7 Tagen, darunter «+4 Tage». */

@@ -1,12 +1,12 @@
 /**
  * «Meine Ideen» im Arbeitsraum Portfolio › Ideen (K4 «Stand verfolgen», BC DM.01.01): Antragstellende sehen nur ihre
  * eigenen Ideen mit Stand und letztem Ereignis, Entwürfe mit «Weiter bearbeiten», Ideen in Ergänzung mit den offenen
- * Rückfragen. Seitentyp Liste (Zeile öffnet die Idee), Zustände Z1, Z2 (mit «Projektidee einreichen»), Z5. Der
- * Ideenpool der UE folgt mit AP-E4-2 (`Pool*`).
+ * Rückfragen. Seitentyp Liste (Zeile öffnet die Idee), Zustände Z1, Z2 (mit «Projektidee einreichen»), Z5. Mit
+ * `eingereicht` die eingereichten Ideen aller Mitglieder (Master Entscheid 14, AP-E8-3); den Pool der UE zeigt `PoolSeite`.
  */
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Datenliste, fmtDatum, Icon, type Spalte } from '../../ui/index.ts';
-import { useEigeneIdeen, type IdeeZeile } from './api.ts';
+import { useEigeneIdeen, useEingereichteIdeen, type IdeeZeile } from './api.ts';
 import { ideePfad, IdeeStandBadge, Verweis, type Gehe } from './stand.tsx';
 import { ideeNeuPfad } from './search.ts';
 import { TI } from './texte.ts';
@@ -27,9 +27,12 @@ const spalten: Spalte<IdeeZeile>[] = [
   { key: 'geaendert', titel: TI.spalten.geaendert, karte: true, zelle: i => fmtDatum(i.updatedAt) },
 ];
 
-export function IdeenPage({ gehe }: { gehe: Gehe }) {
+export function IdeenPage({ gehe, eingereicht = false, ansichten }: { gehe: Gehe; eingereicht?: boolean; ansichten?: ReactNode }) {
   const titleId = useId();
-  const list = useEigeneIdeen();
+  const eigene = useEigeneIdeen(!eingereicht);
+  const alle = useEingereichteIdeen(eingereicht);
+  const list = eingereicht ? alle : eigene;
+  const T = eingereicht ? TI.alleEingereichten : TI;
   const items = list.data?.pages.flatMap(p => p.items) ?? [];
   const einreichen = <Verweis pfad={ideeNeuPfad()} gehe={gehe} className="btn primary"><Icon name="plus" />{TI.einreichen}</Verweis>;
   return (
@@ -39,19 +42,20 @@ export function IdeenPage({ gehe }: { gehe: Gehe }) {
           <div className="mh-title">
             <div className="type-ico neutral"><Icon name="grid" /></div>
             <div className="minw0">
-              <h1 id={titleId}>{TI.titel}</h1>
-              <div className="sub">{TI.sub}</div>
+              <h1 id={titleId}>{T.titel}</h1>
+              <div className="sub">{T.sub}</div>
             </div>
           </div>
           {/* Kopf-Button fehlt nur bei geladener, leerer Liste: sie bietet die erste Aktion selbst an (Z2) */}
           {!list.data || items.length ? <div className="acts">{einreichen}</div> : null}
         </div>
+        {ansichten}
       </header>
       <div className="body">
-        <Datenliste<IdeeZeile> titel={TI.titel} spalten={spalten} zeilen={items} schluessel={i => String(i.nummer)}
+        <Datenliste<IdeeZeile> titel={T.titel} spalten={spalten} zeilen={items} schluessel={i => String(i.nummer)}
           name={i => `${i.titel || TI.ohneTitel}, ${TI.stand[i.stand] ?? i.stand}`}
           oeffnen={i => gehe(ideePfad(i.nummer))} laedt={list.isPending} fehler={list.error} erneut={() => void list.refetch()}
-          leer={TI.leer} leerAktion={einreichen}
+          leer={T.leer} leerAktion={eingereicht ? undefined : einreichen}
           mehr={{ vorhanden: list.hasNextPage, laedt: list.isFetchingNextPage, laden: () => void list.fetchNextPage() }} />
       </div>
     </section>

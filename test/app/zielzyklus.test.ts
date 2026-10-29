@@ -20,11 +20,11 @@ describe('Zielzyklus', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-gl', 'gl');
+    const e = await login(api, 'demo', 'u-gl', 'alle-fuehren');
     tenantId = e.tenantId;
     gl = { authorization: e.authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
     verantwortlich = await person(api, tenantId, 'Anna Muster');
     const feld = (await call('POST', '/v1/handlungsfelder', gl, { label: 'Wirtschaftlichkeit', position: 2 })).json().id;
     ziel21 = (await call('POST', '/v1/strategische-ziele', gl, { handlungsfeldId: feld, nummer: '2.1', text: 'Kosten senken' })).json().id;
@@ -128,9 +128,8 @@ describe('Zielzyklus', () => {
     const z2 = (await call('POST', `/v1/projekte/${id}/ziele`, gl, { strategischesZielId: ziel22 })).json();
     assert.equal(z2.link, '/ziele/strategische-ziele?o=ziel:2.2');
     assert.equal((await call('POST', `/v1/projekte/${randomUUID()}/ziele`, gl, { strategischesZielId: ziel22 })).statusCode, 404);
-    // vertrauliches Projekt (A-34): die GL sieht es nicht und kann es nicht zuordnen
-    assert.equal((await call('POST', `/v1/projekte/${projekt['2026-015']}/ziele`, gl, { strategischesZielId: ziel21 })).statusCode, 404);
-    await full(api.t.runtime, tenantId, tx => tx.query('INSERT INTO ppm.ziel_projekt (tenant_id, projekt_id, strategisches_ziel_id) VALUES ($1, $2, $3)', [tenantId, projekt['2026-015'], ziel21]));
+    // vertrauliches Projekt: «alle Portfolios führen» sieht es und ordnet es zu (Master Entscheid 13)
+    assert.equal((await call('POST', `/v1/projekte/${projekt['2026-015']}/ziele`, gl, { strategischesZielId: ziel21 })).statusCode, 201);
 
     // vom Projekt zum Ziel: ein Aufruf liefert die Adresse des Ziels
     const vonProjekt = (await call('GET', `/v1/projekte/${id}/ziele`, gl)).json();
@@ -141,10 +140,10 @@ describe('Zielzyklus', () => {
     const baum = (await call('GET', '/v1/ziele/2027', gl)).json();
     const s21 = baum.strategischeZiele.find((x: { nummer: string }) => x.nummer === '2.1');
     assert.deepEqual(s21.jahresziele[0].projekte.map((p: { nummer: string }) => p.nummer), ['2026-014']);
-    assert.deepEqual(s21.projekte, [], 'vertrauliches Projekt bleibt unsichtbar');
+    assert.deepEqual(s21.projekte.map((p: { nummer: string }) => p.nummer), ['2026-015'], 'vertrauliches Projekt sichtbar für «alle Portfolios führen» (Master Entscheid 13)');
     assert.deepEqual(baum.strategischeZiele.find((x: { nummer: string }) => x.nummer === '2.2').projekte.map((p: { nummer: string }) => p.nummer), ['2026-014']);
     assert.ok(!baum.pruefung.ohneUmsetzung.some((x: { nummer: string }) => x.nummer === '2.1.1'));
-    // die UE (projekt:vertraulich) sieht auch das vertrauliche Projekt
+    // die UE sieht es ebenso
     const baumUe = (await call('GET', '/v1/ziele/2027', ue)).json();
     assert.deepEqual(baumUe.strategischeZiele.find((x: { nummer: string }) => x.nummer === '2.1').projekte.map((p: { nummer: string }) => p.nummer), ['2026-015']);
 
@@ -169,23 +168,25 @@ describe('Zielzyklus', () => {
     assert.equal((await call('DELETE', `/v1/strategische-ziele/${ziel21}`, { ...gl, 'if-match': s.headers.etag as string })).statusCode, 409);
   });
 
-  test('ab «zur Freigabe» gesperrt (UC-011 Schritt 6, K6 Z9)', async () => {
+  test('ab «zur Freigabe» änderbar mit Markierung, löschen nur in Arbeit (UC-011 Schritt 6, K6 Z9, A-75)', async () => {
     await call('POST', '/v1/ziele/2030', gl, {});
     const jz = (await call('POST', '/v1/jahresziele', gl, { jahr: 2030, strategischesZielId: ziel21, text: 'Gesperrt', metrik: 'm', zielwert: 'w' })).json();
     const ha = (await call('POST', '/v1/hauptaktivitaeten', gl, { jahreszielId: jz.id, text: 'Gesperrt' })).json();
     // Vorlegen setzt AP-E6-2; hier direkt
     await full(api.t.runtime, tenantId, tx => tx.query("UPDATE ppm.zieljahr SET stand = 'zur_freigabe' WHERE tenant_id = $1 AND jahr = 2030", [tenantId]));
     const r = await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': 'W/"1"' }, { text: 'neu' });
-    assert.equal(r.statusCode, 409);
-    assert.equal(r.json().reason, 'gesperrt');
-    assert.match(r.json().detail, /Jahresziele 2030 liegen dem VR zur Freigabe vor/);
-    assert.equal((await call('POST', '/v1/jahresziele', gl, { jahr: 2030, strategischesZielId: ziel21, text: 'x' })).statusCode, 409);
-    assert.equal((await call('DELETE', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': 'W/"1"' })).statusCode, 409);
-    assert.equal((await call('POST', '/v1/hauptaktivitaeten', gl, { jahreszielId: jz.id, text: 'x' })).statusCode, 409);
-    assert.equal((await call('PATCH', `/v1/hauptaktivitaeten/${ha.id}`, { ...gl, 'if-match': 'W/"1"' }, { text: 'x' })).statusCode, 409);
-    assert.equal((await call('PATCH', '/v1/ziele/2030', { ...gl, 'if-match': 'W/"2"' }, { vorlageBis: null })).statusCode, 409);
+    assert.equal(r.statusCode, 200, r.body);
+    assert.ok(r.json().geaendertNachVorlage);
+    assert.equal((await call('POST', '/v1/jahresziele', gl, { jahr: 2030, strategischesZielId: ziel21, text: 'x' })).statusCode, 201);
+    assert.equal((await call('POST', '/v1/hauptaktivitaeten', gl, { jahreszielId: jz.id, text: 'x' })).statusCode, 201);
+    assert.equal((await call('PATCH', `/v1/hauptaktivitaeten/${ha.id}`, { ...gl, 'if-match': 'W/"1"' }, { text: 'x' })).statusCode, 200);
+    // gelöscht werden nur Entwürfe (A-75)
+    const del = await call('DELETE', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${r.json().version}"` });
+    assert.deepEqual([del.statusCode, del.json().reason], [409, 'gesperrt']);
+    assert.equal((await call('DELETE', `/v1/hauptaktivitaeten/${ha.id}`, { ...gl, 'if-match': 'W/"2"' })).statusCode, 409);
     const z = (await call('GET', '/v1/ziele/2030', gl)).json();
-    assert.deepEqual([z.zieljahr.stand, z.zieljahr.can.write, z.can.write], ['zur_freigabe', false, false]);
+    assert.equal(z.zieljahr.stand, 'zur_freigabe');
+    assert.ok(z.zieljahr.geaendertNachVorlage, 'Zieljahr markiert');
   });
 
   test('Audit und Ereignis in derselben Transaktion', async () => {

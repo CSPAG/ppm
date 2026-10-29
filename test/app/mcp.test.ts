@@ -26,9 +26,9 @@ describe('MCP-Dienst', () => {
     mcp = (await app.buildMcp(cfg, { logger: false })).app;
     await mcp.ready();
     // Daten: ein Handlungsfeld in demo, eines in andere
-    const anna = await login(api, 'demo', 'mcp-anna', 'leser');
-    const editor = await login(api, 'demo', 'mcp-editor', 'gl');
-    const other = await login(api, 'andere', 'mcp-other', 'gl');
+    const anna = await login(api, 'demo', 'mcp-anna', 'mitglied');
+    const editor = await login(api, 'demo', 'mcp-editor', 'alle-fuehren');
+    const other = await login(api, 'andere', 'mcp-other', 'alle-fuehren');
     void anna;
     assert.equal((await api.app.inject({ method: 'POST', url: '/v1/handlungsfelder', headers: { authorization: editor.authorization }, payload: { label: 'Patientenorientierung' } })).statusCode, 201);
     assert.equal((await api.app.inject({ method: 'POST', url: '/v1/handlungsfelder', headers: { authorization: other.authorization }, payload: { label: 'Fremdes Handlungsfeld' } })).statusCode, 201);

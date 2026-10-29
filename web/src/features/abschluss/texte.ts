@@ -7,6 +7,13 @@ import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 export const TA = {
+  // Vor der Abnahme abschliessen (UC-015 A3, UX-E12)
+  vorab: {
+    aktion: 'Vor der Abnahme abschliessen',
+    frage: 'Vorhaben vor der Abnahme abschliessen?',
+    wirkung: 'Das Projekt wird «abgeschlossen» und lesend, mit dem Vermerk «Abnahme offen». Das Traktandum beim Gremium bleibt; die Abnahme löst den Vermerk, verlangt das Gremium Nacharbeiten, ist das Projekt wieder aktiv.',
+    erledigt: 'Abgeschlossen, mit Vermerk «Abnahme offen».',
+  },
   reiter: NAV.reiter,
   projektFehlt: 'Dieses Projekt gibt es nicht oder du hast keinen Zugriff darauf.',
   titel: { abschluss: 'Abschlussbericht', sistierung: 'Bericht zur Sistierung', abbruch: 'Bericht zum Abbruch' } as Record<string, string>,
@@ -20,7 +27,7 @@ export const TA = {
   },
   banner: {
     abgeschlossen: (d: string) => `Das Projekt ist seit ${d} formell abgeschlossen. Die Projektakte kann nur noch gelesen werden; Lessons Learned lassen sich weiter erfassen.`,
-    traktandiert: 'Der Abschlussbericht liegt beim Gremium (Exit-Gate P4). Bis zum Entscheid ist er gesperrt; Sponsor und UE können die Nutzenrealisierung noch beurteilen.',
+    traktandiert: 'Der Abschlussbericht liegt beim Gremium (Exit-Gate P4). Bis zum Entscheid ist er gesperrt; Projektauftraggeber:in und UE können die Nutzenrealisierung noch beurteilen.',
     eingereicht: (d: string) => `Eingereicht am ${satzende(d)} Der Bericht kann nur noch gelesen werden.`,
     nacharbeit: 'Das Gremium verlangt Nacharbeiten. Überarbeite den Bericht und reich ihn erneut ein; die Auflagen findest du im Eingang.',
     sistiert: 'Das Projekt ist sistiert. Erfasse Stand, offene Punkte und Lessons Learned; die Wiederaufnahme beschliesst das Gremium.',
@@ -58,9 +65,9 @@ export const TA = {
     textVon: (i: number) => `Offener Punkt ${i}`, verantwortlichVon: (i: number) => `Verantwortlich für Punkt ${i}`, terminVon: (i: number) => `Termin für Punkt ${i}`,
   },
   nutzen: {
-    sp: 'Beurteilung des Sponsors', ue: 'Beurteilung der UE', offen: 'noch nicht beurteilt',
+    sp: 'Beurteilung Projektauftraggeber:in', ue: 'Beurteilung der UE', offen: 'noch nicht beurteilt',
     von: (wer: string, d: string) => `${wer}, ${d}`, speichern: 'Beurteilung speichern', gespeichert: 'Beurteilung gespeichert.',
-    hint: 'Sponsor und UE beurteilen, ob der Nutzen stabil erreicht ist (PC.03.02).',
+    hint: 'Projektauftraggeber:in und UE beurteilen, ob der Nutzen stabil erreicht ist (PC.03.02).',
   },
   lessons: {
     leer: 'Noch keine Lessons Learned. Halte fest, was künftige Vorhaben wissen sollten.',

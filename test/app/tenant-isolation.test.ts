@@ -27,7 +27,8 @@ describe('Mandantentrennung über die API', () => {
   const routes: string[] = [];
 
   before(async () => {
-    api = await testApi();
+    // alle Routen in einem Durchgang: mehr als die 600 Anfragen je Minute des Standards
+    api = await testApi({ API_RATE_LIMIT: '6000' });
     A = { authorization: (await login(api, 'acme', 'u-a', 'org-admin', { clearance: 2 })).authorization };
     B = { authorization: (await login(api, 'globex', 'u-b', 'org-admin', { clearance: 2 })).authorization };
     for (const seed of MATRIX.seeds) Object.assign(ids, await seed(api, A, MARK));

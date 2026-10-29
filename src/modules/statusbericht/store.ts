@@ -12,13 +12,15 @@ export interface Row {
   naechster_meilenstein: string; abweichung: Partial<AbweichungIn>; abhaengigkeiten: string; entscheide: string;
   begruendung: string; massnahme: string; entscheid_noetig: boolean;
   eingereicht_at: Date | null; eingereicht_by: string | null; geprueft_at: Date | null; geprueft_by: string | null;
+  /** Markierung nach Einreichen bzw. Abschluss (A-75). */
+  geaendert_nach: 'einreichen' | 'abschluss' | null; geaendert_nach_at: Date | null;
   version: number; created_at: Date; updated_at: Date;
 }
 
 const T = `${SCHEMA}.statusbericht`;
 const COLS = `id, projekt_id, periode, anlass, stand, status, trend, phase, to_char(abschluss_per, 'YYYY-MM-DD') AS abschluss_per,
   naechster_meilenstein, abweichung, abhaengigkeiten, entscheide, begruendung, massnahme, entscheid_noetig,
-  eingereicht_at, eingereicht_by, geprueft_at, geprueft_by, version, created_at, updated_at`;
+  eingereicht_at, eingereicht_by, geprueft_at, geprueft_by, geaendert_nach, geaendert_nach_at, version, created_at, updated_at`;
 
 /** Projekt, soweit der Bericht es braucht (Kopf, Phase, Lebenszyklus); Tabelle aus 010_portfolio_projekt. */
 export interface ProjektRow { id: string; nummer: string; name: string; phase: string; lebenszyklus: string; portfolio_id: string }

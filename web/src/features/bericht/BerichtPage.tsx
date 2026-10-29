@@ -3,15 +3,14 @@
  * Abschluss per, nächstem Meilenstein und Vorperiode; Abschnitte in fester Reihenfolge (Meilensteine, Kosten, Risiken,
  * Kommunikation, KPIs, Beurteilung), alles aus Vorperiode und Registern vorausgefüllt ausser Status und Trend (K1
  * Entscheid); rechts das Seitenpanel «Bereit zum Einreichen» (I-P4) mit Sprung zur fehlenden Angabe. Automatisches
- * Speichern (I-R3), Einreichen mit Rückgängig 10 s (G6), danach nur lesbar (Z8); abgeschlossene Periode gesperrt (Z9).
+ * Speichern (I-R3), Einreichen mit Rückgängig 10 s (G6); danach und nach dem Abschluss der Periode änderbar mit Markierung
+ * «geändert nach …» und Verlauf am Bericht (Z8, Z9, UX-E13).
  */
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useIamConfig } from '@vollholz/iam-web';
-import { ApiError, isConflict } from '../../api/index.ts';
-import {
-  Empty, ErrorState, type Phase, fmtAbweichungWochen, fmtBetragKurz, fmtDatum, fmtPeriode, fmtPhase, fmtProzent, Hinweis, Icon, Skelett, Status, T,
-  useToast, useVerzoegert,
-} from '../../ui/index.ts';
+import { ApiError, isConflict, api } from '../../api/index.ts';
+import { Empty, ErrorState, type Phase, fmtAbweichungWochen, fmtBetragKurz, fmtDatum, fmtPeriode, fmtPhase, fmtProzent, Hinweis, Icon, Skelett, Status, T, useToast, useVerzoegert, GeaendertNach, Verlauf } from '../../ui/index.ts';
 import {
   useAenderungMoeglich, useBericht, useKosten, useKpis, useKpiWerte, useKpiWertSetzen, useMeilensteine, useProjekt, useRegisterAendern, useRisiken, useSpeichern,
   useToleranzen, useUebergang, type Bericht, type BerichtPut, type Kosten, type Kpi, type Meilenstein, type Toleranz,
@@ -466,6 +465,7 @@ function Arbeitsflaeche({ nummer, projektId, periode, geladen, refetch }: { numm
         <h2 className="sb-titel">{TB.titel(fmtPeriode(periode))}</h2>
         <span className="pill">{TB.stand[b.stand]}</span>
         {b.anlass === 'ausserordentlich' ? <span className="pill">{TB.anlass.ausserordentlich}</span> : null}
+        {b.geaendertNach ? <GeaendertNach text={b.geaendertNach.text} at={b.geaendertNach.at} /> : null}
         <span className="spacer" />
         {bearbeitbar ? <span className="muted small" role="status">{TB[zustand]}</span> : null}
       </div>
@@ -506,6 +506,16 @@ function Arbeitsflaeche({ nummer, projektId, periode, geladen, refetch }: { numm
           ) : <p className="muted small">{TB.panel.nichtBearbeitbar(TB.stand[b.stand] ?? b.stand)}</p>}
         </aside>
       </div>
+      {b.id ? <BerichtVerlauf projektId={projektId} periode={periode} version={b.version} /> : null}
     </div>
   );
+}
+
+/** Verlauf am Bericht (UX-E13): neu geladen mit jeder Version. */
+function BerichtVerlauf({ projektId, periode, version }: { projektId: string; periode: string; version: number }) {
+  const q = useQuery({
+    queryKey: ['bericht', 'verlauf', projektId, periode, version] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/projekte/{id}/berichte/{periode}/verlauf', { params: { path: { id: projektId, periode } }, signal })).data!.items,
+  });
+  return <Verlauf titel={TB.verlauf} eintraege={q.data} laedt={q.isPending} fehler={q.error} erneut={() => void q.refetch()} />;
 }

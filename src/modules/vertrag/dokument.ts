@@ -20,7 +20,7 @@ const PHASE_TEXT: Record<Phase, string> = {
 };
 const KATEGORIE_TEXT: Record<string, string> = { A: 'A: Strategisches Projekt', B: 'B: Projekt der Geschäftsleitung', C: 'C: Projekt der Direktion' };
 const ANLASS_TEXT = { initial: 'erster Vertrag', gate: 'Gate', aenderung: 'Änderung' } as const;
-const FUNKTION_TEXT: Record<string, string> = { sp: 'Haupt-Sponsor/in', koalition: 'Sponsoren-Koalition', pl: 'Projektleiter/in', ctl: 'Clinical Transformation Lead', kt: 'Kernteam' };
+const FUNKTION_TEXT: Record<string, string> = { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' };
 const STUFE_TEXT: Record<string, string> = { hoch: 'hoch', mittel: 'mittel', tief: 'tief' };
 const KPI_TEXT: Record<string, string> = { klinisch: 'klinisch', nicht_klinisch: 'nicht klinisch', projekt: 'Projekt' };
 
@@ -104,13 +104,11 @@ export function vertragDokument(d: DokumentDaten, v: Vorlage = vorlage.aktuell('
       ['Status', STAND_TEXT[ver.stand]],
       ['Freigabe', freigabe],
       ['Klassifikation', kopf.vertraulich ? 'vertraulich' : 'intern'],
-      ['Haupt-Sponsor/in', funktion('sp')],
-      ['Sponsoren-Koalition', funktion('koalition')],
-      ['Projektleiter/in', funktion('pl')],
-      ['Clinical Transformation Lead', funktion('ctl')],
+      ['Projektauftraggeber:in', funktion('sp')],
+      ['Projektleitung', funktion('pl')],
       ['Projektkategorie', d.bez.kategorie ? KATEGORIE_TEXT[d.bez.kategorie] ?? d.bez.kategorie : '–'],
     ], felder: ['version.nummer', 'version.phase', 'version.datum', 'version.status', 'version.freigabe', 'projekt.klassifikation', 'rolle.sponsor',
-      'rolle.koalition', 'rolle.projektleitung', 'rolle.ctl', 'projekt.kategorie'] },
+      'rolle.projektleitung', 'projekt.kategorie'] },
     { art: 'ueberschrift', text: 'Versionierung und Änderungstracking', ebene: 2 },
     tab(['Version', 'Datum', 'Anlass', 'Stand'], [...d.versionen].reverse().map(x => [
       x.nummer, datum(x.eingereicht_at ?? x.created_at), ANLASS_TEXT[x.anlass], `${STAND_TEXT[x.stand]}${x.baseline ? ' (Baseline)' : ''}`,
@@ -153,7 +151,7 @@ export function vertragDokument(d: DokumentDaten, v: Vorlage = vorlage.aktuell('
     { art: 'felder', zeilen: toleranzZeilen(d), felder: ['kap7.toleranzTermin', 'kap7.toleranzKosten', 'kap7.toleranzUmfang'] },
 
     h1('8'),
-    tab(['Rolle', 'Person', 'Aufgaben, Kompetenzen, Verantwortung'], i[8].mitglieder.map(m => [FUNKTION_TEXT[m.funktion] ?? m.funktion, person(m.personId), m.akv]), [3, 3, 6], 'kap8.mitglieder'),
+    tab(['Rolle', 'Person', 'Aufgaben, Kompetenzen, Verantwortung'], i[8].mitglieder.map(m => [m.funktion === 'weitere' ? m.funktionText ?? '' : FUNKTION_TEXT[m.funktion] ?? m.funktion, person(m.personId), m.akv]), [3, 3, 6], 'kap8.mitglieder'),
 
     h1('9'), h2('9.1'),
     tab(['Phase', 'Art', 'Position', 'Lieferant', 'Offerte', 'Betrag'], i[9].kosten.map(k => [

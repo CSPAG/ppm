@@ -12,7 +12,7 @@
 import type { TupleStore } from '@vollholz/iam';
 import { HttpError, type Actor, type Db, type Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
-import { anlegen, organisationFestlegen } from './aktionen.ts';
+import { anlegen, organisationFestlegen, zugriffVorschlagen } from './aktionen.ts';
 import { PHASEN, type Phase } from './schemas.ts';
 
 /** Eine gelesene Zeile des Dashboards (Werte geprüft und normiert). */
@@ -234,7 +234,9 @@ export async function uebernehmen(tx: Tx, ctx: { db: Db; tenantId: string; tuple
           const r = await anlegen(tx, ctx, ctx.who, { name: z.name, portfolioId: pf.id, phase: z.phase, handlungsfeldId: hf?.id ?? null, herkunft });
           nummer = r.nummer;
           if (pl && 'id' in pl) {
-            await organisationFestlegen(tx, { tuples: ctx.tuples, who: ctx.who, principalId: ctx.principalId }, r.id, 0, [{ personId: pl.id, funktion: 'pl' }]);
+            const organisation = [{ personId: pl.id, funktion: 'pl' as const }];
+            await organisationFestlegen(tx, { who: ctx.who }, r.id, 0, organisation);
+            await zugriffVorschlagen(tx, ctx, r.id, organisation);
           }
           for (const t of teile) await t.uebernehmen(tx, ctx.who, { projektId: r.id, periode: o.periode, zeile: z });
         }

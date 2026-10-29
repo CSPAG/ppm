@@ -1,6 +1,7 @@
 /**
- * Abschluss der Periode (UC-005 Schritt 5, A3; Kernablauf K1; AP-E1-2): Sperre bei ungeprüften Berichten, Stand je
- * Projekt mit «nicht gemeldet» und den Werten der Vorperiode (A-11), Periode gesperrt (Z9, A-37). Dazu die Aufgaben
+ * Abschluss der Periode (UC-005 Schritt 5, A3; Kernablauf K1; AP-E1-2): ungeprüfte Berichte zählen mit dem Vermerk
+ * «nicht geprüft» (A-74, keine Sperre), Stand je Projekt mit «nicht gemeldet» und den Werten der Vorperiode (A-11),
+ * Periode gesperrt (Z9, A-37). Dazu die Aufgaben
  * der UE (docs/fachmodell.md 4.2): «Statusberichte prüfen» beim ersten Einreichen der Periode, «Periode abschliessen»
  * am Stichtag (Job), und die Folgen des erneuten Einreichens nach einer Rückfrage (A2.2).
  */
@@ -11,7 +12,7 @@ import { enqueue, record } from '../../platform.ts';
 import { aufgabe } from '../eingang/index.ts';
 import { laufendePeriode } from './bericht.ts';
 import { folgen } from './folgen.ts';
-import { abschlussSperre, eingereichterBericht, fristen, monat, PERIODE_ABGESCHLOSSEN } from './pruefung.ts';
+import { eingereichterBericht, fristen, monat, PERIODE_ABGESCHLOSSEN } from './pruefung.ts';
 import { berichtBezug, linkMonatsabschluss, rechteVon, TAG_MONATSABSCHLUSS } from './pruefung-routes.ts';
 import { PeriodeParams } from './pruefung-schemas.ts';
 import * as pstore from './pruefung-store.ts';
@@ -90,7 +91,7 @@ export function registerAbschlussRoutes(app: FastifyInstance, _deps: Deps): void
   app.post('/v1/perioden/:periode/abschliessen', {
     schema: {
       tags: [TAG_MONATSABSCHLUSS], summary: 'Periode abschliessen',
-      description: 'Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): gesperrt, solange eingereichte Berichte ungeprüft sind (409 mit Anzahl). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/"0"`, solange es sie nicht gibt).',
+      description: 'Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): eingereichte, ungeprüfte Berichte zählen mit ihren Werten und dem Vermerk «nicht geprüft»; die Aufgabe «Statusberichte prüfen» bleibt offen, bis sie bestätigt sind (A-74). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/"0"`, solange es sie nicht gibt).',
       params: PeriodeParams, headers: Type.Partial(IfMatchHeaders), response: { 200: Type.Ref('Periodenstand') },
     },
   }, async (req, reply) => {
@@ -106,19 +107,20 @@ export function registerAbschlussRoutes(app: FastifyInstance, _deps: Deps): void
       if (version !== null && (p?.version ?? 0) !== version) throw preconditionFailed(p?.version ?? 0);
       if (p?.stand === 'abgeschlossen') throw conflict(PERIODE_ABGESCHLOSSEN, { reason: 'periode' });
       const rows = await pstore.zeilen(tx, periode);
-      const sperre = abschlussSperre(rows.filter(z => z.stand === 'eingereicht').length);
-      if (sperre) throw conflict(sperre, { reason: 'ungeprueft' });
       if (!p) {
         await store.periodeSichern(tx, periode);
         p = (await pstore.periode(tx, periode, { sperren: true }))!;
       }
 
       let gemeldet = 0;
+      let ungeprueft = 0;
       for (const z of rows) {
         const vor = await pstore.vorstand(tx, z.projekt_id, periode);
         const statusVorperiode = vor?.status ?? z.vor_status;
-        if (z.stand === 'geprueft') {
+        // geprüft oder eingereicht (mit Vermerk «nicht geprüft», A-74): die Werte des Berichts
+        if (z.stand === 'geprueft' || z.stand === 'eingereicht') {
           gemeldet++;
+          if (z.stand === 'eingereicht') ungeprueft++;
           await pstore.dashboardZeile(tx, periode, {
             projektId: z.projekt_id, statusberichtId: z.bericht_id, status: z.status, trend: z.trend, phase: z.phase ?? z.projekt_phase,
             abschlussPer: z.abschluss_per, naechsterMeilenstein: z.naechster_meilenstein ?? '', werteAus: periode, statusVorperiode,
@@ -139,9 +141,10 @@ export function registerAbschlussRoutes(app: FastifyInstance, _deps: Deps): void
 
       const n = await pstore.abschliessen(tx, periode, p.version);
       if (!n) throw preconditionFailed(p.version);
-      await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: BEZUG(periode) });
+      // die Prüfaufgabe bleibt offen, bis die ungeprüften Berichte bestätigt sind (A-74)
+      if (!ungeprueft) await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: BEZUG(periode) });
       await aufgabe.erledigen(tx, { art: 'periode.abschliessen', bezug: BEZUG(periode) });
-      const daten = { periode, projekte: rows.length, gemeldet, nichtGemeldet: rows.length - gemeldet, version: n.version };
+      const daten = { periode, projekte: rows.length, gemeldet, ungeprueft, nichtGemeldet: rows.length - gemeldet, version: n.version };
       await record(tx, who, { action: 'periode.closed', resourceType: 'periode', resourceId: periodeKennung(periode), data: daten, event: daten });
       return (await uebersicht(tx, periode, rechte)).kopf;
     });

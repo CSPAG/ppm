@@ -71,6 +71,7 @@ export const matrix: Matrix = {
     // Kopfkarte «Meine Projekte»: fremde Projekte ergeben nichts (Liste ohne IDs von A)
     'GET /v1/traktanden/naechste': i => ({ method: 'GET', url: `/v1/traktanden/naechste?projektId=${i.berichtProjekt}`, kind: 'list' }),
     'GET /v1/sitzungen/:id': i => ({ method: 'GET', url: `/v1/sitzungen/${i.sitzung}`, kind: 'foreign' }),
+    'GET /v1/sitzungen/:id/verlauf': i => ({ method: 'GET', url: `/v1/sitzungen/${i.sitzung}/verlauf`, kind: 'foreign' }),
     'PATCH /v1/sitzungen/:id': i => ({ method: 'PATCH', url: `/v1/sitzungen/${i.sitzung}`, body: { ort: 'gehackt' }, headers: { 'if-match': 'W/"2"' }, kind: 'foreign' }),
     'GET /v1/sitzungen/:id/vorschlaege': i => ({ method: 'GET', url: `/v1/sitzungen/${i.sitzung}/vorschlaege`, kind: 'foreign' }),
     'POST /v1/sitzungen/:id/traktanden': i => ({ method: 'POST', url: `/v1/sitzungen/${i.sitzung}/traktanden`, body: { art: 'eskalation', titel: 'gehackt' }, kind: 'foreign' }),
@@ -82,6 +83,8 @@ export const matrix: Matrix = {
     'POST /v1/traktanden/:id/entfernen': i => ({ method: 'POST', url: `/v1/traktanden/${i.traktandum}/entfernen`, kind: 'foreign' }),
     'POST /v1/traktanden/:id/verschieben': i => ({ method: 'POST', url: `/v1/traktanden/${i.traktandum}/verschieben`, kind: 'foreign' }),
     'PUT /v1/traktanden/:id/einladungen': i => ({ method: 'PUT', url: `/v1/traktanden/${i.traktandum}/einladungen`, body: { einladungen: [] }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
+    // nach dem Versand (AP-E8-5): Unterlagen nachführen, Verlauf der Sitzung
+    'POST /v1/traktanden/:id/unterlagen-nachfuehren': i => ({ method: 'POST', url: `/v1/traktanden/${i.traktandum}/unterlagen-nachfuehren`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
   },
   unchanged: async (api, a, mark) => {
     const s = (await api.app.inject({ method: 'GET', url: '/v1/gremien/gremium-a/sitzungen/2026-12-02', headers: a })).json();

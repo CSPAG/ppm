@@ -11,7 +11,7 @@ export const kopfkarten: readonly KopfKarte[] = [
   { id: 'einrichten', recht: 'portfolio:admin', Karte: seite(() => import('./features/portfolios/EinrichtenKopfKarte.tsx'), 'EinrichtenKopfKarte') },
   // Monatszyklus der UE und des PMO (K1 «Prüfen», UC-005): Periode in Arbeit, Stichtag, Abschluss
   { id: 'monatszyklus', recht: 'statusbericht:review', Karte: seite(() => import('./features/monatsabschluss/MonatszyklusKopfKarte.tsx'), 'MonatszyklusKopfKarte') },
-  // Eigene Projekte für PL, CTL und SP (UC-016 Schritt 2: Projektrollen je Projekt)
+  // Eigene Projekte für Projektleitung und Projektauftraggeber:in (eigene Funktionen in der Projektorganisation)
   { id: 'projekte', recht: 'projekt:read', Karte: seite(() => import('./features/projekt/ProjektKopfKarte.tsx'), 'ProjektKopfKarte') },
   // Gesamtstatus des Portfolios für PRAT und GLPA, Projekte der Direktion für DIR (UI-17, Sichtbarkeit nach Recht)
   { id: 'portfolio', recht: 'auswertung:read', Karte: seite(() => import('./features/dashboard/PortfolioKopfKarte.tsx'), 'PortfolioKopfKarte') },

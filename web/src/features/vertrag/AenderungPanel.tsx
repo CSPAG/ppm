@@ -7,8 +7,8 @@
 import { describeError } from '@vollholz/iam-web';
 import { useId, useRef, useState } from 'react';
 import { newIdempotencyKey, statusOf } from '../../api/index.ts';
-import { Dialog, ErrorState, Hinweis, Icon, T, useToast } from '../../ui/index.ts';
-import { useAenderung, useAenderungMutations, useHauptaenderungen, type Hauptaenderungen, type HauptaenderungenLoaded, type Rubrik } from './AenderungApi.ts';
+import { Dialog, ErrorState, Hinweis, Icon, T, useToast, Vermerke, VorabAktion } from '../../ui/index.ts';
+import { useAenderung, useAenderungMutations, useAenderungUebernehmen, useHauptaenderungen, type Hauptaenderungen, type HauptaenderungenLoaded, type Rubrik } from './AenderungApi.ts';
 import { TA } from './AenderungTexte.ts';
 import { useVertrag, type Version } from './api.ts';
 import './Aenderung.css';
@@ -103,6 +103,7 @@ export function AenderungPanel({ projektId, nummer, version: v, speichern }: { p
         <p className="ae-l">{TA.begruendung}</p>
         <p className="ae-text">{v.begruendung}</p>
       </div>
+      {a?.vermerke.length ? <p><Vermerke vermerke={a.vermerke} /></p> : null}
       {a?.wirkung.prat ? <Hinweis stufe="hinweis">{TA.wirkungPrat}</Hinweis> : null}
       {haupt.error ? <ErrorState error={haupt.error} onRetry={() => void haupt.refetch()} />
         : haupt.data ? <HauptaenderungenBlock geladen={haupt.data} projektId={projektId} /> : <p className="muted small" role="status">{T.common.loading}</p>}
@@ -118,6 +119,7 @@ export function AenderungPanel({ projektId, nummer, version: v, speichern }: { p
           <button type="button" className="btn primary" onClick={() => void start()}><Icon name="send" />{TA.einreichen}</button>
         </div>
       ) : null}
+      {a?.can.uebernehmen && antrag.data ? <Uebernehmen projektId={projektId} versionId={v.id} etag={antrag.data.etag} /> : null}
       {dialog ? (
         <Dialog title={TA.einreichenFrage(v.nummer)} onClose={() => setDialog(false)} footer={<>
           <button type="button" className="btn" onClick={() => setDialog(false)} data-autofocus>{TA.weiterBearbeiten}</button>
@@ -127,6 +129,16 @@ export function AenderungPanel({ projektId, nummer, version: v, speichern }: { p
         </Dialog>
       ) : null}
     </section>
+  );
+}
+
+/** Vor dem Entscheid übernehmen (UC-007 A3, UX-E12): Baseline mit Vermerk «nicht freigegeben». */
+function Uebernehmen({ projektId, versionId, etag }: { projektId: string; versionId: string; etag: string }) {
+  const toast = useToast();
+  const m = useAenderungUebernehmen(projektId, versionId);
+  return (
+    <VorabAktion label={TA.vorab.aktion} frage={TA.vorab.frage} wirkung={TA.vorab.wirkung} icon="check" laeuft={m.isPending} fehler={m.error}
+      ausfuehren={fertig => m.mutate({ etag }, { onSuccess: () => { fertig(); toast.show(TA.vorab.erledigt); } })} />
   );
 }
 

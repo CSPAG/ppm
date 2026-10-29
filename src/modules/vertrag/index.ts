@@ -17,6 +17,7 @@ import { entwurfsanlass } from './entwurf.ts';
 import { registriereGate } from './gate.ts';
 import { gateTask } from './gate-job.ts';
 import { registerGateRoutes } from './gate-routes.ts';
+import { registerVermerkRoutes } from './vermerk-routes.ts';
 import { vertragTools } from './mcp.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
@@ -36,7 +37,8 @@ export const vertragModule = defineModule({
     registerZielauswahl(app, deps, TAG); // Ziele zur Wahl in Kap. 2 (PP.02.05)
     registerPruefungRoutes(app, deps);
     registerDokumentRoutes(app, deps); // Dokumentausgabe Word/PDF (AP-E3-5)
-    registerGateRoutes(app, deps); // Gate-Modus (AP-E3-3)
+    registerGateRoutes(app, deps);
+    registerVermerkRoutes(app, deps); // Gate-Modus (AP-E3-3)
     registerVergleichRoutes(app, deps); // Versionsvergleich und Hauptänderungen (AP-E3-4)
     registerAenderungRoutes(app, deps); // Änderungsantrag (AP-E3-4)
     registerToleranzRoutes(app, deps, TAG); // Gültige Toleranzen des Projekts (A-10)

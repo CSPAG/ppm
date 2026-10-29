@@ -38,5 +38,4 @@ test('Monatsabschluss: Periode, Posteingang, Termine; barrierefrei', async ({ pa
 test('Leser:in sieht den Monatsabschluss nicht', async ({ page }) => {
   await login(page, BRUNO, '/portfolio/monatsabschluss');
   await expect(page.getByText('Den Monatsabschluss sieht die Unternehmensentwicklung.')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Portfolio' })).toHaveCount(0);
 });

@@ -70,7 +70,7 @@ describe('Webhooks', () => {
   const deliver = async () => { await outboxTask(CONSUMERS).run(ctx()); for (const t of TASKS) await t.run(ctx()); };
 
   test('nur org-admin verwaltet Webhooks; Geheimnis nur beim Anlegen', async () => {
-    const editor = { authorization: (await login(api, 'demo', 'w-editor', 'gl')).authorization };
+    const editor = { authorization: (await login(api, 'demo', 'w-editor', 'alle-lesen')).authorization };
     assert.equal((await api.app.inject({ method: 'GET', url: '/v1/webhooks', headers: editor })).statusCode, 403);
     const c = await api.app.inject({ method: 'POST', url: '/v1/webhooks', headers: admin, payload: { url, eventTypes: ['handlungsfeld.created'] } });
     assert.equal(c.statusCode, 201, c.body);

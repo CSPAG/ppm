@@ -2,8 +2,11 @@
  * «Meine Projekte» im Arbeitsraum «Projekte» (UI-05, Seitentyp Liste + Schublade; Einstieg in die Projektakte für
  * UC-002–004, 007, 015). Projektzeile «mittel» (darstellung.md) mit den Angaben, die es vor dem ersten Statusbericht gibt;
  * Suche, Filter nach eigener Rolle, Phase und Stand in der Adresse (I-L1, I-N5), «Mehr laden» (I-L3), Schublade `?o=<nr>`.
+ * Ansicht «Alle Projekte» (`?ansicht=alle`, UI-52; Master Entscheid 14): Kopfdaten aller nicht vertraulichen Projekte;
+ * wer nirgends Projekte lesen darf, sieht nur diese Ansicht.
  */
 import { PersonName } from '@vollholz/iam-web';
+import { useSession } from '../../auth/index.ts';
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import { Datenliste, fmtPhase, Icon, PhaseKurz, T, type Spalte } from '../../ui/index.ts';
 import { BEENDET, LAUFEND, useProjektList, type Projekt } from './api.ts';
@@ -42,11 +45,15 @@ export function MeineProjektePage({ search, setSearch, oeffnen }: { search: Proj
     const t = setTimeout(() => { if (text.trim() !== q) setSearch({ q: text.trim() || undefined }, { replace: true }); }, 250);
     return () => clearTimeout(t);
   }, [text, q, setSearch]);
+  const { canSomewhere } = useSession();
+  const lesen = canSomewhere('projekt:read');
+  const alle = !lesen || search.ansicht === 'alle';
   const stand = search.stand ?? 'laufend';
   const list = useProjektList({
     q, rolle: search.rolle ? ROLLE[search.rolle] : undefined, phase: search.phase,
-    lebenszyklus: stand === 'laufend' ? LAUFEND : stand === 'beendet' ? BEENDET : undefined,
+    lebenszyklus: stand === 'laufend' ? LAUFEND : stand === 'beendet' ? BEENDET : undefined, alle,
   });
+  const titel = alle ? TP.alle.titel : TP.titel;
   const items = list.data?.pages.flatMap(p => p.items) ?? [];
   const gefiltert = !!(q || search.rolle || search.phase || search.stand);
   const zuruecksetzen = () => { setText(''); setSearch({ q: undefined, rolle: undefined, phase: undefined, stand: undefined }); };
@@ -58,11 +65,19 @@ export function MeineProjektePage({ search, setSearch, oeffnen }: { search: Proj
           <div className="mh-title">
             <div className="type-ico neutral"><Icon name="folder" /></div>
             <div className="minw0">
-              <h1 id="page-title">{TP.titel}</h1>
-              <div className="sub">{TP.sub}</div>
+              <h1 id="page-title">{titel}</h1>
+              <div className="sub">{alle ? TP.alle.sub : TP.sub}</div>
             </div>
           </div>
         </div>
+        {lesen ? (
+          <nav className="tabs" aria-label={TP.alle.ansicht}>
+            {([false, true] as const).map(a => (
+              <button key={String(a)} type="button" className={`tab${a === alle ? ' on' : ''}`} aria-current={a === alle ? 'page' : undefined}
+                onClick={() => setSearch({ ansicht: a ? 'alle' : undefined, o: undefined })}>{a ? TP.alle.titel : TP.titel}</button>
+            ))}
+          </nav>
+        ) : null}
       </header>
       <div className="toolbar pj-toolbar" role="search">
         <label className="search">
@@ -86,12 +101,12 @@ export function MeineProjektePage({ search, setSearch, oeffnen }: { search: Proj
         {gefiltert ? <button type="button" className="btn sm" onClick={zuruecksetzen}>{T.liste.filterZuruecksetzen}</button> : null}
       </div>
       <div className="body">
-        <Datenliste<Projekt> titel={TP.titel} spalten={SPALTEN} zeilen={items} schluessel={p => p.nummer} name={p => `${p.nummer} ${p.name}`}
+        <Datenliste<Projekt> titel={titel} spalten={SPALTEN} zeilen={items} schluessel={p => p.nummer} name={p => `${p.nummer} ${p.name}`}
           oeffnen={p => setSearch({ o: p.nummer })} aktuell={search.o} laedt={list.isPending} fehler={list.error} erneut={() => void list.refetch()}
-          leer={TP.leer} gefiltert={gefiltert} leerGefiltert={TP.leerGefiltert} zuruecksetzen={zuruecksetzen}
+          leer={alle ? TP.alle.leer : TP.leer} gefiltert={gefiltert} leerGefiltert={TP.leerGefiltert} zuruecksetzen={zuruecksetzen}
           mehr={{ vorhanden: list.hasNextPage, laedt: list.isFetchingNextPage, laden: () => void list.fetchNextPage() }} />
       </div>
-      {search.o ? <ProjektDrawer nummer={search.o} onClose={() => setSearch({ o: undefined })} oeffnen={oeffnen} /> : null}
+      {search.o ? <ProjektDrawer nummer={search.o} alle={alle} onClose={() => setSearch({ o: undefined })} oeffnen={oeffnen} /> : null}
     </section>
   );
 }

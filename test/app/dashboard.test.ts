@@ -27,7 +27,7 @@ describe('Dashboard der Periode', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     const l = await login(api, 'demo', 'u-pl', null);
@@ -53,12 +53,12 @@ describe('Dashboard der Periode', () => {
       await tx.query("INSERT INTO ppm.meilenstein (tenant_id, projekt_id, phase, art, text, termin_baseline) VALUES ($1, $2, 'P1', 'meilenstein', 'Pilot', '2027-03-31')", [T, p['2026-001']]);
     });
     pl = { authorization: l.authorization };
-    await grant(api, T, `user:${l.principalId}`, 'pl', { type: 'projekt', id: p['2026-001']! });
+    await grant(api, T, `user:${l.principalId}`, 'projekt-fuehren', { type: 'projekt', id: p['2026-001']! });
     const g = await login(api, 'demo', 'u-gremium', null);
     await grant(api, T, `user:${g.principalId}`, 'gremium', { type: 'portfolio', id: pfA });
     gremium = { authorization: g.authorization };
     const d = await login(api, 'demo', 'u-dir', null);
-    await grant(api, T, `user:${d.principalId}`, 'direktion', { type: 'portfolio', id: pfC });
+    await grant(api, T, `user:${d.principalId}`, 'portfolio-steuern', { type: 'portfolio', id: pfC });
     direktion = { authorization: d.authorization };
   });
   after(async () => { await api?.close(); });

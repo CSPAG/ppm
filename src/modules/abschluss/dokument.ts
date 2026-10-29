@@ -32,7 +32,7 @@ export const ABSCHLUSS_FELDER: readonly VorlageFeld[] = [
   ...g('Zielerreichung', [['bericht.projektstand', 'Stand des Vorhabens'], ['bericht.zielerreichung', 'Zielerreichung'], ['bericht.kpis', 'KPIs mit Ziel und Ergebnis']]),
   ...g('Business Case', [['bericht.businessCase', 'Business Case Abschluss P4'], ['bericht.kosten', 'Kosten Baseline, Prognose, Ist']]),
   ...g('Übergabe', [['bericht.uebergabe', 'Übergabe an Betrieb und Linie'], ['bericht.offenePunkte', 'Offene Punkte']]),
-  ...g('Nutzenrealisierung', [['bericht.nutzenSp', 'Beurteilung Sponsor'], ['bericht.nutzenUe', 'Beurteilung UE']]),
+  ...g('Nutzenrealisierung', [['bericht.nutzenSp', 'Beurteilung Projektauftraggeber:in'], ['bericht.nutzenUe', 'Beurteilung UE']]),
   ...g('Lessons Learned', [['bericht.lessons', 'Lessons Learned']]),
 ];
 
@@ -76,7 +76,7 @@ export function abschlussDokument(a: AbschlussOut): Dokument {
       ? [
         h1(nr('Nutzenrealisierung')),
         { art: 'felder' as const, zeilen: [
-          ['Sponsor', b.nutzen.sp ? `${b.nutzen.sp.text} (${b.nutzen.sp.von}, ${datum(b.nutzen.sp.at)})` : 'nicht beurteilt'],
+          ['Projektauftraggeber:in', b.nutzen.sp ? `${b.nutzen.sp.text} (${b.nutzen.sp.von}, ${datum(b.nutzen.sp.at)})` : 'nicht beurteilt'],
           ['UE', b.nutzen.ue ? `${b.nutzen.ue.text} (${b.nutzen.ue.von}, ${datum(b.nutzen.ue.at)})` : 'nicht beurteilt'],
         ] as const, felder: ['bericht.nutzenSp', 'bericht.nutzenUe'] },
       ]

@@ -133,6 +133,7 @@ const ProtokollTraktandum = Type.Object({
   projekt: Nullable(Type.Object({ nummer: Type.String(), name: Type.String() }, { additionalProperties: false })),
   vertraulich: Type.Boolean(),
   viaSns: Type.Boolean(),
+  vermerke: Type.Optional(Type.Array(Type.String(), { description: 'Offene Vermerke beim Schliessen, z. B. «Unterlagen fehlen» (UC-006 A2.2, A-74).' })),
   behandlung: enumOf(['entschieden', 'kenntnisnahme', 'nicht_behandelt'] as const, 'Entschieden, zur Kenntnis genommen oder nicht behandelt (für die nächste Sitzung vorgeschlagen).'),
   entscheid: Nullable(Type.Object({
     ergebnis: Type.String(), label: Type.String(), begruendung: Type.String(), stellungnahme: Type.Boolean(), anVr: Type.Boolean(),

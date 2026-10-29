@@ -1,8 +1,8 @@
 /**
  * Projektabschluss (UI-14 Projektakte › Abschluss, UI-32 Portfolio › Auswertungen › Lessons Learned; UC-015 Schritte
- * 1–5; PS.04.01–03; AP-E7-1) in hell, dunkel und 360 px: Max ist in «muster» Sponsor, Projektleitung und CTL eines
- * Projekts in P4 (über die API, daten.ts). Pflichtangaben im Seitenpanel, automatisches Speichern, Nutzenbeurteilung des
- * Sponsors, Lesson Learned, Einreichen mit Wirkung; danach ist der Bericht gesperrt und die Lesson steht in der
+ * 1–5; PS.04.01–03; AP-E7-1) in hell, dunkel und 360 px: Max ist in «muster» Projektauftraggeber:in und Projektleitung eines
+ * Projekts in P4 (über die API, daten.ts). Pflichtangaben im Seitenpanel, automatisches Speichern, Nutzenbeurteilung der
+ * Projektauftraggeber:in, Lesson Learned, Einreichen mit Wirkung; danach ist der Bericht gesperrt und die Lesson steht in der
  * Auswertung des Portfolios. axe ohne Befund, kein Überlauf.
  */
 import { expect, test } from '@playwright/test';
@@ -31,8 +31,8 @@ test('Abschlussbericht erfassen, Nutzen beurteilen, Lesson Learned, einreichen (
   await expect(page.getByText('Alle Pflichtangaben sind erfasst.')).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: /^Gespeichert$/ })).toBeVisible();
 
-  // Nutzenrealisierung: Beurteilung des Sponsors (PC.03.02)
-  await page.getByRole('textbox', { name: /^Beurteilung des Sponsors/ }).fill('Nutzen stabil erreicht');
+  // Nutzenrealisierung: Beurteilung der Projektauftraggeber:in (PC.03.02)
+  await page.getByRole('textbox', { name: /^Beurteilung Projektauftraggeber:in/ }).fill('Nutzen stabil erreicht');
   await page.getByRole('button', { name: 'Beurteilung speichern' }).first().click();
   await expect(page.getByText('Beurteilung gespeichert.')).toBeVisible();
 

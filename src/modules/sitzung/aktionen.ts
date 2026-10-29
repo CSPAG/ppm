@@ -132,12 +132,29 @@ export async function vorschlagZuruecknehmen(tx: Tx, v: { art: Art; bezug: { typ
     [v.art, v.bezug.typ, v.bezug.id])).rowCount ?? 0) > 0);
 }
 
-/** Die Traktandenliste lässt sich nur bis zum Versand ändern (danach AP-E2-2: Sitzungsmodus). */
+/**
+ * Die Traktandenliste lässt sich bis zum Beginn der Sitzung ändern (danach AP-E2-2: Sitzungsmodus). Nach dem Versand ist
+ * jede Änderung markiert «geändert nach Versand» (A-75, UX-E13): `nachVersand` nach der Änderung aufrufen.
+ */
 export function pruefeVorbereitung(s: store.SitzungRow): void {
-  if (s.stand !== 'geplant' && s.stand !== 'in_vorbereitung') throw conflict('Die Unterlagen sind versendet; die Traktandenliste ist fest.');
+  if (s.stand !== 'geplant' && s.stand !== 'in_vorbereitung' && s.stand !== 'versendet') throw conflict('Die Sitzung hat begonnen; die Traktandenliste ist fest.');
 }
 
-/** Einladungen nach Projektorganisation vorsetzen: PL, CTL, SP (UC-006 Schritt 2, I-F2). */
+/** Nach dem Versand geändert (A-75): Sitzung und Traktandum markieren; ohne Versand nichts. */
+export async function nachVersand(tx: Tx, s: store.SitzungRow, traktandumId?: string | null): Promise<void> {
+  if (s.stand !== 'versendet') return;
+  await store.nachVersandMarkieren(tx, s.id, traktandumId ?? null);
+}
+
+/** Unterlagen eines Traktandums als neue Fassung festhalten (nach dem Versand aufgenommen bzw. nachgeführt, A-75). */
+export async function unterlagenFesthalten(tx: Tx, t: store.TraktandumRow): Promise<void> {
+  await store.unterlagenLoeschen(tx, t.id);
+  for (const u of (await unterlagenVon(tx, t.art, bezugVon(t))).unterlagen) {
+    await store.unterlageAnlegen(tx, t.id, { art: u.art, titel: u.titel, standOk: u.bereit, qualityCheckOffen: u.qualityCheck === 'offen', hinweis: u.hinweis ?? '', inhalt: u.inhalt ?? {} });
+  }
+}
+
+/** Einladungen nach Projektorganisation vorsetzen: Projektleitung, Projektauftraggeber:in (UC-006 Schritt 2, I-F2). */
 async function einladungenVorsetzen(tx: Tx, t: store.TraktandumRow, sitzungId: string): Promise<void> {
   if (!t.projekt_id) return;
   const personen = (await store.projektleitung(tx, t.projekt_id)).map(p => ({ personId: p.person_id, funktion: p.funktion }));
@@ -146,7 +163,7 @@ async function einladungenVorsetzen(tx: Tx, t: store.TraktandumRow, sitzungId: s
 
 /**
  * Traktandum aufnehmen (UC-006 Schritt 2): Vorschlag dieses Gremiums (auch von der vorherigen Sitzung verschoben) wird
- * zuunterst traktandiert, mit Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» (A1) und Einladungen an PL, CTL, SP.
+ * zuunterst traktandiert, mit Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» (A1) und Einladungen an Projektleitung und Projektauftraggeber:in.
  */
 export async function aufnehmen(tx: Tx, s: store.SitzungRow, traktandumId: string): Promise<store.TraktandumRow> {
   pruefeVorbereitung(s);
@@ -172,6 +189,11 @@ export async function aufnehmen(tx: Tx, s: store.SitzungRow, traktandumId: strin
   }
   const neu = (await store.getTraktandum(tx, t.id))!;
   await einladungenVorsetzen(tx, neu, s.id);
+  // nach dem Versand aufgenommen (A-75): Unterlagen festhalten, markiert
+  if (s.stand === 'versendet') {
+    await unterlagenFesthalten(tx, neu);
+    await nachVersand(tx, s, neu.id);
+  }
   return neu;
 }
 
@@ -203,6 +225,7 @@ export async function entfernen(tx: Tx, s: store.SitzungRow, t: store.Traktandum
   if (t.sitzung_id !== s.id || t.stand !== 'traktandiert') throw conflict('Das Traktandum steht nicht auf dieser Traktandenliste.');
   await store.entfernen(tx, t.id);
   await store.positionenSchliessen(tx, s.id);
+  await nachVersand(tx, s);
 }
 
 /**
@@ -219,6 +242,7 @@ export async function verschieben(tx: Tx, s: store.SitzungRow, t: store.Traktand
   const ziel = (await store.sitzungAm(tx, g.id, naechster)) ?? await sitzungAnlegen(tx, g, naechster);
   await store.verschieben(tx, t.id, s.id, ziel.id);
   await store.positionenSchliessen(tx, s.id);
+  await nachVersand(tx, s);
   return ziel;
 }
 
@@ -291,9 +315,14 @@ export async function unterlagenstand(tx: Tx, s: store.SitzungRow, ts: readonly 
   if (s.versendet_at) {
     const gespeichert = await store.unterlagenGespeichert(tx, s.id);
     for (const t of ts) {
-      const u = gespeichert.filter(x => x.traktandum_id === t.id).map(x => ({ art: x.art, titel: x.titel, bereit: x.stand_ok, hinweis: x.hinweis || undefined, inhalt: x.inhalt }));
+      const u = gespeichert.filter(x => x.traktandum_id === t.id).map(x => ({
+        art: x.art, titel: x.titel, bereit: x.stand_ok, hinweis: x.hinweis || undefined, inhalt: x.inhalt, ...(x.quality_check_offen ? { qualityCheck: 'offen' as const } : {}),
+      }));
       const art = traktandenart(t.art);
-      m.set(t.id, { stand: !u.length ? (art && !art.unterlagen ? 'keine' : 'fehlt') : u.every(x => x.bereit) ? 'bereit' : 'fehlt', unterlagen: u });
+      // wie vor dem Versand: nur der Quality-Check offen bleibt unterscheidbar (Vermerk, A-74)
+      const stand = !u.length ? (art && !art.unterlagen ? 'keine' : 'fehlt')
+        : u.every(x => x.bereit) ? 'bereit' : u.some(x => !x.bereit && x.qualityCheck !== 'offen') ? 'fehlt' : 'quality_check_offen';
+      m.set(t.id, { stand, unterlagen: u });
     }
     return m;
   }
@@ -351,14 +380,14 @@ export async function versandvorschau(tx: Tx, s: store.SitzungRow): Promise<Vers
  * den Arbeitstagen vor der Sitzung (K3-1). Warnungen sperren nicht.
  */
 export async function versenden(tx: Tx, s: store.SitzungRow, version: number): Promise<Versandvorschau> {
-  pruefeVorbereitung(s);
+  if (s.stand !== 'geplant' && s.stand !== 'in_vorbereitung') throw conflict('Die Unterlagen sind bereits versendet. Änderungen danach sind markiert; ein zweiter Versand ist nicht nötig.');
   const ts = await store.traktanden(tx, s.id);
   if (!ts.length) throw conflict('Die Traktandenliste ist leer. Nimm zuerst Traktanden auf.');
   const vorschau = await versandvorschau(tx, s);
   const stand = await unterlagenstand(tx, s, ts);
   for (const t of ts) {
     for (const u of stand.get(t.id)!.unterlagen) {
-      await store.unterlageAnlegen(tx, t.id, { art: u.art, titel: u.titel, standOk: u.bereit, hinweis: u.hinweis ?? '', inhalt: u.inhalt ?? {} });
+      await store.unterlageAnlegen(tx, t.id, { art: u.art, titel: u.titel, standOk: u.bereit, qualityCheckOffen: u.qualityCheck === 'offen', hinweis: u.hinweis ?? '', inhalt: u.inhalt ?? {} });
     }
   }
   if (!(await store.markVersendet(tx, s.id, version, vorschau.frist.vorlauf))) throw conflict('Die Sitzung wurde inzwischen geändert. Lade sie neu.');
@@ -395,7 +424,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
   for (const t of await store.verschobeneVon(tx, s.id)) {
     if (!t.projekt_id) continue;
     const ziel = await store.getSitzung(tx, t.sitzung_id!);
-    for (const p of (await store.projektleitung(tx, t.projekt_id)).filter(x => x.funktion !== 'ctl')) {
+    for (const p of await store.projektleitung(tx, t.projekt_id)) {
       await mitteilung.senden(tx, {
         an: p.person_id, bezug: { typ: 'traktandum', id: t.id },
         text: `${t.titel}: im ${g} vom ${datum} nicht traktandiert, verschoben auf ${ziel ? `die Sitzung vom ${kurzDatum(ziel.datum)}` : 'die nächste Sitzung'}`,

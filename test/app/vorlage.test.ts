@@ -34,7 +34,7 @@ describe('Vorlagen', () => {
       const pf = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'vl', 'VL', true) RETURNING id", [T])).rows[0]!.id;
       projekt = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-031', 'Digitale Aufnahme', $2) RETURNING id", [T, pf])).rows[0]!.id;
     });
-    for (const [sub, rolle, ort] of [['ue', 'ue', { type: 'org' }], ['pl', 'pl', { type: 'projekt', id: projekt }]] as const) {
+    for (const [sub, rolle, ort] of [['ue', 'alle-fuehren', { type: 'org' }], ['pl', 'projekt-fuehren', { type: 'projekt', id: projekt }]] as const) {
       const l = await login(api, 'acme', `vl-${sub}`, null);
       await grant(api, T, `user:${l.principalId}`, rolle, ort as { type: 'org' });
       h[sub] = { authorization: l.authorization };

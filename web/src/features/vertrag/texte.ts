@@ -9,6 +9,20 @@ type Stand = 'in_arbeit' | 'in_pruefung' | 'zur_unterzeichnung' | 'unterzeichnet
 type Anlass = 'initial' | 'gate' | 'aenderung';
 
 export const TV = {
+  // Weiter ohne Vermerk (UC-002 A7, UC-003 A7; UX-E12)
+  vermerk: {
+    titel: 'Offene Vermerke',
+    version: (nr: string) => `Version ${nr}:`,
+    vorlegen: 'Dem Gremium vorlegen',
+    vorlegenFrage: (nr: string) => `Version ${nr} dem Gremium vorlegen?`,
+    vorlegenMitVermerk: (fehlt: string) => `Noch offen: ${fehlt}. Der Vertrag geht mit diesem Vermerk ans Gremium; die Aufgaben bleiben im Eingang, bis Quality-Check und Unterschriften nachgetragen sind.`,
+    vorlegenOhneVermerk: 'Der Vertrag geht an das Gremium des Gremienwegs.',
+    vorgelegt: 'Dem Gremium vorgelegt.',
+    phaseBeginnen: (p: string) => `Phase ${p} beginnen`,
+    phaseFrage: (p: string) => `Phase ${p} vor dem Gate-Entscheid beginnen?`,
+    phaseWirkung: (p: string) => `Das Projekt wechselt in ${p} und trägt den Vermerk «ohne Gate-Entscheid», bis das Gremium freigibt. Lehnt das Gremium ab oder stellt zurück, siehst du es am Vertrag.`,
+    phaseBegonnen: (p: string) => `Phase ${p} begonnen, mit Vermerk «ohne Gate-Entscheid».`,
+  },
   reiter: NAV.reiter,
   reiterVersionen: NAV.reiterVersionen,
   titel: 'Projektvertrag',
@@ -68,7 +82,7 @@ export const TV = {
   einreichenGesperrt: (phase: string, liste: string) => `Angaben für ${phase} fehlen: ${liste}. Ergänze sie, um einzureichen.`,
   eingereicht: 'Eingereicht. Die Unternehmensentwicklung prüft den Vertrag.',
   weiterBearbeiten: 'Weiter bearbeiten',
-  aenderungEinreichen: 'Eine Änderung reichst du beim Sponsor ein («Änderung einreichen»).',
+  aenderungEinreichen: 'Eine Änderung reichst du zum Entscheid ein («Änderung einreichen»); es entscheidet die Projektauftraggeber:in.',
 
   // Projekt zurückziehen (K2 Schritt 6, UC-002 A4; I-R1 Stufe 3: unumkehrbar, wirkt auf andere)
   zurueckziehen: 'Projekt zurückziehen',
@@ -93,7 +107,8 @@ export const TV = {
   zielKeins: 'Kein Ziel gewählt',
   zielNichtLesbar: 'Die strategischen Ziele siehst du mit dem Recht «Ziele lesen».',
   abhaengigkeitHinweis: 'Die Abhängigkeit erscheint nach der Freigabe auch beim anderen Projekt.',
-  organisationHinweis: 'Wer hier steht, erhält mit der Projektorganisation Zugriff auf das Projekt; die Rollen setzen Sponsor und Projektleitung in der Projektübersicht.',
+  ohneZugriff: 'kein Zugriff',
+  zugriffGeben: 'Zugriff geben',
   personalHinweis: 'Bis zum Gate P1–P2 genügt die Grösse S/M/L; danach braucht es FTE mit Monat von und bis je Rolle und Phase.',
   bitteWaehlen: 'Bitte wählen',
   ja: 'ja',

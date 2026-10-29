@@ -26,14 +26,17 @@ const GatePage = seite(() => import('../features/vertrag/GatePage.tsx'), 'GatePa
 const AenderungPage = seite(() => import('../features/vertrag/AenderungPage.tsx'), 'AenderungPage');
 const VersionenPage = seite(() => import('../features/vertrag/VersionenPage.tsx'), 'VersionenPage');
 const AbschlussPage = seite(() => import('../features/abschluss/AbschlussPage.tsx'), 'AbschlussPage');
+const ProjektZugriffPage = seite(() => import('../features/projekt/Zugriff.tsx'), 'ProjektZugriffPage');
 
-/** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss). */
+/** Reiter der Projektakte in ihrer Reihenfolge (IA: Übersicht, Vertrag, Bericht, Versionen, Abschluss, Zugriff). */
 const REITER: readonly Reiter[] = [
   { pfad: '', label: projektNav.uebersicht },
   { pfad: 'vertrag', label: vertragNav.reiter, recht: 'projekt:read' },
   { pfad: 'bericht', label: berichtNav.reiter, recht: 'projekt:read' },
   { pfad: 'versionen', label: vertragNav.reiterVersionen, recht: 'projekt:read' },
   { pfad: 'abschluss', label: abschlussNav.reiter, recht: 'projekt:read' },
+  // Zugriff am Projekt (UI-51, UX-E14): lesen alle mit Leserecht, ändern wer führt (access:admin)
+  { pfad: 'zugriff', label: projektNav.zugriff, recht: 'projekt:read' },
 ];
 
 export function projekteRoutes(rootRoute: AnyRoute) {
@@ -68,6 +71,14 @@ export function projekteRoutes(rootRoute: AnyRoute) {
   function UebersichtRoute() {
     const { nr } = akteRoute.useParams();
     return <ProjektUebersicht nummer={nr} />;
+  }
+
+  // Zugriff (UI-51, UC-016 A2): `/projekte/<nr>/zugriff`
+  const zugriffRoute = createRoute({ getParentRoute: () => akteRoute, path: '/zugriff', component: ZugriffRoute });
+
+  function ZugriffRoute() {
+    const { nr } = akteRoute.useParams();
+    return <ProjektZugriffPage nummer={nr} />;
   }
 
   // Statusbericht (UI-13, K1): `/projekte/<nr>/bericht?periode=2026-10`
@@ -134,5 +145,5 @@ export function projekteRoutes(rootRoute: AnyRoute) {
     return <Suspense fallback={<Loading />}><AbschlussPage nummer={nr} /></Suspense>;
   }
 
-  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, gateRoute, berichtRoute, versionenRoute, abschlussRoute])] as const;
+  return [listeRoute, akteRoute.addChildren([uebersichtRoute, vertragRoute, pruefenRoute, unterzeichnenRoute, aenderungRoute, gateRoute, berichtRoute, versionenRoute, abschlussRoute, zugriffRoute])] as const;
 }

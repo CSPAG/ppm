@@ -4,24 +4,33 @@
  * (`vertrag:review`, `vertrag:sign`) prüft die Route vorher.
  *
  * Stände (fachmodell.md 2.10): «in Prüfung» → bestätigt: «zur Unterzeichnung» | Rückmeldung: «in Arbeit»;
- * «zur Unterzeichnung» → alle drei (SP, PL, CTL): «unterzeichnet» | verweigert: «in Arbeit».
+ * «zur Unterzeichnung» → beide (Projektauftraggeber:in, Projektleitung): «unterzeichnet» | verweigert: «in Arbeit».
  */
 import { conflict, type Tx } from '@vollholz/platform';
 import { aufgabe, stellvertretung } from '../eingang/index.ts';
 import { SCHEMA } from '../../platform.ts';
 import * as store from './store.ts';
 
-/** Funktionen, die den Vertrag unterzeichnen (UC-002 Schritt 10; A-04: eine Unterschrift für Auftraggeber/Sponsor). */
-export const FUNKTIONEN = ['sp', 'pl', 'ctl'] as const;
+/**
+ * Funktionen, die den Vertrag unterzeichnen (UC-002 Schritt 10; A-04): Projektauftraggeber:in und Projektleitung. Die CTL
+ * unterzeichnet nicht mehr (Master Entscheid 17); ihre früheren Unterschriften bleiben im Verlauf.
+ */
+export const FUNKTIONEN = ['sp', 'pl'] as const;
 export type Funktion = (typeof FUNKTIONEN)[number];
-export const FUNKTION_TEXT: Record<Funktion, string> = { sp: 'Sponsor', pl: 'Projektleitung', ctl: 'CTL' };
+export const FUNKTION_TEXT: Record<Funktion, string> = { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' };
+
+/**
+ * Stände, in denen Quality-Check und Unterschriften nachgetragen werden (A-74, UC-002/003 A7): dem Gremium vorgelegt
+ * oder schon freigegeben. Der Nachtrag ändert den Stand nicht; er löst nur den Vermerk.
+ */
+export const NACHTRAG: readonly store.Stand[] = ['traktandiert', 'abgenommen'];
 
 const Q = `${SCHEMA}.quality_check`;
 const U = `${SCHEMA}.unterschrift`;
 
 export interface QualityCheckRow { id: string; version_id: string; ergebnis: 'bestaetigt' | 'rueckmeldung'; kommentare: Record<string, string>; at: Date; by_person: string }
 export interface UnterschriftRow {
-  id: string; quality_check_id: string; funktion: Funktion; person_id: string; in_vertretung_von: string | null;
+  id: string; quality_check_id: string; funktion: Funktion | 'ctl'; person_id: string; in_vertretung_von: string | null;
   ergebnis: 'unterzeichnet' | 'verweigert'; begruendung: string; at: Date;
 }
 
@@ -45,14 +54,14 @@ export async function durchgang(tx: Tx, versionId: string): Promise<QualityCheck
 }
 
 /**
- * Wer unterzeichnet: Personen der Projektorganisation in den Funktionen SP, PL, CTL (PP.04.04, Tabelle von AP-E0-4).
+ * Wer unterzeichnet: Personen der Projektorganisation in den Funktionen Projektauftraggeber:in und Projektleitung (PP.04.04).
  * Nur lesend; das Modul projekt bietet dafür (noch) keine Abfrage über `index.ts`.
  */
 export async function unterzeichnende(tx: Tx, projektId: string): Promise<Record<Funktion, string[]>> {
   const rows = (await tx.query<{ funktion: Funktion; person_id: string }>(
     `SELECT funktion, person_id FROM ${SCHEMA}.projekt_person WHERE projekt_id = $1 AND funktion = ANY ($2::text[]) ORDER BY position, created_at`,
     [projektId, FUNKTIONEN])).rows;
-  const out: Record<Funktion, string[]> = { sp: [], pl: [], ctl: [] };
+  const out: Record<Funktion, string[]> = { sp: [], pl: [] };
   for (const r of rows) out[r.funktion].push(r.person_id);
   return out;
 }
@@ -105,7 +114,7 @@ async function ueberarbeitenOeffnen(tx: Tx, p: store.ProjektKopf, v: store.Versi
 }
 
 /**
- * Quality-Check erfassen (DM.02.05): bestätigt → Unterzeichnungsaufgaben an SP, PL und CTL (UC-002 Schritt 9, UC-003
+ * Quality-Check erfassen (DM.02.05): bestätigt → Unterzeichnungsaufgaben an Projektauftraggeber:in und PL (UC-002 Schritt 9, UC-003
  * Schritt 7); Rückmeldung → zurück an die Projektleitung mit den Kommentaren je Kapitel (UC-002 A5, UC-003 A4).
  */
 export async function qualityCheckErfassen(tx: Tx, o: {
@@ -113,14 +122,19 @@ export async function qualityCheckErfassen(tx: Tx, o: {
   ergebnis: 'bestaetigt' | 'rueckmeldung'; kommentare: Record<string, string>;
 }): Promise<{ id: string; fehlend: Funktion[] }> {
   const { version: v, projekt: p } = o;
+  const nachtrag = NACHTRAG.includes(v.stand);
+  if (nachtrag && o.ergebnis === 'rueckmeldung') {
+    throw conflict(`Version ${v.nummer} liegt dem Gremium vor oder ist freigegeben; eine Rückmeldung ist jetzt nicht mehr möglich. Bestätige den Quality-Check oder halte die Rückmeldung am Traktandum fest.`, { reason: 'stand', stand: v.stand });
+  }
   const soll = await unterzeichnende(tx, p.id);
   const fehlend = FUNKTIONEN.filter(f => !soll[f].length);
   if (o.ergebnis === 'bestaetigt' && fehlend.length) {
     throw conflict(`Die Projektorganisation ist unvollständig: Es fehlt ${fehlend.map(f => FUNKTION_TEXT[f]).join(', ')}. `
       + 'Ohne diese Funktion kann der Vertrag nicht unterzeichnet werden; lege die Projektorganisation fest.', { reason: 'organisation', fehlend });
   }
-  const nach: store.Stand = o.ergebnis === 'bestaetigt' ? 'zur_unterzeichnung' : 'in_arbeit';
-  if (!(await store.standSetzen(tx, v.id, o.erwartet, ['in_pruefung'], nach))) return { id: '', fehlend };
+  // nachgetragen (A-74): der Stand bleibt, die Version zählt für If-Match weiter
+  const nach: store.Stand = nachtrag ? v.stand : o.ergebnis === 'bestaetigt' ? 'zur_unterzeichnung' : 'in_arbeit';
+  if (!(await store.standSetzen(tx, v.id, o.erwartet, nachtrag ? [v.stand] : ['in_pruefung'], nach))) return { id: '', fehlend };
   const id = (await tx.query<{ id: string }>(
     `INSERT INTO ${Q} (tenant_id, projekt_id, version_id, ergebnis, kommentare, by_person) VALUES (app.tenant_id(), $1, $2, $3, $4, $5) RETURNING id`,
     [p.id, v.id, o.ergebnis, JSON.stringify(o.kommentare), o.person])).rows[0]!.id;
@@ -157,13 +171,15 @@ export async function unterzeichnen(tx: Tx, o: {
   const vorher = await unterschriften(tx, dg.id);
   const funktionen = await offeneFunktionen(tx, o.person, soll, vorher);
   if (!funktionen.length) {
-    throw conflict('Du hast keine offene Unterschrift für diese Version: Du hast bereits unterzeichnet, oder du bist weder Sponsor, Projektleitung noch CTL des Projekts.',
+    throw conflict('Du hast keine offene Unterschrift für diese Version: Du hast bereits unterzeichnet, oder du bist weder Projektauftraggeber:in noch Projektleitung des Projekts.',
       { reason: 'unterschrift' });
   }
   // Version ändert sich mit jeder Unterschrift (If-Match schützt vor gleichzeitigem Entscheid)
   const vollstaendig = o.ergebnis === 'unterzeichnet' && FUNKTIONEN.every(f => vorher.some(u => u.funktion === f) || funktionen.some(x => x.funktion === f));
-  const nach: store.Stand = o.ergebnis === 'verweigert' ? 'in_arbeit' : vollstaendig ? 'unterzeichnet' : 'zur_unterzeichnung';
-  if (!(await store.standSetzen(tx, v.id, o.erwartet, ['zur_unterzeichnung'], nach))) return null;
+  // nachgetragen (A-74): dem Gremium vorgelegt oder freigegeben, der Stand bleibt
+  const nachtrag = NACHTRAG.includes(v.stand);
+  const nach: store.Stand = nachtrag ? v.stand : o.ergebnis === 'verweigert' ? 'in_arbeit' : vollstaendig ? 'unterzeichnet' : 'zur_unterzeichnung';
+  if (!(await store.standSetzen(tx, v.id, o.erwartet, nachtrag ? [v.stand] : ['zur_unterzeichnung'], nach))) return null;
   for (const f of funktionen) {
     await tx.query(
       `INSERT INTO ${U} (tenant_id, projekt_id, version_id, quality_check_id, funktion, person_id, in_vertretung_von, ergebnis, begruendung)
@@ -175,11 +191,13 @@ export async function unterzeichnen(tx: Tx, o: {
     await aufgabe.erledigen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertrag_version', id: v.id }, empfaenger: { person } });
   }
   if (o.ergebnis === 'verweigert') {
-    // Durchgang beendet: übrige Unterzeichnungen entfallen, die PL überarbeitet (UC-003 A5)
+    // Durchgang beendet: übrige Unterzeichnungen entfallen, die PL überarbeitet (UC-003 A5); nachgetragen bleibt nur
+    // der Vermerk «Unterschrift verweigert» an der Version, die beim Gremium liegt bzw. freigegeben ist
     await aufgabe.entfallen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertrag_version', id: v.id } });
+    if (nachtrag) return { funktionen, vollstaendig, stand: nach };
     const grund = o.begruendung.trim().length > 140 ? `${o.begruendung.trim().slice(0, 139)}…` : o.begruendung.trim();
     await ueberarbeitenOeffnen(tx, p, v, soll, `nicht unterzeichnet von ${await personName(tx, o.person)}: ${grund}`);
-  } else if (vollstaendig) {
+  } else if (vollstaendig && !nachtrag) {
     const r = (await store.version(tx, v.id))!;
     for (const fn of nachUnterzeichnung) await fn(tx, { version: r, projekt: p });
   }

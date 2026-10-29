@@ -10,9 +10,9 @@
 import { describeError } from '@vollholz/iam-web';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { api, ApiError, isConflict } from '../../api/index.ts';
-import { Confirm, Dialog, Empty, ErrorState, fmtBetragKurz, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
+import { Confirm, Dialog, Empty, ErrorState, fmtBetragKurz, fmtDatum, fmtPhase, Hinweis, Icon, Skelett, T, useToast, useVerzoegert, type Phase, Vermerke, VorabAktion } from '../../ui/index.ts';
 import {
-  newIdempotencyKey, useAbschluss, useEinreichen, useLessonMutations, useNutzen, useProjekt, useSpeichern, useWiederaufnahme,
+  newIdempotencyKey, useAbschluss, useEinreichen, useLessonMutations, useNutzen, useProjekt, useSpeichern, useVorabAbschliessen, useWiederaufnahme,
   type Abschluss, type AbschlussIn, type Geladen, type OffenerPunkt,
 } from './api.ts';
 import { TA } from './texte.ts';
@@ -209,9 +209,11 @@ function Arbeitsflaeche({ projektId, geladen, refetch }: { projektId: string; ge
       <div className="toolbar ab-tools">
         <h2 className="ab-titel">{TA.titel[art]}</h2>
         {b ? <span className="pill">{TA.stand[b.stand]}</span> : null}
+        <Vermerke vermerke={a.vermerke} />
         <span className="spacer" />
         {bearbeitbar ? <span className="muted small" role="status">{TA[zustand]}</span> : null}
         {a.can.wiederaufnahme ? <Wiederaufnahme projektId={projektId} /> : null}
+        {a.can.abschliessen && b ? <VorabAbschliessen projektId={projektId} version={b.version} /> : null}
         {a.can.dokument ? <Dokument projektId={projektId} nummer={a.projekt.nummer} /> : null}
       </div>
       {banner ? <div className="ab-banner"><Hinweis stufe="hinweis">{banner}</Hinweis></div> : null}
@@ -482,6 +484,16 @@ function LessonsAbschnitt({ a, projektId }: { a: Abschluss; projektId: string })
 }
 
 /** Antrag auf Wiederaufnahme an das Gremium (A-09, K10) mit Begründung und Wirkung. */
+/** Vor der Abnahme abschliessen (UC-015 A3, UX-E12): Wirkung vor dem Klick, das Traktandum bleibt offen. */
+function VorabAbschliessen({ projektId, version }: { projektId: string; version: number }) {
+  const toast = useToast();
+  const m = useVorabAbschliessen(projektId);
+  return (
+    <VorabAktion label={TA.vorab.aktion} frage={TA.vorab.frage} wirkung={TA.vorab.wirkung} icon="check" laeuft={m.isPending} fehler={m.error}
+      ausfuehren={fertig => m.mutate({ etag: `W/"${version}"` }, { onSuccess: () => { fertig(); toast.show(TA.vorab.erledigt); } })} />
+  );
+}
+
 function Wiederaufnahme({ projektId }: { projektId: string }) {
   const id = useId();
   const toast = useToast();

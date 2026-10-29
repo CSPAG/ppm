@@ -119,10 +119,4 @@ export function rang(z: Pick<PeriodeZeileOut, 'stand' | 'auffaelligkeiten'>): nu
   }
 }
 
-/** Sperre des Abschlusses (UC-005 Schritt 5, K1 Regel): eingereichte, nicht geprüfte Berichte. */
-export function abschlussSperre(eingereicht: number): string | null {
-  if (!eingereicht) return null;
-  return `Abschluss: ${eingereicht} ${eingereicht === 1 ? 'Bericht ist' : 'Berichte sind'} eingereicht, aber nicht geprüft. Prüfe ${eingereicht === 1 ? 'ihn' : 'diese'} zuerst.`;
-}
-
 export const PERIODE_ABGESCHLOSSEN = 'Die Periode ist abgeschlossen und gesperrt (Z9).';

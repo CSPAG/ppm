@@ -20,8 +20,8 @@ test('Meine Projekte: Suche, Filter, Schublade und Projektakte, barrierefrei', a
   await expectNoOverflow(page);
 
   // Filter in der Adresse (I-N5); ohne Treffer Z3 mit Ausweg
-  await page.getByLabel('Meine Rolle').selectOption({ label: 'Sponsor' });
-  await expect(page).toHaveURL(/[?&]rolle=sponsor/);
+  await page.getByLabel('Meine Rolle').selectOption({ label: 'Projektauftraggeber:in' });
+  await expect(page).toHaveURL(/[?&]rolle=auftraggeber/);
   await expect(page.getByText('Kein Projekt passt zu deiner Suche oder den Filtern.')).toBeVisible();
   await expectAccessible(page);
   await page.getByRole('button', { name: 'Filter zurücksetzen' }).first().click();

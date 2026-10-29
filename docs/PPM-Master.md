@@ -1,16 +1,18 @@
-# PPM Insel Gruppe – Masterdokument
+# PPM – Masterdokument
 
-**Führendes Dokument** für die fachliche Spezifikation von Strategieumsetzung und Projektportfoliomanagement (PPM) der Insel Gruppe. Alle Entscheide, Annahmen und offenen Punkte werden hier geführt; Details stehen im [Anhang](anhang/).
+**Führendes Dokument** für die fachliche Spezifikation des Produkts PPM für Strategieumsetzung und Projektportfoliomanagement, mandantenfähig für mehrere Organisationen. Erarbeitet am **Referenzkunden Insel Gruppe**: Seine Unterlagen sind die empirischen Quellen (Abschnitt 3), seine Organisation steht in den Abschnitten 4 und 5. Die [Produktgrundsätze](#0-produktgrundsätze) gelten für das ganze Produkt und gehen allen Quellen vor. Alle Entscheide, Annahmen und offenen Punkte werden hier geführt; Details stehen im [Anhang](anhang/).
 
 | | |
 |---|---|
-| Stand | 26. Oktober 2026 |
+| Stand | 29. Oktober 2026 |
 | Status | Entwurf, nicht mit dem Kunden validiert |
 | Verantwortlich | André Hochreutener, CSP AG |
-| Umfang | 7 Business Modules · 23 Business Domains · 89 Business Cases · 18 Use Cases |
+| Referenzkunde | Insel Gruppe |
+| Umfang | 4 Produktgrundsätze · 7 Business Modules · 23 Business Domains · 89 Business Cases · 18 Use Cases |
 
 ## Inhalt
 
+0. [Produktgrundsätze](#0-produktgrundsätze)
 1. [Auftrag](#1-auftrag)
 2. [Methode](#2-methode)
 3. [Quellen](#3-quellen)
@@ -26,9 +28,22 @@
 13. [Nächste Schritte](#13-nächste-schritte)
 14. [Anhang und Pflege](#14-anhang-und-pflege)
 
+## 0. Produktgrundsätze
+
+Die Grundsätze gelten für das ganze Produkt und für jede Organisation. Sie gehen allen Quellen, Entscheiden und Annahmen vor. IDs `G1`, `G2` … nie umnummerieren.
+
+| ID | Grundsatz | Das heisst im System |
+|---|---|---|
+| G1 | **Governance sichtbar machen, nicht erzwingen.** Das System unterstützt mit Hinweisen und weichen Regeln; eine Unterschrift oder Freigabe unterbricht keinen Ablauf. | Unterschrift, Freigabe, Prüfung und Abnahme sind **Vermerke**: Sie zeigen, wer wann zugestimmt hat, steuern aber keinen Stand und sperren nichts. Fehlt ein Vermerk, weist das System vor der Aktion darauf hin, markiert das Objekt (z. B. «ohne Freigabe») und lässt die Aufgabe im Eingang offen, bis der Vermerk nachgetragen ist. Stände zeigen, wo ein Objekt steht; sie halten nichts an. Durchgesetzt werden nur Zugriffsrechte (wer was sehen und ändern darf), nie Governance (wer wann zustimmen muss). |
+| G2 | **Nachvollziehbarkeit vor Sperre.** Wichtiger als Kontrolle ist, dass sichtbar bleibt, dass sich etwas geändert hat und wie. | Jede Änderung ist am Objekt sichtbar für alle, die das Objekt sehen: wer, wann, vorher, nachher. Statt nach Einreichen, Versand oder Abschluss zu sperren, entsteht eine neue Version mit Markierung (z. B. «geändert nach Versand»). Gelöscht werden nur Entwürfe; alles andere wird zurückgezogen oder archiviert und bleibt im Verlauf. |
+| G3 | **Rechte sind Datenbereich × Verb × Ort; Rollen sind Vorlagen.** | Verben: auflisten, lesen, anlegen, ändern (löschen nur für Entwürfe). Ort: Organisation, Portfolio oder Projekt; ein Recht gilt am Ort und darunter. Rollen bündeln Rechte unter einem Namen für Menschen; das System prüft nur Rechte, nie Rollennamen. Sonderrechte gibt es nur für Vertraulichkeit und Sicherheit, nie für Governance. |
+| G4 | **Funktionen sind Daten, keine Rechte.** | Wer ein Projekt leitet oder in Auftrag gibt, steht als Funktion in der Projektorganisation (Projektmanager:in, Projektauftraggeber:in). Die Funktion bestimmt Verantwortung, Aufgaben im Eingang, Vermerke und Angaben im Dokument; was die Person darf, bestimmt ihre Rolle. Die Projektorganisation ist ein Projektergebnis und wirkt nicht auf Rechte; der Zugriff wird getrennt verwaltet. Weitere Personen können dieselben Rechte haben, ohne die Funktion innezuhaben. |
+
+**Verhältnis zu den Quellen:** Verlangt eine Quelle etwas, das einem Grundsatz widerspricht (z. B. Q7 und Q8 «Unterzeichnung vor dem Gate», «Freigabe je Phase durch den PRAT»), bleibt die Anforderung als Vermerk erhalten, und ein Entscheid in Abschnitt 10 hält fest, wie das Produkt sie umsetzt. So bleibt sichtbar, woher eine Anforderung kommt und warum das Produkt sie anders umsetzt.
+
 ## 1. Auftrag
 
-Fachliche Spezifikation eines Systems für Strategieumsetzung und PPM der Insel Gruppe nach CSP-Methode: Funktionsbaum (Business Module → Business Domain → Business Case) und Use Cases der Gesamtspezifikation, gebündelt nach Abläufen, damit das UI Prozesse abbildet statt verteilter Einzelfunktionen.
+Fachliche Spezifikation des Produkts PPM für Strategieumsetzung und Projektportfoliomanagement, erarbeitet am Referenzkunden Insel Gruppe nach CSP-Methode: Funktionsbaum (Business Module → Business Domain → Business Case) und Use Cases der Gesamtspezifikation, gebündelt nach Abläufen, damit das UI Prozesse abbildet statt verteilter Einzelfunktionen.
 
 ## 2. Methode
 
@@ -58,6 +73,8 @@ Q6, Q7 und Q8 enthalten Kundenmaterial (Klassifikation intern) und Personennamen
 
 ## 4. Fachliche Eckpunkte der Insel Gruppe
 
+Die Eckpunkte beschreiben Organisation und Governance des Referenzkunden. Das Produkt bildet sie nach den Produktgrundsätzen ab: Wer bei der Insel Gruppe entscheidet, prüft oder unterzeichnet, erfasst das System als Vermerk (G1); es hält deswegen keinen Ablauf an.
+
 - **Zielkette (Q9, Q6 F1, F3):** Strategie 2035 (vom VR am 13.06.2025 verabschiedet; Vision und Werte Respekt, Exzellenz, Verantwortung) → 5 strategische Handlungsfelder mit Leitsatz und Stossrichtungen: Mitarbeitende und Unternehmenskultur · Patientenorientierung · Medizin der Zukunft · Marktpositionierung und Vernetzung · Wirtschaftlichkeit → strategische Ziele (Horizont 2030) → Jahresziele (z. B. 2027) → Hauptaktivitäten → Projekte; je Ziel eine Metrik. Q9 nennt zwischen strategischen Zielen und Massnahmen/Projekten «kurz-, mittel- und langfristige Ziele».
 - **Drei Portfolios = Projektkategorien (Q8 Kap. 1, 6):** A strategisches Transformationsportfolio = Transformationsprogramm (Gremium PRAT), B taktisch-operatives Portfolio der Geschäftsleitung (GLPA), C operative Portfolios der Direktionen (DIR). Geltung des PM-Handbuchs: für A verbindlich (Programm- und Projekt-Governance), für B die Projekt-Governance (Phasenmodell, Rollen, Steuerung, Reporting), für C keine Vorgaben, Orientierung empfohlen; C braucht kein Reporting an die GL. Zuordnung über das Kriterienraster «Tiering» (Relevanz, Anzahl betroffener Direktionen, Abhängigkeiten, Bedarf an zentraler Priorisierung und Finanzierung, Change-Aufwand) als Gesamtbeurteilung, nicht als starre Logik.
 - **Priorisierung (Q8 Kap. 6.1):** Ideen kommen aus Innovationsprozess und jährlichem Strategieprozess in den Ideenpool; Ablauf: Erfassung → erste Bewertung der strategischen Relevanz → Entscheid strategisch, taktisch-operativ oder operativ → Priorisierung → Freigabe Initialisierung. Kriterien: Strategiebeitrag, Transformationsrelevanz, Anzahl betroffener Bereiche, Komplexität und Abhängigkeiten, Finanzierungsbedarf, Ressourcenverfügbarkeit, Kommunikations- und Change-Aufwand.
@@ -72,6 +89,8 @@ Q6, Q7 und Q8 enthalten Kundenmaterial (Klassifikation intern) und Personennamen
 ## 5. Akteure
 
 VR Verwaltungsrat (Programmauftraggeber) · SNS Strategie-, Nominations- und Strukturausschuss des VR (Schnittstelle PRAT ↔ VR; Gates in P0 und P1) · CEO Programmsponsor · PRAT Programmausschuss Transformation (GL) · UE Unternehmensentwicklung (Programmleitung) · PMO Project Management Office (unterstützt die Programmleitung bei Reporting und Dokumentation) · GL Geschäftsleitung · GLPA GL Portfolio Ausschuss (Portfolio B) · DIR Direktionen (Portfolio C; im Kernteam vertreten als AeD, DPF, DLF, DMS, DTI, DP, DIB) · AG/SP Projektauftraggeber und -sponsor, eine Rolle (GL-Mitglied, bei B die GL, bei C die Direktion; Q8 Kap. 1) · PL Projektleitung · CTL Clinical Transformation Lead · KT Kernteam · AS Antragsteller/in · KOM Unternehmenskommunikation (Change und Kommunikation, mit UE) · DTI/DBI zuständige Stellen für ICT und Infrastruktur · FI Finanzen [OFFEN] · RM Ressourcenmanagement [OFFEN] · ADM Administrator/in
+
+Die Akteure sind Personen und Gremien des Referenzkunden, keine Rollen im System: Was jemand im System darf, bestimmt die Rolle (G3); wer im Projekt verantwortlich ist, die Funktion (G4). Im Produkt heisst AG/SP **Projektauftraggeber:in**; die CTL wird nicht geführt; Finanzen und Ressourcenmanagement sind keine eigenen Rollen (Entscheide 12 und 15).
 
 ## 6. Systemgrenze
 
@@ -142,11 +161,11 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 | UC-004 | Monatlich berichten | ● | Projekt | PL |
 | UC-005 | Statusberichte prüfen und nachverfolgen |  | Portfolio | UE |
 | UC-006 | PRAT-Sitzung vorbereiten und durchführen | ● | Gremium (+ Portfolio) | UE, PRAT |
-| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt | PL, SP |
+| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt | PL, AG |
 | UC-008 | Portfolio priorisieren und ausbalancieren | ● | Portfolio (+ Gremium) | UE, PRAT |
-| UC-009 | Ressourcen planen und zuteilen |  | Portfolio (+ Projekt) | RM |
-| UC-010 | Portfoliofinanzen überwachen |  | Portfolio | FI, UE |
-| UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele (+ Portfolio) | GL, VR |
+| UC-009 | Ressourcen planen und zuteilen |  | Portfolio (+ Projekt) | UE |
+| UC-010 | Portfoliofinanzen überwachen |  | Portfolio | UE |
+| UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele (+ Portfolio) | GL, UE |
 | UC-012 | Quartalsreporting an den VR erstellen |  | Ziele (+ Portfolio) | UE, PRAT |
 | UC-013 | Jahresrückblick auswerten |  | Gremium (+ Ziele) | PRAT |
 | UC-014 | Portfolio auswerten |  | Portfolio | PRAT, GLPA, DIR, UE |
@@ -176,10 +195,56 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 9. **UC-006** «PRAT-Sitzung vorbereiten und durchführen» nach Q8 Kap. 8.1–8.5 ausformuliert. Offen dort: Vorlage an den SNS-VR in P0 und P1, Weiterleitung an den VR ausserhalb des Quartalsreportings.
 10. **Alle 18 Use Cases ausformuliert** (CSP-Vorlage). Fehlende Grundlagen sind als [OFFEN] markiert und unter «Aus den Use Cases» in den offenen Punkten gesammelt.
 11. **UX-Schicht** erstellt ([ux/](ux/README.md)) auf Basis des CSP-UX-Rahmens 1.1: sechs Kernabläufe K1 Statusbericht (UC-004, 005), K2 Projektvertrag (UC-002, 003, 007), K3 Gremiumssitzung (UC-006), K4 Projektidee (UC-001), K5 Priorisierung (UC-008), K6 Ziele (UC-011, 012); Projektentscheide UX-E1–E11, offene Fragen UX-OF-1–18. Präzisierungen und Lücken an den Use Cases stehen unter [Rückfluss an die Anforderungen](ux/fahrplan.md#rückfluss-an-die-anforderungen) und sind noch nicht in Funktionsbaum und Use Cases übernommen.
+12. **Produktgrundsätze G1–G4** festgelegt (29.10.2026): Die Spezifikation gilt für das ganze Produkt, die Insel Gruppe ist Referenzkunde. Governance wird sichtbar gemacht, nicht erzwungen (G1); Nachvollziehbarkeit geht vor Sperre (G2); Rechte sind Datenbereich × Verb × Ort, Rollen sind Vorlagen (G3); Funktionen sind Daten (G4). Dazu:
+   - **Projektauftraggeber:in** statt Sponsor: AG/SP bleibt eine Funktion (Entscheid 8), nur der Name ändert sich.
+   - **Keine CTL** im Produkt: keine Funktion in der Projektorganisation, keine Unterschrift, keine Rolle. Eine Rolle «Controlling» gibt es nicht; so war im Rollenmodell die CTL beschriftet.
+   - **Keine Rolle Finanzen:** Budget, Prognose und Ist-Kosten pflegen Projektportfoliomanager:in und PPMO.
+   - **Strategie und Ziele** dürfen auch Projektportfoliomanager:in und PPMO bearbeiten.
+   - **Noch nicht nachgeführt:** Funktionsbaum und Use Cases (Generator), UX-Schicht, Bauplan ([fachmodell.md](fachmodell.md): Rollen 3.3, Lesesicht 3.4, Annahmen, u. a. A-04, A-31, A-33, A-34, A-41, A-42, A-45), Vorgabewerte der Codetabelle «Ressourcenrolle» (Sponsor, CTL) und Code. Abgelöstes wird dort als «ersetzt durch» markiert, nicht gelöscht. Betroffen sind vor allem Abläufe, die heute anhalten: UC-001 (Projekt erst nach Freigabe der Initialisierung), UC-002 und UC-003 (Gate erst nach Quality-Check und allen Unterschriften, Phase erst nach Gate-Entscheid), UC-004 und UC-005 (Bericht nach Einreichen gesperrt, Monatsabschluss erst nach Prüfung aller Berichte), UC-006 und UC-008 (Traktanden und Antrag nach Versand gesperrt), UC-007 (Änderung nur durch den Sponsor, mit Wirkung nur über den PRAT), UC-011 (Roadmap erst nach Freigabe durch den VR), UC-015 (Abschluss erst nach Abnahme durch das Gremium), UC-016 (Rollen).
+13. **Beträge und vertrauliche Projekte** ohne eigenes Recht (29.10.2026, zu G3 und V14): Wer an einem Ort eine Rolle hat (Bearbeiten oder Lesen an Organisation, Portfolio oder Projekt), sieht dort auch Beträge und vertrauliche Projekte. Mitglieder ohne weitere Rolle sehen beides nicht: keine Beträge, und vertrauliche Projekte fehlen in jeder Liste und Auswertung für Mitglieder. Die Kennzeichnung «vertraulich» am Projekt bleibt. Gegenüber heute sehen neu Projektmitglieder Beträge (A-33) und die Geschäftsleitung vertrauliche Projekte (A-34). Im Bauplan bleiben die Rechte `finanzen:read` und `projekt:vertraulich` mit ihren Policies bestehen; sie stecken in jeder Vorlage ausser «Mitglied». Reicht das später nicht, sind die Freigabestufen von identity-kit (intern, vertraulich, streng vertraulich) der Weg, ohne die Rollen zu ändern.
+14. **Projekte auflisten und Ideen lesen für alle Mitglieder** (29.10.2026, zu G3 und V14):
+   - **Projekte:** Alle Mitglieder listen die Kopfdaten aller nicht vertraulichen Projekte auf: Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektmanager:in, Projektauftraggeber:in. Status, Trend, Beträge und Inhalte (Projektvertrag, Berichte, Register) brauchen «Lesen». Ohne «Lesen» führt ein Eintrag zu einer Kopfansicht, nicht zur Akte. Auch Auswahlfelder (z. B. Abhängigkeiten im Projektvertrag) und die Suche bieten alle aufgelisteten Projekte an.
+   - **Ideen:** Alle Mitglieder lesen eingereichte Ideen vollständig nach Vorlage (Titel, Ausgangslage, Zielsetzung, Handlungsfeld, betroffene Bereiche, Einschätzungen, Stand, eingereicht von). Nicht sichtbar sind Entwürfe anderer und die Prüfung durch die UE (Rückfragen, Tiering-Raster, Leitfragen). Wer eine Idee erfasst, sieht so ähnliche Ideen schon vor dem Einreichen.
+   - **Bauplan:** Die Lesesicht der Projektdetails hängt an der Sichtbarkeit der Projektzeile (`ppm.projekt_sichtbar()`); «Auflisten» braucht deshalb einen eigenen Weg (neues Muster in [fachmodell.md](fachmodell.md) 3.4). Bei Ideen braucht die Lesesicht der Rückfragen eine eigene Bedingung, weil sie heute an der Sichtbarkeit der Idee hängt.
+15. **Keine Rolle Ressourcenmanagement** (29.10.2026, zu G1 und V14): Kapazität, Bedarf und Zuteilung pflegen Projektportfoliomanager:in und PPMO, wie die Finanzen (Entscheid 12). Wer nur Ressourcen plant, erhält PPMO. UC-009 erhält diese Primärakteure statt RM; im Bauplan heisst es in A-69 «das manuell festgelegte Angebot geht vor». Die Rechte `ressource:read` und `ressource:write` bleiben; braucht eine Organisation eine eng gefasste Rolle, definiert sie selbst eine eigene Rolle «Ressourcen pflegen» (Lesen und `ressource:write`; UC-016 A3, eigene Rollen von identity-kit 5.0). Hinweis für die UX-Schicht: Projektportfoliomanager:in und PPMO erhalten damit alle Kopfkarten der Startseite (Einrichten, Monatszyklus, Ziele, Finanzen, Ressourcen, Sitzung); die Startseite braucht eine Lösung dafür, z. B. ausblendbare Karten.
+16. **Zugriff am Projekt getrennt von der Projektorganisation** (29.10.2026, zu G3, G4 und V14):
+   - **Projektorganisation:** ein Projektergebnis (Personen, Funktionen, AKV; Projektvertrag Kap. 8), ohne Wirkung auf Rechte. Aufgaben im Eingang, Vermerke, Einladungen und Angaben im Dokument hängen weiter an der Funktion.
+   - **Zugriff:** Ein eigener Bereich «Zugriff» in der Projektakte zeigt, wer «Bearbeiten» oder «Lesen» direkt am Projekt hat und wer über Portfolio oder Organisation, mit «Warum?». Zugriffe lassen sich dort hinzufügen, befristen und entfernen. Administration › Zugänge (UC-016) bleibt zweiter Einstieg.
+   - **Verwalten darf**, wer am Ort «Bearbeiten» hat; die Vorlage enthält dafür «Zugriff verwalten» (`access:admin` aus identity-kit: niemand gibt mehr, als er hat; jede Änderung steht im Protokoll).
+   - **Weiche Regeln (G1):** Hat die Projektmanager:in kein «Bearbeiten» oder die Projektauftraggeber:in kein «Lesen», zeigt das System einen Hinweis mit «Zugriff geben». Entsteht ein Projekt (Initialisierung, Übernahme), schlägt es diese Zugriffe vorausgewählt vor; danach gibt es keine Kopplung. Wer Zugriff auf ein vertrauliches Projekt gibt, sieht einen Hinweis.
+   - **Bauplan und UX:** Rechte am Projekt laufen über die Vorlagen statt über `sp`, `pl`, `ctl` und `kt`; die Übernahme der Projektorganisation in Rechte entfällt; bestehende Zuweisungen werden migriert; die Stellvertretung (A-31) bleibt. Den Bereich «Zugriff» baut die App auf den Schnittstellen von identity-kit; die Informationsarchitektur erhält ihn in der Projektakte.
+17. **Funktionen der Projektorganisation ohne gepflegte Liste** (29.10.2026, zu G4 und Entscheid 16): Fest sind nur Projektmanager:in und Projektauftraggeber:in, je höchstens eine Person (A-04); an ihnen hängen Aufgaben, Vermerke und Kopfdaten. Alle weiteren Funktionen sind freier Text, und das Feld schlägt vor, was in der Organisation schon verwendet wurde (z. B. «PMO», «Kernteam»). Begründung aus dem Nutzungskontext: Die Projektmanager:in trägt im Projektvertrag (Kap. 8, K2) ein, wer mitarbeitet, und denkt dabei in Personen und Aufgaben, nicht in Stammdaten; eine vorgegebene Liste zwänge sie zu einem unpassenden Wert oder zu einer Anfrage an die Administration. Weitere Funktionen wirken nicht auf Abläufe oder Rechte; der Filter «Meine Projekte» unterscheidet die zwei festen Funktionen und «weitere». Bestehende Einträge (CTL, Kernteam, Sponsoren-Koalition) werden zu Text. Im Bauplan wird `projekt_person.funktion` zu zwei festen Werten plus Text; nachzuführen in `projekt`, `vertrag` (Kap. 8, Dokument, Unterzeichnende), `sitzung` (Einladungen) und im Filter der Webapp.
+18. **Rollenmodell: steuern und führen je Portfolio und Projekt** (29.10.2026, zu G3 und G4; ersetzt V14 und die heutigen 14 Rollen). Methodisch von oben nach unten:
+
+   | Ebene | Rollen |
+   |---|---|
+   | je Portfolio | Portfolio steuern (Portfolio-Auftraggeber:in) · Portfolio führen (Projektportfoliomanager:in) · Gremium |
+   | je Projekt | Projekt steuern (Projektauftraggeber:in) · Projekt führen (Projektmanager:in) · Projekt mitlesen |
+   | übergreifend | alle Portfolios lesen · alle Portfolios führen |
+   | Grundlage | Mitglied · Admin |
+
+   - **Steuern:** alles am Ort lesen, Entscheide und Freigaben vermerken (G1). **Führen:** alles am Ort bearbeiten und den Zugriff verwalten (Entscheid 16); auch wer nicht die offizielle Funktion hat, z. B. ein PMO. **Gremium:** steuert ein Portfolio gemeinsam, liest es und entscheidet in Sitzungen; die Entscheide erfasst, wer das Portfolio führt. **Mitlesen:** liest ein Projekt, z. B. das Kernteam.
+   - **Je Portfolio:** Eine Organisation kann mehrere Portfolios haben; die Rollen werden je Portfolio vergeben, nicht für «eines oder alle».
+   - **Übergreifend:** «Alle Portfolios lesen» liest jedes Portfolio. «Alle Portfolios führen» führt jedes Portfolio und pflegt, was keinem Portfolio gehört: Strategie und Ziele, Ideenpool bis zur Zuordnung zu einem Portfolio, Monatsabschluss, Phasenmodell und Vorlagen.
+   - **Eigene Rollen:** Die Rollen oben sind die Vorgabe und bleiben unverändert; eine Organisation kann sie um eigene Rollen ergänzen (AM.01.02, UC-016 A3).
+   - **Grundlage:** Mitglied wie Entscheid 14 (Ziele lesen, Projekte auflisten, eingereichte Ideen lesen, eigene Ideen erfassen). Admin verwaltet Zugänge, Stammdaten, Schnittstellen und Webhooks.
+   - **Technisch** sind steuern, Gremium, mitlesen und «alle Portfolios lesen» Leserechte, führen und «alle Portfolios führen» Bearbeitungsrechte (Entscheid 13 gilt für alle); die übergreifenden Rollen hängen an der Organisation. Die Oberfläche spricht von «alle Portfolios», nicht von «Organisation». PPMO und PMO sind keine eigenen Rollen: Wer mitführt, erhält «führen».
+   - **Referenzkunde:** UE und PMO führen alle Portfolios, die GL liest alle Portfolios; Portfolio A mit Gremium PRAT, Portfolio B mit Gremium GLPA; je Direktion ein Portfolio C, das die Direktion steuert und dessen Gremium sie ist; führen kann sie es selbst oder über die UE.
+   - **Bauplan, ohne Änderung an identity-kit:** (1) Jede Rolle enthält nur Rechte, die an ihrem Ort gelten; was nur an der Organisation gilt (Ziele, Monatsabschluss, Phasenmodell …), steckt allein in «alle Portfolios führen». So zeigen Startseite und Navigation («Recht irgendwo») nur, was die Person auch tun kann. (2) Damit «Portfolio führen» die Projektdetails schreiben darf, prüfen die Policies der Projektdetails (Muster KIND) zusätzlich das Recht am Portfolio des Projekts, wie es das Muster BETRAG schon tut; `app.has_permission(recht, typ, id)` zählt bewusst nur den Ort selbst.
+19. **Funktionsbaum und Use Cases nach den Entscheiden 12 bis 18 nachgeführt** (29.10.2026; Generator `anhang/generator/`):
+   - **Akteure:** Die Use Cases behalten die Akteure des Referenzkunden (PL, UE, PRAT …). SP heisst neu **AG** (Projektauftraggeber:in); die CTL fällt weg; FI und RM gehen in der UE auf. Primärakteure: UC-007 PL, AG; UC-009 UE; UC-010 UE; UC-011 GL, UE.
+   - **Vermerk statt Sperre (G1):** Der Standardablauf beschreibt weiterhin den Weg mit Quality-Check, Unterschrift und Entscheid; neue Alternativabläufe zeigen, wie es ohne Vermerk weitergeht: UC-001 A6 Initialisierung vor dem Entscheid, UC-002 A7 und UC-003 A7 «Weiter ohne Vermerk», UC-007 A3 Änderung vor dem Entscheid übernehmen, UC-011 A3 Roadmap vor der Freigabe, UC-015 A3 Abschliessen vor der Abnahme. UC-003 A5: Eine verweigerte Unterschrift ist ein Vermerk und schickt den Vertrag nicht zurück. UC-005: Der Monatsabschluss ist auch mit ungeprüften Berichten möglich; UC-006 A2: Ein Traktandum mit unvollständigen Unterlagen kann mit Vermerk behandelt werden.
+   - **Nachvollziehbarkeit statt Sperre (G2):** UC-004 A4 Bericht nach dem Einreichen ändern, UC-005 A4 Änderung nach dem Abschluss, UC-006 Änderungen nach dem Versand, UC-011 Änderungen nach der Vorlage, UC-015 Änderungen nach dem Abschluss, UC-018 Verlauf am Objekt.
+   - **Rollen und Zugriff:** UC-002 Schritt 2 Projektorganisation ohne Wirkung auf den Zugriff, mit freien Funktionen (Entscheide 16, 17); UC-016 neu mit vorgegebenen Rollen, Zugriff direkt am Projekt (A2) und eigenen Rollen der Organisation (A3); UC-017 Portfolios je Direktion; UC-001 und UC-002 nutzen Entscheid 14.
+   - **Funktionsbaum:** AM.01.02 ergänzt die vorgegebenen Rollen um eigene Rollen der Organisation; DM.02.06 und PP.04.04 beschreiben Vermerke bzw. die Projektorganisation ohne Zugriff; die Akteure der Business Cases folgen den Regeln oben.
+   - **Offen:** PDFs neu erzeugen (Abschnitt 13); die Klärungsliste (Master-Session) und die UX-Schicht sind noch nicht angepasst.
+20. **UX-Schicht nach den Entscheiden 12 bis 19 nachgeführt** (29.10.2026; [ux/](ux/README.md)): neue Projektentscheide UX-E12 Vermerk statt Sperre, UX-E13 Verlauf am Objekt statt Sperre, UX-E14 Bereich «Zugriff» in Projektakte und Portfolio; Sperren bleiben nur für unvollständige Eingaben. Nutzungskontexte ohne CTL, FI und RM, AG statt SP; Sichtbarkeit je Rolle nach den Rollen von Entscheid 18 mit den Entscheiden 13 und 14; UI-51 Zugriff und UI-52 Alle Projekte; UX-OF-11, 12 und 13 entschieden, neu UX-OF-19 (viele Kopfkarten); Kernabläufe K1–K6 mit Vermerken, Versionen nach Einreichen, Versand und Vorlage und zwei Unterschriften (AG, PL).
+21. **Bauplan nach den Entscheiden 12 bis 20 nachgeführt** (29.10.2026; [fachmodell.md](fachmodell.md)): Rollen 3.3 nach Entscheid 18 mit Migration der Tupel (A-70); Rechte `projekt:list` und `idee:list`, Projektrechte auch am Portfolio (3.2); Lesesicht mit Auflisten und Rechten am Portfolio für die Projektdetails (3.4, A-73); Funktion und Zugriff getrennt (A-71, A-72); Vermerk statt Sperre (A-74) und Versionen statt Sperre (A-75); 16 abgelöste Annahmen als «ersetzt» markiert; neue Pakete AP-E8-1 bis AP-E8-5 (Migrationen 420–469).
 
 **Vorgeschlagen, nicht entschieden**
 
 - **V10 Bewertungsmodell:** PP.01.02 «Bewertungsmodell festlegen» verlangt heute «Kriterien und Gewichte». Laut Q8 sind Kriterienraster und Priorisierungskriterien eine Orientierung für eine Gesamtbeurteilung, kein Rechenmodell. Vorschlag: Das System führt die Kriterien als Checkliste mit Einschätzung je Kriterium, rechnet aber keinen gewichteten Score. Offen, bis die Insel Gruppe entschieden hat, ob sie einen Score will (siehe offene Punkte).
+- **V14 Rollenvorlagen:** *ersetzt* durch Entscheid 18.
 
 ## 11. Annahmen
 
@@ -191,7 +256,9 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 
 ## 12. Offene Punkte
 
-Alle offenen Punkte mit Fundstelle und Vorschlag von CSP als Fragen K01–K25: [anhang/klaerungsliste.md](anhang/klaerungsliste.md).
+**Produkt:** keine offenen Punkte; die Fragen zum Rollenmodell sind mit den Entscheiden 13 bis 18 geklärt.
+
+**Referenzkunde Insel Gruppe:** Alle offenen Punkte mit Fundstelle und Vorschlag von CSP als Fragen K01–K25: [anhang/klaerungsliste.md](anhang/klaerungsliste.md).
 
 Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung für Kategorie B und C, Reihenfolge Vertragsfreigabe und Gate, Berichtsrhythmus und Frist, Freigabe des Berichts durch den Sponsor (keine), Ampel (eine Ampel plus Trend), Zuordnung Kategorie A = Transformationsprogramm, PM-Handbuch als Quelle.
 
@@ -213,12 +280,13 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
-2. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
-3. V10 mit der Insel Gruppe klären.
-4. Rückfluss der UX-Schicht an die Use Cases entscheiden und übernehmen; offene Fragen UX-OF-1–18 mit der Insel Gruppe klären ([ux/fahrplan.md](ux/fahrplan.md#offene-fragen)).
-5. Prototyp-Test der Kernabläufe K1–K6 mit PL, UE und PRAT vorbereiten (Durchspielen nach [ux/rahmen/pruefung.md](ux/rahmen/pruefung.md)), beginnend mit K1 und K3.
-6. Offene Punkte mit der Insel Gruppe klären.
+1. Entscheide 12 bis 18 umsetzen: Funktionsbaum und Use Cases (Entscheid 19), UX-Schicht (Entscheid 20) und Bauplan (Entscheid 21) sind nachgeführt; offen ist der Code mit den Paketen AP-E8-1 bis AP-E8-5 ([fachmodell.md](fachmodell.md) Abschnitt 7.3).
+2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
+3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
+4. V10 mit der Insel Gruppe klären.
+5. Rückfluss der UX-Schicht an die Use Cases entscheiden und übernehmen; offene Fragen UX-OF-1–18 mit der Insel Gruppe klären ([ux/fahrplan.md](ux/fahrplan.md#offene-fragen)).
+6. Prototyp-Test der Kernabläufe K1–K6 mit PL, UE und PRAT vorbereiten (Durchspielen nach [ux/rahmen/pruefung.md](ux/rahmen/pruefung.md)), beginnend mit K1 und K3.
+7. Offene Punkte mit der Insel Gruppe klären.
 
 ## 14. Anhang und Pflege
 
@@ -235,6 +303,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 **Pflege**
 
 - Dieses Masterdokument ist führend. Neue Entscheide, Annahmen und offene Punkte zuerst hier eintragen.
+- Die Produktgrundsätze (Abschnitt 0) gehen allem vor. Neue Grundsätze hinten anfügen, nie umnummerieren. Widerspricht eine neue Quelle einem Grundsatz, als Entscheid festhalten, wie das Produkt sie umsetzt. Was nur für den Referenzkunden gilt, steht in den Abschnitten 4 und 5 und in der Klärungsliste.
 - Inhaltliche Quelle für Funktionsbaum und Use Cases sind `anhang/generator/daten.py`, `anhang/generator/uc_daten.py` und für die ausformulierten Use Cases `anhang/generator/uc_texte.py`; Anhang-Markdown, JSON und PDFs werden daraus erzeugt. Markdown und JSON erzeugt `anhang/generator/markdown.py`; die ausformulierten Use Cases liefert `use_cases_pdf.py` als `uc_ausformuliert.md`. Abschnitte 8 und 9 hier nachführen, wenn sich diese Daten ändern.
 - IDs nie umnummerieren; Neues hinten anfügen, Gestrichenes als «entfällt» markieren.
 - UX-Schicht: Ändert sich ein Use Case eines Kernablaufs, den Ablauf in `ux/ablaeufe/` nachführen. Vor jeder Oberfläche den Kernablauf lesen; jede Umsetzung mit Oberfläche erfüllt die UX-Definition of Done (`ux/rahmen/pruefung.md`). `ux/rahmen/` nicht projektbezogen ändern.

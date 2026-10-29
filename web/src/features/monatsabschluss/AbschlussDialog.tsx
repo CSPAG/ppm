@@ -25,15 +25,13 @@ export function AbschlussDialog({ kopf, onClose, abschliessen, eingereichteZeige
       <button type="button" className="btn" onClick={onClose} data-autofocus>{TM.abschluss.weiter}</button>
       {a.moeglich ? <button type="button" className="btn primary" onClick={abschliessen} disabled={beschaeftigt}><Icon name="lock" />{TM.aktion.abschliessen}</button> : null}
     </>}>
-      {a.sperre ? (
-        <Hinweis stufe="sperre" aktion={<button type="button" className="btn sm" onClick={eingereichteZeigen}>{TM.aktion.eingereichteZeigen}</button>}>{a.sperre}</Hinweis>
-      ) : (
-        <>
-          <p>{TM.abschluss.wirkung(kopf.anzahl.projekte, a.geprueft, a.nichtGemeldet)}</p>
-          {a.nichtGemeldet ? <Hinweis stufe="warnung">{TM.abschluss.nichtGemeldet(a.nichtGemeldet, fmtPeriode(kopf.vorperiode).split(' ')[0]!)}</Hinweis> : null}
-          <p>{TM.abschluss.dashboard(p.split(' ')[0]!, ab)}</p>
-        </>
-      )}
+      {/* ungeprüfte Berichte: Warnung statt Sperre, abschliessen geht mit Vermerk (UC-005 Schritt 5, UX-E12) */}
+      {a.hinweis ? (
+        <Hinweis stufe="warnung" aktion={<button type="button" className="btn sm" onClick={eingereichteZeigen}>{TM.aktion.eingereichteZeigen}</button>}>{a.hinweis}</Hinweis>
+      ) : null}
+      <p>{TM.abschluss.wirkung(kopf.anzahl.projekte, a.geprueft, a.nichtGemeldet)}</p>
+      {a.nichtGemeldet ? <Hinweis stufe="warnung">{TM.abschluss.nichtGemeldet(a.nichtGemeldet, fmtPeriode(kopf.vorperiode).split(' ')[0]!)}</Hinweis> : null}
+      <p>{TM.abschluss.dashboard(p.split(' ')[0]!, ab)}</p>
     </Dialog>
   );
 }

@@ -40,10 +40,10 @@ describe('Zugang entziehen und Neubesetzung', () => {
       return { h: { authorization: l.authorization }, id: l.principalId, sub };
     };
     adm = await mk('u-adm', 'org-admin');
-    pl = await mk('u-pl', 'leser');
-    nachfolge = await mk('u-nachfolge', 'leser');
-    leser = await mk('u-leser', 'leser');
-    await grant(api, tenantId, `user:${pl.id}`, 'pl', { type: 'projekt', id: projekt });
+    pl = await mk('u-pl', 'mitglied');
+    nachfolge = await mk('u-nachfolge', 'mitglied');
+    leser = await mk('u-leser', 'mitglied');
+    await grant(api, tenantId, `user:${pl.id}`, 'projekt-fuehren', { type: 'projekt', id: projekt });
     await grant(api, tenantId, `user:${pl.id}`, 'gremium', { type: 'portfolio', id: portfolio });
   });
   after(async () => { await api?.close(); });
@@ -68,9 +68,9 @@ describe('Zugang entziehen und Neubesetzung', () => {
     const v = await call('GET', `/v1/zugaenge/${pl.id}`, adm.h);
     assert.equal(v.statusCode, 200, v.body);
     const vb = v.json();
-    assert.deepEqual(vb.orgRollen.map((r: { rolle: string }) => r.rolle), ['leser']);
-    assert.deepEqual(vb.rollen.map((r: { ort: { typ: string }; rolle: string }) => `${r.ort.typ}:${r.rolle}`), ['portfolio:gremium', 'projekt:pl']);
-    assert.equal(vb.rollen.find((r: { rolle: string }) => r.rolle === 'pl').rolleName.length > 2, true);
+    assert.deepEqual(vb.orgRollen.map((r: { rolle: string }) => r.rolle), ['mitglied']);
+    assert.deepEqual(vb.rollen.map((r: { ort: { typ: string }; rolle: string }) => `${r.ort.typ}:${r.rolle}`), ['portfolio:gremium', 'projekt:projekt-fuehren']);
+    assert.equal(vb.rollen.find((r: { rolle: string }) => r.rolle === 'projekt-fuehren').rolleName.length > 2, true);
     assert.deepEqual(vb.aufgaben.map((a: { titel: string }) => a.titel), ['Statusbericht Oktober erstellen']);
     assert.equal(vb.can.entziehen, true);
 
@@ -94,12 +94,12 @@ describe('Zugang entziehen und Neubesetzung', () => {
 
     // Detail: Rollen offen, bis jemand sie am Ort wieder hat
     let d = (await call('GET', `/v1/neubesetzungen/${id}`, adm.h)).json();
-    assert.deepEqual(d.rollen.map((r: { rolle: string; besetzt: boolean }) => [r.rolle, r.besetzt]), [['gremium', false], ['pl', false]]);
+    assert.deepEqual(d.rollen.map((r: { rolle: string; besetzt: boolean }) => [r.rolle, r.besetzt]), [['gremium', false], ['projekt-fuehren', false]]);
     assert.deepEqual(d.aufgaben.map((x: { titel: string }) => x.titel), ['Statusbericht Oktober erstellen']);
     assert.deepEqual([d.neubesetzung.person.name, d.neubesetzung.rollen, d.neubesetzung.offeneRollen, d.neubesetzung.erledigt, d.neubesetzung.entzogenVon.id], ['u-pl', 2, 2, false, adm.id]);
-    await grant(api, tenantId, `user:${nachfolge.id}`, 'pl', { type: 'projekt', id: projekt });
+    await grant(api, tenantId, `user:${nachfolge.id}`, 'projekt-fuehren', { type: 'projekt', id: projekt });
     d = (await call('GET', `/v1/neubesetzungen/${id}`, adm.h)).json();
-    assert.deepEqual(d.rollen.map((r: { rolle: string; besetzt: boolean }) => [r.rolle, r.besetzt]), [['gremium', false], ['pl', true]]);
+    assert.deepEqual(d.rollen.map((r: { rolle: string; besetzt: boolean }) => [r.rolle, r.besetzt]), [['gremium', false], ['projekt-fuehren', true]]);
     assert.equal(d.neubesetzung.offeneRollen, 1);
 
     // Liste: offen bis zum Erledigen im Eingang
@@ -116,15 +116,15 @@ describe('Zugang entziehen und Neubesetzung', () => {
   });
 
   test('ohne Rollen und Aufgaben: entzogen, keine Aufgabe; geliehene Rollen der Vertretung zählen nicht', async () => {
-    const o = await mk('u-ohne', 'leser');
+    const o = await mk('u-ohne', 'mitglied');
     const ohne = { principalId: o.id };
     // Vertretung einer Person mit Rolle sp am Projekt: befristete Rolle der Vertretung
-    const vertreten = await mk('u-vertreten', 'leser');
-    await grant(api, tenantId, `user:${vertreten.id}`, 'sp', { type: 'projekt', id: projekt });
+    const vertreten = await mk('u-vertreten', 'mitglied');
+    await grant(api, tenantId, `user:${vertreten.id}`, 'projekt-steuern', { type: 'projekt', id: projekt });
     const heute = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(new Date());
     const s = await call('POST', '/v1/stellvertretungen', vertreten.h, { vertreter: ohne.principalId, von: heute, bis: heute });
     assert.equal(s.statusCode, 201, s.body);
-    assert.equal(await sys(async tx => (await tx.query("SELECT count(*)::int AS n FROM ppm.authz_tuple WHERE subject = $1 AND relation = 'sp'", [`user:${ohne.principalId}`])).rows[0].n), 1);
+    assert.equal(await sys(async tx => (await tx.query("SELECT count(*)::int AS n FROM ppm.authz_tuple WHERE subject = $1 AND relation = 'projekt-steuern'", [`user:${ohne.principalId}`])).rows[0].n), 1);
     const v = (await call('GET', `/v1/zugaenge/${ohne.principalId}`, adm.h)).json();
     assert.deepEqual(v.rollen, []);
     const e = await call('POST', `/v1/zugaenge/${ohne.principalId}/entziehen`, adm.h);
@@ -136,9 +136,9 @@ describe('Zugang entziehen und Neubesetzung', () => {
   });
 
   test('Fehler im Baukasten: nichts entzogen; der nächste Versuch nimmt es wieder auf', async () => {
-    const w = await mk('u-wieder', 'leser');
+    const w = await mk('u-wieder', 'mitglied');
     const p = { principalId: w.id };
-    await grant(api, tenantId, `user:${p.principalId}`, 'kt', { type: 'projekt', id: projekt });
+    await grant(api, tenantId, `user:${p.principalId}`, 'projekt-mitlesen', { type: 'projekt', id: projekt });
     kc.fail.push({ re: /^DELETE \/organizations\/.*\/members\//, status: 500 });
     const e1 = await call('POST', `/v1/zugaenge/${p.principalId}/entziehen`, adm.h);
     assert.ok(e1.statusCode >= 500, e1.body);
@@ -153,8 +153,8 @@ describe('Zugang entziehen und Neubesetzung', () => {
   });
 
   test('Entfernen unter «Benutzer und Rollen» (Route des Baukastens) löst die Neubesetzung aus (Haken member.removing/removed)', async () => {
-    const p = await mk('u-baukasten', 'leser');
-    await grant(api, tenantId, `user:${p.id}`, 'ctl', { type: 'projekt', id: projekt });
+    const p = await mk('u-baukasten', 'mitglied');
+    await grant(api, tenantId, `user:${p.id}`, 'projekt-mitlesen', { type: 'projekt', id: projekt });
     const r = await call('DELETE', `/v1/admin/members/${p.sub}`, adm.h);
     assert.equal(r.statusCode, 200, r.body);
     const liste = (await call('GET', '/v1/neubesetzungen', adm.h)).json().items;
@@ -162,7 +162,7 @@ describe('Zugang entziehen und Neubesetzung', () => {
     assert.ok(nb, JSON.stringify(liste));
     assert.deepEqual([nb.rollen, nb.offeneRollen, nb.erledigt, nb.entzogenVon?.id], [1, 1, false, adm.id]);
     const d = (await call('GET', `/v1/neubesetzungen/${nb.id}`, adm.h)).json();
-    assert.deepEqual(d.rollen.map((x: { rolle: string }) => x.rolle), ['ctl']);
+    assert.deepEqual(d.rollen.map((x: { rolle: string }) => x.rolle), ['projekt-mitlesen']);
     const a = (await call('GET', '/v1/eingang', adm.h)).json().items.find((x: { bezug: { id: string } }) => x.bezug.id === nb.id);
     assert.equal(a?.titel, 'Rollen von u-baukasten neu besetzen');
     // Während des Entfernens keine Mitteilung je entzogener Rolle
@@ -171,14 +171,14 @@ describe('Zugang entziehen und Neubesetzung', () => {
   });
 
   test('Rollen setzen informiert die Person (UC-016 Schritt 3): erhalten und entzogen, nicht für die eigene Person', async () => {
-    const p = await mk('u-rolle', 'leser');
+    const p = await mk('u-rolle', 'mitglied');
     const texte = async () => (await call('GET', '/v1/mitteilungen', p.h)).json().items.map((x: { text: string }) => x.text);
-    const setzen = await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['leser', 'pmo'] });
+    const setzen = await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['mitglied', 'alle-fuehren'] });
     assert.equal(setzen.statusCode, 200, setzen.body);
     const nach1 = await texte();
     assert.equal(nach1.length, 1, JSON.stringify(nach1));
     assert.match(nach1[0], /^Du hast die Rolle «.+» in der Organisation erhalten\.$/);
-    assert.equal((await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['leser'] })).statusCode, 200);
+    assert.equal((await call('PUT', `/v1/admin/members/${p.sub}/roles`, adm.h, { roles: ['mitglied'] })).statusCode, 200);
     const nach2 = await texte();
     assert.equal(nach2.length, 2);
     assert.ok(nach2.some((t: string) => /^Deine Rolle «.+» in der Organisation wurde entzogen\.$/.test(t)), JSON.stringify(nach2));

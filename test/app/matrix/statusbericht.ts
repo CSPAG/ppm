@@ -24,8 +24,8 @@ export const matrix: Matrix = {
     "ppm.periode.periode_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('periode:close'::text) CHECK app.has_permission('periode:close'::text)",
     // Statusbericht, Muster KIND (Schreiben statusbericht:write, Prüfung statusbericht:review)
     'ppm.statusbericht.statusbericht_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.statusbericht.statusbericht_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id)",
-    "ppm.statusbericht.statusbericht_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (app.has_permission('statusbericht:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
+    "ppm.statusbericht.statusbericht_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('statusbericht:write'::text, projekt_id)",
+    "ppm.statusbericht.statusbericht_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('statusbericht:write'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id))) CHECK (ppm.recht_am_projekt('statusbericht:write'::text, projekt_id) OR app.has_permission('statusbericht:review'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))",
   ],
   tags: ['Statusberichte'],
   seed: async (api, a, mark) => {
@@ -46,6 +46,7 @@ export const matrix: Matrix = {
     'GET /v1/statusberichte/stand': i => ({ method: 'GET', url: `/v1/statusberichte/stand?projektId=${i.berichtProjekt}`, kind: 'list' }),
     'GET /v1/projekte/:id/berichte': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte`, kind: 'foreign' }),
     'GET /v1/projekte/:id/berichte/:periode': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}`, kind: 'foreign' }),
+    'GET /v1/projekte/:id/berichte/:periode/verlauf': i => ({ method: 'GET', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/verlauf`, kind: 'foreign' }),
     'PUT /v1/projekte/:id/berichte/:periode': i => ({ method: 'PUT', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}`, body: { entscheide: 'gehackt' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'POST /v1/projekte/:id/berichte/:periode/einreichen': i => ({ method: 'POST', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/einreichen`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'POST /v1/projekte/:id/berichte/:periode/zurueckziehen': i => ({ method: 'POST', url: `/v1/projekte/${i.berichtProjekt}/berichte/${periode()}/zurueckziehen`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),

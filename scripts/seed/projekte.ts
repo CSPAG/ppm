@@ -272,16 +272,28 @@ export async function projektAnlegen(k: Kontext, d: ProjektDef): Promise<Projekt
   return pj;
 }
 
+/**
+ * Projektorganisation (Projektergebnis, A-72) und getrennt davon der Zugriff am Projekt (Master Entscheid 16): PL und CTL
+ * führen, Projektauftraggeber:in steuert, Kernteam liest mit. Bestehende Freigaben (Vorschlag beim Entstehen) bleiben.
+ */
 export async function organisation(k: Kontext, pj: Projekt, ifMatch?: string): Promise<void> {
-  const akv: Record<string, string> = { sp: 'Auftrag erteilen, Mittel sichern, Änderungen entscheiden', pl: 'Projekt führen und berichten', ctl: 'Klinische Sicht und Einführung verantworten', kt: 'Fachliche Mitarbeit' };
+  const akv = { sp: 'Auftrag erteilen, Mittel sichern, Änderungen entscheiden', pl: 'Projekt führen und berichten', ctl: 'Klinische Sicht und Einführung verantworten', kt: 'Fachliche Mitarbeit' };
   const mitglieder = [
     { personId: pid(k, pj.sp), funktion: 'sp', akv: akv.sp },
     { personId: pid(k, pj.pl), funktion: 'pl', akv: akv.pl },
-    ...(pj.ctl ? [{ personId: pid(k, pj.ctl), funktion: 'ctl', akv: akv.ctl }] : []),
-    ...pj.kt.map(x => ({ personId: pid(k, x), funktion: 'kt', akv: akv.kt })),
+    ...(pj.ctl ? [{ personId: pid(k, pj.ctl), funktion: 'weitere', funktionText: 'Clinical Transformation Lead', akv: akv.ctl }] : []),
+    ...pj.kt.map(x => ({ personId: pid(k, x), funktion: 'weitere', funktionText: 'Kernteam', akv: akv.kt })),
   ];
   const url = `/v1/projekte/${pj.id}/organisation`;
   await k.p.ursula.put(url, { mitglieder }, ifMatch ?? (await k.p.ursula.get(url)).etag);
+  const zugriff: [PersonKey, string][] = [
+    [pj.sp, 'projekt-steuern'], [pj.pl, 'projekt-fuehren'], ...(pj.ctl ? [[pj.ctl, 'projekt-fuehren'] as [PersonKey, string]] : []),
+    ...pj.kt.map(x => [x, 'projekt-mitlesen'] as [PersonKey, string]),
+  ];
+  for (const [wer, relation] of zugriff) {
+    const r = await k.p.ursula.try('POST', '/v1/access', { subject: `user:${pid(k, wer)}`, relation, type: 'projekt', id: pj.id });
+    if (r.status >= 300 && r.status !== 409) throw new Error(`Zugriff ${relation} für ${wer} an ${pj.nummer}: ${r.status} ${JSON.stringify(r.body)}`);
+  }
 }
 
 export const def = (key: string) => PROJEKTE.find(d => d.key === key);
@@ -318,7 +330,10 @@ async function kapitelInitial(k: Kontext, d: ProjektDef, pj: Projekt, v: string)
     meilensteine,
     termine: { projektStart: `${monat(phaseStart(d, 'P0'))}-01`, phasenStart: `${monat(phaseStart(d, d.phase === 'P0' ? 'P1' : d.phase))}-01`, phasenExit: monatsende(monat(d.plan[d.phase === 'P0' ? 'P1' : d.phase])), projektabschluss: monatsende(monat(d.plan.P4)) },
   });
-  await kapitel(pl, v, 8, { mitglieder: [['sp', pj.sp], ['pl', pj.pl], ...(pj.ctl ? [['ctl', pj.ctl]] : [])].map(([funktion, wer]) => ({ personId: pid(k, wer as PersonKey), funktion, akv: '' })) });
+  await kapitel(pl, v, 8, { mitglieder: [
+    { personId: pid(k, pj.sp), funktion: 'sp', akv: '' }, { personId: pid(k, pj.pl), funktion: 'pl', akv: '' },
+    ...(pj.ctl ? [{ personId: pid(k, pj.ctl), funktion: 'weitere', funktionText: 'Clinical Transformation Lead', akv: '' }] : []),
+  ] });
   const kosten = ab.flatMap(p => {
     const b = d.budget[p] ?? 50_000;
     return [

@@ -34,10 +34,10 @@ describe('Aufgabe «Zielerreichung erfassen»', () => {
 
   before(async () => {
     api = await testApi();
-    const g = await login(api, 'demo', 'u-gl', 'gl');
+    const g = await login(api, 'demo', 'u-gl', 'alle-fuehren');
     T = g.tenantId;
     gl = { authorization: g.authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
   });
   after(async () => { await api?.close(); });
 

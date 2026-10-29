@@ -15,6 +15,7 @@ import {
   actorOf, conflict, etag, IdempotencyHeaders, IdParams, IfMatchHeaders, invalid, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx,
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
+import { projekt as projektAktion } from '../projekt/index.ts';
 import { projektdaten } from '../projektdaten/index.ts';
 import { traktandum } from '../sitzung/index.ts';
 import { vertrag } from '../vertrag/index.ts';
@@ -22,6 +23,7 @@ import { erstellenErledigen } from './folge.ts';
 import { lessonOut } from './lessons-routes.ts';
 import { SCHEMAS, type AbschlussInT, type AbschlussOut, type NutzenInT, type WiederaufnahmeInT } from './schemas.ts';
 import * as store from './store.ts';
+import { abschlussVermerke, vorabAbschliessbar } from './vermerk.ts';
 
 export const TAG = 'Abschluss';
 
@@ -106,7 +108,9 @@ export async function ausgabe(req: FastifyRequest, tx: Tx, p: store.ProjektKopf)
       wiederaufnahme: schreiben && p.lebenszyklus === 'sistiert',
       lessons: schreiben && p.lebenszyklus !== 'zurueckgezogen',
       dokument: !!b,
+      abschliessen: schreiben && vorabAbschliessbar(p, offen),
     },
+    vermerke: abschlussVermerke(p, offen),
   };
 }
 
@@ -268,6 +272,32 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       return ausgabe(req, tx, p);
     });
     reply.header('etag', etag(out.bericht!.version));
+    return out;
+  });
+
+  app.post('/v1/projekte/:id/abschluss/abschliessen', {
+    schema: {
+      tags: [TAG], summary: 'Vor der Abnahme abschliessen', params: IdParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Abschluss') },
+      description: 'UC-015 A3 (A-74): PL oder UE schliessen das Vorhaben, bevor das Gremium den Abschlussbericht abnimmt. Das Projekt ist «abgeschlossen» und lesend, '
+        + 'mit dem Vermerk «Abnahme offen»; das Traktandum bleibt offen. Die Abnahme löst den Vermerk; «Nacharbeiten» nimmt den Abschluss zurück. '
+        + 'Voraussetzung: eingereichter Abschlussbericht (sonst 409). `projekt:write`; `If-Match` = Stand des Berichts.',
+    },
+  }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const erwartet = requireIfMatch(req);
+    const p = await req.tx(tx => sichtbar(tx, id));
+    await req.need('projekt:write', projektOrt(p.id));
+    const who = actorOf(req);
+    const out = await req.tx(async tx => {
+      const b = await store.offenerBericht(tx, p.id);
+      if (!vorabAbschliessbar(p, b)) {
+        throw conflict('Abschliessen setzt einen eingereichten Abschlussbericht voraus; reiche ihn zuerst ein.', { reason: 'bericht', stand: b?.stand ?? null });
+      }
+      if (b!.version !== erwartet) throw preconditionFailed(b!.version);
+      await projektAktion.lebenszyklusWechseln(tx, who, p.id, 'abgeschlossen', { vorAbnahme: true, berichtId: b!.id });
+      return ausgabe(req, tx, (await sichtbar(tx, id)));
+    });
+    reply.header('etag', etag(out.bericht?.version ?? 0));
     return out;
   });
 

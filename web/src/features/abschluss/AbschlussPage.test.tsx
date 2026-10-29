@@ -35,7 +35,7 @@ const abschluss = (o: Record<string, unknown> = {}, b: Record<string, unknown> |
     nutzenpruefung: { version: '4.0', beurteilung: 'Nutzen stabil', werte: [{ kpiId: KPI, wert: '25', bemerkung: '' }] },
   },
   lessonsLearned: [], entscheid: null,
-  can: { bearbeiten: true, einreichen: true, nutzenSp: false, nutzenUe: false, wiederaufnahme: false, lessons: true, dokument: true }, ...o,
+  can: { bearbeiten: true, einreichen: true, nutzenSp: false, nutzenUe: false, wiederaufnahme: false, lessons: true, dokument: true, abschliessen: false }, vermerke: [], ...o,
 });
 
 const PL_ME: Partial<Me> = { roles: [], permissions: ['tenant:read'] };

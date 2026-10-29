@@ -6,10 +6,11 @@
 import type { Tx } from '@vollholz/platform';
 import { laufendePeriode } from './bericht.ts';
 import {
-  abschlussSperre, auffaelligkeiten, eingereichterBericht, fristen, rang, register, vorperiodeVon, zeilenStand,
+  auffaelligkeiten, eingereichterBericht, fristen, rang, register, vorperiodeVon, zeilenStand,
 } from './pruefung.ts';
 import type { PeriodenstandOut, PeriodeQueryIn, PeriodeZeileOut } from './pruefung-schemas.ts';
 import * as pstore from './pruefung-store.ts';
+import { abschlussHinweis, berichtVermerke } from './vermerk.ts';
 
 /** Rechte der anfragenden Person (aus `req.can`), je Portfolio gecacht. */
 export interface Rechte {
@@ -36,8 +37,10 @@ export function zeileOffen(z: pstore.ZeileRow, auff: PeriodeZeileOut['auffaellig
     geprueftAt: z.geprueft_at,
     eingefordertAt: z.eingefordert_at,
     version: z.version ?? 0,
+    vermerke: berichtVermerke(z.stand ?? '', !offen),
     can: {
-      bestaetigen: darf && stand === 'eingereicht',
+      // nach dem Abschluss lässt sich die Prüfung nachtragen (Vermerk «nicht geprüft», A-74)
+      bestaetigen: pruefen && stand === 'eingereicht',
       rueckfrage: darf && (stand === 'eingereicht' || stand === 'geprueft'),
       einfordern: darf && stand === 'ausstehend' && z.pflichtig,
       zuruecknehmen: darf && stand === 'geprueft',
@@ -45,15 +48,18 @@ export function zeileOffen(z: pstore.ZeileRow, auff: PeriodeZeileOut['auffaellig
   };
 }
 
-function zeileAbgeschlossen(z: pstore.StandRow, periode: string): PeriodeZeileOut {
+function zeileAbgeschlossen(z: pstore.StandRow, periode: string, pruefen: boolean): PeriodeZeileOut {
+  // mit dem eingereichten Bericht abgeschlossen: «eingereicht» mit Vermerk, die Prüfung lässt sich nachtragen (A-74)
+  const ungeprueft = z.gemeldet && z.bericht_stand === 'eingereicht';
   return {
     projektId: z.projekt_id, projektNummer: z.nummer, projektName: z.name, portfolioId: z.portfolio_id, portfolioName: z.portfolio_name,
-    phase: z.phase, stand: z.gemeldet ? 'geprueft' : 'nicht_gemeldet', entwurf: false,
+    phase: z.phase, stand: ungeprueft ? 'eingereicht' : z.gemeldet ? 'geprueft' : 'nicht_gemeldet', entwurf: false,
     status: z.status, trend: z.trend, abschlussPer: z.abschluss_per, naechsterMeilenstein: z.naechster_meilenstein,
     vorperiode: { periode: vorperiodeVon(periode), status: z.status_vorperiode, trend: z.vor_trend },
     auffaelligkeiten: [], nachRueckfrage: z.gemeldet && z.beantwortet, rueckfrage: null,
     eingereichtAt: z.eingereicht_at, geprueftAt: z.geprueft_at, eingefordertAt: null, version: z.version ?? 0,
-    can: { bestaetigen: false, rueckfrage: false, einfordern: false, zuruecknehmen: false },
+    vermerke: berichtVermerke(z.bericht_stand ?? '', true),
+    can: { bestaetigen: ungeprueft && pruefen, rueckfrage: false, einfordern: false, zuruecknehmen: false },
   };
 }
 
@@ -82,14 +88,15 @@ export async function uebersicht(tx: Tx, periode: string, rechte: Rechte): Promi
       items.push(zeileOffen(z, auff, await rechte.pruefen(z.portfolio_id), true));
     }
   } else {
-    items = (await pstore.standZeilen(tx, periode)).map(z => zeileAbgeschlossen(z, periode));
+    items = [];
+    for (const z of await pstore.standZeilen(tx, periode)) items.push(zeileAbgeschlossen(z, periode, await rechte.pruefen(z.portfolio_id)));
   }
   items.sort((a, b) => rang(a) - rang(b) || a.projektNummer.localeCompare(b.projektNummer));
 
   const zaehle = (s: PeriodeZeileOut['stand']) => items.filter(i => i.stand === s).length;
   const eingereicht = zaehle('eingereicht');
   const geprueft = zaehle('geprueft');
-  const sperre = !offen ? null : abschlussSperre(eingereicht);
+  const hinweis = !offen ? null : abschlussHinweis(eingereicht);
   const laufend = await laufendePeriode(tx);
   const darfAbschliessen = offen && periode <= laufend && (await rechte.abschliessen());
   return {
@@ -109,12 +116,13 @@ export async function uebersicht(tx: Tx, periode: string, rechte: Rechte): Promi
       fristen: await fristen(tx, periode),
       vorperiode: vorperiodeVon(periode),
       abschluss: {
-        moeglich: darfAbschliessen && !sperre,
-        sperre,
+        moeglich: darfAbschliessen,
+        hinweis,
         geprueft,
+        ungeprueft: eingereicht,
         nichtGemeldet: offen ? items.length - geprueft - eingereicht : zaehle('nicht_gemeldet'),
       },
-      can: { pruefen: offen && items.some(i => i.can.bestaetigen || i.can.rueckfrage || i.can.einfordern || i.can.zuruecknehmen), abschliessen: darfAbschliessen },
+      can: { pruefen: items.some(i => i.can.bestaetigen || i.can.rueckfrage || i.can.einfordern || i.can.zuruecknehmen), abschliessen: darfAbschliessen },
     },
   };
 }

@@ -5,10 +5,11 @@
  * Sprung zum Ziel (I-P4). Zustände: Laden (Z1), noch nicht gestartet (Z2), Fehler (Z5), nur lesen (Z8), zur Freigabe
  * und in Kraft (Z9), Ziel unbekannt (Z10).
  */
+import { useQuery } from '@tanstack/react-query';
 import { useId, useState } from 'react';
 import './Zielzyklus.css';
-import { newIdempotencyKey } from '../../api/index.ts';
-import { Empty, ErrorState, Hinweis, Icon, Skelett, Stand, useToast, useVerzoegert, type StandFamilie } from '../../ui/index.ts';
+import { newIdempotencyKey, api } from '../../api/index.ts';
+import { Empty, ErrorState, Hinweis, Icon, Skelett, Stand, useToast, useVerzoegert, type StandFamilie, GeaendertNach, Verlauf } from '../../ui/index.ts';
 import { useSession } from '../../auth/index.ts';
 import { useHandlungsfelder } from './api.ts';
 import { useZielzyklus, useZielzyklusMutations, type Zielzyklus } from './ZielzyklusApi.ts';
@@ -76,6 +77,7 @@ export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektO
           : (
             <>
               {zj.stand === 'zur_freigabe' ? <div className="notice" role="status"><Icon name="lock" /> {TZZ.zurFreigabe(jahr, (zj.vorgelegtAt ?? zj.updatedAt) as string)}</div> : null}
+              {zj.geaendertNachVorlage ? <p><GeaendertNach text={TZZ.geaendertNachVorlage} at={zj.geaendertNachVorlage as string} /></p> : null}
               {zj.stand === 'in_kraft' ? <div className="notice" role="status"><Icon name="check" /> {TZZ.inKraft(jahr, zj.freigabeAt as string | null)}</div> : null}
               {zj.stand === 'in_arbeit' && !q.data.can.write ? <p className="note">{TZZ.nurLesen}</p> : null}
               <div className="zz-flaeche">
@@ -88,6 +90,7 @@ export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektO
                   <Pruefbericht zyklus={q.data} onWaehlen={waehlen} />
                 </aside>
               </div>
+              {zj.stand !== 'in_arbeit' ? <ZyklusVerlauf jahr={jahr} version={zj.version} /> : null}
             </>
           )}
       </div>
@@ -175,4 +178,13 @@ function Pruefbericht({ zyklus, onWaehlen }: { zyklus: Zielzyklus; onWaehlen(n: 
       ))}
     </section>
   );
+}
+
+/** Verlauf der Jahresziele ab der Vorlage (UX-E13). */
+function ZyklusVerlauf({ jahr, version }: { jahr: number; version: number }) {
+  const q = useQuery({
+    queryKey: ['ziele', 'verlauf', jahr, version] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/ziele/{jahr}/verlauf', { params: { path: { jahr } }, signal })).data!.items,
+  });
+  return <Verlauf titel={TZZ.verlauf} eintraege={q.data} laedt={q.isPending} fehler={q.error} erneut={() => void q.refetch()} />;
 }

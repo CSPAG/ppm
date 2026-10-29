@@ -41,7 +41,11 @@ export const TS = {
   angelegt: 'Sitzung angelegt.',
   gone: 'Diese Sitzung gibt es nicht, oder du siehst sie nicht.',
   nurLesen: 'Du siehst die Sitzung lesend. Die Traktandenliste bereitet die Unternehmensentwicklung vor.',
-  versendetBanner: (z: string) => `Unterlagen versendet am ${z}. Die Traktandenliste ist fest.`,
+  versendetBanner: (z: string) => `Unterlagen versendet am ${z}. Änderungen bleiben bis zum Beginn möglich; sie sind für die Mitglieder als «geändert nach Versand» markiert.`,
+  geaendertNachVersand: 'geändert nach Versand',
+  unterlagenNachfuehren: 'Unterlagen nachführen',
+  unterlagenNachgefuehrt: 'Unterlagen nachgeführt, markiert «geändert nach Versand».',
+  verlauf: 'Verlauf',
   konflikt: 'Die Sitzung wurde inzwischen geändert und ist neu geladen; wiederhole deine letzte Aktion.',
 
   // Traktandenliste (K3 Schritte 2–3)
@@ -61,7 +65,7 @@ export const TS = {
   rueckgaengig: 'Rückgängig',
   eingeladen: 'Eingeladen',
   keineEinladung: 'niemand eingeladen',
-  funktion: { pl: 'PL', ctl: 'CTL', sp: 'SP', weitere: 'weitere' } as Record<string, string>,
+  funktion: { pl: 'PL', sp: 'Projektauftraggeber:in', weitere: 'weitere' } as Record<string, string>,
   antrag: 'Antrag',
   minuten: (n: number) => `${n} Min.`,
   ohneZeit: 'Zeitbedarf offen',
@@ -72,8 +76,8 @@ export const TS = {
   unterlagen: {
     bereit: 'Unterlagen bereit', quality_check_offen: 'Quality-Check offen', fehlt: 'Unterlagen fehlen', keine: 'keine Unterlagen nötig',
   } as Record<string, string>,
-  unterlagenWarnung: (titel: string, rest: string) => `Unterlagen für ${titel} fehlen; Versand ${rest}. Verschiebe das Traktandum auf die nächste Sitzung oder warte auf die Unterlagen.`,
-  qcWarnung: (titel: string) => `Quality-Check: offen für ${titel}. Ohne bestandenen Quality-Check wird das Geschäft nicht behandelt.`,
+  unterlagenWarnung: (titel: string, rest: string) => `Unterlagen für ${titel} fehlen; Versand ${rest}. Verschiebe das Traktandum auf die nächste Sitzung oder lass es mit dem Vermerk «Unterlagen fehlen» stehen.`,
+  qcWarnung: (titel: string) => `Quality-Check: offen für ${titel}. Verschiebe das Traktandum oder lass es mit dem Vermerk «Quality-Check offen» stehen; der Vermerk steht in Unterlagen und Protokoll.`,
   zeitbedarfHinweis: (ist: string, soll: string) => `Zeitbedarf: ${ist} statt höchstens ${soll}. Verschiebe ein Traktandum oder kürze die Zeit.`,
 
   // Vorschläge (K3 Schritt 1)
@@ -94,7 +98,7 @@ export const TS = {
     return `Die Mitglieder des ${g} erhalten ${teile.join(', ').replace(/, ([^,]*)$/, ' und $1')}.`;
   },
   versandEingeladene: (n: number) => (n === 1 ? '1 eingeladene Person erhält Einladung und Zeitfenster.' : `${n} Eingeladene erhalten Einladung und Zeitfenster.`),
-  versandVerschoben: (n: number) => `Projektleitung und Sponsor von ${n} verschobenen ${n === 1 ? 'Traktandum' : 'Traktanden'} werden informiert.`,
+  versandVerschoben: (n: number) => `Projektleitung und Projektauftraggeber:in von ${n} verschobenen ${n === 1 ? 'Traktandum' : 'Traktanden'} werden informiert.`,
   fristEingehalten: (n: number) => `Frist 5 Arbeitstage: eingehalten (${n} Arbeitstage vor der Sitzung).`,
   fristVerletzt: (n: number, soll: number) => `Versand: ${n} statt mindestens ${soll} Arbeitstage vor der Sitzung.`,
   versandWarnungen: (n: number) => `${n} ${n === 1 ? 'Traktandum hat' : 'Traktanden haben'} keine vollständigen Unterlagen.`,

@@ -3,9 +3,11 @@
  * mit Bearbeiten in der Schublade für Sponsor, Projektleitung und Programmleitung (`can.organisation`). Meilensteine,
  * Status und letzte Entscheide ergänzen die Pakete der Register und der Gremien (projektdaten, sitzung).
  */
-import { PersonName } from '@vollholz/iam-web';
+import { PersonName, useAccessList, useIamConfig } from '@vollholz/iam-web';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { ErrorState, fmtPhase, Icon, Loading, type Phase } from '../../ui/index.ts';
+import { api } from '../../api/index.ts';
+import { ErrorState, fmtPhase, Icon, Loading, Verlauf, type Phase } from '../../ui/index.ts';
 import { useOrganisation, useProjektNachNummer, type Organisation, type Projekt } from './api.ts';
 import { OrganisationDrawer } from './OrganisationDrawer.tsx';
 import { RegisterUebersicht } from './RegisterUebersicht.tsx';
@@ -32,19 +34,46 @@ function Phasenleiste({ phase }: { phase: Phase }) {
   );
 }
 
-const ORDNUNG = ['sp', 'koalition', 'pl', 'ctl', 'kt'] as const;
+/** Gruppen der Projektorganisation: Projektauftraggeber:in, Projektleitung, danach je Bezeichnung (A-72) in der Reihenfolge der Liste. */
+function gruppen(org: Organisation): { titel: string; mitglieder: Organisation['mitglieder'] }[] {
+  const out = new Map<string, { titel: string; mitglieder: Organisation['mitglieder'] }>();
+  for (const m of [...org.mitglieder].sort((a, b) => Number(a.funktion !== 'sp') - Number(b.funktion !== 'sp') || Number(a.funktion !== 'pl') - Number(b.funktion !== 'pl'))) {
+    const titel = m.funktion === 'weitere' ? m.funktionText : TP.funktionLang[m.funktion];
+    const k = titel.toLowerCase();
+    if (!out.has(k)) out.set(k, { titel, mitglieder: [] });
+    out.get(k)!.mitglieder.push(m);
+  }
+  return [...out.values()];
+}
 
-function OrganisationListe({ org }: { org: Organisation }) {
+/**
+ * Projektorganisation mit dem Hinweis «kein Zugriff» an Personen, die das Projekt nicht sehen (K2 Schritt 3, UX-E14):
+ * die Projektorganisation vergibt keinen Zugriff (Master Entscheid 16); wer hier Zugriff gibt, erhält die Aktion
+ * «Zugriff geben», die in den Bereich «Zugriff» führt. Ohne Liste der Zugriffe (Fehler, Laden) kein Hinweis.
+ */
+function OrganisationListe({ org, projekt }: { org: Organisation; projekt: Projekt }) {
+  const { router: { Link } } = useIamConfig();
+  const zugriff = useAccessList({ type: 'projekt', id: projekt.id }, org.mitglieder.length > 0);
+  const mit = zugriff.data ? new Set(zugriff.data.items.map(e => e.subject.ref)) : null;
+  const darf = !!zugriff.data?.grantable.length;
   if (!org.mitglieder.length) return <p className="empty">{TP.org.leer}</p>;
   return (
     <dl className="attrs pj-org">
-      {ORDNUNG.filter(f => org.mitglieder.some(m => m.funktion === f)).map(f => (
-        <div key={f} className="pj-org-g">
-          <dt>{TP.funktionLang[f]}</dt>
+      {gruppen(org).map(g => (
+        <div key={g.titel} className="pj-org-g">
+          <dt>{g.titel}</dt>
           <dd>
             <ul>
-              {org.mitglieder.filter(m => m.funktion === f).map(m => (
-                <li key={m.personId}><PersonName id={m.personId} />{m.akv ? <span className="muted small"> · {m.akv}</span> : null}</li>
+              {g.mitglieder.map(m => (
+                <li key={m.personId}>
+                  <PersonName id={m.personId} />{m.akv ? <span className="muted small"> · {m.akv}</span> : null}
+                  {mit && !mit.has(`user:${m.personId}`) ? (
+                    <span className="pj-ohne-zugriff">
+                      <span className="stand stand-neutral">{TP.org.ohneZugriff}</span>
+                      {darf ? <Link to={`/projekte/${projekt.nummer}/zugriff`} className="linkbtn">{TP.org.zugriffGeben}</Link> : null}
+                    </span>
+                  ) : null}
+                </li>
               ))}
             </ul>
           </dd>
@@ -62,6 +91,15 @@ function Angaben({ p }: { p: Projekt }) {
       <dt>{TP.uebersicht.stand}</dt><dd>{TP.lebenszyklus[p.lebenszyklus]}{p.vertraulich ? ` · ${TP.vertraulichHinweis}` : ''}</dd>
     </dl>
   );
+}
+
+/** Verlauf der Projektakte nach dem Abschluss (UX-E13, A-75): Abschluss und alle Änderungen danach, markiert. */
+function ProjektVerlauf({ id, version }: { id: string; version: number }) {
+  const q = useQuery({
+    queryKey: ['projekt', 'verlauf', id, version] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/projekte/{id}/verlauf', { params: { path: { id } }, signal })).data!.items,
+  });
+  return <Verlauf titel={TP.akte.verlauf} eintraege={q.data} laedt={q.isPending} fehler={q.error} erneut={() => void q.refetch()} />;
 }
 
 export function ProjektUebersicht({ nummer }: { nummer: string }) {
@@ -87,12 +125,13 @@ export function ProjektUebersicht({ nummer }: { nummer: string }) {
         </div>
         {org.isPending ? <Loading /> : org.error ? <ErrorState error={org.error} onRetry={() => void org.refetch()} /> : (
           <>
-            <OrganisationListe org={org.data.org} />
+            <OrganisationListe org={org.data.org} projekt={p} />
             {!org.data.org.can.write && (p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert') ? <p className="note">{TP.org.nurLesen}</p> : null}
           </>
         )}
       </section>
       <RegisterUebersicht projektId={p.id} />
+      {p.lebenszyklus === 'abgeschlossen' || p.lebenszyklus === 'abgebrochen' ? <ProjektVerlauf id={p.id} version={p.version} /> : null}
       {bearbeiten && org.data ? <OrganisationDrawer projektId={p.id} titel={`${p.nummer} · ${p.name}`} geladen={org.data}
         neuLaden={async () => (await org.refetch()).data} onClose={() => setBearbeiten(false)} /> : null}
     </div>

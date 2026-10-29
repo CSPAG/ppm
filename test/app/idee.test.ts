@@ -33,14 +33,14 @@ describe('Projektidee einreichen', () => {
 
   before(async () => {
     api = await testApi();
-    const a = await login(api, 'demo', 'u-as1', 'antragsteller');
+    const a = await login(api, 'demo', 'u-as1', 'mitglied');
     tenantId = a.tenantId;
     as1Id = a.principalId;
     as1 = { authorization: a.authorization };
-    as2 = { authorization: (await login(api, 'demo', 'u-as2', 'antragsteller')).authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
+    as2 = { authorization: (await login(api, 'demo', 'u-as2', 'mitglied')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-fuehren')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
     const admin = { authorization: (await login(api, 'demo', 'u-admin', 'org-admin')).authorization };
     feld1 = (await call('POST', '/v1/handlungsfelder', gl, { label: 'Patientenorientierung', leitsatz: 'Der Mensch im Mittelpunkt.', position: 1 })).json().id;
@@ -54,8 +54,8 @@ describe('Projektidee einreichen', () => {
   });
   after(async () => { await api?.close(); });
 
-  test('Auswahl für den Assistenten: Handlungsfelder mit Leitsatz und Zielen, Bereiche, Herkunft – ohne Leserecht auf Ziele', async () => {
-    assert.equal((await call('GET', '/v1/strategische-ziele', as1)).statusCode, 403, 'Antragstellende lesen Ziele nicht direkt');
+  test('Auswahl für den Assistenten: Handlungsfelder mit Leitsatz und Zielen, Bereiche, Herkunft', async () => {
+    assert.equal((await call('GET', '/v1/strategische-ziele', as1)).statusCode, 200, 'Mitglieder lesen Ziele (Master Entscheid 18)');
     const r = await call('GET', '/v1/ideen/auswahl', as1);
     assert.equal(r.statusCode, 200, r.body);
     const a = r.json();
@@ -93,7 +93,7 @@ describe('Projektidee einreichen', () => {
     assert.deepEqual(await fehler({ bereiche: [randomUUID()] }), ['/bereiche']);
     assert.deepEqual(await fehler({ herkunft: 'erfunden' }), ['/herkunft']);
     assert.deepEqual(await fehler({ handlungsfeldId: randomUUID(), strategischesZielId: null }), ['/handlungsfeldId']);
-    const fremd = (await call('POST', '/v1/handlungsfelder', { authorization: (await login(api, 'andere', 'u-gl-andere', 'gl')).authorization }, { label: 'Fremd' })).json().id;
+    const fremd = (await call('POST', '/v1/handlungsfelder', { authorization: (await login(api, 'andere', 'u-gl-andere', 'alle-fuehren')).authorization }, { label: 'Fremd' })).json().id;
     assert.deepEqual(await fehler({ handlungsfeldId: fremd, strategischesZielId: null }), ['/handlungsfeldId'], 'Handlungsfeld einer anderen Organisation wie unbekannt');
     assert.equal((await call('PATCH', `/v1/ideen/${e.id}`, mit(as1, 2), { farbe: 'rot' })).statusCode, 422, 'unbekannte Felder');
 
@@ -127,17 +127,19 @@ describe('Projektidee einreichen', () => {
     assert.deepEqual([pruefen[0]!.titel, pruefen[0]!.link], ['Projektidee prüfen · Nur ein Titel', `/portfolio/ideen/${e.nummer}`]);
     assert.ok(!(await call('GET', '/v1/eingang', as1)).json().items.some((x: { art: string }) => x.art === 'idee.pruefen'), 'nicht bei Antragstellenden');
 
-    // Ideenpool (idee:read) sieht die eingereichte Idee, andere Antragstellende nicht; AS sieht sie als «eingereicht»
+    // eingereicht: der Ideenpool (idee:read) und alle Mitglieder (idee:list, Master Entscheid 14) lesen sie; AS sieht sie als «eingereicht»
     assert.equal((await call('GET', `/v1/ideen/${e.id}`, ue)).json().eigene, false);
-    assert.equal((await call('GET', `/v1/ideen/${e.id}`, as2)).statusCode, 404);
+    const fremd = await call('GET', `/v1/ideen/${e.id}`, as2);
+    assert.deepEqual([fremd.statusCode, fremd.json().eigene, fremd.json().can.bearbeiten], [200, false, false]);
     const meine = (await call('GET', '/v1/ideen?eigene=true', as1)).json().items as { id: string; stand: string }[];
     assert.equal(meine.find(x => x.id === e.id)?.stand, 'eingereicht');
-    assert.ok((await call('GET', '/v1/ideen', as2)).json().items.every((x: { eigene: boolean }) => x.eigene), 'nur eigene');
+    assert.ok((await call('GET', '/v1/ideen?eigene=true', as2)).json().items.every((x: { eigene: boolean }) => x.eigene), 'nur eigene');
+    assert.ok((await call('GET', '/v1/ideen', as2)).json().items.some((x: { id: string }) => x.id === e.id), 'eingereichte Ideen anderer im Pool');
     // Suche für die Befehlspalette (I-N4): Titel als Teilstring, Nummer genau; nach Recht wie die Liste
     const suche = async (q: string, h: Record<string, string>) => ((await call('GET', `/v1/ideen?q=${encodeURIComponent(q)}`, h)).json().items as { id: string }[]).map(x => x.id);
     assert.ok((await suche('nur ein tit', ue)).includes(e.id));
     assert.ok((await suche(String(e.nummer), ue)).includes(e.id));
-    assert.ok(!(await suche('nur ein tit', as2)).includes(e.id), 'fremde Idee nicht für andere Antragstellende');
+    assert.ok((await suche('nur ein tit', as2)).includes(e.id), 'eingereichte Idee auch für andere Mitglieder (Master Entscheid 14)');
     assert.deepEqual(await suche('100%_', ue), []);
 
     // nach dem Einreichen nicht mehr änderbar, nicht verwerfbar, nicht erneut einreichbar
@@ -150,7 +152,7 @@ describe('Projektidee einreichen', () => {
     const e = (await call('POST', '/v1/ideen', as1, vollstaendig())).json();
     assert.equal((await call('POST', `/v1/ideen/${e.id}/einreichen`, mit(as1, 1))).statusCode, 200);
     // Rückfrage der UE (Route mit AP-E4-2): Stand, Rückfrage und Aufgaben wie dort vorgesehen
-    const ueId = (await login(api, 'demo', 'u-ue', 'ue')).principalId;
+    const ueId = (await login(api, 'demo', 'u-ue', 'alle-fuehren')).principalId;
     const frage = await full(api.t.runtime, tenantId, async tx => {
       await tx.query("UPDATE ppm.idee SET stand = 'in_ergaenzung' WHERE id = $1", [e.id]);
       const id = (await tx.query<{ id: string }>("INSERT INTO ppm.idee_rueckfrage (tenant_id, idee_id, feld, text, gestellt_von) VALUES ($1, $2, 'zielsetzung', 'Woran misst du den Erfolg?', $3) RETURNING id", [tenantId, e.id, ueId])).rows[0]!.id;
@@ -163,7 +165,9 @@ describe('Projektidee einreichen', () => {
       ['in_ergaenzung', true, [['zielsetzung', 'Woran misst du den Erfolg?', null]]]);
     assert.equal((await call('GET', '/v1/ideen?eigene=true', as1)).json().items.find((x: { id: string }) => x.id === e.id).rueckfragenOffen, 1);
 
-    assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as2, { antwort: 'fremd' })).statusCode, 404);
+    // fremde Idee: sichtbar (eingereicht), Rückfragen nicht (A-73), beantworten nicht
+    assert.deepEqual((await call('GET', `/v1/ideen/${e.id}`, as2)).json().rueckfragen, []);
+    assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as2, { antwort: 'fremd' })).statusCode, 403);
     assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${randomUUID()}`, as1, { antwort: 'x' })).statusCode, 404);
     const a = await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as1, { antwort: ' Aufnahmezeit unter 10 Minuten. ' });
     assert.equal(a.statusCode, 200, a.body);
@@ -179,6 +183,23 @@ describe('Projektidee einreichen', () => {
     assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as1, { antwort: 'zu spät' })).statusCode, 409);
   });
 
+  test('Ähnliche eingereichte Ideen beim Ausfüllen für alle Mitglieder, ohne Entwürfe anderer (UC-001 Schritt 3, Master Entscheid 14)', async () => {
+    const titel = async (q: string, h: H = as2) => {
+      const r = await call('GET', `/v1/ideen/aehnlich?${q}`, h);
+      assert.equal(r.statusCode, 200, r.body);
+      return (r.json().items as { idee: { titel: string; stand: string } }[]).map(x => x.idee);
+    };
+    // gleiches Handlungsfeld: die eingereichten Ideen von AS1, nicht deren Entwurf
+    const nachFeld = await titel(`handlungsfeldId=${feld1}`);
+    assert.ok(nachFeld.length > 0 && nachFeld.every(x => x.stand !== 'entwurf'), JSON.stringify(nachFeld));
+    // gemeinsamer Bereich genügt
+    assert.ok((await titel(`bereich=${bereich}`)).length > 0);
+    // anderes Handlungsfeld ohne Ideen, ohne Angaben: leer
+    assert.deepEqual(await titel(`handlungsfeldId=${feld2}`), []);
+    assert.deepEqual(await titel(''), []);
+    assert.equal((await call('GET', `/v1/ideen/aehnlich?handlungsfeldId=${feld1}`, nobody)).statusCode, 403);
+  });
+
   test('Entwurf verwerfen; Kopf mit eigenen Ideen und Pool; Rechte', async () => {
     const e = (await call('POST', '/v1/ideen', as2, { titel: 'Verwerfen' })).json();
     assert.equal((await call('DELETE', `/v1/ideen/${e.id}`, mit(as2, 1))).statusCode, 204);
@@ -190,8 +211,9 @@ describe('Projektidee einreichen', () => {
     assert.ok((await call('GET', '/v1/ideen/kopf', ue)).json().zuPruefen >= 2);
 
     assert.equal((await call('POST', '/v1/ideen', nobody, {})).statusCode, 403);
-    assert.equal((await call('GET', '/v1/ideen', leser)).statusCode, 403);
-    assert.equal((await call('POST', '/v1/ideen', ue, {})).statusCode, 403, 'UE ohne Rolle «antragsteller» erfasst nicht (A-46: alle Mitglieder)');
+    // Mitglieder erfassen Ideen und lesen eingereichte (Master Entscheid 14); «alle Portfolios führen» erfasst auch
+    assert.equal((await call('GET', '/v1/ideen', leser)).statusCode, 200);
+    assert.equal((await call('POST', '/v1/ideen', ue, {})).statusCode, 201);
     assert.equal((await call('GET', '/v1/ideen?nummer=1', ue)).statusCode, 200);
   });
 });

@@ -26,10 +26,10 @@ describe('Eingang', () => {
   before(async () => {
     api = await testApi();
     const mk = async (sub: string, role: string | null) => { const l = await login(api, 'demo', sub, role); tenantId = l.tenantId; return { h: { authorization: l.authorization }, id: l.principalId }; };
-    anna = await mk('u-anna', 'leser');
-    beat = await mk('u-beat', 'leser');
-    cora = await mk('u-cora', 'leser');
-    gl = await mk('u-gl', 'gl');
+    anna = await mk('u-anna', 'mitglied');
+    beat = await mk('u-beat', 'mitglied');
+    cora = await mk('u-cora', 'mitglied');
+    gl = await mk('u-gl', 'alle-fuehren');
     ohne = await mk('u-ohne', null);
   });
   after(async () => { await api?.close(); });
@@ -214,7 +214,7 @@ describe('Eingang', () => {
     assert.equal(p.length, 1);
     assert.equal(p[0]!.relation, role);
     assert.ok(p[0]!.expires_at && p[0]!.expires_at.getTime() > Date.now() + 2 * 86_400_000);
-    assert.ok(t.rows.every(r => r.object_type !== 'org' || r.relation === 'leser'));
+    assert.ok(t.rows.every(r => r.object_type !== 'org' || r.relation === 'mitglied'));
     assert.equal((await call('DELETE', `/v1/stellvertretungen/${c.json().id}`, anna.h)).statusCode, 204);
     const nach = await sys(tx => tx.query("SELECT 1 FROM ppm.authz_tuple WHERE subject = $1 AND object_type = 'projekt'", [`user:${cora.id}`]));
     assert.equal(nach.rowCount, 0);
@@ -223,7 +223,7 @@ describe('Eingang', () => {
   test('nur Projektrolle: Eingang und Aufgaben an das Recht am Projekt', async () => {
     const projekt = '22222222-2222-4222-8222-222222222222';
     const pl = await login(api, 'demo', 'u-nur-pl', null);
-    await grant(api, tenantId, `user:${pl.principalId}`, 'pl', { type: 'projekt', id: projekt });
+    await grant(api, tenantId, `user:${pl.principalId}`, 'projekt-fuehren', { type: 'projekt', id: projekt });
     const h = { authorization: pl.authorization };
     await sys(tx => aufgabe.oeffnen(tx, { art: 'kpi.erfassen', bezug: { typ: 'projekt', id: projekt }, empfaenger: { recht: 'kpi:write', ort: { typ: 'projekt', id: projekt } }, titel: 'KPI-Werte erfassen', link: '/projekte' }));
     await sys(tx => aufgabe.oeffnen(tx, { art: 'kpi.erfassen', bezug: { typ: 'projekt', id: 'anderes' }, empfaenger: { recht: 'kpi:write', ort: { typ: 'projekt', id: '33333333-3333-4333-8333-333333333333' } }, titel: 'Anderes Projekt', link: '/projekte' }));

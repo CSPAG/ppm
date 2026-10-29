@@ -16,10 +16,12 @@ export const resources: ResourceModel<Kette> = {
   load: async tx => new Map((await tx.query<{ id: string; portfolio_id: string }>('SELECT id, portfolio_id FROM ppm.projekt')).rows.map(r => [r.id, r.portfolio_id])),
   version: async tx => (await tx.query<{ v: string }>(
     "SELECT count(*) || ':' || md5(coalesce(string_agg(id::text || '>' || portfolio_id::text, ',' ORDER BY id), '')) AS v FROM ppm.projekt")).rows[0]!.v,
-  chain: (portfolioVon, ref): ResourceRef[] => {
+  // `hint`: Portfolio des Projekts, wenn der Zustand es noch nicht kennt (eben angelegt); Rollen am Portfolio wirken auf
+  // seine Projekte (Master Entscheid 18)
+  chain: (portfolioVon, ref, hint): ResourceRef[] => {
     if (ref.type === 'org') return [{ type: 'org' }];
     if (ref.type === 'portfolio') return [{ type: 'org' }, ref];
-    return [{ type: 'org' }, { type: 'portfolio', id: portfolioVon.get(ref.id ?? '') ?? null }, ref];
+    return [{ type: 'org' }, { type: 'portfolio', id: portfolioVon.get(ref.id ?? '') ?? hint ?? null }, ref];
   },
   exists: async (tx, ref) => {
     if (ref.type === 'org') return true;

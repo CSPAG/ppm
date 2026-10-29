@@ -1,6 +1,6 @@
 /**
  * Exit-Gate P4 in der Sitzung (UC-015 Schritte 5–6, K3 Durchführen; AP-E7-1) und Korrektur in der offenen Sitzung
- * (A-30, #147) in hell, dunkel und 360 px: Max ist in «muster» Sponsor, Projektleitung und CTL eines Projekts in P4 mit
+ * (A-30, #147) in hell, dunkel und 360 px: Max ist in «muster» Projektauftraggeber:in und Projektleitung eines Projekts in P4 mit
  * entscheidendem Gremium (daten.ts). Abschlussbericht einreichen → Traktandum beim Gremium; Sitzung mit dem Traktandum
  * über die API versendet; im Sitzungsmodus «Abgeschlossen» → Projekt nur noch lesbar; Korrektur auf «Nacharbeiten
  * verlangt» → Projekt wieder aktiv, Bericht wieder bearbeitbar. axe ohne Befund, kein Überlauf.
@@ -20,7 +20,7 @@ async function entscheiden(page: Page, ergebnis: string, begruendung: string) {
   await page.getByLabel('Begründung').fill(begruendung);
 }
 
-test('Exit-Gate in der Sitzung: «Abgeschlossen» macht das Projekt lesend, Korrektur öffnet es wieder (UC-015, A-30)', async ({ page }) => {
+test('Exit-Gate in der Sitzung: «Abgeschlossen» hält den Bericht fest, Korrektur öffnet es wieder (UC-015, A-30)', async ({ page }) => {
   await login(page, MAX, '/eingang');
   const a = await apiAls(page);
   const p = await projekt(a, `Exit-Gate E2E ${Date.now().toString(36)}`, 'P4');
@@ -48,7 +48,7 @@ test('Exit-Gate in der Sitzung: «Abgeschlossen» macht das Projekt lesend, Korr
   await expect(page.getByText('Entscheid erfasst: Abgeschlossen.').first()).toBeVisible();
   await expectAccessible(page);
 
-  // Endzustand: Projektakte nur noch lesbar, Lessons Learned weiter möglich
+  // Endzustand: abgenommener Bericht fest, Lessons Learned weiter möglich
   await page.goto(`/projekte/${p.nummer}/abschluss`);
   await expect(page.getByText(/Das Projekt ist seit .* formell abgeschlossen\./)).toBeVisible();
   await expect(page.getByRole('textbox', { name: /^Zielerreichung/ })).toBeDisabled();

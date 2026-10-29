@@ -10,17 +10,22 @@ export const LEBENSZYKLUS = ['aktiv', 'sistiert', 'abgebrochen', 'abgeschlossen'
 export type Lebenszyklus = (typeof LEBENSZYKLUS)[number];
 export const ENDZUSTAENDE: readonly Lebenszyklus[] = ['abgebrochen', 'abgeschlossen', 'zurueckgezogen'];
 
-/** Funktionen der Projektorganisation (Q7 Kap. 8); `koalition` = Sponsoren-Koalition ohne eigene Rolle (A-04). */
-export const FUNKTIONEN = ['sp', 'pl', 'ctl', 'kt', 'koalition'] as const;
+/**
+ * Funktionen der Projektorganisation (Q7 Kap. 8; Master Entscheid 17, A-72): fest nur `sp` (Projektauftraggeber:in) und
+ * `pl` (Projektleitung), je höchstens eine Person; alle weiteren `weitere` mit freiem Text. Die Projektorganisation wirkt
+ * nicht auf den Zugriff (Master Entscheid 16, A-71).
+ */
+export const FUNKTIONEN = ['sp', 'pl', 'weitere'] as const;
 export type Funktion = (typeof FUNKTIONEN)[number];
-/** Funktionen, die zugleich Rolle am Projekt sind (Tupel, fachmodell.md 3.3). */
-export const ROLLEN: readonly Funktion[] = ['sp', 'pl', 'ctl', 'kt'];
+/** Rollen, die beim Entstehen eines Projekts für die genannten Personen vorgeschlagen werden (A-71). */
+export const VORSCHLAG_JE_FUNKTION = { sp: 'projekt-steuern', pl: 'projekt-fuehren' } as const;
 
 const enumOf = <T extends string>(values: readonly T[], description: string) => Type.Unsafe<T>({ type: 'string', enum: [...values], description });
 
 const PhaseT = enumOf(PHASEN, 'Phase nach Phasenmodell (P0 Initialisierung bis P4 Abschluss).');
 const LebenszyklusT = enumOf(LEBENSZYKLUS, '`aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`).');
-const FunktionT = enumOf(FUNKTIONEN, '`sp` Sponsor, `pl` Projektleitung, `ctl` Clinical Transformation Lead, `kt` Kernteam, `koalition` Sponsoren-Koalition.');
+const FunktionT = enumOf(FUNKTIONEN, '`sp` Projektauftraggeber:in, `pl` Projektleitung, `weitere` mit Text in `funktionText` (z. B. Kernteam, PMO).');
+const FunktionText = Type.String({ maxLength: 100, description: 'Bezeichnung der Funktion bei `weitere`, z. B. «Kernteam» oder «PMO»; sonst leer.' });
 const Name = Type.String({ minLength: 1, maxLength: 200, description: 'Name des Projekts.', examples: ['Digitale Patientenaufnahme'] });
 
 export const Projekt = Type.Object({
@@ -37,15 +42,18 @@ export const Projekt = Type.Object({
   phase: PhaseT,
   phasenmodellId: Nullable(Uuid),
   lebenszyklus: LebenszyklusT,
-  vertraulich: Type.Boolean({ description: 'Sichtbar nur für Projektrollen, UE und Gremium des Portfolios (A-34).' }),
+  vertraulich: Type.Boolean({ description: 'Sichtbar nur für Personen mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13).' }),
   sponsor: Nullable(Uuid),
   projektleitung: Nullable(Uuid),
-  controlling: Nullable(Uuid),
   rollen: Type.Array(FunktionT, { description: 'Eigene Funktionen der anfragenden Person in der Projektorganisation.' }),
+  geaendertNachAbschluss: Nullable(DateTime),
   version: Type.Integer({ minimum: 1 }),
   createdAt: DateTime,
   updatedAt: DateTime,
-  can: Type.Object({ write: Type.Boolean(), organisation: Type.Boolean() }, { description: 'Was die anfragende Person damit darf.' }),
+  can: Type.Object({
+    read: Type.Boolean({ description: 'Projektakte lesen; ohne nur die Kopfdaten (Master Entscheid 14, A-73).' }),
+    write: Type.Boolean(), organisation: Type.Boolean(),
+  }, { description: 'Was die anfragende Person damit darf.' }),
 }, { $id: 'Projekt', additionalProperties: false });
 export type ProjektOut = Static<typeof Projekt>;
 
@@ -76,6 +84,7 @@ export const ListQuery = Type.Object({
   lebenszyklus: Type.Optional(Type.Array(LebenszyklusT, { maxItems: 5, description: 'Nur Projekte in diesen Zuständen.' })),
   nummer: Type.Optional(Type.String({ maxLength: 20, description: 'Genau diese Projektnummer.' })),
   q: Type.Optional(Type.String({ maxLength: 200, description: 'Suche in Name und Nummer (Teilstring).' })),
+  alle: Type.Optional(Type.Boolean({ description: 'Auch Projekte, die die Person nur auflisten darf (Kopfdaten, `projekt:list`, UI-52); ohne nur Projekte mit Leserecht.' })),
   cursor: Type.Optional(Cursor),
   limit: Type.Optional(Limit),
 }, { additionalProperties: false });
@@ -83,12 +92,14 @@ export const ListQuery = Type.Object({
 export const Mitglied = Type.Object({
   personId: Uuid,
   funktion: FunktionT,
+  funktionText: FunktionText,
   akv: Type.String({ description: 'Aufgaben, Kompetenzen, Verantwortung.' }),
 }, { $id: 'Mitglied', additionalProperties: false });
 
 export const Organisation = Type.Object({
   version: Type.Integer({ minimum: 0, description: 'Stand der Projektorganisation (ETag); 0 ohne Mitglieder.' }),
-  mitglieder: Type.Array(Type.Ref('Mitglied'), { description: 'In der Reihenfolge Sponsor, Koalition, Projektleitung, CTL, Kernteam.' }),
+  mitglieder: Type.Array(Type.Ref('Mitglied'), { description: 'In der Reihenfolge Projektauftraggeber:in, Projektleitung, weitere.' }),
+  vorschlaege: Type.Array(Type.String(), { description: 'Bisher verwendete Bezeichnungen weiterer Funktionen in der Organisation, häufigste zuerst (Vorschläge für `funktionText`, A-72).' }),
   can: Type.Object({ write: Type.Boolean() }, { description: 'Was die anfragende Person damit darf.' }),
 }, { $id: 'Organisation', additionalProperties: false });
 export type OrganisationOut = Static<typeof Organisation>;
@@ -97,8 +108,9 @@ export const OrganisationPut = Type.Object({
   mitglieder: Type.Array(Type.Object({
     personId: Uuid,
     funktion: FunktionT,
+    funktionText: Type.Optional(FunktionText),
     akv: Type.Optional(Type.String({ maxLength: 2000 })),
-  }, { additionalProperties: false }), { maxItems: 100, description: 'Sponsor, Projektleitung und CTL höchstens je eine Person.' }),
+  }, { additionalProperties: false }), { maxItems: 100, description: 'Projektauftraggeber:in und Projektleitung höchstens je eine Person; `weitere` mit Text.' }),
 }, { $id: 'OrganisationPut', additionalProperties: false });
 export type OrganisationPutIn = Static<typeof OrganisationPut>;
 

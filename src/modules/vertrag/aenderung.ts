@@ -142,6 +142,37 @@ export async function einreichen(tx: Tx, who: Actor, o: { version: store.Version
   return true;
 }
 
+// ---------------------------------------------------------------- Vor dem Entscheid übernehmen (UC-007 A3, A-74)
+
+/**
+ * Vorab übernommen: Baseline ohne Entscheid (SP offen: `entscheid` null) bzw. ohne Entscheid des Gremiums (`an_prat`).
+ * Der spätere Entscheid ersetzt den Vermerk; eine Ablehnung bleibt an der Baseline sichtbar (UC-007 A3.2).
+ */
+export const vorabUebernommen = (v: Pick<store.VersionRow, 'anlass' | 'stand' | 'baseline'>, e: EntscheidRow | null) =>
+  v.anlass === 'aenderung' && v.stand === 'abgenommen' && v.baseline && (!e?.entscheid || e.entscheid === 'an_prat');
+
+/**
+ * Die Projektleitung übernimmt die eingereichte Änderung vor dem Entscheid als Baseline (UC-007 A3.1): Register wie bei
+ * der Freigabe; die Aufgabe des SP bzw. das Traktandum bleiben offen. In voller Sicht (`vertrag:write` prüft der Aufrufer).
+ */
+export async function uebernehmen(tx: Tx, who: Actor, o: { version: store.VersionRow; projekt: store.ProjektKopf; erwartet: number }): Promise<boolean> {
+  const { version: v, projekt: p } = o;
+  if (v.stand !== 'in_pruefung' && v.stand !== 'traktandiert') throw conflict(`Version ${v.nummer} ist nicht zum Entscheid eingereicht.`, { reason: 'stand', stand: v.stand });
+  if (v.version !== o.erwartet) return false;
+  await baselineSetzen(tx, who, v.id);
+  const r = (await store.version(tx, v.id))!;
+  const daten = { id: v.id, projektId: p.id, nummer: r.nummer, stand: r.stand, vorEntscheid: true };
+  await record(tx, who, { action: 'vertrag.change_adopted', resourceType: 'vertrag_version', resourceId: v.id, data: { ...daten, projekt: p.nummer }, event: daten });
+  return true;
+}
+
+/** Entscheid nachtragen an einer vorab übernommenen Änderung (Stand bleibt «abgenommen», Baseline bleibt). */
+async function entscheidNachtragen(tx: Tx, id: string, e: { entscheid: Entscheid; begruendung: string; person: string | null }): Promise<void> {
+  await tx.query(
+    `UPDATE ${SCHEMA}.vertrag_version SET entscheid = $2, entscheid_begruendung = btrim($3), entschieden_at = now(), entschieden_by = $4 WHERE id = $1 AND anlass = 'aenderung'`,
+    [id, e.entscheid, e.begruendung, e.person]);
+}
+
 // ---------------------------------------------------------------- Entscheid des Sponsors (UC-007 Schritt 4, A1, A2)
 
 /**
@@ -155,7 +186,8 @@ export async function entscheiden(tx: Tx, who: Actor, o: {
 }): Promise<boolean> {
   const { version: v, projekt: p } = o;
   if (v.anlass !== 'aenderung') throw conflict('Diese Version ist kein Änderungsantrag.', { reason: 'anlass' });
-  if (v.stand !== 'in_pruefung') throw conflict(`Version ${v.nummer} ist nicht zum Entscheid eingereicht.`, { reason: 'stand', stand: v.stand });
+  const vorab = vorabUebernommen(v, await entscheidVon(tx, v.id)) && !(await entscheidVon(tx, v.id))?.entscheid;
+  if (v.stand !== 'in_pruefung' && !vorab) throw conflict(`Version ${v.nummer} ist nicht zum Entscheid eingereicht.`, { reason: 'stand', stand: v.stand });
   const w = await wirkung(tx, v.id, o.modell);
   if (o.entscheid === 'freigegeben' && w.prat) throw conflict(w.hinweis!, { reason: 'prat', dimensionen: w.dimensionen, kapitel: w.kapitel });
   if (o.entscheid === 'an_prat' && !w.prat) {
@@ -165,10 +197,16 @@ export async function entscheiden(tx: Tx, who: Actor, o: {
     throw invalid('Begründung fehlt: Die Projektleitung erfährt sonst nicht, was zu ändern ist.', [{ path: '/begruendung', message: 'Pflicht beim Ablehnen.' }]);
   }
   const nach: store.Stand = o.entscheid === 'abgelehnt' ? 'abgelehnt' : o.entscheid === 'an_prat' ? 'traktandiert' : 'in_pruefung';
-  if (!(await entscheidSetzen(tx, v.id, o.erwartet, nach, { entscheid: o.entscheid, begruendung: o.begruendung, person: o.person }))) return false;
+  // vorab übernommen (UC-007 A3.2): nur den Entscheid nachtragen; die Baseline bleibt, auch bei einer Ablehnung
+  if (vorab) await entscheidNachtragen(tx, v.id, { entscheid: o.entscheid, begruendung: o.begruendung, person: o.person });
+  else if (!(await entscheidSetzen(tx, v.id, o.erwartet, nach, { entscheid: o.entscheid, begruendung: o.begruendung, person: o.person }))) return false;
 
   const pl = (await unterzeichnende(tx, p.id)).pl;
-  if (o.entscheid === 'freigegeben') {
+  if (vorab && o.entscheid === 'abgelehnt') {
+    for (const an of pl) await mitteilung.senden(tx, { an, bezug: { typ: 'vertrag_version', id: v.id }, text: `Änderung abgelehnt: Version ${v.nummer} des Projektvertrags ${p.name} ist bereits Baseline. Beantrage eine Gegenänderung; die Begründung steht beim Antrag.`, link: link(p) });
+  } else if (vorab && o.entscheid === 'freigegeben') {
+    for (const an of pl) await mitteilung.senden(tx, { an, bezug: { typ: 'vertrag_version', id: v.id }, text: `Änderung freigegeben: Version ${v.nummer} des Projektvertrags ${p.name} (bereits Baseline).`, link: link(p) });
+  } else if (o.entscheid === 'freigegeben') {
     await baselineSetzen(tx, who, v.id);
     for (const an of pl) await mitteilung.senden(tx, { an, bezug: { typ: 'vertrag_version', id: v.id }, text: `Änderung freigegeben: Version ${v.nummer} des Projektvertrags ${p.name} ist Baseline.`, link: link(p) });
   } else if (o.entscheid === 'abgelehnt') {
@@ -202,9 +240,18 @@ async function geschaeft(tx: Tx, bezug: { typ: string; id: string }): Promise<{ 
  */
 export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext): Promise<void> {
   const g = await geschaeft(tx, f.bezug);
-  if (!g || g.v.stand !== 'traktandiert') return;
+  if (!g) return;
   // Baseline und Register im Audit mit der Person, die den Entscheid erfasst (UE)
   const who = k?.akteur ?? systemActor('system');
+  // vorab übernommen (UC-007 A3.2): der Entscheid des Gremiums ersetzt den Vermerk, die Baseline bleibt
+  if (vorabUebernommen(g.v, await entscheidVon(tx, g.v.id))) {
+    if (f.ergebnis !== 'freigegeben' && f.ergebnis !== 'abgelehnt') return;
+    await intern(tx, () => entscheidNachtragen(tx, g.v.id, { entscheid: f.ergebnis as Entscheid, begruendung: f.begruendung, person: k?.principalId ?? null }));
+    const daten = { id: g.v.id, projektId: g.p.id, nummer: g.v.nummer, ergebnis: f.ergebnis, traktandumId: f.traktandumId, stand: g.v.stand, nachgetragen: true };
+    await record(tx, who, { action: 'vertrag.change_decided', resourceType: 'vertrag_version', resourceId: g.v.id, data: { ...daten, projekt: g.p.nummer, gremium: true }, event: daten });
+    return;
+  }
+  if (g.v.stand !== 'traktandiert') return;
   await intern(tx, async () => {
     if (f.ergebnis === 'freigegeben') await baselineSetzen(tx, who, g.v.id);
     else if (f.ergebnis === 'abgelehnt') await store.standSetzen(tx, g.v.id, null, ['traktandiert'], 'abgelehnt');

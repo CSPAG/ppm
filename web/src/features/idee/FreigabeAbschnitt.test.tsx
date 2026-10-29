@@ -31,7 +31,7 @@ const idee = (stand: string) => ({
 }) as unknown as Idee;
 const freigabe = (o: Record<string, unknown> = {}) => ({
   weg: 'gremium', zustaendig: 'PRAT Programmausschuss', vorgesehenerSponsor: SP, sponsor: null, projektleitung: null, freigegebenAt: null, projekt: null,
-  can: { traktandieren: true, angaben: true, entscheiden: false }, ...o,
+  can: { traktandieren: true, angaben: true, entscheiden: false, initialisieren: false }, vermerke: [], ...o,
 });
 
 function stub(routes: Parameters<typeof mockIamApi>[0]) {

@@ -68,7 +68,7 @@ describe('Dokumentausgabe Projektvertrag', () => {
       const pf = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'B', 'dok', 'Dok', true) RETURNING id", [T])).rows[0]!.id;
       projekt = (await tx.query<{ id: string }>("INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-014', 'Neues KIS (Zürich)', $2) RETURNING id", [T, pf])).rows[0]!.id;
     });
-    for (const [sub, rolle, ort] of [['pl', 'pl', { type: 'projekt', id: projekt }], ['kt', 'kt', { type: 'projekt', id: projekt }], ['ue', 'ue', { type: 'org' }], ['fremd', 'antragsteller', { type: 'org' }]] as const) {
+    for (const [sub, rolle, ort] of [['pl', 'projekt-fuehren', { type: 'projekt', id: projekt }], ['kt', 'projekt-mitlesen', { type: 'projekt', id: projekt }], ['ue', 'alle-fuehren', { type: 'org' }], ['fremd', 'mitglied', { type: 'org' }]] as const) {
       const l = await login(api, 'acme', `dok-${sub}`, null);
       id[sub] = l.principalId;
       await grant(api, T, `user:${l.principalId}`, rolle, ort as { type: 'org' });
@@ -133,10 +133,9 @@ describe('Dokumentausgabe Projektvertrag', () => {
     assert.match(doc, /Toleranz Kosten<\/w:t>.*?Standard des Phasenmodells: 10 %/s);
   });
 
-  test('ohne Recht auf Beträge «nicht verfügbar» (A-33, G12); ohne Leserecht 404/403; Format geprüft', async () => {
+  test('Kernteam sieht Beträge (Master Entscheid 13); ohne Leserecht 404/403; Format geprüft', async () => {
     const kt = pdfText((await call('kt', 'GET', `/v1/vertragsversionen/${version}/dokument`)).rawPayload);
-    assert.match(kt, /nicht verfügbar/);
-    assert.doesNotMatch(kt, /12.345/);
+    assert.doesNotMatch(kt, /nicht verfügbar/);
     assert.equal((await call('fremd', 'GET', `/v1/vertragsversionen/${version}/dokument`)).statusCode, 404, 'Projekt nicht sichtbar');
     assert.equal((await call('pl', 'GET', `/v1/vertragsversionen/${version}/dokument?format=odt`)).statusCode, 422);
   });

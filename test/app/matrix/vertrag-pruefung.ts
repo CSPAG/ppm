@@ -21,7 +21,7 @@ export const matrix: Matrix = {
     'ppm.quality_check.quality_check_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
     "ppm.quality_check.quality_check_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('vertrag:review'::text)",
     'ppm.unterschrift.unterschrift_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.unterschrift.unterschrift_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('vertrag:sign'::text, 'projekt'::text, projekt_id)",
+    "ppm.unterschrift.unterschrift_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('vertrag:sign'::text, projekt_id)",
   ],
   cases: {
     'GET /v1/vertragsversionen/:id/pruefung': i => ({ method: 'GET', url: `/v1/vertragsversionen/${i.vertragVersion}/pruefung`, kind: 'foreign' }),

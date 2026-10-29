@@ -12,11 +12,12 @@ import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { actorOf, conflict, etag, IdParams, IfMatchHeaders, notFound, preconditionFailed, requireIfMatch, type Deps, type Tx } from '@vollholz/platform';
 import { aktuellesPhasenmodell } from '../phasenmodell/index.ts';
 import { fullTx } from '../../platform.ts';
-import { einreichen, entscheiden, entscheidVon, wirkung } from './aenderung.ts';
+import { einreichen, entscheiden, entscheidVon, uebernehmen, vorabUebernommen, wirkung } from './aenderung.ts';
 import { Aenderung, AenderungEntscheid, type AenderungEntscheidIn, type AenderungOut } from './aenderung-schemas.ts';
 import { STAND_TEXT, type Phasenmodell } from './entwurf.ts';
 import { TAG } from './routes.ts';
 import * as store from './store.ts';
+import { versionVermerke } from './vermerk.ts';
 
 const projektOrt = (id: string) => ({ type: 'projekt', id });
 const aenderbar = (p: store.ProjektKopf) => p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert';
@@ -39,7 +40,9 @@ export function registerAenderungRoutes(app: FastifyInstance, deps: Deps): void 
     const w = await wirkung(tx, v.id, m);
     const e = await entscheidVon(tx, v.id);
     const basis = v.basis_version_id ? await store.version(tx, v.basis_version_id) : null;
-    const offen = v.stand === 'in_pruefung' && aenderbar(p) && await req.can('vertrag:decide', projektOrt(p.id));
+    // nach einer vorab übernommenen Änderung entscheidet der SP nachträglich (UC-007 A3.2)
+    const nachtrag = vorabUebernommen(v, e) && !e?.entscheid;
+    const offen = (v.stand === 'in_pruefung' || nachtrag) && aenderbar(p) && await req.can('vertrag:decide', projektOrt(p.id));
     return {
       versionId: v.id, projektId: p.id, nummer: v.nummer, basisVersionId: v.basis_version_id, basisNummer: basis?.nummer ?? null, stand: v.stand,
       begruendung: v.begruendung, eingereichtAt: v.eingereicht_at, wirkung: w,
@@ -48,7 +51,9 @@ export function registerAenderungRoutes(app: FastifyInstance, deps: Deps): void 
       can: {
         einreichen: v.stand === 'in_arbeit' && aenderbar(p) && await req.can('vertrag:write', projektOrt(p.id)),
         freigeben: offen && !w.prat, ablehnen: offen, anPrat: offen && w.prat,
+        uebernehmen: (v.stand === 'in_pruefung' || v.stand === 'traktandiert') && aenderbar(p) && await req.can('vertrag:write', projektOrt(p.id)),
       },
+      vermerke: await versionVermerke(tx, v),
     };
   }
 
@@ -87,6 +92,30 @@ export function registerAenderungRoutes(app: FastifyInstance, deps: Deps): void 
       if (!(await einreichen(tx, who, { version: v, projekt: p, erwartet, modell: m }))) throw preconditionFailed(v.version + 1);
       return ausgabe(req, tx, (await store.version(tx, id))!, p, m);
     });
+    reply.header('etag', etag(out.version));
+    return out;
+  });
+
+  app.post('/v1/vertragsversionen/:id/aenderung/uebernehmen', {
+    schema: {
+      tags: [TAG], summary: 'Änderung vor dem Entscheid übernehmen', params: IdParams, headers: IfMatchHeaders, response: { 200: Type.Ref('VertragAenderung') },
+      description: 'UC-007 A3 (A-74): Die Projektleitung setzt die eingereichte Änderung als Baseline, bevor Projektauftraggeber:in bzw. PRAT entschieden haben; '
+        + 'das Register wird nachgeführt, die Version trägt den Vermerk «nicht freigegeben», Aufgabe bzw. Traktandum bleiben offen. Der spätere Entscheid ersetzt '
+        + 'den Vermerk; eine Ablehnung bleibt an der Baseline sichtbar. `vertrag:write`; `If-Match` Pflicht.',
+    },
+  }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const erwartet = requireIfMatch(req);
+    const { p } = await req.tx(tx => sichtbar(tx, id));
+    await req.need('vertrag:write', projektOrt(p.id));
+    if (!aenderbar(p)) throw conflict(`Das Projekt ${p.nummer} kann nur noch gelesen werden.`, { reason: 'lebenszyklus', lebenszyklus: p.lebenszyklus });
+    const who = actorOf(req);
+    const m = await modell(req);
+    await voll(req, async tx => {
+      const r = (await store.version(tx, id))!;
+      if (!(await uebernehmen(tx, who, { version: r, projekt: p, erwartet }))) throw preconditionFailed(r.version);
+    });
+    const out = await req.tx(async tx => ausgabe(req, tx, (await store.version(tx, id))!, p, m));
     reply.header('etag', etag(out.version));
     return out;
   });

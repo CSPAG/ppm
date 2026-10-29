@@ -11,7 +11,7 @@ import { abschlussPruefen } from '../../src/modules/abschluss/aufgabe-job.ts';
 import { nachGate } from '../../src/modules/abschluss/folge.ts';
 import { _abmelden } from '../../src/modules/abschluss/lessons-haken.ts';
 import { lessonsLearned } from '../../src/modules/abschluss/index.ts';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
@@ -66,12 +66,12 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
 
   before(async () => {
     api = await testApi();
-    const ue = await login(api, 'acme', 'a-ue', 'ue');
+    const ue = await login(api, 'acme', 'a-ue', 'alle-fuehren');
     T = ue.tenantId;
     h.ue = { authorization: ue.authorization };
     for (const f of ['sp', 'pl', 'kt']) {
       id[f] = await person(api, T, `a-${f}`);
-      h[f] = { authorization: (await login(api, 'acme', `a-${f}`, 'antragsteller')).authorization };
+      h[f] = { authorization: (await login(api, 'acme', `a-${f}`, 'mitglied')).authorization };
     }
     const portfolio = (await ok('ue', 'POST', '/v1/portfolios', { kategorie: 'A', schluessel: 'abschluss', name: 'Abschluss' }, {}, 201)).body.id;
     const prat = (await ok('ue', 'POST', '/v1/gremien', { portfolioId: portfolio, kuerzel: 'prat', name: 'Programmausschuss', art: 'entscheidend' }, {}, 201)).body.id;
@@ -80,8 +80,12 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
       const p = (await ok('ue', 'POST', '/v1/projekte', { name, portfolioId: portfolio, phase }, {}, 201)).body;
       pj[k] = { id: p.id, nummer: p.nummer };
       await ok('ue', 'PUT', `/v1/projekte/${p.id}/organisation`, { mitglieder: [
-        { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.kt, funktion: 'kt', akv: '' },
+        { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.kt, funktion: 'weitere', funktionText: 'Kernteam', akv: '' },
       ] }, { 'if-match': 'W/"0"' });
+      // Zugriff getrennt von der Projektorganisation (Master Entscheid 16)
+      for (const [f, rolle] of [['sp', 'projekt-steuern'], ['pl', 'projekt-fuehren'], ['kt', 'projekt-mitlesen']] as const) {
+        await grant(api, T, `user:${id[f]}`, rolle, { type: 'projekt', id: p.id });
+      }
     }
   });
   after(async () => { await api?.close(); });
@@ -101,7 +105,7 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
     g = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
     assert.deepEqual(g.body.grundlagen.nutzenpruefung, { version: '4.0', beurteilung: 'Nutzen stabil', werte: [] });
     const kt = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
-    assert.deepEqual([kt.body.can.bearbeiten, kt.body.grundlagen.kosten], [false, null], 'Kernteam liest, ohne Beträge (A-33)');
+    assert.deepEqual([kt.body.can.bearbeiten, kt.body.grundlagen.kosten], [false, { budgetBaseline: 0, prognose: 0, ist: 0 }], 'Kernteam liest mit Beträgen (Master Entscheid 13)');
     assert.equal((await call('kt', 'PUT', `/v1/projekte/${pj.exit!.id}/abschluss`, LEER, { 'if-match': 'W/"0"' })).statusCode, 403);
     const p2 = await call('pl', 'PUT', `/v1/projekte/${pj.stopp!.id}/abschluss`, LEER, { 'if-match': 'W/"0"' });
     assert.equal(p2.statusCode, 409, p2.body);
@@ -137,6 +141,15 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
   });
 
   test('Exit-Gate: Nacharbeiten, Korrektur zu «Abgeschlossen»; Endzustand lesend (UC-015 Schritt 6, A2; A-30)', async () => {
+    // vor der Abnahme abschliessen (UC-015 A3, A-74): läuft weiter, Vermerk «Abnahme offen», Traktandum bleibt
+    const v0 = await ok('pl', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
+    assert.deepEqual([v0.body.can.abschliessen, v0.body.vermerke], [true, []]);
+    assert.equal((await call('kt', 'POST', `/v1/projekte/${pj.exit!.id}/abschluss/abschliessen`, undefined, { 'if-match': `W/"${v0.body.bericht.version}"` })).statusCode, 403);
+    const vorab = await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/abschluss/abschliessen`, undefined, { 'if-match': `W/"${v0.body.bericht.version}"` });
+    assert.deepEqual([vorab.body.projekt.lebenszyklus, vorab.body.bericht.stand, vorab.body.vermerke.map((x: { art: string }) => x.art), vorab.body.can.abschliessen],
+      ['abgeschlossen', 'traktandiert', ['abnahme_offen'], false]);
+    assert.ok(await sys(async tx => (await tx.query("SELECT 1 FROM ppm.traktandum WHERE id = $1 AND stand <> 'entschieden'", [id.tExit])).rowCount), 'Traktandum offen');
+
     id.s1 = await sitzungLaufend(termine[0]!, { vorschlagId: id.tExit! });
     const falsch = await call('ue', 'PUT', `/v1/traktanden/${id.tExit}/entscheid`, { ergebnis: 'sistiert', begruendung: 'x' });
     assert.equal(falsch.statusCode, 422, falsch.body);
@@ -148,7 +161,7 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
 
     await entscheiden(id.tExit!, 'abgeschlossen');
     g = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
-    assert.deepEqual([g.body.lage, g.body.projekt.lebenszyklus, g.body.bericht.stand], ['abgeschlossen', 'abgeschlossen', 'abgenommen']);
+    assert.deepEqual([g.body.lage, g.body.projekt.lebenszyklus, g.body.bericht.stand, g.body.vermerke], ['abgeschlossen', 'abgeschlossen', 'abgenommen', []]);
     assert.ok(g.body.bericht.abgenommenAt);
     assert.ok((await aufgaben(pj.exit!.id)).every(a => a.stand !== 'offen'));
 
@@ -160,17 +173,22 @@ describe('Abschluss: Exit-Gate, Sistierung, Abbruch, Wiederaufnahme', () => {
     assert.ok((await aufgaben(pj.exit!.id)).some(a => a.stand === 'offen'));
     const audit = await sys(async tx => (await tx.query<{ action: string }>(
       "SELECT action FROM ppm.audit_log WHERE resource_type = 'projekt' AND resource_id = $1 AND action = 'projekt.reopened'", [pj.exit!.id])).rows);
-    assert.equal(audit.length, 1);
+    assert.equal(audit.length, 2, 'Nacharbeit nach dem Abschluss vor der Abnahme und Korrektur');
 
     // und wieder zurück: abgeschlossen
     await entscheiden(id.tExit!, 'abgeschlossen');
     g = await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/abschluss`);
     assert.deepEqual([g.body.projekt.lebenszyklus, g.body.bericht.stand], ['abgeschlossen', 'abgenommen']);
 
-    // Abnahme «Endzustand lesend»: Projekt, Register und Bericht nur noch lesen; Lessons Learned bleiben möglich (UC-013 A1)
+    // nach der Abnahme: Projekt und Register bleiben änderbar, markiert «geändert nach Abschluss» (UC-015 Schritt 6, A-75);
+    // der abgenommene Bericht ist fest, Lessons Learned bleiben möglich (UC-013 A1)
     const projekt = await ok('ue', 'GET', `/v1/projekte/${pj.exit!.id}`);
-    assert.equal((await call('ue', 'PATCH', `/v1/projekte/${pj.exit!.id}`, { name: 'Anders' }, { 'if-match': projekt.etag })).statusCode, 409);
-    assert.equal((await call('pl', 'POST', `/v1/projekte/${pj.exit!.id}/meilensteine`, { phase: 'P4', art: 'meilenstein', text: 'Neu' })).statusCode, 409);
+    assert.equal(projekt.body.geaendertNachAbschluss, null);
+    await ok('ue', 'PATCH', `/v1/projekte/${pj.exit!.id}`, { name: 'Anders' }, { 'if-match': projekt.etag });
+    await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/meilensteine`, { phase: 'P4', art: 'meilenstein', text: 'Neu' }, {}, 201);
+    assert.ok((await ok('ue', 'GET', `/v1/projekte/${pj.exit!.id}`)).body.geaendertNachAbschluss);
+    const verlauf = (await ok('kt', 'GET', `/v1/projekte/${pj.exit!.id}/verlauf`)).body.items as { aktion: string; nachAbschluss: boolean }[];
+    assert.ok(verlauf.some(e => e.aktion === 'projekt.updated.amended' && e.nachAbschluss), JSON.stringify(verlauf.slice(-5)));
     assert.equal((await call('pl', 'PUT', `/v1/projekte/${pj.exit!.id}/abschluss`, LEER, { 'if-match': `W/"${g.body.bericht.version}"` })).statusCode, 409);
     assert.equal((await call('pl', 'POST', `/v1/projekte/${pj.exit!.id}/abschluss/einreichen`, undefined, { 'if-match': 'W/"1"' })).statusCode, 409);
     await ok('pl', 'POST', `/v1/projekte/${pj.exit!.id}/lessons-learned`, { text: 'Abnahme früh terminieren' }, {}, 201);

@@ -45,9 +45,9 @@ export const matrix: Matrix = {
     `ppm.budgetrahmen.budgetrahmen_delete RESTRICTIVE DELETE ppm_app USING (${WP} AND ${ENTWURF}) CHECK -`,
     // Muster KIND
     'ppm.bewertung.bewertung_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.bewertung.bewertung_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('priorisierung:write'::text, 'projekt'::text, projekt_id)",
-    "ppm.bewertung.bewertung_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('priorisierung:write'::text, 'projekt'::text, projekt_id) CHECK app.has_permission('priorisierung:write'::text, 'projekt'::text, projekt_id)",
-    "ppm.bewertung.bewertung_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('priorisierung:write'::text, 'projekt'::text, projekt_id) CHECK -",
+    "ppm.bewertung.bewertung_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('priorisierung:write'::text, projekt_id)",
+    "ppm.bewertung.bewertung_update RESTRICTIVE UPDATE ppm_app USING ppm.recht_am_projekt('priorisierung:write'::text, projekt_id) CHECK ppm.recht_am_projekt('priorisierung:write'::text, projekt_id)",
+    "ppm.bewertung.bewertung_delete RESTRICTIVE DELETE ppm_app USING ppm.recht_am_projekt('priorisierung:write'::text, projekt_id) CHECK -",
   ],
   tags: ['Priorisierung'],
   seed: async (api, a, mark) => {

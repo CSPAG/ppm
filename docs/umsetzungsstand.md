@@ -56,6 +56,11 @@ Querschnitt: Anrede «Du» (UX-OF-1, A-24) in allen Texten der Oberfläche und F
 | AP-E7-6 | Ad-hoc-Auswertungen | 390–399 | umgesetzt (`GET /v1/auswertungen` im Modul `auswertung`, Dateien `adhoc*`, ohne Migration: Filter Portfolio, Phase, Lebenszyklus, Status bis Stichperiode, Handlungsfeld; Kennzahlen, Gruppierung, Summe und Einzelwerte; Export CSV; Oberfläche UI-30, Seitentyp Bericht mit Filterchips und Einzelwerten in der Schublade #110) | #97, #110 | A-55 |
 | AP-E7-7 | Vorlagen mit Feldzuordnung | 400–409 | umgesetzt (400, Versionen je Dokumentart, Word-Vorlage hochladen, Platzhalter «…» lesen, Zuordnung zu Datenfeldern mit Vorschlag und Prüfung, aktiv setzen; Word-Ausgabe des Projektvertrags über die aktive Vorlage; Administration › Vorlagen UI-48 mit Hochladen, Zuordnung, Prüfbericht, Aktiv setzen, Entwurf löschen; Datenquelle Portfoliobericht #113) | #93, #98, #113 | Platzhalter in Guillemets (Q7 «Projektname»); nur Word-Vorlagen (.docx, ≤ 5 MB, ohne Makros); PDF weiter im Layout des Grundbestands; Feldkatalog registriert das erzeugende Modul, Arten ohne Modul nur als Zuordnungsziel; Kennzeichnung «Personendaten» fehlt → Warnung (G12); Leserecht der Vorlagen = `vorlage:write` |
 | AP-E7-8 | Benutzer und Zugänge vollständig | 410–419 | umgesetzt (410; Dateien `neubesetzung*` im Modul `eingang`: Vorschau, Entziehen über den Baukasten (`admin.removeMember`), Aufgabe `zugang.neu_besetzen` an `members:admin`, Neubesetzungen; Feature `zugang`: Administration › Zugänge `/administration/zugaenge` mit Entziehen in der Schublade und Vorschau, Neubesetzung `/administration/neubesetzungen/:id`, Befehl «Zugang entziehen …»; E2E `web/e2e/zugaenge.spec.ts` bis zur Vorschau; Neubesetzung über die Haken des Baukastens `member.removing`/`member.removed` (`AppSpec.iamEvents`, iam 4.0), auch beim Entfernen unter «Benutzer und Rollen»; Mitteilung bei Rollenänderungen) | #87, #106, #114, #130 | A-21, A-50, A-59 |
+| AP-E8-1 | Rollenmodell steuern und führen je Portfolio und Projekt | 420–429 | umgesetzt (420: Tupel nach A-70 umbenannt, Rollen nach fachmodell.md 3.3 in `src/authz/model.ts`, Rechte `projekt:list` und `idee:list`, KIND-Policies mit Portfolio, Testmatrix; abgelöste Rollenschlüssel bleiben ohne Rechte im Modell bis zum nächsten Deploy, OP-20) | #210 | A-70, A-73; A-62 nachgeführt (vertrauliche Projekte im Jahresbedarf mit Namen für alle, die sie sehen) |
+| AP-E8-2 | Zugriff getrennt von der Projektorganisation | 430–439 | umgesetzt (430: Funktionen `sp`/`pl`/`weitere` mit Text, Projektorganisation ohne Tupel; Vorschlag `projekt-fuehren`/`projekt-steuern` beim Entstehen; Kap. 8 und Unterzeichnende Projektauftraggeber:in und Projektleitung, Einladungen nur an diese; Bereich «Zugriff» an Projekt und Portfolio UI-51; Hinweis «kein Zugriff» in der Projektübersicht und in Kap. 8; Wortlaut «Projektauftraggeber:in» statt «Sponsor» in allen Texten) | #210 | A-71, A-72 |
+| AP-E8-3 | Projekte auflisten, eingereichte Ideen für alle | 440–449 | umgesetzt (440: `ppm.projekt_lesbar`, Kopfdaten aller nicht vertraulichen Projekte mit `projekt:list`, Details nur mit Leserecht; «Alle Projekte» UI-52; eingereichte Ideen mit `idee:list`, ähnliche Ideen beim Ausfüllen `GET /v1/ideen/aehnlich`) | #210 | A-73; Zählungen in Auswertungen zeigen Kopfdaten anderer Portfolios (gewollt, im Browser nicht geprüft) |
+| AP-E8-4 | Vermerk statt Sperre | 450–459 | umgesetzt (450; `vermerk*` in `vertrag`, `idee`, `statusbericht`, `abschluss`, `ziel`, `sitzung`: Gate vorlegen ohne Quality-Check und Unterschrift, Phase ohne Gate-Entscheid beginnen, Änderung vor dem Entscheid übernehmen, Initialisierung vor der Freigabe, Abschluss vor der Abnahme, Monatsabschluss mit ungeprüften Berichten, Roadmap vor der Freigabe, Traktandum mit Vermerk; Aufgaben bleiben offen, Entscheid wird nachgetragen; Bausteine `Vermerke`, `VorabAktion`) | #210 | A-74; Korrektur eines Gate-Entscheids nach vorab begonnener Phase setzt die Phase nicht zurück (G1) |
+| AP-E8-5 | Versionen statt Sperre, Verlauf am Objekt | 460–469 | umgesetzt (460–463: Statusbericht nach Einreichen und Abschluss, Sitzung und Unterlagen nach dem Versand, Jahresziele nach der Vorlage, Projekt nach dem Abschluss änderbar, markiert «geändert nach …»; Verlauf aus dem Audit je Bericht, Sitzung, Zieljahr und Projekt; Bausteine `Verlauf`, `GeaendertNach`) | #210 | A-75 (A-37 abgelöst); zurückgezogene Projekte bleiben lesend; offen: der abgenommene Abschlussbericht ist noch fest (409), G2 verlangt eine neue Fassung |
 
 ## Business Cases
 
@@ -72,7 +77,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | ZM.03.01 | Zielerreichung erfassen | 012 | E6 | AP-E6-3 | umgesetzt (UC-012 Schritte 1–2; Aufgabe im Eingang) | #37, #101 |
 | ZM.03.02 | Quartalsreporting an den VR erstellen | 012 | E6 | AP-E6-4 | umgesetzt | #104, #117 |
 | ZM.03.03 | Jahresrückblick auswerten | 013 | E7 | AP-E7-5 | umgesetzt | #140, #171, #187, #196 |
-| DM.01.01 | Projektidee erfassen | 001 | E4 | AP-E4-1 | umgesetzt | #36, #50 |
+| DM.01.01 | Projektidee erfassen | 001 | E4, E8 | AP-E4-1, AP-E8-3 | umgesetzt (ähnliche Ideen beim Ausfüllen, A-73) | #36, #50, #210 |
 | DM.01.02 | Projektidee qualifizieren | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
 | DM.01.03 | Projektideen zusammenführen | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
 | DM.01.04 | Projektidee zurückweisen | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
@@ -97,7 +102,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.04.01 | Entscheidungsvorlage vorbereiten | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2) | #32, #39 |
 | PP.04.02 | Portfolioentscheid erfassen | 006 | E2 | AP-E2-2 | umgesetzt (UC-006 Schritte 6–9, A1, A3, A4) | #42, #45 |
 | PP.04.03 | Portfolio-Roadmap publizieren | 011 | E6 | AP-E6-2 | umgesetzt (#72) | #72 |
-| PP.04.04 | Projektorganisation festlegen | 002 | E0 | AP-E0-4 | umgesetzt | #21, #25 |
+| PP.04.04 | Projektorganisation festlegen | 002 | E0, E8 | AP-E0-4, AP-E8-2 | umgesetzt (ohne Wirkung auf Rechte, Funktionen als Text, A-71, A-72) | #21, #25, #210 |
 | PP.04.05 | Gate-Reviews einplanen | 006 | E2 | AP-E2-1 | umgesetzt (UC-006 Schritte 1–5, A1, A2; Schritt 4 Traktandum 1 Portfoliobericht immer gesetzt #109) | #32, #39, #109 |
 | PS.01.01 | Statusbericht erfassen | 004 | E1 | AP-E1-1 | umgesetzt («Änderung beantragen» aus der Warnung «wesentlich», UC-004 A1, #119; «Eskalieren» #136) | #30, #52, #58, #119, #136 |
 | PS.01.02 | Statusbericht prüfen | 005 | E1 | AP-E1-2 | umgesetzt | #41, #44 |
@@ -143,7 +148,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | RK.02.05 | Ressourcenbedarf präzisieren | 003 | E3 | AP-E3-3 | umgesetzt (Gate-Entwurf übernimmt Personal aus der Baseline; FTE ab Gate P1–P2 als Pflichtangabe aus AP-E3-1) | #90, #118 |
 | RK.02.06 | ICT- und Infrastrukturbedarf anmelden | 002 | E0, E3 | AP-E0-6, AP-E3-1 | Register umgesetzt (AP-E0-6) | #29, #51 |
 | AM.01.01 | Benutzer verwalten | 016 | E7 | AP-E7-8 (Baukasten) | umgesetzt (Anlegen, Einladen, Rollen im Baukasten; Zugang entziehen mit Neubesetzung, UC-016 A1; Information bei Rollenänderung, Schritt 3) | #87, #106, #114 |
-| AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7 | AP-E0-1, AP-E7-8 | umgesetzt (Rollen des Modells; eigene Rollen der Organisation zur Laufzeit über die Seite «Rollen» des Baukastens `/verwalten/rollen`, UC-016 A2, iam 5.0; Recht `roles:admin` nur org-admin) | #14, #130 |
+| AM.01.02 | Rolle mit Berechtigungen definieren | 016 | E0, E7, E8 | AP-E0-1, AP-E7-8, AP-E8-1, AP-E8-2 | umgesetzt (Rollen des Modells; eigene Rollen der Organisation zur Laufzeit über die Seite «Rollen» des Baukastens `/verwalten/rollen`, UC-016 A2, iam 5.0; Recht `roles:admin` nur org-admin) | #14, #130, #210 |
 | AM.01.03 | Stellvertretung regeln | 016 | E0 | AP-E0-8 | umgesetzt | #22, #31 |
 | AM.02.01 | Organisationseinheiten verwalten | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
 | AM.02.02 | Codetabellen pflegen | 017 | E0 | AP-E0-2 | umgesetzt | #20, #26 |
@@ -203,6 +208,7 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, Anrede (ab #152 maschinell geprüft) | Zielgrössen |
 |---|---|---|---|---|---|---|---|
+| #210 | AP-E8-2–AP-E8-5 | Liste + Schublade «Zugriff» (UI-51), Bericht «Alle Projekte» (UI-52); Vermerke und «geändert nach …» als Text mit Symbol (darstellung.md), Verlauf als Zeitleiste; Z1, Z2, Z5, Z7, Z8 (zurückgezogen), Z9 (Banner nach Abschluss) | ja | ohne Befund (Vitest) | nicht im Browser geprüft | ja, «Du», «Projektauftraggeber:in» | – |
 | #199 | AP-E0-0 | Querschnitt Leistung, Oberfläche unverändert | – | unverändert | unverändert | – | Start-Bundle 208,9 kB (Q-L6) |
 | #188 | AP-E0-8 | Startseite (UI-01): Zeile entfällt ohne Meilenstein bzw. Geschäft | ja (Links) | ohne Befund (Vitest, E2E `eingang.spec.ts` hell/dunkel) | 360 px im E2E; 768/1440 nicht eigens | ja, «Du» | eine Abfrage für alle Projekte der Karte |
 | #193 | AP-E1-2, AP-E1-3, AP-E2-3 | Bericht (UI-16, UI-17, UI-18): Einzelwerte, Filter aus Zahlen (I-N5), Chips; Z1, Z3, Z5 | ja | ohne Befund | unverändert | ja, «Du» | Start-Bundle 239,4 kB |

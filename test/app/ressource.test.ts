@@ -87,10 +87,10 @@ db.describe('Kapazität und Auslastung (API)', () => {
       await tx.query(bedarf, [T, projekt.geheim, 'P2', 'projektleitung', 1, '2027-01', '2027-12']);
       await tx.query("INSERT INTO ppm.ressourcenbedarf (tenant_id, projekt_id, phase, rolle, groesse) VALUES ($1, $2, 'P3', 'ctl', 'L')", [T, projekt.x]);
     });
-    h.rm = await person('rm', 'rm');
-    h.ue = await person('ue', 'ue');
-    h.gl = await person('gl', 'gl');
-    h.pl = await person('pl', 'pl', { type: 'projekt', id: projekt.x });
+    h.rm = await person('rm', 'alle-fuehren');
+    h.ue = await person('ue', 'alle-fuehren');
+    h.gl = await person('gl', 'alle-lesen');
+    h.pl = await person('pl', 'projekt-fuehren', { type: 'projekt', id: projekt.x });
     h.admin = await person('admin', 'org-admin');
   });
   db.after(async () => { await api?.close(); });
@@ -137,9 +137,9 @@ db.describe('Kapazität und Auslastung (API)', () => {
     assert.deepEqual(audit, ['kapazitaet.created', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated', 'kapazitaet.deleted', 'kapazitaet.created', 'kapazitaet.created', 'kapazitaet.updated']);
   });
 
-  db.test('Rechte: lesen mit ressource:read (RM, UE), pflegen nur mit ressource:write (RM)', async () => {
-    assert.equal((await call('ue', 'GET', '/v1/kapazitaet')).json().can.write, false);
-    assert.equal((await call('ue', 'PUT', '/v1/kapazitaet', { zellen: [{ rolle: 'ctl', monat: '2027-08', fte: 1 }] })).statusCode, 403);
+  db.test('Rechte: Ressourcen lesen und pflegen nur «alle Portfolios führen» (Personendaten, darstellung.md)', async () => {
+    assert.equal((await call('rm', 'GET', '/v1/kapazitaet')).json().can.write, true);
+    assert.equal((await call('gl', 'PUT', '/v1/kapazitaet', { zellen: [{ rolle: 'ctl', monat: '2027-08', fte: 1 }] })).statusCode, 403);
     for (const who of ['gl', 'pl']) {
       assert.equal((await call(who, 'GET', '/v1/kapazitaet')).statusCode, 403, who);
       assert.equal((await call(who, 'GET', '/v1/auslastung')).statusCode, 403, who);
@@ -155,12 +155,12 @@ db.describe('Kapazität und Auslastung (API)', () => {
     // Grösse L (ctl) ohne FTE zählt nicht; ctl erscheint wegen des Angebots
     assert.deepEqual(a.rollen.map((x: { rolle: string }) => x.rolle), ['ctl', 'projektleitung']);
     const pl = a.rollen[1].zellen as { angebot: number; bedarf: number; lage: string; beitraege: { projektId: string }[] }[];
-    // RM sieht das vertrauliche Projekt nicht (Lesesicht, A-34): 3 + 2,5 FTE
-    assert.deepEqual(pl.map(z => [z.angebot, z.bedarf, z.lage]), [[6, 5.5, 'frei'], [5, 5.5, 'ueberbucht'], [5, 5.5, 'ueberbucht']]);
-    assert.deepEqual(a.projekte.map((p: { nummer: string }) => p.nummer), ['2026-001', '2026-002']);
-    assert.deepEqual(a.engpaesse, [{ rolle: 'projektleitung', quartal: '2027-Q2', monat: '2027-05', bedarf: 5.5, angebot: 5, projekte: 2 }]);
+    // «Alle Portfolios führen» sieht auch das vertrauliche Projekt (Master Entscheid 13): 3 + 2,5 + 1 FTE
+    assert.deepEqual(pl.map(z => [z.angebot, z.bedarf, z.lage]), [[6, 6.5, 'ueberbucht'], [5, 6.5, 'ueberbucht'], [5, 6.5, 'ueberbucht']]);
+    assert.deepEqual(a.projekte.map((p: { nummer: string }) => p.nummer), ['2026-001', '2026-002', '2026-003']);
+    assert.deepEqual(a.engpaesse, [{ rolle: 'projektleitung', quartal: '2027-Q2', monat: '2027-05', bedarf: 6.5, angebot: 5, projekte: 3 }], JSON.stringify(a.engpaesse));
 
-    // UE sieht vertrauliche Projekte nicht ohne projekt:vertraulich; org-admin hat alle Rechte
+    // org-admin hat alle Rechte
     const admin = (await call('admin', 'GET', '/v1/auslastung?von=2027-04&bis=2027-04')).json();
     assert.equal(admin.rollen.find((x: { rolle: string }) => x.rolle === 'projektleitung').zellen[0].bedarf, 6.5);
 
@@ -178,7 +178,7 @@ db.describe('Kapazität und Auslastung (API)', () => {
       const s = (await call('rm', 'GET', `/v1/auslastung?von=2027-04&bis=2027-05&szenario=${id}`)).json();
       assert.deepEqual(s.szenario, { id, name: 'Variante B' });
       const pl = s.rollen.find((x: { rolle: string }) => x.rolle === 'projektleitung').zellen;
-      assert.deepEqual(pl.map((z: { bedarf: number }) => z.bedarf), [0, 2.5], 'x fällt weg, y beginnt einen Monat später');
+      assert.deepEqual(pl.map((z: { bedarf: number }) => z.bedarf), [1, 3.5], 'x fällt weg, y beginnt einen Monat später; das vertrauliche Projekt zählt mit');
       assert.equal((await call('rm', 'GET', `/v1/auslastung?szenario=00000000-0000-4000-8000-000000000002`)).statusCode, 404);
     } finally {
       auslastungModul.szenarioQuelleSetzen(null);

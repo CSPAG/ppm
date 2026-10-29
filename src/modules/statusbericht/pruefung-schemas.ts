@@ -61,8 +61,10 @@ export const PeriodeZeile = Type.Object({
   eingefordertAt: Nullable(DateTime),
   /** Version des Berichts für `If-Match` (0 ohne Bericht). */
   version: Type.Integer({ minimum: 0 }),
+  vermerke: Type.Array(Type.Object({ art: Type.String(), text: Type.String() }, { additionalProperties: false }),
+    { description: 'Offene Vermerke (A-74): «nicht geprüft», wenn die Periode mit dem eingereichten Bericht abgeschlossen wurde.' }),
   can: Type.Object({
-    bestaetigen: Type.Boolean(),
+    bestaetigen: Type.Boolean({ description: 'Bestätigen; nach dem Abschluss nur für ungeprüfte Berichte (Vermerk nachtragen).' }),
     rueckfrage: Type.Boolean(),
     einfordern: Type.Boolean(),
     zuruecknehmen: Type.Boolean({ description: 'Bestätigung rückgängig machen (Toast «Rückgängig»).' }),
@@ -90,8 +92,9 @@ export const Periodenstand = Type.Object({
   vorperiode: Type.String(),
   abschluss: Type.Object({
     moeglich: Type.Boolean(),
-    sperre: Nullable(Type.String({ description: 'Warum der Abschluss gesperrt ist (Text der Regel).' })),
+    hinweis: Nullable(Type.String({ description: 'Warnung vor dem Abschluss (A-74): ungeprüfte Berichte zählen mit dem Vermerk «nicht geprüft».' })),
     geprueft: Type.Integer(),
+    ungeprueft: Type.Integer({ description: 'Eingereichte, nicht geprüfte Berichte; nach dem Abschluss mit Vermerk.' }),
     nichtGemeldet: Type.Integer({ description: 'Projekte, für die die Werte der Vorperiode mit «nicht gemeldet» übernommen werden.' }),
   }, { additionalProperties: false }),
   can: Type.Object({ pruefen: Type.Boolean(), abschliessen: Type.Boolean() }, { additionalProperties: false }),

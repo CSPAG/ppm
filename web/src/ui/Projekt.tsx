@@ -10,7 +10,7 @@ import { fmtDatum, fmtPhase, type Phase, type Tag } from './format.ts';
 import { Status, type Projektstatus, type Trend } from './Status.tsx';
 import { T } from './texte/index.ts';
 
-export type ProjektMerkmal = 'sns-vr' | 'eskalation';
+export type ProjektMerkmal = 'sns-vr' | 'eskalation' | 'nicht_geprueft';
 
 export interface ProjektKurz {
   /** Jahr und laufende Nummer, z. B. «2026-014». */
@@ -37,7 +37,10 @@ export function PhaseKurz({ phase }: { phase: Phase }) {
 
 export function Merkmale({ merkmale }: { merkmale?: ProjektMerkmal[] }) {
   if (!merkmale?.length) return null;
-  return <>{merkmale.map(m => <span key={m} className={`merkmal merkmal-${m}`}>{T.projekt.merkmal[m]}</span>)}</>;
+  // «nicht geprüft» ist ein offener Vermerk (A-74) und erscheint wie jeder Vermerk
+  return <>{merkmale.map(m => (m === 'nicht_geprueft'
+    ? <span key={m} className="vermerk"><span className="vermerk-kreis" aria-hidden="true" />{T.projekt.merkmal[m]}</span>
+    : <span key={m} className={`merkmal merkmal-${m}`}>{T.projekt.merkmal[m]}</span>))}</>;
 }
 
 /** Projekt klein: Name, Phase, Status mit Trend. */

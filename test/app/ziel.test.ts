@@ -18,10 +18,10 @@ describe('Strategische Ziele', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-editor', 'gl');
+    const e = await login(api, 'demo', 'u-editor', 'alle-fuehren');
     tenantId = e.tenantId;
     editor = { authorization: e.authorization };
-    viewer = { authorization: (await login(api, 'demo', 'u-viewer', 'leser')).authorization };
+    viewer = { authorization: (await login(api, 'demo', 'u-viewer', 'mitglied')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
     feld1 = (await call('POST', '/v1/handlungsfelder', editor, { label: 'Patientenorientierung', position: 1 })).json().id;
     feld2 = (await call('POST', '/v1/handlungsfelder', editor, { label: 'Wirtschaftlichkeit', position: 2 })).json().id;

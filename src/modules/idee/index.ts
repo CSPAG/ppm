@@ -9,6 +9,7 @@ import type { FastifyInstance } from 'fastify';
 import { registriereIdee } from './freigabe.ts';
 import { registerFreigabeRoutes } from './freigabe-routes.ts';
 import { ideeTools } from './mcp.ts';
+import { registerPoolRoutes } from './pool-routes.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
@@ -19,9 +20,13 @@ export const ideeModule = defineModule({
     registerRoutes(app, deps);
     registerPruefungRoutes(app, deps);
     registerFreigabeRoutes(app, deps);
+    registerPoolRoutes(app);
   },
   mcpTools: { ...ideeTools },
 });
 
 // Freigabe der Initialisierung (AP-E4-3): Traktandenart `idee` in der Registry der Sitzung
 registriereIdee();
+
+// Vermerk «Initialisierung nicht freigegeben» am Projekt (AP-E8-4, UC-001 A6) für die Anzeige im Projektvertrag
+export { vermerkeZumProjekt as initialisierungsvermerke } from './vermerk.ts';

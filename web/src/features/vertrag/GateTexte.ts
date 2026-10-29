@@ -48,7 +48,7 @@ export const TG = {
 
   // Nutzenprüfung (UC-003 A2)
   nutzen: 'Nutzenprüfung',
-  nutzenHinweis: 'Erfasse die erreichten Werte je KPI und deine Beurteilung (Projektleitung und Sponsor).',
+  nutzenHinweis: 'Erfasse die erreichten Werte je KPI und deine Beurteilung (Projektleitung und Projektauftraggeber:in).',
   kpi: 'KPI',
   zielwert: 'Zielwert',
   erreichterWert: 'Erreicht',

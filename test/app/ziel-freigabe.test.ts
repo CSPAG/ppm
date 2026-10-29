@@ -24,12 +24,12 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-gl', 'gl');
+    const e = await login(api, 'demo', 'u-gl', 'alle-fuehren');
     tenantId = e.tenantId;
     gl = { authorization: e.authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser', 'leser')).authorization };
-    ohneZiele = { authorization: (await login(api, 'demo', 'u-kt', 'antragsteller')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser', 'mitglied')).authorization };
+    ohneZiele = { authorization: (await login(api, 'demo', 'u-kt', 'mitglied')).authorization };
     felder = [
       (await call('POST', '/v1/handlungsfelder', gl, { label: 'Wirtschaftlichkeit', position: 1 })).json().id,
       (await call('POST', '/v1/handlungsfelder', gl, { label: 'Innovation', position: 2 })).json().id,
@@ -87,13 +87,18 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
     assert.deepEqual([r.json().stand, typeof r.json().vorgelegtAt, r.json().can.write], ['zur_freigabe', 'string', false]);
     assert.ok(!(await eingang(gl)).some(x => x.titel === 'Jahresziele 2027 vervollständigen'), 'Aufgabe erledigt');
 
-    // gesperrt bis zum Entscheid (K6 Z9)
+    // nach der Vorlage änderbar, markiert «geändert nach Vorlage» und im Verlauf (K6 Z9, A-75)
     const jz = (await call('GET', '/v1/jahresziele?jahr=2027', gl)).json().items[0];
-    assert.equal((await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${jz.version}"` }, { text: 'neu' })).statusCode, 409);
+    const n = await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${jz.version}"` }, { zielwert: `${jz.zielwert} (präzisiert)` });
+    assert.equal(n.statusCode, 200, n.body);
+    assert.ok(n.json().geaendertNachVorlage);
+    const vl = (await call('GET', '/v1/ziele/2027/verlauf', leser)).json().items as { text: string; nachVorlage: boolean }[];
+    assert.ok(vl.some(x => x.nachVorlage && x.text === 'Jahresziel geändert · geändert nach Vorlage'), JSON.stringify(vl));
+    assert.ok(vl.some(x => x.text === 'dem VR vorgelegt' && !x.nachVorlage));
     assert.equal((await call('POST', '/v1/ziele/2027/vorlegen', { ...gl, 'if-match': `W/"${await version(2027)}"` })).statusCode, 409, 'schon vorgelegt');
 
-    // Freigabe erfassen: nur ziel:freigabe (UE), nicht die GL
-    assert.equal((await call('POST', '/v1/ziele/2027/freigabe', { ...gl, 'if-match': `W/"${await version(2027)}"` }, { entscheid: 'freigegeben', datum: '2026-12-01' })).statusCode, 403);
+    // Freigabe erfassen: nur ziel:freigabe («alle Portfolios führen»), nicht wer nur liest
+    assert.equal((await call('POST', '/v1/ziele/2027/freigabe', { ...leser, 'if-match': `W/"${await version(2027)}"` }, { entscheid: 'freigegeben', datum: '2026-12-01' })).statusCode, 403);
     assert.equal((await call('GET', '/v1/ziele/2027/vorlage', ue)).json().can.freigabe, true);
   });
 
@@ -120,7 +125,7 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
       ['zieljahr.submitted', 'zieljahr.changes_requested', 'zieljahr.submitted', 'zieljahr.approved']);
   });
 
-  test('Roadmap: erst nach Freigabe publizieren, Vorschau, lesbar für alle Angemeldeten, ohne vertrauliche Projekte', async () => {
+  test('Roadmap: vor der Freigabe mit Vermerk, danach ohne; Vorschau, lesbar für alle Angemeldeten, ohne vertrauliche Projekte', async () => {
     const jz = (await call('GET', '/v1/jahresziele?jahr=2027', gl)).json().items[0];
     // Zuordnung über die Datenbank (Projekte sind für die GL nur teilweise sichtbar)
     await full(api.t.runtime, tenantId, async tx => {
@@ -128,12 +133,17 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
         await tx.query('INSERT INTO ppm.ziel_projekt (tenant_id, projekt_id, strategisches_ziel_id, jahresziel_id) VALUES ($1, $2, $3, $4)', [tenantId, projekt[nr], ziel21, jz.id]);
       }
     });
-    assert.equal((await call('POST', '/v1/roadmap/2026', ue)).statusCode, 409, 'Jahresziele 2026 nicht in Kraft');
-    assert.equal((await call('POST', '/v1/roadmap/2027', gl)).statusCode, 403, 'publizieren nur ziel:freigabe');
+    // vor der Freigabe der Jahresziele: publiziert mit Vermerk (UC-011 A3, A-74), der Vermerk steht auch beim Lesen
+    const vorab = await call('POST', '/v1/roadmap/2026', ue);
+    assert.equal(vorab.statusCode, 200, vorab.body);
+    assert.deepEqual(vorab.json().vermerke.map((v: { art: string }) => v.art), ['jahresziele_nicht_freigegeben']);
+    assert.deepEqual((await call('GET', '/v1/roadmap/2026', leser)).json().vermerke.map((v: { text: string }) => v.text), ['Jahresziele noch nicht freigegeben']);
+    assert.equal((await call('POST', '/v1/roadmap/2099', ue)).statusCode, 404, 'ohne Zielzyklus');
+    assert.equal((await call('POST', '/v1/roadmap/2027', leser)).statusCode, 403, 'publizieren nur ziel:freigabe');
     assert.equal((await call('GET', '/v1/roadmap/2027', leser)).statusCode, 404, 'noch nicht publiziert');
 
     const vorschau = (await call('GET', '/v1/roadmap/2027/vorschau', ue)).json();
-    assert.deepEqual([vorschau.stand, vorschau.publiziertAt, vorschau.can.publizieren], ['in_kraft', null, true]);
+    assert.deepEqual([vorschau.stand, vorschau.publiziertAt, vorschau.can.publizieren, vorschau.vermerke], ['in_kraft', null, true, []]);
 
     const p = await call('POST', '/v1/roadmap/2027', ue);
     assert.equal(p.statusCode, 200, p.body);
@@ -152,6 +162,6 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
 
     // erneut publizieren ersetzt den Stand
     assert.equal((await call('POST', '/v1/roadmap/2027', ue)).json().version, 2);
-    assert.deepEqual((await call('GET', '/v1/roadmap', ohneZiele)).json().items.map((x: { jahr: number; version: number }) => [x.jahr, x.version]), [[2027, 2]]);
+    assert.deepEqual((await call('GET', '/v1/roadmap', ohneZiele)).json().items.map((x: { jahr: number; version: number }) => [x.jahr, x.version]), [[2027, 2], [2026, 1]]);
   });
 });

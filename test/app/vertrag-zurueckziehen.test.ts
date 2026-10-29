@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict';
 import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
-import { login, person, testApi, type TestApi } from './api.ts';
+import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
@@ -40,11 +40,11 @@ describe('Projektvertrag: zurückziehen', () => {
     const r = await ok('pl', 'POST', `/v1/vertragsversionen/${e.body.version.id}/einreichen`, undefined, { 'if-match': e.etag });
     return { v: e.body.version.id, etag: r.etag };
   }
-  /** Quality-Check bestätigen, SP, PL und CTL unterzeichnen: traktandiert beim PRAT (UC-002 Schritte 9–10). */
+  /** Quality-Check bestätigen, SP und PL unterzeichnen: traktandiert beim PRAT (UC-002 Schritte 9–10). */
   async function traktandiert(p: string): Promise<{ v: string; etag: string }> {
     const { v, etag } = await eingereicht(p);
     await ok('ue', 'POST', `/v1/vertragsversionen/${v}/quality-check`, { ergebnis: 'bestaetigt' }, { 'if-match': etag });
-    for (const who of ['sp', 'pl', 'ctl']) {
+    for (const who of ['sp', 'pl']) {
       const q = await ok(who, 'GET', `/v1/vertragsversionen/${v}/pruefung`);
       await ok(who, 'POST', `/v1/vertragsversionen/${v}/unterschriften`, { ergebnis: 'unterzeichnet' }, { 'if-match': q.etag });
     }
@@ -55,14 +55,14 @@ describe('Projektvertrag: zurückziehen', () => {
 
   before(async () => {
     api = await testApi();
-    const ue = await login(api, 'acme', 'z-ue', 'ue');
+    const ue = await login(api, 'acme', 'z-ue', 'alle-fuehren');
     T = ue.tenantId;
     id.ue = ue.principalId;
     h.ue = { authorization: ue.authorization };
     h.adm = { authorization: (await login(api, 'acme', 'z-adm', 'org-admin')).authorization };
     for (const f of ['sp', 'pl', 'ctl']) {
       id[f] = await person(api, T, `z-${f}`);
-      h[f] = { authorization: (await login(api, 'acme', `z-${f}`, 'antragsteller')).authorization };
+      h[f] = { authorization: (await login(api, 'acme', `z-${f}`, 'mitglied')).authorization };
     }
     const m = await ok('ue', 'POST', '/v1/phasenmodelle', {}, {}, 201);
     await ok('adm', 'POST', `/v1/phasenmodelle/${m.body.id}/in-kraft-setzen`, undefined, { 'if-match': m.etag });
@@ -73,8 +73,12 @@ describe('Projektvertrag: zurückziehen', () => {
       const p = (await ok('ue', 'POST', '/v1/projekte', { name: `Vorhaben ${k.toUpperCase()}`, portfolioId: portfolio, phase: 'P0' }, {}, 201)).body;
       pj[k] = { id: p.id, nummer: p.nummer };
       await ok('ue', 'PUT', `/v1/projekte/${p.id}/organisation`, { mitglieder: [
-        { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.ctl, funktion: 'ctl', akv: '' },
+        { personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }, { personId: id.ctl, funktion: 'weitere', funktionText: 'CTL', akv: '' },
       ] }, { 'if-match': 'W/"0"' });
+      // Zugriff getrennt von der Projektorganisation (Master Entscheid 16)
+      for (const [f, rolle] of [['sp', 'projekt-steuern'], ['pl', 'projekt-fuehren'], ['ctl', 'projekt-fuehren']] as const) {
+        await grant(api, T, `user:${id[f]}`, rolle, { type: 'projekt', id: p.id });
+      }
     }
   });
   after(async () => { await api?.close(); });

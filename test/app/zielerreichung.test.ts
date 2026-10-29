@@ -21,11 +21,11 @@ describe('Zielerreichung', () => {
 
   before(async () => {
     api = await testApi();
-    const e = await login(api, 'demo', 'u-gl-ze', 'gl');
+    const e = await login(api, 'demo', 'u-gl-ze', 'alle-fuehren');
     tenantId = e.tenantId;
     gl = { authorization: e.authorization };
-    leser = { authorization: (await login(api, 'demo', 'u-leser-ze', 'leser')).authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue-ze', 'ue')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'u-leser-ze', 'mitglied')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue-ze', 'alle-fuehren')).authorization };
     const feld = (await call('POST', '/v1/handlungsfelder', gl, { label: 'Qualität', position: 3 })).json().id;
     ziel31 = (await call('POST', '/v1/strategische-ziele', gl, { handlungsfeldId: feld, nummer: '3.1', text: 'Qualität sichern', metrik: 'Zufriedenheit', zielwert: '≥ 80 %' })).json().id;
     for (const jahr of [2026, 2027]) await call('POST', `/v1/ziele/${jahr}`, gl, {});

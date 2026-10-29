@@ -60,13 +60,15 @@ export interface StandRow {
   statusbericht_id: string | null; gemeldet: boolean; status: 'im_plan' | 'kritisch' | null; trend: string | null; phase: string;
   abschluss_per: string | null; naechster_meilenstein: string; werte_aus: string | null; status_vorperiode: 'im_plan' | 'kritisch' | null;
   eingereicht_at: Date | null; geprueft_at: Date | null; version: number | null; vor_trend: string | null; beantwortet: boolean;
+  /** Stand des Berichts der Zeile (eingereicht = mit Vermerk «nicht geprüft» abgeschlossen, A-74). */
+  bericht_stand: string | null;
 }
 
 export async function standZeilen(tx: Tx, periode: string): Promise<StandRow[]> {
   return (await tx.query<StandRow>(
     `SELECT d.projekt_id, p.nummer, p.name, p.portfolio_id, pf.name AS portfolio_name, d.statusbericht_id, d.gemeldet, d.status, d.trend,
             d.phase, to_char(d.abschluss_per, 'YYYY-MM-DD') AS abschluss_per, d.naechster_meilenstein, d.werte_aus, d.status_vorperiode,
-            b.eingereicht_at, b.geprueft_at, b.version,
+            b.eingereicht_at, b.geprueft_at, b.version, b.stand AS bericht_stand,
             (SELECT v.trend FROM ${S}.dashboard_zeile v WHERE v.projekt_id = d.projekt_id AND v.periode < $1 ORDER BY v.periode DESC LIMIT 1) AS vor_trend,
             EXISTS (SELECT 1 FROM ${S}.rueckfrage x WHERE x.statusbericht_id = d.statusbericht_id) AS beantwortet
        FROM ${S}.dashboard_zeile d
@@ -166,4 +168,9 @@ export async function tagesbeginn(tx: Tx, datum: string): Promise<Date> {
 
 export async function heute(tx: Tx): Promise<string> {
   return (await tx.query<{ d: string }>("SELECT to_char(now() AT TIME ZONE 'Europe/Zurich', 'YYYY-MM-DD') AS d")).rows[0]!.d;
+}
+
+/** Eingereichte, nicht geprüfte Berichte der Periode (Vermerk «nicht geprüft» nach dem Abschluss, A-74). */
+export async function ungeprueft(tx: Tx, periode: string): Promise<number> {
+  return (await tx.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${S}.statusbericht WHERE periode = $1 AND stand = 'eingereicht'`, [periode])).rows[0]!.n;
 }

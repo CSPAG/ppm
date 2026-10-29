@@ -20,6 +20,7 @@ import {
 } from './schemas.ts';
 import { fristen } from './pruefung.ts';
 import * as store from './store.ts';
+import { dashboardNachfuehren, GEAENDERT_TEXT, markieren, nachWas } from './verlauf.ts';
 
 const TAG = 'Statusberichte';
 
@@ -83,13 +84,14 @@ function out(l: Lage, schreiben: boolean, principalId: string | null): Statusber
     vorperiode: l.vor ? { periode: l.vor.periode, status: l.vor.status, trend: l.vor.trend, stand: l.vor.stand } : null,
     fehlend: fehlend(felder),
     eingereichtAt: r?.eingereicht_at ?? null, eingereichtBy: r?.eingereicht_by ?? null, geprueftAt: r?.geprueft_at ?? null,
+    geaendertNach: r?.geaendert_nach && r.geaendert_nach_at ? { art: r.geaendert_nach, text: GEAENDERT_TEXT[r.geaendert_nach], at: r.geaendert_nach_at } : null,
     version: r?.version ?? 0, updatedAt: r?.updated_at ?? null,
     eskalation: l.eskalation ? { id: l.eskalation.id, anlass: l.eskalation.anlass, stand: l.eskalation.stand, vorgeschlagen: l.eskalation.vorgeschlagen, angelegtAt: l.eskalation.created_at.toISOString() } : null,
     can: {
       write: bearbeitbar,
-      einreichen: bearbeitbar && !!r,
+      einreichen: bearbeitbar && !!r && (r.stand === 'entwurf' || r.stand === 'zurueckgegeben'),
       zurueckziehen: schreiben && !!r && !!principalId && l.periodeStand === 'offen' && rueckgaengigMoeglich(r, principalId, l.sekunden),
-      eskalieren: bearbeitbar && !l.eskalation,
+      eskalieren: bearbeitbar && !l.eskalation && l.periodeStand === 'offen' && (!r || r.stand === 'entwurf' || r.stand === 'zurueckgegeben'),
     },
   };
 }
@@ -104,7 +106,7 @@ function pruefeVersion(r: store.Row | null, version: number): void {
   if ((r?.version ?? 0) !== version) throw preconditionFailed(r?.version ?? 0);
 }
 
-export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
+export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   for (const s of [Abweichung, BerichtStandList, EskalationNeu, Fehlend, Statusbericht, StatusberichtKurz, StatusberichtList, StatusberichtPut]) app.addSchema(s);
 
   app.get('/v1/statusberichte/stand', {
@@ -184,19 +186,26 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       const vorher = await lage(tx, id, periode, { sperren: true });
       pruefeVersion(vorher.bericht, version);
       pruefeBearbeitbar(vorher.projekt, periode, vorher.laufend, vorher.periodeStand, vorher.bericht);
-      if ((await store.periodeSichern(tx, periode)) !== 'offen') throw conflict('Die Periode ist abgeschlossen.', { reason: 'periode' });
+      await store.periodeSichern(tx, periode);
       const felder = body.status !== undefined && body.status !== 'kritisch' && body.entscheidNoetig === undefined ? { ...body, entscheidNoetig: false } : body;
+      // nach dem Einreichen bzw. nach dem Abschluss: Version mit Markierung (A-75); die Phase des Einreichens bleibt
+      const nach = nachWas(vorher.bericht, vorher.periodeStand);
       let r: store.Row | null;
       if (vorher.bericht) {
-        r = await store.update(tx, vorher.bericht.id, version, vorher.projekt.phase, felder);
+        r = await store.update(tx, vorher.bericht.id, version, nach && vorher.bericht.stand !== 'entwurf' && vorher.bericht.stand !== 'zurueckgegeben' ? vorher.bericht.phase : vorher.projekt.phase, felder);
         if (!r) throw preconditionFailed(vorher.bericht.version);
         await record(tx, who, { action: 'statusbericht.updated', resourceType: 'statusbericht', resourceId: r.id, data: { before: snapshot(vorher.bericht), after: snapshot(r) }, event: snapshot(r) });
+        if (nach) {
+          await markieren(tx, who, vorher.bericht, r, nach);
+          r = (await store.get(tx, id, periode))!;
+        }
       } else {
         r = await store.create(tx, id, periode, vorher.projekt.phase, { ...vorbelegung(vorher.vor, vorher.plan), ...felder });
         await record(tx, who, { action: 'statusbericht.created', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       }
-      return { ...vorher, bericht: r, periodeStand: 'offen' as const };
+      return { ...vorher, bericht: r };
     });
+    if (l.periodeStand === 'abgeschlossen') await dashboardNachfuehren(deps.db, req.requirePrincipal().tenantId, l.bericht!);
     reply.header('etag', etag(l.bericht!.version));
     return antwort(req, l);
   });
@@ -217,15 +226,22 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       if (!vorher.bericht) throw notFound('Statusbericht');
       pruefeVersion(vorher.bericht, version);
       pruefeBearbeitbar(vorher.projekt, periode, vorher.laufend, vorher.periodeStand, vorher.bericht);
+      if (vorher.bericht.stand === 'eingereicht' || vorher.bericht.stand === 'geprueft') throw conflict('Der Bericht ist bereits eingereicht; Änderungen speicherst du direkt (sie sind markiert).', { reason: 'stand' });
       pruefePflichtangaben(werteVon(vorher.bericht));
-      if ((await store.periodeSichern(tx, periode)) !== 'offen') throw conflict('Die Periode ist abgeschlossen.', { reason: 'periode' });
-      const r = await store.stand(tx, vorher.bericht.id, version, 'eingereicht', vorher.projekt.phase);
+      await store.periodeSichern(tx, periode);
+      let r = await store.stand(tx, vorher.bericht.id, version, 'eingereicht', vorher.projekt.phase);
       if (!r) throw preconditionFailed(vorher.bericht.version);
       await record(tx, who, { action: 'statusbericht.submitted', resourceType: 'statusbericht', resourceId: r.id, data: snapshot(r), event: snapshot(r) });
       await nachEinreichen(tx, r, who);
+      // nach dem Abschluss nachgereicht (UC-005 A4.1): markiert, das Dashboard der Periode wird nachgeführt
+      if (vorher.periodeStand === 'abgeschlossen') {
+        await markieren(tx, who, vorher.bericht, r, 'abschluss');
+        r = (await store.get(tx, id, periode))!;
+      }
       // Eskalation nach den Folgen neu lesen («kritisch» mit Entscheidbedarf legt sie eben an)
       return { ...vorher, bericht: r, sekunden: 0, eskalation: await eskalation.vonBericht(tx, r.id) };
     });
+    if (l.periodeStand === 'abgeschlossen') await dashboardNachfuehren(deps.db, req.requirePrincipal().tenantId, l.bericht!);
     reply.header('etag', etag(l.bericht!.version));
     return antwort(req, l);
   });

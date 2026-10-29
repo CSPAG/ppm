@@ -131,7 +131,7 @@ REGELN = ["Jeder Kernablauf läuft in seinem Heimat-Arbeitsraum; Übergaben in e
 OFFEN = [("Pflichtfelder","Welche Angaben des Projektvertrags sind je Phase Pflicht? Das PM-Handbuch nennt nur Lieferergebnisse."),
  ("Abweichung","Ab welcher Schwelle ist eine Abweichung wesentlich? Das PM-Handbuch nennt «Toleranzen» ohne Werte."),
  ("Kategorie B","Gelten Quality-Check und monatliches Dashboard auch für GL-Projekte?"),
- ("Sponsoren-Koalition","Wer gehört dazu? Sie entscheidet Konflikte zwischen PL und CTL."),
+ ("Sponsoren-Koalition","Wer gehört dazu? Im Produkt ist sie eine freie Funktion der Projektorganisation (Entscheid 17)."),
  ("SNS-VR","Wie werden Geschäfte in P0 und P1 dem SNS-VR vorgelegt und dessen Entscheide erfasst?")]
 reg = ''.join(f'<li>{E(x)}</li>' for x in REGELN)
 off = ''.join(f'<li>{E(a)} <span class="neben">{E(b)}</span></li>' for a,b in OFFEN)

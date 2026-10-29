@@ -283,6 +283,29 @@ describe('Projektvertrag (UI-07)', () => {
     expect(await within(gruppe).findByText('Für diese Dimension gibt es schon eine Toleranz.')).toBeInTheDocument();
   });
 
+  it('Kap. 8: Personen ohne Zugriff tragen «kein Zugriff» mit Link in den Bereich «Zugriff» (Master Entscheid 16, UX-E14)', async () => {
+    const PLP = '00000000-0000-4000-8000-0000000000a2';
+    const KT = '00000000-0000-4000-8000-0000000000a3';
+    const inhalt = { mitglieder: [
+      { personId: PLP, funktion: 'pl', funktionText: '', akv: '' }, { personId: KT, funktion: 'weitere', funktionText: 'Kernteam', akv: '' },
+    ] };
+    stub({ routes: {
+      [`GET /v1/vertragsversionen/${V}/kapitel/8`]: () => mitEtag(kapitel(8, inhalt), 1),
+      'GET /v1/access': () => json({
+        resource: { type: 'projekt', id: P }, classification: null, grantable: ['projekt-mitlesen'],
+        items: [{ id: 't1', subject: { ref: `user:${PLP}`, kind: 'user', name: 'Sandra Huber' }, relation: 'projekt-fuehren', place: { type: 'projekt', id: P },
+          via: 'direct', removable: true, expiresAt: null, createdAt: '2026-10-01T08:00:00Z', createdBy: 'Ursula Egli' }],
+      }),
+    } });
+    const { container } = renderWithIam(<Page initial={{ kapitel: 8 }} />, PL as never);
+    const gruppe = await screen.findByRole('group', { name: 'Funktionen im Projekt' });
+    const zeilen = gruppe.querySelectorAll('.vt-zeile');
+    expect(await within(zeilen[1] as HTMLElement).findByText(TV.ohneZugriff)).toBeInTheDocument();
+    expect(within(zeilen[1] as HTMLElement).getByRole('link', { name: TV.zugriffGeben })).toHaveAttribute('href', '/projekte/2026-014/zugriff');
+    expect(within(zeilen[0] as HTMLElement).queryByText(TV.ohneZugriff)).not.toBeInTheDocument();
+    await expectNoAxe(container);
+  });
+
   it('Kapitelnavigation mit ↑/↓', async () => {
     stub();
     renderWithIam(<Page initial={{ kapitel: 3 }} />, PL as never);

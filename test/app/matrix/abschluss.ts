@@ -6,9 +6,9 @@ import type { Matrix } from './typ.ts';
 /** Projekt «Probe» (2026-001) aus matrix/projekt.ts. */
 const PROBE = "(SELECT id FROM ppm.projekt WHERE nummer = '2026-001')";
 
-const PL = "app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)";
+const PL = "ppm.recht_am_projekt('projekt:write'::text, projekt_id)";
 const INTERN = "(current_setting('app.abschluss_intern'::text, true) = 'on'::text)";
-const NUTZEN = `(${PL} OR app.has_permission('vertrag:decide'::text, 'projekt'::text, projekt_id) OR app.has_permission('vertrag:review'::text) OR ${INTERN})`;
+const NUTZEN = `(${PL} OR ppm.recht_am_projekt('vertrag:decide'::text, projekt_id) OR app.has_permission('vertrag:review'::text) OR ${INTERN})`;
 
 export const matrix: Matrix = {
   tables: {
@@ -61,6 +61,8 @@ export const matrix: Matrix = {
       method: 'PUT', url: `/v1/projekte/${i.projekt}/abschluss/nutzen`, headers: { 'if-match': 'W/"1"' }, body: { rolle: 'ue', beurteilung: 'x' }, kind: 'foreign',
     }),
     'POST /v1/projekte/:id/abschluss/einreichen': i => ({ method: 'POST', url: `/v1/projekte/${i.projekt}/abschluss/einreichen`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
+    // vor der Abnahme abschliessen (AP-E8-4, UC-015 A3)
+    'POST /v1/projekte/:id/abschluss/abschliessen': i => ({ method: 'POST', url: `/v1/projekte/${i.projekt}/abschluss/abschliessen`, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'GET /v1/projekte/:id/abschluss/dokument': i => ({ method: 'GET', url: `/v1/projekte/${i.projekt}/abschluss/dokument?format=pdf`, kind: 'foreign' }),
     'POST /v1/projekte/:id/wiederaufnahme': i => ({ method: 'POST', url: `/v1/projekte/${i.projekt}/wiederaufnahme`, body: { begruendung: 'x' }, kind: 'foreign' }),
     'GET /v1/lessons-learned': () => ({ method: 'GET', url: '/v1/lessons-learned', kind: 'list' }),

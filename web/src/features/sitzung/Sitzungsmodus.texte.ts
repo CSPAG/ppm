@@ -51,7 +51,7 @@ export const TM = {
   wirkungText: (art: string, label: string, auflagen: number, sns: boolean) => [
     sns ? `Stellungnahme «${label}» zu ${art}; die Folge tritt erst mit dem Entscheid des SNS-VR ein.` : `${art}: ${label}. Die Folge wird sofort nachgeführt.`,
     auflagen ? `${auflagen === 1 ? '1 Auflage wird' : `${auflagen} Auflagen werden`} beim Schliessen der Sitzung Aufgabe der Verantwortlichen.` : '',
-    'Projektleitung und Sponsor werden nach der Sitzung informiert.',
+    'Projektleitung und Projektauftraggeber:in werden nach der Sitzung informiert.',
   ].filter(Boolean).join(' '),
   erfassen: 'Entscheid erfassen',
   korrigieren: 'Entscheid korrigieren',
@@ -71,7 +71,7 @@ export const TM = {
   schliessen: 'Sitzung schliessen',
   schliessenTitel: 'Sitzung jetzt schliessen?',
   schliessenOhne: (n: number) => (n ? `${n} ${n === 1 ? 'Traktandum wird' : 'Traktanden werden'} für die nächste Sitzung vorgeschlagen.` : 'Alle Traktanden sind entschieden.'),
-  schliessenWirkung: 'Danach sind die Entscheide fest. Das System erzeugt den Protokollentwurf, legt Auflagen in den Eingang der Verantwortlichen und benachrichtigt Projektleitung und Sponsor, gebündelt je Person.',
+  schliessenWirkung: 'Danach sind die Entscheide fest. Das System erzeugt den Protokollentwurf, legt Auflagen in den Eingang der Verantwortlichen und benachrichtigt Projektleitung und Projektauftraggeber:in, gebündelt je Person.',
   geschlossen: 'Sitzung geschlossen. Der Protokollentwurf ist bereit.',
   geschlossenBanner: (d: string) => `Sitzung geschlossen am ${d} · Protokoll im Entwurf.`,
   protokollVersendetBanner: (d: string) => `Protokoll versendet am ${d}.`,

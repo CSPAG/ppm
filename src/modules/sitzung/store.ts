@@ -52,11 +52,11 @@ export async function projekt(tx: Tx, id: string): Promise<ProjektKurz | null> {
   return (await tx.query<ProjektKurz>(`SELECT id, nummer, name, phase, portfolio_id, vertraulich FROM ${SCHEMA}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
-/** Sponsor, Projektleitung und CTL des Projekts (Einladung je Geschäft, UC-006 Schritt 2). */
-export async function projektleitung(tx: Tx, projektId: string): Promise<{ person_id: string; funktion: 'sp' | 'pl' | 'ctl' }[]> {
-  return (await tx.query<{ person_id: string; funktion: 'sp' | 'pl' | 'ctl' }>(
-    `SELECT person_id, funktion FROM ${SCHEMA}.projekt_person WHERE projekt_id = $1 AND funktion IN ('pl', 'ctl', 'sp')
-      ORDER BY array_position(ARRAY['pl', 'ctl', 'sp'], funktion)`, [projektId])).rows;
+/** Projektleitung und Projektauftraggeber:in des Projekts (Einladung je Geschäft, UC-006 Schritt 2). */
+export async function projektleitung(tx: Tx, projektId: string): Promise<{ person_id: string; funktion: 'sp' | 'pl' }[]> {
+  return (await tx.query<{ person_id: string; funktion: 'sp' | 'pl' }>(
+    `SELECT person_id, funktion FROM ${SCHEMA}.projekt_person WHERE projekt_id = $1 AND funktion IN ('pl', 'sp')
+      ORDER BY array_position(ARRAY['pl', 'sp'], funktion)`, [projektId])).rows;
 }
 
 /**
@@ -83,9 +83,11 @@ export interface SitzungRow {
   stand: SitzungStand; versendet_at: Date | null; versendet_by: string | null; versand_vorlauf: number | null;
   geschlossen_at: Date | null; protokoll_versendet_at: Date | null; version: number; created_at: Date; updated_at: Date;
   gremium_kuerzel: string; gremium_name: string;
+  /** Zuletzt nach dem Versand geändert (A-75). */
+  geaendert_nach_versand_at: Date | null;
 }
 
-const SCOLS = `s.id, s.portfolio_id, s.gremium_id, to_char(s.datum, 'YYYY-MM-DD') AS datum, to_char(s.beginn, 'HH24:MI') AS beginn,
+const SCOLS = `s.id, s.geaendert_nach_versand_at, s.portfolio_id, s.gremium_id, to_char(s.datum, 'YYYY-MM-DD') AS datum, to_char(s.beginn, 'HH24:MI') AS beginn,
   s.dauer_min, s.ort, s.stand, s.versendet_at, s.versendet_by, s.versand_vorlauf, s.geschlossen_at, s.protokoll_versendet_at,
   s.version, s.created_at, s.updated_at, g.kuerzel AS gremium_kuerzel, g.name AS gremium_name`;
 const SFROM = `${S} s JOIN ${SCHEMA}.gremium g ON g.tenant_id = s.tenant_id AND g.id = s.gremium_id`;
@@ -150,10 +152,12 @@ export interface TraktandumRow {
   projekt_id: string | null; titel: string; antrag: string; position: number | null; dauer_min: number | null; stand: TraktandumStand;
   via_sns: boolean; vertraulich: boolean; verschoben_von: string | null; versendet_at: Date | null; version: number;
   created_at: Date; updated_at: Date;
+  /** Zuletzt nach dem Versand geändert (A-75). */
+  geaendert_nach_versand_at: Date | null;
   projekt_nummer: string | null; projekt_name: string | null; projekt_phase: string | null; verschoben_von_datum: string | null;
 }
 
-const TCOLS = `t.id, t.portfolio_id, t.gremium_id, t.sitzung_id, t.art, t.bezug_typ, t.bezug_id, t.projekt_id, t.titel, t.antrag,
+const TCOLS = `t.id, t.geaendert_nach_versand_at, t.portfolio_id, t.gremium_id, t.sitzung_id, t.art, t.bezug_typ, t.bezug_id, t.projekt_id, t.titel, t.antrag,
   t.position, t.dauer_min, t.stand, t.via_sns, t.vertraulich, t.verschoben_von, t.versendet_at, t.version, t.created_at, t.updated_at,
   p.nummer AS projekt_nummer, p.name AS projekt_name, p.phase AS projekt_phase,
   (SELECT to_char(v.datum, 'YYYY-MM-DD') FROM ${S} v WHERE v.id = t.verschoben_von) AS verschoben_von_datum`;
@@ -272,14 +276,14 @@ export async function verschobeneVon(tx: Tx, sitzungId: string): Promise<Traktan
 
 // --- Einladung, Unterlage -----------------------------------------------------------------------------------------
 
-export interface EinladungRow { id: string; traktandum_id: string; person_id: string; funktion: 'sp' | 'pl' | 'ctl' | 'weitere'; name: string | null }
+export interface EinladungRow { id: string; traktandum_id: string; person_id: string; funktion: 'sp' | 'pl' | 'weitere'; name: string | null }
 
 export async function einladungen(tx: Tx, o: { traktandumId?: string; sitzungId?: string }): Promise<EinladungRow[]> {
   const [col, v] = o.traktandumId ? ['e.traktandum_id', o.traktandumId] : ['e.sitzung_id', o.sitzungId];
   return (await tx.query<EinladungRow>(
     `SELECT e.id, e.traktandum_id, e.person_id, e.funktion, p.display_name AS name
        FROM ${E} e LEFT JOIN ${SCHEMA}.principal p ON p.tenant_id = e.tenant_id AND p.id = e.person_id
-      WHERE ${col} = $1 ORDER BY array_position(ARRAY['pl', 'ctl', 'sp', 'weitere'], e.funktion), p.display_name, e.id`, [v])).rows;
+      WHERE ${col} = $1 ORDER BY array_position(ARRAY['pl', 'sp', 'weitere'], e.funktion), p.display_name, e.id`, [v])).rows;
 }
 
 /** Einladungen eines Traktandums ersetzen. */
@@ -292,18 +296,18 @@ export async function einladungenSetzen(tx: Tx, t: { id: string; sitzung_id: str
   }
 }
 
-export interface UnterlageRow { id: string; traktandum_id: string; art: 'packet' | 'bericht' | 'beilage'; titel: string; stand_ok: boolean; hinweis: string; inhalt: Record<string, unknown> }
+export interface UnterlageRow { id: string; traktandum_id: string; art: 'packet' | 'bericht' | 'beilage'; titel: string; stand_ok: boolean; quality_check_offen: boolean; hinweis: string; inhalt: Record<string, unknown> }
 
 export async function unterlagenGespeichert(tx: Tx, sitzungId: string): Promise<UnterlageRow[]> {
   return (await tx.query<UnterlageRow>(
-    `SELECT u.id, u.traktandum_id, u.art, u.titel, u.stand_ok, u.hinweis, u.inhalt FROM ${U} u JOIN ${T} t ON t.tenant_id = u.tenant_id AND t.id = u.traktandum_id
+    `SELECT u.id, u.traktandum_id, u.art, u.titel, u.stand_ok, u.quality_check_offen, u.hinweis, u.inhalt FROM ${U} u JOIN ${T} t ON t.tenant_id = u.tenant_id AND t.id = u.traktandum_id
       WHERE t.sitzung_id = $1 ORDER BY t.position, u.created_at, u.id`, [sitzungId])).rows;
 }
 
-export async function unterlageAnlegen(tx: Tx, traktandumId: string, u: { art: UnterlageRow['art']; titel: string; standOk: boolean; hinweis: string; inhalt: Record<string, unknown> }): Promise<void> {
+export async function unterlageAnlegen(tx: Tx, traktandumId: string, u: { art: UnterlageRow['art']; titel: string; standOk: boolean; qualityCheckOffen: boolean; hinweis: string; inhalt: Record<string, unknown> }): Promise<void> {
   await tx.query(
-    `INSERT INTO ${U} (tenant_id, traktandum_id, art, titel, stand_ok, hinweis, inhalt) VALUES (app.tenant_id(), $1, $2, btrim($3), $4, $5, $6)`,
-    [traktandumId, u.art, u.titel, u.standOk, u.hinweis, JSON.stringify(u.inhalt)]);
+    `INSERT INTO ${U} (tenant_id, traktandum_id, art, titel, stand_ok, quality_check_offen, hinweis, inhalt) VALUES (app.tenant_id(), $1, $2, btrim($3), $4, $5, $6, $7)`,
+    [traktandumId, u.art, u.titel, u.standOk, u.qualityCheckOffen, u.hinweis, JSON.stringify(u.inhalt)]);
 }
 
 /** Je Gremium die nächste Sitzung, die die Person sieht, nach Datum (Kopf im Eingang). */
@@ -329,4 +333,15 @@ export async function naechsteSitzungen(tx: Tx, ab: string, limit: number): Prom
               (SELECT count(*)::int FROM ${T} t WHERE t.sitzung_id = s.id AND t.stand IN ('traktandiert', 'entschieden')) AS traktanden
          FROM ${SFROM} WHERE s.datum >= $1::date ORDER BY s.gremium_id, s.datum
      ) n ORDER BY n.datum, n.sort_kuerzel LIMIT $2`, [ab, limit])).rows;
+}
+
+/** Nach dem Versand geändert (A-75): Zeitpunkt an der Sitzung und, falls genannt, am Traktandum. */
+export async function nachVersandMarkieren(tx: Tx, sitzungId: string, traktandumId: string | null): Promise<void> {
+  await tx.query(`UPDATE ${SCHEMA}.sitzung SET geaendert_nach_versand_at = now() WHERE id = $1`, [sitzungId]);
+  if (traktandumId) await tx.query(`UPDATE ${SCHEMA}.traktandum SET geaendert_nach_versand_at = now() WHERE id = $1`, [traktandumId]);
+}
+
+/** Festgehaltene Unterlagen eines Traktandums entfernen (vor einer neuen Fassung, A-75). */
+export async function unterlagenLoeschen(tx: Tx, traktandumId: string): Promise<void> {
+  await tx.query(`DELETE FROM ${U} WHERE traktandum_id = $1`, [traktandumId]);
 }

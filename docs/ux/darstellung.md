@@ -33,9 +33,9 @@ Die Zeile entspricht dem heutigen Dashboard (Q6 F7), damit Gremien und UE sie wi
 - **mittel** (Dashboard, Monatsabschluss, Meine Projekte): Nummer, Handlungsfeld, Projektname, Thema, Projektleitung, Phase
   aktuell und «Abschluss per», nächster Meilenstein (Termin und Text), Status, Status Vorperiode, Trend.
 - **gross** (Projektübersicht): zusätzlich Phasenleiste P0–P4 mit Gates (erledigt, aktuell, eingeplant mit Sitzungsdatum),
-  Sponsor und CTL, Business Case in Kennzahlen, letzte Entscheide.
+  Projektauftraggeber:in und Projektleitung, Business Case in Kennzahlen, letzte Entscheide.
 - Mobil wird die Zeile zur Karte mit Projektname, Status mit Trend und nächstem Meilenstein (I-L6).
-- Projekte «via SNS-VR», mit offener Eskalation oder «nicht gemeldet» tragen ein Badge mit Text.
+- Projekte «via SNS-VR», mit offener Eskalation, «nicht gemeldet» oder offenem Vermerk («ohne Freigabe») tragen ein Badge mit Text.
 
 ## Projektstatus und Trend
 
@@ -64,19 +64,21 @@ Ein Satz Badges für alle Objekte mit Bearbeitungsstand: Projektidee, Projektver
 | Familie | Symbol | Farbe | Stände (Beispiele je Objekt) |
 |---|---|---|---|
 | Entwurf, in Arbeit | Stift | neutral | Idee «Entwurf»; Vertrag «in Arbeit»; Jahresziele «in Arbeit»; Bericht «Entwurf» |
-| Wartet auf andere | Uhr + «wartet auf ‹Name/Stelle›» | blau | Idee «eingereicht», «in Prüfung», «in Ergänzung» (wartet auf AS); Vertrag «in Prüfung», «zur Unterzeichnung 2 von 3»; Bericht «eingereicht», «zurückgegeben»; Jahresziele «zur Freigabe»; Traktandum «Entscheid SNS-VR ausstehend» |
+| Wartet auf andere | Uhr + «wartet auf ‹Name/Stelle›» | blau | Idee «eingereicht», «in Prüfung», «in Ergänzung» (wartet auf AS); Vertrag «in Prüfung», «zur Unterzeichnung 1 von 2»; Bericht «eingereicht», «zurückgegeben»; Jahresziele «zur Freigabe»; Traktandum «Entscheid SNS-VR ausstehend» |
 | Traktandiert | Kalender + Sitzungsdatum | blau | Idee, Vertrag, Änderung, Bericht an den VR: «traktandiert PRAT Mi 10.12.» |
 | Erledigt positiv | Haken | grün | Idee «freigegeben»; Vertrag «abgenommen» (Baseline); Bericht «geprüft»; Änderung «freigegeben»; Jahresziele «in Kraft»; Quartalsreporting «verabschiedet»; Projekt «abgeschlossen» |
 | Erledigt negativ | Kreuz | rot | Idee «zurückgewiesen»; Änderung «abgelehnt»; Projekt «abgebrochen» |
 | Ruhend, beendet ohne Entscheid | Strich | neutral | Idee «zusammengeführt», «zurückgestellt»; Projekt «zurückgezogen», «sistiert» |
-| Gesperrt | Schloss | neutral | Periode «abgeschlossen»; Sitzung «geschlossen» |
+| Abgeschlossen | Schloss | neutral | Periode «abgeschlossen»; Sitzung «geschlossen»; Änderungen danach bleiben möglich und tragen «geändert nach Abschluss» (UX-E13) |
+| Vermerk offen | Kreis gestrichelt + Text | gelb | «ohne Freigabe», «Quality-Check offen», «Unterschrift offen», «Abnahme offen», «ohne Gate-Entscheid»; verschwindet, sobald der Vermerk nachgetragen ist (UX-E12) |
+| Geändert nach … | Stift + Datum | neutral | «geändert nach Einreichen», «geändert nach Versand», «geändert nach Vorlage», «geändert nach Abschluss»; führt in den Verlauf (UX-E13) |
 
 ## Regelprüfung
 
 | Stufe | Beispiele | Verhalten |
 |---|---|---|
-| **Sperre** | Pflichtangaben fehlen (UC-002 A3, UC-003 A3, UC-004 Schritt 7, UC-001 Schritt 2); «Kritisch» ohne Begründung und Massnahme (UC-004 A2); Periode mit ungeprüften Berichten (UC-005 Schritt 5); Jahresziel ohne Metrik (UC-011 Schritt 5); Änderung an Scope, Budget oder Ressourcen durch SP freigeben (UC-007 A1); Ablehnen, Zurückweisen, Nicht unterzeichnen ohne Begründung | wird nicht ausgeführt; Meldung nennt alle Lücken mit Sprung zur Stelle |
-| **Warnung** | wesentliche Abweichung (UC-004 A1, UC-010 A2; Schwelle K11); Unterlagen nicht 5 Arbeitstage vor der Sitzung (UC-006 A2); Budget oder Kapazität im Szenario überschritten (UC-008 Schritt 5); Überbuchung (UC-009 A1); unbeantwortete Leitfragen; fehlende Berichte beim Periodenabschluss (UC-005 A3) | wird ausgeführt bzw. ist zulässig, bleibt am Objekt markiert; Begründung wo die Quelle sie verlangt |
+| **Sperre** | Pflichtangaben fehlen (UC-002 A3, UC-003 A3, UC-004 Schritt 7, UC-001 Schritt 2); «Kritisch» ohne Begründung und Massnahme (UC-004 A2); Jahresziel ohne Metrik (UC-011 Schritt 5); Freigabe einer Änderung an Scope, Budget oder Ressourcen durch die Projektauftraggeber:in vermerken (UC-007 A1, das vermerkt der PRAT); Ablehnen, Zurückweisen, Nicht unterzeichnen ohne Begründung | wird nicht ausgeführt; Meldung nennt alle Lücken mit Sprung zur Stelle. Nur für unvollständige oder widersprüchliche Eingaben, nie für fehlende Prüfung, Unterschrift oder Freigabe (UX-E12) |
+| **Warnung** | wesentliche Abweichung (UC-004 A1, UC-010 A2; Schwelle K11); Unterlagen nicht 5 Arbeitstage vor der Sitzung (UC-006 A2); Budget oder Kapazität im Szenario überschritten (UC-008 Schritt 5); Überbuchung (UC-009 A1); unbeantwortete Leitfragen; fehlende oder ungeprüfte Berichte beim Periodenabschluss (UC-005 Schritt 5, A3); weiter ohne Quality-Check, Unterschrift, Freigabe oder Abnahme (UX-E12) | wird ausgeführt bzw. ist zulässig, bleibt am Objekt markiert; Begründung wo die Quelle sie verlangt |
 | **Hinweis** | ähnliche Ideen (UC-001 Schritt 3); Gremienweg via SNS-VR (UC-006 A1); Abweichung zur Baseline im Entwurf; ungedeckter Bedarf (UC-009 A2) | nur am Objekt und im Prüfbericht |
 
 Mustertexte nach «‹Regel›: ‹Ist› statt ‹Grenze› (‹wer, wann›). ‹Vorschlag›.» (I-P2):
@@ -93,24 +95,24 @@ Das PPM führt kaum Gesundheits- oder Lohndaten; sensibel sind vor allem Persone
 
 | Daten | Wer sieht den Grund | Was andere sehen |
 |---|---|---|
-| Abwesenheiten aus dem HR-System (RK.01.02, falls übernommen, K23) | niemand im PPM; der Grund wird nicht übernommen | RM und PL: verfügbare Kapazität bzw. «nicht verfügbar ‹Zeitraum›» |
-| Zuteilung und Auslastung einzelner Personen (UC-009) | RM, UE, die Person selbst | PL: Zuteilung zum eigenen Projekt; übrige: nur Summen je Rolle |
-| Bewertung, Kriterienraster und Begründung einer Idee (UC-001) | UE, vorgesehener Sponsor, Gremium | AS: Status und Begründung des Entscheids |
-| Zurückweisungs-, Ablehnungs- und Abbruchsbegründungen | Betroffene (AS bzw. PL, SP), UE, Gremium | übrige: nur der Stand |
+| Abwesenheiten aus dem HR-System (RK.01.02, falls übernommen, K23) | niemand im PPM; der Grund wird nicht übernommen | UE und PL: verfügbare Kapazität bzw. «nicht verfügbar ‹Zeitraum›» |
+| Zuteilung und Auslastung einzelner Personen (UC-009) | UE, die Person selbst | PL: Zuteilung zum eigenen Projekt; übrige: nur Summen je Rolle |
+| Bewertung, Kriterienraster und Begründung einer Idee (UC-001) | UE, vorgesehene Projektauftraggeber:in, Gremium | AS: Status und Begründung des Entscheids |
+| Zurückweisungs-, Ablehnungs- und Abbruchsbegründungen | Betroffene (AS bzw. PL, AG), UE, Gremium | übrige: nur der Stand |
 | Gremienunterlagen vor dem Versand, Protokollentwurf | UE | Mitglieder ab Versand; Eingeladene nur ihr Traktandum |
-| Vertrauliche Projekte und Traktanden (z. B. Reorganisation, Standortfragen) | Kreis offen ([UX-OF-13](fahrplan.md#offene-fragen)) | Vorschlag: Kennzeichnung «vertraulich» am Projekt, sichtbar nur für Projektrollen, UE und Gremium |
+| Vertrauliche Projekte und Traktanden (z. B. Reorganisation, Standortfragen) | alle mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13) | Mitglieder ohne weitere Rolle: das Projekt fehlt in jeder Liste |
 | Exporte mit Personennamen (Dashboard, Protokoll) | – | Dokument trägt in der Kopfzeile «Intern · enthält Personendaten» (G12) |
 
 ## Personen
 
-- Namensform: «Vorname Nachname»; in engen Spalten «V. Nachname». Rolle im Projekt dahinter, wo sie zählt: «Lea Brunner (CTL)».
-- Rollen erscheinen ausgeschrieben («Sponsor», «Projektleitung», «Clinical Transformation Lead»); «CTL» ist als Kurzform
-  der Insel zulässig, weil das PM-Handbuch sie verwendet. Gremien heissen wie bei der Insel: PRAT, GLPA, SNS-VR.
+- Namensform: «Vorname Nachname»; in engen Spalten «V. Nachname». Funktion im Projekt dahinter, wo sie zählt: «Lea Brunner (Kernteam)».
+- Funktionen erscheinen ausgeschrieben («Projektauftraggeber:in», «Projektleitung»); weitere Funktionen so, wie die
+  Organisation sie erfasst (Master Entscheid 17). Gremien heissen wie bei der Insel: PRAT, GLPA, SNS-VR.
 - Vertretung (I-Z2): «Sandra Frei in Vertretung von Daniel Keller» in Entscheiden, Unterschriften und Verlauf.
 
 ## Kosten
 
-- Beträge sehen: PL, CTL und SP des Projekts, UE, FI, Gremium des Portfolios. Kernteam, DIR (fremde Portfolios) und AS sehen
-  keine Beträge (Vorschlag, [UX-OF-12](fahrplan.md#offene-fragen)).
+- Beträge sieht, wer am Projekt, an seinem Portfolio oder übergreifend eine Rolle hat; Mitglieder ohne weitere Rolle sehen
+  keine (Master Entscheid 13).
 - CAPEX und OPEX sind getrennt ausgewiesen, Summen zeigen beide Teile auf Wunsch.
 - Prognose, Budget und Ist erscheinen immer in dieser Reihenfolge; fehlt Ist, steht «noch nicht verfügbar», nicht «0».

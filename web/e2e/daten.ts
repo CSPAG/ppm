@@ -78,7 +78,7 @@ export interface Projekt { id: string; nummer: string; name: string; portfolioId
 export interface Gremium { id: string; kuerzel: string }
 
 /** Projekt in eigenem Portfolio, die angemeldete Person in den angegebenen Funktionen. */
-export async function projekt(a: Api, name: string, phase: string, funktionen: readonly string[] = ['sp', 'pl', 'ctl']): Promise<Projekt> {
+export async function projekt(a: Api, name: string, phase: string, funktionen: readonly string[] = ['sp', 'pl']): Promise<Projekt> {
   const schluessel = kennung();
   const pf = await a.send<{ id: string }>('POST', '/v1/portfolios', { kategorie: 'A', schluessel, name: `E2E ${schluessel}` });
   const pj = await a.send<{ id: string; nummer: string }>('POST', '/v1/projekte', { name, portfolioId: pf.body.id, phase });
@@ -139,7 +139,7 @@ export async function projektMitBaseline(page: Page, name: string, o: { meilenst
   const d = await a.get(`/v1/vertragsversionen/${v}`);
   const r = await a.send('POST', `/v1/vertragsversionen/${v}/einreichen`, undefined, { 'if-match': d.headers()['etag'] ?? '' });
   await a.send('POST', `/v1/vertragsversionen/${v}/quality-check`, { ergebnis: 'bestaetigt' }, { 'if-match': r.etag });
-  // Eine Unterschrift deckt alle offenen Funktionen der Person (SP, PL, CTL)
+  // Eine Unterschrift deckt alle offenen Funktionen der Person (Projektauftraggeber:in, Projektleitung)
   const pr = await a.get(`/v1/vertragsversionen/${v}/pruefung`);
   await a.send('POST', `/v1/vertragsversionen/${v}/unterschriften`, { ergebnis: 'unterzeichnet' }, { 'if-match': pr.headers()['etag'] ?? '' });
 

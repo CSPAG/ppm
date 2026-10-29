@@ -34,7 +34,10 @@ export const Aenderung = Type.Object({
     freigeben: Type.Boolean({ description: '«Änderung freigeben» (eingereicht, vertrag:decide, ohne Wirkung auf Scope, Budget, Ressourcen).' }),
     ablehnen: Type.Boolean({ description: '«Ablehnen» mit Begründung (eingereicht, vertrag:decide).' }),
     anPrat: Type.Boolean({ description: '«Antrag an den PRAT unterstützen» (eingereicht, vertrag:decide, mit Wirkung).' }),
+    uebernehmen: Type.Boolean({ description: '«Vor dem Entscheid übernehmen» (eingereicht oder beim PRAT, vertrag:write; UC-007 A3, A-74).' }),
   }, { additionalProperties: false }),
+  vermerke: Type.Array(Type.Object({ art: Type.String(), text: Type.String() }, { additionalProperties: false }),
+    { description: 'Offene Vermerke (A-74): «nicht freigegeben» nach einer vorab übernommenen Änderung, «Änderung abgelehnt» an der Baseline.' }),
 }, { $id: 'VertragAenderung', additionalProperties: false });
 export type AenderungOut = Static<typeof Aenderung>;
 

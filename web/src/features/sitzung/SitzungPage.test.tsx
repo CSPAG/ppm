@@ -144,7 +144,7 @@ describe('Sitzung vorbereiten', () => {
     expect(api.calls.some(c => c.method === 'POST')).toBe(false);
     await userEvent.click(within(dialog).getByRole('button', { name: TS.versenden }));
     await waitFor(() => expect(api.calls.find(c => c.method === 'POST')?.headers.get('If-Match')).toBe('W/"3"'));
-    expect(await screen.findByText(/Unterlagen versendet am .* Die Traktandenliste ist fest\./)).toBeInTheDocument();
+    expect(await screen.findByText(/Unterlagen versendet am .* als «geändert nach Versand» markiert\./)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: TS.versenden })).not.toBeInTheDocument();
   });
 

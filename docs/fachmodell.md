@@ -8,7 +8,7 @@ eine Annahme aus [Abschnitt 8](#8-annahmen) (`A-nn`). Stand der Umsetzung: [umse
 
 | | |
 |---|---|
-| Stand | 27. Oktober 2026 |
+| Stand | 29. Oktober 2026 |
 | Gilt für | alle Sessions, die Arbeitspakete `AP-<Etappe>-<n>` umsetzen |
 | Ändern | nur per PR; Modulschnitt, Rechte und Migrationsbereiche nur zusammen mit der Master-Session |
 
@@ -170,7 +170,7 @@ nachgeführt.
 | Tabelle | Schlüssel und Steuerspalten | Bemerkung |
 |---|---|---|
 | `projekt` | `id`, `nummer` (eindeutig, «JJJJ-NNN», A-47), `name`, `portfolio_id`, `org_einheit_id` (federführend), `handlungsfeld_id`, `phase` (Code), `phasenmodell_id`, `lebenszyklus` (`aktiv`/`sistiert`/`abgebrochen`/`abgeschlossen`/`zurueckgezogen`), `vertraulich` bool (UX-OF-13, A-34), `herkunft` jsonb (Angaben aus Idee bzw. Übernahme), `version` | **Ort** (Blatt) im Rechtemodell; Tabelle entsteht in AP-E0-1 |
-| `projekt_person` | `projekt_id`, `person_id`, `funktion` (`sp`/`pl`/`ctl`/`kt`/`koalition`), `akv` text | Projektorganisation (PP.04.04, Q7 Kap. 8); die Rollen (`sp`, `pl`, `ctl`, `kt`) setzt das Modul zusätzlich als Tupel am Projekt |
+| `projekt_person` | `projekt_id`, `person_id`, `funktion` (`sp` Projektauftraggeber:in / `pl` Projektleitung / `weitere`), `funktion_text` (bei `weitere`), `akv` text | Projektorganisation (PP.04.04, Q7 Kap. 8) als Projektergebnis ohne Wirkung auf Rechte (A-71); feste Funktionen je höchstens eine Person, weitere als Text (A-72) |
 | `projekt_version` | Verlauf von `projekt` | Phase und Lebenszyklus nachvollziehbar |
 
 Lebenszyklus: `aktiv` → `sistiert` ↔ `aktiv` (Wiederaufnahme per Gremiumsentscheid, A-09) · `aktiv` → `abgebrochen` |
@@ -199,7 +199,7 @@ Register je Projekt («aufdatiert»). Werte der Baseline stehen in der Baseline-
 |---|---|---|
 | `strategisches_ziel` | `id`, `handlungsfeld_id`, `nummer` («2.1»), `text`, `horizont` (2030, A-15), `metrik`, `zielwert`, `version` + `strategisches_ziel_version` | versioniert (UC-011 Schritt 2) |
 | `zieljahr` | `jahr`, `stand` (`in_arbeit`/`zur_freigabe`/`in_kraft`), `freigabe_at`, `freigabe_text` | Jahresziele gemeinsam freigegeben (UX-E8) |
-| `jahresziel` | `id`, `jahr`, `strategisches_ziel_id`, `nummer`, `text`, `metrik`, `zielwert` | ab `zur_freigabe` gesperrt |
+| `jahresziel` | `id`, `jahr`, `strategisches_ziel_id`, `nummer`, `text`, `metrik`, `zielwert` | ab `zur_freigabe` änderbar mit Verlauf, markiert «geändert nach Vorlage» (A-75) |
 | `hauptaktivitaet` | `id`, `jahresziel_id`, `text`, `verantwortlich` | |
 | `ziel_projekt` | `projekt_id`, `strategisches_ziel_id`, `jahresziel_id` NULL | PP.02.05; aus Vertrag Kap. 2 |
 | `zielerreichung` | `ziel_typ`, `ziel_id`, `quartal` («2026-Q3»), `stand`, `beurteilung`, `erfasst_at` | ZM.03.01 |
@@ -210,7 +210,7 @@ Register je Projekt («aufdatiert»). Werte der Baseline stehen in der Baseline-
 
 | Tabelle | Schlüssel und Steuerspalten | Bemerkung |
 |---|---|---|
-| `periode` | `periode` ('YYYY-MM'), `stand` (`offen`/`abgeschlossen`), `abgeschlossen_at/_by` | gesperrt nach Abschluss |
+| `periode` | `periode` ('YYYY-MM'), `stand` (`offen`/`abgeschlossen`), `abgeschlossen_at/_by` | nach Abschluss änderbar mit Verlauf, markiert «geändert nach Abschluss» (A-75) |
 | `statusbericht` | `id`, `projekt_id`, `periode`, `stand` (`entwurf`/`eingereicht`/`zurueckgegeben`/`geprueft`), `status` (`im_plan`/`kritisch`), `trend`, `phase`, `abschluss_per`, `naechster_meilenstein`, `abweichung` jsonb (Inhalt, Termin, Ressourcen, Budget: keine/gering/wesentlich + Kommentar, A-38), `abhaengigkeiten`, `entscheide`, `begruendung`, `massnahme`, `entscheid_noetig`, `eingereicht_at`, `geprueft_at/_by`; eindeutig (`projekt_id`, `periode`) | UC-004; Einreichen 10 s rückgängig (UX-Rückfluss) |
 | `rueckfrage` | `statusbericht_id`, `text`, `antwort`, `gestellt_by/_at`, `beantwortet_at` | UC-005 A2 |
 | `einforderung` | `periode`, `projekt_id`, `anzahl`, `eingefordert_at/_by` | UC-005 A1: letzte Einforderung («eingefordert am»); die Erinnerung ist eine Aufgabe (AP-E1-2) |
@@ -225,7 +225,7 @@ Ein Bericht, der nach Abschluss der Periode eingeht, zählt für die nächste Pe
 |---|---|---|
 | `sitzung` | `id`, `gremium_id`, `datum`, `stand` (`geplant`/`in_vorbereitung`/`versendet`/`laufend`/`geschlossen`/`protokoll_versendet`), `versendet_at`, `geschlossen_at`, `protokoll_versendet_at` | K3; Fristen aus `phasenmodell.frist` |
 | `traktandum` | `id`, `sitzung_id` NULL (Vorschlag ohne Sitzung), `art`, `bezug_typ`, `bezug_id`, `projekt_id` NULL, `position`, `dauer_min` (Gate 35), `stand` (`vorgeschlagen`/`traktandiert`/`verschoben`/`entschieden`), `via_sns` bool, `vertraulich` bool | Arten-Registry unten |
-| `einladung` | `traktandum_id`, `person_id` | PL, CTL, SP je Geschäft; versandt mit den Unterlagen (UX-Rückfluss UC-006 2) |
+| `einladung` | `traktandum_id`, `person_id` | Projektleitung und Projektauftraggeber:in je Geschäft, weitere bei Bedarf; versandt mit den Unterlagen (UX-Rückfluss UC-006 2) |
 | `unterlage` | `traktandum_id`, `art` (`packet`/`bericht`/`beilage`), `stand_ok` bool, `inhalt` jsonb bzw. Datei | Gate Review Packet aus dem Vertrag |
 | `entscheid` | `traktandum_id`, `ergebnis` (`freigegeben`/`mit_auflagen`/`zurueckgestellt`/`abgelehnt`/`sistiert`/`abgebrochen`/`stellungnahme`), `begruendung`, `sns_ergebnis` NULL, `erfasst_at/_by`, `version` + `entscheid_version` | korrigierbar bis `geschlossen` (UX-OF-9, A-30) |
 | `auflage` | `entscheid_id`, `text`, `verantwortlich`, `termin`, `stand` | als Aufgabe im Eingang (UC-006 A3) |
@@ -258,7 +258,7 @@ null) sowie `db` und `tuples` für Folgen, die Orte und Rollen anlegen.
 | `vertrag_version` | `id`, `projekt_id`, `nummer` («2.0», «2.1»), `anlass` (`initial`/`gate`/`aenderung`), `zielphase`, `stand` (`in_arbeit`/`in_pruefung`/`zur_unterzeichnung`/`unterzeichnet`/`traktandiert`/`abgenommen`/`abgelehnt`/`verworfen`/`zurueckgezogen`), `baseline` bool, `baseline_at`, `basis_version_id`, `hauptaenderungen` jsonb, `andere` text, `begruendung` | höchstens ein Entwurf je Projekt (UX-E5, A-29), genau eine Baseline |
 | `vertrag_kapitel` | `version_id`, `kapitel` (1–13, Q7), `inhalt` jsonb (Schema je Kapitel), `geaendert` bool | Kapitel sind die Daten; Listen (Meilensteine, Kosten, Risiken …) als Teil des Kapitels |
 | `quality_check` | `version_id`, `ergebnis` (`bestaetigt`/`rueckmeldung`), `kommentare` jsonb je Kapitel, `at/_by` | DM.02.05 |
-| `unterschrift` | `version_id`, `funktion` (`sp`/`pl`/`ctl`), `person_id`, `in_vertretung_von` NULL, `ergebnis` (`unterzeichnet`/`verweigert`), `begruendung`, `at` | Klick mit Protokoll (A-31) |
+| `unterschrift` | `version_id`, `funktion` (`auftraggeber`/`projektleitung`), `person_id`, `in_vertretung_von` NULL, `ergebnis` (`unterzeichnet`/`verweigert`), `begruendung`, `at` | Klick mit Protokoll (A-31) |
 | `gate_antrag` | `version_id`, `gate_code`, `sitzung_id` NULL, `stand` | Leitfragen und Packet |
 | `leitfrage_antwort` | `gate_antrag_id` bzw. `idee_id`, `leitfrage_id`, `antwort` | auch für Idee (Eintritt P0) im Modul `idee` gespiegelt |
 | `nutzenpruefung` | `version_id`, `beurteilung`, Werte je KPI | UC-003 A2 |
@@ -266,7 +266,7 @@ null) sowie `db` und `tuples` für Folgen, die Orte und Rollen anlegen.
 
 Ablauf: `in_arbeit` → `in_pruefung` (Pflichtangaben erfüllt) → Rückmeldung: `in_arbeit` | bestätigt: `zur_unterzeichnung`
 → alle drei: `unterzeichnet` → `traktandiert` (Gate) → `abgenommen` (Baseline) | Auflagen: `in_arbeit` · Änderung:
-`in_arbeit` → eingereicht beim SP → `abgenommen` | `abgelehnt` (Entwurf verworfen) | an den PRAT → `traktandiert`.
+`in_arbeit` → eingereicht bei der Projektauftraggeber:in → `abgenommen` | `abgelehnt` (Entwurf verworfen) | an den PRAT → `traktandiert`.
 
 ### 2.11 idee
 
@@ -323,12 +323,13 @@ aus `phasenmodell.frist`.
 
 Stufe «mittel» (identity-kit, Spezifikation 8.3): Kette **`org → portfolio → projekt`**. `projekt` ist der Blatt-Typ
 (höchstens einer, M6). Gremien sind kein eigener Ort: Ein entscheidendes Gremium gehört zu genau einem Portfolio (A-45);
-Rechte im Gremium sind Rollen am Portfolio.
+Rechte im Gremium sind Rollen am Portfolio. Rollen nach Master Entscheid 18 (A-70).
 
 ```ts
 types: {
-  portfolio: { label: 'Portfolio', parent: 'org', roles: ['gremium', 'direktion'], read: 'projekt:read' },
-  projekt: { label: 'Projekt', parent: 'portfolio', roles: ['pl', 'ctl', 'sp', 'kt'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
+  org: { roles: ['mitglied', 'alle-lesen', 'alle-fuehren'] },
+  portfolio: { label: 'Portfolio', parent: 'org', roles: ['portfolio-steuern', 'portfolio-fuehren', 'gremium'], read: 'projekt:read' },
+  projekt: { label: 'Projekt', parent: 'portfolio', roles: ['projekt-steuern', 'projekt-fuehren', 'projekt-mitlesen'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
 }
 ```
 
@@ -350,27 +351,29 @@ Schlüssel `<bereich>:<verb>`. «Ort» = Typen in `resources` (immer mit `org`).
 | stammdaten | `stammdaten:read`, `stammdaten:write` | org | AM.02.01, AM.02.02 |
 | phasenmodell | `phasenmodell:read`, `phasenmodell:write`, `phasenmodell:activate` | org | AM.02.03 |
 | portfolios | `portfolio:read`, `portfolio:admin` | org | AM.02.04 |
+| projekte | `projekt:list` | org | Kopfdaten aller nicht vertraulichen Projekte auflisten (Master Entscheid 14, A-73) |
 | projekte | `projekt:read` | org, portfolio, projekt | Projekt und Register lesen |
-| projekte | `projekt:write` | org, projekt | Register pflegen (UC-002, UC-004) |
+| projekte | `projekt:write` | org, portfolio, projekt | Register pflegen (UC-002, UC-004) |
 | projekte | `projekt:create` | org, portfolio | Projekt anlegen (Übernahme, Initialisierung) |
-| projekte | `projekt:organisation` | org, projekt | PP.04.04 Projektorganisation festlegen |
+| projekte | `projekt:organisation` | org, portfolio, projekt | PP.04.04 Projektorganisation pflegen (ohne Wirkung auf Rechte, A-71) |
 | projekte | `projekt:vertraulich` | org, portfolio | vertrauliche Projekte sehen (A-34) |
-| finanzen | `finanzen:read` | org, portfolio, projekt | Beträge sehen (UX-OF-12, A-33) |
+| finanzen | `finanzen:read` | org, portfolio, projekt | Beträge sehen; in jeder Rolle ausser `mitglied` (Master Entscheid 13) |
 | finanzen | `finanzen:write` | org | Ist-Kosten, Begründungen, Budgetübergabe (UC-010) |
-| berichte | `statusbericht:write` | org, projekt | PS.01.01 |
+| berichte | `statusbericht:write` | org, portfolio, projekt | PS.01.01 |
 | berichte | `statusbericht:review` | org, portfolio | PS.01.02, PS.01.03 |
 | berichte | `periode:close` | org | UC-005 Schritt 5 |
-| berichte | `kpi:write` | org, projekt | PC.03.03 (PL, CTL) |
-| vertraege | `vertrag:write` | org, projekt | DM.02.01–03, PS.02.01, PS.02.05, PS.03.01 |
+| berichte | `kpi:write` | org, portfolio, projekt | PC.03.03 |
+| vertraege | `vertrag:write` | org, portfolio, projekt | DM.02.01–03, PS.02.01, PS.02.05, PS.03.01 |
 | vertraege | `vertrag:review` | org | DM.02.05 |
-| vertraege | `vertrag:sign` | org, projekt | DM.02.06 Unterschrift (SP, PL, CTL) |
-| vertraege | `vertrag:decide` | org, projekt | DM.02.04 zurückziehen, PS.03.02 Änderung entscheiden (SP) |
+| vertraege | `vertrag:sign` | org, portfolio, projekt | DM.02.06 Unterschrift als Vermerk; wer unterzeichnet, bestimmt die Funktion (Projektauftraggeber:in, Projektleitung; A-74) |
+| vertraege | `vertrag:decide` | org, portfolio, projekt | DM.02.04 zurückziehen, PS.03.02 Änderung entscheiden (Vermerk der Projektauftraggeber:in, A-74) |
 | gremien | `sitzung:read` | org, portfolio | Sitzung und Unterlagen ab Versand |
 | gremien | `sitzung:write` | org, portfolio | UC-006 vorbereiten, Entscheide erfassen, Protokoll |
 | ideen | `idee:create` | org | DM.01.01 (eigene) |
-| ideen | `idee:read` | org, portfolio | Ideenpool |
+| ideen | `idee:list` | org | eingereichte Ideen nach Vorlage lesen, ohne Prüfung (Master Entscheid 14, A-73) |
+| ideen | `idee:read` | org, portfolio | Ideenpool mit Prüfung |
 | ideen | `idee:write` | org | DM.01.02–04 |
-| ideen | `idee:decide` | org, portfolio | Initialisierung freigeben bei Kategorie C (UC-001 A4) |
+| ideen | `idee:decide` | org, portfolio | Initialisierung freigeben (Vermerk), bei Kategorie C durch die Direktion (UC-001 A4) |
 | priorisierung | `priorisierung:read` | org, portfolio | Matrix, Szenarien sehen |
 | priorisierung | `priorisierung:write` | org | UC-008 |
 | ressourcen | `ressource:read`, `ressource:write` | org | UC-009, RK.02.04 |
@@ -379,37 +382,40 @@ Schlüssel `<bereich>:<verb>`. «Ort» = Typen in `resources` (immer mit `org`).
 | vorlagen | `vorlage:write` | org | AM.03.01 |
 | schnittstellen | `schnittstelle:admin` (scope: false) | org | AM.03.02 |
 | webhooks | `webhook:admin` (besteht) | org | AM.03.02 |
-| reserviert | `tenant:read`, `tenant:admin`, `members:admin`, `access:admin`, `audit:read` | | Baukasten; `audit:read` für AM.03.03 |
+| reserviert | `tenant:read`, `tenant:admin`, `members:admin`, `access:admin`, `audit:read`, `roles:admin` | | Baukasten; `audit:read` für AM.03.03; `access:admin` an Portfolio und Projekt für den Bereich «Zugriff» (A-71); `roles:admin` eigene Rollen nur für `org-admin` (A-59) |
 
 ### 3.3 Rollen
 
-Rollen nach den Akteuren (Master §5), Rechte aus der Sichtbarkeitstabelle in
+Rollen nach Master Entscheid 18 (A-70), Rechte aus der Sichtbarkeitstabelle in
 [informationsarchitektur.md](ux/informationsarchitektur.md#sichtbarkeit-je-rolle). Alle Rollen enthalten `tenant:read`,
 `stammdaten:read`, `phasenmodell:read`, `portfolio:read`. `<bereich>:*` = alle Rechte des Bereichs aus 3.2.
 
-| Rolle (Schlüssel) | Ort | Akteur | Rechte (zusätzlich zur Grundmenge) |
+| Rolle (Schlüssel) | Ort | Bei der Insel z. B. | Rechte (zusätzlich zur Grundmenge) |
 |---|---|---|---|
 | `org-admin` | org | ADM | alle (Paket) |
-| `ue` | org | UE (Programmleitung) | `projekt:*`, `finanzen:read`, `statusbericht:review`, `periode:close`, `vertrag:review`, `sitzung:*`, `idee:read/write`, `priorisierung:*`, `ressource:read`, `auswertung:*`, `ziel:read/freigabe`, `zielerreichung:write`, `quartalsbericht:write`, `phasenmodell:write`, `portfolio:admin`, `vorlage:write`, `audit:read`, `handlungsfeld:read` |
-| `pmo` | org | PMO | wie `ue` (A-42) |
-| `gl` | org | GL | `ziel:read/write`, `zielerreichung:write`, `handlungsfeld:*`, `projekt:read`, `auswertung:read`, `finanzen:read` (A-41), `sitzung:read` |
-| `fi` | org | FI | `projekt:read`, `finanzen:read/write`, `auswertung:read/write` |
-| `rm` | org | RM | `projekt:read`, `ressource:read/write`, `auswertung:read` |
-| `antragsteller` | org (an «Alle Mitglieder», A-46) | AS | `idee:create` (eigene Ideen über Policy) |
-| `leser` (besteht) | org | – | `handlungsfeld:read`, `ziel:read` |
-| `gremium` | portfolio | PRAT-, GLPA-Mitglied | `projekt:read`, `projekt:vertraulich`, `finanzen:read`, `sitzung:read`, `idee:read`, `priorisierung:read`, `auswertung:read` |
-| `direktion` | portfolio (Kategorie C) | DIR | `projekt:read`, `projekt:create`, `finanzen:read`, `idee:read`, `idee:decide`, `auswertung:read` |
-| `sp` | projekt | SP | `projekt:read`, `projekt:organisation`, `finanzen:read`, `vertrag:sign`, `vertrag:decide` |
-| `pl` | projekt | PL | `projekt:read/write`, `projekt:organisation`, `finanzen:read`, `statusbericht:write`, `kpi:write`, `vertrag:write`, `vertrag:sign` |
-| `ctl` | projekt | CTL | `projekt:read`, `finanzen:read`, `kpi:write`, `vertrag:sign` |
-| `kt` | projekt | KT | `projekt:read` (keine Beträge) |
+| `mitglied` | org (an «Alle Mitglieder») | alle; AS | `handlungsfeld:read`, `ziel:read`, `projekt:list`, `idee:list`, `idee:create` (eigene Ideen über Policy) |
+| `alle-lesen` | org | GL | alle Leserechte ausser Ressourcen (Zuteilung einzelner Personen ist sensibel, darstellung.md): `handlungsfeld:read`, `ziel:read`, `projekt:list/read/vertraulich`, `finanzen:read`, `sitzung:read`, `idee:list/read`, `priorisierung:read`, `auswertung:read` |
+| `alle-fuehren` | org | UE, PMO | alle Fachrechte aus 3.2 ausser `stammdaten:write`, `phasenmodell:activate`, `schnittstelle:admin`, `webhook:admin` und den reservierten; dazu `access:admin` und `audit:read` |
+| `portfolio-steuern` | portfolio | Direktion für ihr Portfolio C | `projekt:read/vertraulich`, `finanzen:read`, `sitzung:read`, `idee:read`, `idee:decide`, `priorisierung:read`, `auswertung:read`, `vertrag:sign`, `vertrag:decide` |
+| `portfolio-fuehren` | portfolio | Direktion, wenn sie ihr Portfolio selbst führt | wie `portfolio-steuern`, dazu `projekt:create/write/organisation`, `statusbericht:write/review`, `kpi:write`, `vertrag:write`, `sitzung:write`, `access:admin` |
+| `gremium` | portfolio | PRAT, GLPA | wie `portfolio-steuern` ohne `idee:decide`, `vertrag:sign`, `vertrag:decide` (Entscheide erfasst, wer führt) |
+| `projekt-steuern` | projekt | Projektauftraggeber:in | `projekt:read`, `projekt:organisation` (UC-002 Schritt 2), `finanzen:read`, `vertrag:sign`, `vertrag:decide` |
+| `projekt-fuehren` | projekt | Projektleitung, PMO | `projekt:read/write/organisation`, `finanzen:read`, `statusbericht:write`, `kpi:write`, `vertrag:write`, `vertrag:sign`, `access:admin` |
+| `projekt-mitlesen` | projekt | Kernteam | `projekt:read`, `finanzen:read` |
 
+- Jede Rolle enthält nur Rechte, deren Ort in 3.2 ihren Typ umfasst (Grundmenge ausgenommen); was nur an der Organisation
+  gilt, steckt allein in `alle-fuehren` bzw. `alle-lesen` (Master Entscheid 18). So zeigt «Recht irgendwo» nur, was die
+  Person tun kann.
+- **Eigene Rollen** (identity-kit 5.0, AM.01.02, UC-016 A3): Die Rollen oben sind die Vorgabe und bleiben unverändert; die
+  Organisation ergänzt eigene (`c-…`) aus Rechten des Modells, z. B. «Ressourcen pflegen» (Master Entscheid 15).
+- **Funktion und Zugriff getrennt** (A-71): Die Projektorganisation setzt keine Tupel. Zugriff vergibt, wer am Ort
+  `access:admin` hat, über `/v1/access` (Bereich «Zugriff», UI-51) oder zentral über Administration › Zugänge; beim
+  Entstehen eines Projekts schlägt das System Zugriffe für die genannte Projektleitung (`projekt-fuehren`) und
+  Projektauftraggeber:in (`projekt-steuern`) vor.
 - VR, SNS-VR, KOM, DTI/DBI sind keine Rollen (UX-E8, A-02, A-22).
-- `ziel:read` für alle Rollen ausser `antragsteller` (IA: Ziele ○ lesend); die Roadmap lesen alle (A-35) über eine eigene
-  Route mit `tenant:read`.
-- Projektrollen setzt `projekt` beim Festlegen der Projektorganisation selbst als Tupel (`iam.tuples.grant`), geprüft mit
-  `projekt:organisation`; die Regel «niemand gibt mehr, als er hat» gilt für `/v1/access`, nicht für diese Fachaktion.
-- **Scopes:** `ppm:read` umfasst alle `*:read` ausser `finanzen:read`; `handlungsfeld:write` (besteht). Weitere schreibende
+- `ziel:read` über `mitglied` für alle (IA: Ziele ○ lesend); die Roadmap lesen alle (A-35) über eine eigene Route mit
+  `tenant:read`.
+- **Scopes:** `ppm:read` umfasst alle `*:read` und `*:list` ausser `finanzen:read`; `handlungsfeld:write` (besteht). Weitere schreibende
   Scopes erst, wenn ein Maschinen-Client sie braucht (z. B. ERP in AP-E7-4).
 - **mcpTools:** nur lesend (`list_*`, `get_*`) je Modul mit dem Leserecht der Ressource; schreibende Werkzeuge nur nach
   Entscheid der Master-Session.
@@ -418,16 +424,17 @@ Rollen nach den Akteuren (Master §5), Rechte aus der Sichtbarkeitstabelle in
 
 Restriktiv, zusätzlich zu `tenant_isolation`; **jede** Tabelle aus Abschnitt 2 hat genau ein Muster (die Liste ist vollständig; neue Tabellen zuerst hier eintragen). Hilfsfunktionen legt AP-E0-1 an (SQL, `STABLE`, Rechte der aufrufenden Rolle,
 **nicht** `SECURITY DEFINER`): `ppm.projekt_sichtbar(projekt_id uuid)` = `EXISTS (SELECT 1 FROM ppm.projekt …)` unter RLS,
-`ppm.portfolio_von(projekt_id uuid)`.
+`ppm.portfolio_von(projekt_id uuid)`. `ppm.projekt_sichtbar()` prüft ausdrücklich das Leserecht des Projekts (nicht
+`projekt:list`), damit das Auflisten die Projektdetails nicht freigibt (A-73).
 
 | Muster | Lesen (`USING`) | Schreiben (`WITH CHECK`) | Tabellen |
 |---|---|---|---|
 | **ORG** | `app.has_permission('<bereich>:read')` | `app.has_permission('<bereich>:write')` | `org_einheit`, `codewert`, `feiertag`, `phasenmodell` + Kinder, `strategisches_ziel`, `zieljahr`, `jahresziel`, `hauptaktivitaet`, `zielerreichung`, `quartalsbericht`, `bewertungsmodell` und `kriterium` (Lesen auch mit `priorisierung:read` an einem Portfolio, `ppm.priorisierung_lesbar()`: das Gremium liest die Bewertung seines Portfolios nach dem Modell), `kapazitaet`, `vorlage`, `schnittstelle*`, `periode`, `budgetuebergabe`, `jahresrueckblick`, `roadmap` (Lesen nach Publikation mit `tenant:read`, A-35) |
 | **PORTFOLIO** | `app.has_permission('<r>') OR app.has_permission('<r>', 'portfolio', portfolio_id)` | dasselbe mit dem Schreibrecht | `portfolio` (Lesen mit `portfolio:read`), `gremium`, `gremienweg`, `sitzungstermin`, `sitzung`, `traktandum` (über Sitzung), `rangfolge`, `szenario*`, `budgetrahmen`, `risiko` (Portfoliorisiko) |
-| **PROJEKT** (Blatt) | `(app.read_all() OR portfolio_id = ANY (app.read_types()) OR app.has_tuple('projekt', id, app.read_relations())) AND (NOT vertraulich OR app.has_tuple('projekt', id, app.read_relations()) OR app.has_permission('projekt:vertraulich') OR app.has_permission('projekt:vertraulich', 'portfolio', portfolio_id))` | `app.write_all() OR portfolio_id = ANY (app.write_types()) OR app.has_tuple('projekt', id, app.write_relations())`; Anlegen: `app.has_permission('projekt:create') OR app.has_permission('projekt:create', 'portfolio', portfolio_id)` | `projekt` |
-| **KIND** | `ppm.projekt_sichtbar(projekt_id)` | `app.has_permission('<recht>', 'projekt', projekt_id)` | `projekt_person`, `meilenstein`, `risiko` (Projektrisiko), `kpi`, `kpi_wert` (`kpi:write`), `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`, `meldung`, `statusbericht` (`statusbericht:write`; Prüfung: `statusbericht:review`), `rueckfrage`, `einforderung` (`statusbericht:review`), `eskalation`, `vertrag_*`, `quality_check` (`vertrag:review`), `unterschrift` (`vertrag:sign`), `ziel_projekt`, `abschlussbericht`, `abschluss_entscheid` (Schreiben nur als Folge eines Entscheids), `lessons_learned`, `bewertung` (`priorisierung:write`) |
+| **PROJEKT** (Blatt) | `((app.has_permission('projekt:list') AND NOT vertraulich) OR app.read_all() OR portfolio_id = ANY (app.read_types()) OR app.has_tuple('projekt', id, app.read_relations())) AND (NOT vertraulich OR app.has_tuple('projekt', id, app.read_relations()) OR app.has_permission('projekt:vertraulich') OR app.has_permission('projekt:vertraulich', 'portfolio', portfolio_id))` | `app.write_all() OR portfolio_id = ANY (app.write_types()) OR app.has_tuple('projekt', id, app.write_relations())`; Anlegen: `app.has_permission('projekt:create') OR app.has_permission('projekt:create', 'portfolio', portfolio_id)` | `projekt` |
+| **KIND** | `ppm.projekt_sichtbar(projekt_id)` | `app.has_permission('<recht>', 'projekt', projekt_id) OR app.has_permission('<recht>', 'portfolio', ppm.portfolio_von(projekt_id))` (Rollen am Portfolio, Master Entscheid 18) | `projekt_person`, `meilenstein`, `risiko` (Projektrisiko), `kpi`, `kpi_wert` (`kpi:write`), `stakeholder`, `abhaengigkeit`, `ressourcenbedarf`, `meldung`, `statusbericht` (`statusbericht:write`; Prüfung: `statusbericht:review`), `rueckfrage`, `einforderung` (`statusbericht:review`), `eskalation`, `vertrag_*`, `quality_check` (`vertrag:review`), `unterschrift` (`vertrag:sign`), `ziel_projekt`, `abschlussbericht`, `abschluss_entscheid` (Schreiben nur als Folge eines Entscheids), `lessons_learned`, `bewertung` (`priorisierung:write`) |
 | **BETRAG** | `ppm.projekt_sichtbar(projekt_id) AND (app.has_permission('finanzen:read', 'projekt', projekt_id) OR app.has_permission('finanzen:read', 'portfolio', ppm.portfolio_von(projekt_id)))` | KIND mit `projekt:write` bzw. `finanzen:write` | `kosten`, `ist_kosten`, `abweichung_begruendung` |
-| **EIGEN** | `<person> = app.principal_id() OR <Recht wie oben>` | `<person> = app.principal_id()` | `idee` (`erfasst_von`, `vorgesehener_sponsor`; sonst `idee:read` an org/portfolio), `idee_rueckfrage`, `stellvertretung`, `mitteilung` |
+| **EIGEN** | `<person> = app.principal_id() OR <Recht wie oben>` | `<person> = app.principal_id()` | `idee` (`erfasst_von`, `vorgesehener_sponsor`; sonst `idee:read` an org/portfolio oder `stand <> 'entwurf'` mit `idee:list`, A-73), `idee_rueckfrage` (eigene Bedingung `erfasst_von` oder `idee:read`, nicht über die Sichtbarkeit der Idee), `stellvertretung`, `mitteilung` |
 | **AUFGABE** | `empfaenger_person = app.principal_id() OR (empfaenger_recht IS NOT NULL AND (CASE ort_typ WHEN 'org' THEN app.has_permission(empfaenger_recht) ELSE app.has_permission(empfaenger_recht, ort_typ, ort_id) END)) OR <Stellvertretung>` | nur das schreibende Modul über `eingang` | `aufgabe` |
 | **STAND** | wie KIND bzw. PORTFOLIO | nur anhängen (kein UPDATE/DELETE für `ppm_app`) | alle `*_version` (auch `projekt_version`, `strategisches_ziel_version`), `entscheid_version`, `dashboard_zeile` |
 | **ÜBER ELTERN** | `EXISTS` auf die Elternzeile (deren Policy wirkt mit) | Schreibrecht des Elternobjekts | Sitzung: `einladung`, `unterlage`, `entscheid`, `auflage`, `protokoll` (Eltern `traktandum`/`sitzung`, Schreiben `sitzung:write`); Vertrag: `vertrag_version`, `vertrag_kapitel`, `gate_antrag`, `leitfrage_antwort`, `nutzenpruefung`, `beilage` (Eltern Projekt, Schreiben `vertrag:write`); Idee: `idee_leitfrage`, `idee_raster` (Schreiben `idee:write`); Ressourcen: `zuteilung` (`ressource:write`) |
@@ -470,10 +477,10 @@ await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: { typ: 'perio
 | `periode.abschliessen` | Recht `periode:close` | Job am 25. | Monatsende | Abschluss | AP-E1-2 |
 | `vertrag.erstellen` | PL | Initialisierung freigegeben | – | Einreichen | AP-E4-3 (AP-E3-1 für übernommene Projekte) |
 | `vertrag.quality_check` | Recht `vertrag:review` | Einreichen | – | Bestätigen / Rückmeldung | AP-E3-2 |
-| `vertrag.unterzeichnen` | SP, PL, CTL je Person | Quality-Check bestätigt | – | Unterzeichnen / Verweigern | AP-E3-2 |
+| `vertrag.unterzeichnen` | Projektauftraggeber:in und Projektleitung je Person (Funktion) | Quality-Check bestätigt | – | Unterzeichnen / Verweigern | AP-E3-2 |
 | `vertrag.ueberarbeiten` | PL | Rückmeldung, Verweigerung, Auflage | – | Einreichen | AP-E3-2, AP-E3-3 |
 | `gate.vorbereiten` | PL | Job 30 Arbeitstage vor geplanter Gate-Sitzung | Unterlagen 5 Arbeitstage vor Sitzung | Einreichen | AP-E3-3 |
-| `aenderung.entscheiden` | SP | Änderungsantrag eingereicht | – | Entscheid / Antrag an den PRAT | AP-E3-4 |
+| `aenderung.entscheiden` | Projektauftraggeber:in (Funktion) | Änderungsantrag eingereicht | – | Entscheid / Antrag an den PRAT | AP-E3-4 |
 | `sitzung.vorbereiten` | Recht `sitzung:write` am Portfolio | Job 15 Arbeitstage vor Sitzung | Versand 5 Arbeitstage vorher | Versand | AP-E2-1 |
 | `sitzung.lesen` | Mitglieder (`sitzung:read` am Portfolio) | Versand | Sitzung | Sitzung geschlossen | AP-E2-1 |
 | `protokoll.versenden` | Recht `sitzung:write` | Sitzung geschlossen | 3 Arbeitstage | Versand | AP-E2-2 |
@@ -492,6 +499,10 @@ await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: { typ: 'perio
 | `abweichung.klaeren`, `budget.uebergeben` | Recht `finanzen:write` | Prognose über Budget / Budgetzyklus | – | Begründung / Übergabe | AP-E7-4 |
 | `schnittstelle.fehler` | Recht `schnittstelle:admin` | Lauf fehlgeschlagen | – | erfolgreicher Lauf | AP-E7-3 |
 | `zugang.neu_besetzen` | Recht `members:admin` | Zugang entzogen mit Rollen an Orten oder offenen Aufgaben (UC-016 A1) | – | von Hand, sobald neu besetzt | AP-E7-8 |
+
+Vermerke (A-74): Aufgaben für Quality-Check, Unterschrift, Freigabe und Abnahme bleiben offen, auch wenn der Ablauf ohne
+den Vermerk weitergeht; sie erledigen sich erst mit dem Vermerk. Fehlt in der Projektorganisation die Funktion, geht die
+Aufgabe an alle mit `projekt:write` bzw. dem Recht am Ort und weist auf die fehlende Funktion hin.
 
 ### 4.3 Stellvertretung
 
@@ -679,6 +690,16 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | **AP-E7-7** | Vorlagen mit Versionen und Feldzuordnung für alle Dokumente (AM.03.01; UC-018 Schritte 1–2) | `vorlage` · `vorlagen` | `src/modules/vorlage/` (Erweiterung), `web/src/features/vorlagen/` | 400–409 | nach AP-E3-5 · AP-E3-5 | UX-DoD |
 | **AP-E7-8** | Benutzer und Rollen vollständig: Zugang entziehen mit offenen Aufgaben und neu zu besetzenden Rollen (AM.01.01, AM.01.02; UC-016 Schritte 1–3, A1, A2) | `eingang` (`neubesetzung*`), Baukasten | diese Dateien | 410–419 | nach AP-E0-8 · AP-E0-8, AP-E0-4 | UX-DoD |
 
+**E8 Produktgrundsätze** (Master Entscheide 12–20; Abnahme: UX-E12–E14, Abnahmekriterien K1–K6 in der nachgeführten Fassung)
+
+| Paket | Inhalt | Besitz | Dateien | Migrationen | Start · Merge nach | Abnahme |
+|---|---|---|---|---|---|---|
+| **AP-E8-1** | Rollenmodell nach 3.3 in `model.ts` und `resources.ts`, Rechte `projekt:list`, `idee:list`, Orte nach 3.2; KIND-Policies mit Portfolio; Migration der Tupel (A-70); Testmatrix | `src/authz/`, `test/app/matrix/` | diese Dateien und Policies je Modul | 420–429 | sofort · – | `rls.test.ts`, `tenant-isolation.test.ts`; Rolle am Portfolio schreibt Projektdetails (Test) |
+| **AP-E8-2** | Zugriff am Projekt und Portfolio (UI-51, UX-E14); Projektorganisation ohne Tupel, Funktionen `sp`/`pl`/`weitere` mit Text (A-71, A-72); Vorschlag beim Entstehen | `projekt` (`organisation*`, `zugriff*`), `vertrag` (Kap. 8, Unterzeichnende), `sitzung` (Einladungen) | diese Dateien | 430–439 | nach AP-E8-1 · AP-E8-1 | Projektorganisation ändert keine Tupel (Test); UX-DoD |
+| **AP-E8-3** | Alle Projekte auflisten (UI-52), eingereichte Ideen für alle, ähnliche Ideen beim Ausfüllen (A-73) | `projekt` (`liste*`), `idee` (`pool*`) | diese Dateien | 440–449 | nach AP-E8-1 · AP-E8-1 | Mitglied sieht keine Details und keine vertraulichen Projekte (Test) |
+| **AP-E8-4** | Vermerk statt Sperre (A-74): Gate und Vertrag ohne Quality-Check oder Unterschrift, Phase ohne Gate-Entscheid, Änderung vor Entscheid, Initialisierung vor Entscheid, Abschluss vor Abnahme, Monatsabschluss mit ungeprüften Berichten, Roadmap vor Freigabe, Traktandum mit Vermerk | `vertrag`, `idee`, `statusbericht`, `abschluss`, `ziel`, `sitzung` (je `vermerk*`) | diese Dateien | 450–459 | nach AP-E8-1 · AP-E8-1 | je Fall ein Test «läuft weiter, Vermerk gesetzt, Aufgabe offen»; UX-DoD |
+| **AP-E8-5** | Versionen statt Sperre (A-75): Bericht nach Einreichen und Abschluss, Unterlagen nach Versand, Jahresziele nach Vorlage, Projekt nach Abschluss; Verlauf am Objekt | `statusbericht`, `sitzung`, `ziel`, `abschluss` (je `verlauf*`), `web/src/ui/` (Baustein Verlauf über die Master-Session) | diese Dateien | 460–469 | nach AP-E8-1 · AP-E8-1 | Änderung nach Versand markiert (Test); UX-DoD |
+
 ### 7.4 Wellen (Vorschlag der Parallelität)
 
 | Welle | Pakete gleichzeitig |
@@ -690,6 +711,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | 6 | AP-E2-3, AP-E2-4, AP-E3-2, AP-E3-4, AP-E3-5, AP-E4-2, AP-E5-2, AP-E6-2, AP-E7-6 |
 | 7 | AP-E3-3, AP-E4-3, AP-E5-3, AP-E6-4, AP-E7-2, AP-E7-4, AP-E7-8 |
 | 8 | AP-E5-5, AP-E7-1, AP-E7-7, danach AP-E7-5 |
+| 9 | AP-E8-1, danach AP-E8-2, AP-E8-3, AP-E8-4, AP-E8-5 |
 
 ## 8. Annahmen
 
@@ -702,11 +724,11 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-01 | K01, V10 | Bewertung ohne Score: je Kriterium hoch/mittel/tief, Gesamtbeurteilung durch das Gremium | AP-E5-1, AP-E5-2 |
 | A-02 | K02, UX-E8 | SNS-VR ist ein Gremium ohne Benutzer am Portfolio A; die UE erfasst Vorlage und Entscheid | AP-E0-5, AP-E2-2, AP-E3-3 |
 | A-03 | K03 | Weiterleitung an den VR auch ausserhalb des Quartals als Ausnahme; die UE erfasst sie | AP-E2-2, AP-E6-4 |
-| A-04 | K04, K05 | Programmauftraggeber VR; Sponsoren-Koalition als Liste in der Projektorganisation; eine Unterschrift für Auftraggeber/Sponsor | AP-E0-4, AP-E3-2 |
-| A-05 | K06 | Das Gremium benennt den Sponsor, der Sponsor die Projektleitung; die UE erfasst beide mit dem Entscheid | AP-E4-3 |
+| A-04 | K04, K05 | Programmauftraggeber VR; Sponsoren-Koalition als Liste in der Projektorganisation; eine Unterschrift für Auftraggeber/Sponsor *Ersetzt durch A-72, A-74, Master Entscheid 12, 17.* | AP-E0-4, AP-E3-2 |
+| A-05 | K06 | Das Gremium benennt den Sponsor, der Sponsor die Projektleitung; die UE erfasst beide mit dem Entscheid *Ersetzt durch A-70 (Projektauftraggeber:in statt Sponsor), Master Entscheid 12.* | AP-E4-3 |
 | A-06 | K07 | Die UE weist offensichtlich ungeeignete Ideen allein zurück und informiert das Gremium (Mitteilung); alle anderen entscheidet das Gremium | AP-E4-2 |
 | A-07 | K08 | Kategorie B: gleicher Mindeststandard wie A (Vertrag, Quality-Check, Monatsbericht) | AP-E0-5, AP-E1-1 |
-| A-08 | K09 | Kategorie C wird geführt, freiwillig, ohne Pflicht-Gates und Pflicht-Reporting (`portfolio.pflichten = false`) | AP-E0-5, AP-E1-1 |
+| A-08 | K09 | Kategorie C wird geführt, freiwillig, ohne Pflicht-Gates und Pflicht-Reporting (`portfolio.pflichten = false`) *Ersetzt durch A-74 (Pflichten sind für alle Kategorien Hinweise), Master Entscheid 12.* | AP-E0-5, AP-E1-1 |
 | A-09 | K10 | Wiederaufnahme sistierter Projekte per Gremiumsentscheid, Vertrag über ein Gate fortgeschrieben | AP-E7-1 |
 | A-10 | K11 | Toleranzen je Projekt im Vertrag, Standard im Phasenmodell; ohne Wert keine Warnung «wesentlich» | AP-E0-3, AP-E1-1, AP-E7-4 |
 | A-11 | K12 | Fehlender Bericht: Werte der Vorperiode mit «nicht gemeldet», im Dashboard sichtbar | AP-E1-2 |
@@ -715,7 +737,7 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-14 | K16 | Einmalige Übernahme der laufenden Projekte aus dem Excel-Dashboard | AP-E0-7 |
 | A-15 | K17 | Strategische Ziele = Ziele 2030; keine Zwischenstufe | AP-E0-9 |
 | A-16 | K18 | Ist-Kosten monatlich aus dem ERP über einen Kostenträger je Projekt | AP-E7-4 |
-| A-17 | K19 | Jahresbedarf zeitanteilig nach Phasenterminen, durch FI korrigierbar | AP-E7-4 |
+| A-17 | K19 | Jahresbedarf zeitanteilig nach Phasenterminen, durch FI korrigierbar *Ersetzt durch A-70 (UE statt FI), Master Entscheid 12.* | AP-E7-4 |
 | A-18 | K20 | Budgetrahmen je Kategorie optional; ohne Rahmen keine Budget-Wasserlinie | AP-E5-1, AP-E5-3 |
 | A-19 | K21 | Business Case bis zur Vorlage: Kosten je Phase CAPEX/OPEX aus dem Register, Nutzen als Text mit KPIs | AP-E3-1 |
 | A-20 | K22 | Ressourcen in FTE × Monate je Rolle und Phase; Pool = Rolle | AP-E0-6, AP-E5-4, AP-E7-2 |
@@ -728,27 +750,27 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-28 | UX-OF-7 | Sammelbestätigung unauffälliger Berichte; Berichte mit Auffälligkeit einzeln | AP-E1-2 |
 | A-29 | UX-OF-8 | Höchstens ein Entwurf je Projekt; Änderung während der Gate-Vorbereitung im Gate-Entwurf | AP-E3-1, AP-E3-4 |
 | A-30 | UX-OF-9 | Entscheid bis zum Schliessen der Sitzung korrigierbar, mit Verlauf; danach nur über ein neues Traktandum | AP-E2-2 |
-| A-31 | UX-OF-10 | Unterzeichnen als protokollierter Klick; Stellvertretung nur mit ausdrücklich erteiltem Recht für Unterschriften | AP-E0-8, AP-E3-2 |
-| A-32 | UX-OF-11 | Ähnliche Ideen sieht nur die UE | AP-E4-2 |
-| A-33 | UX-OF-12 | Projektrollen sehen nur ihre Projekte; Beträge nur PL, CTL, SP, UE, FI, Gremium (und GL, A-41) | AP-E0-1, AP-E0-6, AP-E1-3 |
-| A-34 | UX-OF-13 | Kennzeichnung «vertraulich» am Projekt; sichtbar nur für Projektrollen, UE und Gremium des Portfolios | AP-E0-1, AP-E0-4 |
+| A-31 | UX-OF-10 | Unterzeichnen als protokollierter Klick; Stellvertretung nur mit ausdrücklich erteiltem Recht für Unterschriften *Ersetzt durch A-74 (Unterschrift als Vermerk; die Regel zur Stellvertretung bleibt), Master Entscheid 12.* | AP-E0-8, AP-E3-2 |
+| A-32 | UX-OF-11 | Ähnliche Ideen sieht nur die UE *Ersetzt durch A-73, Master Entscheid 14.* | AP-E4-2 |
+| A-33 | UX-OF-12 | Projektrollen sehen nur ihre Projekte; Beträge nur PL, CTL, SP, UE, FI, Gremium (und GL, A-41) *Ersetzt durch A-70, Master Entscheid 13, 18.* | AP-E0-1, AP-E0-6, AP-E1-3 |
+| A-34 | UX-OF-13 | Kennzeichnung «vertraulich» am Projekt; sichtbar nur für Projektrollen, UE und Gremium des Portfolios *Ersetzt durch A-70, Master Entscheid 13.* | AP-E0-1, AP-E0-4 |
 | A-35 | UX-OF-14 | Publizierte Roadmap lesen alle angemeldeten Personen | AP-E6-2 |
 | A-36 | UX-OF-15 | Gremienunterlagen im System, PDF zum Herunterladen, E-Mail nur mit Link | AP-E2-1 |
 | A-37 | UX-OF-16 | Bericht nach Abschluss der Periode zählt für die nächste; die abgeschlossene bleibt «nicht gemeldet» | AP-E1-2 |
 | A-38 | UX-OF-17 | Abweichung je Dimension «keine / gering / wesentlich» mit Kommentar | AP-E1-1 |
 | A-39 | UX-OF-18 | Nutzen und Risiko der Matrix aus der Bewertung je Kriterium nach fester, angezeigter Zuordnung | AP-E5-2 |
 | A-40 | UX-OF-3, UX-OF-6 | Nutzungskontexte wie beschrieben; Zugriff wie andere interne Web-Anwendungen | alle |
-| A-41 | – (Bauplan) | GL sieht Beträge, weil sie den Budgetbedarf übergibt (UC-010 Schritt 6, UC-011 Schritt 9) | AP-E0-1 |
-| A-42 | – (Bauplan) | PMO hat dieselben Rechte wie die UE (IA: gleiche Sichtbarkeit) | AP-E0-1 |
+| A-41 | – (Bauplan) | GL sieht Beträge, weil sie den Budgetbedarf übergibt (UC-010 Schritt 6, UC-011 Schritt 9) *Ersetzt durch A-70, Master Entscheid 18.* | AP-E0-1 |
+| A-42 | – (Bauplan) | PMO hat dieselben Rechte wie die UE (IA: gleiche Sichtbarkeit) *Ersetzt durch A-70, Master Entscheid 18.* | AP-E0-1 |
 | A-43 | – (Bauplan) | Arbeitstage = Montag bis Freitag ohne gepflegte Feiertage | AP-E0-2, AP-E0-3 |
 | A-44 | – (Bauplan) | Benachrichtigungen vorerst nur im Eingang; E-Mail mit Link folgt mit einem Netz-Adapter für Mail | AP-E0-8 |
-| A-45 | – (Bauplan) | Je Portfolio genau ein entscheidendes Gremium (PRAT ↔ A, GLPA ↔ B, Direktion ↔ C); Rechte im Gremium = Rolle `gremium` am Portfolio | AP-E0-1, AP-E0-5 |
-| A-46 | – (Bauplan) | Antragstellende = alle Mitglieder (Rolle `antragsteller` an «Alle Mitglieder») | AP-E0-1, AP-E4-1 |
+| A-45 | – (Bauplan) | Je Portfolio genau ein entscheidendes Gremium (PRAT ↔ A, GLPA ↔ B, Direktion ↔ C); Rechte im Gremium = Rolle `gremium` am Portfolio *Ersetzt durch A-70 (ein entscheidendes Gremium je Portfolio bleibt; Rechte über `gremium`, `portfolio-steuern`, `portfolio-fuehren`), Master Entscheid 18.* | AP-E0-1, AP-E0-5 |
+| A-46 | – (Bauplan) | Antragstellende = alle Mitglieder (Rolle `antragsteller` an «Alle Mitglieder») *Ersetzt durch A-70 (Rolle `mitglied`), Master Entscheid 18.* | AP-E0-1, AP-E4-1 |
 | A-47 | – (Bauplan) | Projektnummer «JJJJ-NNN» fortlaufend je Jahr der Anlage und Organisation | AP-E0-4 |
 | A-48 | K3 Schritt 4 | Portfoliobericht nur aus einer abgeschlossenen Periode, Inhalt als Stand bei Erzeugung; «Entwurf» → «bereitgestellt», ab dann für Gremien sichtbar; ein Kommentar je Bericht («Bericht der Programmleitung»); Traktandum als Vorschlag beim Bereitstellen; Risikolage ohne eigene Bewertungsregel, nur aktive Projekte | AP-E2-3 |
 | A-49 | – (Bauplan, I-B3) | Aufgabe «Zielerreichung erfassen» als Sammelaufgabe je Quartal an `zielerreichung:write` mit Fortschritt, ohne Frist bis zur Klärung des Termins des Quartalsreportings | AP-E6-3 |
 | A-50 | UC-016 A1 | «Zugang sperren» = Mitglied im Baukasten entfernen; neu zu besetzen sind nur unbefristete Rollen an Orten (befristete entfallen mit dem Ablauf); neu besetzt wird dort, wo die Rolle vergeben wird; die Aufgabe erledigt die Administration | AP-E7-8 |
-| A-51 | K25 | Bei Kategorie C ist die Direktion das Portfolio C mit seiner Organisationseinheit; sie benennt SP und PL mit der Freigabe; sonst erfasst die UE SP und PL vor dem Entscheid (ohne beide 422); «Mit Auflagen freigegeben» wirkt wie «Freigegeben»; die Direktion kann nicht zurückstellen; eine Korrektur weg von «Freigegeben» zieht das Projekt zurück | AP-E4-3 |
+| A-51 | K25 | Bei Kategorie C ist die Direktion das Portfolio C mit seiner Organisationseinheit; sie benennt SP und PL mit der Freigabe; sonst erfasst die UE SP und PL vor dem Entscheid (ohne beide 422); «Mit Auflagen freigegeben» wirkt wie «Freigegeben»; die Direktion kann nicht zurückstellen; eine Korrektur weg von «Freigegeben» zieht das Projekt zurück *Ersetzt durch A-70, A-72 (Projektauftraggeber:in und Projektleitung statt SP und PL), Master Entscheid 12, 18.* | AP-E4-3 |
 | A-52 | K01, UX-OF-18, K5 Z4 | Matrix: Achse = Durchschnitt hoch 3 / mittel 2 / tief 1 der zugeordneten Kriterien, > 2 hoch, < 2 tief, = 2 Grenze ohne Feld (Gremium beurteilt); Kosten = Summe Prognose, sonst Budget-Baseline; Ressourcen = FTE × Monate, sonst Grösse S/M/L = 1/6, 1/2, 5/6 der Achse («geschätzt»); Rangfolge nur als Entwurf der UE, «entschieden» mit AP-E5-5 | AP-E5-2 |
 | A-53 | Q7 | Änderungsantrag: Rubriken der Hauptänderungen Scope = Kap. 3–5, Zeitplan = Kap. 7, Ressourcen/Budget = Kap. 9, Annahmen = Kap. 4, Key-Risiken = Kap. 10; Wirkung aus den gegenüber der Baseline geänderten Kapiteln und `kapitel_wirkung` des Phasenmodells (ohne Phasenmodell entscheidet der SP); Antrag an den PRAT nur bei Wirkung; eingereicht = «in Prüfung» beim SP ohne Quality-Check; Korrektur des Gremiums hebt eine gesetzte Baseline nicht auf; die UE erhält keine Mitteilung (keine Mitteilung an ein Recht, offen) | AP-E3-4 |
 | A-54 | UC-018, A-16, A-17, K23 | Umsysteme über HTTP(S) mit JSON an einer Adresse je Schnittstelle, ohne Anmeldung am Umsystem (folgt mit dem Anschluss); Katalog nur ERP › Ist-Kosten, HR-System › Personal, Budgetprozess › Jahresbedarf; die Verarbeitung registriert das Fachmodul, ohne sie scheitert ein Lauf mit «noch nicht verfügbar»; Testlauf prüft nur die Verbindung; private Adressen nur mit `WEBHOOK_ALLOW_PRIVATE`; geplanter Lauf einmal je Tag, Woche oder Monat (Europe/Zurich), ohne Rückmeldung nach 1 h abgebrochen; Änderungsprotokoll mit altem und neuem Wert aus dem Audit | AP-E7-3 |
@@ -759,14 +781,20 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-59 | UC-016 Schritt 3, A-44 | «Informiert den Benutzer» = Mitteilung im Eingang (E-Mail mit A-44); die Mitteilung nennt nur den Typ des Orts, nicht seinen Namen; eigene Rollen zur Laufzeit (iam 5.0): Recht `roles:admin` nur für org-admin, keiner Fachrolle | AP-E7-8 |
 | A-60 | UC-015, K3 Schritt 8, A-09, A-30 | Art `abschluss` je Lage: Exit-Gate mit eingereichtem Bericht «Abgeschlossen»/«Nacharbeiten verlangt»; aktives Projekt «Sistiert»/«Abgebrochen»/«Weiterführen»; sistiertes Projekt «Weiterführen» (= Wiederaufnahme)/«Sistiert»/«Abgebrochen»; Gate «Gestoppt» gilt als Abbruch; Bericht zu Sistierung und Abbruch endet mit «eingereicht» ohne Gremium (Pflicht «Stand des Vorhabens»); Beurteilung der Nutzenrealisierung durch SP (`vertrag:decide`) und UE (`vertrag:review`), keine Voraussetzung für das Einreichen; Lessons Learned mit freier Kategorie, Jahr = Jahr der Erfassung, auch nach Abschluss erfassbar | AP-E7-1 |
 | A-61 | UC-013, K3 | Jahresrückblick: lesen mit `ziel:read`, erfassen und traktandieren mit `quartalsbericht:write`; PRAT = entscheidendes Gremium des ersten Portfolios der Kategorie A (nach Name); laufend = aktiv und sistiert; Abschluss bzw. Abbruch zählt im Jahr des Wechsels (Europe/Zurich); Traktandieren nur mit gespeichertem Rückblick; keine automatische Aufgabe «Jahresrückblick» bis K31; Dokument ohne eigene Vorlage und ohne Feldkatalog (Grundbestand wie Quartalsreporting, Kante `jahresrueckblick` → `vorlage`); «ohne Lessons Learned» umfasst nur die im Jahr abgeschlossenen, nicht die abgebrochenen Vorhaben; Lessons Learned früherer Jahre zählen; Anfordern legt den Rückblick an, die Aufgabe führt auf `/projekte/<nr>/abschluss`; ohne Jahr gilt im Q4 das laufende Jahr, sonst das Vorjahr | AP-E7-5 |
-| A-62 | UC-010, A-10, A-16, A-17, A-54 | Finanzen: ERP liefert JSON-Buchungen `{kostentraeger, monat, art, betrag}`, ein Lauf ersetzt die gelieferten Monate je Kostenträger; Ist nur je Projekt, Art und Monat (ohne Phase); Toleranz «Kosten» in Prozent aus dem Phasenmodell (Übersteuerung im Vertrag noch nicht erfasst), ohne Toleranz oder Budget nie wesentlich; Prognose leer = Budget; Phasenzeitraum vom Tag nach dem Ende der Vorphase bis zum spätesten Meilenstein; vertrauliche Projekte ohne Aufgabe «Abweichung klären», im Jahresbedarf als Summe ohne Namen | AP-E7-4 |
+| A-62 | UC-010, A-10, A-16, A-17, A-54 | Finanzen: ERP liefert JSON-Buchungen `{kostentraeger, monat, art, betrag}`, ein Lauf ersetzt die gelieferten Monate je Kostenträger; Ist nur je Projekt, Art und Monat (ohne Phase); Toleranz «Kosten» in Prozent aus dem Phasenmodell (Übersteuerung im Vertrag noch nicht erfasst), ohne Toleranz oder Budget nie wesentlich; Prognose leer = Budget; Phasenzeitraum vom Tag nach dem Ende der Vorphase bis zum spätesten Meilenstein; vertrauliche Projekte ohne Aufgabe «Abweichung klären»; im Jahresbedarf und im Export an den Budgetprozess erscheinen sie mit Namen für alle, die sie sehen (Master Entscheid 13; entschieden 29.10.2026), als Summe ohne Namen nur, was die Person nicht sieht | AP-E7-4 |
 | A-63 | UC-015 Schritt 6, A1, K10 | «Gibt Ressourcen frei» = Bedarf und Zuteilungen nicht aktiver Projekte zählen nicht mehr (Auslastung, Szenario, Bedarfsliste, Konflikte, Sammelaufgaben), sie werden nicht gelöscht; bei Wiederaufnahme gelten sie wieder; neue Zuteilung an ein inaktives Projekt 409 | AP-E5-4, AP-E7-2 |
-| A-64 | UC-008 Schritte 7–8, A2, K3, A-30 | Priorisierungsentscheid: laufendes Projekt = aktiv ab P1 (P0 braucht keinen Folgeentscheid); Folgeentscheide werden mit dem Antrag beantragt, das Gremium wählt das Szenario samt Folgen; «UC-015 einleiten» = Aufgabe an die PL; der Start als Ist-Stand steht in der Rangfolge, der Bedarf wird nicht verschoben; Information an SP und PL der Projekte mit geändertem Rang oder Start; ab dem Versand der Unterlagen ist der Antrag fest; eine Korrektur ändert nur die Begründung, weil die Art ein einziges Ergebnis «Szenario gewählt» hat (Ist-Stand bleibt, protokolliert), ein anderes Szenario braucht einen neuen Antrag | AP-E5-5 |
+| A-64 | UC-008 Schritte 7–8, A2, K3, A-30 | Priorisierungsentscheid: laufendes Projekt = aktiv ab P1 (P0 braucht keinen Folgeentscheid); Folgeentscheide werden mit dem Antrag beantragt, das Gremium wählt das Szenario samt Folgen; «UC-015 einleiten» = Aufgabe an die PL; der Start als Ist-Stand steht in der Rangfolge, der Bedarf wird nicht verschoben; Information an SP und PL der Projekte mit geändertem Rang oder Start; ab dem Versand der Unterlagen ist der Antrag fest; eine Korrektur ändert nur die Begründung, weil die Art ein einziges Ergebnis «Szenario gewählt» hat (Ist-Stand bleibt, protokolliert), ein anderes Szenario braucht einen neuen Antrag *Ersetzt durch A-75 (Antrag nach Versand änderbar mit Vermerk), Master Entscheid 12.* | AP-E5-5 |
 | A-65 | Q7, A-10 | Toleranzen des Projekts stehen im Vertrag in Kap. 7.2 «Zusammenfassung Projektplanung» (Q7 nennt kein Kapitel), je Dimension höchstens eine, gültig ab Baseline; sonst gilt der Standard des Phasenmodells; Termin in Tagen, Kosten in Prozent; eine andere Einheit ergibt keine Warnung | AP-E3-1 |
 | A-66 | I-N7, UC-006 | Ohne Gremium in der Adresse gilt das zuletzt gewählte (gemerkt je Gerät); «Alle Gremien» ist wählbar | AP-E2-1 |
 | A-67 | UC-012, UC-013, K34 | Jahresrückblick und Quartalsbericht lesen auch Mitglieder des PRAT (`sitzung:read` am Portfolio des entscheidenden Gremiums), ab «traktandiert»; das Portfolio wird beim Traktandieren festgehalten, Gremien eines zweiten Portfolios der Kategorie A lesen nicht mit | AP-E6-4, AP-E7-5 |
-| A-68 | UC-002, DM.02.04 | Zurückziehen nur beim ersten Vertrag eines aktiven Projekts, von «in Arbeit» bis «traktandiert», durch den SP; ein laufendes Projekt beenden Gremium bzw. Abschluss; das Gate-Traktandum wird zurückgenommen, solange es nicht versendet ist (sonst 409); Quality-Check und Unterschriften bleiben im Verlauf; «informiert die UE» = Mitteilung an die Person, die den Quality-Check erfasst hat (wie K28) | AP-E3-1 |
-| A-69 | UC-009 Schritt 1, A-54, K23, K35 | HR-System › Personal liefert JSON `{personalnummer, rolle, monat, fte, abwesend?}` (Liste oder `{personen:[…]}`); gespeichert wird nur die Summe je Rolle und Monat (Pensum minus Abwesenheit, Anzahl Personen), keine Personendaten; ein Lauf ersetzt die gelieferten Monate; die Rolle muss ein aktiver Codewert von `ressourcenrolle` sein, sonst schlägt der Lauf ohne Änderung fehl; das von der RM festgelegte Angebot geht vor, HR füllt Lücken | AP-E7-2 |
+| A-68 | UC-002, DM.02.04 | Zurückziehen nur beim ersten Vertrag eines aktiven Projekts, von «in Arbeit» bis «traktandiert», durch den SP; ein laufendes Projekt beenden Gremium bzw. Abschluss; das Gate-Traktandum wird zurückgenommen, solange es nicht versendet ist (sonst 409); Quality-Check und Unterschriften bleiben im Verlauf; «informiert die UE» = Mitteilung an die Person, die den Quality-Check erfasst hat (wie K28) *Ersetzt durch A-70 (Projektauftraggeber:in statt SP), Master Entscheid 12.* | AP-E3-1 |
+| A-69 | UC-009 Schritt 1, A-54, K23, K35 | HR-System › Personal liefert JSON `{personalnummer, rolle, monat, fte, abwesend?}` (Liste oder `{personen:[…]}`); gespeichert wird nur die Summe je Rolle und Monat (Pensum minus Abwesenheit, Anzahl Personen), keine Personendaten; ein Lauf ersetzt die gelieferten Monate; die Rolle muss ein aktiver Codewert von `ressourcenrolle` sein, sonst schlägt der Lauf ohne Änderung fehl; das von der RM festgelegte Angebot geht vor, HR füllt Lücken *Ersetzt durch A-70 («das manuell festgelegte Angebot geht vor»), Master Entscheid 15.* | AP-E7-2 |
+| A-70 | Master Entscheide 12–15, 18 | Rollen nach 3.3; Migration der Tupel: `ue`, `pmo`, `fi`, `rm` → `alle-fuehren`; `gl` → `alle-lesen`; `antragsteller`, `leser` → `mitglied`; `gremium` bleibt; `direktion` → `portfolio-steuern`; `sp` → `projekt-steuern`; `pl`, `ctl` → `projekt-fuehren`; `kt` → `projekt-mitlesen`; befristete Tupel (Stellvertretung) behalten ihren Ablauf; wer enger bleiben soll, erhält eine eigene Rolle | AP-E8-1 |
+| A-71 | Master Entscheid 16 | Projektorganisation ohne Tupel; Zugriff am Ort über `access:admin` (`projekt-fuehren`, `portfolio-fuehren`, `alle-fuehren`); beim Entstehen eines Projekts Vorschlag `projekt-fuehren` für die Projektleitung und `projekt-steuern` für die Projektauftraggeber:in, vorausgewählt; Hinweis «kein Zugriff» an der Projektorganisation | AP-E8-2 |
+| A-72 | Master Entscheid 17 | `projekt_person.funktion` = `sp` (Projektauftraggeber:in), `pl` (Projektleitung) (je höchstens eine Person) oder `weitere` mit `funktion_text` (Vorschläge = verwendete Texte der Organisation); die Schlüssel `sp` und `pl` bleiben intern (API, Ereignisse, Kapitel 8), die Oberfläche zeigt die Bezeichnungen; Migration `ctl` → «CTL», `kt` → «Kernteam», `koalition` → «Sponsoren-Koalition»; Unterzeichnende = Projektauftraggeber:in und Projektleitung; vorhandene Unterschriften der CTL bleiben im Verlauf | AP-E8-2 |
+| A-73 | Master Entscheid 14 | Auflisten: Policy `projekt` mit `projekt:list` für nicht vertrauliche Projekte, `ppm.projekt_sichtbar()` prüft das Leserecht ausdrücklich; jede Detailroute prüft `projekt:read`; Kopfdaten = Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektleitung, Projektauftraggeber:in; Ideen: `idee:list` liest eingereichte Ideen nach Vorlage, Rückfragen, Leitfragen und Raster nur mit `idee:read` | AP-E8-3 |
+| A-74 | Master Abschnitt 0 G1, UX-E12 | Vermerk statt Sperre: Quality-Check, Unterschrift, Freigabe, Abnahme und Entscheide sind Vermerke; ein fehlender Vermerk ergibt 200 mit Vermerk am Objekt statt 409, die Aufgabe bleibt offen; 409 bzw. 422 nur für unvollständige oder widersprüchliche Eingaben (Pflichtangaben, Begründungen, Freigabe einer PRAT-Änderung durch die Projektauftraggeber:in) | AP-E8-4 |
+| A-75 | Master Abschnitt 0 G2, UX-E13 | Versionen statt Sperre: Änderungen nach Einreichen, Versand, Vorlage oder Abschluss erzeugen eine Version mit Markierung «geändert nach …»; Verlauf am Objekt für alle mit Leserecht aus dem Audit und den `*_version`-Tabellen; gelöscht werden nur Entwürfe | AP-E8-5 |
 
 A-25 ist nicht vergeben (in A-24 enthalten). Annahmen A-41 bis A-47 sind technische Schnitte dieses Bauplans ohne
 Fachregel; sie kommen als Frage in die Klärungsliste, sobald eine Fachfrage daran hängt.

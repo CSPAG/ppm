@@ -48,9 +48,9 @@ export const matrix: Matrix = {
     "ppm.hauptaktivitaet.hauptaktivitaet_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('ziel:write'::text) CHECK -",
     // Muster KIND: sichtbar mit dem Projekt; schreiben mit ziel:write oder projekt:write am Projekt (301)
     'ppm.ziel_projekt.ziel_projekt_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
-    "ppm.ziel_projekt.ziel_projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id))",
-    "ppm.ziel_projekt.ziel_projekt_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id))",
-    "ppm.ziel_projekt.ziel_projekt_delete RESTRICTIVE DELETE ppm_app USING (app.has_permission('ziel:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id)) CHECK -",
+    "ppm.ziel_projekt.ziel_projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id))",
+    "ppm.ziel_projekt.ziel_projekt_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id)) CHECK (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id))",
+    "ppm.ziel_projekt.ziel_projekt_delete RESTRICTIVE DELETE ppm_app USING (ppm.recht_am_projekt('ziel:write'::text, projekt_id) OR ppm.recht_am_projekt('projekt:write'::text, projekt_id)) CHECK -",
   ],
   seed: async (api, a, mark) => {
     const call = async (method: string, url: string, payload?: unknown) => {
@@ -84,6 +84,7 @@ export const matrix: Matrix = {
   cases: {
     // Jahr ist kein Geheimnis: B sieht seinen eigenen (leeren) Zielzyklus bzw. legt ihn an
     'GET /v1/ziele/:jahr': () => ({ method: 'GET', url: '/v1/ziele/2026', kind: 'list' }),
+    'GET /v1/ziele/:jahr/verlauf': () => ({ method: 'GET', url: '/v1/ziele/2026/verlauf', kind: 'list' }),
     'POST /v1/ziele/:jahr': () => ({ method: 'POST', url: '/v1/ziele/2028', body: {}, kind: 'create' }),
     'PATCH /v1/ziele/:jahr': () => ({ method: 'PATCH', url: '/v1/ziele/2026', body: { vorlageBis: '2026-11-30' }, headers: { 'if-match': 'W/"1"' }, kind: 'foreign' }),
     'GET /v1/jahresziele': () => ({ method: 'GET', url: '/v1/jahresziele', kind: 'list' }),

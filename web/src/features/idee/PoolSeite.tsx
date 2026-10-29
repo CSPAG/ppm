@@ -22,10 +22,29 @@ import './Pruefung.css';
 /** Einstieg von Portfolio › Ideen: Pool für den Ideenpool (`idee:read`), sonst «Meine Ideen». */
 export function IdeenBereich({ search, setSearch, gehe }: { search: IdeenSearch; setSearch: SetIdeenSearch; gehe: Gehe }) {
   const { canSomewhere } = useSession();
-  if (!canSomewhere('idee:read') || search.ansicht === 'meine') {
-    return canSomewhere('idee:read') ? <><PoolAnsichten search={search} setSearch={setSearch} /><IdeenPage gehe={gehe} /></> : <IdeenPage gehe={gehe} />;
+  if (!canSomewhere('idee:read')) {
+    // Mitglieder: eigene Ideen und die eingereichten aller (Master Entscheid 14, AP-E8-3)
+    const eingereicht = search.ansicht === 'eingereicht';
+    return <IdeenPage gehe={gehe} eingereicht={eingereicht} ansichten={<MitgliedAnsichten eingereicht={eingereicht} setSearch={setSearch} />} />;
+  }
+  if (search.ansicht === 'meine' || search.ansicht === 'eingereicht') {
+    return <><PoolAnsichten search={search} setSearch={setSearch} /><IdeenPage gehe={gehe} /></>;
   }
   return <PoolPage search={search} setSearch={setSearch} gehe={gehe} />;
+}
+
+function MitgliedAnsichten({ eingereicht, setSearch }: { eingereicht: boolean; setSearch: SetIdeenSearch }) {
+  return (
+    <nav className="tabs idee-ansichten" aria-label={TI.ansichtLabel}>
+      {(['meine', 'eingereicht'] as const).map(a => {
+        const on = (a === 'eingereicht') === eingereicht;
+        return (
+          <button key={a} type="button" className={`tab${on ? ' on' : ''}`} aria-current={on ? 'page' : undefined}
+            onClick={() => setSearch({ ansicht: a === 'meine' ? undefined : a })}>{TI.ansichten[a]}</button>
+        );
+      })}
+    </nav>
+  );
 }
 
 function PoolAnsichten({ search, setSearch }: { search: IdeenSearch; setSearch: SetIdeenSearch }) {

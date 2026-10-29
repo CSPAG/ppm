@@ -30,7 +30,7 @@ describe('Übernahme aus dem Excel-Dashboard', () => {
     const a = await login(api, 'insel', 'u-adm', 'org-admin');
     T = a.tenantId;
     adm = { authorization: a.authorization };
-    ue = { authorization: (await login(api, 'insel', 'u-ue', 'ue')).authorization };
+    ue = { authorization: (await login(api, 'insel', 'u-ue', 'alle-fuehren')).authorization };
     await full(api.t.runtime, T, async tx => {
       await tx.query("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, 'A', 'transformation', 'Transformation', true)", [T]);
       await tx.query("INSERT INTO ppm.handlungsfeld (tenant_id, label) VALUES ($1, 'Beispielfeld Nord')", [T]);
@@ -43,8 +43,9 @@ describe('Übernahme aus dem Excel-Dashboard', () => {
   });
   after(async () => { await api?.close(); });
 
-  test('Rechte: die Programmleitung allein darf nicht übernehmen (statusbericht:write fehlt)', async () => {
-    assert.equal((await post(ue, { csv: BEISPIEL, speichern: false })).statusCode, 403);
+  test('Rechte: wer alle Portfolios nur liest, darf nicht übernehmen (statusbericht:write fehlt)', async () => {
+    const lesend = { authorization: (await login(api, 'insel', 'u-lesend', 'alle-lesen')).authorization };
+    assert.equal((await post(lesend, { csv: BEISPIEL, speichern: false })).statusCode, 403);
   });
 
   test('Prüflauf meldet Fehler je Zeile und speichert nichts', async () => {
@@ -101,7 +102,7 @@ describe('Übernahme aus dem Excel-Dashboard', () => {
 
     // Projektleitung als Rolle am Projekt
     const t = await sql<{ s: string; r: string }>("SELECT subject AS s, relation AS r FROM ppm.authz_tuple WHERE object_type = 'projekt' AND object_id = $1", [p[0]!.id]);
-    assert.deepEqual(t, [{ s: `user:${pl.alpha}`, r: 'pl' }]);
+    assert.deepEqual(t, [{ s: `user:${pl.alpha}`, r: 'projekt-fuehren' }]);
 
     // Bericht der Übernahmeperiode, geprüft; ohne Status keiner
     const b = await sql<{ projekt_id: string; stand: string; status: string; trend: string; abschluss_per: string; naechster_meilenstein: string; begruendung: string }>(

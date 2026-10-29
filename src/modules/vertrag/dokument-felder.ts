@@ -11,8 +11,8 @@ export const VERTRAG_FELDER: readonly VorlageFeld[] = [
   ...g('Deckblatt', [
     ['projekt.nummer', 'Projektnummer'], ['projekt.name', 'Projektname'], ['version.nummer', 'Version'], ['version.phase', 'Phase'],
     ['version.datum', 'Datum'], ['version.status', 'Status'], ['version.freigabe', 'Freigabe'], ['projekt.klassifikation', 'Klassifikation'],
-    ['rolle.sponsor', 'Haupt-Sponsor/in'], ['rolle.koalition', 'Sponsoren-Koalition'], ['rolle.projektleitung', 'Projektleiter/in'],
-    ['rolle.ctl', 'Clinical Transformation Lead'], ['projekt.kategorie', 'Projektkategorie'], ['versionierung', 'Versionierung und Änderungstracking'],
+    ['rolle.sponsor', 'Projektauftraggeber:in'], ['rolle.projektleitung', 'Projektleitung'],
+    ['projekt.kategorie', 'Projektkategorie'], ['versionierung', 'Versionierung und Änderungstracking'],
     ['version.begruendung', 'Begründung der Änderung'], ['dokument.datum', 'Erstellt am'],
   ]),
   ...g('1 Ausgangslage / Problembeschreibung', [

@@ -18,10 +18,10 @@ describe('Portfolios und Gremien', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     tenantId = u.tenantId;
     ue = { authorization: u.authorization };
-    gl = { authorization: (await login(api, 'demo', 'u-gl', 'gl')).authorization };
+    gl = { authorization: (await login(api, 'demo', 'u-gl', 'alle-lesen')).authorization };
     nobody = { authorization: (await login(api, 'demo', 'u-nobody', null)).authorization };
   });
   after(async () => { await api?.close(); });

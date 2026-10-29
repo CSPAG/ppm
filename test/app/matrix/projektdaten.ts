@@ -8,12 +8,12 @@ const PROBE = "(SELECT id FROM ppm.projekt WHERE nummer = '2026-001')";
 
 const kind = (tabelle: string, schreiben = 'projekt:write') => [
   `ppm.${tabelle}.${tabelle}_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -`,
-  `ppm.${tabelle}.${tabelle}_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('${schreiben}'::text, 'projekt'::text, projekt_id)`,
-  `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING app.has_permission('${schreiben}'::text, 'projekt'::text, projekt_id) CHECK app.has_permission('${schreiben}'::text, 'projekt'::text, projekt_id)`,
-  `ppm.${tabelle}.${tabelle}_delete RESTRICTIVE DELETE ppm_app USING app.has_permission('${schreiben}'::text, 'projekt'::text, projekt_id) CHECK -`,
+  `ppm.${tabelle}.${tabelle}_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('${schreiben}'::text, projekt_id)`,
+  `ppm.${tabelle}.${tabelle}_update RESTRICTIVE UPDATE ppm_app USING ppm.recht_am_projekt('${schreiben}'::text, projekt_id) CHECK ppm.recht_am_projekt('${schreiben}'::text, projekt_id)`,
+  `ppm.${tabelle}.${tabelle}_delete RESTRICTIVE DELETE ppm_app USING ppm.recht_am_projekt('${schreiben}'::text, projekt_id) CHECK -`,
 ];
-const BETRAG = "(app.has_permission('finanzen:read'::text, 'projekt'::text, projekt_id) OR app.has_permission('finanzen:read'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))";
-const RISIKO_SCHREIBEN = "CASE WHEN (projekt_id IS NOT NULL) THEN app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) ELSE app.has_permission('projekt:write'::text) END";
+const BETRAG = "(ppm.recht_am_projekt('finanzen:read'::text, projekt_id) OR app.has_permission('finanzen:read'::text, 'portfolio'::text, ppm.portfolio_von(projekt_id)))";
+const RISIKO_SCHREIBEN = "CASE WHEN (projekt_id IS NOT NULL) THEN ppm.recht_am_projekt('projekt:write'::text, projekt_id) ELSE app.has_permission('projekt:write'::text) END";
 
 export const matrix: Matrix = {
   tables: {
@@ -62,7 +62,7 @@ export const matrix: Matrix = {
     ...kind('meilenstein'), ...kind('kpi'), ...kind('kpi_wert', 'kpi:write'), ...kind('stakeholder'),
     // Ressourcenbedarf: «gedeckt» führt auch das Modul ressource nach (350_zuteilung, AP-E7-2)
     ...kind('ressourcenbedarf').filter(z => !z.includes('_update ')),
-    "ppm.ressourcenbedarf.ressourcenbedarf_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('ressource:write'::text)) CHECK (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) OR app.has_permission('ressource:write'::text))",
+    "ppm.ressourcenbedarf.ressourcenbedarf_update RESTRICTIVE UPDATE ppm_app USING (ppm.recht_am_projekt('projekt:write'::text, projekt_id) OR app.has_permission('ressource:write'::text)) CHECK (ppm.recht_am_projekt('projekt:write'::text, projekt_id) OR app.has_permission('ressource:write'::text))",
     // Meldung: nur anhängen
     ...kind('meldung').slice(0, 2),
     // Abhängigkeit: sichtbar bei beiden Projekten
@@ -75,7 +75,7 @@ export const matrix: Matrix = {
     `ppm.risiko.risiko_delete RESTRICTIVE DELETE ppm_app USING ${RISIKO_SCHREIBEN} CHECK -`,
     // Muster BETRAG (A-33)
     `ppm.kosten.kosten_read RESTRICTIVE SELECT ppm_app USING (ppm.projekt_sichtbar(projekt_id) AND ${BETRAG}) CHECK -`,
-    `ppm.kosten.kosten_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('projekt:write'::text, 'projekt'::text, projekt_id) AND ${BETRAG})`,
+    `ppm.kosten.kosten_insert RESTRICTIVE INSERT ppm_app USING - CHECK (ppm.recht_am_projekt('projekt:write'::text, projekt_id) AND ${BETRAG})`,
     ...kind('kosten').slice(2),
   ],
   tags: ['Projektdaten'],

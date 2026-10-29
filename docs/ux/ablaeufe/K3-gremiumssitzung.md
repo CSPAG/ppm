@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Rollen** | primär UE (bereitet vor, erfasst, protokolliert); Gremiumsmitglieder PRAT bzw. GLPA (lesen, entscheiden); beteiligt PL, CTL, SP (stellen vor) |
+| **Rollen** | primär UE (bereitet vor, erfasst, protokolliert); Gremiumsmitglieder PRAT bzw. GLPA (lesen, entscheiden); beteiligt PL und AG (stellen vor) |
 | **Gerät** | UE Desktop, in der Sitzung Laptop am Beamer; Mitglieder Tablet und Laptop, Lesen auch Telefon |
 | **Use Cases** | [UC-006](../../anhang/use-cases.md#uc-006-prat-sitzung-vorbereiten-und-durchführen) (alle Schritte, A1–A4); Entscheidschritte aus UC-001 Schritt 7 und A5, UC-002 Schritt 11 und A6, UC-003 Schritt 9–10 und A6, UC-007 A1, UC-008 Schritt 7–8 und A2, UC-012 Schritt 4–5, UC-013 Schritt 3–4, UC-015 Schritt 5–6 und A2 |
 | **Oberflächen** | UI-01 Eingang, UI-33 Sitzung, UI-34 Entscheidmaske, UI-35 Protokoll, UI-36 Entscheide und Auflagen, UI-17 Dashboard, UI-18 Risikolage, UI-29 Portfoliobericht |
@@ -50,14 +50,16 @@ konfigurierbar, AM.02.04). Entscheide einer Direktion (Kategorie C) laufen ohne 
    Szenario (UC-008), Quartalsreporting (UC-012), Jahresrückblick (UC-013), Exit-Gates (UC-015) und nicht behandelte
    Traktanden der letzten Sitzung.
 2. **Traktandum aufnehmen** (Schritt 2) per «Aufnehmen» oder Ziehen (G9); das System setzt den Zeitbedarf (Gate-Review 35
-   Min.: Präsentation 20, Diskussion 10, Entscheid 5) und die Eingeladenen (PL, CTL, SP) vor (I-F2). Reihenfolge per
+   Min.: Präsentation 20, Diskussion 10, Entscheid 5) und die Eingeladenen (PL, AG) vor (I-F2). Reihenfolge per
    Ziehen oder «Nach oben» / «Nach unten». Ein Traktandum eines Projekts in P0 oder P1 bis zur Freigabe von P2 trägt
    automatisch «via SNS-VR» (A1).
 3. **Unterlagenstand** (Schritt 3) je Traktandum als Badge: «Gate Review Packet bereit · Quality-Check bestanden 28.10.»,
-   «Quality-Check offen» oder «Unterlagen fehlen». Das **Gate Review Packet** (UC-003 Schritt 9) stellt das System aus
+   «Quality-Check offen», «Unterschrift offen» oder «Unterlagen fehlen». Das **Gate Review Packet** (UC-003 Schritt 9) stellt das System aus
    Vertrag, Business Case, Leitfragen und Hauptänderungen zusammen; die UE sieht es als Vorschau.
-   **Unterlagen fehlen** (A2): Warnung am Traktandum mit **Auf nächste Sitzung verschieben**; umkehrbar (Toast mit
-   Rückgängig), PL und SP werden mit dem Versand informiert.
+   **Unterlagen fehlen** (A2): Warnung am Traktandum mit **Auf nächste Sitzung verschieben** oder **Mit Vermerk behandeln**
+   (UX-E12); verschieben ist umkehrbar (Toast mit Rückgängig), PL und AG werden mit dem Versand informiert. Nach dem
+   Versand bleiben Traktanden und Unterlagen änderbar; Änderungen sind für die Mitglieder als «geändert nach Versand»
+   markiert (UX-E13).
 4. **Portfoliobericht** (Schritt 4): Traktandum 1 «Bericht der Programmleitung» ist immer gesetzt. «Portfoliobericht
    erzeugen» erstellt ihn aus dem abgeschlossenen Dashboard (Seitentyp Bericht); die UE ergänzt Kommentare.
 5. **Unterlagen versenden** (Schritt 5) mit Vorschau der Wirkung (I-R1 Stufe 3): «9 Mitglieder des PRAT erhalten
@@ -89,7 +91,7 @@ konfigurierbar, AM.02.04). Entscheide einer Direktion (Kategorie C) laufen ohne 
    | Exit-Gate P4 (UC-015) | Abgeschlossen · Nacharbeiten verlangt |
 
    Begründung ist Pflicht. Vor dem Erfassen zeigt die Maske die Wirkung (I-F5): «Gate P1–P2 freigegeben: Version 2.0 wird
-   Baseline, Projekt wechselt in Phase P2, Dashboard wird nachgeführt. Projektleitung und Sponsor werden nach der Sitzung
+   Baseline, Projekt wechselt in Phase P2, Dashboard wird nachgeführt. Projektleitung und Projektauftraggeber:in werden nach der Sitzung
    informiert.» Erfassen ist bestätigt (I-R2): erst nach Antwort des Servers als erledigt markiert.
    - **Auflagen** (A3): je Auflage Text, Termin, Verantwortliche; sie werden Aufgaben im Eingang. Zurückgestellte
      Traktanden werden für die Folgesitzung vorgeschlagen.
@@ -99,7 +101,7 @@ konfigurierbar, AM.02.04). Entscheide einer Direktion (Kategorie C) laufen ohne 
      (UC-012; Weiterleitung ausserhalb des Quartals offen, K03).
 9. **Sitzung schliessen** (Schritt 8): Hinweis auf Traktanden ohne Entscheid («2 Traktanden werden für die nächste Sitzung
    vorgeschlagen»); das System erzeugt den Protokollentwurf und führt das Dashboard nach. Jetzt erst gehen die
-   Benachrichtigungen an PL, SP und Verantwortliche von Auflagen, gebündelt je Person (I-B3).
+   Benachrichtigungen an PL, AG und Verantwortliche von Auflagen, gebündelt je Person (I-B3).
 
 **Protokoll (UE, Seitentyp Arbeitsfläche):**
 
@@ -123,15 +125,15 @@ konfigurierbar, AM.02.04). Entscheide einer Direktion (Kategorie C) laufen ohne 
 | Regel (Quelle) | Zeitpunkt | Stufe | Text | Ausweg |
 |---|---|---|---|---|
 | Unterlagen 5 Arbeitstage vor der Sitzung (UC-006 Schritt 5, A2; Q8 Kap. 8.1) | *vorher* am Traktandum, *dabei* beim Versand | Warnung | «Unterlagen: Gate Review Packet für ‹Projekt› fehlt, Versand in 2 Arbeitstagen. Verschieben Sie das Traktandum auf Mi 10.12. oder warten Sie auf die Unterlagen.» | **Auf nächste Sitzung verschieben** |
-| Quality-Check nicht bestanden (UC-006 A2) | *vorher* am Traktandum | Warnung | «Quality-Check: offen für ‹Projekt›. Ohne bestandenen Quality-Check wird das Geschäft nicht behandelt.» | verschieben |
+| Quality-Check oder Unterschrift offen (UC-006 A2; UX-E12) | *vorher* am Traktandum | Warnung | «Quality-Check: offen für ‹Projekt›. Das Geschäft kann mit Vermerk behandelt werden; der Vermerk steht im Protokoll.» | verschieben oder mit Vermerk behandeln |
 | Zeitbedarf über Sitzungsdauer | *dabei* beim Aufnehmen | Hinweis | «Zeitbedarf: 3 h 20 statt höchstens 3 h.» | Traktandum verschieben oder Zeit kürzen |
-| Gremienweg via SNS-VR (UC-006 A1; Q8 Kap. 5.1) | *vorher* automatisch am Traktandum | Hinweis | «Via SNS-VR: Der Entscheid des PRAT ist eine Stellungnahme; er gilt erst mit dem SNS-VR.» | – |
+| Gremienweg via SNS-VR (UC-006 A1; Q8 Kap. 5.1) | *vorher* automatisch am Traktandum | Hinweis | «Via SNS-VR: Der Entscheid des PRAT ist eine Stellungnahme; der Entscheid des SNS-VR steht als Vermerk aus.» | – |
 | Entscheid ohne Begründung (UC-006 Schritt 7) | *dabei* | Sperre | «Begründung fehlt: Sie erscheint im Protokoll und beim Projekt.» | Begründung erfassen |
 | Protokoll nach 2–3 Arbeitstagen (Q8 Kap. 8.1) | *vorher* im Eingang | Hinweis, ab Tag 4 Warnung | «Protokoll PRAT 12.11.: Versand fällig seit Mo 17.11.» | Protokoll versenden |
 
 ## Texte
 
-- Schaltflächen: «Aufnehmen», «Auf nächste Sitzung verschieben», «Portfoliobericht erzeugen», «Unterlagen versenden»,
+- Schaltflächen: «Aufnehmen», «Auf nächste Sitzung verschieben», «Mit Vermerk behandeln», «Portfoliobericht erzeugen», «Unterlagen versenden»,
   «Sitzung starten», «Entscheid erfassen», «Sitzung schliessen», «Protokoll versenden»
 - Wirkung Versand: «9 Mitglieder des PRAT erhalten Traktandenliste, Portfoliobericht und 3 Gate Review Packets.»
 - Benachrichtigung Mitglieder: «Unterlagen PRAT Mi 12.11. bereit: 6 Traktanden, davon 3 Gate-Reviews.»
@@ -147,13 +149,14 @@ konfigurierbar, AM.02.04). Entscheide einer Direktion (Kategorie C) laufen ohne 
 ## Abnahmekriterien
 
 - [ ] Eine neue Sitzung zeigt als Vorschläge alle eingeplanten Gate-Reviews, Eskalationen und Änderungsanträge des Gremiums.
-- [ ] Aufnehmen eines Gate-Reviews setzt 35 Minuten und PL, CTL, SP als Eingeladene.
+- [ ] Aufnehmen eines Gate-Reviews setzt 35 Minuten und PL, AG als Eingeladene.
 - [ ] Ein Traktandum eines Projekts in P1 trägt automatisch «via SNS-VR».
-- [ ] Ein Traktandum ohne bestandenen Quality-Check zeigt die Warnung und lässt sich mit einem Klick verschieben.
+- [ ] Ein Traktandum ohne bestandenen Quality-Check zeigt die Warnung und lässt sich mit einem Klick verschieben oder mit Vermerk behandeln.
+- [ ] Eine Änderung an Unterlagen nach dem Versand ist für die Mitglieder als «geändert nach Versand» markiert.
 - [ ] «Unterlagen versenden» zeigt vorher Anzahl Empfänger und Unterlagen und protokolliert den Versand mit Zeitpunkt.
 - [ ] Nach «Gate freigegeben» stehen Phase und Baseline des Projekts richtig, bevor die Sitzung geschlossen wird.
 - [ ] Auflagen erscheinen als Aufgaben im Eingang der Verantwortlichen, mit Termin.
-- [ ] Benachrichtigungen an PL und SP gehen erst beim Schliessen der Sitzung, gebündelt je Person.
+- [ ] Benachrichtigungen an PL und AG gehen erst beim Schliessen der Sitzung, gebündelt je Person.
 - [ ] Der Protokollentwurf enthält jedes Traktandum mit Entscheid und Begründung.
 - [ ] Ein Mitglied öffnet auf einem Tablet (768 px) ein Traktandum und sieht den Antrag ohne Scrollen.
 

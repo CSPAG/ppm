@@ -22,6 +22,7 @@ import * as ps from './pruefung-store.ts';
 import { TAG } from './routes.ts';
 import type { Stand } from './schemas.ts';
 import * as store from './store.ts';
+import { ideeVermerke } from './vermerk.ts';
 
 /** Vorlegen: solange die Idee bei der UE liegt (auch nach «zurückgestellt», UC-001 A5). */
 const VORLEGBAR: readonly Stand[] = ['eingereicht', 'in_pruefung', 'zurueckgestellt'];
@@ -54,7 +55,9 @@ async function freigabeOut(req: FastifyRequest, tx: Tx, r: store.Row): Promise<F
       traktandieren: write && !!weg && VORLEGBAR.includes(r.stand),
       angaben: write && weg === 'gremium' && ANGABEN.includes(r.stand),
       entscheiden: weg === 'direktion' && r.stand === 'traktandiert' && await req.can('idee:decide', { type: 'portfolio', id: pf!.id }),
+      initialisieren: write && r.stand === 'traktandiert' && !a.projekt_id && !!a.sponsor && !!a.projektleitung,
     },
+    vermerke: ideeVermerke(r.stand, a.projekt_id),
   };
 }
 
@@ -108,7 +111,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, deps: Deps): void {
     return req.tx(async tx => {
       const r = await laden(tx, id, version, ANGABEN);
       const pf = (await fs.angaben(tx, id))!.portfolio_id;
-      if (!pf || (await fs.portfolio(tx, pf))?.kategorie === 'C') throw conflict('Bei Kategorie C benennt die Direktion Sponsor und Projektleitung mit der Freigabe.');
+      if (!pf || (await fs.portfolio(tx, pf))?.kategorie === 'C') throw conflict('Bei Kategorie C benennt die Direktion Projektauftraggeber:in und Projektleitung mit der Freigabe.');
       const vorhanden = await fs.personenVorhanden(tx, [body.sponsor, body.projektleitung].filter((x): x is string => !!x));
       const fehler = (['sponsor', 'projektleitung'] as const).filter(k => body[k] && !vorhanden.has(body[k]!))
         .map(k => ({ path: `/${k}`, message: 'Diese Person gibt es in der Organisation nicht.' }));
@@ -164,6 +167,29 @@ export function registerFreigabeRoutes(app: FastifyInstance, deps: Deps): void {
       const r = await laden(tx, id, version, ['traktandiert']);
       await pruefePersonen(tx, body.sponsor, body.projektleitung);
       await initialisieren(tx, { db: deps.db, tuples: deps.iam.tuples }, who, principalId, r, { sponsor: body.sponsor, projektleitung: body.projektleitung, begruendung: (body.begruendung ?? '').trim() });
+    });
+    return req.tx(tx => antwort(req, reply, tx, id));
+  });
+
+  app.post('/v1/ideen/:id/initialisieren', {
+    schema: { tags: [TAG], summary: 'Initialisierung vor dem Entscheid starten', description: 'UC-001 A6 (A-74): Die UE legt das Projekt in P0 an wie bei der Freigabe, solange die Idee traktandiert ist; die Idee trägt den Vermerk «Initialisierung nicht freigegeben», Traktandum bzw. Aufgabe der Direktion bleiben offen. Der spätere Entscheid ersetzt den Vermerk; bei Ablehnung läuft das Projekt weiter, Projektleitung und Projektauftraggeber:in werden informiert. Recht `idee:write`; Projektauftraggeber:in und Projektleitung müssen erfasst sein (422); schon initialisiert: 409. Nur mit `If-Match`.', params: IdParams, headers: Type.Composite([IfMatchHeaders, IdempotencyHeaders]), response: { 200: Type.Ref('IdeeFreigabe') } },
+  }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const version = requireIfMatch(req);
+    await req.need('idee:write');
+    const who = actorOf(req);
+    const principalId = req.requirePrincipal().principalId;
+    // Projekt, Organisation und Zugriff mit voller Sicht wie die Folge des Entscheids (Recht oben geprüft)
+    await fullTx(deps.db, req.requirePrincipal().tenantId, async tx => {
+      const r = await laden(tx, id, version, ['traktandiert']);
+      const a = (await fs.angaben(tx, id))!;
+      if (a.projekt_id) throw conflict('Zu dieser Idee läuft die Initialisierung bereits.', { reason: 'projekt' });
+      try {
+        await pruefePersonen(tx, a.sponsor, a.projektleitung);
+      } catch {
+        throw invalid('Für die Initialisierung fehlen Projektauftraggeber:in oder Projektleitung. Erfasse beide bei der Idee.', [{ path: '/angaben', message: 'Projektauftraggeber:in und Projektleitung fehlen (A-05).' }]);
+      }
+      await initialisieren(tx, { db: deps.db, tuples: deps.iam.tuples }, who, principalId, r, { sponsor: a.sponsor!, projektleitung: a.projektleitung!, begruendung: '', vorab: true });
     });
     return req.tx(tx => antwort(req, reply, tx, id));
   });

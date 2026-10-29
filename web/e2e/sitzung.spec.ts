@@ -70,7 +70,7 @@ test('Sitzung vorbereiten: einplanen, verschieben und zurückholen, versenden; b
   await expect(dialog.getByText(/Frist 5 Arbeitstage: eingehalten|Unterlagen/).first()).toBeVisible();
   await expectAccessible(page);
   await dialog.getByRole('button', { name: 'Unterlagen versenden' }).click();
-  await expect(page.getByText(/Unterlagen versendet am .* Die Traktandenliste ist fest\./)).toBeVisible();
+  await expect(page.getByText(/Unterlagen versendet am .* Änderungen bleiben bis zum Beginn möglich/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Unterlagen versenden' })).toHaveCount(0);
   await expectAccessible(page);
   await expectNoOverflow(page);

@@ -42,7 +42,7 @@ describe('Kopfkarten je Rolle', () => {
     const glpa = gremium('glpa', 2);
     stub({
       'GET /v1/statusberichte/kopf': () => json({ pruefen: { periode: '2026-10', eingereicht: 12, zurueckgegeben: 2, geprueft: 15, ausstehend: 2, auffaellig: 3, projekte: 31, stichtag: '2026-10-25', abschlussBis: '2026-10-31' } }),
-      'GET /v1/projekte/kopf': () => json({ projekte: [projekt(4, { rollen: ['sp', 'ctl'], lebenszyklus: 'sistiert' }), ...[1, 2, 3, 5, 6].map(n => projekt(n))], anzahl: 6 }),
+      'GET /v1/projekte/kopf': () => json({ projekte: [projekt(4, { rollen: ['sp', 'weitere'], lebenszyklus: 'sistiert' }), ...[1, 2, 3, 5, 6].map(n => projekt(n))], anzahl: 6 }),
       'GET /v1/statusberichte/stand': () => json({ items: [
         { projektId: uuid(1), letzter: { periode: '2026-09', status: 'im_plan', trend: 'aufwaerts', begruendung: '', naechsterMeilenstein: 'Go-live Pilot' }, laufend: { periode: '2026-10', stand: 'entwurf', stichtag: tag(3) } },
         { projektId: uuid(3), letzter: { periode: '2026-09', status: 'kritisch', trend: 'abwaerts', begruendung: 'Lieferverzug Hauptsystem', naechsterMeilenstein: '' }, laufend: { periode: '2026-10', stand: 'eingereicht', stichtag: tag(3) } },
@@ -78,7 +78,7 @@ describe('Kopfkarten je Rolle', () => {
     const p4 = pz.find(z => within(z).queryByRole('link', { name: '2026-014 Projekt 4' }))!;
     expect(within(p4).getByRole('link', { name: /^Du stellst am .* im PRAT vor$/ })).toBeInTheDocument();
     expect(within(projekte).getByRole('link', { name: '2026-014 Projekt 4' })).toHaveAttribute('href', '/projekte/2026-014');
-    expect(within(projekte).getByText('P1 Konzept und Planung · sistiert · Sponsor, CTL')).toBeInTheDocument();
+    expect(within(projekte).getByText('P1 Konzept und Planung · sistiert · Projektauftraggeber:in, weitere Funktion')).toBeInTheDocument();
     expect(within(projekte).getByRole('link', { name: 'Alle 6 Projekte' })).toHaveAttribute('href', '/projekte');
 
     const sitzungen = (await screen.findByRole('heading', { name: 'Nächste Sitzungen' })).closest('article')!;

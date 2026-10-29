@@ -21,8 +21,8 @@ describe('Phasenmodell', () => {
     const a = await login(api, 'demo', 'pm-adm', 'org-admin');
     tenantId = a.tenantId;
     adm = { authorization: a.authorization };
-    ue = { authorization: (await login(api, 'demo', 'pm-ue', 'ue')).authorization };
-    leser = { authorization: (await login(api, 'demo', 'pm-leser', 'leser')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'pm-ue', 'alle-fuehren')).authorization };
+    leser = { authorization: (await login(api, 'demo', 'pm-leser', 'mitglied')).authorization };
     niemand = { authorization: (await login(api, 'demo', 'pm-niemand', null)).authorization };
   });
   after(async () => { await api?.close(); });

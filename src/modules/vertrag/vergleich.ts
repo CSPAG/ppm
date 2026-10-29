@@ -69,16 +69,18 @@ const TOLERANZ: Record<string, string> = { termin: 'Termin', kosten: 'Kosten', u
 /** Wie Einträge einer Liste ohne `registerId` wiedergefunden werden (natürlicher Schlüssel). */
 const SCHLUESSEL: Record<string, (e: Obj) => string> = {
   kpis: e => String(e.text), abhaengigkeiten: e => String(e.zuProjektId), meilensteine: e => `${e.phase}:${e.text}`,
-  mitglieder: e => `${e.funktion}:${e.personId}`, kosten: e => `${e.phase}:${e.art}:${e.text}`, personal: e => `${e.phase}:${e.rolle}`,
+  mitglieder: e => `${e.funktion}:${String(e.funktionText ?? '').toLowerCase()}:${e.personId}`, kosten: e => `${e.phase}:${e.art}:${e.text}`, personal: e => `${e.phase}:${e.rolle}`,
   risiken: e => String(e.text), stakeholder: e => String(e.gruppe), kommunikation: e => `${e.phase}:${e.text}`,
   beilagen: e => String(e.bezeichnung), toleranzen: e => String(e.dimension),
 };
+
+const MITGLIED: Record<string, string> = { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' };
 
 /** Bezeichnung eines Listeneintrags für Vergleich und Hauptänderungen. */
 function eintragText(liste: string, e: Obj): string {
   if (liste === 'personal') return `${e.phase} ${e.rolle}`;
   if (liste === 'kosten') return `${e.phase} ${e.text}`;
-  if (liste === 'mitglieder') return `${String(e.funktion).toUpperCase()} ${e.personId}`;
+  if (liste === 'mitglieder') return `${e.funktion === 'weitere' ? e.funktionText : MITGLIED[String(e.funktion)] ?? e.funktion} ${e.personId}`;
   if (liste === 'abhaengigkeiten') return String(e.text);
   if (liste === 'toleranzen') return `Toleranz ${TOLERANZ[String(e.dimension)] ?? e.dimension}`;
   return String(e.text ?? e.gruppe ?? e.bezeichnung ?? '');

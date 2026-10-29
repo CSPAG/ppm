@@ -16,12 +16,14 @@ import { sitzungTools } from './mcp.ts';
 import { registerProtokollRoutes } from './protokoll-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 import { registerSucheRoutes } from './suche-routes.ts';
+import { registerVerlaufRoutes } from './verlauf.ts';
 
 const ROUTEN: ((app: FastifyInstance, deps: Deps) => void)[] = [
   registerRoutes,
   registerEntscheidRoutes,
   registerProtokollRoutes,
   registerSucheRoutes,
+  registerVerlaufRoutes,
 ];
 
 export const sitzungModule = defineModule({

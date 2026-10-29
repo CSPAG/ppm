@@ -11,7 +11,7 @@ import {
 } from '@vollholz/platform';
 import { record } from '../../platform.ts';
 import {
-  type TraktandumStandUnterlagen, aufnehmen, bezugVon, einplanen, entfernen, istFest, pruefeReihenfolge, pruefeVorbereitung, sitzungAnlegen, unterlagenstand, verschieben, versandfrist,
+  type TraktandumStandUnterlagen, aufnehmen, bezugVon, einplanen, entfernen, istFest, nachVersand, pruefeReihenfolge, pruefeVorbereitung, sitzungAnlegen, unterlagenFesthalten, unterlagenstand, verschieben, versandfrist,
   versandvorschau, versenden, zeitfenster,
 } from './aktionen.ts';
 import { ARTEN, artLabel, type Art } from './arten.ts';
@@ -22,6 +22,7 @@ import {
   type EinladungenPutIn, type SitzungOut, type SitzungPatchIn, type TraktandumCreateIn, type TraktandumOut, type TraktandumPatchIn,
 } from './schemas.ts';
 import * as store from './store.ts';
+import { traktandumVermerke } from './vermerk.ts';
 
 export const TAG = 'Sitzungen';
 
@@ -29,7 +30,8 @@ const ort = (portfolioId: string) => ({ type: 'portfolio', id: portfolioId });
 
 /** Darf die Person die Traktandenliste bearbeiten (sitzung:write am Portfolio, nur bis zum Versand)? */
 async function kannSchreiben(req: FastifyRequest, s: store.SitzungRow): Promise<boolean> {
-  return (s.stand === 'geplant' || s.stand === 'in_vorbereitung') && await req.can('sitzung:write', ort(s.portfolio_id));
+  // nach dem Versand bleibt die Traktandenliste bis zum Beginn änderbar, markiert (A-75)
+  return (s.stand === 'geplant' || s.stand === 'in_vorbereitung' || s.stand === 'versendet') && await req.can('sitzung:write', ort(s.portfolio_id));
 }
 
 async function traktandumOut(tx: Tx, t: store.TraktandumRow, o: { stand: Awaited<ReturnType<typeof unterlagenstand>>; zeit?: Map<string, string | null> }): Promise<TraktandumOut> {
@@ -39,11 +41,12 @@ async function traktandumOut(tx: Tx, t: store.TraktandumRow, o: { stand: Awaited
     id: t.id, sitzungId: t.sitzung_id, art: t.art, artLabel: artLabel(t.art), bezug: { typ: t.bezug_typ, id: t.bezug_id },
     projekt: t.projekt_id && t.projekt_nummer ? { id: t.projekt_id, nummer: t.projekt_nummer, name: t.projekt_name!, phase: t.projekt_phase! } : null,
     titel: t.titel, antrag: t.antrag, position: t.position, dauerMin: t.dauer_min, zeit: o.zeit?.get(t.id) ?? null, stand: t.stand,
-    viaSns: t.via_sns, vertraulich: t.vertraulich, fest: istFest(t), verschobenVon: t.verschoben_von_datum,
+    viaSns: t.via_sns, vertraulich: t.vertraulich, fest: istFest(t), verschobenVon: t.verschoben_von_datum, geaendertNachVersand: t.geaendert_nach_versand_at,
     unterlagen: {
       stand: u.stand,
       liste: u.unterlagen.map(x => ({ art: x.art, titel: x.titel, bereit: x.bereit, ...(x.hinweis ? { hinweis: x.hinweis } : {}), ...(x.qualityCheck ? { qualityCheck: x.qualityCheck } : {}) })),
     },
+    vermerke: traktandumVermerke(u.stand),
     einladungen: einl.map(e => ({ personId: e.person_id, name: e.name, funktion: e.funktion })),
     version: t.version,
   };
@@ -58,7 +61,7 @@ async function sitzungOut(req: FastifyRequest, tx: Tx, s: store.SitzungRow): Pro
   for (const t of ts) traktanden.push(await traktandumOut(tx, t, { stand, zeit }));
   return {
     id: s.id, gremium: { id: s.gremium_id, kuerzel: s.gremium_kuerzel, name: s.gremium_name }, portfolioId: s.portfolio_id,
-    datum: s.datum, beginn: s.beginn, dauerMin: s.dauer_min, ort: s.ort, stand: s.stand, versendetAt: s.versendet_at, versandVorlauf: s.versand_vorlauf,
+    datum: s.datum, beginn: s.beginn, dauerMin: s.dauer_min, ort: s.ort, stand: s.stand, geaendertNachVersand: s.geaendert_nach_versand_at, versendetAt: s.versendet_at, versandVorlauf: s.versand_vorlauf,
     frist: await versandfrist(tx, s),
     zeitbedarfMin: ts.reduce((n, t) => n + (t.dauer_min ?? 0), 0),
     traktanden,
@@ -279,7 +282,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
   app.post('/v1/sitzungen/:id/traktanden', {
     schema: {
       tags: [TAG], summary: 'Traktandum aufnehmen oder einplanen',
-      description: 'Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an PL, CTL, SP werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.',
+      description: 'Mit `vorschlagId` einen Vorschlag aufnehmen; mit `art` (und `projektId`) ein Geschäft einplanen (PP.04.05). Zeitbedarf der Art (Gate-Review 35 Min.), «via SNS-VR» aus dem Gremienweg (UC-006 A1) und Einladungen an Projektleitung und Projektauftraggeber:in werden vorgesetzt (UC-006 Schritt 2). Liefert die Sitzung; nach dem Versand 409.',
       params: IdParams, headers: IdempotencyHeaders, body: Type.Ref('TraktandumCreate'), response: { 200: Type.Ref('Sitzung') },
     },
   }, async (req, reply) => {
@@ -316,6 +319,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       await req.need('sitzung:write', ort(s.portfolio_id));
       if (s.version !== version) throw preconditionFailed(s.version);
       pruefeVorbereitung(s);
+      await nachVersand(tx, s);
       const ts = (await store.traktanden(tx, s.id)).filter(t => t.stand === 'traktandiert');
       const ist = ts.map(t => t.id);
       if (ist.length !== reihenfolge.length || new Set(reihenfolge).size !== reihenfolge.length || !reihenfolge.every(x => ist.includes(x))) {
@@ -400,6 +404,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       pruefeVorbereitung(s);
       if (!(await store.updateTraktandum(tx, id, version, body))) throw preconditionFailed(t.version);
       await store.touchSitzung(tx, s.id);
+      await nachVersand(tx, s, id);
       const n = (await store.getTraktandum(tx, id))!;
       await record(tx, who, { action: 'traktandum.updated', resourceType: 'traktandum', resourceId: id, data: { before: traktandumSnapshot(t), after: traktandumSnapshot(n) }, event: traktandumSnapshot(n) });
       return traktandumOut(tx, n, { stand: await unterlagenstand(tx, s, [n]), zeit: zeitfenster(s, await store.traktanden(tx, s.id)) });
@@ -443,10 +448,36 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     });
   });
 
+  app.post('/v1/traktanden/:id/unterlagen-nachfuehren', {
+    schema: {
+      tags: [TAG], summary: 'Unterlagen nach dem Versand nachführen', params: IdParams, headers: IfMatchHeaders, response: { 200: Type.Ref('Traktandum') },
+      description: 'Nach dem Versand (A-75, K3): hält die Unterlagen des Traktandums neu fest (z. B. nach dem Quality-Check oder einer Änderung am Vertrag); Traktandum und Sitzung tragen «geändert nach Versand», die frühere Fassung steht im Verlauf. Nur «versendet»; `If-Match` = Version des Traktandums.',
+    },
+  }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const version = requireIfMatch(req);
+    const who = actorOf(req);
+    const out = await req.tx(async tx => {
+      const { t, s } = await traktandumMitSitzung(req, tx, id);
+      if (t.version !== version) throw preconditionFailed(t.version);
+      if (s.stand !== 'versendet') throw conflict('Nachführen ist nach dem Versand und vor dem Beginn der Sitzung möglich; vorher gelten die aktuellen Unterlagen.', { reason: 'stand', stand: s.stand });
+      const vorher = (await store.unterlagenGespeichert(tx, s.id)).filter(u => u.traktandum_id === id).map(u => ({ art: u.art, titel: u.titel, standOk: u.stand_ok, hinweis: u.hinweis }));
+      await unterlagenFesthalten(tx, t);
+      if (!(await store.updateTraktandum(tx, id, version, {}))) throw preconditionFailed(t.version);
+      await nachVersand(tx, s, id);
+      const n = (await store.getTraktandum(tx, id))!;
+      const nachher = (await store.unterlagenGespeichert(tx, s.id)).filter(u => u.traktandum_id === id).map(u => ({ art: u.art, titel: u.titel, standOk: u.stand_ok, hinweis: u.hinweis }));
+      await record(tx, who, { action: 'traktandum.amended', resourceType: 'traktandum', resourceId: id, data: { nach: 'versand', unterlagen: { before: vorher, after: nachher } }, event: { id, nach: 'versand' } });
+      return traktandumOut(tx, n, { stand: await unterlagenstand(tx, s, [n]), zeit: zeitfenster(s, await store.traktanden(tx, s.id)) });
+    });
+    reply.header('etag', etag(out.version));
+    return out;
+  });
+
   app.put('/v1/traktanden/:id/einladungen', {
     schema: {
       tags: [TAG], summary: 'Eingeladene festlegen',
-      description: 'Ersetzt die Eingeladenen des Traktandums (vorgesetzt PL, CTL, SP, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.',
+      description: 'Ersetzt die Eingeladenen des Traktandums (vorgesetzt Projektleitung und Projektauftraggeber:in, UC-006 Schritt 2). Die Einladung geht mit dem Versand (I-B3). Nur mit `If-Match` (Version des Traktandums), bis zum Versand.',
       params: IdParams, headers: IfMatchHeaders, body: Type.Ref('EinladungenPut'), response: { 200: Type.Ref('Traktandum') },
     },
   }, async (req, reply) => {
@@ -466,6 +497,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       await store.einladungenSetzen(tx, { id, sitzung_id: s.id, portfolio_id: t.portfolio_id }, body.einladungen);
       if (!(await store.updateTraktandum(tx, id, version, {}))) throw preconditionFailed(t.version);
       await store.touchSitzung(tx, s.id);
+      await nachVersand(tx, s, id);
       const n = (await store.getTraktandum(tx, id))!;
       await record(tx, who, {
         action: 'traktandum.invitations_changed', resourceType: 'traktandum', resourceId: id,

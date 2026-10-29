@@ -18,6 +18,7 @@ import {
   Meldung, MeldungCreate, MeldungList, Ressourcenbedarf, Risiko, SeiteQuery, Stakeholder, type KpiWertPutIn, type MeldungCreateIn,
 } from './schemas.ts';
 import * as store from './store.ts';
+import { projekt as projektAktion } from '../projekt/index.ts';
 
 export const TAG = 'Projektdaten';
 
@@ -25,14 +26,15 @@ const projektOrt = (id: string) => ({ type: 'projekt', id });
 
 // ---------------------------------------------------------------- gemeinsame Bausteine
 
-/** Endzustände sind lesend (UC-015 Schritt 6); sistierte Projekte bleiben pflegbar (wie im Modul projekt). */
-const aenderbar = (p: store.ProjektKopf) => p.lebenszyklus === 'aktiv' || p.lebenszyklus === 'sistiert';
+/**
+ * Register bleiben nach dem Abschluss pflegbar, markiert «geändert nach Abschluss» (UC-015 Schritt 6, A-75); zurückgezogene
+ * Projekte sind lesend. Regel und Markierung im Modul projekt.
+ */
+const aenderbar = (p: store.ProjektKopf) => p.lebenszyklus !== 'zurueckgezogen';
 
-function pruefeAenderbar(p: store.ProjektKopf): void {
-  if (!aenderbar(p)) {
-    throw conflict(`Das Projekt ${p.nummer} ist abgeschlossen, abgebrochen oder zurückgezogen; seine Register können nur noch gelesen werden.`,
-      { reason: 'lebenszyklus', lebenszyklus: p.lebenszyklus });
-  }
+async function pruefeAenderbar(tx: Tx, p: store.ProjektKopf): Promise<void> {
+  projektAktion.pruefeAenderbar(p);
+  await projektAktion.nachAbschluss(tx, p);
 }
 
 /** Projekt unter der Lesesicht oder 404 (Recht vorher mit `need` geprüft). */
@@ -142,7 +144,7 @@ function registerRoutes(app: FastifyInstance, r: RegisterRoute): void {
     const who = actorOf(req);
     const [p, e] = await db(label, () => req.tx(async tx => {
       const p = await projekt(tx, id);
-      pruefeAenderbar(p);
+      await pruefeAenderbar(tx, p);
       await r.vorher?.(tx, p, body);
       const neu = await store.create(tx, reg, { projektId: id }, body);
       const e = (await lesen(tx, id, neu))!;
@@ -165,7 +167,7 @@ function registerRoutes(app: FastifyInstance, r: RegisterRoute): void {
       const before = await lesen(tx, id, eintragId);
       if (!before) throw notFound(label);
       if (before.version !== version) throw preconditionFailed(before.version);
-      pruefeAenderbar(p);
+      await pruefeAenderbar(tx, p);
       await r.vorher?.(tx, p, body);
       if (!(await store.update(tx, reg, eintragId, version, body))) throw preconditionFailed(before.version);
       const e = (await lesen(tx, id, eintragId))!;
@@ -188,7 +190,7 @@ function registerRoutes(app: FastifyInstance, r: RegisterRoute): void {
       const before = await lesen(tx, id, eintragId);
       if (!before) throw notFound(label);
       if (before.version !== version) throw preconditionFailed(before.version);
-      pruefeAenderbar(p);
+      await pruefeAenderbar(tx, p);
       if (!(await store.remove(tx, reg, eintragId, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: `${reg.name}.deleted`, resourceType: reg.name, resourceId: eintragId, data: { nummer: p.nummer, ...audit(before) }, event: { id: eintragId, projektId: id } });
     });
@@ -279,7 +281,7 @@ function kpiWertRoutes(app: FastifyInstance): void {
   app.put('/v1/projekte/:id/kpis/:kpiId/werte/:periode', {
     schema: {
       tags: [TAG], summary: 'KPI-Wert erfassen',
-      description: 'Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, PL und CTL mit `kpi:write`, ab Phase P2, sonst 409). `If-Match: W/"0"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).',
+      description: 'Ist-Wert der Periode «JJJJ-MM» erfassen oder ändern (PC.03.03, mit `kpi:write` am Projekt, ab Phase P2, sonst 409). `If-Match: W/"0"` für einen neuen Wert, sonst der ETag des Werts (412 bei Abweichung).',
       params: KpiWertParams, headers: IfMatchHeaders, body: Type.Ref('KpiWertPut'), response: { 200: Type.Ref('KpiWert') },
     },
   }, async (req, reply) => {
@@ -290,7 +292,7 @@ function kpiWertRoutes(app: FastifyInstance): void {
     const who = actorOf(req);
     const [p, w] = await req.tx(async tx => {
       const p = await kpi(tx, id, kpiId);
-      pruefeAenderbar(p);
+      await pruefeAenderbar(tx, p);
       if (!WERTE_AB.includes(p.phase)) throw conflict(`KPI-Werte werden ab der Implementierung (Phase P2) erfasst; das Projekt ${p.nummer} ist in ${p.phase}.`, { reason: 'phase', phase: p.phase });
       const before = await store.kpiWert(tx, kpiId, periode);
       if ((before?.version ?? 0) !== version) throw preconditionFailed(before?.version ?? 0);
@@ -316,7 +318,7 @@ function kpiWertRoutes(app: FastifyInstance): void {
       const before = await store.kpiWert(tx, kpiId, periode);
       if (!before) throw notFound('KPI-Wert');
       if (before.version !== version) throw preconditionFailed(before.version);
-      pruefeAenderbar(p);
+      await pruefeAenderbar(tx, p);
       if (!(await store.kpiWertLoeschen(tx, kpiId, periode, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: 'kpi_wert.deleted', resourceType: 'kpi', resourceId: kpiId, data: { nummer: p.nummer, periode, wert: Number(before.wert) }, event: { projektId: id, kpiId, periode } });
     });
@@ -355,7 +357,7 @@ function meldungRoutes(app: FastifyInstance): void {
     const who = actorOf(req);
     const m = await req.tx(async tx => {
       const p = await projekt(tx, id);
-      pruefeAenderbar(p);
+      await pruefeAenderbar(tx, p);
       const m = await store.melden(tx, id, body.stelle, body.text);
       const daten = { id: m.id, projektId: id, nummer: p.nummer, name: p.name, stelle: m.stelle, stelleText: STELLE_TEXT[m.stelle], text: m.text, gemeldetAt: m.gemeldet_at };
       await record(tx, who, { action: 'meldung.created', resourceType: 'meldung', resourceId: m.id, data: daten, event: daten });

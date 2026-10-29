@@ -23,7 +23,7 @@ const VOLL = {
   abweichung: Object.fromEntries(['inhalt', 'termin', 'ressourcen', 'budget'].map(d => [d, { stufe: 'keine', kommentar: '' }])),
 };
 
-interface Zeile { projektId: string; projektNummer: string; stand: string; version: number; auffaelligkeiten: { art: string }[]; nachRueckfrage: boolean; eingefordertAt: string | null; status: string | null; vorperiode: { status: string | null } | null; can: Record<string, boolean> }
+interface Zeile { projektId: string; projektNummer: string; stand: string; version: number; vermerke: { art: string; text: string }[]; auffaelligkeiten: { art: string }[]; nachRueckfrage: boolean; eingefordertAt: string | null; status: string | null; vorperiode: { status: string | null } | null; can: Record<string, boolean> }
 
 describe('Monatsabschluss', () => {
   let api: TestApi;
@@ -35,7 +35,7 @@ describe('Monatsabschluss', () => {
 
   before(async () => {
     api = await testApi();
-    const u = await login(api, 'demo', 'u-ue', 'ue');
+    const u = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     T = u.tenantId;
     ue = { authorization: u.authorization };
     let pfA = '';
@@ -55,8 +55,8 @@ describe('Monatsabschluss', () => {
         [T, p['2026-202'], VORPERIODE]);
     });
     const l = await login(api, 'demo', 'u-pl', null);
-    for (const nr of ['2026-201', '2026-202']) await grant(api, T, `user:${l.principalId}`, 'pl', { type: 'projekt', id: p[nr]! });
-    await grant(api, T, `user:${l.principalId}`, 'pl', { type: 'projekt', id: daten.projekte['2026-104']! });
+    for (const nr of ['2026-201', '2026-202']) await grant(api, T, `user:${l.principalId}`, 'projekt-fuehren', { type: 'projekt', id: p[nr]! });
+    await grant(api, T, `user:${l.principalId}`, 'projekt-fuehren', { type: 'projekt', id: daten.projekte['2026-104']! });
     pl = { authorization: l.authorization };
     const g = await login(api, 'demo', 'u-gremium', null);
     await grant(api, T, `user:${g.principalId}`, 'gremium', { type: 'portfolio', id: pfA });
@@ -70,7 +70,7 @@ describe('Monatsabschluss', () => {
   const uebersicht = async (q = '') => {
     const r = await call('GET', `/v1/perioden/${PERIODE}${q}`, ue);
     assert.equal(r.statusCode, 200, r.body);
-    return r.json() as { kopf: { anzahl: Record<string, number>; abschluss: { moeglich: boolean; sperre: string | null; nichtGemeldet: number }; stand: string; version: number; can: Record<string, boolean> }; items: Zeile[] };
+    return r.json() as { kopf: { anzahl: Record<string, number>; abschluss: { moeglich: boolean; hinweis: string | null; ungeprueft: number; nichtGemeldet: number }; stand: string; version: number; can: Record<string, boolean> }; items: Zeile[] };
   };
   const zeile = async (id: string) => (await uebersicht()).items.find(i => i.projektId === id)!;
   const aufgaben = async (h: Record<string, string>) => (await call('GET', '/v1/eingang', h)).json().items as { art: string; titel: string; link: string }[];
@@ -109,12 +109,10 @@ describe('Monatsabschluss', () => {
     assert.equal((await uebersicht('?stand=ausstehend')).items[0]!.projektNummer, '2026-202');
   });
 
-  test('Abschluss gesperrt, solange eingereichte Berichte ungeprüft sind', async () => {
+  test('Abschluss mit ungeprüften Berichten: Warnung statt Sperre (UC-005 Schritt 5, A-74)', async () => {
     const u = await uebersicht();
-    assert.deepEqual([u.kopf.abschluss.moeglich, u.kopf.abschluss.sperre], [false, 'Abschluss: 31 Berichte sind eingereicht, aber nicht geprüft. Prüfe diese zuerst.']);
-    const r = await call('POST', `/v1/perioden/${PERIODE}/abschliessen`, ue);
-    assert.equal(r.statusCode, 409);
-    assert.equal(r.json().reason, 'ungeprueft');
+    assert.deepEqual([u.kopf.abschluss.moeglich, u.kopf.abschluss.ungeprueft], [true, 31]);
+    assert.match(u.kopf.abschluss.hinweis!, /^31 Berichte sind eingereicht, aber nicht geprüft\. Schliesst du ab, zählen sie mit dem Vermerk «nicht geprüft»/);
   });
 
   test('Sammelbestätigung überspringt auffällige Berichte und nennt sie (A-28, I-L4)', async () => {
@@ -235,11 +233,13 @@ describe('Monatsabschluss', () => {
     assert.equal((await aufgaben(ue)).filter(x => x.art === 'periode.abschliessen').length, 1);
   });
 
-  test('Abschluss mit «nicht gemeldet»: Werte der Vorperiode, Periode gesperrt (A3, A-11, A-37)', async () => {
+  test('Abschluss mit «nicht gemeldet» und einem ungeprüften Bericht: läuft weiter, Vermerk gesetzt, Aufgabe offen (A3, A-11, A-37, A-74)', async () => {
     const offen = (await uebersicht()).items.filter(i => i.stand === 'eingereicht');
-    for (const z of offen) assert.equal((await call('POST', bericht(z.projektId, '/pruefen'), { ...ue, 'if-match': `W/"${z.version}"` })).statusCode, 200);
+    // einer bleibt ungeprüft
+    const [rest, ...pruefen] = offen;
+    for (const z of pruefen) assert.equal((await call('POST', bericht(z.projektId, '/pruefen'), { ...ue, 'if-match': `W/"${z.version}"` })).statusCode, 200);
     const k = (await uebersicht()).kopf;
-    assert.deepEqual([k.abschluss.moeglich, k.abschluss.nichtGemeldet, k.anzahl.geprueft], [true, 1, 31]);
+    assert.deepEqual([k.abschluss.moeglich, k.abschluss.nichtGemeldet, k.anzahl.geprueft, k.abschluss.ungeprueft], [true, 1, 30, 1]);
     assert.equal((await call('POST', `/v1/perioden/${PERIODE}/abschliessen`, { ...ue, 'if-match': `W/"${k.version + 1}"` })).statusCode, 412);
     const r = await call('POST', `/v1/perioden/${PERIODE}/abschliessen`, { ...ue, 'if-match': `W/"${k.version}"` });
     assert.equal(r.statusCode, 200, r.body);
@@ -249,20 +249,40 @@ describe('Monatsabschluss', () => {
     const u = await uebersicht();
     const ng = u.items.find(i => i.projektId === p['2026-202'])!;
     assert.deepEqual([ng.stand, ng.status, ng.vorperiode?.status], ['nicht_gemeldet', 'kritisch', 'kritisch']);
-    assert.equal(u.items.filter(i => i.stand === 'geprueft').length, 31);
+    assert.equal(u.items.filter(i => i.stand === 'geprueft').length, 30);
+    // ungeprüft: mit den Werten des Berichts, Vermerk «nicht geprüft», Prüfung nachtragbar
+    const ug = u.items.find(i => i.projektId === rest!.projektId)!;
+    assert.deepEqual([ug.stand, ug.vermerke, ug.can.bestaetigen, ug.status], ['eingereicht', [{ art: 'nicht_geprueft', text: 'nicht geprüft' }], true, rest!.status]);
     const d = await full(api.t.runtime, T, tx => tx.query<{ gemeldet: boolean; status: string; werte_aus: string; naechster_meilenstein: string }>(
       'SELECT gemeldet, status, werte_aus, naechster_meilenstein FROM ppm.dashboard_zeile WHERE periode = $1 AND projekt_id = $2', [PERIODE, p['2026-202']]));
     assert.deepEqual(d.rows, [{ gemeldet: false, status: 'kritisch', werte_aus: VORPERIODE, naechster_meilenstein: 'Konzept' }]);
 
-    // Aufgaben erledigt bzw. entfallen
-    assert.ok(!(await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen' || x.art === 'periode.abschliessen'));
+    // Aufgaben: «Periode abschliessen» erledigt, «Statusberichte prüfen» bleibt offen bis zum Nachtrag
+    assert.ok(!(await aufgaben(ue)).some(x => x.art === 'periode.abschliessen'));
+    assert.ok((await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen'), 'Prüfaufgabe bleibt offen (A-74)');
     assert.ok(!(await aufgaben(pl)).some(x => x.art === 'statusbericht.erstellen'));
-    // Gesperrt (Z9): kein Bericht, keine Prüfung, kein zweiter Abschluss
-    assert.equal((await call('PUT', bericht(p['2026-202']!), { ...pl, 'if-match': 'W/"0"' }, VOLL)).json().reason, 'periode');
+    // nach dem Abschluss (A-75): ein später Bericht ist möglich und markiert; kein zweiter Abschluss, keine Sammelprüfung
+    const spaet = await call('PUT', bericht(p['2026-202']!), { ...pl, 'if-match': 'W/"0"' }, VOLL);
+    assert.equal(spaet.statusCode, 200, spaet.body);
     assert.equal((await call('POST', `/v1/perioden/${PERIODE}/abschliessen`, ue)).statusCode, 409);
     assert.equal((await call('POST', `/v1/perioden/${PERIODE}/bestaetigen`, ue, { projekte: [p['2026-201']] })).statusCode, 409);
-    assert.ok(u.items.every(i => !Object.values(i.can).some(Boolean)));
+    assert.ok(u.items.filter(i => i.projektId !== rest!.projektId).every(i => !Object.values(i.can).some(Boolean)));
     const audit = await full(api.t.runtime, T, tx => tx.query("SELECT data FROM ppm.audit_log WHERE action = 'periode.closed'"));
-    assert.deepEqual([audit.rows[0]!.data.gemeldet, audit.rows[0]!.data.nichtGemeldet], [31, 1]);
+    assert.deepEqual([audit.rows[0]!.data.gemeldet, audit.rows[0]!.data.ungeprueft, audit.rows[0]!.data.nichtGemeldet], [31, 1, 1]);
+
+    // Prüfung nachtragen: Vermerk weg, Prüfaufgabe erledigt
+    const nach = await call('POST', bericht(rest!.projektId, '/pruefen'), { ...ue, 'if-match': `W/"${ug.version}"` });
+    assert.equal(nach.statusCode, 200, nach.body);
+    assert.deepEqual([nach.json().stand, nach.json().vermerke], ['geprueft', []]);
+    assert.ok(!(await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen'));
+
+    // Änderung nach dem Abschluss (UC-005 A4.1, A-75): markiert, Dashboard der Periode nachgeführt, die UE prüft erneut
+    const g = await call('GET', bericht(rest!.projektId), pl);
+    const n = await call('PUT', bericht(rest!.projektId), { ...pl, 'if-match': g.headers.etag as string }, { naechsterMeilenstein: 'Nachgeführt' });
+    assert.equal(n.statusCode, 200, n.body);
+    assert.deepEqual([n.json().geaendertNach.text, n.json().stand], ['geändert nach Abschluss', 'eingereicht']);
+    const dz = await full(api.t.runtime, T, tx => tx.query<{ naechster_meilenstein: string }>('SELECT naechster_meilenstein FROM ppm.dashboard_zeile WHERE periode = $1 AND projekt_id = $2', [PERIODE, rest!.projektId]));
+    assert.equal(dz.rows[0]!.naechster_meilenstein, 'Nachgeführt');
+    assert.ok((await aufgaben(ue)).some(x => x.art === 'statusbericht.pruefen'), 'die UE sieht die Änderung');
   });
 });

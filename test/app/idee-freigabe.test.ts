@@ -10,6 +10,7 @@ import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { grant, login, person, testApi, type TestApi } from './api.ts';
 import { full } from './harness.ts';
 import { heute } from '../../src/modules/sitzung/format.ts';
+import { traktandenart } from '../../src/modules/sitzung/arten.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
 
@@ -56,9 +57,9 @@ describe('Freigabe der Initialisierung', () => {
 
   before(async () => {
     api = await testApi();
-    const a = await login(api, 'demo', 'u-as1', 'antragsteller');
+    const a = await login(api, 'demo', 'u-as1', 'mitglied');
     tenantId = a.tenantId; as1Id = a.principalId; as1 = { authorization: a.authorization };
-    ue = { authorization: (await login(api, 'demo', 'u-ue', 'ue')).authorization };
+    ue = { authorization: (await login(api, 'demo', 'u-ue', 'alle-fuehren')).authorization };
     adm = { authorization: (await login(api, 'demo', 'u-adm', 'org-admin')).authorization };
     [sp, pl] = [await person(api, tenantId, 'u-sp'), await person(api, tenantId, 'u-pl')];
     feld = (await ok('POST', '/v1/handlungsfelder', adm, { label: 'Patientenorientierung' }, 201)).json().id;
@@ -72,10 +73,10 @@ describe('Freigabe der Initialisierung', () => {
     portfolioC = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'C', schluessel: 'dpf', name: 'Direktion Pflege', orgEinheitId: direktionPflege }, 201)).json().id;
     portfolioC2 = (await ok('POST', '/v1/portfolios', ue, { kategorie: 'C', schluessel: 'dms', name: 'Direktion Medizin', orgEinheitId: bereich }, 201)).json().id;
     const d = await login(api, 'demo', 'u-direktion', null);
-    await grant(api, tenantId, `user:${d.principalId}`, 'direktion', { type: 'portfolio', id: portfolioC });
+    await grant(api, tenantId, `user:${d.principalId}`, 'portfolio-steuern', { type: 'portfolio', id: portfolioC });
     direktion = { authorization: d.authorization };
     const d2 = await login(api, 'demo', 'u-direktion2', null);
-    await grant(api, tenantId, `user:${d2.principalId}`, 'direktion', { type: 'portfolio', id: portfolioC2 });
+    await grant(api, tenantId, `user:${d2.principalId}`, 'portfolio-steuern', { type: 'portfolio', id: portfolioC2 });
     fremdeDirektion = { authorization: d2.authorization };
   });
   after(async () => { await api?.close(); });
@@ -83,7 +84,7 @@ describe('Freigabe der Initialisierung', () => {
   test('Kategorie A: dem Gremium vorlegen, Entscheid in der Sitzung legt das Projekt in P0 mit den Angaben der Idee an', async () => {
     const i = await zugeordnet('Digitale Patientenaufnahme', 'A', portfolioA);
     let f = await ok('GET', `/v1/ideen/${i.id}/freigabe`, ue);
-    assert.deepEqual([f.json().weg, f.json().zustaendig, f.json().can], ['gremium', 'PRAT Programmausschuss', { traktandieren: true, angaben: true, entscheiden: false }]);
+    assert.deepEqual([f.json().weg, f.json().zustaendig, f.json().can], ['gremium', 'PRAT Programmausschuss', { traktandieren: true, angaben: true, entscheiden: false, initialisieren: false }]);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/traktandieren`, mit(as1, i.etag))).statusCode, 403);
     f = await ok('POST', `/v1/ideen/${i.id}/traktandieren`, mit(ue, i.etag));
     assert.equal((await ok('GET', `/v1/ideen/${i.id}`, as1)).json().stand, 'traktandiert');
@@ -93,7 +94,7 @@ describe('Freigabe der Initialisierung', () => {
 
     // Sitzung: Vorschlag aufnehmen, versenden, starten
     const t = await sys(async tx => (await tx.query<{ id: string; titel: string; antrag: string }>("SELECT id, titel, antrag FROM ppm.traktandum WHERE art = 'idee' AND bezug_id = $1", [i.id])).rows);
-    assert.deepEqual(t.map(x => [x.titel, x.antrag]), [['Initialisierung: Digitale Patientenaufnahme', 'Initialisierung freigeben (Kategorie A), Sponsor und Projektleitung benennen']]);
+    assert.deepEqual(t.map(x => [x.titel, x.antrag]), [['Initialisierung: Digitale Patientenaufnahme', 'Initialisierung freigeben (Kategorie A), Projektauftraggeber:in und Projektleitung benennen']]);
     const s = (await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin }, 201)).json();
     let v = (await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: t[0]!.id })).json();
     v = (await ok('POST', `/v1/sitzungen/${s.id}/versenden`, mit(ue, `W/"${v.version}"`))).json();
@@ -123,7 +124,7 @@ describe('Freigabe der Initialisierung', () => {
     const vertrag = await aufgaben('vertrag.erstellen', projekt.id);
     assert.deepEqual(vertrag.map(x => [x.empfaenger_person, x.stand, x.link]), [[pl, 'offen', `/projekte/${projekt.nummer}/vertrag`]]);
     assert.ok((await mitteilungen(as1Id)).some(x => x.includes(`Das Projekt ${projekt.nummer} entsteht in Phase P0`)));
-    assert.ok((await mitteilungen(sp)).some(x => x.includes('Du bist Sponsor')));
+    assert.ok((await mitteilungen(sp)).some(x => x.includes('Du bist Projektauftraggeber:in')));
 
     // je Idee ein Projekt
     const anzahl = async () => sys(async tx => (await tx.query<{ n: number }>("SELECT count(*)::int AS n FROM ppm.projekt WHERE herkunft->>'ideeId' = $1", [i.id])).rows[0]!.n);
@@ -140,6 +141,43 @@ describe('Freigabe der Initialisierung', () => {
     assert.equal(await anzahl(), 1);
   });
 
+  test('Initialisierung vor dem Entscheid: läuft weiter, Vermerk gesetzt, Entscheid offen; Freigabe ersetzt den Vermerk, Ablehnung lässt das Projekt laufen (UC-001 A6, A-74)', async () => {
+    const vorab = async (titel: string) => {
+      const i = await zugeordnet(titel, 'A', portfolioA);
+      let f = await ok('PUT', `/v1/ideen/${i.id}/freigabe/angaben`, mit(ue, i.etag), { sponsor: sp, projektleitung: pl });
+      f = await ok('POST', `/v1/ideen/${i.id}/traktandieren`, mit(ue, f.headers.etag as string));
+      assert.equal(f.json().can.initialisieren, true);
+      assert.equal((await call('POST', `/v1/ideen/${i.id}/initialisieren`, mit(as1, f.headers.etag as string))).statusCode, 403);
+      const r = await ok('POST', `/v1/ideen/${i.id}/initialisieren`, mit(ue, f.headers.etag as string));
+      assert.deepEqual(r.json().vermerke, [{ art: 'initialisierung_nicht_freigegeben', text: 'Initialisierung nicht freigegeben' }]);
+      assert.equal((await call('POST', `/v1/ideen/${i.id}/initialisieren`, mit(ue, r.headers.etag as string))).statusCode, 409, 'nur einmal');
+      const projekt = r.json().projekt as { id: string; nummer: string };
+      assert.equal((await ok('GET', `/v1/ideen/${i.id}`, as1)).json().stand, 'traktandiert', 'Entscheid offen');
+      assert.deepEqual((await aufgaben('vertrag.erstellen', projekt.id)).map(x => [x.empfaenger_person, x.stand]), [[pl, 'offen']]);
+      // Vermerk auch am Projekt (Reiter Vertrag)
+      assert.deepEqual((await ok('GET', `/v1/projekte/${projekt.id}/vermerke`, ue)).json().projekt.map((x: { art: string }) => x.art), ['initialisierung_nicht_freigegeben']);
+      const t = await sys(async tx => (await tx.query<{ id: string }>("SELECT id FROM ppm.traktandum WHERE art = 'idee' AND bezug_id = $1", [i.id])).rows[0]!);
+      return { i, projekt, traktandum: t.id };
+    };
+    const entscheid = (o: { i: { id: string }; traktandum: string }, ergebnis: string) => sys(tx => traktandenart('idee')!.beiEntscheid!(tx,
+      { traktandumId: o.traktandum, bezug: { typ: 'idee', id: o.i.id }, ergebnis, begruendung: 'Gremium', viaSns: false } as Parameters<NonNullable<NonNullable<ReturnType<typeof traktandenart>>['beiEntscheid']>>[1]));
+
+    // Freigabe nachgetragen: Vermerk weg, kein zweites Projekt
+    const a = await vorab('Vorab freigegeben');
+    await entscheid(a, 'freigegeben');
+    const fa = (await ok('GET', `/v1/ideen/${a.i.id}/freigabe`, ue)).json();
+    assert.deepEqual([fa.vermerke, fa.projekt.id], [[], a.projekt.id]);
+    assert.equal((await ok('GET', `/v1/ideen/${a.i.id}`, as1)).json().stand, 'freigegeben');
+    assert.equal((await sys(tx => tx.query("SELECT 1 FROM ppm.projekt WHERE herkunft->>'ideeId' = $1", [a.i.id]))).rowCount, 1);
+
+    // Ablehnung: das Projekt läuft weiter, Projektleitung informiert, Vermerk «abgelehnt»
+    const b = await vorab('Vorab abgelehnt');
+    await entscheid(b, 'abgelehnt');
+    assert.equal((await ok('GET', `/v1/projekte/${b.projekt.id}`, ue)).json().lebenszyklus, 'aktiv');
+    assert.deepEqual((await ok('GET', `/v1/ideen/${b.i.id}/freigabe`, ue)).json().vermerke.map((x: { art: string }) => x.art), ['initialisierung_abgelehnt']);
+    assert.ok((await mitteilungen(pl)).some(x => x.includes('nicht freigegeben') && x.includes('läuft bereits')));
+  });
+
   test('Kategorie C: der Direktion übergeben, Freigabe im Eingang legt das Projekt im Portfolio der Direktion an', async () => {
     const i = await zugeordnet('Pflegedokumentation mobil', 'C', portfolioC);
     let f = await ok('GET', `/v1/ideen/${i.id}/freigabe`, ue);
@@ -150,11 +188,10 @@ describe('Freigabe der Initialisierung', () => {
     assert.deepEqual(auf.map(x => [x.empfaenger_recht, x.stand, x.link]), [['idee:decide', 'offen', `/portfolio/ideen/${i.nummer}`]]);
     assert.ok((await mitteilungen(as1Id)).some(t => t.includes('der Direktion (Direktion Pflege) zum Entscheid vorgelegt')));
 
-    // Direktion sieht die Idee und darf entscheiden; die UE und eine fremde Direktion nicht
+    // Direktion sieht die Idee und darf entscheiden; eine fremde Direktion nicht
     const d = await ok('GET', `/v1/ideen/${i.id}/freigabe`, direktion);
     assert.equal(d.json().can.entscheiden, true);
     const etag = d.headers.etag as string;
-    assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(ue, etag), { sponsor: sp, projektleitung: pl })).statusCode, 403);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(fremdeDirektion, etag), { sponsor: sp, projektleitung: pl })).statusCode, 404);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(direktion, 'W/"1"'), { sponsor: sp, projektleitung: pl })).statusCode, 412);
     assert.equal((await call('POST', `/v1/ideen/${i.id}/freigeben`, mit(direktion, etag), { sponsor: sp, projektleitung: '00000000-0000-4000-8000-000000000009' })).statusCode, 422);
@@ -186,6 +223,6 @@ describe('Freigabe der Initialisierung', () => {
     const e = await ok('POST', `/v1/ideen/${c.json().id}/einreichen`, mit(as1, 'W/"1"'));
     assert.equal((await call('POST', `/v1/ideen/${c.json().id}/traktandieren`, mit(ue, e.headers.etag as string))).statusCode, 409);
     const f = await ok('GET', `/v1/ideen/${c.json().id}/freigabe`, as1);
-    assert.deepEqual([f.json().weg, f.json().can], [null, { traktandieren: false, angaben: false, entscheiden: false }]);
+    assert.deepEqual([f.json().weg, f.json().can], [null, { traktandieren: false, angaben: false, entscheiden: false, initialisieren: false }]);
   });
 });

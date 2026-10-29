@@ -35,7 +35,8 @@ async function ausgabe(req: FastifyRequest, tx: Tx, v: store.VersionRow, p: stor
   const dg = checks[0]?.ergebnis === 'bestaetigt' ? checks[0] : null;
   const soll = await pruefung.unterzeichnende(tx, p.id);
   const us = dg ? await pruefung.unterschriften(tx, dg.id) : [];
-  const offen = v.stand === 'zur_unterzeichnung' && await req.can('vertrag:sign', projektOrt(p.id))
+  const nachtrag = pruefung.NACHTRAG.includes(v.stand);
+  const offen = (v.stand === 'zur_unterzeichnung' || (nachtrag && !!dg)) && await req.can('vertrag:sign', projektOrt(p.id))
     ? await pruefung.offeneFunktionen(tx, person, soll, us) : [];
   return {
     versionId: v.id, nummer: v.nummer, stand: v.stand, version: v.version,
@@ -56,7 +57,7 @@ async function ausgabe(req: FastifyRequest, tx: Tx, v: store.VersionRow, p: stor
       }),
     } : null,
     can: {
-      qualityCheck: v.stand === 'in_pruefung' && v.anlass !== 'aenderung' && await req.can('vertrag:review'),
+      qualityCheck: (v.stand === 'in_pruefung' || (nachtrag && !dg)) && v.anlass !== 'aenderung' && await req.can('vertrag:review'),
       unterzeichnen: offen,
     },
   };
@@ -86,7 +87,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     schema: {
       tags: [TAG], summary: 'Quality-Check erfassen', params: IdParams, headers: IfMatchHeaders,
       body: Type.Ref('VertragQualityCheckIn'), response: { 200: Type.Ref('VertragPruefung') },
-      description: 'Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Sponsor, Projektleitung und CTL erhalten je eine Aufgabe (UC-002 Schritt 9); '
+      description: 'Nur «in Prüfung», mit `vertrag:review` (DM.02.05). `bestaetigt` → «zur Unterzeichnung», Projektauftraggeber:in und Projektleitung erhalten je eine Aufgabe (UC-002 Schritt 9); '
         + 'fehlt eine dieser Funktionen in der Projektorganisation: 409. `rueckmeldung` → «in Arbeit» mit Kommentaren je Kapitel, die PL erhält «Projektvertrag überarbeiten» (UC-002 A5). '
         + '`If-Match` = Version der Vertragsversion.',
     },
@@ -109,7 +110,9 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     await voll(req, async tx => {
       const r = await store.version(tx, id);
       if (!r) throw notFound('Vertragsversion');
-      if (r.stand !== 'in_pruefung') throw conflict(`Version ${r.nummer} ist ${STAND_TEXT[r.stand]}, nicht in Prüfung.`, { reason: 'stand', stand: r.stand });
+      // in Prüfung oder nachgetragen, solange noch kein Quality-Check bestätigt ist (A-74)
+      const nachtrag = pruefung.NACHTRAG.includes(r.stand) && !(await pruefung.durchgang(tx, r.id));
+      if (r.stand !== 'in_pruefung' && !nachtrag) throw conflict(`Version ${r.nummer} ist ${STAND_TEXT[r.stand]}, nicht in Prüfung.`, { reason: 'stand', stand: r.stand });
       // eine Änderung entscheidet der Sponsor ohne Quality-Check (UC-007 Schritt 3; AP-E3-4)
       if (r.anlass === 'aenderung') throw conflict('Eine Änderung entscheidet der Sponsor; ein Quality-Check ist nicht vorgesehen.', { reason: 'anlass' });
       if (r.version !== erwartet) throw preconditionFailed(r.version);
@@ -130,7 +133,7 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     schema: {
       tags: [TAG], summary: 'Unterzeichnen oder verweigern', params: IdParams, headers: IfMatchHeaders,
       body: Type.Ref('VertragUnterschriftIn'), response: { 200: Type.Ref('VertragPruefung') },
-      description: 'Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (SP, PL, CTL), die sie innehat oder in Vertretung mit '
+      description: 'Nur «zur Unterzeichnung», mit `vertrag:sign` am Projekt (DM.02.06). Die Person unterzeichnet alle Funktionen (Projektauftraggeber:in, Projektleitung), die sie innehat oder in Vertretung mit '
         + 'Recht auf Unterschriften wahrnimmt (A-31); protokolliert mit Person und Zeitpunkt. Nach der letzten Funktion: «unterzeichnet» (UC-002 Schritt 10). `verweigert` mit '
         + 'Begründung (Pflicht) → «in Arbeit», die PL erhält die Begründung im Eingang (UC-003 A5). Keine offene Unterschrift der Person: 409. `If-Match` = Version der Vertragsversion.',
     },
@@ -149,7 +152,8 @@ export function registerPruefungRoutes(app: FastifyInstance, deps: Deps): void {
     await voll(req, async tx => {
       const r = await store.version(tx, id);
       if (!r) throw notFound('Vertragsversion');
-      if (r.stand !== 'zur_unterzeichnung') throw conflict(`Version ${r.nummer} ist ${STAND_TEXT[r.stand]}, nicht zur Unterzeichnung.`, { reason: 'stand', stand: r.stand });
+      // zur Unterzeichnung oder nachgetragen, wenn der Vertrag schon beim Gremium liegt oder freigegeben ist (A-74)
+      if (r.stand !== 'zur_unterzeichnung' && !pruefung.NACHTRAG.includes(r.stand)) throw conflict(`Version ${r.nummer} ist ${STAND_TEXT[r.stand]}, nicht zur Unterzeichnung.`, { reason: 'stand', stand: r.stand });
       if (r.version !== erwartet) throw preconditionFailed(r.version);
       const u = await pruefung.unterzeichnen(tx, { version: r, projekt: p, erwartet, person, ergebnis: body.ergebnis, begruendung });
       if (!u) throw preconditionFailed(r.version + 1);

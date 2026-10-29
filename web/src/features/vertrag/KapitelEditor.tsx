@@ -3,7 +3,7 @@
  * Hinzufügen und Entfernen, Termine, Ziel aus dem Zielbaum. Jedes Feld trägt die ID seines Sprungziels (K2-4). Im
  * Lesemodus (Z8, Z9) ohne Bearbeiten-Elemente. Unter Texten steht die Baseline, wenn der Entwurf davon abweicht.
  */
-import { PersonName, PersonPick } from '@vollholz/iam-web';
+import { PersonName, PersonPick, useAccessList, useIamConfig } from '@vollholz/iam-web';
 import type { ReactNode } from 'react';
 import { fmtBetrag, fmtDatum, Icon } from '../../ui/index.ts';
 import { useProjekteAuswahl, useRollen, useZielauswahl, type Inhalt } from './api.ts';
@@ -18,13 +18,15 @@ export interface EditorProps {
   /** Fehler je Feld: `feld` oder `feld/<index>/<spalte>` (lokal und vom Server). */
   fehler: Record<string, string>;
   onChange(inhalt: Inhalt, feld: string): void;
-  /** Projekt des Vertrags (Zielauswahl für Kap. 2). */
+  /** Projekt des Vertrags (Zielauswahl für Kap. 2, Zugriff für Kap. 8). */
   projektId: string;
+  /** Projektnummer (Link «Zugriff geben» in Kap. 8); ohne sie kein Link. */
+  nummer?: string;
 }
 
 type Zeile = Record<string, unknown>;
 
-export function KapitelEditor({ nr, inhalt, basis, ro, fehler, onChange, projektId }: EditorProps) {
+export function KapitelEditor({ nr, inhalt, basis, ro, fehler, onChange, projektId, nummer }: EditorProps) {
   const k = kapitel(nr);
   const setze = (key: string, v: unknown) => onChange({ ...inhalt, [key]: v }, key);
   return (
@@ -32,16 +34,16 @@ export function KapitelEditor({ nr, inhalt, basis, ro, fehler, onChange, projekt
       {k.felder.map(f => (
         <div key={f.key} id={feldId(nr, f.key)} className="vt-feld" data-feld={f.key}>
           <FeldEditor nr={nr} f={f} wert={inhalt[f.key]} basis={basis?.[f.key]} ro={ro} fehler={fehler} setze={v => setze(f.key, v)}
-            inhalt={inhalt} projektId={projektId} onZiel={(zielId, hf) => onChange({ ...inhalt, strategischesZielId: zielId, handlungsfeldId: hf, jahreszielId: null }, 'strategischesZielId')} />
+            inhalt={inhalt} projektId={projektId} nummer={nummer} onZiel={(zielId, hf) => onChange({ ...inhalt, strategischesZielId: zielId, handlungsfeldId: hf, jahreszielId: null }, 'strategischesZielId')} />
         </div>
       ))}
     </div>
   );
 }
 
-function FeldEditor({ nr, f, wert, basis, ro, fehler, setze, inhalt, projektId, onZiel }: {
+function FeldEditor({ nr, f, wert, basis, ro, fehler, setze, inhalt, projektId, nummer, onZiel }: {
   nr: number; f: Feld; wert: unknown; basis: unknown; ro: boolean; fehler: Record<string, string>; setze(v: unknown): void; inhalt: Inhalt;
-  projektId: string; onZiel(zielId: string | null, handlungsfeldId: string | null): void;
+  projektId: string; nummer?: string; onZiel(zielId: string | null, handlungsfeldId: string | null): void;
 }) {
   const id = `${feldId(nr, f.key)}-in`;
   const err = fehler[f.key];
@@ -84,7 +86,7 @@ function FeldEditor({ nr, f, wert, basis, ro, fehler, setze, inhalt, projektId, 
     return <JahreszielFeld id={id} label={label} ziel={inhalt.strategischesZielId as string | null} wert={wert as string | null} ro={ro} err={err} projektId={projektId} setze={setze} />;
   }
   if (f.art === 'handlungsfeld') return <HandlungsfeldFeld id={id} label={label} wert={wert as string | null} projektId={projektId} />;
-  return <ListeFeld nr={nr} f={f} zeilen={(wert ?? []) as Zeile[]} ro={ro} fehler={fehler} setze={setze} />;
+  return <ListeFeld nr={nr} f={f} zeilen={(wert ?? []) as Zeile[]} ro={ro} fehler={fehler} setze={setze} projektId={projektId} nummer={nummer} />;
 }
 
 function ZielFeld({ id, label, hilfe, wert, ro, err, projektId, onZiel }: {
@@ -145,7 +147,10 @@ function HandlungsfeldFeld({ id, label, wert, projektId }: { id: string; label: 
   );
 }
 
-function ListeFeld({ nr, f, zeilen, ro, fehler, setze }: { nr: number; f: Feld; zeilen: Zeile[]; ro: boolean; fehler: Record<string, string>; setze(v: unknown): void }) {
+function ListeFeld({ nr, f, zeilen, ro, fehler, setze, projektId, nummer }: {
+  nr: number; f: Feld; zeilen: Zeile[]; ro: boolean; fehler: Record<string, string>; setze(v: unknown): void; projektId: string; nummer?: string;
+}) {
+  const ohneZugriff = useOhneZugriff(projektId, nr === 8 && f.key === 'mitglieder' && zeilen.some(z => z.personId));
   const was = f.eintrag ?? f.label;
   const base = feldId(nr, f.key);
   const aendere = (i: number, key: string, v: unknown) => setze(zeilen.map((z, j) => (j === i ? { ...z, [key]: v } : z)));
@@ -162,6 +167,8 @@ function ListeFeld({ nr, f, zeilen, ro, fehler, setze }: { nr: number; f: Feld; 
                 <Zelle key={s.key} s={s} wert={z[s.key]} ro={ro} id={`${base}-${i}-${s.key}`} label={`${s.label} (${TV.zeile(was, i + 1)})`}
                   err={fehler[`${f.key}/${i}/${s.key}`]} setze={v => aendere(i, s.key, v)} />
               ))}
+              {ohneZugriff && typeof z.personId === 'string' && z.personId && !ohneZugriff.mit.has(`user:${z.personId}`)
+                ? <OhneZugriff nummer={ohneZugriff.darf ? nummer : undefined} /> : null}
               {!ro ? (
                 <button type="button" className="iconbtn vt-weg" aria-label={TV.entfernen(was, i + 1)} title={TV.entfernen(was, i + 1)}
                   onClick={() => setze(zeilen.filter((_, j) => j !== i))}><Icon name="trash" /></button>
@@ -174,6 +181,27 @@ function ListeFeld({ nr, f, zeilen, ro, fehler, setze }: { nr: number; f: Feld; 
         <button type="button" className="btn sm ghost" id={`${base}-neu`} onClick={() => setze([...zeilen, f.neu!()])}><Icon name="plus" />{TV.hinzufuegen(was)}</button>
       ) : null}
     </fieldset>
+  );
+}
+
+/**
+ * Kap. 8: Die Projektorganisation vergibt keinen Zugriff (Master Entscheid 16, UX-E14); Personen ohne Zugriff auf das
+ * Projekt tragen «kein Zugriff» wie in der Projektübersicht (K2 Schritt 3). Ohne Liste der Zugriffe (Laden, Fehler,
+ * kein Recht) kein Hinweis.
+ */
+function useOhneZugriff(projektId: string, aktiv: boolean): { mit: Set<string>; darf: boolean } | null {
+  const zugriff = useAccessList({ type: 'projekt', id: projektId }, aktiv);
+  if (!aktiv || !zugriff.data) return null;
+  return { mit: new Set(zugriff.data.items.map(e => e.subject.ref)), darf: zugriff.data.grantable.length > 0 };
+}
+
+function OhneZugriff({ nummer }: { nummer?: string }) {
+  const { router: { Link } } = useIamConfig();
+  return (
+    <span className="vt-ohne-zugriff">
+      <span className="stand stand-neutral">{TV.ohneZugriff}</span>
+      {nummer ? <Link to={`/projekte/${nummer}/zugriff`} className="linkbtn">{TV.zugriffGeben}</Link> : null}
+    </span>
   );
 }
 

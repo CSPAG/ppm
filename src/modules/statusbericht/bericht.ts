@@ -83,17 +83,14 @@ export async function laufendePeriode(tx: Tx): Promise<string> {
   return (await tx.query<{ p: string }>("SELECT to_char(now() AT TIME ZONE 'Europe/Zurich', 'YYYY-MM') AS p")).rows[0]!.p;
 }
 
-export const PERIODE_GESPERRT = 'Die Periode ist abgeschlossen. Ein Bericht nach dem Abschluss zählt für die nächste Periode (A-37).';
 
 /** Warum der Bericht nicht (mehr) bearbeitet werden kann; null = bearbeitbar. Texte für die Sperre (409). */
 export function sperre(p: store.ProjektRow, periode: string, laufend: string, periodeStand: 'offen' | 'abgeschlossen', r: store.Row | null): { grund: string; text: string } | null {
   if (p.lebenszyklus !== 'aktiv') return { grund: 'lebenszyklus', text: `Das Projekt ${p.nummer} ist nicht aktiv und berichtet nicht.` };
   if (!BERICHTSPHASEN.includes(p.phase)) return { grund: 'phase', text: `Das Projekt ${p.nummer} ist in Phase ${p.phase} und berichtet nicht mehr monatlich.` };
   if (periode > laufend) return { grund: 'zukunft', text: `Die Periode ${periode} hat noch nicht begonnen.` };
-  if (periodeStand === 'abgeschlossen') return { grund: 'periode', text: PERIODE_GESPERRT };
-  if (r && r.stand !== 'entwurf' && r.stand !== 'zurueckgegeben') {
-    return { grund: 'stand', text: r.stand === 'eingereicht' ? 'Der Bericht ist eingereicht und in Prüfung. Ändern ist erst nach einer Rückfrage möglich.' : 'Der Bericht ist geprüft und kann nicht mehr geändert werden.' };
-  }
+  // nach dem Einreichen bzw. nach dem Abschluss der Periode bleibt der Bericht änderbar, markiert (A-75, UC-004 A4, UC-005 A4)
+  void periodeStand; void r;
   return null;
 }
 

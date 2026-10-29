@@ -1,6 +1,6 @@
 # Use Cases Projektportfoliomanagement (Insel Gruppe)
 
-Entwurf, Stand 26. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen; jeder Use Case hat einen Heimat-Arbeitsraum (Projekt, Portfolio, Gremium, Ziele, Administration). Prinzip siehe [PPM-Master.md](../PPM-Master.md#7-ux-prinzip-arbeitsräume).
+Entwurf, Stand 29. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen; jeder Use Case hat einen Heimat-Arbeitsraum (Projekt, Portfolio, Gremium, Ziele, Administration). Prinzip siehe [PPM-Master.md](../PPM-Master.md#7-ux-prinzip-arbeitsräume).
 
 ## Use-Case-Liste
 
@@ -14,11 +14,11 @@ Entwurf, Stand 26. Oktober 2026. Use Cases bündeln Business Cases zu Abläufen;
 | UC-004 | Monatlich berichten | ● | Projekt |  | PL | PS.01.01, PS.02.04, PC.01.03, PC.02.03, PC.02.04, PC.03.03, PS.05.03, PS.03.03 |
 | UC-005 | Statusberichte prüfen und nachverfolgen |  | Portfolio |  | UE | PS.01.02, PS.01.03, PS.01.04 |
 | UC-006 | PRAT-Sitzung vorbereiten und durchführen | ● | Gremium | Portfolio | UE, PRAT | PP.04.01, PP.04.02, PP.04.05, PS.02.02, PS.02.03, PS.03.03, PS.04.02, PC.02.02 |
-| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt |  | PL, SP | PS.03.01, PS.03.02, PS.03.04 |
+| UC-007 | Änderung am Projektvertrag beantragen und entscheiden |  | Projekt |  | PL, AG | PS.03.01, PS.03.02, PS.03.04 |
 | UC-008 | Portfolio priorisieren und ausbalancieren | ● | Portfolio | Gremium | UE, PRAT | PP.01.02, PP.01.03, PP.02.01, PP.02.02, PP.02.03, PP.03.01, PP.03.02, PP.03.03, PP.03.04, PC.02.01, RK.02.04 |
-| UC-009 | Ressourcen planen und zuteilen |  | Portfolio | Projekt | RM | RK.01.01, RK.01.02, RK.02.02, RK.02.03, RK.02.04 |
-| UC-010 | Portfoliofinanzen überwachen |  | Portfolio |  | FI, UE | PC.01.02, PC.01.04, PC.01.05 |
-| UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele | Portfolio | GL, VR | ZM.01.01, ZM.01.02, ZM.02.01, ZM.02.02, ZM.02.03, ZM.02.04, PP.04.03, PC.01.05 |
+| UC-009 | Ressourcen planen und zuteilen |  | Portfolio | Projekt | UE | RK.01.01, RK.01.02, RK.02.02, RK.02.03, RK.02.04 |
+| UC-010 | Portfoliofinanzen überwachen |  | Portfolio |  | UE | PC.01.02, PC.01.04, PC.01.05 |
+| UC-011 | Ziele im Jahreszyklus festlegen | ● | Ziele | Portfolio | GL, UE | ZM.01.01, ZM.01.02, ZM.02.01, ZM.02.02, ZM.02.03, ZM.02.04, PP.04.03, PC.01.05 |
 | UC-012 | Quartalsreporting an den VR erstellen |  | Ziele | Portfolio | UE, PRAT | ZM.03.01, ZM.03.02, PC.04.02 |
 | UC-013 | Jahresrückblick auswerten |  | Gremium | Ziele | PRAT | ZM.03.03, PS.04.03 |
 | UC-014 | Portfolio auswerten |  | Portfolio |  | PRAT, GLPA, DIR, UE | PC.04.01, PC.04.02, PC.04.03, PC.02.02 |
@@ -136,7 +136,7 @@ Nach CSP-Vorlage. Alle 18 Use Cases sind ausformuliert.
 
 #### Beschreibung
 - **Ausgangslage:** Aus dem Innovationsprozess, dem jährlichen Strategieprozess oder einem Bereich der Organisation entsteht eine Projektidee (Q8 Kap. 6.1).
-- **Use Case:** AS stellt die Idee nach Vorlage in den Ideenpool. UE prüft sie mit dem vorgesehenen Sponsor anhand der Leitfragen zum Eintritt P0, ordnet sie über das Kriterienraster einer Kategorie zu und legt sie dem zuständigen Gremium zur Freigabe der Initialisierung vor.
+- **Use Case:** AS stellt die Idee nach Vorlage in den Ideenpool. UE prüft sie mit der vorgesehenen Projektauftraggeber:in anhand der Leitfragen zum Eintritt P0, ordnet sie über das Kriterienraster einer Kategorie zu und legt sie dem zuständigen Gremium zur Freigabe der Initialisierung vor.
 - **Resultat:** Idee qualifiziert und der Kategorie A, B oder C zugeordnet; bei Freigabe Vorhaben in Phase P0 und Aufgabe «Projektvertrag erstellen» im Eingang der Projektleitung (UC-002); sonst Idee begründet zurückgewiesen oder zusammengeführt.
 - **User Interfaces:** Formular Projektidee; Ideenpool im Arbeitsraum Portfolio als Liste und Funnel «Pre-P0»; Eingang.
 
@@ -145,7 +145,7 @@ Nach CSP-Vorlage. Alle 18 Use Cases sind ausformuliert.
 |---|---|
 | AS | erfasst die Idee, ergänzt bei Rückfragen |
 | UE | prüft, führt zusammen, ordnet zu, traktandiert |
-| SP | vorgesehener Sponsor, qualifiziert mit |
+| AG | vorgesehene Projektauftraggeber:in, qualifiziert mit |
 | PRAT, GLPA | geben die Initialisierung frei |
 
 #### Vorbedingungen
@@ -159,13 +159,13 @@ Nach CSP-Vorlage. Alle 18 Use Cases sind ausformuliert.
 
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
-| 1 |  | AS legt eine neue Projektidee an. | System zeigt das Formular nach Vorlage: Ausgangslage, Zielsetzung, Strategiebezug (Handlungsfeld, strategisches Ziel), betroffene Bereiche, erste Einschätzung von Nutzen, Aufwand und Relevanz, Herkunft der Idee. |
+| 1 |  | AS legt eine neue Projektidee an. | System zeigt das Formular nach Vorlage: Ausgangslage, Zielsetzung, Strategiebezug (Handlungsfeld, strategisches Ziel), betroffene Bereiche, erste Einschätzung von Nutzen, Aufwand und Relevanz, Herkunft der Idee. Beim Ausfüllen zeigt es eingereichte Ideen mit gleichem Handlungsfeld oder gleichen betroffenen Bereichen; alle Mitglieder lesen eingereichte Ideen (Entscheid 14). |
 | 2 |  | AS füllt das Formular aus und reicht die Idee ein. | System prüft die Pflichtfelder, stellt die Idee in den Ideenpool und legt der UE eine Prüfaufgabe in den Eingang. |
 | 3 | A1 | UE öffnet die Idee. | System zeigt die Idee und ähnliche Ideen im Ideenpool mit gleichem Handlungsfeld oder gleichen betroffenen Bereichen. |
-| 4 | A2, A3 | UE und SP beantworten die Leitfragen zum Eintritt P0: strategische Relevanz, Projektziel, klinische Fragestellung, ICT-Einbindung, Infrastruktur. | System speichert die Antworten zur Idee. |
+| 4 | A2, A3 | UE und AG beantworten die Leitfragen zum Eintritt P0: strategische Relevanz, Projektziel, klinische Fragestellung, ICT-Einbindung, Infrastruktur. | System speichert die Antworten zur Idee. |
 | 5 | A4 | UE ordnet die Idee anhand des Kriterienrasters ein: strategisch, taktisch-operativ oder operativ. | System speichert die Kategorie A, B oder C und damit das zuständige Portfolio und Gremium. |
-| 6 |  | UE traktandiert die Freigabe der Initialisierung (UC-006). | System setzt die Idee auf die Traktandenliste des zuständigen Gremiums. |
-| 7 | A5 | Das Gremium gibt die Initialisierung frei; UE erfasst den Entscheid mit Sponsor und Projektleitung [OFFEN: Wer benennt Sponsor und Projektleitung?]. | System legt das Vorhaben in Phase P0 an, übernimmt die Angaben der Idee, informiert AS und legt der Projektleitung die Aufgabe «Projektvertrag erstellen» in den Eingang (UC-002). |
+| 6 | A6 | UE traktandiert die Freigabe der Initialisierung (UC-006). | System setzt die Idee auf die Traktandenliste des zuständigen Gremiums. |
+| 7 | A5 | Das Gremium gibt die Initialisierung frei; UE erfasst den Entscheid mit Projektauftraggeber:in und Projektleitung [OFFEN: Wer benennt Projektauftraggeber:in und Projektleitung?]. | System legt das Vorhaben in Phase P0 an, übernimmt die Angaben der Idee, schlägt Zugriff für die Projektleitung (Projekt führen) und die Projektauftraggeber:in (Projekt steuern) vor (Entscheid 16), informiert AS und legt der Projektleitung die Aufgabe «Projektvertrag erstellen» in den Eingang (UC-002). |
 
 **Alternativablauf**
 
@@ -186,7 +186,7 @@ Ende: weiter bei Schritt 4 mit der führenden Idee.
 
 Ende: weiter bei Schritt 3.
 
-**A3 Idee zurückweisen (ab Schritt 4):** Bedingung: Die Idee ist nicht strategisch relevant oder wird aus anderen Gründen nicht verfolgt [OFFEN: Darf die UE allein zurückweisen, oder entscheidet das Gremium?].
+**A3 Idee zurückweisen (ab Schritt 4):** Bedingung: Die Idee ist nicht strategisch relevant oder wird aus anderen Gründen nicht verfolgt. Ob die UE allein zurückweist oder das Gremium entscheidet, regelt die Organisation; das System verlangt keinen Gremiumsentscheid (G1) [OFFEN beim Referenzkunden: K07].
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
@@ -199,7 +199,7 @@ Ende: Use Case endet.
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
 | A4.1 |  | System weist die Idee dem Portfolio der zuständigen Direktion zu; Freigabe und Steuerung liegen dort, ohne Vorgaben des PM-Handbuchs (Q8 Kap. 1). |
-| A4.2 | Die Direktion gibt die Initialisierung frei und erfasst den Entscheid. | System legt das Vorhaben in Phase P0 an. |
+| A4.2 | Die Direktion gibt die Initialisierung frei; den Entscheid erfasst, wer das Portfolio führt: die Direktion selbst oder die UE (Entscheid 18). | System legt das Vorhaben in Phase P0 an. |
 
 Ende: weiter in UC-002.
 
@@ -211,6 +211,15 @@ Ende: weiter in UC-002.
 
 Ende: bei Rückstellung weiter bei Schritt 4; bei Ablehnung endet der Use Case.
 
+**A6 Initialisierung vor dem Entscheid (ab Schritt 6):** Bedingung: Die UE will das Vorhaben starten, bevor das Gremium entschieden hat (G1).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A6.1 | UE startet die Initialisierung. | System weist auf den ausstehenden Entscheid hin, legt das Vorhaben wie in Schritt 7 in Phase P0 an, mit dem Vermerk «Initialisierung nicht freigegeben», und lässt das Traktandum offen. |
+| A6.2 | Das Gremium entscheidet später; UE erfasst den Entscheid. | System ersetzt den Vermerk durch den Entscheid; bei Ablehnung weist es PL und AG auf das laufende Vorhaben hin. |
+
+Ende: weiter in UC-002; bei Ablehnung weiter in UC-015.
+
 ### UC-002 Projektvertrag erarbeiten und freigeben
 
 **Referenz Funktionsbaum:** DM.02.01 Projektvertrag erstellen, DM.02.02 Projektvertrag zur Prüfung einreichen, DM.02.03 Projektvertrag überarbeiten, DM.02.04 Projektvertrag zurückziehen, DM.02.05 Quality Review durchführen, DM.02.06 Projektvertrag freigeben, DM.02.07 Projektvertrag als Dokument ausgeben, PP.02.03 Abhängigkeiten zwischen Vorhaben erfassen, PP.02.05 Vorhaben mit strategischen Zielen verknüpfen, PP.04.04 Projektorganisation festlegen, PC.01.01 Projektbudget planen, PC.02.04 Projektrisiko erfassen, PC.03.01 Projekt-KPIs festlegen, PC.03.04 Business Case fortschreiben, PS.02.04 Meilensteinplan pflegen, PS.05.01 Stakeholder erfassen, PS.05.02 Kommunikationsplan erstellen, RK.02.01 Ressourcenbedarf anmelden, RK.02.06 ICT- und Infrastrukturbedarf anmelden
@@ -219,7 +228,7 @@ Ende: bei Rückstellung weiter bei Schritt 4; bei Ablehnung endet der Use Case.
 
 #### Beschreibung
 - **Ausgangslage:** Das Gremium hat die Initialisierung freigegeben (UC-001); das Vorhaben ist in Phase P0. Das System legt der Projektleitung die Aufgabe «Projektvertrag erstellen» in den Eingang.
-- **Use Case:** PL erarbeitet mit Sponsor und CTL den Projektvertrag für Phase P1 und den initialen Business Case, bei Bedarf gestützt auf eine Vorstudie. UE führt den Quality-Check durch, Sponsor, PL und CTL unterzeichnen, und das zuständige Gremium gibt am Gate P0–P1 den Vertrag und die Phase P1 frei.
+- **Use Case:** PL erarbeitet mit der Projektauftraggeber:in den Projektvertrag für Phase P1 und den initialen Business Case, bei Bedarf gestützt auf eine Vorstudie. UE führt den Quality-Check durch, AG und PL unterzeichnen, und das zuständige Gremium gibt am Gate P0–P1 den Vertrag und die Phase P1 frei. Quality-Check, Unterschriften und Freigabe sind Vermerke, die den Ablauf nicht anhalten (G1).
 - **Resultat:** Projektvertrag P1 freigegeben und als erste Baseline gespeichert; Projektorganisation, Ziele, Meilensteine, Budget, Ressourcenbedarf, Risiken, KPIs, Stakeholder und Kommunikation erfasst; ICT- und Infrastrukturbedarf gemeldet; Vorhaben in P1; Vertrag als Dokument verfügbar.
 - **User Interfaces:** Eingang; Projektakte mit den Kapiteln des Projektvertrags; Dokumentausgabe im Layout der Vorlage; Traktandum im Arbeitsraum Gremium.
 
@@ -227,8 +236,7 @@ Ende: bei Rückstellung weiter bei Schritt 4; bei Ablehnung endet der Use Case.
 | Akteur | Rolle im Use Case |
 |---|---|
 | PL | erarbeitet den Vertrag, reicht ein, unterzeichnet |
-| SP | legt mit PL die Projektorganisation fest, stimmt ab, unterzeichnet |
-| CTL | bringt Zielbild und klinische Anforderungen ein, unterzeichnet |
+| AG | Projektauftraggeber:in; legt mit PL die Projektorganisation fest, stimmt ab, unterzeichnet |
 | UE | führt den Quality-Check durch, traktandiert |
 | PRAT, SNS, GLPA | geben am Gate P0–P1 frei |
 
@@ -244,15 +252,15 @@ Ende: bei Rückstellung weiter bei Schritt 4; bei Ablehnung endet der Use Case.
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
 | 1 |  | PL öffnet die Aufgabe im Eingang. | System legt den Projektvertrag in Version 0.1 mit Status «in Arbeit» an und übernimmt Ausgangslage, Zielsetzung und Strategiebezug aus der Projektidee. |
-| 2 |  | PL und SP legen die Projektorganisation fest: Sponsor, Sponsoren-Koalition, PL, CTL und Kernteam mit AKV. | System speichert die Rollen und gibt den benannten Personen Zugriff auf das Vorhaben. |
+| 2 |  | PL und AG legen die Projektorganisation fest: Projektauftraggeber:in, Projektleitung und weitere Personen mit Funktion und AKV. | System schlägt für weitere Funktionen vor, was in der Organisation schon verwendet wird (z. B. Kernteam, PMO; Entscheid 17), und speichert die Projektorganisation als Kapitel des Projektvertrags. Den Zugriff ändert das nicht (Entscheid 16); hat PL oder AG keinen Zugriff auf das Vorhaben, weist das System darauf hin und bietet «Zugriff geben» an. |
 | 3 |  | PL erfasst Ausgangslage, Ziele und Nutzenbeitrag, Lösungsansatz und Abgrenzung und ordnet das Vorhaben einem strategischen Ziel und allenfalls einem Jahresziel zu. | System verknüpft das Vorhaben mit dem Ziel; es erscheint im Arbeitsraum Ziele. |
 | 4 |  | PL erfasst den initialen Business Case mit Kosten und Nutzen und die Projekt-KPIs mit Zielwert; eine Vorstudie legt PL als Beilage ab. | System speichert Business Case P0, KPIs und Beilage. |
-| 5 |  | PL erfasst Abhängigkeiten zu anderen Vorhaben mit Ansprechperson. | System zeigt die Abhängigkeit auch beim anderen Vorhaben. |
+| 5 |  | PL erfasst Abhängigkeiten zu anderen Vorhaben mit Ansprechperson. | System bietet alle aufgelisteten Vorhaben zur Auswahl an (Entscheid 14) und zeigt die Abhängigkeit auch beim anderen Vorhaben. |
 | 6 | A1 | PL plant Meilensteine und Lieferergebnisse je Phase, Kosten je Phase (CAPEX/OPEX) und den Personalbedarf. | System schlägt die Standard-Lieferergebnisse und -Meilensteine der Phase vor (AM.02.03) und stellt den Bedarf der Ressourcenplanung bereit (UC-009). |
 | 7 | A2 | PL erfasst Risiken mit Eintrittswahrscheinlichkeit, Auswirkung und Massnahme sowie Stakeholder und Kommunikationsmassnahmen. | System speichert sie im Risikoregister und im Kommunikationsplan des Vorhabens. |
-| 8 | A3, A4 | PL reicht den Vertrag zur Prüfung ein. | System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality-Check in den Eingang. |
-| 9 | A5 | UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt. | System legt SP, PL und CTL je eine Unterzeichnungsaufgabe an. |
-| 10 |  | SP, PL und CTL unterzeichnen. | System setzt das Vorhaben auf die Traktandenliste des Gate-Reviews P0–P1 beim zuständigen Gremium (UC-006). |
+| 8 | A3, A4, A7 | PL reicht den Vertrag zur Prüfung ein. | System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality-Check in den Eingang. |
+| 9 | A5 | UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt. | System vermerkt den Quality-Check und legt AG und PL je eine Unterzeichnungsaufgabe an. |
+| 10 |  | AG und PL unterzeichnen. | System vermerkt die Unterschriften und setzt das Vorhaben auf die Traktandenliste des Gate-Reviews P0–P1 beim zuständigen Gremium (UC-006). |
 | 11 | A6 | Das Gremium gibt Vertrag und Phase P1 frei; UE erfasst den Entscheid. | System setzt den Status «abgenommen», speichert die Version als Baseline, wechselt in Phase P1 und aktualisiert das Dashboard. |
 | 12 |  | PL gibt den Vertrag als Dokument aus. | System erzeugt das Dokument im Layout der Vorlage mit Versionierung und Freigabe. |
 
@@ -283,11 +291,11 @@ Ende: weiter bei Schritt 8.
 
 Ende: weiter bei Schritt 8.
 
-**A4 Vorhaben zurückziehen (ab Schritt 8):** Bedingung: Der Sponsor will das Vorhaben nicht weiterverfolgen.
+**A4 Vorhaben zurückziehen (ab Schritt 8):** Bedingung: Die Projektauftraggeber:in will das Vorhaben nicht weiterverfolgen.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A4.1 | SP zieht das Vorhaben mit Begründung zurück. | System schliesst Vertrag und Vorhaben als «zurückgezogen», gibt den Ressourcenbedarf frei und informiert die UE. |
+| A4.1 | AG zieht das Vorhaben mit Begründung zurück. | System schliesst Vertrag und Vorhaben als «zurückgezogen», gibt den Ressourcenbedarf frei und informiert die UE. |
 
 Ende: Use Case endet.
 
@@ -303,9 +311,18 @@ Ende: weiter bei Schritt 3.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A6.1 | UE erfasst Entscheid und Auflagen. | System informiert PL und SP; das Vorhaben bleibt in P0. |
+| A6.1 | UE erfasst Entscheid und Auflagen. | System informiert PL und AG; das Vorhaben bleibt in P0. |
 
 Ende: bei Auflagen weiter bei Schritt 3; bei Ablehnung weiter in UC-015.
+
+**A7 Weiter ohne Vermerk (ab Schritt 8):** Bedingung: PL will den Vertrag dem Gremium vorlegen oder Phase P1 beginnen, bevor Quality-Check, Unterschriften oder Freigabe vorliegen (G1).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A7.1 |  | System zeigt, welche Vermerke fehlen. |
+| A7.2 | PL legt den Vertrag trotzdem vor oder wechselt in Phase P1. | System setzt das Traktandum bzw. die Phase mit dem Vermerk «Quality-Check offen», «Unterschrift offen» oder «ohne Freigabe»; die Aufgaben bleiben im Eingang, bis die Vermerke nachgetragen sind. |
+
+Ende: weiter bei Schritt 11 bzw. in UC-003.
 
 ### UC-003 Gate-Übergang durchführen
 
@@ -315,7 +332,7 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Ablehnung weiter in UC-015.
 
 #### Beschreibung
 - **Ausgangslage:** Eine Phase nähert sich dem Ende. Der nächste Gate-Review ist im Projektvertrag eingeplant (Kap. 7.2); das System legt der Projektleitung eine Gate-Aufgabe in den Eingang.
-- **Use Case:** PL schreibt Projektvertrag und Business Case für die nächste Phase fort und beantwortet die Leitfragen des Gates. UE führt den Quality-Check durch, Sponsor, PL und CTL unterzeichnen. Das zuständige Gremium entscheidet am Gate und gibt damit den Vertrag für die nächste Phase frei: der PRAT, in P0 und P1 bis zur Freigabe von P2 zusätzlich der SNS-VR, bei Kategorie B die GLPA.
+- **Use Case:** PL schreibt Projektvertrag und Business Case für die nächste Phase fort und beantwortet die Leitfragen des Gates. UE führt den Quality-Check durch, Projektauftraggeber:in und PL unterzeichnen. Das zuständige Gremium entscheidet am Gate und gibt damit den Vertrag für die nächste Phase frei: der PRAT, in P0 und P1 bis zur Freigabe von P2 zusätzlich der SNS-VR, bei Kategorie B die GLPA. Quality-Check, Unterschriften und Gate-Entscheid sind Vermerke: Fehlt einer, weist das System darauf hin, hält den Ablauf aber nicht an (G1).
 - **Resultat:** Neue Vertragsversion freigegeben und als Baseline gespeichert, Gate-Entscheid mit Datum dokumentiert, Vorhaben in der nächsten Phase, Dashboard aktuell.
 - **User Interfaces:** Eingang; Projektakte im Gate-Modus mit Vertragskapiteln, Leitfragen und Versionsvergleich; Traktandum im Arbeitsraum Gremium.
 
@@ -324,7 +341,7 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Ablehnung weiter in UC-015.
 |---|---|
 | PL | löst aus, schreibt Vertrag und Business Case fort, beantwortet Leitfragen, unterzeichnet |
 | UE | führt den Quality-Check durch, stellt das Gate Review Packet bereit |
-| SP, CTL | stimmen die Vorlage ab und unterzeichnen |
+| AG | Projektauftraggeber:in; stimmt die Vorlage ab und unterzeichnet |
 | PRAT, SNS, GLPA | entscheiden am Gate je nach Phase und Kategorie und geben den Vertrag frei |
 
 #### Vorbedingungen
@@ -343,11 +360,11 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Ablehnung weiter in UC-015.
 | 3 | A1, A2 | PL ergänzt die Kapitel, etwa Planung, Kosten je Phase, Personal, Risiken, Stakeholder und Kommunikation, und schreibt den Business Case fort. | System speichert und zeigt laufend die Abweichungen zur Baseline. |
 | 4 |  | PL beantwortet die Leitfragen des Gates. | System speichert die Antworten zur Version. |
 | 5 |  | PL prüft die Zusammenfassung der Hauptänderungen und ergänzt «Andere». | System erzeugt die Hauptänderungen zu Scope, Zeitplan, Ressourcen/Budget, Annahmen und Key-Risiken aus dem Versionsvergleich. |
-| 6 | A3 | PL reicht den Vertrag zur Prüfung ein. | System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality-Check in den Eingang. |
-| 7 | A4 | UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt. | System protokolliert den Quality-Check und legt SP, PL und CTL je eine Unterzeichnungsaufgabe an. |
-| 8 | A5 | SP, PL und CTL unterzeichnen. | System protokolliert die Unterzeichnung und setzt das Vorhaben auf die Traktandenliste des nächsten Gate-Reviews des zuständigen Gremiums. |
+| 6 | A3, A7 | PL reicht den Vertrag zur Prüfung ein. | System prüft die Pflichtangaben der Phase, setzt den Status «in Prüfung» und legt der UE die Aufgabe Quality-Check in den Eingang. |
+| 7 | A4 | UE prüft Vollständigkeit und Einhaltung des PM-Handbuchs und bestätigt. | System vermerkt den Quality-Check und legt AG und PL je eine Unterzeichnungsaufgabe an. |
+| 8 | A5 | AG und PL unterzeichnen. | System vermerkt die Unterschriften und setzt das Vorhaben auf die Traktandenliste des nächsten Gate-Reviews des zuständigen Gremiums. |
 | 9 |  | UE stellt das Gate Review Packet spätestens 5 Arbeitstage vor der Sitzung bereit (UC-006). | System stellt das Packet aus Vertrag, Business Case, Leitfragen und Hauptänderungen zusammen. |
-| 10 | A6 | Das Gremium gibt die nächste Phase und den Vertrag frei; UE erfasst den Entscheid. | System speichert den Entscheid, setzt den Status «abgenommen» und die Version als neue Baseline, wechselt die Phase, aktualisiert das Dashboard und informiert PL und SP. |
+| 10 | A6 | Das Gremium gibt die nächste Phase und den Vertrag frei; UE erfasst den Entscheid. | System speichert den Entscheid, setzt den Status «abgenommen» und die Version als neue Baseline, wechselt die Phase, aktualisiert das Dashboard und informiert PL und AG. |
 
 **Alternativablauf**
 
@@ -365,7 +382,7 @@ Ende: weiter bei Schritt 4.
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
 | A2.1 |  | System zeigt die Projekt-KPIs mit Zielwert und den nachgeführten Ist-Werten (PC.03.03). |
-| A2.2 | PL und SP erfassen erreichte Werte und Beurteilung. | System speichert die Nutzenprüfung. Beim Exit-Gate P4 weiter in UC-015. |
+| A2.2 | PL und AG erfassen erreichte Werte und Beurteilung. | System speichert die Nutzenprüfung. Beim Exit-Gate P4 weiter in UC-015. |
 
 Ende: weiter bei Schritt 4.
 
@@ -386,21 +403,30 @@ Ende: weiter bei Schritt 6.
 
 Ende: weiter bei Schritt 3.
 
-**A5 Freigabe verweigert (ab Schritt 8):** Bedingung: SP, PL oder CTL unterzeichnet nicht.
+**A5 Unterschrift verweigert (ab Schritt 8):** Bedingung: AG oder PL unterzeichnet nicht.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A5.1 | Rolle erfasst die Begründung. | System setzt den Status «in Arbeit» und informiert PL. |
+| A5.1 | AG bzw. PL erfasst die Begründung. | System vermerkt die Verweigerung am Vertrag und am Traktandum und informiert PL. |
 
-Ende: weiter bei Schritt 3.
+Ende: weiter bei Schritt 3, wenn PL nachbessert, sonst bei Schritt 9.
 
 **A6 Gremium gibt nicht frei (ab Schritt 10):** Bedingung: Das Gremium stellt zurück, erteilt Auflagen oder stoppt.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A6.1 | UE erfasst Entscheid und Auflagen. | System informiert PL und SP; die Baseline bleibt unverändert. |
+| A6.1 | UE erfasst Entscheid und Auflagen. | System informiert PL und AG; die Baseline bleibt unverändert. |
 
 Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
+
+**A7 Weiter ohne Vermerk (ab Schritt 6):** Bedingung: PL will den Vertrag dem Gremium vorlegen oder die nächste Phase beginnen, bevor Quality-Check, Unterschriften oder Gate-Entscheid vorliegen (G1).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A7.1 |  | System zeigt, welche Vermerke fehlen. |
+| A7.2 | PL legt den Vertrag trotzdem vor oder wechselt die Phase. | System setzt das Traktandum bzw. die Phase mit dem Vermerk «Quality-Check offen», «Unterschrift offen» oder «ohne Gate-Entscheid»; die Aufgaben bleiben im Eingang, bis die Vermerke nachgetragen sind. |
+
+Ende: weiter bei Schritt 9 bzw. in der nächsten Phase.
 
 ### UC-004 Monatlich berichten
 
@@ -419,7 +445,7 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
 |---|---|
 | PL | löst aus, aktualisiert die Daten, reicht ein |
 | UE | erhält den Bericht zur Prüfung (UC-005) |
-| SP | wird bei Status «kritisch» informiert; gibt den Bericht nicht frei |
+| AG | Projektauftraggeber:in; wird bei Status «kritisch» informiert, gibt den Bericht nicht frei |
 
 #### Vorbedingungen
 - PL ist angemeldet und für das Vorhaben berechtigt (AM.01.02).
@@ -439,7 +465,7 @@ Ende: bei Auflagen weiter bei Schritt 3; bei Stopp weiter in UC-015.
 | 5 |  | PL meldet erledigte Kommunikationsmassnahmen. | System setzt sie auf erledigt. |
 | 6 |  | PL erfasst ab der Implementierung die Ist-Werte der Projekt-KPIs. | System speichert sie zum Zielwert. |
 | 7 | A2 | PL wählt Status (im Plan/kritisch) und Trend, beurteilt die Abweichungen bei Inhalt, Termin, Ressourcen und Budget und erfasst nächsten Meilenstein, Abhängigkeiten und anstehende Entscheide. | System prüft die Pflichtangaben des Berichts. |
-| 8 |  | PL reicht den Bericht ein. | System speichert den Bericht als Stand der Periode, aktualisiert das Dashboard und legt der UE die Prüfaufgabe an; die UE konsolidiert bis Monatsende (UC-005). |
+| 8 | A4 | PL reicht den Bericht ein. | System speichert den Bericht als Stand der Periode, aktualisiert das Dashboard und legt der UE die Prüfaufgabe an; die UE konsolidiert bis Monatsende (UC-005). |
 
 **Alternativablauf**
 
@@ -457,7 +483,7 @@ Ende: weiter bei Schritt 3.
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
 | A2.1 |  | System verlangt Begründung und Massnahme. |
-| A2.2 | PL erfasst beides und hält fest, ob ein Entscheid des PRAT nötig ist. | System markiert das Vorhaben im Dashboard, informiert SP und UE und legt bei Entscheidbedarf eine Eskalation an (PS.03.03, UC-006). |
+| A2.2 | PL erfasst beides und hält fest, ob ein Entscheid des PRAT nötig ist. | System markiert das Vorhaben im Dashboard, informiert AG und UE und legt bei Entscheidbedarf eine Eskalation an (PS.03.03, UC-006). |
 
 Ende: weiter bei Schritt 8.
 
@@ -468,6 +494,14 @@ Ende: weiter bei Schritt 8.
 | A3.1 |  | System erinnert PL und zeigt der UE den fehlenden Bericht (PS.01.03). |
 
 Ende: weiter bei Schritt 1.
+
+**A4 Bericht nach dem Einreichen ändern (ab Schritt 8):** Bedingung: PL korrigiert einen bereits eingereichten Bericht (G2).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A4.1 | PL ändert den Bericht. | System speichert eine neue Version mit dem Vermerk «geändert nach Einreichen», zeigt der UE die Änderung und aktualisiert das Dashboard; eine bereits erfolgte Prüfung bleibt bei der früheren Version sichtbar. |
+
+Ende: Use Case endet.
 
 ### UC-005 Statusberichte prüfen und nachverfolgen
 
@@ -502,7 +536,7 @@ Ende: weiter bei Schritt 1.
 | 2 |  | UE öffnet einen eingereichten Bericht. | System zeigt den Bericht im Vergleich zur Vorperiode und zur Baseline und markiert Auffälligkeiten: Status geändert, Termine verschoben, Prognose über Budget. |
 | 3 | A2 | UE prüft die Plausibilität und bestätigt den Bericht. | System setzt den Bericht auf «geprüft». UE wiederholt Schritte 2 und 3 für alle eingereichten Berichte. |
 | 4 |  | UE analysiert die Terminabweichungen über alle Vorhaben. | System vergleicht je Vorhaben Baseline und aufdatierte Phasen- und Abschlusstermine und zeigt die Abweichungen nach Grösse sortiert. |
-| 5 | A3 | UE schliesst die Periode bis Monatsende ab. | System prüft, dass alle Berichte geprüft sind, finalisiert das Dashboard und stellt es ab dem 1. den Gremien bereit. |
+| 5 | A3, A4 | UE schliesst die Periode bis Monatsende ab. | System weist auf ungeprüfte Berichte hin; schliesst die UE trotzdem ab, tragen sie den Vermerk «nicht geprüft» (G1). Das System finalisiert das Dashboard und stellt es ab dem 1. den Gremien bereit. |
 
 **Alternativablauf**
 
@@ -531,6 +565,14 @@ Ende: weiter bei Schritt 2.
 
 Ende: Use Case endet.
 
+**A4 Änderung nach dem Abschluss (ab Schritt 5):** Bedingung: PL ändert einen Bericht einer abgeschlossenen Periode oder reicht ihn nach (G2).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A4.1 | PL ändert oder reicht nach. | System speichert eine neue Version mit dem Vermerk «geändert nach Abschluss», zeigt die Änderung im Dashboard der Periode und informiert die UE. |
+
+Ende: Use Case endet.
+
 ### UC-006 PRAT-Sitzung vorbereiten und durchführen
 
 **Referenz Funktionsbaum:** PP.04.01 Entscheidungsvorlage vorbereiten, PP.04.02 Portfolioentscheid erfassen, PP.04.05 Gate-Reviews einplanen, PS.02.02 Phasenfreigabe entscheiden, PS.02.03 Meilenstein abnehmen, PS.03.03 Eskalation behandeln, PS.04.02 Vorhaben sistieren oder abbrechen, PC.02.02 Risikolage des Portfolios beurteilen
@@ -548,8 +590,8 @@ Ende: Use Case endet.
 |---|---|
 | UE | bereitet vor, versendet Unterlagen, berichtet als Programmleitung, erfasst Entscheide, versendet das Protokoll |
 | PRAT | berät und entscheidet |
-| PL, CTL | stellen das Geschäft ihres Vorhabens vor |
-| SP | hat die Vorlage vorab abgestimmt, vertritt das Vorhaben |
+| PL | stellt das Geschäft des Vorhabens vor |
+| AG | Projektauftraggeber:in; hat die Vorlage vorab abgestimmt, vertritt das Vorhaben |
 
 #### Vorbedingungen
 - UE ist angemeldet und für das Gremium PRAT berechtigt (AM.01.02).
@@ -563,12 +605,12 @@ Ende: Use Case endet.
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
 | 1 |  | UE öffnet die Aufgabe «Sitzung vorbereiten» im Eingang. | System öffnet die Sitzung im Arbeitsraum Gremium mit Traktandenvorschlägen: Portfoliobericht, eingeplante Gate-Reviews, anstehende Meilensteinabnahmen, Eskalationen, Änderungen mit Wirkung auf Scope, Budget oder Ressourcen, Priorisierungs- und Szenarioentscheide. |
-| 2 | A1 | UE stellt die Traktandenliste zusammen und lädt je Geschäft PL, CTL und SP ein. | System legt die Traktanden mit Zeitbedarf an, für ein Gate-Review rund 35 Minuten (Präsentation 20, Diskussion 10, Entscheid 5), und informiert die Eingeladenen. |
-| 3 | A2 | UE prüft je Traktandum, ob die Unterlagen vollständig sind und den Quality-Check bestanden haben (UC-003). | System zeigt je Traktandum den Stand der Unterlagen. |
+| 2 | A1 | UE stellt die Traktandenliste zusammen und lädt je Geschäft PL und AG sowie bei Bedarf weitere Personen ein. | System legt die Traktanden mit Zeitbedarf an, für ein Gate-Review rund 35 Minuten (Präsentation 20, Diskussion 10, Entscheid 5), und informiert die Eingeladenen. |
+| 3 | A2 | UE prüft je Traktandum, ob die Unterlagen vollständig sind und den Quality-Check bestanden haben (UC-003). | System zeigt je Traktandum den Stand der Unterlagen und offene Vermerke wie Quality-Check oder Unterschriften. |
 | 4 |  | UE stellt den Portfoliobericht zusammen. | System erzeugt ihn aus dem Dashboard: Gesamtstatus, Status und Trend je Vorhaben, Risikolage, Abhängigkeiten, Eskalationen, anstehende Meilensteine, Freigaben und Abnahmen. |
-| 5 |  | UE versendet die Unterlagen spätestens 5 Arbeitstage vor der Sitzung. | System stellt Traktandenliste, Portfoliobericht und Gate Review Packets den PRAT-Mitgliedern im Arbeitsraum Gremium bereit und protokolliert den Versand. |
+| 5 |  | UE versendet die Unterlagen spätestens 5 Arbeitstage vor der Sitzung. | System stellt Traktandenliste, Portfoliobericht und Gate Review Packets den PRAT-Mitgliedern im Arbeitsraum Gremium bereit und protokolliert den Versand. Traktanden und Unterlagen bleiben änderbar; Änderungen nach dem Versand markiert das System für die Teilnehmenden (G2). |
 | 6 |  | In der Sitzung berichtet UE über das Portfolio. | System zeigt Dashboard und Risikolage des Portfolios. |
-| 7 | A3, A4 | Je Traktandum stellen PL und CTL das Geschäft vor, der PRAT berät und entscheidet, UE erfasst den Entscheid mit Begründung. | System speichert den Entscheid am Traktandum und am Vorhaben und löst die Folgeschritte aus: Gate freigegeben (UC-003), Meilenstein abgenommen, Änderung freigegeben (UC-007), Eskalation erledigt, Priorisierung festgehalten, Vorhaben sistiert oder abgebrochen (UC-015). |
+| 7 | A3, A4 | Je Traktandum stellt PL das Geschäft vor, der PRAT berät und entscheidet, UE erfasst den Entscheid mit Begründung. | System speichert den Entscheid am Traktandum und am Vorhaben und löst die Folgeschritte aus: Gate freigegeben (UC-003), Meilenstein abgenommen, Änderung freigegeben (UC-007), Eskalation erledigt, Priorisierung festgehalten, Vorhaben sistiert oder abgebrochen (UC-015). |
 | 8 |  | UE schliesst die Sitzung. | System erzeugt den Protokollentwurf aus Traktanden und Entscheiden und aktualisiert das Dashboard. |
 | 9 |  | UE bereinigt das Protokoll und versendet es innert 2–3 Arbeitstagen. | System versendet es an den PRAT und die Beteiligten und schlägt nicht behandelte Traktanden für die nächste Sitzung vor. |
 
@@ -579,15 +621,16 @@ Ende: Use Case endet.
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
 | A1.1 |  | System markiert das Traktandum «via SNS-VR». |
-| A1.2 | UE erfasst in Schritt 7 die Stellungnahme des PRAT. | System legt das Geschäft dem SNS-VR vor; der Entscheid gilt erst mit dem SNS-VR [OFFEN: Ablauf und Erfassung im SNS-VR]. |
+| A1.2 | UE erfasst in Schritt 7 die Stellungnahme des PRAT. | System legt das Geschäft dem SNS-VR vor und vermerkt, dass dessen Entscheid aussteht [OFFEN: Ablauf und Erfassung im SNS-VR]. |
 
 Ende: weiter bei Schritt 3.
 
-**A2 Unterlagen fehlen (ab Schritt 3):** Bedingung: Das Gate Review Packet liegt 5 Arbeitstage vor der Sitzung nicht vor oder hat den Quality-Check nicht bestanden.
+**A2 Unterlagen fehlen (ab Schritt 3):** Bedingung: Das Gate Review Packet liegt 5 Arbeitstage vor der Sitzung nicht vor, oder Quality-Check oder Unterschriften fehlen.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A2.1 | UE verschiebt das Traktandum auf die nächste Sitzung. | System informiert PL und SP und plant das Traktandum neu ein. |
+| A2.1 |  | System weist am Traktandum darauf hin. |
+| A2.2 | UE verschiebt das Traktandum auf die nächste Sitzung oder lässt es mit dem Vermerk stehen (G1). | System plant das Traktandum neu ein bzw. zeigt den Vermerk in Unterlagen und Protokoll und informiert PL und AG. |
 
 Ende: weiter bei Schritt 3 mit dem nächsten Traktandum.
 
@@ -615,7 +658,7 @@ Ende: weiter bei Schritt 7 mit dem nächsten Traktandum.
 
 #### Beschreibung
 - **Ausgangslage:** Während einer Phase zeichnet sich eine wesentliche Änderung an Zielen, Umfang, Terminen, Ressourcen oder Budget ab, etwa aus dem Monatsbericht (UC-004 A1). Wesentliche Änderungen sind im Projektvertrag nachzuführen und zur Entscheidung vorzulegen (Q7) [OFFEN: Schwelle für «wesentlich»].
-- **Use Case:** PL beantragt die Änderung als neue Vertragsversion mit Begründung und Auswirkungen. Der Sponsor entscheidet; Änderungen an Scope, Budget oder Ressourcen gibt der PRAT frei (Q8 Kap. 8.5). Mit der Freigabe wird die Baseline nachgeführt.
+- **Use Case:** PL beantragt die Änderung als neue Vertragsversion mit Begründung und Auswirkungen. Die Projektauftraggeber:in entscheidet; Änderungen an Scope, Budget oder Ressourcen gibt der PRAT frei (Q8 Kap. 8.5). Mit der Freigabe wird die Baseline nachgeführt. Beide Entscheide sind Vermerke: PL kann die Änderung übernehmen, bevor sie vorliegen (G1).
 - **Resultat:** Änderung entschieden und begründet; bei Freigabe neue Vertragsversion als Baseline mit dokumentierten Hauptänderungen; Planung und Dashboard aktuell.
 - **User Interfaces:** Projektakte mit Änderungsantrag und Versionsvergleich; Eingang; Traktandum im Arbeitsraum Gremium.
 
@@ -623,7 +666,7 @@ Ende: weiter bei Schritt 7 mit dem nächsten Traktandum.
 | Akteur | Rolle im Use Case |
 |---|---|
 | PL | beantragt, beschreibt die Auswirkungen |
-| SP | entscheidet oder unterstützt den Antrag an den PRAT |
+| AG | Projektauftraggeber:in; entscheidet oder unterstützt den Antrag an den PRAT |
 | UE | traktandiert Anträge für den PRAT |
 | PRAT | gibt Änderungen an Scope, Budget oder Ressourcen frei |
 
@@ -639,8 +682,8 @@ Ende: weiter bei Schritt 7 mit dem nächsten Traktandum.
 |---|---|---|---|
 | 1 |  | PL legt einen Änderungsantrag an. | System legt eine neue Vertragsversion als Entwurf an. |
 | 2 |  | PL passt die betroffenen Kapitel an und begründet die Änderung. | System zeigt den Vergleich zur Baseline und erzeugt die Hauptänderungen zu Scope, Zeitplan, Ressourcen/Budget, Annahmen und Key-Risiken. |
-| 3 |  | PL reicht den Antrag ein. | System legt dem SP eine Entscheidaufgabe in den Eingang. |
-| 4 | A1, A2 | SP prüft den Antrag mit dem Versionsvergleich und gibt die Änderung frei. | System speichert den Entscheid, setzt die Version als neue Baseline, aktualisiert Planung und Dashboard und informiert PL und UE. |
+| 3 | A3 | PL reicht den Antrag ein. | System legt der AG eine Entscheidaufgabe in den Eingang; fehlt in der Projektorganisation eine Projektauftraggeber:in, weist es darauf hin. |
+| 4 | A1, A2 | AG prüft den Antrag mit dem Versionsvergleich und gibt die Änderung frei. | System vermerkt den Entscheid, setzt die Version als neue Baseline, aktualisiert Planung und Dashboard und informiert PL und UE. |
 
 **Alternativablauf**
 
@@ -648,18 +691,27 @@ Ende: weiter bei Schritt 7 mit dem nächsten Traktandum.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A1.1 | SP unterstützt den Antrag. | System setzt ihn auf die Traktandenliste des PRAT (UC-006). |
+| A1.1 | AG unterstützt den Antrag. | System setzt ihn auf die Traktandenliste des PRAT (UC-006). |
 | A1.2 | Der PRAT entscheidet; UE erfasst den Entscheid. | System verfährt bei Freigabe wie in Schritt 4, bei Ablehnung wie in A2. |
 
 Ende: Use Case endet.
 
-**A2 Änderung abgelehnt (ab Schritt 4):** Bedingung: SP oder PRAT lehnen die Änderung ab.
+**A2 Änderung abgelehnt (ab Schritt 4):** Bedingung: AG oder PRAT lehnen die Änderung ab.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A2.1 | Die entscheidende Rolle erfasst die Begründung. | System verwirft den Entwurf, die Baseline bleibt unverändert; PL wird informiert. |
+| A2.1 | AG bzw. UE für den PRAT erfasst die Begründung. | System vermerkt die Ablehnung und verwirft den Entwurf, die Baseline bleibt unverändert; PL wird informiert. |
 
 Ende: Use Case endet; bei Bedarf Eskalation (UC-006).
+
+**A3 Änderung vor dem Entscheid übernehmen (ab Schritt 3):** Bedingung: PL will mit der geänderten Planung weiterarbeiten, bevor AG oder PRAT entschieden haben (G1).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A3.1 | PL übernimmt die Änderung. | System weist auf den ausstehenden Entscheid hin, setzt die Version als neue Baseline mit dem Vermerk «nicht freigegeben» und lässt die Entscheidaufgabe offen. |
+| A3.2 | AG oder PRAT entscheiden später. | System ersetzt den Vermerk durch den Entscheid; bei Ablehnung zeigt es die Ablehnung an der Baseline, und PL beantragt eine Gegenänderung. |
+
+Ende: Use Case endet.
 
 ### UC-008 Portfolio priorisieren und ausbalancieren
 
@@ -670,16 +722,14 @@ Ende: Use Case endet; bei Bedarf Eskalation (UC-006).
 #### Beschreibung
 - **Ausgangslage:** Neue Vorhaben sind zur Initialisierung freigegeben, Budget- oder Kapazitätsrahmen ändern sich, oder der Jahreszyklus verlangt eine Neupriorisierung (Q6 F2). UE bereitet die Priorisierung für das zuständige Gremium vor.
 - **Use Case:** UE bewertet die Vorhaben nach den Kriterien des Bewertungsmodells, erfasst Abhängigkeiten und Portfoliorisiken, beurteilt das Portfolio in der Matrixsicht und spielt Szenarien gegen Budget und Kapazität durch. Das Gremium entscheidet über Rangfolge und Szenario.
-- **Resultat:** Bewertung je Vorhaben, Rangfolge je Portfolio und gewähltes Szenario entschieden und dokumentiert; Wasserlinie sichtbar; betroffene Sponsoren und Projektleitungen informiert.
+- **Resultat:** Bewertung je Vorhaben, Rangfolge je Portfolio und gewähltes Szenario entschieden und dokumentiert; Wasserlinie sichtbar; betroffene Projektauftraggeber:innen und Projektleitungen informiert.
 - **User Interfaces:** Arbeitsraum Portfolio: Liste, Bewertungsmaske, Matrix (Nutzen/Risiko, Ressourcen/Nutzen), Szenariovergleich mit Wasserlinie, Auslastung; Traktandum im Arbeitsraum Gremium.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| UE | bewertet, erstellt Szenarien, bereitet den Entscheid vor |
+| UE | bewertet, erstellt Szenarien, führt Budgetrahmen und Kapazitätsangebot, bereitet den Entscheid vor |
 | PRAT | legt das Bewertungsmodell fest, entscheidet Rangfolge und Szenario |
-| FI | liefert Budgetrahmen |
-| RM | liefert Kapazitätsangebot und Auslastung |
 
 #### Vorbedingungen
 - UE ist angemeldet und für das Portfolio berechtigt (AM.01.02).
@@ -698,7 +748,7 @@ Ende: Use Case endet; bei Bedarf Eskalation (UC-006).
 | 5 |  | UE erstellt ein oder mehrere Szenarien mit Reihenfolge und Startzeitpunkten. | System rechnet je Szenario Budget- und Kapazitätsbedarf gegen den Rahmen, zieht die Wasserlinie und zeigt Engpässe; der Ist-Stand des Portfolios bleibt unverändert. |
 | 6 |  | UE vergleicht die Szenarien und wählt einen Antrag. | System stellt die Szenarien nach Kosten, Nutzen, Risiko und Strategiebeitrag nebeneinander und erzeugt die Entscheidungsvorlage. |
 | 7 |  | UE traktandiert den Antrag (UC-006). | System setzt ihn auf die Traktandenliste des zuständigen Gremiums. |
-| 8 | A2 | Das Gremium entscheidet über Rangfolge und Szenario; UE erfasst den Entscheid. | System übernimmt Rangfolge und Szenario als Ist-Stand des Portfolios und informiert die betroffenen Sponsoren und Projektleitungen. |
+| 8 | A2 | Das Gremium entscheidet über Rangfolge und Szenario; UE erfasst den Entscheid. | System übernimmt Rangfolge und Szenario als Ist-Stand des Portfolios und informiert die betroffenen Projektauftraggeber:innen und Projektleitungen. |
 
 **Alternativablauf**
 
@@ -706,7 +756,7 @@ Ende: Use Case endet; bei Bedarf Eskalation (UC-006).
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A1.1 | UE erarbeitet mit FI Kriterien und Budgetrahmen je Kategorie [OFFEN: Budgetrahmen je Kategorie]. | System speichert sie als Entwurf. |
+| A1.1 | UE erarbeitet Kriterien und Budgetrahmen je Kategorie [OFFEN: Budgetrahmen je Kategorie]. | System speichert sie als Entwurf. |
 | A1.2 | Der PRAT gibt frei; UE erfasst den Entscheid. | System setzt das Modell für folgende Bewertungen in Kraft; frühere Bewertungen bleiben nachvollziehbar. |
 
 Ende: weiter bei Schritt 1.
@@ -726,20 +776,19 @@ Ende: Use Case endet.
 **Arbeitsraum:** Portfolio
 
 #### Beschreibung
-- **Ausgangslage:** Vorhaben melden Ressourcenbedarf als Grösse S, M oder L oder in FTE und Monaten je Rolle und Phase (UC-002, UC-003). RM plant das Kapazitätsangebot und teilt Personen zu [OFFEN: Rolle RM, Planung je Pool].
-- **Use Case:** RM hält das Kapazitätsangebot aktuell, deckt den angemeldeten Bedarf mit Personen, löst Überbuchungen nach Priorität auf und analysiert die Auslastung.
+- **Ausgangslage:** Vorhaben melden Ressourcenbedarf als Grösse S, M oder L oder in FTE und Monaten je Rolle und Phase (UC-002, UC-003). Die UE plant das Kapazitätsangebot und teilt Personen zu; eine eigene Rolle Ressourcenmanagement gibt es nicht (Entscheid 15) [OFFEN: Planung je Pool].
+- **Use Case:** UE hält das Kapazitätsangebot aktuell, deckt den angemeldeten Bedarf mit Personen, löst Überbuchungen nach Priorität auf und analysiert die Auslastung.
 - **Resultat:** Bedarf der Vorhaben gedeckt oder Lücken ausgewiesen; Konflikte nach Priorität bereinigt; Auslastung je Pool sichtbar.
 - **User Interfaces:** Arbeitsraum Portfolio: Kapazitätsplanung je Pool, Bedarfsliste, Zuteilung, Auslastung; Eingang.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| RM | plant das Angebot, teilt zu, löst Konflikte |
-| UE | bringt die Priorität ein, unterstützt bei Konflikten |
+| UE | plant das Angebot, teilt zu, löst Konflikte nach Priorität |
 | PL | meldet Bedarf, erhält die Zuteilung |
 
 #### Vorbedingungen
-- RM ist angemeldet und berechtigt (AM.01.02).
+- UE ist angemeldet und berechtigt (AM.01.02).
 - Ressourcenpools sind definiert [OFFEN].
 - Vorhaben haben Bedarf gemeldet (RK.02.01, RK.02.05).
 
@@ -749,11 +798,11 @@ Ende: Use Case endet.
 
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
-| 1 |  | RM öffnet die Kapazitätsplanung. | System zeigt je Pool das Kapazitätsangebot aus Personal- und Abwesenheitsdaten und den angemeldeten Bedarf der Vorhaben [OFFEN: Übernahme aus dem HR-System]. |
-| 2 |  | RM legt die für Vorhaben verfügbare Kapazität je Pool und Periode fest. | System speichert das Angebot. |
-| 3 |  | RM öffnet einen offenen Bedarf. | System zeigt Rolle, Umfang, Zeitraum und Priorität des Vorhabens sowie Personen mit freier Kapazität. |
-| 4 | A1, A2 | RM teilt Personen zu. | System bucht die Kapazität, informiert PL und die Zugeteilten und aktualisiert die Auslastung. |
-| 5 |  | RM analysiert die Auslastung. | System zeigt Engpässe und Unterauslastung je Pool und Periode, auch für Szenarien (UC-008). |
+| 1 |  | UE öffnet die Kapazitätsplanung. | System zeigt je Pool das Kapazitätsangebot aus Personal- und Abwesenheitsdaten und den angemeldeten Bedarf der Vorhaben [OFFEN: Übernahme aus dem HR-System]. |
+| 2 |  | UE legt die für Vorhaben verfügbare Kapazität je Pool und Periode fest. | System speichert das Angebot. |
+| 3 |  | UE öffnet einen offenen Bedarf. | System zeigt Rolle, Umfang, Zeitraum und Priorität des Vorhabens sowie Personen mit freier Kapazität. |
+| 4 | A1, A2 | UE teilt Personen zu. | System bucht die Kapazität, informiert PL und die Zugeteilten und aktualisiert die Auslastung. |
+| 5 |  | UE analysiert die Auslastung. | System zeigt Engpässe und Unterauslastung je Pool und Periode, auch für Szenarien (UC-008). |
 
 **Alternativablauf**
 
@@ -762,7 +811,7 @@ Ende: Use Case endet.
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
 | A1.1 |  | System zeigt die beteiligten Vorhaben mit ihrer Priorität. |
-| A1.2 | RM löst den Konflikt mit der UE nach Priorität. | System passt die Zuteilungen an und informiert die betroffenen Projektleitungen. |
+| A1.2 | UE löst den Konflikt nach Priorität. | System passt die Zuteilungen an und informiert die betroffenen Projektleitungen. |
 
 Ende: weiter bei Schritt 5.
 
@@ -770,7 +819,7 @@ Ende: weiter bei Schritt 5.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A2.1 | RM meldet die Lücke. | System markiert den Bedarf als ungedeckt und zeigt ihn im Dashboard und in der Priorisierung (UC-008). |
+| A2.1 | UE meldet die Lücke. | System markiert den Bedarf als ungedeckt und zeigt ihn im Dashboard und in der Priorisierung (UC-008). |
 
 Ende: weiter bei Schritt 5.
 
@@ -782,20 +831,19 @@ Ende: weiter bei Schritt 5.
 
 #### Beschreibung
 - **Ausgangslage:** Die Vorhaben führen Kosten je Phase und eine Kostenprognose (UC-002, UC-004). Ist-Kosten sollen ohne Handerfassung aus dem ERP kommen [OFFEN: Quelle der Ist-Kosten].
-- **Use Case:** Das System übernimmt die Ist-Kosten. FI und UE analysieren Budgetabweichungen über das Portfolio und klären Ursachen. Für den Budgetprozess leiten GL und FI aus den Kosten je Phase den Jahresbedarf CAPEX und OPEX ab.
+- **Use Case:** Das System übernimmt die Ist-Kosten. Die UE analysiert Budgetabweichungen über das Portfolio und klärt Ursachen; eine eigene Rolle Finanzen gibt es nicht (Entscheid 12). Für den Budgetprozess leiten GL und UE aus den Kosten je Phase den Jahresbedarf CAPEX und OPEX ab.
 - **Resultat:** Ist-Kosten aktuell; Abweichungen je Vorhaben und Portfolio ausgewiesen und begründet; Jahresbedarf an den Budgetprozess übergeben.
 - **User Interfaces:** Arbeitsraum Portfolio: Finanzübersicht mit Budget, Ist und Prognose je Vorhaben und Phase; Abweichungsanalyse; Export für den Budgetprozess.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| FI | analysiert, leitet den Jahresbedarf ab |
-| UE | analysiert mit, klärt Ursachen mit der Projektleitung |
+| UE | analysiert, klärt Ursachen mit der Projektleitung, leitet den Jahresbedarf ab |
 | GL | übergibt den Bedarf an den Budgetprozess |
 | PL | begründet Abweichungen |
 
 #### Vorbedingungen
-- FI ist angemeldet und berechtigt (AM.01.02).
+- UE ist angemeldet und berechtigt (AM.01.02).
 - Die Vorhaben haben Kosten je Phase (PC.01.01).
 - Die Schnittstelle zum ERP ist konfiguriert (AM.03.02).
 
@@ -806,11 +854,11 @@ Ende: weiter bei Schritt 5.
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
 | 1 |  |  | System übernimmt periodisch die Ist-Kosten je Vorhaben aus dem ERP [OFFEN: Rhythmus und Kostenzuordnung]. |
-| 2 | A1 | FI öffnet die Finanzübersicht des Portfolios. | System zeigt je Vorhaben Budget je Phase, Ist-Kosten und Prognose und markiert Überschreitungen. |
-| 3 | A2 | FI und UE analysieren die Abweichungen. | System zeigt die Abweichungen nach Vorhaben, Phase und CAPEX/OPEX mit Verlauf. |
+| 2 | A1 | UE öffnet die Finanzübersicht des Portfolios. | System zeigt je Vorhaben Budget je Phase, Ist-Kosten und Prognose und markiert Überschreitungen. |
+| 3 | A2 | UE analysiert die Abweichungen. | System zeigt die Abweichungen nach Vorhaben, Phase und CAPEX/OPEX mit Verlauf. |
 | 4 |  | UE klärt die Ursachen mit der Projektleitung und hält sie fest. | System speichert die Begründung zum Vorhaben. |
-| 5 |  | FI leitet für den Budgetprozess den Jahresbedarf ab. | System rechnet aus Kosten je Phase und Terminplanung den Bedarf je Jahr, CAPEX und OPEX, je Vorhaben und Portfolio [OFFEN: Umrechnung Phase zu Jahr]. |
-| 6 |  | GL und FI übergeben den Bedarf an den Budgetprozess. | System erzeugt den Export und protokolliert die Übergabe. |
+| 5 |  | UE leitet für den Budgetprozess den Jahresbedarf ab. | System rechnet aus Kosten je Phase und Terminplanung den Bedarf je Jahr, CAPEX und OPEX, je Vorhaben und Portfolio [OFFEN: Umrechnung Phase zu Jahr]. |
+| 6 |  | GL und UE übergeben den Bedarf an den Budgetprozess. | System erzeugt den Export und protokolliert die Übergabe. |
 
 **Alternativablauf**
 
@@ -818,7 +866,7 @@ Ende: weiter bei Schritt 5.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A1.1 | FI klärt die Zuordnung des Vorhabens im ERP. | System übernimmt die Kosten beim nächsten Lauf. |
+| A1.1 | UE klärt die Zuordnung des Vorhabens im ERP. | System übernimmt die Kosten beim nächsten Lauf. |
 
 Ende: weiter bei Schritt 3.
 
@@ -838,20 +886,19 @@ Ende: weiter bei Schritt 4.
 
 #### Beschreibung
 - **Ausgangslage:** Im Jahreszyklus aktualisiert der VR mit der GL Strategie und Mehrjahresziele; danach setzt die GL die Ziele für das Folgejahr (Q6 F2). Grundlage ist die Strategie 2035 mit fünf Handlungsfeldern (Q9).
-- **Use Case:** GL pflegt Handlungsfelder und strategische Ziele, leitet die Jahresziele ab und legt Hauptaktivitäten mit Verantwortlichen und je Ziel eine Metrik fest. Der VR gibt die Jahresziele frei. Daraus entstehen die Portfolio-Roadmap und der Input für den Budgetprozess.
+- **Use Case:** GL pflegt Handlungsfelder und strategische Ziele, leitet die Jahresziele ab und legt Hauptaktivitäten mit Verantwortlichen und je Ziel eine Metrik fest; im System pflegen das die GL oder die UE, je nachdem, wer alle Portfolios führt (Entscheid 18). Der VR gibt die Jahresziele frei; die Freigabe ist ein Vermerk (G1). Daraus entstehen die Portfolio-Roadmap und der Input für den Budgetprozess.
 - **Resultat:** Handlungsfelder, strategische Ziele und Jahresziele mit Metrik freigegeben; Hauptaktivitäten und Vorhaben zugeordnet; Roadmap publiziert; Budgetbedarf übergeben.
 - **User Interfaces:** Arbeitsraum Ziele mit der Hierarchie Handlungsfeld, strategisches Ziel, Jahresziel, Hauptaktivität, Projekt; Freigabemaske; Roadmap im Arbeitsraum Portfolio.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| GL | pflegt Ziele, leitet Jahresziele ab, legt Hauptaktivitäten und Metriken fest |
+| GL | legt Ziele fest, leitet Jahresziele ab, legt Hauptaktivitäten und Metriken fest |
 | VR | aktualisiert die Strategie mit der GL, gibt die Jahresziele frei |
-| UE | unterstützt den Zielprozess, erfasst Freigaben, publiziert die Roadmap |
-| FI | übergibt mit der GL den Budgetbedarf |
+| UE | unterstützt den Zielprozess, pflegt die Ziele im System, erfasst Freigaben, publiziert die Roadmap, übergibt mit der GL den Budgetbedarf |
 
 #### Vorbedingungen
-- GL ist angemeldet und für den Arbeitsraum Ziele berechtigt (AM.01.02).
+- GL oder UE ist angemeldet und führt alle Portfolios (AM.01.02, Entscheid 18).
 - Die Handlungsfelder sind erfasst.
 - Der Jahresrückblick des Vorjahres liegt vor, sofern vorhanden (UC-013).
 
@@ -866,10 +913,10 @@ Ende: weiter bei Schritt 4.
 | 3 |  | GL leitet je strategischem Ziel die Jahresziele ab. | System legt die Jahresziele unter dem strategischen Ziel an. |
 | 4 |  | GL legt je Jahresziel Hauptaktivitäten mit Verantwortlichen fest. | System speichert sie und erlaubt, Vorhaben zuzuordnen; neue Vorhaben lassen sich als Projektidee anstossen (UC-001). |
 | 5 |  | GL definiert je Ziel eine Metrik mit Zielwert. | System prüft, dass jedes Ziel eine Metrik hat. |
-| 6 |  | GL legt die Jahresziele dem VR zur Freigabe vor. | System setzt die Jahresziele auf «zur Freigabe». |
+| 6 |  | GL legt die Jahresziele dem VR zur Freigabe vor. | System setzt die Jahresziele auf «zur Freigabe»; Änderungen bleiben möglich und werden als «geändert nach Vorlage» markiert (G2). |
 | 7 | A2 | Der VR gibt die Jahresziele frei; UE erfasst die Freigabe. | System setzt die Jahresziele in Kraft. |
-| 8 |  | UE publiziert die Portfolio-Roadmap. | System erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie intern bereit. |
-| 9 |  | GL und FI übergeben den Budgetbedarf an den Budgetprozess (UC-010). | System stellt den Jahresbedarf der Vorhaben bereit. |
+| 8 | A3 | UE publiziert die Portfolio-Roadmap. | System erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie intern bereit. |
+| 9 |  | GL und UE übergeben den Budgetbedarf an den Budgetprozess (UC-010). | System stellt den Jahresbedarf der Vorhaben bereit. |
 
 **Alternativablauf**
 
@@ -888,6 +935,14 @@ Ende: weiter bei Schritt 2.
 | A2.1 | UE erfasst die Rückmeldungen. | System setzt die Jahresziele auf «in Arbeit» zurück und informiert die GL. |
 
 Ende: weiter bei Schritt 3.
+
+**A3 Roadmap vor der Freigabe (ab Schritt 8):** Bedingung: Die Roadmap soll erscheinen, bevor der VR die Jahresziele freigegeben hat (G1).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A3.1 | UE publiziert die Roadmap trotzdem. | System weist darauf hin und publiziert sie mit dem Vermerk «Jahresziele noch nicht freigegeben»; der Vermerk entfällt mit der Freigabe. |
+
+Ende: weiter bei Schritt 9.
 
 ### UC-012 Quartalsreporting an den VR erstellen
 
@@ -989,20 +1044,20 @@ Ende: weiter bei Schritt 3.
 **Arbeitsraum:** Portfolio
 
 #### Beschreibung
-- **Ausgangslage:** Ein Gremium, ein Sponsor oder die UE will den Stand eines Portfolios überblicken oder eine spezifische Frage beantworten.
-- **Use Case:** Die Nutzenden sehen das Dashboard ihrer Portfolioebene und die Risikolage. UE erstellt den periodischen Portfoliobericht für das Gremium; UE und FI beantworten spezifische Fragen mit Ad-hoc-Auswertungen.
+- **Ausgangslage:** Ein Gremium, eine Projektauftraggeber:in, die GL oder die UE will den Stand eines Portfolios überblicken oder eine spezifische Frage beantworten.
+- **Use Case:** Die Nutzenden sehen das Dashboard ihrer Portfolios und die Risikolage. UE erstellt den periodischen Portfoliobericht für das Gremium und beantwortet spezifische Fragen mit Ad-hoc-Auswertungen.
 - **Resultat:** Überblick gewonnen; Portfoliobericht oder Auswertung erstellt und bei Bedarf exportiert.
 - **User Interfaces:** Arbeitsraum Portfolio: Dashboard, Funnel nach Phase, Matrix, Risikolage, Auswertungen mit Filtern und Export.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| PRAT, GLPA, DIR | sehen Dashboard und Bericht ihrer Portfolioebene |
-| UE | erstellt Portfoliobericht und Auswertungen |
-| FI | erstellt Finanzauswertungen |
+| PRAT, GLPA, DIR | sehen Dashboard und Bericht ihres Portfolios |
+| GL | sieht alle Portfolios |
+| UE | erstellt Portfoliobericht und Auswertungen, auch zu den Finanzen |
 
 #### Vorbedingungen
-- Die Nutzenden sind angemeldet und sehen nur Portfolios gemäss ihrer Berechtigung (AM.01.02).
+- Die Nutzenden sind angemeldet und sehen nur Portfolios, an denen sie eine Rolle haben, oder alle mit «alle Portfolios lesen» (AM.01.02, Entscheid 18); Beträge und vertrauliche Projekte sehen sie dort mit (Entscheid 13).
 - Das Dashboard der Periode ist final (UC-005).
 
 #### Ablauf
@@ -1029,7 +1084,7 @@ Ende: weiter bei Schritt 1.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A2.1 | UE oder FI wählt Filter, Kennzahlen und Gruppierung. | System zeigt das Ergebnis und bietet einen Export an. |
+| A2.1 | UE wählt Filter, Kennzahlen und Gruppierung. | System zeigt das Ergebnis und bietet einen Export an. |
 
 Ende: Use Case endet.
 
@@ -1041,7 +1096,7 @@ Ende: Use Case endet.
 
 #### Beschreibung
 - **Ausgangslage:** Das Vorhaben hat die Phase P4 Abschluss erreicht, oder das Gremium hat entschieden, es zu sistieren oder abzubrechen (UC-006, UC-008).
-- **Use Case:** PL erstellt den Abschlussbericht mit Zielerreichung, Business Case Abschluss, offenen Punkten, Übergabe an den Betrieb und Lessons Learned. Sponsor und UE überprüfen die Nutzenrealisierung. Am Exit-Gate P4 entscheidet das Gremium über den formellen Abschluss (Q8 Kap. 7.5).
+- **Use Case:** PL erstellt den Abschlussbericht mit Zielerreichung, Business Case Abschluss, offenen Punkten, Übergabe an den Betrieb und Lessons Learned. Projektauftraggeber:in und UE überprüfen die Nutzenrealisierung. Am Exit-Gate P4 entscheidet das Gremium über den formellen Abschluss (Q8 Kap. 7.5); die Abnahme ist ein Vermerk (G1).
 - **Resultat:** Vorhaben formell abgeschlossen, sistiert oder abgebrochen; Abschlussbericht und Business Case Abschluss P4 gespeichert; Ressourcen freigegeben; Lessons Learned verfügbar; Dashboard aktuell.
 - **User Interfaces:** Projektakte, Bereich Abschluss; Eingang; Traktandum im Arbeitsraum Gremium.
 
@@ -1049,7 +1104,7 @@ Ende: Use Case endet.
 | Akteur | Rolle im Use Case |
 |---|---|
 | PL | erstellt Abschlussbericht und Lessons Learned |
-| SP, UE | überprüfen die Nutzenrealisierung |
+| AG, UE | überprüfen die Nutzenrealisierung |
 | PRAT | entscheidet am Exit-Gate, sistiert oder bricht ab |
 | UE | traktandiert das Exit-Gate |
 
@@ -1065,10 +1120,10 @@ Ende: Use Case endet.
 |---|---|---|---|
 | 1 | A1 | PL öffnet die Aufgabe «Abschluss» im Eingang. | System zeigt Ziele, KPIs mit Ziel- und Ist-Werten, Business Case, Meilensteine und offene Punkte des Vorhabens. |
 | 2 |  | PL erfasst die Zielerreichung und den Business Case Abschluss P4 mit Kosten und Nutzen. | System vergleicht mit Baseline und Zielwerten. |
-| 3 |  | SP und UE beurteilen die Nutzenrealisierung. | System speichert die Beurteilung. |
+| 3 |  | AG und UE beurteilen die Nutzenrealisierung. | System speichert die Beurteilung. |
 | 4 |  | PL erfasst die Übergabe an Betrieb und Linie, offene Punkte mit Verantwortlichen und die Lessons Learned. | System speichert sie; die Lessons Learned stehen künftigen Vorhaben und dem Jahresrückblick zur Verfügung (UC-013). |
-| 5 |  | PL reicht den Abschlussbericht ein; UE traktandiert das Exit-Gate P4 (UC-006). | System erzeugt den Abschlussbericht und setzt ihn auf die Traktandenliste. |
-| 6 | A2 | Das Gremium nimmt den Abschlussbericht ab und schliesst das Vorhaben formell; UE erfasst den Entscheid. | System setzt das Vorhaben auf «abgeschlossen», gibt zugeteilte Ressourcen frei, archiviert die Projektakte lesend und aktualisiert das Dashboard. |
+| 5 | A3 | PL reicht den Abschlussbericht ein; UE traktandiert das Exit-Gate P4 (UC-006). | System erzeugt den Abschlussbericht und setzt ihn auf die Traktandenliste. |
+| 6 | A2 | Das Gremium nimmt den Abschlussbericht ab und schliesst das Vorhaben formell; UE erfasst den Entscheid. | System setzt das Vorhaben auf «abgeschlossen», gibt zugeteilte Ressourcen frei und aktualisiert das Dashboard. Spätere Änderungen an der Projektakte bleiben möglich und werden als «geändert nach Abschluss» markiert (G2). |
 
 **Alternativablauf**
 
@@ -1089,6 +1144,14 @@ Ende: Use Case endet [OFFEN: Wiederaufnahme sistierter Vorhaben].
 
 Ende: weiter bei Schritt 2.
 
+**A3 Abschliessen vor der Abnahme (ab Schritt 5):** Bedingung: Das Vorhaben soll abgeschlossen werden, bevor das Gremium den Abschlussbericht abgenommen hat (G1).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A3.1 | PL oder UE schliessen das Vorhaben. | System weist auf die ausstehende Abnahme hin, setzt das Vorhaben wie in Schritt 6 auf «abgeschlossen», mit dem Vermerk «Abnahme offen», und lässt das Traktandum offen; die Abnahme wird nachgetragen. |
+
+Ende: Use Case endet.
+
 ### UC-016 Benutzer, Rollen und Stellvertretungen verwalten
 
 **Referenz Funktionsbaum:** AM.01.01 Benutzer verwalten, AM.01.02 Rolle mit Berechtigungen definieren, AM.01.03 Stellvertretung regeln
@@ -1097,14 +1160,15 @@ Ende: weiter bei Schritt 2.
 
 #### Beschreibung
 - **Ausgangslage:** Personen treten ein, wechseln die Funktion oder übernehmen eine Rolle in einem Vorhaben oder Gremium.
-- **Use Case:** ADM verwaltet Benutzer und Rollen der Programm- und Projektebene mit ihren Berechtigungen. Alle regeln ihre Stellvertretung, damit Freigaben bei Abwesenheit nicht liegen bleiben.
-- **Resultat:** Benutzer mit Rollen und Berechtigungen aktuell; Stellvertretungen geregelt; Änderungen protokolliert.
-- **User Interfaces:** Administration: Benutzer, Rollen, Berechtigungen; Profil mit Stellvertretung.
+- **Use Case:** ADM verwaltet die Mitglieder der Organisation und vergibt Zugriff zentral; wer ein Portfolio oder Projekt führt, vergibt Zugriff auch direkt dort (Entscheid 16). Die Rollen sind vorgegeben (Entscheid 18): je Portfolio steuern, führen oder Gremium, je Projekt steuern, führen oder mitlesen, übergreifend alle Portfolios lesen oder führen; eigene Rollen kann die Organisation ergänzen. Alle regeln ihre Stellvertretung, damit Aufgaben bei Abwesenheit nicht liegen bleiben.
+- **Resultat:** Mitglieder mit Zugriff aktuell; Stellvertretungen geregelt; Änderungen protokolliert und am Portfolio bzw. Projekt sichtbar.
+- **User Interfaces:** Administration › Zugänge; Bereich «Zugriff» in Portfolio und Projektakte; Profil mit Stellvertretung.
 
 #### Beteiligte Akteure
 | Akteur | Rolle im Use Case |
 |---|---|
-| ADM | verwaltet Benutzer und Rollen |
+| ADM | verwaltet Mitglieder und Zugriff zentral |
+| PL, UE | vergeben Zugriff am Projekt bzw. Portfolio, das sie führen |
 | alle | regeln ihre Stellvertretung |
 
 #### Vorbedingungen
@@ -1117,10 +1181,10 @@ Ende: weiter bei Schritt 2.
 
 | Schritt | Abzweigung Alternativablauf | Aktion User | Systemverhalten |
 |---|---|---|---|
-| 1 | A1 | ADM legt einen Benutzer an oder öffnet einen bestehenden. | System zeigt Personendaten, Organisationseinheit und Rollen [OFFEN: Übernahme aus HR-System oder Verzeichnisdienst]. |
-| 2 | A2 | ADM teilt Rollen zu: Programmrollen wie PRAT, UE oder PMO, Projektrollen wie SP, PL, CTL oder Kernteam je Vorhaben, Gremienrollen und Administration. | System leitet die Berechtigungen aus den Rollen ab; Projektrollen gelten nur für das jeweilige Vorhaben. |
-| 3 |  | ADM speichert. | System protokolliert die Änderung (AM.03.03) und informiert den Benutzer. |
-| 4 |  | Ein Benutzer erfasst in seinem Profil eine Stellvertretung mit Zeitraum. | System stellt Aufgaben im Zeitraum auch der Stellvertretung in den Eingang und protokolliert deren Freigaben als Stellvertretung. |
+| 1 | A1 | ADM nimmt eine Person als Mitglied auf oder öffnet ein bestehendes Mitglied. | System zeigt Personendaten, Organisationseinheit und Zugriffe [OFFEN: Übernahme aus HR-System oder Verzeichnisdienst]. Jedes Mitglied listet Projekte auf, liest eingereichte Ideen und erfasst eigene (Entscheid 14). |
+| 2 | A2, A3 | ADM vergibt Zugriff: eine Rolle an einem Portfolio, an einem Projekt oder übergreifend, bei Bedarf befristet. | System prüft, dass niemand mehr vergibt, als er selbst hat, und leitet die Rechte aus der Rolle ab; eine Rolle an einem Portfolio oder Projekt gilt nur dort. |
+| 3 |  | ADM speichert. | System protokolliert die Änderung (AM.03.03) und informiert die Person. |
+| 4 |  | Ein Mitglied erfasst in seinem Profil eine Stellvertretung mit Zeitraum. | System stellt Aufgaben im Zeitraum auch der Stellvertretung in den Eingang und protokolliert deren Vermerke als Stellvertretung. |
 
 **Alternativablauf**
 
@@ -1132,11 +1196,20 @@ Ende: weiter bei Schritt 2.
 
 Ende: Use Case endet.
 
-**A2 Rolle definieren (ab Schritt 2):** Bedingung: Eine Rolle fehlt, oder ihre Berechtigungen ändern sich.
+**A2 Zugriff direkt am Projekt vergeben (ab Schritt 2):** Bedingung: Wer ein Projekt oder Portfolio führt, vergibt den Zugriff selbst (Entscheid 16).
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A2.1 | ADM definiert die Rolle mit Berechtigungen je Arbeitsraum und Objekt. | System speichert sie und wendet sie auf alle Inhaber an. |
+| A2.1 | PL öffnet in der Projektakte den Bereich «Zugriff». | System zeigt, wer das Projekt führt, steuert oder mitliest, und wer über das Portfolio oder übergreifend Zugriff hat, mit «Warum?». |
+| A2.2 | PL fügt eine Person mit Rolle hinzu, befristet oder entfernt einen Zugriff. | System prüft wie in Schritt 2, weist bei einem vertraulichen Projekt vorher darauf hin, protokolliert die Änderung und zeigt sie im Verlauf des Projekts. |
+
+Ende: Use Case endet.
+
+**A3 Eigene Rolle definieren (ab Schritt 2):** Bedingung: Die vorgegebenen Rollen passen nicht, etwa für eine Person, die nur Ressourcen plant (Entscheid 15).
+
+| Schritt | Aktion User | Systemverhalten |
+|---|---|---|
+| A3.1 | ADM stellt eine eigene Rolle aus Rechten zusammen und legt fest, an welchen Orten sie vergeben werden darf. | System speichert sie neben den vorgegebenen Rollen, die unverändert bleiben, und wendet spätere Änderungen sofort auf alle an, die sie haben. |
 
 Ende: weiter bei Schritt 2.
 
@@ -1170,7 +1243,7 @@ Ende: weiter bei Schritt 2.
 | 1 |  | ADM pflegt die Organisationseinheiten inklusive Direktionen. | System speichert die Hierarchie; Vorhaben, Benutzer und Portfolios verweisen darauf. |
 | 2 |  | ADM pflegt die Codetabellen: Status (im Plan, kritisch), Trend (aufwärts, gleichbleibend, abwärts), Grössen S, M, L, Projektkategorien und weitere Auswahlwerte. | System speichert sie; nicht mehr verwendete Werte werden deaktiviert statt gelöscht. |
 | 3 |  | UE bildet das Phasenmodell ab: Phasen P0 bis P4, Gates, Leitfragen je Wertestrom, Standard-Lieferergebnisse und -Meilensteine je Phase sowie Pflichtangaben des Projektvertrags je Phase. | System speichert das Phasenmodell als neue Version [OFFEN: Pflichtfelder je Phase]. |
-| 4 | A1 | UE bildet Portfolioebenen und Gremien ab: drei Portfolios mit Gremium, Gremienweg je Phase und Kategorie, Sitzungsrhythmus und Dashboard. | System speichert sie und wendet den Gremienweg bei der Traktandierung an (UC-006). |
+| 4 | A1 | UE bildet Portfolios und Gremien ab: je Portfolio das Gremium, Gremienweg je Phase und Kategorie, Sitzungsrhythmus und Dashboard; beim Referenzkunden die Portfolios A und B und je Direktion ein Portfolio C. | System speichert sie und wendet den Gremienweg bei der Traktandierung an (UC-006); den Zugriff je Portfolio vergibt UC-016. |
 | 5 |  | ADM setzt die neue Version in Kraft. | System protokolliert die Änderung [OFFEN: Gilt eine neue Version auch für laufende Phasen?]. |
 
 **Alternativablauf**
@@ -1179,7 +1252,7 @@ Ende: weiter bei Schritt 2.
 
 | Schritt | Aktion User | Systemverhalten |
 |---|---|---|
-| A1.1 | UE konfiguriert das Portfolio ohne Pflicht-Gates und Pflicht-Reporting. | System lässt die Direktion Phasen, Gates und Berichte freiwillig nutzen. |
+| A1.1 | UE konfiguriert das Portfolio ohne Hinweise auf Gates und Reporting und gibt der Direktion die Rolle «Portfolio steuern», bei Bedarf auch «Portfolio führen» (Entscheid 18). | System lässt die Direktion Phasen, Gates und Berichte freiwillig nutzen. |
 
 Ende: weiter bei Schritt 5.
 
@@ -1214,7 +1287,7 @@ Ende: weiter bei Schritt 5.
 | 2 |  | UE lädt eine neue Version einer Vorlage hoch und ordnet die Felder den Daten zu. | System prüft die Zuordnung, versioniert die Vorlage und verwendet sie für künftige Dokumentausgaben (DM.02.07). |
 | 3 |  | ADM richtet eine Schnittstelle ein: Umsystem, Daten, Richtung, Rhythmus. | System speichert die Konfiguration und führt einen Testlauf aus. |
 | 4 | A1 | ADM überwacht die Schnittstellen. | System zeigt je Lauf Zeitpunkt, Umfang und Fehler und meldet Fehler im Eingang des ADM. |
-| 5 |  | ADM oder UE sehen das Änderungsprotokoll ein. | System zeigt Änderungen mit Benutzer, Zeitpunkt, altem und neuem Wert, filterbar nach Objekt und Zeitraum. |
+| 5 |  | ADM oder UE sehen das Änderungsprotokoll ein. | System zeigt Änderungen mit Benutzer, Zeitpunkt, altem und neuem Wert, filterbar nach Objekt und Zeitraum. Am Objekt selbst sieht jede Person, die es sehen darf, dessen Verlauf (G2). |
 
 **Alternativablauf**
 

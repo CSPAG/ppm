@@ -201,6 +201,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Keine Rolle Finanzen:** Budget, Prognose und Ist-Kosten pflegen Projektportfoliomanager:in und PPMO.
    - **Strategie und Ziele** dürfen auch Projektportfoliomanager:in und PPMO bearbeiten.
    - **Noch nicht nachgeführt:** Funktionsbaum und Use Cases (Generator), UX-Schicht, Bauplan ([fachmodell.md](fachmodell.md): Rollen 3.3, Lesesicht 3.4, Annahmen, u. a. A-04, A-31, A-33, A-34, A-41, A-42, A-45) und Code. Abgelöstes wird dort als «ersetzt durch» markiert, nicht gelöscht. Betroffen sind vor allem Abläufe, die heute anhalten: UC-001 (Projekt erst nach Freigabe der Initialisierung), UC-002 und UC-003 (Gate erst nach Quality-Check und allen Unterschriften, Phase erst nach Gate-Entscheid), UC-004 und UC-005 (Bericht nach Einreichen gesperrt, Monatsabschluss erst nach Prüfung aller Berichte), UC-006 und UC-008 (Traktanden und Antrag nach Versand gesperrt), UC-007 (Änderung nur durch den Sponsor, mit Wirkung nur über den PRAT), UC-011 (Roadmap erst nach Freigabe durch den VR), UC-015 (Abschluss erst nach Abnahme durch das Gremium), UC-016 (Rollen).
+13. **Beträge und vertrauliche Projekte** ohne eigenes Recht (29.10.2026, zu G3 und V14): Wer an einem Ort eine Rolle hat (Bearbeiten oder Lesen an Organisation, Portfolio oder Projekt), sieht dort auch Beträge und vertrauliche Projekte. Mitglieder ohne weitere Rolle sehen beides nicht: keine Beträge, und vertrauliche Projekte fehlen in jeder Liste und Auswertung für Mitglieder. Die Kennzeichnung «vertraulich» am Projekt bleibt. Gegenüber heute sehen neu Projektmitglieder Beträge (A-33) und die Geschäftsleitung vertrauliche Projekte (A-34). Im Bauplan bleiben die Rechte `finanzen:read` und `projekt:vertraulich` mit ihren Policies bestehen; sie stecken in jeder Vorlage ausser «Mitglied». Reicht das später nicht, sind die Freigabestufen von identity-kit (intern, vertraulich, streng vertraulich) der Weg, ohne die Rollen zu ändern.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -225,7 +226,6 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 
 **Produkt** (nicht in der Klärungsliste, die sich an den Referenzkunden richtet), zu V14:
 
-- **Beträge und Vertrauliches:** Bleiben «Beträge sehen» und «vertrauliche Projekte sehen» eigene Leserechte (heute A-33, A-34), oder sieht jede Person mit «Lesen» alles an ihrem Ort?
 - **Auflisten:** Dürfen alle Mitglieder Projekte und Ideen auflisten (Kopfdaten wie Nummer, Name, Phase, Status, Verantwortliche), mit Details nur über «Lesen»? Vertrauliche Projekte erscheinen auch in der Liste nicht.
 - **Ressourcenmanagement:** Bleibt es eine eigene Rolle, oder planen Projektportfoliomanager:in und PPMO die Ressourcen?
 - **PMO am Projekt:** Als Funktion in der Projektorganisation geführt (die Projektmanager:in setzt sie selbst) oder nur über Zugänge vergeben?

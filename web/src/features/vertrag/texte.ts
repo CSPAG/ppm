@@ -8,6 +8,20 @@ type Stand = 'in_arbeit' | 'in_pruefung' | 'zur_unterzeichnung' | 'unterzeichnet
 type Anlass = 'initial' | 'gate' | 'aenderung';
 
 export const TV = {
+  // Weiter ohne Vermerk (UC-002 A7, UC-003 A7; UX-E12)
+  vermerk: {
+    titel: 'Offene Vermerke',
+    version: (nr: string) => `Version ${nr}:`,
+    vorlegen: 'Dem Gremium vorlegen',
+    vorlegenFrage: (nr: string) => `Version ${nr} dem Gremium vorlegen?`,
+    vorlegenMitVermerk: (fehlt: string) => `Noch offen: ${fehlt}. Der Vertrag geht mit diesem Vermerk ans Gremium; die Aufgaben bleiben im Eingang, bis Quality-Check und Unterschriften nachgetragen sind.`,
+    vorlegenOhneVermerk: 'Der Vertrag geht an das Gremium des Gremienwegs.',
+    vorgelegt: 'Dem Gremium vorgelegt.',
+    phaseBeginnen: (p: string) => `Phase ${p} beginnen`,
+    phaseFrage: (p: string) => `Phase ${p} vor dem Gate-Entscheid beginnen?`,
+    phaseWirkung: (p: string) => `Das Projekt wechselt in ${p} und trägt den Vermerk «ohne Gate-Entscheid», bis das Gremium freigibt. Lehnt das Gremium ab oder stellt zurück, siehst du es am Vertrag.`,
+    phaseBegonnen: (p: string) => `Phase ${p} begonnen, mit Vermerk «ohne Gate-Entscheid».`,
+  },
   reiter: NAV.reiter,
   reiterVersionen: NAV.reiterVersionen,
   titel: 'Projektvertrag',

@@ -33,7 +33,7 @@ import * as store from './store.ts';
 /** Gate in die Zielphase (fest wie im Phasenmodell); Exit P4 gehört zum Abschluss (UC-015). */
 export const GATE_IN: Readonly<Partial<Record<Phase, gs.GateCode>>> = { P1: 'P0_P1', P2: 'P1_P2', P3: 'P2_P3', P4: 'P3_P4' };
 const NACH: Readonly<Record<gs.GateCode, Phase>> = { P0_P1: 'P1', P1_P2: 'P2', P2_P3: 'P3', P3_P4: 'P4' };
-const NAECHSTE: Readonly<Partial<Record<Phase, Phase>>> = { P0: 'P1', P1: 'P2', P2: 'P3', P3: 'P4' };
+export const NAECHSTE: Readonly<Partial<Record<Phase, Phase>>> = { P0: 'P1', P1: 'P2', P2: 'P3', P3: 'P4' };
 
 /** «P1–P2» für Texte (darstellung.md). */
 export const gateLabel = (g: gs.GateCode) => g.replace('_', '–');
@@ -110,9 +110,22 @@ const antragVon = (g: gs.GateCode, v: Pick<store.VersionRow, 'nummer'>) => `Proj
  * Pflicht-Gates, A-08) bleibt sie «unterzeichnet»; die UE traktandiert dann von Hand.
  */
 async function traktandieren(tx: Tx, o: { version: store.VersionRow; projekt: store.ProjektKopf }): Promise<void> {
+  await traktandierenAus(tx, o, ['unterzeichnet']);
+}
+
+/**
+ * Dem Gremium vorlegen, auch vor Quality-Check und Unterschriften (UC-002 A7, UC-003 A7; A-74): wie nach der letzten
+ * Unterschrift, aus den Ständen `von`; Quality-Check und Unterschriften werden nachgetragen (Vermerk). Liefert, ob ein
+ * Traktandum entstanden ist (ohne Gremium bzw. schon vorgeschlagen: false).
+ */
+export async function vorlegen(tx: Tx, o: { version: store.VersionRow; projekt: store.ProjektKopf }): Promise<boolean> {
+  return traktandierenAus(tx, o, ['in_pruefung', 'zur_unterzeichnung', 'unterzeichnet']);
+}
+
+async function traktandierenAus(tx: Tx, o: { version: store.VersionRow; projekt: store.ProjektKopf }, von: readonly store.Stand[]): Promise<boolean> {
   const gate = gateVon(o.version);
   const pg = gate ? await gs.projektGate(tx, o.projekt.id) : null;
-  if (!gate || !pg) return;
+  if (!gate || !pg) return false;
   const a = await antragSichern(tx, o.version);
   const weg = await gremienwegFuerGate(tx, pg.portfolio_id, gate);
   let id: string;
@@ -122,12 +135,13 @@ async function traktandieren(tx: Tx, o: { version: store.VersionRow; projekt: st
       titel: titelVon(gate, o.projekt), antrag: antragVon(gate, o.version),
     });
   } catch (err) {
-    if ((err as { status?: number }).status === 409) return;
+    if ((err as { status?: number }).status === 409) return false;
     throw err;
   }
   await gs.traktandiert(tx, a!.id, id);
-  await store.standSetzen(tx, o.version.id, null, ['unterzeichnet'], 'traktandiert');
+  await store.standSetzen(tx, o.version.id, null, von, 'traktandiert');
   await aufgabe.erledigen(tx, { art: ART_VORBEREITEN, bezug: { typ: 'projekt', id: o.projekt.id } });
+  return true;
 }
 
 

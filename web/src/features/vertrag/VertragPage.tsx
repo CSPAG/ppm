@@ -18,6 +18,7 @@ import {
   type Version, type VersionLoaded,
 } from './api.ts';
 import { AenderungBeantragen, aenderungBanner, AenderungPanel } from './AenderungPanel.tsx';
+import { VermerkPanel } from './VermerkPanel.tsx';
 import { DokumentAusgabe } from './DokumentAusgabe.tsx';
 import { feldId, KAPITEL, pruefeLokal } from './felder.ts';
 import { KapitelEditor } from './KapitelEditor.tsx';
@@ -220,6 +221,7 @@ function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, searc
               <button type="button" className="btn primary" onClick={() => void einreichenStart()}><Icon name="send" />{TV.einreichen}</button>
             </div>
           ) : null}
+          <VermerkPanel projektId={projektId} />
           {v.anlass === 'aenderung' ? <AenderungPanel projektId={projektId} nummer={nummer} version={v} speichern={() => speichernRef.current()} /> : null}
         </aside>
       </div>

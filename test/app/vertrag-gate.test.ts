@@ -233,4 +233,55 @@ describe('Projektvertrag: Gate-Modus und Gate-Entscheid', () => {
     assert.match(ueb[0]!.kontext, /Gate P1–P2 mit Auflagen freigegeben: Risikoplan fehlt$/);
     assert.equal((await ok('pl', 'GET', `/v1/vertragsversionen/${id.v2}/gate`)).body.can.antworten, true, 'wieder bearbeitbar');
   });
+
+  test('Weiter ohne Vermerk: vorlegen vor Quality-Check und Unterschriften, Phase vor dem Gate-Entscheid; Vermerke nachtragen (UC-002 A7, A-74)', async () => {
+    const pf = (await ok('ue', 'GET', `/v1/projekte/${projekt.id}`)).body.portfolioId;
+    const q = (await ok('ue', 'POST', '/v1/projekte', { name: 'Vorab', portfolioId: pf, phase: 'P0' }, {}, 201)).body;
+    await ok('ue', 'PUT', `/v1/projekte/${q.id}/organisation`, { mitglieder: [{ personId: id.sp, funktion: 'sp', akv: '' }, { personId: id.pl, funktion: 'pl', akv: '' }] }, { 'if-match': 'W/"0"' });
+    for (const [f, rolle] of [['sp', 'projekt-steuern'], ['pl', 'projekt-fuehren'], ['kt', 'projekt-mitlesen']] as const) {
+      await grant(api, T, `user:${id[f]}`, rolle, { type: 'projekt', id: q.id });
+    }
+    const e = await ok('pl', 'POST', `/v1/projekte/${q.id}/vertrag/entwuerfe`, { anlass: 'initial' }, {}, 201);
+    const v = e.body.version.id as string;
+    // in Arbeit: vorlegen geht erst nach dem Einreichen (Pflichtangaben bleiben eine Sperre)
+    assert.equal((await call('pl', 'POST', `/v1/vertragsversionen/${v}/vorlegen`, undefined, { 'if-match': e.etag })).statusCode, 409);
+    const ein = await ok('pl', 'POST', `/v1/vertragsversionen/${v}/einreichen`, undefined, { 'if-match': e.etag });
+
+    // vorlegen ohne Quality-Check: traktandiert mit Vermerk, Aufgabe «Quality-Check» bleibt offen
+    assert.equal((await call('kt', 'POST', `/v1/vertragsversionen/${v}/vorlegen`, undefined, { 'if-match': ein.etag })).statusCode, 403);
+    const vor = await ok('pl', 'POST', `/v1/vertragsversionen/${v}/vorlegen`, undefined, { 'if-match': ein.etag });
+    assert.deepEqual(vor.body.versionen, [{ versionId: v, nummer: '0.1', vermerke: [{ art: 'quality_check_offen', text: 'Quality-Check offen' }] }]);
+    const stand = async () => (await sys(tx => tx.query<{ stand: string; version: number }>('SELECT stand, version FROM ppm.vertrag_version WHERE id = $1', [v]))).rows[0]!;
+    assert.equal((await stand()).stand, 'traktandiert');
+    assert.ok((await sys(tx => tx.query("SELECT 1 FROM ppm.traktandum WHERE projekt_id = $1 AND art = 'gate'", [q.id]))).rowCount);
+    const offen = (art: string) => sys(async tx => (await tx.query("SELECT 1 FROM ppm.aufgabe WHERE art = $1 AND bezug_id = $2 AND stand = 'offen'", [art, v])).rowCount ?? 0);
+    assert.equal(await offen('vertrag.quality_check'), 1, 'Aufgabe bleibt offen (A-74)');
+
+    // Quality-Check nachtragen: Stand bleibt, Rückmeldung nicht mehr; danach «Unterschrift offen»
+    assert.equal((await call('ue', 'POST', `/v1/vertragsversionen/${v}/quality-check`, { ergebnis: 'rueckmeldung', kommentare: [{ kapitel: 1, text: 'x' }] }, { 'if-match': `W/"${(await stand()).version}"` })).statusCode, 409);
+    await ok('ue', 'POST', `/v1/vertragsversionen/${v}/quality-check`, { ergebnis: 'bestaetigt' }, { 'if-match': `W/"${(await stand()).version}"` });
+    assert.equal((await stand()).stand, 'traktandiert');
+    assert.equal(await offen('vertrag.quality_check'), 0);
+    assert.equal(await offen('vertrag.unterzeichnen'), 2);
+    let vm = (await ok('pl', 'GET', `/v1/projekte/${q.id}/vermerke`)).body;
+    assert.deepEqual(vm.versionen[0].vermerke.map((x: { art: string }) => x.art), ['unterschrift_offen']);
+
+    // Phase P1 vor dem Gate-Entscheid: Vermerk am Projekt, kein doppelter Schritt, Mitlesen darf nicht
+    assert.equal(vm.can.phaseBeginnen, 'P1');
+    assert.equal((await call('kt', 'POST', `/v1/projekte/${q.id}/phase-beginnen`, { phase: 'P1' })).statusCode, 403);
+    vm = (await ok('pl', 'POST', `/v1/projekte/${q.id}/phase-beginnen`, { phase: 'P1' })).body;
+    assert.deepEqual(vm.projekt, [{ art: 'ohne_gate_entscheid', text: 'ohne Gate-Entscheid' }]);
+    assert.equal((await sys(tx => tx.query<{ phase: string }>('SELECT phase FROM ppm.projekt WHERE id = $1', [q.id]))).rows[0]!.phase, 'P1');
+    assert.equal((await call('pl', 'POST', `/v1/projekte/${q.id}/phase-beginnen`, { phase: 'P1' })).statusCode, 409);
+
+    // Unterschriften nachtragen: Vermerk weg, Version bleibt beim Gremium
+    for (const who of ['sp', 'pl']) {
+      const p = await ok(who, 'GET', `/v1/vertragsversionen/${v}/pruefung`);
+      assert.equal(p.body.can.unterzeichnen.length, 1, who);
+      await ok(who, 'POST', `/v1/vertragsversionen/${v}/unterschriften`, { ergebnis: 'unterzeichnet' }, { 'if-match': p.etag });
+    }
+    vm = (await ok('pl', 'GET', `/v1/projekte/${q.id}/vermerke`)).body;
+    assert.deepEqual([vm.versionen, (await stand()).stand, await offen('vertrag.unterzeichnen')], [[], 'traktandiert', 0]);
+    assert.deepEqual(vm.projekt.map((x: { art: string }) => x.art), ['ohne_gate_entscheid'], 'bis das Gremium freigibt');
+  });
 });

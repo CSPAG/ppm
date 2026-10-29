@@ -19,6 +19,12 @@ export const FUNKTIONEN = ['sp', 'pl'] as const;
 export type Funktion = (typeof FUNKTIONEN)[number];
 export const FUNKTION_TEXT: Record<Funktion, string> = { sp: 'Projektauftraggeber:in', pl: 'Projektleitung' };
 
+/**
+ * Stände, in denen Quality-Check und Unterschriften nachgetragen werden (A-74, UC-002/003 A7): dem Gremium vorgelegt
+ * oder schon freigegeben. Der Nachtrag ändert den Stand nicht; er löst nur den Vermerk.
+ */
+export const NACHTRAG: readonly store.Stand[] = ['traktandiert', 'abgenommen'];
+
 const Q = `${SCHEMA}.quality_check`;
 const U = `${SCHEMA}.unterschrift`;
 
@@ -116,14 +122,19 @@ export async function qualityCheckErfassen(tx: Tx, o: {
   ergebnis: 'bestaetigt' | 'rueckmeldung'; kommentare: Record<string, string>;
 }): Promise<{ id: string; fehlend: Funktion[] }> {
   const { version: v, projekt: p } = o;
+  const nachtrag = NACHTRAG.includes(v.stand);
+  if (nachtrag && o.ergebnis === 'rueckmeldung') {
+    throw conflict(`Version ${v.nummer} liegt dem Gremium vor oder ist freigegeben; eine Rückmeldung ist jetzt nicht mehr möglich. Bestätige den Quality-Check oder halte die Rückmeldung am Traktandum fest.`, { reason: 'stand', stand: v.stand });
+  }
   const soll = await unterzeichnende(tx, p.id);
   const fehlend = FUNKTIONEN.filter(f => !soll[f].length);
   if (o.ergebnis === 'bestaetigt' && fehlend.length) {
     throw conflict(`Die Projektorganisation ist unvollständig: Es fehlt ${fehlend.map(f => FUNKTION_TEXT[f]).join(', ')}. `
       + 'Ohne diese Funktion kann der Vertrag nicht unterzeichnet werden; lege die Projektorganisation fest.', { reason: 'organisation', fehlend });
   }
-  const nach: store.Stand = o.ergebnis === 'bestaetigt' ? 'zur_unterzeichnung' : 'in_arbeit';
-  if (!(await store.standSetzen(tx, v.id, o.erwartet, ['in_pruefung'], nach))) return { id: '', fehlend };
+  // nachgetragen (A-74): der Stand bleibt, die Version zählt für If-Match weiter
+  const nach: store.Stand = nachtrag ? v.stand : o.ergebnis === 'bestaetigt' ? 'zur_unterzeichnung' : 'in_arbeit';
+  if (!(await store.standSetzen(tx, v.id, o.erwartet, nachtrag ? [v.stand] : ['in_pruefung'], nach))) return { id: '', fehlend };
   const id = (await tx.query<{ id: string }>(
     `INSERT INTO ${Q} (tenant_id, projekt_id, version_id, ergebnis, kommentare, by_person) VALUES (app.tenant_id(), $1, $2, $3, $4, $5) RETURNING id`,
     [p.id, v.id, o.ergebnis, JSON.stringify(o.kommentare), o.person])).rows[0]!.id;
@@ -165,8 +176,10 @@ export async function unterzeichnen(tx: Tx, o: {
   }
   // Version ändert sich mit jeder Unterschrift (If-Match schützt vor gleichzeitigem Entscheid)
   const vollstaendig = o.ergebnis === 'unterzeichnet' && FUNKTIONEN.every(f => vorher.some(u => u.funktion === f) || funktionen.some(x => x.funktion === f));
-  const nach: store.Stand = o.ergebnis === 'verweigert' ? 'in_arbeit' : vollstaendig ? 'unterzeichnet' : 'zur_unterzeichnung';
-  if (!(await store.standSetzen(tx, v.id, o.erwartet, ['zur_unterzeichnung'], nach))) return null;
+  // nachgetragen (A-74): dem Gremium vorgelegt oder freigegeben, der Stand bleibt
+  const nachtrag = NACHTRAG.includes(v.stand);
+  const nach: store.Stand = nachtrag ? v.stand : o.ergebnis === 'verweigert' ? 'in_arbeit' : vollstaendig ? 'unterzeichnet' : 'zur_unterzeichnung';
+  if (!(await store.standSetzen(tx, v.id, o.erwartet, nachtrag ? [v.stand] : ['zur_unterzeichnung'], nach))) return null;
   for (const f of funktionen) {
     await tx.query(
       `INSERT INTO ${U} (tenant_id, projekt_id, version_id, quality_check_id, funktion, person_id, in_vertretung_von, ergebnis, begruendung)
@@ -178,11 +191,13 @@ export async function unterzeichnen(tx: Tx, o: {
     await aufgabe.erledigen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertrag_version', id: v.id }, empfaenger: { person } });
   }
   if (o.ergebnis === 'verweigert') {
-    // Durchgang beendet: übrige Unterzeichnungen entfallen, die PL überarbeitet (UC-003 A5)
+    // Durchgang beendet: übrige Unterzeichnungen entfallen, die PL überarbeitet (UC-003 A5); nachgetragen bleibt nur
+    // der Vermerk «Unterschrift verweigert» an der Version, die beim Gremium liegt bzw. freigegeben ist
     await aufgabe.entfallen(tx, { art: 'vertrag.unterzeichnen', bezug: { typ: 'vertrag_version', id: v.id } });
+    if (nachtrag) return { funktionen, vollstaendig, stand: nach };
     const grund = o.begruendung.trim().length > 140 ? `${o.begruendung.trim().slice(0, 139)}…` : o.begruendung.trim();
     await ueberarbeitenOeffnen(tx, p, v, soll, `nicht unterzeichnet von ${await personName(tx, o.person)}: ${grund}`);
-  } else if (vollstaendig) {
+  } else if (vollstaendig && !nachtrag) {
     const r = (await store.version(tx, v.id))!;
     for (const fn of nachUnterzeichnung) await fn(tx, { version: r, projekt: p });
   }

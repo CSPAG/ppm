@@ -27,15 +27,39 @@ function person(e: ProtokollEintrag): string {
   return e.person.art === 'client' ? TX.p.client(name) : name;
 }
 
-function Aenderungen({ e }: { e: ProtokollEintrag }) {
+/** Verweis auf ein Objekt: Kennung oder `{ id, typ }`; sonst `null`. */
+export function verweis(v: unknown): { id: string; typ?: string } | null {
+  if (typeof v === 'string' && UUID.test(v)) return { id: v.toLowerCase() };
+  if (v && typeof v === 'object' && !Array.isArray(v)) {
+    const o = v as Record<string, unknown>;
+    if (typeof o.id === 'string' && UUID.test(o.id) && Object.keys(o).every(k => k === 'id' || k === 'typ')) {
+      return { id: o.id.toLowerCase(), typ: typeof o.typ === 'string' ? o.typ : undefined };
+    }
+  }
+  return null;
+}
+
+/** Wert einer Änderung; ein Verweis erscheint kurz (wie in der Spalte «Objekt») und filtert das Protokoll auf dieses Objekt. */
+function Wert({ v, filtern }: { v: unknown; filtern(id: string): void }) {
+  const r = verweis(v);
+  if (!r) return <>{wert(v)}</>;
+  return (
+    <>
+      {r.typ ? `${r.typ} · ` : null}
+      <button type="button" className="sx-ref mono" title={TX.p.verweis(r.id)} onClick={() => filtern(r.id)}>{r.id.slice(0, 8)}</button>
+    </>
+  );
+}
+
+function Aenderungen({ e, filtern }: { e: ProtokollEintrag; filtern(id: string): void }) {
   if (!e.aenderungen.length) return <span className="empty">{TX.p.keineAenderung}</span>;
   return (
     <ul className="sx-aend">
       {e.aenderungen.map(a => (
         <li key={a.feld}>
           <span className="feld mono">{a.feld}</span>{': '}
-          {e.art === 'angelegt' ? <ins>{wert(a.nachher)}</ins> : e.art === 'geloescht' ? <del>{wert(a.vorher)}</del>
-            : <><del>{wert(a.vorher)}</del>{' → '}<ins>{wert(a.nachher)}</ins></>}
+          {e.art === 'angelegt' ? <ins><Wert v={a.nachher} filtern={filtern} /></ins> : e.art === 'geloescht' ? <del><Wert v={a.vorher} filtern={filtern} /></del>
+            : <><del><Wert v={a.vorher} filtern={filtern} /></del>{' → '}<ins><Wert v={a.nachher} filtern={filtern} /></ins></>}
         </li>
       ))}
     </ul>
@@ -84,7 +108,7 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
           ) : null}
         </div>
       </header>
-      <div className="body">
+      <div className="body sx-body">
         <form className="sx-filter" role="search" aria-label={TX.p.filter} onSubmit={e => { e.preventDefault(); kennungUebernehmen(); }}>
           <label htmlFor={`${id}-objekt`}>{TX.p.objekt}
             <select id={`${id}-objekt`} value={search.objekt ?? ''} onChange={e => setSearch({ objekt: e.target.value || undefined }, { replace: true })}>
@@ -138,7 +162,7 @@ export function AenderungsprotokollPage({ search, setSearch }: { search: Protoko
                         </button></div>
                       ) : null}
                     </td>
-                    <td><Aenderungen e={e} /></td>
+                    <td><Aenderungen e={e} filtern={objektId => { setKennung(objektId); setSearch({ objekt: undefined, objektId }); }} /></td>
                   </tr>
                 ))}
               </tbody>

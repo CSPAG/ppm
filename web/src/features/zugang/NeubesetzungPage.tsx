@@ -55,7 +55,7 @@ export function NeubesetzungPage({ id, gehe }: { id: string; gehe: Gehe }) {
           <div className="acts"><Ziel pfad="/administration/zugaenge" gehe={gehe} className="btn">{Z.detail.zurueck}</Ziel></div>
         </div>
       </header>
-      <div className="body">
+      <div className="body zg-body">
         {!d ? (skelett ? <Skelett zeilen={4} /> : null) : (
           <>
             {d.neubesetzung.erledigt

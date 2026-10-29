@@ -49,7 +49,7 @@ export const TX = {
     quelle: { ui: 'Oberfläche', api: 'API', mcp: 'Assistent (MCP)', worker: 'Hintergrund', webhook: 'Webhook', system: 'System' } as Record<string, string>,
     leer: 'Noch keine Änderungen protokolliert. Hier steht, wer wann was geändert hat.',
     leerGefiltert: 'Keine Änderung passt zu den Filtern.', zuruecksetzen: 'Filter zurücksetzen',
-    keineAenderung: 'ohne Feldänderung', leerWert: 'leer', ja: 'ja', nein: 'nein',
+    keineAenderung: 'ohne Feldänderung', leerWert: 'leer', verweis: (id: string) => `Kennung ${id}: Änderungen an diesem Objekt zeigen`, ja: 'ja', nein: 'nein',
     vonNachBis: '«von» liegt nach «bis». Wähle einen gültigen Zeitraum.',
     objektIdUngueltig: 'Die Kennung hat das Format 8-4-4-4-12 (z. B. aus der Adresse).',
   },

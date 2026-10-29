@@ -2,6 +2,7 @@
  * Texte des Eingangs (UI-01; Namensraum = Feature, fachmodell.md 7.2). Anrede «Du», Begriffe aus dem Glossar
  * (docs/ux/README.md: Eingang, Zu tun, Mitteilung, Stellvertretung).
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 export const E = {
@@ -15,9 +16,9 @@ export const E = {
     naechsteFrist: (frist: string) => `nächste Frist ${frist}`,
   },
   vertretung: {
-    sieVertreten: (name: string, bis: string) => `Du vertrittst ${name} bis ${bis}. Aufgaben dieser Person stehen in «Zu tun».`,
+    sieVertreten: (name: string, bis: string) => `Du vertrittst ${name} bis ${satzende(bis)} Aufgaben dieser Person stehen in «Zu tun».`,
     mitUnterschriften: 'Du darfst in Vertretung unterzeichnen.',
-    werdenVertreten: (name: string, von: string, bis: string) => `${name} vertritt dich von ${von} bis ${bis}.`,
+    werdenVertreten: (name: string, von: string, bis: string) => `${name} vertritt dich von ${von} bis ${satzende(bis)}`,
     verwalten: 'Stellvertretung verwalten',
   },
   zuTun: {

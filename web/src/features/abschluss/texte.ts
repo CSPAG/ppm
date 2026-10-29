@@ -3,6 +3,7 @@
  * UC-015, PS.04.03; Namensraum je Feature, docs/fachmodell.md 7.2): Anrede «Du» (UX-E7, Entscheid UX-OF-1), Schweizer Rechtschreibung,
  * «Organisation» statt «Mandant».
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 export const TA = {
@@ -20,7 +21,7 @@ export const TA = {
   banner: {
     abgeschlossen: (d: string) => `Das Projekt ist seit ${d} formell abgeschlossen. Die Projektakte kann nur noch gelesen werden; Lessons Learned lassen sich weiter erfassen.`,
     traktandiert: 'Der Abschlussbericht liegt beim Gremium (Exit-Gate P4). Bis zum Entscheid ist er gesperrt; Sponsor und UE können die Nutzenrealisierung noch beurteilen.',
-    eingereicht: (d: string) => `Eingereicht am ${d}. Der Bericht kann nur noch gelesen werden.`,
+    eingereicht: (d: string) => `Eingereicht am ${satzende(d)} Der Bericht kann nur noch gelesen werden.`,
     nacharbeit: 'Das Gremium verlangt Nacharbeiten. Überarbeite den Bericht und reich ihn erneut ein; die Auflagen findest du im Eingang.',
     sistiert: 'Das Projekt ist sistiert. Erfasse Stand, offene Punkte und Lessons Learned; die Wiederaufnahme beschliesst das Gremium.',
     abgebrochen: 'Das Projekt ist abgebrochen und kann nur noch gelesen werden. Erfasse Stand, offene Punkte und Lessons Learned.',

@@ -17,6 +17,10 @@ export function OrganisationPage({ search, setSearch }: { search: OrganisationSe
   const feiertage = search.ansicht === 'feiertage';
   const canWrite = can('stammdaten:write');
   const zeige = (ansicht?: 'feiertage') => setSearch({ ansicht, o: undefined, q: undefined, aktiv: undefined, jahr: undefined });
+  // Kopf-Button fehlt nur bei geladener, leerer Liste: sie bietet die erste Aktion selbst an (Z2). Gleiche Abfragen wie die Ansichten.
+  const einheiten = useOrgAlle();
+  const tage = useFeiertage(search.jahr ?? new Date().getFullYear());
+  const leer = feiertage ? !!tage.data && !tage.data.pages.some(p => p.items.length) : !!einheiten.data && !einheiten.data.length;
 
   return (
     <section aria-labelledby="page-title">
@@ -29,7 +33,7 @@ export function OrganisationPage({ search, setSearch }: { search: OrganisationSe
               <div className="sub">{TS.org.sub}</div>
             </div>
           </div>
-          {canWrite ? (
+          {canWrite && !leer ? (
             <div className="acts">
               <button type="button" className="btn primary" onClick={() => setSearch({ o: 'neu' })}>
                 <Icon name="plus" />{feiertage ? TS.feiertag.create : TS.org.create}

@@ -4,6 +4,7 @@
  * in der Arbeitsfläche, unter 768 px liegt die Navigation unten (`BottomNav`).
  */
 import { useIamConfig } from '@vollholz/iam-web';
+import { useEffect, useRef, useState } from 'react';
 import { Icon, T } from '../ui/index.ts';
 import type { SichtbarerRaum, Zaehler } from './nav.ts';
 import { Zahl } from './Zahl.tsx';
@@ -39,12 +40,30 @@ export function Rail({ raeume, zaehler = {} }: { raeume: SichtbarerRaum[]; zaehl
   );
 }
 
-/** Bereiche des aktiven Arbeitsraums als Leiste über der Arbeitsfläche, nur unter 1024 px und mit mehr als einem Bereich. */
+/**
+ * Bereiche des aktiven Arbeitsraums als Leiste über der Arbeitsfläche, nur unter 1024 px und mit mehr als einem Bereich.
+ * Passt sie nicht in die Breite, scrollt sie: der aktive Bereich steht im sichtbaren Teil, eine ausgeblendete Kante zeigt,
+ * auf welcher Seite weitere Bereiche folgen.
+ */
 export function BereichLeiste({ raum }: { raum: SichtbarerRaum | undefined }) {
   const { router: { Link } } = useIamConfig();
+  const ref = useRef<HTMLElement>(null);
+  const [mehr, setMehr] = useState({ links: false, rechts: false });
+  const aktiv = raum?.bereiche.find(b => b.aktiv)?.pfad;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const pruefen = () => setMehr({ links: el.scrollLeft > 1, rechts: el.scrollLeft + el.clientWidth < el.scrollWidth - 1 });
+    el.querySelector<HTMLElement>('[aria-current="page"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    pruefen();
+    el.addEventListener('scroll', pruefen, { passive: true });
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(pruefen);
+    ro?.observe(el);
+    return () => { el.removeEventListener('scroll', pruefen); ro?.disconnect(); };
+  }, [raum?.id, aktiv]);
   if (!raum || raum.bereiche.length < 2) return null;
   return (
-    <nav className="bereiche" aria-label={`${T.nav.bereiche} ${raum.label}`}>
+    <nav ref={ref} className={`bereiche${mehr.links ? ' mehr-links' : ''}${mehr.rechts ? ' mehr-rechts' : ''}`} aria-label={`${T.nav.bereiche} ${raum.label}`}>
       {raum.bereiche.map(b => (
         <Link key={b.pfad} to={b.pfad} className={`tab${b.aktiv ? ' on' : ''}`} {...(b.aktiv ? { 'aria-current': 'page' as const } : {})}>{b.label}</Link>
       ))}

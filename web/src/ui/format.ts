@@ -77,6 +77,9 @@ export function fmtZeitpunkt(iso: string | Date): string {
   return `${wt} ${p.day}.${p.month}.${p.year}, ${zz(p.hour)}:${zz(p.minute)}`;
 }
 
+/** Datum am Satzende: kein zweiter Punkt nach «Do 29.10.» (`fmtDatum` endet im laufenden Jahr auf einen Punkt). */
+export const satzende = (s: string): string => (s.endsWith('.') ? s : `${s}.`);
+
 /** Früherer Name für den Verlauf; gleich wie `fmtZeitpunkt`. */
 export const fmtDateTime = fmtZeitpunkt;
 

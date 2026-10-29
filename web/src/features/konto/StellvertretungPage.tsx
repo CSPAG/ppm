@@ -52,7 +52,8 @@ export function StellvertretungPage({ search, setSearch }: { search: KontoSearch
               <div className="sub">{K.sub}</div>
             </div>
           </div>
-          <div className="acts"><button type="button" className="btn primary" onClick={() => setSearch({ o: 'neu' })}><Icon name="plus" />{K.erfassen}</button></div>
+          {/* Kopf-Button fehlt nur bei geladener, leerer Liste: sie bietet die erste Aktion selbst an (Z2) */}
+          {!list.data || list.data.length ? <div className="acts"><button type="button" className="btn primary" onClick={() => setSearch({ o: 'neu' })}><Icon name="plus" />{K.erfassen}</button></div> : null}
         </div>
       </header>
       <div className="body">

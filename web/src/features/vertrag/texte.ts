@@ -2,6 +2,7 @@
  * Texte des Features «Projektvertrag» (Namensraum des Features, fachmodell.md 7.2; Kernablauf K2): Anrede «Du»,
  * Schweizer Rechtschreibung, Begriffe nach docs/ux/darstellung.md und der Vorlage Projektvertrag (Q7).
  */
+import { satzende } from '../../ui/index.ts';
 import { NAV } from './nav.ts';
 
 type Stand = 'in_arbeit' | 'in_pruefung' | 'zur_unterzeichnung' | 'unterzeichnet' | 'traktandiert' | 'abgenommen' | 'abgelehnt' | 'verworfen' | 'zurueckgezogen';
@@ -30,7 +31,7 @@ export const TV = {
   anlegen: 'Projektvertrag erstellen',
   legtAn: 'Der Projektvertrag wird angelegt …',
   nurLesen: 'Du siehst den Projektvertrag. Ändern kann ihn die Projektleitung, solange der Entwurf in Arbeit ist.',
-  inPruefung: (datum: string) => `In Prüfung bei der Unternehmensentwicklung seit ${datum}. Bis zum Ergebnis ist der Entwurf gesperrt.`,
+  inPruefung: (datum: string) => `In Prüfung bei der Unternehmensentwicklung seit ${satzende(datum)} Bis zum Ergebnis ist der Entwurf gesperrt.`,
   gesperrt: (stand: string) => `Diese Version ist ${stand} und kann nicht mehr bearbeitet werden.`,
   baselineSeit: (nummer: string, datum: string) => `Version ${nummer} ist seit ${datum} Baseline.`,
   ohneBetraege: 'Beträge siehst du nur mit Recht auf Beträge; dieses Kapitel kannst du darum nicht bearbeiten.',

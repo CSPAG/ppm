@@ -40,16 +40,15 @@ export function ProjektKopfKarte() {
           const offen = s?.laufend && (s.laufend.stand === null || s.laufend.stand === 'entwurf' || s.laufend.stand === 'zurueckgegeben') ? s.laufend : null;
           return (
             <li key={p.id}>
-              <Link to={`/projekte/${encodeURIComponent(p.nummer)}`}>{`${p.nummer} ${p.name}`}</Link>
+              {/* Projekt klein (darstellung.md): Name mit Status-Symbol und Trend in einer Zeile */}
+              <span className="eg-k-zeile">
+                <Link to={`/projekte/${encodeURIComponent(p.nummer)}`}>{`${p.nummer} ${p.name}`}</Link>
+                {l?.status ? <Status status={l.status === 'im_plan' ? 'im-plan' : 'kritisch'} trend={l.trend ? TREND[l.trend] : undefined} kompakt /> : null}
+              </span>
               <span className="muted small">
                 {[fmtPhase(p.phase), p.lebenszyklus === 'sistiert' ? TP.lebenszyklus.sistiert : '', p.rollen.map(r => TP.funktion[r]).join(', ')].filter(Boolean).join(' · ')}
               </span>
-              {l?.status ? (
-                <span className="small">
-                  <Status status={l.status === 'im_plan' ? 'im-plan' : 'kritisch'} trend={l.trend ? TREND[l.trend] : undefined} />
-                  {l.status === 'kritisch' && l.begruendung ? <span className="muted"> · {TP.kopfkarte.kritischGrund(l.begruendung)}</span> : null}
-                </span>
-              ) : null}
+              {l?.status === 'kritisch' && l.begruendung ? <span className="small eg-k-grund" title={l.begruendung}>{TP.kopfkarte.kritischGrund(l.begruendung)}</span> : null}
               {l?.naechsterMeilenstein ? <span className="muted small">{TP.kopfkarte.meilenstein(l.naechsterMeilenstein)}</span> : null}
               {g ? (
                 <Link to={`/gremien/${encodeURIComponent(g.sitzung.gremium.kuerzel)}/sitzungen/${g.sitzung.datum}`} className="small">

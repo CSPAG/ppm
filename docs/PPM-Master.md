@@ -213,6 +213,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Verwalten darf**, wer am Ort «Bearbeiten» hat; die Vorlage enthält dafür «Zugriff verwalten» (`access:admin` aus identity-kit: niemand gibt mehr, als er hat; jede Änderung steht im Protokoll).
    - **Weiche Regeln (G1):** Hat die Projektmanager:in kein «Bearbeiten» oder die Projektauftraggeber:in kein «Lesen», zeigt das System einen Hinweis mit «Zugriff geben». Entsteht ein Projekt (Initialisierung, Übernahme), schlägt es diese Zugriffe vorausgewählt vor; danach gibt es keine Kopplung. Wer Zugriff auf ein vertrauliches Projekt gibt, sieht einen Hinweis.
    - **Bauplan und UX:** Rechte am Projekt laufen über die Vorlagen statt über `sp`, `pl`, `ctl` und `kt`; die Übernahme der Projektorganisation in Rechte entfällt; bestehende Zuweisungen werden migriert; die Stellvertretung (A-31) bleibt. Den Bereich «Zugriff» baut die App auf den Schnittstellen von identity-kit; die Informationsarchitektur erhält ihn in der Projektakte.
+17. **Funktionen der Projektorganisation ohne gepflegte Liste** (29.10.2026, zu G4 und Entscheid 16): Fest sind nur Projektmanager:in und Projektauftraggeber:in, je höchstens eine Person (A-04); an ihnen hängen Aufgaben, Vermerke und Kopfdaten. Alle weiteren Funktionen sind freier Text, und das Feld schlägt vor, was in der Organisation schon verwendet wurde (z. B. «PMO», «Kernteam»). Begründung aus dem Nutzungskontext: Die Projektmanager:in trägt im Projektvertrag (Kap. 8, K2) ein, wer mitarbeitet, und denkt dabei in Personen und Aufgaben, nicht in Stammdaten; eine vorgegebene Liste zwänge sie zu einem unpassenden Wert oder zu einer Anfrage an die Administration. Weitere Funktionen wirken nicht auf Abläufe oder Rechte; der Filter «Meine Projekte» unterscheidet die zwei festen Funktionen und «weitere». Bestehende Einträge (CTL, Kernteam, Sponsoren-Koalition) werden zu Text. Im Bauplan wird `projekt_person.funktion` zu zwei festen Werten plus Text; nachzuführen in `projekt`, `vertrag` (Kap. 8, Dokument, Unterzeichnende), `sitzung` (Einladungen) und im Filter der Webapp.
 
 **Vorgeschlagen, nicht entschieden**
 
@@ -237,7 +238,6 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 
 **Produkt** (nicht in der Klärungsliste, die sich an den Referenzkunden richtet), zu V14:
 
-- **Funktionen der Projektorganisation:** Fest im System nur Projektmanager:in und Projektauftraggeber:in, weil an ihnen Aufgaben und Vermerke hängen; weitere Funktionen (PMO, Kernteam, Sponsoren-Koalition …) als Codetabelle, die jede Organisation selbst pflegt?
 - **Direktion:** Pflegt sie ihr Portfolio C selbst («Bearbeiten» am Portfolio), oder liest sie nur, und Projektportfoliomanager:in und PPMO erfassen ihre Entscheide?
 
 **Referenzkunde Insel Gruppe:** Alle offenen Punkte mit Fundstelle und Vorschlag von CSP als Fragen K01–K25: [anhang/klaerungsliste.md](anhang/klaerungsliste.md).

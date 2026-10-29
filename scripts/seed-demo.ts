@@ -36,7 +36,12 @@ const url = env('DATABASE_URL');
 if (!url) { console.error('seed-demo: DATABASE_URL (bzw. _FILE) fehlt'); process.exit(78); }
 const fail = (msg: string): never => { console.error(`seed-demo: ${msg}`); process.exit(1); };
 
-const db = new pg.Pool({ connectionString: url, max: 4 });
+// TLS wie createPool des Baukastens (DATABASE_SSL; im Betrieb verify-full, CA über NODE_EXTRA_CA_CERTS); ohne Variable PGSSLMODE
+const tls = env('DATABASE_SSL');
+const db = new pg.Pool({
+  connectionString: url, max: 4,
+  ...(tls ? { ssl: tls === 'disable' ? false : { rejectUnauthorized: tls !== 'require' } } : {}),
+});
 const umgebung = { ...process.env, ENCRYPTION_KEYS: env('ENCRYPTION_KEYS') || process.env.ENCRYPTION_KEYS, SESSION_SECRET: env('SESSION_SECRET') };
 const s = await seedApi(db, a.org, umgebung);
 try {

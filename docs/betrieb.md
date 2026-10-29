@@ -121,9 +121,13 @@ und schreibt nur in diese Organisation.
 
    ```sh
    cd /opt/ppm
-   sudo docker compose -f compose.prod.yaml --env-file prod.env run --rm --no-deps api \
+   sudo env IMAGE="$(sudo cat state/image)" docker compose -f compose.prod.yaml --env-file prod.env run --rm --no-deps api \
      node scripts/seed-demo.ts --org demo --admin <eigene E-Mail> --einladen
    ```
+
+   `IMAGE` ist das deployte Image (`compose.prod.yaml` verlangt es). Bis zum Image vom 29.10.2026
+   (`sha256:c6ca458f…`) öffnet das Skript die Datenbank ohne TLS («pg_hba.conf rejects connection … no encryption»);
+   dann nach `--no-deps` zusätzlich `-e PGSSLMODE=verify-full` (so am 29.10.2026 für `demo` gelaufen).
 
    `--einladen` lädt die 16 Personen der Demo (`scripts/seed/personen.ts`) über die Verwaltung ein: Keycloak legt Konten
    ohne Passwort unter `…@demo.example` an; die Mail «Passwort setzen» erreicht niemanden (`.example`, RFC 2606), also

@@ -1,5 +1,5 @@
 /**
- * Rahmen der Projektakte (`/projekte/<nr>/…`, fachmodell.md 1.2): Kopf mit Nummer, Name, Portfolio, Phase und Stand,
+ * Rahmen der Projektakte (`/projekte/<nr>/…`, fachmodell.md 1.2): Kopf mit Nummer, Name, Portfolio, Phase, Stand und «Zugriff»,
  * Banner bei sistierten und beendeten Projekten (Z9), Reiter der Projektakte und darunter der Inhalt des Reiters. Die
  * Reiter anderer Features hängt der Router ein (`reiter`, Kinder); der Rahmen importiert keine Features (I-N6: Projekt ›
  * Reiter statt tieferer Ebenen). Unbekannt und ohne Zugriff zeigen dieselbe Meldung (Z10).
@@ -8,7 +8,7 @@ import { useIamConfig } from '@vollholz/iam-web';
 import type { ReactNode } from 'react';
 import { useSession } from '../../auth/index.ts';
 import type { AppPermission } from '../../auth/permissions.ts';
-import { Empty, ErrorState, fmtPhase, GeaendertNach, Hinweis, Icon, Skelett, T, useVerzoegert } from '../../ui/index.ts';
+import { Empty, ErrorState, fmtPhase, GeaendertNach, Hinweis, Icon, Skelett, T, useVerzoegert, ZugriffKurz } from '../../ui/index.ts';
 import { useProjektNachNummer } from './api.ts';
 import { ProjektStand } from './ProjektStand.tsx';
 import { TP } from './texte.ts';
@@ -47,7 +47,11 @@ export function ProjektAkte({ nummer, reiter, children }: { nummer: string; reit
                 {p.geaendertNachAbschluss ? <> <GeaendertNach text={TP.akte.geaendertNachAbschluss} at={p.geaendertNachAbschluss} /></> : null}</div>
             </div>
           </div>
-          <div className="acts">{zurueck}</div>
+          <div className="acts">
+            {/* Zugriff auf einen Blick, mit Schloss bei vertraulichen Projekten (docs/ux/zugriff.md, UX-E14) */}
+            {p.can.read ? <ZugriffKurz ort={{ type: 'projekt', id: p.id }} label={`${p.nummer} ${p.name}`} vertraulich={p.vertraulich} bereich={`${basis}/zugriff`} /> : null}
+            {zurueck}
+          </div>
         </div>
         {sichtbar.length > 1 ? (
           <nav className="tabs" aria-label={TP.akte.reiter}>

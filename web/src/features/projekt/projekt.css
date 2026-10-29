@@ -32,3 +32,5 @@
 .pj-zugriff{display:flex;flex-direction:column;gap:16px}
 .pj-zugriff-kopf{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;justify-content:space-between}
 .pj-zugriff-kopf .acts{display:flex;gap:8px;flex-wrap:wrap}
+/* Stufe oben im Bereich «Zugriff» (docs/ux/zugriff.md, Z-3): Satz und Auswahl */
+.pj-zugriff-stufe{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}

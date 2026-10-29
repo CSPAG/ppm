@@ -6,7 +6,7 @@
 import { describeError } from '@vollholz/iam-web';
 import { Fragment, useId, useState, type FormEvent } from 'react';
 import { isConflict, isGone, newIdempotencyKey, statusOf } from '../../api/index.ts';
-import { Confirm, Drawer, Empty, ErrorState, fmtGate, Icon, Loading, T, useToast } from '../../ui/index.ts';
+import { Confirm, Drawer, Empty, ErrorState, fmtGate, Icon, Loading, T, useToast, ZugriffKurz } from '../../ui/index.ts';
 import {
   GATES, useGremien, useGremienweg, usePortfolio, usePortfolioMutations, type GateCode, type Gremienweg, type Gremium, type Loaded, type Portfolio,
 } from './api.ts';
@@ -102,10 +102,14 @@ function ViewDrawer({ loaded: { item, etag }, onClose, onEdit, onWeg, onGremium 
   const weg = useGremienweg(item.id);
   const eigene = (gremien.data ?? []).filter(g => g.portfolioId === item.id);
   return (
-    <Drawer title={item.name} onClose={onClose} actions={item.can.admin ? <>
-      <button type="button" className="btn sm" onClick={onEdit}><Icon name="edit" />{T.common.edit}</button>
-      <button type="button" className="btn sm danger" onClick={() => setConfirm(true)}><Icon name="trash" />{T.common.delete}</button>
-    </> : undefined}>
+    <Drawer title={item.name} onClose={onClose} actions={<>
+      {item.can.admin ? <>
+        <button type="button" className="btn sm" onClick={onEdit}><Icon name="edit" />{T.common.edit}</button>
+        <button type="button" className="btn sm danger" onClick={() => setConfirm(true)}><Icon name="trash" />{T.common.delete}</button>
+      </> : null}
+      {/* Zugriff auf einen Blick, verwaltet unter Portfolio › Zugriff (docs/ux/zugriff.md, UI-51) */}
+      <ZugriffKurz ort={{ type: 'portfolio', id: item.id }} label={item.name} bereich={`/portfolio/zugriff?portfolio=${encodeURIComponent(item.schluessel)}`} />
+    </>}>
       <dl className="attrs">
         <dt>{TP.kategorie}</dt><dd>{TP.kategorien[item.kategorie]}</dd>
         <dt>{TP.pflichten}</dt><dd className="wrap">{item.pflichten ? TP.mitPflichten : TP.freiwillig}</dd>

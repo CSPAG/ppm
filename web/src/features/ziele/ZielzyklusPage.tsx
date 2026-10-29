@@ -76,7 +76,7 @@ export function ZielzyklusPage({ jahr, search, setSearch, jahrWechseln, projektO
           : !zj ? <Leer zyklus={q.data} onStrategischeZiele={strategischeZiele} />
           : (
             <>
-              {zj.stand === 'zur_freigabe' ? <div className="notice" role="status"><Icon name="lock" /> {TZZ.zurFreigabe(jahr, (zj.vorgelegtAt ?? zj.updatedAt) as string)}</div> : null}
+              {zj.stand === 'zur_freigabe' ? <div className="notice" role="status"><Icon name="clock" /> {TZZ.zurFreigabe(jahr, (zj.vorgelegtAt ?? zj.updatedAt) as string)}</div> : null}
               {zj.geaendertNachVorlage ? <p><GeaendertNach text={TZZ.geaendertNachVorlage} at={zj.geaendertNachVorlage as string} /></p> : null}
               {zj.stand === 'in_kraft' ? <div className="notice" role="status"><Icon name="check" /> {TZZ.inKraft(jahr, zj.freigabeAt as string | null)}</div> : null}
               {zj.stand === 'in_arbeit' && !q.data.can.write ? <p className="note">{TZZ.nurLesen}</p> : null}

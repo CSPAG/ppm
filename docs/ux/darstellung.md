@@ -69,7 +69,7 @@ Ein Satz Badges für alle Objekte mit Bearbeitungsstand: Projektidee, Projektver
 | Erledigt positiv | Haken | grün | Idee «freigegeben»; Vertrag «abgenommen» (Baseline); Bericht «geprüft»; Änderung «freigegeben»; Jahresziele «in Kraft»; Quartalsreporting «verabschiedet»; Projekt «abgeschlossen» |
 | Erledigt negativ | Kreuz | rot | Idee «zurückgewiesen»; Änderung «abgelehnt»; Projekt «abgebrochen» |
 | Ruhend, beendet ohne Entscheid | Strich | neutral | Idee «zusammengeführt», «zurückgestellt»; Projekt «zurückgezogen», «sistiert» |
-| Abgeschlossen | Schloss | neutral | Periode «abgeschlossen»; Sitzung «geschlossen»; Änderungen danach bleiben möglich und tragen «geändert nach Abschluss» (UX-E13) |
+| Abgeschlossen | Kalender mit Haken | neutral | Periode «abgeschlossen»; Sitzung «geschlossen»; Änderungen danach bleiben möglich und tragen «geändert nach Abschluss» (UX-E13). Das Schloss steht nur für «vertraulich» ([zugriff.md](zugriff.md#5-symbol)) |
 | Vermerk offen | Kreis gestrichelt + Text | gelb | «ohne Freigabe», «Quality-Check offen», «Unterschrift offen», «Abnahme offen», «ohne Gate-Entscheid»; verschwindet, sobald der Vermerk nachgetragen ist (UX-E12) |
 | Geändert nach … | Stift + Datum | neutral | «geändert nach Einreichen», «geändert nach Versand», «geändert nach Vorlage», «geändert nach Abschluss»; führt in den Verlauf (UX-E13) |
 

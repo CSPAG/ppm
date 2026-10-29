@@ -193,6 +193,20 @@ tbody td.wrap{white-space:normal;max-width:none}
 /* Vermerk offen (darstellung.md, UX-E12): Kreis gestrichelt + Text, gelb */
 .vermerk{display:inline-flex;align-items:center;gap:5px;min-height:20px;padding:0 6px;border-radius:4px;font-size:11.5px;font-weight:500;color:var(--warn);background:var(--warn-soft);border:1px solid color-mix(in srgb, var(--warn) 45%, transparent);white-space:nowrap;vertical-align:middle}
 .vermerk + .vermerk, .merkmal + .vermerk, .vermerk + .merkmal{margin-left:4px}
+/* Zugriff auf einen Blick (docs/ux/zugriff.md): Kurzübersicht, Stufe und Zeile der Mitglieder */
+.zk{display:flex;flex-direction:column;gap:14px}
+.zk p{margin:0}
+.zk-du{font-weight:500}
+.zk-stufe, .zg-stufe{display:flex;gap:8px;align-items:flex-start;color:var(--fg-2)}
+.zk-stufe .ico, .zg-stufe .ico{flex:none;width:16px;height:16px;margin-top:2px}
+.zk-rollen, .zk-namen{list-style:none;margin:0;padding:0}
+.zk-rollen > li + li{border-top:1px solid var(--line)}
+.zk-rollen summary{display:flex;gap:4px;align-items:baseline;padding:6px 0;cursor:pointer}
+.zk-rolle{font-weight:500}
+.zk-n{margin-left:auto;font:500 12px var(--f-mono);color:var(--fg-2)}
+.zk-namen{padding:0 0 8px 16px;color:var(--fg-2)}
+.zk-mitglieder{color:var(--fg-2)}
+.zk-mitglieder .ico{width:14px;height:14px;vertical-align:-2px}
 .vermerk-kreis{width:9px;height:9px;border-radius:50%;border:1.5px dashed currentColor}
 .pk{display:inline-flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
 .pk-n{font-weight:500}

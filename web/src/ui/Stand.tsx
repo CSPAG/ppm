@@ -15,7 +15,8 @@ const FAMILIE: Record<StandFamilie, { icon: IconName; ton: 'neutral' | 'info' | 
   positiv: { icon: 'check', ton: 'ok' },
   negativ: { icon: 'x', ton: 'bad' },
   ruhend: { icon: 'minus', ton: 'neutral' },
-  gesperrt: { icon: 'lock', ton: 'neutral' },
+  // «Abgeschlossen» (Periode, Sitzung; UX-E13): Kalender mit Haken; das Schloss bedeutet nur «vertraulich» (docs/ux/zugriff.md)
+  gesperrt: { icon: 'calendar-check', ton: 'neutral' },
 };
 
 export interface StandProps {

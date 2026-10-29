@@ -83,6 +83,28 @@ export const deCH = {
     merkmal: { 'sns-vr': 'via SNS-VR', eskalation: 'Eskalation offen', nicht_geprueft: 'nicht geprüft' },
     keinMeilenstein: 'kein Meilenstein geplant',
   },
+  // Zugriff auf einen Blick (docs/ux/zugriff.md, Ergänzung zu UX-E14 und UI-51)
+  zugriff: {
+    schaltflaeche: 'Zugriff', schaltflaecheVertraulich: 'Zugriff · vertraulich',
+    titel: (objekt: string) => `Zugriff · ${objekt}`,
+    duBearbeiten: { projekt: 'Du kannst das Projekt bearbeiten', portfolio: 'Du kannst die Projekte des Portfolios bearbeiten' },
+    duLesen: { projekt: 'Du kannst das Projekt lesen', portfolio: 'Du kannst die Projekte des Portfolios lesen' },
+    duKeiner: 'Du hast hier keine Rolle.',
+    grund: (rolle: string, wo: string) => ` – Rolle «${rolle}» ${wo}.`,
+    wo: { projekt: 'am Projekt', portfolio: 'am Portfolio', ueberPortfolio: 'über das Portfolio', org: 'für alle Portfolios' },
+    stufe: {
+      offenProjekt: 'Alle Mitglieder sehen die Kopfdaten: Nummer, Name, Portfolio, Phase, Projektleitung und Projektauftraggeber:in.',
+      vertraulichProjekt: 'Vertraulich: Nur wer am Projekt, am Portfolio oder für alle Portfolios eine Rolle hat, sieht das Projekt.',
+      offenPortfolio: 'Alle Mitglieder sehen das Portfolio und die Kopfdaten seiner nicht vertraulichen Projekte.',
+    },
+    gruppe: { projekt: 'Am Projekt', portfolio: 'Am Portfolio', ueberPortfolio: 'Über das Portfolio', org: 'Für alle Portfolios' },
+    darf: { bearbeiten: 'lesen und bearbeiten', lesen: 'lesen', auflisten: 'auflisten', verwalten: 'verwaltet Zugriff' },
+    mitglieder: 'Alle Mitglieder',
+    mitgliederProjekt: 'Kopfdaten auflisten', mitgliederVertraulich: 'kein Zugriff', mitgliederPortfolio: 'Portfolio sehen, Kopfdaten der Projekte auflisten',
+    anzahl: (n: number) => (n === 1 ? '1 Eintrag' : `${n} Einträge`),
+    niemand: 'Hier hat noch niemand eine Rolle.',
+    alleAnzeigen: 'Alle anzeigen',
+  },
   // Regelprüfung (I-P1 bis I-P6)
   regel: {
     stufe: { hinweis: 'Hinweis', warnung: 'Warnung', sperre: 'Sperre' },

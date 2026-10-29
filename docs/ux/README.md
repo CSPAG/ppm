@@ -18,6 +18,7 @@ mit welcher Rückmeldung. Es gelten die Produktgrundsätze G1–G4 ([Master Absc
 | [nutzungskontexte.md](nutzungskontexte.md) | Rollen: Gerät, Umgebung, Häufigkeit, Kernfrage |
 | [informationsarchitektur.md](informationsarchitektur.md) | Arbeitsräume, Sichtbarkeit je Rolle, Startseiten, abgeleiteter UI-Katalog UI-01–UI-52, Adressen |
 | [darstellung.md](darstellung.md) | wie Projekte, Status, Stände, Beträge, Fristen und Personen überall aussehen |
+| [zugriff.md](zugriff.md) | Vorlage zu UX-E14: Schloss im Kopf, Bereich «Zugriff» im Stil von Confluence, vertrauliches Portfolio |
 | [ablaeufe/](ablaeufe/) | die Kernabläufe K1–K6 |
 | [fahrplan.md](fahrplan.md) | Etappen mit Abnahme, offene Fragen UX-OF, Rückfluss an die Anforderungen |
 | [rahmen/](rahmen/) | UX-Rahmen: Grundsätze G1–G12, Qualitätsziele, Interaktionsregeln, Vorlage, Prüfung und UX-Definition of Done |

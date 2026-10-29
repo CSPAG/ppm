@@ -214,17 +214,27 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
    - **Weiche Regeln (G1):** Hat die Projektmanager:in kein «Bearbeiten» oder die Projektauftraggeber:in kein «Lesen», zeigt das System einen Hinweis mit «Zugriff geben». Entsteht ein Projekt (Initialisierung, Übernahme), schlägt es diese Zugriffe vorausgewählt vor; danach gibt es keine Kopplung. Wer Zugriff auf ein vertrauliches Projekt gibt, sieht einen Hinweis.
    - **Bauplan und UX:** Rechte am Projekt laufen über die Vorlagen statt über `sp`, `pl`, `ctl` und `kt`; die Übernahme der Projektorganisation in Rechte entfällt; bestehende Zuweisungen werden migriert; die Stellvertretung (A-31) bleibt. Den Bereich «Zugriff» baut die App auf den Schnittstellen von identity-kit; die Informationsarchitektur erhält ihn in der Projektakte.
 17. **Funktionen der Projektorganisation ohne gepflegte Liste** (29.10.2026, zu G4 und Entscheid 16): Fest sind nur Projektmanager:in und Projektauftraggeber:in, je höchstens eine Person (A-04); an ihnen hängen Aufgaben, Vermerke und Kopfdaten. Alle weiteren Funktionen sind freier Text, und das Feld schlägt vor, was in der Organisation schon verwendet wurde (z. B. «PMO», «Kernteam»). Begründung aus dem Nutzungskontext: Die Projektmanager:in trägt im Projektvertrag (Kap. 8, K2) ein, wer mitarbeitet, und denkt dabei in Personen und Aufgaben, nicht in Stammdaten; eine vorgegebene Liste zwänge sie zu einem unpassenden Wert oder zu einer Anfrage an die Administration. Weitere Funktionen wirken nicht auf Abläufe oder Rechte; der Filter «Meine Projekte» unterscheidet die zwei festen Funktionen und «weitere». Bestehende Einträge (CTL, Kernteam, Sponsoren-Koalition) werden zu Text. Im Bauplan wird `projekt_person.funktion` zu zwei festen Werten plus Text; nachzuführen in `projekt`, `vertrag` (Kap. 8, Dokument, Unterzeichnende), `sitzung` (Einladungen) und im Filter der Webapp.
+18. **Rollenmodell: steuern und führen je Portfolio und Projekt** (29.10.2026, zu G3 und G4; ersetzt V14 und die heutigen 14 Rollen). Methodisch von oben nach unten:
+
+   | Ebene | Rollen |
+   |---|---|
+   | je Portfolio | Portfolio steuern (Portfolio-Auftraggeber:in) · Portfolio führen (Projektportfoliomanager:in) · Gremium |
+   | je Projekt | Projekt steuern (Projektauftraggeber:in) · Projekt führen (Projektmanager:in) · Projekt mitlesen |
+   | übergreifend | alle Portfolios lesen · alle Portfolios führen |
+   | Grundlage | Mitglied · Admin |
+
+   - **Steuern:** alles am Ort lesen, Entscheide und Freigaben vermerken (G1). **Führen:** alles am Ort bearbeiten und den Zugriff verwalten (Entscheid 16); auch wer nicht die offizielle Funktion hat, z. B. ein PMO. **Gremium:** steuert ein Portfolio gemeinsam, liest es und entscheidet in Sitzungen; die Entscheide erfasst, wer das Portfolio führt. **Mitlesen:** liest ein Projekt, z. B. das Kernteam.
+   - **Je Portfolio:** Eine Organisation kann mehrere Portfolios haben; die Rollen werden je Portfolio vergeben, nicht für «eines oder alle».
+   - **Übergreifend:** «Alle Portfolios lesen» liest jedes Portfolio. «Alle Portfolios führen» führt jedes Portfolio und pflegt, was keinem Portfolio gehört: Strategie und Ziele, Ideenpool bis zur Zuordnung zu einem Portfolio, Monatsabschluss, Phasenmodell und Vorlagen.
+   - **Grundlage:** Mitglied wie Entscheid 14 (Ziele lesen, Projekte auflisten, eingereichte Ideen lesen, eigene Ideen erfassen). Admin verwaltet Zugänge, Stammdaten, Schnittstellen und Webhooks.
+   - **Technisch** sind steuern, Gremium, mitlesen und «alle Portfolios lesen» Leserechte, führen und «alle Portfolios führen» Bearbeitungsrechte (Entscheid 13 gilt für alle); die übergreifenden Rollen hängen an der Organisation. Die Oberfläche spricht von «alle Portfolios», nicht von «Organisation». PPMO und PMO sind keine eigenen Rollen: Wer mitführt, erhält «führen».
+   - **Referenzkunde:** UE und PMO führen alle Portfolios, die GL liest alle Portfolios; Portfolio A mit Gremium PRAT, Portfolio B mit Gremium GLPA; je Direktion ein Portfolio C, das die Direktion steuert und dessen Gremium sie ist; führen kann sie es selbst oder über die UE.
+   - **Voraussetzungen in identity-kit:** (1) «Recht irgendwo» (Startseite, Navigation) zählt ein Recht nur an den Orttypen, für die es gilt. (2) In der Datenbank zählt `app.has_permission(recht, typ, id)` auch Rollen an Vorfahren; heute nur am Ort selbst, sodass «Portfolio führen» die Projektdetails nicht schreiben dürfte.
 
 **Vorgeschlagen, nicht entschieden**
 
 - **V10 Bewertungsmodell:** PP.01.02 «Bewertungsmodell festlegen» verlangt heute «Kriterien und Gewichte». Laut Q8 sind Kriterienraster und Priorisierungskriterien eine Orientierung für eine Gesamtbeurteilung, kein Rechenmodell. Vorschlag: Das System führt die Kriterien als Checkliste mit Einschätzung je Kriterium, rechnet aber keinen gewichteten Score. Offen, bis die Insel Gruppe entschieden hat, ob sie einen Score will (siehe offene Punkte).
-- **V14 Rollenvorlagen (G3, G4):** vier Vorlagen statt heute 14 Rollen.
-  - **Organisations-Admin:** alles, dazu Zugänge, Schnittstellen und Webhooks.
-  - **Bearbeiten:** auflisten, lesen, anlegen und ändern in allen Fachbereichen am Ort, dazu Zugriff am Ort verwalten (Entscheid 16). An der Organisation heisst sie Projektportfoliomanager:in oder PPMO, am Projekt je nach Funktion in der Projektorganisation z. B. Projektmanager:in oder PMO.
-  - **Lesen:** alles am Ort lesen. An der Organisation für die Geschäftsleitung, am Portfolio für Gremien (PRAT, GLPA, Direktion), am Projekt für Projektauftraggeber:in und Projektmitglieder.
-  - **Mitglied:** für alle Mitglieder der Organisation; Ziele lesen, Projekte auflisten, eingereichte Ideen lesen (Entscheid 14) und eigene Ideen erfassen.
-
-  Voraussetzung: identity-kit zählt «Recht irgendwo» (Startseite, Navigation) nur an den Orttypen, für die ein Recht gilt; sonst braucht «Bearbeiten» je eine Vorlage für Organisation und Projekt. Offene Fragen dazu in Abschnitt 12.
+- **V14 Rollenvorlagen:** *ersetzt* durch Entscheid 18.
 
 ## 11. Annahmen
 
@@ -236,9 +246,7 @@ Die **UX-Schicht** in [ux/](ux/README.md) konkretisiert dieses Prinzip: Nutzungs
 
 ## 12. Offene Punkte
 
-**Produkt** (nicht in der Klärungsliste, die sich an den Referenzkunden richtet), zu V14:
-
-- **Direktion:** Pflegt sie ihr Portfolio C selbst («Bearbeiten» am Portfolio), oder liest sie nur, und Projektportfoliomanager:in und PPMO erfassen ihre Entscheide?
+**Produkt:** keine offenen Punkte; die Fragen zum Rollenmodell sind mit den Entscheiden 13 bis 18 geklärt.
 
 **Referenzkunde Insel Gruppe:** Alle offenen Punkte mit Fundstelle und Vorschlag von CSP als Fragen K01–K25: [anhang/klaerungsliste.md](anhang/klaerungsliste.md).
 
@@ -262,7 +270,7 @@ Erledigt durch Q8 und Q9: GLPA, DIR, SNS, Rolle Auftraggeber/Sponsor, Geltung f�
 
 ## 13. Nächste Schritte
 
-1. Offene Punkte «Produkt» entscheiden und V14 übernehmen; danach Entscheid 12 nachführen: Funktionsbaum und Use Cases (Generator), UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
+1. Entscheide 12 bis 18 nachführen: zuerst die zwei Voraussetzungen in identity-kit (Entscheid 18), dann Funktionsbaum und Use Cases (Generator), UX-Schicht (Kernabläufe K1–K6, Sichtbarkeit je Rolle, Bereich «Zugriff»), Bauplan (Rollen, Lesesicht, Annahmen), zuletzt Code.
 2. PDFs mit dem Generator neu erzeugen und in `anhang/pdf/` ablegen (braucht die CSP-Skills); die alten PDFs (Stand vor Entscheid 8) sind gelöscht.
 3. Use Cases mit PL, UE und PRAT durchgehen und die Klärungsliste K01–K25 beantworten; Antworten hier als Entscheid oder Annahme eintragen.
 4. V10 mit der Insel Gruppe klären.

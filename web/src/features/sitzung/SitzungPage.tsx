@@ -178,8 +178,8 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
           </div>
           {bearbeiten ? <Vorschlagsliste sitzung={s} busy={busy} onAufnehmen={id => aufnehmen(id)} onEinplanen={body => m.aufnehmen.mutate({ id: s.id, body }, { onSuccess: () => toast.show(TS.aufgenommen), onError: fehler })} /> : null}
         </div>
+        {versendet ? <SitzungVerlauf id={s.id} version={s.version} /> : null}
       </div>
-      {versendet ? <div className="body"><SitzungVerlauf id={s.id} version={s.version} /></div> : null}
       {versand ? <VersandDialog s={s} busy={m.versenden.isPending} onClose={() => setVersand(false)} onVersenden={versenden} /> : null}
     </section>
   );

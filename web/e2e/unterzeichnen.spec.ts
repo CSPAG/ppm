@@ -73,7 +73,8 @@ test('Unterzeichnen ab dem Eingang bei 360 px in höchstens 3 Interaktionen (K2-
   expect(Date.now() - start).toBeLessThanOrEqual(60_000);
   // Hinweis mit Stufe vorangestellt («Hinweis: …», I-P1)
   await expect(page.locator('.hinweis').filter({ hasText: 'Der Vertrag ist vollständig unterzeichnet.' })).toBeVisible();
-  await expect(page.getByText('3 von 3')).toBeVisible();
+  // Unterzeichnende: Projektauftraggeber:in und Projektleitung (A-72)
+  await expect(page.getByText('2 von 2')).toBeVisible();
 
   await page.emulateMedia({ colorScheme: 'dark' });
   await expectAccessible(page);

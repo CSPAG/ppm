@@ -60,5 +60,7 @@ test('Projektidee in vier Schritten einreichen und unter «Meine Ideen» verfolg
 
 test('Mitglied sieht den Bereich «Ideen» und kann einreichen (Master Entscheid 14, A-73)', async ({ page }) => {
   await login(page, BRUNO, '/ziele/handlungsfelder');
-  await expect(page.getByRole('link', { name: 'Portfolio' })).toHaveCount(1);
+  // auf dem Telefon liegt «Portfolio» im Blatt «Mehr»
+  if (page.viewportSize()!.width < 768) await page.getByRole('navigation', { name: 'Navigation' }).getByRole('button', { name: 'Mehr' }).click();
+  await expect(page.getByRole('link', { name: 'Portfolio', exact: true }).first()).toBeVisible();
 });

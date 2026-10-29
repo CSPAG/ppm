@@ -51,13 +51,16 @@ test('Arbeitsräume nach Recht, mit Tastatur, barrierefrei', async ({ page }) =>
 
 test('Mitglied sieht nur die Arbeitsräume mit Recht (Master Entscheid 14, 18)', async ({ page }) => {
   await login(page, BRUNO);
-  const nav = navigation(page);
-  await expect(nav.getByRole('link', { name: 'Ziele', exact: true })).toBeVisible();
+  // auf dem Telefon liegen Arbeitsräume über drei im Blatt «Mehr»
+  const telefon = page.viewportSize()!.width < 768;
+  if (telefon) await navigation(page).getByRole('button', { name: 'Mehr' }).click();
+  const nav = telefon ? page : navigation(page);
+  await expect(nav.getByRole('link', { name: 'Ziele', exact: true }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: 'Administration' })).toHaveCount(0);
   // Eingang hat jede Rolle (UX-E3); Arbeitsräume ohne Inhalt erscheinen nicht (keine leeren Seiten)
-  await expect(nav.getByRole('link', { name: /^Eingang/ })).toBeVisible();
+  await expect(nav.getByRole('link', { name: /^Eingang/ }).first()).toBeVisible();
   // Projekte auflisten und Ideen einreichen alle Mitglieder (A-73); Gremien nur mit Recht
-  for (const name of ['Projekte', 'Portfolio']) await expect(nav.getByRole('link', { name })).toBeVisible();
+  for (const name of ['Projekte', 'Portfolio']) await expect(nav.getByRole('link', { name, exact: true }).first()).toBeVisible();
   await expect(nav.getByRole('link', { name: 'Gremien' })).toHaveCount(0);
 });
 

@@ -81,7 +81,7 @@ export const TV = {
   einreichenGesperrt: (phase: string, liste: string) => `Angaben für ${phase} fehlen: ${liste}. Ergänze sie, um einzureichen.`,
   eingereicht: 'Eingereicht. Die Unternehmensentwicklung prüft den Vertrag.',
   weiterBearbeiten: 'Weiter bearbeiten',
-  aenderungEinreichen: 'Eine Änderung reichst du beim Sponsor ein («Änderung einreichen»).',
+  aenderungEinreichen: 'Eine Änderung reichst du zum Entscheid ein («Änderung einreichen»); es entscheidet die Projektauftraggeber:in.',
 
   // Projekt zurückziehen (K2 Schritt 6, UC-002 A4; I-R1 Stufe 3: unumkehrbar, wirkt auf andere)
   zurueckziehen: 'Projekt zurückziehen',
@@ -106,7 +106,8 @@ export const TV = {
   zielKeins: 'Kein Ziel gewählt',
   zielNichtLesbar: 'Die strategischen Ziele siehst du mit dem Recht «Ziele lesen».',
   abhaengigkeitHinweis: 'Die Abhängigkeit erscheint nach der Freigabe auch beim anderen Projekt.',
-  organisationHinweis: 'Wer hier steht, erhält mit der Projektorganisation Zugriff auf das Projekt; die Rollen setzen Sponsor und Projektleitung in der Projektübersicht.',
+  ohneZugriff: 'kein Zugriff',
+  zugriffGeben: 'Zugriff geben',
   personalHinweis: 'Bis zum Gate P1–P2 genügt die Grösse S/M/L; danach braucht es FTE mit Monat von und bis je Rolle und Phase.',
   bitteWaehlen: 'Bitte wählen',
   ja: 'ja',

@@ -26,7 +26,7 @@ export const TA = {
   },
   banner: {
     abgeschlossen: (d: string) => `Das Projekt ist seit ${d} formell abgeschlossen. Die Projektakte kann nur noch gelesen werden; Lessons Learned lassen sich weiter erfassen.`,
-    traktandiert: 'Der Abschlussbericht liegt beim Gremium (Exit-Gate P4). Bis zum Entscheid ist er gesperrt; Sponsor und UE können die Nutzenrealisierung noch beurteilen.',
+    traktandiert: 'Der Abschlussbericht liegt beim Gremium (Exit-Gate P4). Bis zum Entscheid ist er gesperrt; Projektauftraggeber:in und UE können die Nutzenrealisierung noch beurteilen.',
     eingereicht: (d: string) => `Eingereicht am ${d}. Der Bericht kann nur noch gelesen werden.`,
     nacharbeit: 'Das Gremium verlangt Nacharbeiten. Überarbeite den Bericht und reich ihn erneut ein; die Auflagen findest du im Eingang.',
     sistiert: 'Das Projekt ist sistiert. Erfasse Stand, offene Punkte und Lessons Learned; die Wiederaufnahme beschliesst das Gremium.',
@@ -64,9 +64,9 @@ export const TA = {
     textVon: (i: number) => `Offener Punkt ${i}`, verantwortlichVon: (i: number) => `Verantwortlich für Punkt ${i}`, terminVon: (i: number) => `Termin für Punkt ${i}`,
   },
   nutzen: {
-    sp: 'Beurteilung des Sponsors', ue: 'Beurteilung der UE', offen: 'noch nicht beurteilt',
+    sp: 'Beurteilung Projektauftraggeber:in', ue: 'Beurteilung der UE', offen: 'noch nicht beurteilt',
     von: (wer: string, d: string) => `${wer}, ${d}`, speichern: 'Beurteilung speichern', gespeichert: 'Beurteilung gespeichert.',
-    hint: 'Sponsor und UE beurteilen, ob der Nutzen stabil erreicht ist (PC.03.02).',
+    hint: 'Projektauftraggeber:in und UE beurteilen, ob der Nutzen stabil erreicht ist (PC.03.02).',
   },
   lessons: {
     leer: 'Noch keine Lessons Learned. Halte fest, was künftige Vorhaben wissen sollten.',

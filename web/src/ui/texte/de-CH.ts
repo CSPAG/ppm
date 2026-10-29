@@ -138,7 +138,7 @@ export const deCH = {
     toleranzen: 'Standardtoleranzen', toleranzenHint: 'Ab dieser Abweichung warnt PPM «wesentlich»; der Projektvertrag kann sie übersteuern. Ohne Wert keine Warnung.',
     toleranz: { termin: 'Termin', kosten: 'Kosten', umfang: 'Umfang' } as Record<string, string>,
     ohneWert: 'ohne Wert', toleranzUngueltig: 'Zahl ab 0 oder leer.',
-    wirkungHint: 'Eine Änderung an diesen Kapiteln betrifft Scope, Budget oder Ressourcen und geht an das Gremium statt nur an die Sponsorin oder den Sponsor (UC-007 A1).',
+    wirkungHint: 'Eine Änderung an diesen Kapiteln betrifft Scope, Budget oder Ressourcen und geht an das Gremium statt nur an die Projektauftraggeber:in (UC-007 A1).',
     dimension: { scope: 'Scope', budget: 'Budget', ressourcen: 'Ressourcen' } as Record<string, string>,
     kapitelName: ['Ausgangslage / Problembeschreibung', 'Strategiebezug', 'Ziele und Nutzenbeitrag', 'Lösungsansatz', 'Abgrenzung', 'Abhängigkeiten / Schnittstellen',
       'Projektplanung und Lieferergebnisse', 'Projektstruktur und Organisation', 'Ressourcen (Kosten, Personal)', 'Risiko-Management', 'Change Management', 'Freigabe', 'Beilagen'],

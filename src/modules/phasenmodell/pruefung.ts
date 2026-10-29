@@ -55,7 +55,7 @@ export function pruefe(d: Dokument): Pruefpunkt[] {
   if (d.kapitelWirkung.length === 0) {
     out.push({
       stufe: 'warnung', regel: 'kapitelwirkung', ort: { art: 'wirkung', code: null },
-      text: 'Kapitelwirkung: Kein Kapitel wirkt auf Scope, Budget oder Ressourcen. Jede Änderung am Vertrag könnte die Sponsorin oder der Sponsor allein freigeben.',
+      text: 'Kapitelwirkung: Kein Kapitel wirkt auf Scope, Budget oder Ressourcen. Jede Änderung am Vertrag könnte die Projektauftraggeber:in allein freigeben.',
     });
   }
   return out;

@@ -15,12 +15,12 @@ export const TF = {
   zustaendig: (wer: string) => `Zuständig: ${wer}`,
 
   // Gremium (Kategorie A, B; UC-001 Schritt 6)
-  sponsor: 'Sponsor',
+  sponsor: 'Projektauftraggeber:in',
   projektleitung: 'Projektleitung',
-  angabenHilfe: 'Das Gremium benennt den Sponsor, der Sponsor die Projektleitung. Erfasse beide vor dem Entscheid; ohne sie lässt sich die Initialisierung nicht freigeben.',
-  sponsorFehlt: 'Sponsor fehlt: Benenne den Sponsor, er trägt das Projekt.',
+  angabenHilfe: 'Das Gremium benennt die Projektauftraggeber:in, diese die Projektleitung. Erfasse beide vor dem Entscheid; ohne sie lässt sich die Initialisierung nicht freigeben.',
+  sponsorFehlt: 'Projektauftraggeber:in fehlt: Benenne, wer das Projekt trägt.',
   plFehlt: 'Projektleitung fehlt: Die Projektleitung erhält die Aufgabe «Projektvertrag erstellen».',
-  angabenSpeichern: 'Sponsor und Projektleitung speichern',
+  angabenSpeichern: 'Projektauftraggeber:in und Projektleitung speichern',
   traktandieren: 'Für das Gremium traktandieren',
   traktandierenWirkung: (gremium: string) => `Die Idee erscheint als Vorschlag in der nächsten Sitzung von ${gremium}; die antragstellende Person wird informiert.`,
   vorgelegt: (gremium: string) => `Dem Gremium ${gremium} vorgelegt. Der Entscheid fällt in der Sitzung.`,

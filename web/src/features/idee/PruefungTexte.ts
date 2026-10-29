@@ -32,9 +32,9 @@ export const TP = {
   zusammenfuehrenMit: (nr: number) => `Mit Idee ${nr} zusammenführen`,
 
   leitfragen: 'Leitfragen zum Eintritt P0',
-  leitfragenSub: 'Antworten der UE mit dem vorgesehenen Sponsor (UC-001 Schritt 4); Fragen aus dem Phasenmodell in Kraft.',
+  leitfragenSub: 'Antworten der UE mit der vorgesehenen Projektauftraggeber:in (UC-001 Schritt 4); Fragen aus dem Phasenmodell in Kraft.',
   keinPhasenmodell: 'Es ist kein Phasenmodell in Kraft; die Leitfragen fehlen. Administration › Phasenmodell setzt eines in Kraft.',
-  sponsor: 'Vorgesehener Sponsor',
+  sponsor: 'Vorgesehene Projektauftraggeber:in',
   sponsorHilfe: 'Sieht die Idee lesend und qualifiziert sie mit.',
   antwortenSpeichern: 'Antworten speichern',
   gespeichert: 'Gespeichert.',

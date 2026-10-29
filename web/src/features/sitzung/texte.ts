@@ -98,7 +98,7 @@ export const TS = {
     return `Die Mitglieder des ${g} erhalten ${teile.join(', ').replace(/, ([^,]*)$/, ' und $1')}.`;
   },
   versandEingeladene: (n: number) => (n === 1 ? '1 eingeladene Person erhält Einladung und Zeitfenster.' : `${n} Eingeladene erhalten Einladung und Zeitfenster.`),
-  versandVerschoben: (n: number) => `Projektleitung und Sponsor von ${n} verschobenen ${n === 1 ? 'Traktandum' : 'Traktanden'} werden informiert.`,
+  versandVerschoben: (n: number) => `Projektleitung und Projektauftraggeber:in von ${n} verschobenen ${n === 1 ? 'Traktandum' : 'Traktanden'} werden informiert.`,
   fristEingehalten: (n: number) => `Frist 5 Arbeitstage: eingehalten (${n} Arbeitstage vor der Sitzung).`,
   fristVerletzt: (n: number, soll: number) => `Versand: ${n} statt mindestens ${soll} Arbeitstage vor der Sitzung.`,
   versandWarnungen: (n: number) => `${n} ${n === 1 ? 'Traktandum hat' : 'Traktanden haben'} keine vollständigen Unterlagen.`,

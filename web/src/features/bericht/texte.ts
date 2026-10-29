@@ -82,8 +82,8 @@ export const TB = {
     stufeWaehlen: 'wählen', kommentar: (d: string) => `Kommentar ${d}`,
     naechster: 'Nächster Meilenstein', abschlussPer: 'Abschluss per', abhaengigkeiten: 'Abhängigkeiten', entscheide: 'Anstehende Entscheide',
     begruendung: 'Begründung', massnahme: 'Massnahme', entscheidNoetig: 'Entscheid des PRAT nötig',
-    kritischHinweis: 'Kritisch: Begründung und Massnahme fehlen. Sponsor und Unternehmensentwicklung brauchen beides, um handeln zu können.',
-    wirkungKritisch: 'Dein Sponsor und die Unternehmensentwicklung werden beim Einreichen informiert. Mit «Entscheid des PRAT nötig» wird eine Eskalation für die nächste PRAT-Sitzung angelegt.',
+    kritischHinweis: 'Kritisch: Begründung und Massnahme fehlen. Projektauftraggeber:in und Unternehmensentwicklung brauchen beides, um handeln zu können.',
+    wirkungKritisch: 'Projektauftraggeber:in und Unternehmensentwicklung werden beim Einreichen informiert. Mit «Entscheid des PRAT nötig» wird eine Eskalation für die nächste PRAT-Sitzung angelegt.',
   },
   panel: {
     titel: 'Bereit zum Einreichen', bereit: 'Alle Pflichtangaben sind erfasst.',

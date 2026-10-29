@@ -297,7 +297,7 @@ async function unterlagen(tx: Tx, projektId: string): Promise<Unterlage[]> {
   if (!p) return [];
   const b = await store.offenerBericht(tx, p.id);
   if (b?.art === 'abschluss' && b.stand !== 'entwurf') {
-    const nutzen = [b.nutzen_sp_at && 'Sponsor', b.nutzen_ue_at && 'UE'].filter(Boolean);
+    const nutzen = [b.nutzen_sp_at && 'Projektauftraggeber:in', b.nutzen_ue_at && 'UE'].filter(Boolean);
     const bereit = b.stand === 'eingereicht' || b.stand === 'traktandiert';
     return [{
       art: 'bericht', titel: `Abschlussbericht ${p.nummer}`, bereit,

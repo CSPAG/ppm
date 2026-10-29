@@ -77,7 +77,7 @@ export const KAPITEL: readonly { nr: number; titel: string; felder: readonly Fel
       ], neu: () => ({ dimension: 'termin', wert: null, einheit: 'kalendertage' }) },
   ] },
   { nr: 8, titel: 'Projektstruktur und Organisation', felder: [
-    { key: 'mitglieder', label: 'Funktionen im Projekt', art: 'liste', eintrag: 'Funktion', hilfe: 'Projektauftraggeber:in und Projektleitung je höchstens eine Person (A-04); weitere Funktionen mit Bezeichnung, z. B. Kernteam (A-72).', spalten: [
+    { key: 'mitglieder', label: 'Funktionen im Projekt', art: 'liste', eintrag: 'Funktion', hilfe: 'Projektauftraggeber:in und Projektleitung je höchstens eine Person (A-04); weitere Funktionen mit Bezeichnung, z. B. Kernteam (A-72). Die Projektorganisation vergibt keinen Zugriff; Personen ohne Zugriff tragen «kein Zugriff».', spalten: [
       { key: 'funktion', label: 'Funktion', art: 'auswahl', optionen: [['sp', 'Projektauftraggeber:in'], ['pl', 'Projektleitung'], ['weitere', 'Weitere Funktion']] },
       { key: 'funktionText', label: 'Bezeichnung (weitere Funktion)', art: 'kurz', optional: true, max: 100 },
       { key: 'personId', label: 'Person', art: 'person' },

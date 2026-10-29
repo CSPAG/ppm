@@ -35,11 +35,11 @@ const FREIGEGEBEN = new Set(['freigegeben', 'mit_auflagen']);
 export async function pruefePersonen(tx: Tx, sponsor: string | null, projektleitung: string | null, praefix = ''): Promise<void> {
   const fehler: { path: string; message: string }[] = [];
   const vorhanden = await fs.personenVorhanden(tx, [sponsor, projektleitung].filter((x): x is string => !!x));
-  if (!sponsor) fehler.push({ path: `${praefix}/sponsor`, message: 'Sponsor fehlt: Das Gremium benennt den Sponsor (A-05).' });
+  if (!sponsor) fehler.push({ path: `${praefix}/sponsor`, message: 'Projektauftraggeber:in fehlt: Das Gremium benennt die Projektauftraggeber:in (A-05).' });
   else if (!vorhanden.has(sponsor)) fehler.push({ path: `${praefix}/sponsor`, message: 'Diese Person gibt es in der Organisation nicht.' });
-  if (!projektleitung) fehler.push({ path: `${praefix}/projektleitung`, message: 'Projektleitung fehlt: Der Sponsor benennt die Projektleitung (A-05).' });
+  if (!projektleitung) fehler.push({ path: `${praefix}/projektleitung`, message: 'Projektleitung fehlt: Die Projektauftraggeber:in benennt die Projektleitung (A-05).' });
   else if (!vorhanden.has(projektleitung)) fehler.push({ path: `${praefix}/projektleitung`, message: 'Diese Person gibt es in der Organisation nicht.' });
-  if (fehler.length) throw invalid('Für die Freigabe fehlen Sponsor oder Projektleitung.', fehler);
+  if (fehler.length) throw invalid('Für die Freigabe fehlen Projektauftraggeber:in oder Projektleitung.', fehler);
 }
 
 /**
@@ -173,8 +173,8 @@ export async function beiEntscheid(tx: Tx, f: EntscheidFolge, k?: FolgeKontext):
     try {
       await pruefePersonen(tx, a.sponsor, a.projektleitung);
     } catch {
-      throw invalid(`Für die Freigabe von «${titelVon(r)}» fehlen Sponsor oder Projektleitung. Erfasse beide bei der Idee (Portfolio › Ideen ${r.nummer}) und erfasse den Entscheid erneut.`,
-        [{ path: '/ergebnis', message: 'Sponsor und Projektleitung fehlen (A-05).' }]);
+      throw invalid(`Für die Freigabe von «${titelVon(r)}» fehlen Projektauftraggeber:in oder Projektleitung. Erfasse beide bei der Idee (Portfolio › Ideen ${r.nummer}) und erfasse den Entscheid erneut.`,
+        [{ path: '/ergebnis', message: 'Projektauftraggeber:in und Projektleitung fehlen (A-05).' }]);
     }
     if (!k) throw new Error('Folge der Freigabe ohne Kontext der Sitzung (FolgeKontext)');
     await initialisieren(tx, k, who, k.principalId, r, { sponsor: a.sponsor!, projektleitung: a.projektleitung!, begruendung: f.begruendung });
@@ -206,4 +206,4 @@ export function registriereIdee(): void {
 }
 
 export const antragVon = (kategorie: string | null) =>
-  `Initialisierung freigeben${kategorie ? ` (Kategorie ${kategorie})` : ''}, Sponsor und Projektleitung benennen`;
+  `Initialisierung freigeben${kategorie ? ` (Kategorie ${kategorie})` : ''}, Projektauftraggeber:in und Projektleitung benennen`;

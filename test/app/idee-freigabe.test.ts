@@ -94,7 +94,7 @@ describe('Freigabe der Initialisierung', () => {
 
     // Sitzung: Vorschlag aufnehmen, versenden, starten
     const t = await sys(async tx => (await tx.query<{ id: string; titel: string; antrag: string }>("SELECT id, titel, antrag FROM ppm.traktandum WHERE art = 'idee' AND bezug_id = $1", [i.id])).rows);
-    assert.deepEqual(t.map(x => [x.titel, x.antrag]), [['Initialisierung: Digitale Patientenaufnahme', 'Initialisierung freigeben (Kategorie A), Sponsor und Projektleitung benennen']]);
+    assert.deepEqual(t.map(x => [x.titel, x.antrag]), [['Initialisierung: Digitale Patientenaufnahme', 'Initialisierung freigeben (Kategorie A), Projektauftraggeber:in und Projektleitung benennen']]);
     const s = (await ok('POST', '/v1/gremien/prat/sitzungen', ue, { datum: termin }, 201)).json();
     let v = (await ok('POST', `/v1/sitzungen/${s.id}/traktanden`, ue, { vorschlagId: t[0]!.id })).json();
     v = (await ok('POST', `/v1/sitzungen/${s.id}/versenden`, mit(ue, `W/"${v.version}"`))).json();

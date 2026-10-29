@@ -191,7 +191,7 @@ function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, searc
         <section className="vt-haupt" aria-labelledby={`${navId}-t`}>
           <h3 id={`${navId}-t`} className="vt-titel"><span className="muted">{nr}</span> {k?.titel ?? KAPITEL[nr - 1]!.titel}</h3>
           <KapitelArbeit key={`${v.id}-${nr}`} versionId={v.id} nr={nr} versionRo={ro} feld={search.feld} speichernRef={speichernRef}
-            projektId={projektId} onFokussiert={() => setSearch({ feld: undefined }, { replace: true })} />
+            projektId={projektId} nummer={nummer} onFokussiert={() => setSearch({ feld: undefined }, { replace: true })} />
         </section>
         <aside className="vt-panel" aria-labelledby={`${navId}-p`}>
           <h3 id={`${navId}-p`} className="grp-h">{TV.pflicht} {TV.pflichtFuer(phase)}</h3>
@@ -240,21 +240,21 @@ function Arbeitsflaeche({ nummer, projektId, projektName, loaded, angaben, searc
 type Status = 'gespeichert' | 'speichert' | 'ungespeichert' | 'fehler' | 'konflikt' | 'gesperrt';
 
 /** Ein Kapitel mit automatischem Speichern (I-R3), Rückgängig/Wiederholen und Konflikt (Z7). */
-function KapitelArbeit({ versionId, nr, versionRo, feld, speichernRef, projektId, onFokussiert }: {
+function KapitelArbeit({ versionId, nr, versionRo, feld, speichernRef, projektId, nummer, onFokussiert }: {
   versionId: string; nr: number; versionRo: boolean; feld?: string; speichernRef: MutableRefObject<() => Promise<boolean>>;
-  projektId: string; onFokussiert(): void;
+  projektId: string; nummer: string; onFokussiert(): void;
 }) {
   const q = useKapitel(versionId, nr);
   const skelett = useVerzoegert(q.isPending);
   if (q.isPending) return <div aria-busy="true"><span className="sr" role="status">{T.common.loading}</span>{skelett ? <Skelett zeilen={4} /> : null}</div>;
   if (q.error) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   return <KapitelForm geladen={q.data} versionId={versionId} nr={nr} ro={versionRo || !q.data.kapitel.can.write} feld={feld} speichernRef={speichernRef}
-    projektId={projektId} onFokussiert={onFokussiert} betraegeVerborgen={nr === 9 && !versionRo && !q.data.kapitel.can.write} />;
+    projektId={projektId} nummer={nummer} onFokussiert={onFokussiert} betraegeVerborgen={nr === 9 && !versionRo && !q.data.kapitel.can.write} />;
 }
 
-function KapitelForm({ geladen, versionId, nr, ro, feld, speichernRef, projektId, onFokussiert, betraegeVerborgen }: {
+function KapitelForm({ geladen, versionId, nr, ro, feld, speichernRef, projektId, nummer, onFokussiert, betraegeVerborgen }: {
   geladen: KapitelLoaded; versionId: string; nr: number; ro: boolean; feld?: string; speichernRef: MutableRefObject<() => Promise<boolean>>;
-  projektId: string; onFokussiert(): void; betraegeVerborgen: boolean;
+  projektId: string; nummer: string; onFokussiert(): void; betraegeVerborgen: boolean;
 }) {
   const { speichern: speicherMut } = useVertragMutations(undefined);
   const [inhalt, setInhalt] = useState<Inhalt>(geladen.kapitel.inhalt as Inhalt);
@@ -411,7 +411,7 @@ function KapitelForm({ geladen, versionId, nr, ro, feld, speichernRef, projektId
           {status === 'fehler' ? <p className="small">{TV.fehlerSpeichern} <button type="button" className="btn sm" onClick={() => { dirty.current = true; void speichern(); }}>{TV.erneutSpeichern}</button></p> : null}
         </div>
       ) : null}
-      <KapitelEditor nr={nr} inhalt={inhalt} basis={(geladen.kapitel.basis as Inhalt | null) ?? null} ro={ro} fehler={{ ...server, ...lokal }} onChange={aendere} projektId={projektId} />
+      <KapitelEditor nr={nr} inhalt={inhalt} basis={(geladen.kapitel.basis as Inhalt | null) ?? null} ro={ro} fehler={{ ...server, ...lokal }} onChange={aendere} projektId={projektId} nummer={nummer} />
     </div>
   );
 }

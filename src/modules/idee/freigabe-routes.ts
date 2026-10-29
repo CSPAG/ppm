@@ -111,7 +111,7 @@ export function registerFreigabeRoutes(app: FastifyInstance, deps: Deps): void {
     return req.tx(async tx => {
       const r = await laden(tx, id, version, ANGABEN);
       const pf = (await fs.angaben(tx, id))!.portfolio_id;
-      if (!pf || (await fs.portfolio(tx, pf))?.kategorie === 'C') throw conflict('Bei Kategorie C benennt die Direktion Sponsor und Projektleitung mit der Freigabe.');
+      if (!pf || (await fs.portfolio(tx, pf))?.kategorie === 'C') throw conflict('Bei Kategorie C benennt die Direktion Projektauftraggeber:in und Projektleitung mit der Freigabe.');
       const vorhanden = await fs.personenVorhanden(tx, [body.sponsor, body.projektleitung].filter((x): x is string => !!x));
       const fehler = (['sponsor', 'projektleitung'] as const).filter(k => body[k] && !vorhanden.has(body[k]!))
         .map(k => ({ path: `/${k}`, message: 'Diese Person gibt es in der Organisation nicht.' }));

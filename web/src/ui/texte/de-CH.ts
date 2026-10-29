@@ -80,7 +80,7 @@ export const deCH = {
     nummer: 'Nummer', name: 'Projekt', handlungsfeld: 'Handlungsfeld', thema: 'Thema', projektleitung: 'Projektleitung', phase: 'Phase',
     meilenstein: 'Nächster Meilenstein', status: 'Status', vorperiode: 'Vorperiode', trend: 'Trend',
     abschlussPer: (datum: string) => `Abschluss per ${datum}`,
-    merkmal: { 'sns-vr': 'via SNS-VR', eskalation: 'Eskalation offen' },
+    merkmal: { 'sns-vr': 'via SNS-VR', eskalation: 'Eskalation offen', nicht_geprueft: 'nicht geprüft' },
     keinMeilenstein: 'kein Meilenstein geplant',
   },
   // Regelprüfung (I-P1 bis I-P6)

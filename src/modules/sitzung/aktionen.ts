@@ -291,9 +291,14 @@ export async function unterlagenstand(tx: Tx, s: store.SitzungRow, ts: readonly 
   if (s.versendet_at) {
     const gespeichert = await store.unterlagenGespeichert(tx, s.id);
     for (const t of ts) {
-      const u = gespeichert.filter(x => x.traktandum_id === t.id).map(x => ({ art: x.art, titel: x.titel, bereit: x.stand_ok, hinweis: x.hinweis || undefined, inhalt: x.inhalt }));
+      const u = gespeichert.filter(x => x.traktandum_id === t.id).map(x => ({
+        art: x.art, titel: x.titel, bereit: x.stand_ok, hinweis: x.hinweis || undefined, inhalt: x.inhalt, ...(x.quality_check_offen ? { qualityCheck: 'offen' as const } : {}),
+      }));
       const art = traktandenart(t.art);
-      m.set(t.id, { stand: !u.length ? (art && !art.unterlagen ? 'keine' : 'fehlt') : u.every(x => x.bereit) ? 'bereit' : 'fehlt', unterlagen: u });
+      // wie vor dem Versand: nur der Quality-Check offen bleibt unterscheidbar (Vermerk, A-74)
+      const stand = !u.length ? (art && !art.unterlagen ? 'keine' : 'fehlt')
+        : u.every(x => x.bereit) ? 'bereit' : u.some(x => !x.bereit && x.qualityCheck !== 'offen') ? 'fehlt' : 'quality_check_offen';
+      m.set(t.id, { stand, unterlagen: u });
     }
     return m;
   }
@@ -358,7 +363,7 @@ export async function versenden(tx: Tx, s: store.SitzungRow, version: number): P
   const stand = await unterlagenstand(tx, s, ts);
   for (const t of ts) {
     for (const u of stand.get(t.id)!.unterlagen) {
-      await store.unterlageAnlegen(tx, t.id, { art: u.art, titel: u.titel, standOk: u.bereit, hinweis: u.hinweis ?? '', inhalt: u.inhalt ?? {} });
+      await store.unterlageAnlegen(tx, t.id, { art: u.art, titel: u.titel, standOk: u.bereit, qualityCheckOffen: u.qualityCheck === 'offen', hinweis: u.hinweis ?? '', inhalt: u.inhalt ?? {} });
     }
   }
   if (!(await store.markVersendet(tx, s.id, version, vorschau.frist.vorlauf))) throw conflict('Die Sitzung wurde inzwischen geändert. Lade sie neu.');

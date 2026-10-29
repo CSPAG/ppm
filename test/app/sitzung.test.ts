@@ -186,6 +186,8 @@ describe('Sitzungen vorbereiten', () => {
     const s = await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue);
     const t = s.traktanden.find((x: { projekt: { id: string } | null; art: string }) => x.art === 'gate' && x.projekt?.id === p2.id);
     assert.equal(t.unterlagen.stand, 'quality_check_offen');
+    // Vermerk am Traktandum: bleibt stehen, wenn die UE nicht verschiebt (UC-006 A2.2, A-74)
+    assert.deepEqual(t.vermerke, [{ art: 'quality_check_offen', text: 'Quality-Check offen' }]);
     const vor = await ok('GET', `/v1/sitzungen/${sitzung.id}/versand`, ue);
     assert.deepEqual(vor.warnungen.map((w: { traktandumId: string; stand: string }) => [w.traktandumId, w.stand]).filter(([id]: string[]) => id === t.id), [[t.id, 'quality_check_offen']]);
 
@@ -238,6 +240,8 @@ describe('Sitzungen vorbereiten', () => {
     assert.ok(s.versandVorlauf >= 5);
     assert.equal(s.can.write, false);
     assert.equal(s.traktanden.find((t: { art: string }) => t.art === 'gate').unterlagen.liste[0].hinweis, 'Quality-Check bestanden', 'Stand festgehalten');
+    // mit Vermerk versendet: Bericht der Programmleitung ohne Unterlagen trägt den Vermerk auch nach dem Versand
+    assert.deepEqual(s.traktanden.find((t: { fest: boolean }) => t.fest).vermerke.map((v: { art: string }) => v.art), ['unterlagen_fehlen']);
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { art: 'abschluss' })).statusCode, 409, 'nach dem Versand fest');
     assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${s.version}"` })).statusCode, 409);
 

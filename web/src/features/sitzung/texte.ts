@@ -72,8 +72,8 @@ export const TS = {
   unterlagen: {
     bereit: 'Unterlagen bereit', quality_check_offen: 'Quality-Check offen', fehlt: 'Unterlagen fehlen', keine: 'keine Unterlagen nötig',
   } as Record<string, string>,
-  unterlagenWarnung: (titel: string, rest: string) => `Unterlagen für ${titel} fehlen; Versand ${rest}. Verschiebe das Traktandum auf die nächste Sitzung oder warte auf die Unterlagen.`,
-  qcWarnung: (titel: string) => `Quality-Check: offen für ${titel}. Ohne bestandenen Quality-Check wird das Geschäft nicht behandelt.`,
+  unterlagenWarnung: (titel: string, rest: string) => `Unterlagen für ${titel} fehlen; Versand ${rest}. Verschiebe das Traktandum auf die nächste Sitzung oder lass es mit dem Vermerk «Unterlagen fehlen» stehen.`,
+  qcWarnung: (titel: string) => `Quality-Check: offen für ${titel}. Verschiebe das Traktandum oder lass es mit dem Vermerk «Quality-Check offen» stehen; der Vermerk steht in Unterlagen und Protokoll.`,
   zeitbedarfHinweis: (ist: string, soll: string) => `Zeitbedarf: ${ist} statt höchstens ${soll}. Verschiebe ein Traktandum oder kürze die Zeit.`,
 
   // Vorschläge (K3 Schritt 1)

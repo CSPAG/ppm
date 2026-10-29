@@ -267,7 +267,7 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
   app.post('/v1/projekte/:id/berichte/:periode/pruefen', {
     schema: {
       tags: [TAG], summary: 'Statusbericht bestätigen',
-      description: 'Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist.',
+      description: 'Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist. Nach dem Abschluss trägt die UE so die Prüfung ungeprüfter Berichte nach (Vermerk «nicht geprüft», A-74); ist es der letzte, erledigt sich «Statusberichte prüfen».',
       params: BerichtParams, headers: Type.Composite([IfMatchHeaders, IdempotencyHeaders]), response: { 200: Type.Ref('PeriodeZeile') },
     },
   }, async (req, reply) => {
@@ -275,9 +275,12 @@ export function registerPruefungRoutes(app: FastifyInstance, _deps: Deps): void 
     const version = requireIfMatch(req);
     const out = await req.tx(async tx => {
       await projektZumPruefen(req, tx, id);
-      await offenePeriode(tx, periode);
       const r = pruefeBericht(await store.get(tx, id, periode, { sperren: true }), version, ['eingereicht'], 'Nur eingereichte Berichte lassen sich bestätigen.');
       await bestaetigen(tx, req, r);
+      // nachgetragen nach dem Abschluss (A-74): letzte ungeprüfte erledigt die Prüfaufgabe der Periode
+      if ((await store.periodeStand(tx, periode)) === 'abgeschlossen' && !(await pstore.ungeprueft(tx, periode))) {
+        await aufgabe.erledigen(tx, { art: 'statusbericht.pruefen', bezug: { typ: 'periode', id: periode } });
+      }
       return zeileAntwort(req, tx, periode, id);
     });
     reply.header('etag', etag(out.version));

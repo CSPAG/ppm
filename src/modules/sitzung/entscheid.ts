@@ -7,12 +7,13 @@
 import { conflict, invalid, type Tx } from '@vollholz/platform';
 import { aufgabe, mitteilung } from '../eingang/index.ts';
 import { fristDatum } from '../phasenmodell/index.ts';
-import { sitzungLink } from './aktionen.ts';
+import { sitzungLink, unterlagenstand } from './aktionen.ts';
 import { artLabel, traktandenart, type Art, type Ergebnis, type FolgeKontext } from './arten.ts';
 import * as es from './entscheid-store.ts';
 import { kurzDatum } from './format.ts';
 import { protokollErzeugen } from './protokoll.ts';
 import * as store from './store.ts';
+import { traktandumVermerke } from './vermerk.ts';
 
 /**
  * Ergebnisse je Art nach K3 Schritt 8, solange das Modul der Art sie noch nicht registriert hat (die Registry geht vor).
@@ -193,7 +194,11 @@ export async function schliessen(tx: Tx, s: store.SitzungRow, version: number): 
   const leitung = async (t: store.TraktandumRow) => t.projekt_id ? await store.projektleitung(tx, t.projekt_id) : [];
 
   // Protokollentwurf vor dem Umhängen der nicht behandelten Traktanden (sie erscheinen darin als «nicht behandelt»)
-  await protokollErzeugen(tx, s, ts, ent, auflagen, { hatOptionen: art => optionen(art).length > 0, label: ergebnisLabel });
+  const unterlagen = await unterlagenstand(tx, s, ts);
+  await protokollErzeugen(tx, s, ts, ent, auflagen, {
+    hatOptionen: art => optionen(art).length > 0, label: ergebnisLabel,
+    vermerke: t => traktandumVermerke(unterlagen.get(t.id)?.stand ?? 'keine').map(v => v.text),
+  });
 
   let nichtBehandelt = 0;
   let zurueck = 0;

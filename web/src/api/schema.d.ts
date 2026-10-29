@@ -23982,7 +23982,7 @@ export interface paths {
         put?: never;
         /**
          * Roadmap publizieren
-         * @description Erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie allen angemeldeten Personen lesend bereit (UC-011 Schritt 8, A-35). Erneutes Publizieren ersetzt den Stand. 409, solange die Jahresziele nicht in Kraft sind.
+         * @description Erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie allen angemeldeten Personen lesend bereit (UC-011 Schritt 8, A-35). Erneutes Publizieren ersetzt den Stand. Vor der Freigabe der Jahresziele durch den VR mit dem Vermerk «Jahresziele noch nicht freigegeben»; er entfällt mit der Freigabe (UC-011 A3, A-74).
          */
         post: {
             parameters: {
@@ -30271,7 +30271,7 @@ export interface paths {
         put?: never;
         /**
          * Statusbericht bestätigen
-         * @description Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist.
+         * @description Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist. Nach dem Abschluss trägt die UE so die Prüfung ungeprüfter Berichte nach (Vermerk «nicht geprüft», A-74); ist es der letzte, erledigt sich «Statusberichte prüfen».
          */
         post: {
             parameters: {
@@ -30762,7 +30762,7 @@ export interface paths {
         put?: never;
         /**
          * Periode abschliessen
-         * @description Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): gesperrt, solange eingereichte Berichte ungeprüft sind (409 mit Anzahl). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/"0"`, solange es sie nicht gibt).
+         * @description Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): eingereichte, ungeprüfte Berichte zählen mit ihren Werten und dem Vermerk «nicht geprüft»; die Aufgabe «Statusberichte prüfen» bleibt offen, bis sie bestätigt sind (A-74). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/"0"`, solange es sie nicht gibt).
          */
         post: {
             parameters: {
@@ -48279,8 +48279,15 @@ export interface components {
             publiziertBy: null | string;
             version: number;
             inhalt: components["schemas"]["RoadmapInhalt"];
+            /** @description Offene Vermerke (A-74), z. B. Jahresziele noch nicht freigegeben (UC-011 A3). */
+            vermerke: {
+                /** @description Schlüssel des Vermerks, z. B. `jahresziele_nicht_freigegeben`. */
+                art: string;
+                /** @description Text für die Anzeige (darstellung.md «Vermerk offen»). */
+                text: string;
+            }[];
             can: {
-                /** @description Neu publizieren (ziel:freigabe, Jahresziele in Kraft). */
+                /** @description Neu publizieren (ziel:freigabe). */
                 publizieren: boolean;
             };
         };
@@ -48297,8 +48304,15 @@ export interface components {
             stand: null | ("in_arbeit" | "zur_freigabe" | "in_kraft");
             publiziertAt: null | string;
             inhalt: components["schemas"]["RoadmapInhalt"];
+            /** @description Vermerke, mit denen die Roadmap jetzt publiziert würde (A-74). */
+            vermerke: {
+                /** @description Schlüssel des Vermerks, z. B. `jahresziele_nicht_freigegeben`. */
+                art: string;
+                /** @description Text für die Anzeige (darstellung.md «Vermerk offen»). */
+                text: string;
+            }[];
             can: {
-                /** @description Publizieren möglich (Jahresziele in Kraft). */
+                /** @description Publizieren möglich (Zielzyklus vorhanden; vor der Freigabe mit Vermerk, UC-011 A3). */
                 publizieren: boolean;
             };
         };
@@ -48613,6 +48627,11 @@ export interface components {
                 stand: "bereit" | "quality_check_offen" | "fehlt" | "keine";
                 liste: components["schemas"]["Unterlage"][];
             };
+            /** @description Offene Vermerke (A-74): «Unterlagen fehlen», «Quality-Check offen»; das Traktandum bleibt stehen (UC-006 A2.2). */
+            vermerke: {
+                art: string;
+                text: string;
+            }[];
             einladungen: components["schemas"]["Einladung"][];
             version: number;
         };
@@ -49096,6 +49115,8 @@ export interface components {
                     };
                     vertraulich: boolean;
                     viaSns: boolean;
+                    /** @description Offene Vermerke beim Schliessen, z. B. «Unterlagen fehlen» (UC-006 A2.2, A-74). */
+                    vermerke?: string[];
                     /**
                      * @description Entschieden, zur Kenntnis genommen oder nicht behandelt (für die nächste Sitzung vorgeschlagen).
                      * @enum {string}
@@ -49368,7 +49389,13 @@ export interface components {
             geprueftAt: null | string;
             eingefordertAt: null | string;
             version: number;
+            /** @description Offene Vermerke (A-74): «nicht geprüft», wenn die Periode mit dem eingereichten Bericht abgeschlossen wurde. */
+            vermerke: {
+                art: string;
+                text: string;
+            }[];
             can: {
+                /** @description Bestätigen; nach dem Abschluss nur für ungeprüfte Berichte (Vermerk nachtragen). */
                 bestaetigen: boolean;
                 rueckfrage: boolean;
                 einfordern: boolean;
@@ -49408,8 +49435,10 @@ export interface components {
             vorperiode: string;
             abschluss: {
                 moeglich: boolean;
-                sperre: null | string;
+                hinweis: null | string;
                 geprueft: number;
+                /** @description Eingereichte, nicht geprüfte Berichte; nach dem Abschluss mit Vermerk. */
+                ungeprueft: number;
                 /** @description Projekte, für die die Werte der Vorperiode mit «nicht gemeldet» übernommen werden. */
                 nichtGemeldet: number;
             };
@@ -49548,8 +49577,8 @@ export interface components {
             trend: null | string;
             meldung: "gemeldet" | "ausstehend" | "nicht_gemeldet" | "ohne_pflicht";
             werteAus: null | string;
-            /** @description «Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4). */
-            merkmale: "eskalation"[];
+            /** @description «Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4). «nicht geprüft»: Periode mit dem eingereichten, ungeprüften Bericht abgeschlossen (Vermerk, A-74). */
+            merkmale: ("eskalation" | "nicht_geprueft")[];
         };
         FunnelStufe: {
             phase: "P0" | "P1" | "P2" | "P3" | "P4";

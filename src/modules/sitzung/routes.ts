@@ -22,6 +22,7 @@ import {
   type EinladungenPutIn, type SitzungOut, type SitzungPatchIn, type TraktandumCreateIn, type TraktandumOut, type TraktandumPatchIn,
 } from './schemas.ts';
 import * as store from './store.ts';
+import { traktandumVermerke } from './vermerk.ts';
 
 export const TAG = 'Sitzungen';
 
@@ -44,6 +45,7 @@ async function traktandumOut(tx: Tx, t: store.TraktandumRow, o: { stand: Awaited
       stand: u.stand,
       liste: u.unterlagen.map(x => ({ art: x.art, titel: x.titel, bereit: x.bereit, ...(x.hinweis ? { hinweis: x.hinweis } : {}), ...(x.qualityCheck ? { qualityCheck: x.qualityCheck } : {}) })),
     },
+    vermerke: traktandumVermerke(u.stand),
     einladungen: einl.map(e => ({ personId: e.person_id, name: e.name, funktion: e.funktion })),
     version: t.version,
   };

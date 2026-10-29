@@ -7,7 +7,7 @@
 import { useId } from 'react';
 import './Freigabe.css';
 import { useSession } from '../../auth/index.ts';
-import { Empty, ErrorState, Hinweis, Icon, PhaseKurz, Skelett, useToast, useVerzoegert, type Phase } from '../../ui/index.ts';
+import { Empty, ErrorState, Hinweis, Icon, PhaseKurz, Skelett, useToast, useVerzoegert, type Phase, Vermerke } from '../../ui/index.ts';
 import { usePublizieren, useRoadmap, useRoadmapListe, useRoadmapVorschau, type RoadmapInhalt } from './RoadmapApi.ts';
 import type { RoadmapSearch, SetRoadmapSearch } from './RoadmapSearch.ts';
 import { TR } from './RoadmapTexte.ts';
@@ -42,7 +42,7 @@ export function RoadmapPage({ search, setSearch, projektOeffnen }: RoadmapPagePr
             <div className="type-ico neutral"><Icon name="layers" /></div>
             <div className="minw0">
               <h1 id="page-title">{jahr ? TR.titel(jahr) : TR.bereich}</h1>
-              <div className="sub">{roadmap.data ? TR.publiziert(roadmap.data.publiziertAt as string) : roadmap.data === null ? TR.nichtPubliziert : null}</div>
+              <div className="sub">{roadmap.data ? TR.publiziert(roadmap.data.publiziertAt as string) : roadmap.data === null ? TR.nichtPubliziert : null} <Vermerke vermerke={roadmap.data?.vermerke} /></div>
             </div>
           </div>
           {darfPublizieren && jahr && !vorschauAktiv
@@ -89,6 +89,8 @@ function Vorschau({ jahr, q, onFertig, projektOeffnen }: {
             </button>
           </span>}>
             {TR.wirkung(jahr)}{v.publiziertAt ? ` ${TR.ersetzt(v.publiziertAt as string)}` : ''}
+            {/* vor der Freigabe der Jahresziele: publizieren mit Vermerk (UC-011 A3, UX-E12) */}
+            {v.vermerke.length ? ` ${TR.mitVermerk(jahr)}` : ''}
           </Hinweis>
         : <Hinweis stufe="sperre" aktion={<button type="button" className="btn" onClick={onFertig}>{TR.abbrechen}</button>}>{TR.nichtInKraft(jahr)}</Hinweis>}
       <Inhalt inhalt={v.inhalt} projektOeffnen={projektOeffnen} />

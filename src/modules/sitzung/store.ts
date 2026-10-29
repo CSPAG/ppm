@@ -292,18 +292,18 @@ export async function einladungenSetzen(tx: Tx, t: { id: string; sitzung_id: str
   }
 }
 
-export interface UnterlageRow { id: string; traktandum_id: string; art: 'packet' | 'bericht' | 'beilage'; titel: string; stand_ok: boolean; hinweis: string; inhalt: Record<string, unknown> }
+export interface UnterlageRow { id: string; traktandum_id: string; art: 'packet' | 'bericht' | 'beilage'; titel: string; stand_ok: boolean; quality_check_offen: boolean; hinweis: string; inhalt: Record<string, unknown> }
 
 export async function unterlagenGespeichert(tx: Tx, sitzungId: string): Promise<UnterlageRow[]> {
   return (await tx.query<UnterlageRow>(
-    `SELECT u.id, u.traktandum_id, u.art, u.titel, u.stand_ok, u.hinweis, u.inhalt FROM ${U} u JOIN ${T} t ON t.tenant_id = u.tenant_id AND t.id = u.traktandum_id
+    `SELECT u.id, u.traktandum_id, u.art, u.titel, u.stand_ok, u.quality_check_offen, u.hinweis, u.inhalt FROM ${U} u JOIN ${T} t ON t.tenant_id = u.tenant_id AND t.id = u.traktandum_id
       WHERE t.sitzung_id = $1 ORDER BY t.position, u.created_at, u.id`, [sitzungId])).rows;
 }
 
-export async function unterlageAnlegen(tx: Tx, traktandumId: string, u: { art: UnterlageRow['art']; titel: string; standOk: boolean; hinweis: string; inhalt: Record<string, unknown> }): Promise<void> {
+export async function unterlageAnlegen(tx: Tx, traktandumId: string, u: { art: UnterlageRow['art']; titel: string; standOk: boolean; qualityCheckOffen: boolean; hinweis: string; inhalt: Record<string, unknown> }): Promise<void> {
   await tx.query(
-    `INSERT INTO ${U} (tenant_id, traktandum_id, art, titel, stand_ok, hinweis, inhalt) VALUES (app.tenant_id(), $1, $2, btrim($3), $4, $5, $6)`,
-    [traktandumId, u.art, u.titel, u.standOk, u.hinweis, JSON.stringify(u.inhalt)]);
+    `INSERT INTO ${U} (tenant_id, traktandum_id, art, titel, stand_ok, quality_check_offen, hinweis, inhalt) VALUES (app.tenant_id(), $1, $2, btrim($3), $4, $5, $6, $7)`,
+    [traktandumId, u.art, u.titel, u.standOk, u.qualityCheckOffen, u.hinweis, JSON.stringify(u.inhalt)]);
 }
 
 /** Je Gremium die nächste Sitzung, die die Person sieht, nach Datum (Kopf im Eingang). */

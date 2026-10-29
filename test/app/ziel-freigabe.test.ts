@@ -120,7 +120,7 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
       ['zieljahr.submitted', 'zieljahr.changes_requested', 'zieljahr.submitted', 'zieljahr.approved']);
   });
 
-  test('Roadmap: erst nach Freigabe publizieren, Vorschau, lesbar für alle Angemeldeten, ohne vertrauliche Projekte', async () => {
+  test('Roadmap: vor der Freigabe mit Vermerk, danach ohne; Vorschau, lesbar für alle Angemeldeten, ohne vertrauliche Projekte', async () => {
     const jz = (await call('GET', '/v1/jahresziele?jahr=2027', gl)).json().items[0];
     // Zuordnung über die Datenbank (Projekte sind für die GL nur teilweise sichtbar)
     await full(api.t.runtime, tenantId, async tx => {
@@ -128,12 +128,17 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
         await tx.query('INSERT INTO ppm.ziel_projekt (tenant_id, projekt_id, strategisches_ziel_id, jahresziel_id) VALUES ($1, $2, $3, $4)', [tenantId, projekt[nr], ziel21, jz.id]);
       }
     });
-    assert.equal((await call('POST', '/v1/roadmap/2026', ue)).statusCode, 409, 'Jahresziele 2026 nicht in Kraft');
+    // vor der Freigabe der Jahresziele: publiziert mit Vermerk (UC-011 A3, A-74), der Vermerk steht auch beim Lesen
+    const vorab = await call('POST', '/v1/roadmap/2026', ue);
+    assert.equal(vorab.statusCode, 200, vorab.body);
+    assert.deepEqual(vorab.json().vermerke.map((v: { art: string }) => v.art), ['jahresziele_nicht_freigegeben']);
+    assert.deepEqual((await call('GET', '/v1/roadmap/2026', leser)).json().vermerke.map((v: { text: string }) => v.text), ['Jahresziele noch nicht freigegeben']);
+    assert.equal((await call('POST', '/v1/roadmap/2099', ue)).statusCode, 404, 'ohne Zielzyklus');
     assert.equal((await call('POST', '/v1/roadmap/2027', leser)).statusCode, 403, 'publizieren nur ziel:freigabe');
     assert.equal((await call('GET', '/v1/roadmap/2027', leser)).statusCode, 404, 'noch nicht publiziert');
 
     const vorschau = (await call('GET', '/v1/roadmap/2027/vorschau', ue)).json();
-    assert.deepEqual([vorschau.stand, vorschau.publiziertAt, vorschau.can.publizieren], ['in_kraft', null, true]);
+    assert.deepEqual([vorschau.stand, vorschau.publiziertAt, vorschau.can.publizieren, vorschau.vermerke], ['in_kraft', null, true, []]);
 
     const p = await call('POST', '/v1/roadmap/2027', ue);
     assert.equal(p.statusCode, 200, p.body);
@@ -152,6 +157,6 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
 
     // erneut publizieren ersetzt den Stand
     assert.equal((await call('POST', '/v1/roadmap/2027', ue)).json().version, 2);
-    assert.deepEqual((await call('GET', '/v1/roadmap', ohneZiele)).json().items.map((x: { jahr: number; version: number }) => [x.jahr, x.version]), [[2027, 2]]);
+    assert.deepEqual((await call('GET', '/v1/roadmap', ohneZiele)).json().items.map((x: { jahr: number; version: number }) => [x.jahr, x.version]), [[2027, 2], [2026, 1]]);
   });
 });

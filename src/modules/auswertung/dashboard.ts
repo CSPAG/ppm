@@ -27,7 +27,7 @@ export function zeile(z: store.ZeileRow, portfolio: string, eskaliert: boolean):
     handlungsfeld: z.handlungsfeld, projektleitung: z.projektleitung, phase, abschlussPer: z.abschluss_per,
     naechsterMeilenstein: z.ms_text ? { termin: z.ms_termin, text: z.ms_text } : z.naechster_meilenstein ? { termin: null, text: z.naechster_meilenstein } : null,
     status: z.status, statusVorperiode: z.status_vorperiode, trend: z.trend, meldung: meldung(z), werteAus: z.werte_aus,
-    merkmale: eskaliert ? ['eskalation'] : [],
+    merkmale: [...(eskaliert ? ['eskalation' as const] : []), ...(z.ungeprueft ? ['nicht_geprueft' as const] : [])],
   };
 }
 

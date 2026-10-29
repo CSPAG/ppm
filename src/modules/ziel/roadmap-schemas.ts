@@ -4,6 +4,7 @@
  */
 import { Type, type Static } from '@sinclair/typebox';
 import { DateTime, Nullable, Uuid } from '@vollholz/platform';
+import { VermerkT } from './vermerk.ts';
 
 const Projekt = Type.Object({
   nummer: Type.String({ description: 'Projektnummer (Adresse der Projektakte).' }), name: Type.String(), phase: Type.String(), lebenszyklus: Type.String(),
@@ -33,7 +34,8 @@ export const Roadmap = Type.Object({
   publiziertBy: Nullable(Uuid),
   version: Type.Integer({ minimum: 1 }),
   inhalt: Type.Ref('RoadmapInhalt'),
-  can: Type.Object({ publizieren: Type.Boolean({ description: 'Neu publizieren (ziel:freigabe, Jahresziele in Kraft).' }) }),
+  vermerke: Type.Array(VermerkT, { description: 'Offene Vermerke (A-74), z. B. Jahresziele noch nicht freigegeben (UC-011 A3).' }),
+  can: Type.Object({ publizieren: Type.Boolean({ description: 'Neu publizieren (ziel:freigabe).' }) }),
 }, { $id: 'Roadmap', additionalProperties: false });
 
 export const RoadmapList = Type.Object({
@@ -47,5 +49,6 @@ export const RoadmapVorschau = Type.Object({
   // letzte Publikation dieses Jahres; null, wenn noch nie publiziert
   publiziertAt: Nullable(DateTime),
   inhalt: Type.Ref('RoadmapInhalt'),
-  can: Type.Object({ publizieren: Type.Boolean({ description: 'Publizieren möglich (Jahresziele in Kraft).' }) }),
+  vermerke: Type.Array(VermerkT, { description: 'Vermerke, mit denen die Roadmap jetzt publiziert würde (A-74).' }),
+  can: Type.Object({ publizieren: Type.Boolean({ description: 'Publizieren möglich (Zielzyklus vorhanden; vor der Freigabe mit Vermerk, UC-011 A3).' }) }),
 }, { $id: 'RoadmapVorschau', additionalProperties: false });

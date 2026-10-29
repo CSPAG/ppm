@@ -60,6 +60,8 @@ export const Traktandum = Type.Object({
   fest: Type.Boolean({ description: 'Festes Traktandum 1 «Bericht der Programmleitung» (K3 Schritt 4): weder entfernen noch verschieben, bleibt an Position 1.' }),
   verschobenVon: Beschrieben(Datum, 'Datum der Sitzung, von der das Traktandum verschoben wurde (UC-006 A2).'),
   unterlagen: Type.Object({ stand: UnterlagenStandT, liste: Type.Array(Type.Ref('Unterlage')) }, { additionalProperties: false }),
+  vermerke: Type.Array(Type.Object({ art: Type.String(), text: Type.String() }, { additionalProperties: false }),
+    { description: 'Offene Vermerke (A-74): «Unterlagen fehlen», «Quality-Check offen»; das Traktandum bleibt stehen (UC-006 A2.2).' }),
   einladungen: Type.Array(Type.Ref('Einladung')),
   version: Type.Integer({ minimum: 1 }),
 }, { $id: 'Traktandum', additionalProperties: false });

@@ -10423,6 +10423,7 @@
           "publiziertBy",
           "version",
           "inhalt",
+          "vermerke",
           "can"
         ],
         "properties": {
@@ -10453,6 +10454,29 @@
           "inhalt": {
             "$ref": "#/components/schemas/RoadmapInhalt"
           },
+          "vermerke": {
+            "description": "Offene Vermerke (A-74), z. B. Jahresziele noch nicht freigegeben (UC-011 A3).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Offener Vermerk (A-74): der Ablauf ging ohne Freigabe weiter.",
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "description": "Schlüssel des Vermerks, z. B. `jahresziele_nicht_freigegeben`.",
+                  "type": "string"
+                },
+                "text": {
+                  "description": "Text für die Anzeige (darstellung.md «Vermerk offen»).",
+                  "type": "string"
+                }
+              }
+            }
+          },
           "can": {
             "type": "object",
             "required": [
@@ -10460,7 +10484,7 @@
             ],
             "properties": {
               "publizieren": {
-                "description": "Neu publizieren (ziel:freigabe, Jahresziele in Kraft).",
+                "description": "Neu publizieren (ziel:freigabe).",
                 "type": "boolean"
               }
             }
@@ -10508,6 +10532,7 @@
           "stand",
           "publiziertAt",
           "inhalt",
+          "vermerke",
           "can"
         ],
         "properties": {
@@ -10561,6 +10586,29 @@
           "inhalt": {
             "$ref": "#/components/schemas/RoadmapInhalt"
           },
+          "vermerke": {
+            "description": "Vermerke, mit denen die Roadmap jetzt publiziert würde (A-74).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Offener Vermerk (A-74): der Ablauf ging ohne Freigabe weiter.",
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "description": "Schlüssel des Vermerks, z. B. `jahresziele_nicht_freigegeben`.",
+                  "type": "string"
+                },
+                "text": {
+                  "description": "Text für die Anzeige (darstellung.md «Vermerk offen»).",
+                  "type": "string"
+                }
+              }
+            }
+          },
           "can": {
             "type": "object",
             "required": [
@@ -10568,7 +10616,7 @@
             ],
             "properties": {
               "publizieren": {
-                "description": "Publizieren möglich (Jahresziele in Kraft).",
+                "description": "Publizieren möglich (Zielzyklus vorhanden; vor der Freigabe mit Vermerk, UC-011 A3).",
                 "type": "boolean"
               }
             }
@@ -11768,6 +11816,7 @@
           "fest",
           "verschobenVon",
           "unterlagen",
+          "vermerke",
           "einladungen",
           "version"
         ],
@@ -11967,6 +12016,26 @@
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/Unterlage"
+                }
+              }
+            }
+          },
+          "vermerke": {
+            "description": "Offene Vermerke (A-74): «Unterlagen fehlen», «Quality-Check offen»; das Traktandum bleibt stehen (UC-006 A2.2).",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
                 }
               }
             }
@@ -13874,6 +13943,13 @@
                     "viaSns": {
                       "type": "boolean"
                     },
+                    "vermerke": {
+                      "description": "Offene Vermerke beim Schliessen, z. B. «Unterlagen fehlen» (UC-006 A2.2, A-74).",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
                     "behandlung": {
                       "type": "string",
                       "enum": [
@@ -15331,6 +15407,7 @@
           "geprueftAt",
           "eingefordertAt",
           "version",
+          "vermerke",
           "can"
         ],
         "properties": {
@@ -15582,6 +15659,26 @@
             "minimum": 0,
             "type": "integer"
           },
+          "vermerke": {
+            "description": "Offene Vermerke (A-74): «nicht geprüft», wenn die Periode mit dem eingereichten Bericht abgeschlossen wurde.",
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "art",
+                "text"
+              ],
+              "properties": {
+                "art": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "can": {
             "additionalProperties": false,
             "type": "object",
@@ -15593,6 +15690,7 @@
             ],
             "properties": {
               "bestaetigen": {
+                "description": "Bestätigen; nach dem Abschluss nur für ungeprüfte Berichte (Vermerk nachtragen).",
                 "type": "boolean"
               },
               "rueckfrage": {
@@ -15776,15 +15874,16 @@
             "type": "object",
             "required": [
               "moeglich",
-              "sperre",
+              "hinweis",
               "geprueft",
+              "ungeprueft",
               "nichtGemeldet"
             ],
             "properties": {
               "moeglich": {
                 "type": "boolean"
               },
-              "sperre": {
+              "hinweis": {
                 "anyOf": [
                   {
                     "enum": [
@@ -15792,12 +15891,16 @@
                     ]
                   },
                   {
-                    "description": "Warum der Abschluss gesperrt ist (Text der Regel).",
+                    "description": "Warnung vor dem Abschluss (A-74): ungeprüfte Berichte zählen mit dem Vermerk «nicht geprüft».",
                     "type": "string"
                   }
                 ]
               },
               "geprueft": {
+                "type": "integer"
+              },
+              "ungeprueft": {
+                "description": "Eingereichte, nicht geprüfte Berichte; nach dem Abschluss mit Vermerk.",
                 "type": "integer"
               },
               "nichtGemeldet": {
@@ -16567,12 +16670,22 @@
             ]
           },
           "merkmale": {
-            "description": "«Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4).",
+            "description": "«Eskalation»: Eskalation zum Bericht der Zeile, noch nicht erledigt (offen oder traktandiert; UC-004 A2.2, AP-E2-4). «nicht geprüft»: Periode mit dem eingereichten, ungeprüften Bericht abgeschlossen (Vermerk, A-74).",
             "type": "array",
             "items": {
-              "type": "string",
-              "enum": [
-                "eskalation"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "eskalation"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "nicht_geprueft"
+                  ]
+                }
               ]
             }
           }
@@ -61473,7 +61586,7 @@
         "tags": [
           "Ziele"
         ],
-        "description": "Erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie allen angemeldeten Personen lesend bereit (UC-011 Schritt 8, A-35). Erneutes Publizieren ersetzt den Stand. 409, solange die Jahresziele nicht in Kraft sind.",
+        "description": "Erzeugt die Roadmap aus Zielen, Hauptaktivitäten und Vorhaben und stellt sie allen angemeldeten Personen lesend bereit (UC-011 Schritt 8, A-35). Erneutes Publizieren ersetzt den Stand. Vor der Freigabe der Jahresziele durch den VR mit dem Vermerk «Jahresziele noch nicht freigegeben»; er entfällt mit der Freigabe (UC-011 A3, A-74).",
         "parameters": [
           {
             "schema": {
@@ -68324,7 +68437,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist.",
+        "description": "Bestätigt einen eingereichten Bericht als «geprüft» (UC-005 Schritt 3), auch mit Auffälligkeit. Rückgängig mit `…/pruefung-zuruecknehmen`, solange die Periode offen ist. Nach dem Abschluss trägt die UE so die Prüfung ungeprüfter Berichte nach (Vermerk «nicht geprüft», A-74); ist es der letzte, erledigt sich «Statusberichte prüfen».",
         "parameters": [
           {
             "schema": {
@@ -68893,7 +69006,7 @@
         "tags": [
           "Monatsabschluss"
         ],
-        "description": "Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): gesperrt, solange eingereichte Berichte ungeprüft sind (409 mit Anzahl). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/\"0\"`, solange es sie nicht gibt).",
+        "description": "Abschluss (UC-005 Schritt 5, A3; Recht `periode:close`): eingereichte, ungeprüfte Berichte zählen mit ihren Werten und dem Vermerk «nicht geprüft»; die Aufgabe «Statusberichte prüfen» bleibt offen, bis sie bestätigt sind (A-74). Für jedes berichtspflichtige Projekt ohne geprüften Bericht gelten die Werte der Vorperiode mit dem Vermerk «nicht gemeldet» (A-11); danach ist die Periode gesperrt, ein späterer Bericht zählt für die nächste (A-37). Optional `If-Match` mit der Version der Periode aus dem Kopf (`W/\"0\"`, solange es sie nicht gibt).",
         "parameters": [
           {
             "schema": {

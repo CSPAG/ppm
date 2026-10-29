@@ -30,7 +30,7 @@ const inhalt: RoadmapInhalt = {
     }],
   }],
 };
-const roadmap = { jahr: 2027, publiziertAt: '2026-12-16T08:00:00Z', publiziertBy: null, version: 1, inhalt, can: { publizieren: false } };
+const roadmap = { jahr: 2027, publiziertAt: '2026-12-16T08:00:00Z', publiziertBy: null, version: 1, inhalt, vermerke: [], can: { publizieren: false } };
 
 function stub(routes: Parameters<typeof mockIamApi>[0]) {
   const api = mockIamApi(routes, { catalog: CATALOG_PPM as unknown as AuthzCatalog });
@@ -68,7 +68,7 @@ describe('Roadmap', () => {
     const api = stub({
       'GET /v1/roadmap': () => json({ items: [] }),
       'GET /v1/roadmap/2027': () => json({ title: 'Nicht gefunden', status: 404 }, 404),
-      'GET /v1/roadmap/2027/vorschau': () => json({ jahr: 2027, stand: 'in_kraft', publiziertAt: null, inhalt, can: { publizieren: true } }),
+      'GET /v1/roadmap/2027/vorschau': () => json({ jahr: 2027, stand: 'in_kraft', publiziertAt: null, inhalt, vermerke: [], can: { publizieren: true } }),
       'POST /v1/roadmap/2027': () => json(roadmap),
     });
     renderWithIam(<Page initial={{ jahr: '2027' }} />, { roles: ['ue'], permissions: ['tenant:read', 'ziel:read', 'ziel:freigabe'] });
@@ -85,7 +85,7 @@ describe('Roadmap', () => {
     stub({
       'GET /v1/roadmap': () => json({ items: [] }),
       'GET /v1/roadmap/2028': () => json({ title: 'Nicht gefunden', status: 404 }, 404),
-      'GET /v1/roadmap/2028/vorschau': () => json({ jahr: 2028, stand: 'in_arbeit', publiziertAt: null, inhalt: { jahr: 2028, handlungsfelder: [] }, can: { publizieren: false } }),
+      'GET /v1/roadmap/2028/vorschau': () => json({ jahr: 2028, stand: null, publiziertAt: null, inhalt: { jahr: 2028, handlungsfelder: [] }, vermerke: [], can: { publizieren: false } }),
     });
     renderWithIam(<Page initial={{ jahr: '2028', ansicht: 'vorschau' }} />, { roles: ['ue'], permissions: ['tenant:read', 'ziel:read', 'ziel:freigabe'] });
     expect(await screen.findByText(TR.nichtInKraft(2028))).toBeInTheDocument();

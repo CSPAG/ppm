@@ -8834,12 +8834,62 @@
           }
         }
       },
+      "ZieljahrVerlauf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "at",
+                "person",
+                "aktion",
+                "text",
+                "nachVorlage"
+              ],
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "person": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "aktion": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "nachVorlage": {
+                  "description": "Nach der Vorlage an den VR («geändert nach Vorlage», A-75).",
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
       "Zieljahr": {
         "additionalProperties": false,
         "type": "object",
         "required": [
           "jahr",
           "stand",
+          "geaendertNachVorlage",
           "vorlageBis",
           "vorgelegtAt",
           "freigabeAt",
@@ -8854,7 +8904,7 @@
             "type": "integer"
           },
           "stand": {
-            "description": "Bearbeitungsstand der Jahresziele; ab «zur_freigabe» gesperrt.",
+            "description": "Bearbeitungsstand der Jahresziele; ab «zur_freigabe» änderbar mit Markierung (A-75).",
             "anyOf": [
               {
                 "type": "string",
@@ -8873,6 +8923,19 @@
                 "enum": [
                   "in_kraft"
                 ]
+              }
+            ]
+          },
+          "geaendertNachVorlage": {
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "type": "string",
+                "format": "date-time"
               }
             ]
           },
@@ -9138,6 +9201,7 @@
                       "metrik",
                       "zielwert",
                       "version",
+                      "geaendertNachVorlage",
                       "hauptaktivitaeten",
                       "projekte"
                     ],
@@ -9160,6 +9224,19 @@
                       },
                       "version": {
                         "type": "integer"
+                      },
+                      "geaendertNachVorlage": {
+                        "anyOf": [
+                          {
+                            "enum": [
+                              null
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        ]
                       },
                       "hauptaktivitaeten": {
                         "type": "array",
@@ -9307,6 +9384,7 @@
           "createdBy",
           "updatedAt",
           "updatedBy",
+          "geaendertNachVorlage",
           "can"
         ],
         "properties": {
@@ -9371,6 +9449,19 @@
               }
             ]
           },
+          "geaendertNachVorlage": {
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
+          },
           "can": {
             "type": "object",
             "required": [
@@ -9378,7 +9469,7 @@
             ],
             "properties": {
               "write": {
-                "description": "Ändern und löschen (nur solange das Jahr «in Arbeit» ist).",
+                "description": "Ändern (nach der Vorlage markiert); löschen nur «in Arbeit».",
                 "type": "boolean"
               }
             }
@@ -58930,6 +59021,110 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StrategischesZielHistory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ziele/{jahr}/verlauf": {
+      "get": {
+        "summary": "Verlauf der Jahresziele",
+        "tags": [
+          "Ziele"
+        ],
+        "description": "Zielzyklus, Vorlage, Freigabe und alle Änderungen an Jahreszielen und Hauptaktivitäten des Jahres, älteste zuerst; nach der Vorlage markiert (A-75, UX-E13). Ohne Zielzyklus leer. Mit `ziel:read`.",
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "jahr",
+            "required": true,
+            "description": "Jahr des Zielzyklus."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZieljahrVerlauf"
                 }
               }
             }

@@ -87,9 +87,14 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
     assert.deepEqual([r.json().stand, typeof r.json().vorgelegtAt, r.json().can.write], ['zur_freigabe', 'string', false]);
     assert.ok(!(await eingang(gl)).some(x => x.titel === 'Jahresziele 2027 vervollständigen'), 'Aufgabe erledigt');
 
-    // gesperrt bis zum Entscheid (K6 Z9)
+    // nach der Vorlage änderbar, markiert «geändert nach Vorlage» und im Verlauf (K6 Z9, A-75)
     const jz = (await call('GET', '/v1/jahresziele?jahr=2027', gl)).json().items[0];
-    assert.equal((await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${jz.version}"` }, { text: 'neu' })).statusCode, 409);
+    const n = await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${jz.version}"` }, { zielwert: `${jz.zielwert} (präzisiert)` });
+    assert.equal(n.statusCode, 200, n.body);
+    assert.ok(n.json().geaendertNachVorlage);
+    const vl = (await call('GET', '/v1/ziele/2027/verlauf', leser)).json().items as { text: string; nachVorlage: boolean }[];
+    assert.ok(vl.some(x => x.nachVorlage && x.text === 'Jahresziel geändert · geändert nach Vorlage'), JSON.stringify(vl));
+    assert.ok(vl.some(x => x.text === 'dem VR vorgelegt' && !x.nachVorlage));
     assert.equal((await call('POST', '/v1/ziele/2027/vorlegen', { ...gl, 'if-match': `W/"${await version(2027)}"` })).statusCode, 409, 'schon vorgelegt');
 
     // Freigabe erfassen: nur ziel:freigabe («alle Portfolios führen»), nicht wer nur liest

@@ -21311,6 +21311,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ziele/{jahr}/verlauf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verlauf der Jahresziele
+         * @description Zielzyklus, Vorlage, Freigabe und alle Änderungen an Jahreszielen und Hauptaktivitäten des Jahres, älteste zuerst; nach der Vorlage markiert (A-75, UX-E13). Ohne Zielzyklus leer. Mit `ziel:read`.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Jahr des Zielzyklus. */
+                    jahr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ZieljahrVerlauf"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ziele/{jahr}": {
         parameters: {
             query?: never;
@@ -48965,10 +49070,22 @@ export interface components {
             /** @description Angestrebter Wert der Metrik. */
             zielwert?: string;
         };
+        ZieljahrVerlauf: {
+            items: {
+                /** Format: date-time */
+                at: string;
+                person: string | null;
+                aktion: string;
+                text: string;
+                /** @description Nach der Vorlage an den VR («geändert nach Vorlage», A-75). */
+                nachVorlage: boolean;
+            }[];
+        };
         Zieljahr: {
             jahr: number;
-            /** @description Bearbeitungsstand der Jahresziele; ab «zur_freigabe» gesperrt. */
+            /** @description Bearbeitungsstand der Jahresziele; ab «zur_freigabe» änderbar mit Markierung (A-75). */
             stand: "in_arbeit" | "zur_freigabe" | "in_kraft";
+            geaendertNachVorlage: null | string;
             vorlageBis: null | string;
             vorgelegtAt: null | string;
             freigabeAt: null | string;
@@ -49029,6 +49146,7 @@ export interface components {
                     metrik: string;
                     zielwert: string;
                     version: number;
+                    geaendertNachVorlage: null | string;
                     hauptaktivitaeten: {
                         /** Format: uuid */
                         id: string;
@@ -49081,8 +49199,9 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             updatedBy: null | string;
+            geaendertNachVorlage: null | string;
             can: {
-                /** @description Ändern und löschen (nur solange das Jahr «in Arbeit» ist). */
+                /** @description Ändern (nach der Vorlage markiert); löschen nur «in Arbeit». */
                 write: boolean;
             };
         };

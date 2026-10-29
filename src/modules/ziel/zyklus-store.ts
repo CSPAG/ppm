@@ -18,9 +18,9 @@ export type Stand = 'in_arbeit' | 'zur_freigabe' | 'in_kraft';
 
 export interface ZieljahrRow {
   id: string; jahr: number; stand: Stand; vorlage_bis: string | null; vorgelegt_at: Date | null; freigabe_at: Date | null; freigabe_text: string;
-  version: number; created_at: Date; updated_at: Date;
+  version: number; created_at: Date; updated_at: Date; geaendert_nach_vorlage_at: Date | null;
 }
-export const ZJ_COLS = "id, jahr, stand, to_char(vorlage_bis, 'YYYY-MM-DD') AS vorlage_bis, vorgelegt_at, freigabe_at, freigabe_text, version, created_at, updated_at";
+export const ZJ_COLS = "id, jahr, stand, to_char(vorlage_bis, 'YYYY-MM-DD') AS vorlage_bis, vorgelegt_at, freigabe_at, freigabe_text, version, created_at, updated_at, geaendert_nach_vorlage_at";
 
 export async function getJahr(tx: Tx, jahr: number, sperren: boolean | 'exklusiv' = false): Promise<ZieljahrRow | null> {
   // FOR SHARE: Vorlegen (AP-E6-2) wartet, bis laufende Änderungen an Jahreszielen abgeschlossen sind;
@@ -43,9 +43,9 @@ export async function updateJahr(tx: Tx, jahr: number, version: number, vorlageB
 
 export interface JahreszielRow {
   id: string; jahr: number; strategisches_ziel_id: string; nummer: string; nummer_sort: number[]; text: string; metrik: string; zielwert: string;
-  version: number; created_at: Date; created_by: string | null; updated_at: Date; updated_by: string | null;
+  version: number; created_at: Date; created_by: string | null; updated_at: Date; updated_by: string | null; geaendert_nach_vorlage_at: Date | null;
 }
-const JZ_COLS = 'id, jahr, strategisches_ziel_id, nummer, nummer_sort, text, metrik, zielwert, version, created_at, created_by, updated_at, updated_by';
+const JZ_COLS = 'id, jahr, strategisches_ziel_id, nummer, nummer_sort, text, metrik, zielwert, version, created_at, created_by, updated_at, updated_by, geaendert_nach_vorlage_at';
 
 export interface JzAfter { jahr: number; sort: number[]; id: string }
 

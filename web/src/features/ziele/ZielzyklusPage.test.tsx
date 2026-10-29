@@ -36,11 +36,11 @@ function zyklus(o: Partial<Zielzyklus> = {}): Zielzyklus {
       projekte: [],
       jahresziele: [
         {
-          id: JZ1, nummer: '2.1.1', text: 'Einkauf bündeln', metrik: 'Anteil gebündelt', zielwert: '≥ 60 %', version: 1,
+          id: JZ1, nummer: '2.1.1', text: 'Einkauf bündeln', metrik: 'Anteil gebündelt', zielwert: '≥ 60 %', version: 1, geaendertNachVorlage: null,
           hauptaktivitaeten: [{ id: 'h1', text: 'Rahmenverträge verhandeln', verantwortlich: null, position: 0, version: 1 }],
           projekte: [{ zuordnungId: 'z1', projektId: PR, nummer: '2026-014', name: 'Neues KIS', phase: 'P1', lebenszyklus: 'aktiv' }],
         },
-        { id: JZ2, nummer: '2.1.2', text: 'Lager reduzieren', metrik: '', zielwert: '', version: 1, hauptaktivitaeten: [], projekte: [] },
+        { id: JZ2, nummer: '2.1.2', text: 'Lager reduzieren', metrik: '', zielwert: '', version: 1, geaendertNachVorlage: null, hauptaktivitaeten: [], projekte: [] },
       ],
     }],
     pruefung: { ohneMetrik: [{ id: JZ2, nummer: '2.1.2' }], ohneUmsetzung: [{ id: JZ2, nummer: '2.1.2' }] },

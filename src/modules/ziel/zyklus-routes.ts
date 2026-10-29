@@ -21,20 +21,22 @@ import {
   type HauptaktivitaetOut, type JahreszielOut, type ProjektZielOut, type ZieljahrOut,
 } from './zyklus-schemas.ts';
 import * as store from './zyklus-store.ts';
+import { nachVorlage } from './verlauf.ts';
 
 const TAG = 'Ziele';
 
 const STAND_TEXT: Record<store.Stand, string> = { in_arbeit: 'in Arbeit', zur_freigabe: 'liegen dem VR zur Freigabe vor', in_kraft: 'sind in Kraft' };
 
 /**
- * Zieljahr lesen und für die Dauer der Transaktion gegen Vorlegen sperren; 404 ohne Zielzyklus, 409 ausserhalb von
- * «in Arbeit» (K6 Z9: «Ändern erst nach dem Entscheid»).
+ * Zieljahr lesen und für die Dauer der Transaktion gegen Vorlegen sperren; 404 ohne Zielzyklus. Nach der Vorlage bleibt
+ * Ändern möglich und ist markiert «geändert nach Vorlage» (K6 Z9, A-75: `nachVorlage` nach der Änderung); Löschen nur
+ * «in Arbeit» (409, gelöscht werden nur Entwürfe).
  */
-async function jahrBearbeitbar(tx: Tx, jahr: number): Promise<store.ZieljahrRow> {
+async function jahrBearbeitbar(tx: Tx, jahr: number, o: { loeschen?: boolean } = {}): Promise<store.ZieljahrRow> {
   const zj = await store.getJahr(tx, jahr, true);
   if (!zj) throw notFound(`Zielzyklus ${jahr}`);
-  if (zj.stand !== 'in_arbeit') {
-    throw conflict(`Die Jahresziele ${jahr} ${STAND_TEXT[zj.stand]} und können nicht geändert werden.`, { reason: 'gesperrt', stand: zj.stand });
+  if (o.loeschen && zj.stand !== 'in_arbeit') {
+    throw conflict(`Die Jahresziele ${jahr} ${STAND_TEXT[zj.stand]}; gelöscht wird nach der Vorlage nichts mehr. Ändere den Eintrag, die Änderung ist markiert.`, { reason: 'gesperrt', stand: zj.stand });
   }
   return zj;
 }
@@ -59,11 +61,14 @@ async function aufgabeVervollstaendigen(tx: Tx, zj: store.ZieljahrRow): Promise<
 
 export const zieljahrOut = (r: store.ZieljahrRow, write: boolean): ZieljahrOut => ({
   jahr: r.jahr, stand: r.stand, vorlageBis: r.vorlage_bis, vorgelegtAt: r.vorgelegt_at, freigabeAt: r.freigabe_at, freigabeText: r.freigabe_text,
-  version: r.version, createdAt: r.created_at, updatedAt: r.updated_at, can: { write: write && r.stand === 'in_arbeit' },
+  geaendertNachVorlage: r.geaendert_nach_vorlage_at,
+  // nach der Vorlage bleibt Ändern möglich, markiert (A-75)
+  version: r.version, createdAt: r.created_at, updatedAt: r.updated_at, can: { write },
 });
 
 const jahreszielOut = (r: store.JahreszielRow, write: boolean): JahreszielOut => ({
   id: r.id, jahr: r.jahr, strategischesZielId: r.strategisches_ziel_id, nummer: r.nummer, text: r.text, metrik: r.metrik, zielwert: r.zielwert,
+  geaendertNachVorlage: r.geaendert_nach_vorlage_at,
   version: r.version, createdAt: r.created_at, createdBy: r.created_by, updatedAt: r.updated_at, updatedBy: r.updated_by, can: { write },
 });
 const jahreszielSnapshot = (r: store.JahreszielRow) => ({
@@ -140,7 +145,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
     const jahresziele = d.jz.map(j => ({
       strategischesZielId: j.strategisches_ziel_id,
       knoten: {
-        id: j.id, nummer: j.nummer, text: j.text, metrik: j.metrik, zielwert: j.zielwert, version: j.version,
+        id: j.id, nummer: j.nummer, text: j.text, metrik: j.metrik, zielwert: j.zielwert, version: j.version, geaendertNachVorlage: j.geaendert_nach_vorlage_at,
         hauptaktivitaeten: d.ha.filter(h => h.jahresziel_id === j.id).map(h => ({ id: h.id, text: h.text, verantwortlich: person(h.verantwortlich, h.verantwortlich_name), position: h.position, version: h.version })),
         projekte: d.pr.filter(p => p.jahresziel_id === j.id).map(projekt),
       },
@@ -199,6 +204,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
       if (before.version !== version) throw preconditionFailed(before.version);
       const r = await store.updateJahr(tx, jahr, version, body.vorlageBis);
       if (!r) throw preconditionFailed(before.version);
+      await nachVorlage(tx, before);
       await aufgabeVervollstaendigen(tx, r);
       await record(tx, who, { action: 'zieljahr.updated', resourceType: 'zieljahr', resourceId: r.id, data: { before: { vorlageBis: before.vorlage_bis }, after: { vorlageBis: r.vorlage_bis } }, event: { id: r.id, jahr, vorlageBis: r.vorlage_bis, version: r.version } });
       return r;
@@ -249,10 +255,11 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
     const body = req.body as typeof JahreszielCreate.static;
     const who = actorOf(req);
     const row = await strategischesZielPruefen(() => req.tx(async tx => {
-      await jahrBearbeitbar(tx, body.jahr);
+      const zj = await jahrBearbeitbar(tx, body.jahr);
       const nummer = body.nummer ?? await store.naechsteNummer(tx, body.jahr, body.strategischesZielId);
       if (!nummer) throw notFound('Strategisches Ziel');
-      const r = await store.createJahresziel(tx, { ...body, nummer });
+      let r = await store.createJahresziel(tx, { ...body, nummer });
+      if (await nachVorlage(tx, zj, r.id)) r = (await store.getJahresziel(tx, r.id))!;
       await record(tx, who, { action: 'jahresziel.created', resourceType: 'jahresziel', resourceId: r.id, data: jahreszielSnapshot(r), event: jahreszielSnapshot(r) });
       return r;
     }));
@@ -269,10 +276,11 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
     const row = await req.tx(async tx => {
       const before = await store.getJahresziel(tx, id);
       if (!before) throw notFound('Jahresziel');
-      await jahrBearbeitbar(tx, before.jahr);
+      const zj = await jahrBearbeitbar(tx, before.jahr);
       if (before.version !== version) throw preconditionFailed(before.version);
-      const r = await store.updateJahresziel(tx, id, version, req.body as typeof JahreszielPatch.static);
+      let r = await store.updateJahresziel(tx, id, version, req.body as typeof JahreszielPatch.static);
       if (!r) throw preconditionFailed(before.version);
+      if (await nachVorlage(tx, zj, id)) r = (await store.getJahresziel(tx, id))!;
       await record(tx, who, { action: 'jahresziel.updated', resourceType: 'jahresziel', resourceId: id, data: { before: jahreszielSnapshot(before), after: jahreszielSnapshot(r) }, event: jahreszielSnapshot(r) });
       return r;
     });
@@ -290,7 +298,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
     await req.tx(async tx => {
       const before = await store.getJahresziel(tx, id);
       if (!before) throw notFound('Jahresziel');
-      await jahrBearbeitbar(tx, before.jahr);
+      await jahrBearbeitbar(tx, before.jahr, { loeschen: true });
       if (before.version !== version || !(await store.removeJahresziel(tx, id, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: 'jahresziel.deleted', resourceType: 'jahresziel', resourceId: id, data: jahreszielSnapshot(before), event: { id } });
     });
@@ -332,9 +340,10 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
     const row = await req.tx(async tx => {
       const jz = await store.getJahresziel(tx, body.jahreszielId);
       if (!jz) throw notFound('Jahresziel');
-      await jahrBearbeitbar(tx, jz.jahr);
+      const zj = await jahrBearbeitbar(tx, jz.jahr);
       await verantwortlichPruefen(tx, body.verantwortlich);
       const r = (await store.getHauptaktivitaet(tx, await store.createHauptaktivitaet(tx, body)))!;
+      await nachVorlage(tx, zj, jz.id);
       await record(tx, who, { action: 'hauptaktivitaet.created', resourceType: 'hauptaktivitaet', resourceId: r.id, data: hauptaktivitaetSnapshot(r), event: hauptaktivitaetSnapshot(r) });
       return r;
     });
@@ -353,10 +362,11 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
       const before = await store.getHauptaktivitaet(tx, id);
       if (!before) throw notFound('Hauptaktivität');
       const jz = (await store.getJahresziel(tx, before.jahresziel_id))!;
-      await jahrBearbeitbar(tx, jz.jahr);
+      const zj = await jahrBearbeitbar(tx, jz.jahr);
       if (before.version !== version) throw preconditionFailed(before.version);
       await verantwortlichPruefen(tx, body.verantwortlich);
       if (!(await store.updateHauptaktivitaet(tx, id, version, body))) throw preconditionFailed(before.version);
+      await nachVorlage(tx, zj, jz.id);
       const r = (await store.getHauptaktivitaet(tx, id))!;
       await record(tx, who, { action: 'hauptaktivitaet.updated', resourceType: 'hauptaktivitaet', resourceId: id, data: { before: hauptaktivitaetSnapshot(before), after: hauptaktivitaetSnapshot(r) }, event: hauptaktivitaetSnapshot(r) });
       return r;
@@ -376,7 +386,7 @@ export function registerZyklusRoutes(app: FastifyInstance, _deps: Deps): void {
       const before = await store.getHauptaktivitaet(tx, id);
       if (!before) throw notFound('Hauptaktivität');
       const jz = (await store.getJahresziel(tx, before.jahresziel_id))!;
-      await jahrBearbeitbar(tx, jz.jahr);
+      await jahrBearbeitbar(tx, jz.jahr, { loeschen: true });
       if (before.version !== version || !(await store.removeHauptaktivitaet(tx, id, version))) throw preconditionFailed(before.version);
       await record(tx, who, { action: 'hauptaktivitaet.deleted', resourceType: 'hauptaktivitaet', resourceId: id, data: hauptaktivitaetSnapshot(before), event: { id } });
     });

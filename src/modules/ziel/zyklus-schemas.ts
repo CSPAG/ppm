@@ -15,7 +15,8 @@ export const JahrParams = Type.Object({ jahr: Type.Integer({ minimum: 2000, maxi
 
 export const Zieljahr = Type.Object({
   jahr: Type.Integer(),
-  stand: Type.Union([Type.Literal('in_arbeit'), Type.Literal('zur_freigabe'), Type.Literal('in_kraft')], { description: 'Bearbeitungsstand der Jahresziele; ab «zur_freigabe» gesperrt.' }),
+  stand: Type.Union([Type.Literal('in_arbeit'), Type.Literal('zur_freigabe'), Type.Literal('in_kraft')], { description: 'Bearbeitungsstand der Jahresziele; ab «zur_freigabe» änderbar mit Markierung (A-75).' }),
+  geaendertNachVorlage: Nullable(DateTime),
   vorlageBis: Nullable(Type.String({ format: 'date', description: 'Geplante Vorlage an den VR.' })),
   vorgelegtAt: Nullable(DateTime),
   freigabeAt: Nullable(DateTime),
@@ -86,7 +87,8 @@ export const Jahresziel = Type.Object({
   createdBy: Nullable(Uuid),
   updatedAt: DateTime,
   updatedBy: Nullable(Uuid),
-  can: Type.Object({ write: Type.Boolean({ description: 'Ändern und löschen (nur solange das Jahr «in Arbeit» ist).' }) }),
+  geaendertNachVorlage: Nullable(DateTime),
+  can: Type.Object({ write: Type.Boolean({ description: 'Ändern (nach der Vorlage markiert); löschen nur «in Arbeit».' }) }),
 }, { $id: 'Jahresziel', additionalProperties: false });
 export type JahreszielOut = Static<typeof Jahresziel>;
 
@@ -136,6 +138,7 @@ export const Zielzyklus = Type.Object({
       metrik: Type.String(),
       zielwert: Type.String(),
       version: Type.Integer(),
+      geaendertNachVorlage: Nullable(DateTime),
       hauptaktivitaeten: Type.Array(Type.Object({
         id: Uuid, text: Type.String(), verantwortlich: Nullable(Type.Ref('ZielPerson')), position: Type.Integer(), version: Type.Integer(),
       }, { additionalProperties: false })),

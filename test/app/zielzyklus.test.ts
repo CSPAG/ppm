@@ -168,23 +168,25 @@ describe('Zielzyklus', () => {
     assert.equal((await call('DELETE', `/v1/strategische-ziele/${ziel21}`, { ...gl, 'if-match': s.headers.etag as string })).statusCode, 409);
   });
 
-  test('ab «zur Freigabe» gesperrt (UC-011 Schritt 6, K6 Z9)', async () => {
+  test('ab «zur Freigabe» änderbar mit Markierung, löschen nur in Arbeit (UC-011 Schritt 6, K6 Z9, A-75)', async () => {
     await call('POST', '/v1/ziele/2030', gl, {});
     const jz = (await call('POST', '/v1/jahresziele', gl, { jahr: 2030, strategischesZielId: ziel21, text: 'Gesperrt', metrik: 'm', zielwert: 'w' })).json();
     const ha = (await call('POST', '/v1/hauptaktivitaeten', gl, { jahreszielId: jz.id, text: 'Gesperrt' })).json();
     // Vorlegen setzt AP-E6-2; hier direkt
     await full(api.t.runtime, tenantId, tx => tx.query("UPDATE ppm.zieljahr SET stand = 'zur_freigabe' WHERE tenant_id = $1 AND jahr = 2030", [tenantId]));
     const r = await call('PATCH', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': 'W/"1"' }, { text: 'neu' });
-    assert.equal(r.statusCode, 409);
-    assert.equal(r.json().reason, 'gesperrt');
-    assert.match(r.json().detail, /Jahresziele 2030 liegen dem VR zur Freigabe vor/);
-    assert.equal((await call('POST', '/v1/jahresziele', gl, { jahr: 2030, strategischesZielId: ziel21, text: 'x' })).statusCode, 409);
-    assert.equal((await call('DELETE', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': 'W/"1"' })).statusCode, 409);
-    assert.equal((await call('POST', '/v1/hauptaktivitaeten', gl, { jahreszielId: jz.id, text: 'x' })).statusCode, 409);
-    assert.equal((await call('PATCH', `/v1/hauptaktivitaeten/${ha.id}`, { ...gl, 'if-match': 'W/"1"' }, { text: 'x' })).statusCode, 409);
-    assert.equal((await call('PATCH', '/v1/ziele/2030', { ...gl, 'if-match': 'W/"2"' }, { vorlageBis: null })).statusCode, 409);
+    assert.equal(r.statusCode, 200, r.body);
+    assert.ok(r.json().geaendertNachVorlage);
+    assert.equal((await call('POST', '/v1/jahresziele', gl, { jahr: 2030, strategischesZielId: ziel21, text: 'x' })).statusCode, 201);
+    assert.equal((await call('POST', '/v1/hauptaktivitaeten', gl, { jahreszielId: jz.id, text: 'x' })).statusCode, 201);
+    assert.equal((await call('PATCH', `/v1/hauptaktivitaeten/${ha.id}`, { ...gl, 'if-match': 'W/"1"' }, { text: 'x' })).statusCode, 200);
+    // gelöscht werden nur Entwürfe (A-75)
+    const del = await call('DELETE', `/v1/jahresziele/${jz.id}`, { ...gl, 'if-match': `W/"${r.json().version}"` });
+    assert.deepEqual([del.statusCode, del.json().reason], [409, 'gesperrt']);
+    assert.equal((await call('DELETE', `/v1/hauptaktivitaeten/${ha.id}`, { ...gl, 'if-match': 'W/"2"' })).statusCode, 409);
     const z = (await call('GET', '/v1/ziele/2030', gl)).json();
-    assert.deepEqual([z.zieljahr.stand, z.zieljahr.can.write, z.can.write], ['zur_freigabe', false, false]);
+    assert.equal(z.zieljahr.stand, 'zur_freigabe');
+    assert.ok(z.zieljahr.geaendertNachVorlage, 'Zieljahr markiert');
   });
 
   test('Audit und Ereignis in derselben Transaktion', async () => {

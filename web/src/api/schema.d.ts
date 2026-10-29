@@ -27292,6 +27292,131 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/traktanden/{id}/unterlagen-nachfuehren": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unterlagen nach dem Versand nachführen
+         * @description Nach dem Versand (A-75, K3): hält die Unterlagen des Traktandums neu fest (z. B. nach dem Quality-Check oder einer Änderung am Vertrag); Traktandum und Sitzung tragen «geändert nach Versand», die frühere Fassung steht im Verlauf. Nur «versendet»; `If-Match` = Version des Traktandums.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Traktandum"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/traktanden/{id}/einladungen": {
         parameters: {
             query?: never;
@@ -28842,6 +28967,110 @@ export interface paths {
                 };
                 /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
                 403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sitzungen/{id}/verlauf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verlauf der Sitzung
+         * @description Änderungen an Sitzung, Traktanden, Einladungen und Unterlagen, älteste zuerst; nach dem Versand markiert (A-75, UX-E13). Mit `sitzung:read` am Portfolio, unter der Lesesicht der Sitzung.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SitzungVerlauf"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -49454,6 +49683,8 @@ export interface components {
             fest: boolean;
             /** @description Datum der Sitzung, von der das Traktandum verschoben wurde (UC-006 A2). */
             verschobenVon: string | null;
+            /** @description Zuletzt nach dem Versand geändert oder aufgenommen («geändert nach Versand», A-75, UX-E13); Einzelheiten im Verlauf. */
+            geaendertNachVersand: (null | string) | null;
             unterlagen: {
                 /**
                  * @description Stand der Unterlagen (UC-006 Schritt 3): bereit, Quality-Check offen, Unterlagen fehlen, keine Unterlagen nötig.
@@ -49494,6 +49725,7 @@ export interface components {
              * @enum {string}
              */
             stand: "geplant" | "in_vorbereitung" | "versendet" | "laufend" | "geschlossen" | "protokoll_versendet";
+            geaendertNachVersand: null | string;
             versendetAt: null | string;
             versandVorlauf: null | number;
             frist: components["schemas"]["Versandfrist"];
@@ -50025,6 +50257,17 @@ export interface components {
                 stand: string;
                 /** @description Titel des gefundenen Traktandums, wenn die Suche über den Titel traf. */
                 traktandum: string | null;
+            }[];
+        };
+        SitzungVerlauf: {
+            items: {
+                /** Format: date-time */
+                at: string;
+                person: string | null;
+                aktion: string;
+                text: string;
+                /** @description Nach dem Versand («geändert nach Versand», A-75). */
+                nachVersand: boolean;
             }[];
         };
         /** @description Beurteilung der Abweichung je Dimension. */

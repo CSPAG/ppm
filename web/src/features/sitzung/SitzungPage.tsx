@@ -5,9 +5,10 @@
  * (I-R2: Antwort des Servers ersetzt die Sitzung); Umkehrbares mit «Rückgängig» im Toast. Mitglieder und Eingeladene
  * lesen ab dem Versand (Z8), danach ist die Liste fest (Z9).
  */
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useId, useState } from 'react';
-import { isConflict, statusOf } from '../../api/index.ts';
-import { Dialog, Empty, ErrorState, Hinweis, Icon, Loading, Stand, T, fmtDatum, fmtZeitpunkt, useToast } from '../../ui/index.ts';
+import { isConflict, statusOf, api } from '../../api/index.ts';
+import { Dialog, Empty, ErrorState, Hinweis, Icon, Loading, Stand, T, fmtDatum, fmtZeitpunkt, useToast, Verlauf } from '../../ui/index.ts';
 import { useSitzung, useSitzungMutations, useSitzungsliste, useVersandvorschau, useVorschlaege, type Sitzung, type Traktandum } from './api.ts';
 import type { SetSitzungSearch, SitzungSearch } from './search.ts';
 import { fmtMinuten, standFamilie, Traktandenliste } from './Traktandenliste.tsx';
@@ -144,7 +145,7 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
               </div>
             </div>
           </div>
-          {bearbeiten ? (
+          {bearbeiten && !versendet ? (
             <div className="acts">
               <button type="button" className="btn primary" disabled={busy} onClick={() => setVersand(true)}><Icon name="send" />{TS.versenden}</button>
             </div>
@@ -171,12 +172,14 @@ export function SitzungPage({ kuerzel, datum, search, gehe }: { kuerzel: string;
             {s.traktanden.length ? (
               <Traktandenliste traktanden={s.traktanden} bearbeiten={bearbeiten} busy={busy} versandRest={vt ?? ''}
                 aktuell={search.traktandum ? Number(search.traktandum) : undefined}
-                onVerschieben={ordnen} onEntfernen={entfernen} onAufNaechste={aufNaechste} />
+                onVerschieben={ordnen} onEntfernen={entfernen} onAufNaechste={aufNaechste}
+                versendet={versendet} onNachfuehren={tr => m.nachfuehren.mutate(tr, { onSuccess: () => toast.show(TS.unterlagenNachgefuehrt), onError: fehler })} />
             ) : bearbeiten ? <VorschlagsZaehler id={s.id} /> : <Empty>{TS.leerLesen}</Empty>}
           </div>
           {bearbeiten ? <Vorschlagsliste sitzung={s} busy={busy} onAufnehmen={id => aufnehmen(id)} onEinplanen={body => m.aufnehmen.mutate({ id: s.id, body }, { onSuccess: () => toast.show(TS.aufgenommen), onError: fehler })} /> : null}
         </div>
       </div>
+      {versendet ? <div className="body"><SitzungVerlauf id={s.id} version={s.version} /></div> : null}
       {versand ? <VersandDialog s={s} busy={m.versenden.isPending} onClose={() => setVersand(false)} onVersenden={versenden} /> : null}
     </section>
   );
@@ -191,4 +194,13 @@ function VorschlagsZaehler({ id }: { id: string }) {
 function useAnzahlVorschlaege(id: string): number {
   const v = useVorschlaege(id, true);
   return v.data?.gruppen.reduce((n, g) => n + g.traktanden.length, 0) ?? 0;
+}
+
+/** Verlauf der Sitzung nach dem Versand (UX-E13): Versand und alle Änderungen danach, markiert. */
+function SitzungVerlauf({ id, version }: { id: string; version: number }) {
+  const q = useQuery({
+    queryKey: ['sitzung', 'verlauf', id, version] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/sitzungen/{id}/verlauf', { params: { path: { id } }, signal })).data!.items,
+  });
+  return <Verlauf titel={TS.verlauf} eintraege={q.data} laedt={q.isPending} fehler={q.error} erneut={() => void q.refetch()} />;
 }

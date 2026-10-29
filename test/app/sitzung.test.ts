@@ -238,12 +238,18 @@ describe('Sitzungen vorbereiten', () => {
     assert.ok(s.versendetAt);
     assert.equal(s.versandVorlauf, s.frist.vorlauf);
     assert.ok(s.versandVorlauf >= 5);
-    assert.equal(s.can.write, false);
     assert.equal(s.traktanden.find((t: { art: string }) => t.art === 'gate').unterlagen.liste[0].hinweis, 'Quality-Check bestanden', 'Stand festgehalten');
     // mit Vermerk versendet: Bericht der Programmleitung ohne Unterlagen trägt den Vermerk auch nach dem Versand
     assert.deepEqual(s.traktanden.find((t: { fest: boolean }) => t.fest).vermerke.map((v: { art: string }) => v.art), ['unterlagen_fehlen']);
-    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/traktanden`, ue, { art: 'abschluss' })).statusCode, 409, 'nach dem Versand fest');
-    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${s.version}"` })).statusCode, 409);
+    // nach dem Versand änderbar, markiert «geändert nach Versand» (A-75, UX-E13; Abnahme AP-E8-5)
+    assert.equal(s.can.write, true);
+    const gate = s.traktanden.find((x: { art: string }) => x.art === 'gate');
+    const pt = await call('PATCH', `/v1/traktanden/${gate.id}`, { ...ue, 'if-match': `W/"${gate.version}"` }, { antrag: 'Phase P2 freigeben (ergänzt)' });
+    assert.equal(pt.statusCode, 200, pt.body);
+    assert.ok(pt.json().geaendertNachVersand);
+    const nachher = await ok('GET', `/v1/sitzungen/${sitzung.id}`, ue);
+    assert.ok(nachher.geaendertNachVersand);
+    assert.equal((await call('POST', `/v1/sitzungen/${sitzung.id}/versenden`, { ...ue, 'if-match': `W/"${nachher.version}"` })).statusCode, 409);
 
     // Protokoll: Audit sitzung.dispatched mit Vorlauf; Mitteilungen; Aufgabe «Unterlagen lesen» für die Mitglieder
     const [audit, mitteilungen] = await sys(async tx => [
@@ -259,6 +265,10 @@ describe('Sitzungen vorbereiten', () => {
     assert.equal(an(pl).length, 2, 'Einladung und Verschiebung');
     assert.ok(an(sp).some(t => t.includes('verschoben auf')), 'SP über die Verschiebung informiert');
 
+    // Verlauf für die Mitglieder: Versand und die Änderung danach, markiert
+    const vl = await ok('GET', `/v1/sitzungen/${sitzung.id}/verlauf`, mitglied);
+    assert.ok(vl.items.some((x: { text: string; nachVersand: boolean }) => x.nachVersand && x.text === 'Traktandum geändert · geändert nach Versand'), JSON.stringify(vl.items));
+    assert.ok(vl.items.some((x: { aktion: string }) => x.aktion === 'sitzung.dispatched'));
     const eingang = (await ok('GET', '/v1/eingang', mitglied)).items.map((a: { titel: string }) => a.titel);
     assert.ok(eingang.some((t: string) => t.startsWith('Unterlagen PRAT') && t.endsWith('lesen')), JSON.stringify(eingang));
 

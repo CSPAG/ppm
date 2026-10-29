@@ -41,7 +41,11 @@ export const TS = {
   angelegt: 'Sitzung angelegt.',
   gone: 'Diese Sitzung gibt es nicht, oder du siehst sie nicht.',
   nurLesen: 'Du siehst die Sitzung lesend. Die Traktandenliste bereitet die Unternehmensentwicklung vor.',
-  versendetBanner: (z: string) => `Unterlagen versendet am ${z}. Die Traktandenliste ist fest.`,
+  versendetBanner: (z: string) => `Unterlagen versendet am ${z}. Änderungen bleiben bis zum Beginn möglich; sie sind für die Mitglieder als «geändert nach Versand» markiert.`,
+  geaendertNachVersand: 'geändert nach Versand',
+  unterlagenNachfuehren: 'Unterlagen nachführen',
+  unterlagenNachgefuehrt: 'Unterlagen nachgeführt, markiert «geändert nach Versand».',
+  verlauf: 'Verlauf',
   konflikt: 'Die Sitzung wurde inzwischen geändert und ist neu geladen; wiederhole deine letzte Aktion.',
 
   // Traktandenliste (K3 Schritte 2–3)

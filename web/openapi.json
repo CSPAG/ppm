@@ -11815,6 +11815,7 @@
           "vertraulich",
           "fest",
           "verschobenVon",
+          "geaendertNachVersand",
           "unterlagen",
           "vermerke",
           "einladungen",
@@ -11994,6 +11995,27 @@
               }
             ]
           },
+          "geaendertNachVersand": {
+            "description": "Zuletzt nach dem Versand geändert oder aufgenommen («geändert nach Versand», A-75, UX-E13); Einzelheiten im Verlauf.",
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "enum": [
+                      null
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "unterlagen": {
             "additionalProperties": false,
             "type": "object",
@@ -12064,6 +12086,7 @@
           "dauerMin",
           "ort",
           "stand",
+          "geaendertNachVersand",
           "versendetAt",
           "versandVorlauf",
           "frist",
@@ -12156,6 +12179,19 @@
               "protokoll_versendet"
             ],
             "description": "Bearbeitungsstand: geplant, in Vorbereitung, Unterlagen versendet, laufend, geschlossen, Protokoll versendet."
+          },
+          "geaendertNachVersand": {
+            "anyOf": [
+              {
+                "enum": [
+                  null
+                ]
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
           },
           "versendetAt": {
             "anyOf": [
@@ -14232,6 +14268,55 @@
                       "type": "null"
                     }
                   ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "SitzungVerlauf": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "at",
+                "person",
+                "aktion",
+                "text",
+                "nachVersand"
+              ],
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "person": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "aktion": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "nachVersand": {
+                  "description": "Nach dem Versand («geändert nach Versand», A-75).",
+                  "type": "boolean"
                 }
               }
             }
@@ -65443,6 +65528,137 @@
         }
       }
     },
+    "/v1/traktanden/{id}/unterlagen-nachfuehren": {
+      "post": {
+        "summary": "Unterlagen nach dem Versand nachführen",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Nach dem Versand (A-75, K3): hält die Unterlagen des Traktandums neu fest (z. B. nach dem Quality-Check oder einer Änderung am Vertrag); Traktandum und Sitzung tragen «geändert nach Versand», die frühere Fassung steht im Verlauf. Nur «versendet»; `If-Match` = Version des Traktandums.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Traktandum"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/traktanden/{id}/einladungen": {
       "put": {
         "summary": "Eingeladene festlegen",
@@ -67136,6 +67352,108 @@
           },
           "403": {
             "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sitzungen/{id}/verlauf": {
+      "get": {
+        "summary": "Verlauf der Sitzung",
+        "tags": [
+          "Sitzungen"
+        ],
+        "description": "Änderungen an Sitzung, Traktanden, Einladungen und Unterlagen, älteste zuerst; nach dem Versand markiert (A-75, UX-E13). Mit `sitzung:read` am Portfolio, unter der Lesesicht der Sitzung.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitzungVerlauf"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
             "content": {
               "application/problem+json": {
                 "schema": {

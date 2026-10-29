@@ -118,6 +118,12 @@ export function useSitzungMutations(kuerzel: string, datum: string) {
       (await api.PUT('/v1/sitzungen/{id}/traktanden', { params: { path: { id: s.id }, header: { 'if-match': etag(s.version) } }, body: { reihenfolge } })).data!,
     onSuccess: setze,
   });
+  // nach dem Versand: Unterlagen eines Traktandums neu festhalten (A-75)
+  const nachfuehren = useMutation({
+    mutationFn: async (t: Traktandum) =>
+      (await api.POST('/v1/traktanden/{id}/unterlagen-nachfuehren', { params: { path: { id: t.id }, header: { 'if-match': etag(t.version) } } })).data!,
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: sitzungKeys.eine(kuerzel, datum) }); },
+  });
   const entfernen = useMutation({
     mutationFn: async (t: Traktandum) =>
       (await api.POST('/v1/traktanden/{id}/entfernen', { params: { path: { id: t.id }, header: { 'idempotency-key': newIdempotencyKey() } } })).data!,
@@ -133,5 +139,5 @@ export function useSitzungMutations(kuerzel: string, datum: string) {
       (await api.POST('/v1/sitzungen/{id}/versenden', { params: { path: { id: s.id }, header: { 'if-match': etag(s.version) } } })).data!,
     onSuccess: setze,
   });
-  return { anlegen, aufnehmen, ordnen, entfernen, verschieben, versenden };
+  return { anlegen, aufnehmen, ordnen, entfernen, verschieben, versenden, nachfuehren };
 }

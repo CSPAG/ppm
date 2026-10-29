@@ -7,7 +7,8 @@ export type Organisation = Schemas['Organisation'];
 export type Funktion = Schemas['Mitglied']['funktion'];
 export type Lebenszyklus = Projekt['lebenszyklus'];
 
-export interface ListFilter { q: string; rolle?: Funktion; phase?: Projekt['phase']; lebenszyklus?: Lebenszyklus[] }
+/** `alle`: auch Projekte, die die Person nur auflisten darf (Kopfdaten, UI-52, Master Entscheid 14). */
+export interface ListFilter { q: string; rolle?: Funktion; phase?: Projekt['phase']; lebenszyklus?: Lebenszyklus[]; alle?: boolean }
 
 export const projektKeys = {
   all: ['projekt'] as const,
@@ -49,7 +50,7 @@ export function useProjektList(f: ListFilter) {
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam, signal }) => {
       const { data } = await api.GET('/v1/projekte', {
-        params: { query: { q: f.q || undefined, rolle: f.rolle, phase: f.phase, lebenszyklus: f.lebenszyklus, cursor: pageParam, limit: 50 } }, signal,
+        params: { query: { q: f.q || undefined, rolle: f.rolle, phase: f.phase, lebenszyklus: f.lebenszyklus, alle: f.alle || undefined, cursor: pageParam, limit: 50 } }, signal,
       });
       return data!;
     },
@@ -58,11 +59,11 @@ export function useProjektList(f: ListFilter) {
 }
 
 /** Projekt zur Nummer (Adresse `/projekte/<nr>`, I-N5); `null`, wenn es das Projekt nicht gibt oder die Person es nicht sieht. */
-export function useProjektNachNummer(nr: string) {
+export function useProjektNachNummer(nr: string, alle = false) {
   return useQuery({
-    queryKey: projektKeys.nummer(nr),
+    queryKey: [...projektKeys.nummer(nr), alle] as const,
     queryFn: async ({ signal }) => {
-      const { data } = await api.GET('/v1/projekte', { params: { query: { nummer: nr, limit: 1 } }, signal });
+      const { data } = await api.GET('/v1/projekte', { params: { query: { nummer: nr, alle: alle || undefined, limit: 1 } }, signal });
       return data!.items[0] ?? null;
     },
   });
@@ -103,7 +104,8 @@ export async function suchePersonen(q: string, signal: AbortSignal) {
   return (await api.GET('/v1/projekte/personen', { params: { query: { q, limit: 5 } }, signal })).data!.items;
 }
 
-export async function sucheProjekte(q: string, signal: AbortSignal): Promise<Projekt[]> {
-  const { data } = await api.GET('/v1/projekte', { params: { query: { q, limit: 5 } }, signal });
+/** Suche der Befehlspalette; `alle`: alle aufgelisteten Projekte (Master Entscheid 14), sonst nur mit Leserecht. */
+export async function sucheProjekte(q: string, signal: AbortSignal, alle = false): Promise<Projekt[]> {
+  const { data } = await api.GET('/v1/projekte', { params: { query: { q, alle: alle || undefined, limit: 5 } }, signal });
   return data!.items;
 }

@@ -68,6 +68,13 @@ export const TP = {
     ohneZugriff: 'kein Zugriff',
     zugriffGeben: 'Zugriff geben',
   },
+  // Alle Projekte (UI-52, Master Entscheid 14)
+  alle: {
+    titel: 'Alle Projekte', ansicht: 'Ansicht',
+    sub: 'Alle Projekte der Organisation mit Nummer, Portfolio, Phase und Projektleitung. Vertrauliche Projekte siehst du nur mit einer Rolle.',
+    leer: 'Es gibt noch keine Projekte. Projekte entstehen aus freigegebenen Projektideen.',
+    nurKopf: 'Du siehst die Kopfdaten. Status, Berichte und den Projektvertrag sieht, wer am Projekt oder seinem Portfolio eine Rolle hat; Zugriff gibt die Projektleitung.',
+  },
   // Bereich «Zugriff» (UI-51, UC-016 A2)
   zugriff: {
     titelPortfolio: 'Zugriff am Portfolio', portfolio: 'Portfolio',

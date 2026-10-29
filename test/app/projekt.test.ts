@@ -64,12 +64,12 @@ describe('Projekte', () => {
     assert.match(a.nummer, new RegExp(`^${jahr}-\\d{3}$`));
     assert.deepEqual([a.name, a.phase, a.lebenszyklus, a.vertraulich, a.version, a.rollen], ['Digitale Patientenaufnahme', 'P0', 'aktiv', false, 1, []]);
     assert.deepEqual(a.portfolio, { schluessel: 'transformation', name: 'Transformation', kategorie: 'A' });
-    assert.deepEqual(a.can, { write: true, organisation: true });
+    assert.deepEqual(a.can, { read: true, write: true, organisation: true });
 
     // Direktion C führt ihr Portfolio und legt dort an; sie sieht die Projekte in A nicht, die Nummer zählt sie trotzdem
     const c = await anlegen({ name: 'Direktionsprojekt', portfolioId: portfolio.c }, direktionC.h);
     assert.equal(Number(c.nummer.split('-')[1]), Number(a.nummer.split('-')[1]) + 1);
-    assert.deepEqual(c.can, { write: true, organisation: true }, 'Portfolio führen pflegt die Projekte (Master Entscheid 18)');
+    assert.deepEqual(c.can, { read: true, write: true, organisation: true }, 'Portfolio führen pflegt die Projekte (Master Entscheid 18)');
     const sichtbar = (await call('GET', '/v1/projekte', direktionC.h)).json().items.map((x: { nummer: string }) => x.nummer);
     assert.deepEqual(sichtbar, [c.nummer]);
 
@@ -94,7 +94,7 @@ describe('Projekte', () => {
 
     await full(api.t.runtime, T, tx => aktionen.lebenszyklusWechseln(tx, systemActor('system'), p.id, 'abgeschlossen'));
     const g = (await call('GET', `/v1/projekte/${p.id}`, ue.h)).json();
-    assert.deepEqual([g.lebenszyklus, g.can], ['abgeschlossen', { write: false, organisation: false }]);
+    assert.deepEqual([g.lebenszyklus, g.can], ['abgeschlossen', { read: true, write: false, organisation: false }]);
     const z = await call('PATCH', `/v1/projekte/${p.id}`, { ...ue.h, 'if-match': `W/"${g.version}"` }, { name: 'Zu spät' });
     assert.equal(z.statusCode, 409, z.body);
     assert.match(z.json().detail, /abgeschlossen und kann nur noch gelesen werden/);
@@ -158,9 +158,9 @@ describe('Projekte', () => {
     // eigenes Projekt: lesen alle Rollen, ändern nur PL, Organisation PL und SP; Koalition ohne Rolle (A-04)
     for (const p of [pl, sp, ctl, kt]) assert.equal(await lesen(p, eigenes.id), 200);
     assert.equal(await lesen(ohne, eigenes.id), 403);
-    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, pl.h)).json().can, { write: true, organisation: true });
-    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, sp.h)).json().can, { write: false, organisation: true });
-    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, kt.h)).json().can, { write: false, organisation: false });
+    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, pl.h)).json().can, { read: true, write: true, organisation: true });
+    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, sp.h)).json().can, { read: true, write: false, organisation: true });
+    assert.deepEqual((await call('GET', `/v1/projekte/${eigenes.id}`, kt.h)).json().can, { read: true, write: false, organisation: false });
     assert.equal((await call('PATCH', `/v1/projekte/${eigenes.id}`, { ...pl.h, 'if-match': 'W/"1"' }, { name: 'Eigenes Projekt (PL)' })).statusCode, 200);
     assert.equal((await call('PATCH', `/v1/projekte/${eigenes.id}`, { ...sp.h, 'if-match': 'W/"2"' }, { name: 'SP' })).statusCode, 403);
     assert.equal((await call('PATCH', `/v1/projekte/${eigenes.id}`, { ...kt.h, 'if-match': 'W/"2"' }, { name: 'KT' })).statusCode, 403);
@@ -241,6 +241,25 @@ describe('Projekte', () => {
     assert.equal((await call('GET', `/v1/projekte/${p.id}`, direktionC.h)).statusCode, 200);
     // ohne Rolle an diesem Portfolio bleibt es unsichtbar wie ein unbekanntes
     assert.equal(await sieht(pl), false);
+  });
+
+  test('Mitglied listet Kopfdaten aller nicht vertraulichen Projekte, ohne Details (Master Entscheid 14, A-73; Abnahme AP-E8-3)', async () => {
+    const mitglied = await wer('u-mitglied', 'mitglied');
+    const offen = await anlegen({ name: 'Offenes Projekt', phase: 'P1' });
+    const geheim = await anlegen({ name: 'Geheimes Projekt', vertraulich: true });
+    assert.equal((await organisation(offen.id, 0, [{ personId: sp.id, funktion: 'sp' }, { personId: pl.id, funktion: 'pl' }, { personId: kt.id, funktion: 'weitere', funktionText: 'Kernteam', akv: 'intern' }])).statusCode, 200);
+
+    // ohne `alle`: nur Projekte mit Leserecht (Meine Projekte), also keine
+    assert.deepEqual((await call('GET', '/v1/projekte', mitglied.h)).json().items, []);
+    // mit `alle`: Kopfdaten des offenen Projekts, das vertrauliche fehlt
+    const alle = (await call('GET', '/v1/projekte?alle=true', mitglied.h)).json().items as { id: string; sponsor: string; projektleitung: string; handlungsfeldId: unknown; can: unknown }[];
+    assert.ok(!alle.some(x => x.id === geheim.id), 'vertrauliches Projekt fehlt');
+    const kopf = alle.find(x => x.id === offen.id)!;
+    assert.deepEqual([kopf.sponsor, kopf.projektleitung, kopf.can], [sp.id, pl.id, { read: false, write: false, organisation: false }]);
+    // keine Details: Akte, Projektorganisation, Bericht, Register
+    for (const url of [`/v1/projekte/${offen.id}`, `/v1/projekte/${offen.id}/organisation`, `/v1/projekte/${offen.id}/berichte`, `/v1/projekte/${offen.id}/meldungen`]) {
+      assert.equal((await call('GET', url, mitglied.h)).statusCode, 403, url);
+    }
   });
 
   test('Liste: Filter und Cursor', async () => {

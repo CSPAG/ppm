@@ -25,12 +25,12 @@ export const matrix: Matrix = {
   },
   policies: [
     // Lesesicht, Muster PROJEKT (Blatt) mit «vertraulich» (fachmodell.md 3.4, A-34)
-    "ppm.projekt.projekt_read RESTRICTIVE SELECT ppm_app USING ((app.read_all() OR (portfolio_id = ANY (app.read_types())) OR app.has_tuple('projekt'::text, id, app.read_relations())) AND ((NOT vertraulich) OR app.has_tuple('projekt'::text, id, app.read_relations()) OR app.has_permission('projekt:vertraulich'::text) OR app.has_permission('projekt:vertraulich'::text, 'portfolio'::text, portfolio_id))) CHECK -",
+    "ppm.projekt.projekt_read RESTRICTIVE SELECT ppm_app USING (((app.has_permission('projekt:list'::text) AND (NOT vertraulich)) OR ppm.projekt_lesbar(id, portfolio_id)) AND ((NOT vertraulich) OR app.has_tuple('projekt'::text, id, app.read_relations()) OR app.has_permission('projekt:vertraulich'::text) OR app.has_permission('projekt:vertraulich'::text, 'portfolio'::text, portfolio_id))) CHECK -",
     "ppm.projekt.projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('projekt:create'::text) OR app.has_permission('projekt:create'::text, 'portfolio'::text, portfolio_id))",
     "ppm.projekt.projekt_update RESTRICTIVE UPDATE ppm_app USING (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations())) CHECK (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations()))",
     "ppm.projekt.projekt_delete RESTRICTIVE DELETE ppm_app USING (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations())) CHECK -",
     // Projektorganisation, Muster KIND: lesen wer das Projekt sieht, schreiben mit projekt:organisation (org oder Rolle am Projekt)
-    'ppm.projekt_person.projekt_person_read RESTRICTIVE SELECT ppm_app USING ppm.projekt_sichtbar(projekt_id) CHECK -',
+    "ppm.projekt_person.projekt_person_read RESTRICTIVE SELECT ppm_app USING (ppm.projekt_sichtbar(projekt_id) OR ((funktion = ANY (ARRAY['sp'::text, 'pl'::text])) AND (EXISTS ( SELECT 1 FROM ppm.projekt p WHERE ((p.tenant_id = projekt_person.tenant_id) AND (p.id = projekt_person.projekt_id)))))) CHECK -",
     "ppm.projekt_person.projekt_person_insert RESTRICTIVE INSERT ppm_app USING - CHECK ppm.recht_am_projekt('projekt:organisation'::text, projekt_id)",
     "ppm.projekt_person.projekt_person_delete RESTRICTIVE DELETE ppm_app USING ppm.recht_am_projekt('projekt:organisation'::text, projekt_id) CHECK -",
     // Verlauf, Muster STAND

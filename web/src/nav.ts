@@ -32,7 +32,7 @@ export const navigation: NavRegistrierung = {
     // Arbeitsraum «Eingang»: Startseite jeder Rolle (UI-01, UX-E3); jede Rolle enthält tenant:read (fachmodell.md 3.3)
     { raum: 'eingang', pfad: '/eingang', label: eingangNav.titel, recht: 'tenant:read' },
     // Arbeitsraum «Projekte»: Meine Projekte mit der Projektakte (UI-05, UI-06; Projektrollen sehen nur ihre Projekte)
-    { raum: 'projekte', pfad: '/projekte', label: projektNav.bereich, recht: 'projekt:read' },
+    { raum: 'projekte', pfad: '/projekte', label: projektNav.bereich, recht: ['projekt:read', 'projekt:list'] },
     // Arbeitsraum «Gremien»: Sitzungen vorbereiten (UI-33, UC-006, AP-E2-1)
     { raum: 'gremien', pfad: '/gremien/sitzungen', label: sitzungNav.bereich, recht: 'sitzung:read', muster: /^\/gremien\/(sitzungen|(?!(entscheide|jahresrueckblick)\/?$)[a-z0-9][a-z0-9-]*(\/sitzungen.*)?)\/?$/ },
     // Entscheide und Auflagen (UI-36, UC-006 A3, AP-E2-2)
@@ -136,9 +136,11 @@ export const navigation: NavRegistrierung = {
       })),
     },
     {
-      id: 'projekte', recht: 'projekt:read',
-      suchen: async (q, signal) => (await sucheProjekte(q, signal)).map(p => ({
-        id: `projekt:${p.id}`, label: `${p.nummer} ${p.name}`, detail: projektNav.palette.detail, icon: 'folder', pfad: `/projekte/${p.nummer}`,
+      // alle aufgelisteten Projekte (Master Entscheid 14); ohne Leserecht führt der Treffer zur Kopfansicht in «Alle Projekte»
+      id: 'projekte', recht: ['projekt:read', 'projekt:list'],
+      suchen: async (q, signal) => (await sucheProjekte(q, signal, true)).map(p => ({
+        id: `projekt:${p.id}`, label: `${p.nummer} ${p.name}`, detail: projektNav.palette.detail, icon: 'folder',
+        pfad: p.can.read ? `/projekte/${p.nummer}` : `/projekte?ansicht=alle&o=${encodeURIComponent(p.nummer)}`,
       })),
     },
     // Ideen nach Titel oder Nummer (I-N4): eigene für Antragstellende, eingereichte für den Ideenpool

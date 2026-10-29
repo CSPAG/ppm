@@ -25,15 +25,17 @@ const ort = (id: string) => ({ type: 'projekt', id });
 
 function out(r: store.Row, caps: Caps): ProjektOut {
   const c = caps('projekt', r.id, r.portfolio_id);
+  // ohne Leserecht nur die Kopfdaten (A-73): Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektleitung, Projektauftraggeber:in
+  const l = r.lesbar;
   return {
     id: r.id, nummer: r.nummer, name: r.name, portfolioId: r.portfolio_id,
     portfolio: r.pf_schluessel ? { schluessel: r.pf_schluessel, name: r.pf_name!, kategorie: r.pf_kategorie! } : null,
-    orgEinheitId: r.org_einheit_id, handlungsfeldId: r.handlungsfeld_id, handlungsfeld: r.hf_label,
-    phase: r.phase, phasenmodellId: r.phasenmodell_id, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
+    orgEinheitId: l ? r.org_einheit_id : null, handlungsfeldId: l ? r.handlungsfeld_id : null, handlungsfeld: l ? r.hf_label : null,
+    phase: r.phase, phasenmodellId: l ? r.phasenmodell_id : null, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
     sponsor: r.sponsor, projektleitung: r.projektleitung, rollen: r.rollen,
     version: r.version, createdAt: r.created_at, updatedAt: r.updated_at,
     // Endzustände sind lesend (UC-015 Schritt 6)
-    can: { write: !!c.write && aenderbar(r), organisation: !!c.organisation && aenderbar(r) },
+    can: { read: l, write: l && !!c.write && aenderbar(r), organisation: l && !!c.organisation && aenderbar(r) },
   };
 }
 
@@ -61,15 +63,15 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   app.get('/v1/projekte', {
     schema: {
       tags: [TAG], summary: 'Projekte auflisten',
-      description: 'Alle sichtbaren Projekte (Meine Projekte, UI-05), sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.',
+      description: 'Projekte mit Leserecht (Meine Projekte, UI-05), mit `alle` auch die nur aufgelisteten mit ihren Kopfdaten (Alle Projekte, UI-52; `projekt:list`, Master Entscheid 14); vertrauliche nur mit Rolle. Sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.',
       querystring: ListQuery, response: { 200: Type.Ref('ProjektList') },
     },
   }, async req => {
-    await req.needSomewhere('projekt:read');
-    const q = req.query as { rolle?: Funktion; portfolio?: string; phase?: Phase; lebenszyklus?: Lebenszyklus[]; nummer?: string; q?: string; cursor?: string; limit?: number };
+    if (!(await req.can('projekt:list'))) await req.needSomewhere('projekt:read');
+    const q = req.query as { rolle?: Funktion; portfolio?: string; phase?: Phase; lebenszyklus?: Lebenszyklus[]; nummer?: string; q?: string; alle?: boolean; cursor?: string; limit?: number };
     const limit = q.limit ?? 50;
     // Der Cursor gilt nur für dieselben Filter
-    const filter = JSON.stringify([q.rolle, q.portfolio, q.phase, q.lebenszyklus, q.nummer, q.q]);
+    const filter = JSON.stringify([q.rolle, q.portfolio, q.phase, q.lebenszyklus, q.nummer, q.q, q.alle]);
     const after = decodeCursor<{ n: string; f: string }>(q.cursor, v => typeof v.n === 'string' && v.f === filter);
     const rows = await req.tx(tx => store.list(tx, { ...q, after: after && { nummer: after.n }, limit }));
     const page = rows.slice(0, limit);

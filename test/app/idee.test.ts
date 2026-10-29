@@ -127,17 +127,19 @@ describe('Projektidee einreichen', () => {
     assert.deepEqual([pruefen[0]!.titel, pruefen[0]!.link], ['Projektidee prüfen · Nur ein Titel', `/portfolio/ideen/${e.nummer}`]);
     assert.ok(!(await call('GET', '/v1/eingang', as1)).json().items.some((x: { art: string }) => x.art === 'idee.pruefen'), 'nicht bei Antragstellenden');
 
-    // Ideenpool (idee:read) sieht die eingereichte Idee, andere Antragstellende nicht; AS sieht sie als «eingereicht»
+    // eingereicht: der Ideenpool (idee:read) und alle Mitglieder (idee:list, Master Entscheid 14) lesen sie; AS sieht sie als «eingereicht»
     assert.equal((await call('GET', `/v1/ideen/${e.id}`, ue)).json().eigene, false);
-    assert.equal((await call('GET', `/v1/ideen/${e.id}`, as2)).statusCode, 404);
+    const fremd = await call('GET', `/v1/ideen/${e.id}`, as2);
+    assert.deepEqual([fremd.statusCode, fremd.json().eigene, fremd.json().can.bearbeiten], [200, false, false]);
     const meine = (await call('GET', '/v1/ideen?eigene=true', as1)).json().items as { id: string; stand: string }[];
     assert.equal(meine.find(x => x.id === e.id)?.stand, 'eingereicht');
-    assert.ok((await call('GET', '/v1/ideen', as2)).json().items.every((x: { eigene: boolean }) => x.eigene), 'nur eigene');
+    assert.ok((await call('GET', '/v1/ideen?eigene=true', as2)).json().items.every((x: { eigene: boolean }) => x.eigene), 'nur eigene');
+    assert.ok((await call('GET', '/v1/ideen', as2)).json().items.some((x: { id: string }) => x.id === e.id), 'eingereichte Ideen anderer im Pool');
     // Suche für die Befehlspalette (I-N4): Titel als Teilstring, Nummer genau; nach Recht wie die Liste
     const suche = async (q: string, h: Record<string, string>) => ((await call('GET', `/v1/ideen?q=${encodeURIComponent(q)}`, h)).json().items as { id: string }[]).map(x => x.id);
     assert.ok((await suche('nur ein tit', ue)).includes(e.id));
     assert.ok((await suche(String(e.nummer), ue)).includes(e.id));
-    assert.ok(!(await suche('nur ein tit', as2)).includes(e.id), 'fremde Idee nicht für andere Antragstellende');
+    assert.ok((await suche('nur ein tit', as2)).includes(e.id), 'eingereichte Idee auch für andere Mitglieder (Master Entscheid 14)');
     assert.deepEqual(await suche('100%_', ue), []);
 
     // nach dem Einreichen nicht mehr änderbar, nicht verwerfbar, nicht erneut einreichbar
@@ -163,7 +165,9 @@ describe('Projektidee einreichen', () => {
       ['in_ergaenzung', true, [['zielsetzung', 'Woran misst du den Erfolg?', null]]]);
     assert.equal((await call('GET', '/v1/ideen?eigene=true', as1)).json().items.find((x: { id: string }) => x.id === e.id).rueckfragenOffen, 1);
 
-    assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as2, { antwort: 'fremd' })).statusCode, 404);
+    // fremde Idee: sichtbar (eingereicht), Rückfragen nicht (A-73), beantworten nicht
+    assert.deepEqual((await call('GET', `/v1/ideen/${e.id}`, as2)).json().rueckfragen, []);
+    assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as2, { antwort: 'fremd' })).statusCode, 403);
     assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${randomUUID()}`, as1, { antwort: 'x' })).statusCode, 404);
     const a = await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as1, { antwort: ' Aufnahmezeit unter 10 Minuten. ' });
     assert.equal(a.statusCode, 200, a.body);
@@ -177,6 +181,23 @@ describe('Projektidee einreichen', () => {
     assert.ok(!(await call('GET', '/v1/eingang', as1)).json().items.some((x: { art: string; bezug: { id: string } }) => x.art === 'idee.ergaenzen' && x.bezug.id === e.id));
     assert.ok((await call('GET', '/v1/eingang', ue)).json().items.some((x: { art: string; bezug: { id: string } }) => x.art === 'idee.pruefen' && x.bezug.id === e.id));
     assert.equal((await call('PUT', `/v1/ideen/${e.id}/rueckfragen/${frage}`, as1, { antwort: 'zu spät' })).statusCode, 409);
+  });
+
+  test('Ähnliche eingereichte Ideen beim Ausfüllen für alle Mitglieder, ohne Entwürfe anderer (UC-001 Schritt 3, Master Entscheid 14)', async () => {
+    const titel = async (q: string, h: H = as2) => {
+      const r = await call('GET', `/v1/ideen/aehnlich?${q}`, h);
+      assert.equal(r.statusCode, 200, r.body);
+      return (r.json().items as { idee: { titel: string; stand: string } }[]).map(x => x.idee);
+    };
+    // gleiches Handlungsfeld: die eingereichten Ideen von AS1, nicht deren Entwurf
+    const nachFeld = await titel(`handlungsfeldId=${feld1}`);
+    assert.ok(nachFeld.length > 0 && nachFeld.every(x => x.stand !== 'entwurf'), JSON.stringify(nachFeld));
+    // gemeinsamer Bereich genügt
+    assert.ok((await titel(`bereich=${bereich}`)).length > 0);
+    // anderes Handlungsfeld ohne Ideen, ohne Angaben: leer
+    assert.deepEqual(await titel(`handlungsfeldId=${feld2}`), []);
+    assert.deepEqual(await titel(''), []);
+    assert.equal((await call('GET', `/v1/ideen/aehnlich?handlungsfeldId=${feld1}`, nobody)).statusCode, 403);
   });
 
   test('Entwurf verwerfen; Kopf mit eigenen Ideen und Pool; Rechte', async () => {

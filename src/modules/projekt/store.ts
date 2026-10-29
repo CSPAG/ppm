@@ -14,6 +14,8 @@ export interface Row {
   version: number; created_at: Date; updated_at: Date;
   pf_schluessel: string | null; pf_name: string | null; pf_kategorie: 'A' | 'B' | 'C' | null; hf_label: string | null;
   sponsor: string | null; projektleitung: string | null; rollen: Funktion[];
+  /** Leserecht (nicht nur auflisten, A-73). */
+  lesbar: boolean;
 }
 
 const T = `${SCHEMA}.projekt`;
@@ -26,13 +28,16 @@ const SELECT = `
          pf.schluessel AS pf_schluessel, pf.name AS pf_name, pf.kategorie AS pf_kategorie, hf.label AS hf_label,
          (SELECT x.person_id FROM ${P} x WHERE x.projekt_id = p.id AND x.funktion = 'sp') AS sponsor,
          (SELECT x.person_id FROM ${P} x WHERE x.projekt_id = p.id AND x.funktion = 'pl') AS projektleitung,
-         ARRAY(SELECT DISTINCT x.funktion FROM ${P} x WHERE x.projekt_id = p.id AND x.person_id = app.principal_id() ORDER BY x.funktion) AS rollen
+         ARRAY(SELECT DISTINCT x.funktion FROM ${P} x WHERE x.projekt_id = p.id AND x.person_id = app.principal_id() ORDER BY x.funktion) AS rollen,
+         ppm.projekt_lesbar(p.id, p.portfolio_id) AS lesbar
     FROM ${T} p
     LEFT JOIN ${SCHEMA}.portfolio pf ON pf.tenant_id = p.tenant_id AND pf.id = p.portfolio_id
     LEFT JOIN ${SCHEMA}.handlungsfeld hf ON hf.tenant_id = p.tenant_id AND hf.id = p.handlungsfeld_id`;
 
 export interface ListFilter {
   rolle?: Funktion; portfolio?: string; phase?: Phase; lebenszyklus?: Lebenszyklus[]; nummer?: string; q?: string;
+  /** Auch nur aufgelistete Projekte (UI-52); sonst nur mit Leserecht. */
+  alle?: boolean;
   after?: { nummer: string } | null; limit: number;
 }
 
@@ -40,6 +45,7 @@ export async function list(tx: Tx, f: ListFilter): Promise<Row[]> {
   const where: string[] = [];
   const args: unknown[] = [];
   const arg = (v: unknown) => { args.push(v); return `$${args.length}`; };
+  if (!f.alle) where.push('ppm.projekt_lesbar(p.id, p.portfolio_id)');
   if (f.rolle) where.push(`EXISTS (SELECT 1 FROM ${P} x WHERE x.projekt_id = p.id AND x.person_id = app.principal_id() AND x.funktion = ${arg(f.rolle)})`);
   if (f.portfolio) where.push(`pf.schluessel = ${arg(f.portfolio)}`);
   if (f.phase) where.push(`p.phase = ${arg(f.phase)}`);

@@ -18,11 +18,11 @@ export const matrix: Matrix = {
     // Lesesicht EIGEN (docs/fachmodell.md 3.4): eigene Ideen, als vorgesehener Sponsor, sonst Ideenpool mit idee:read
     "ppm.idee.idee_delete RESTRICTIVE DELETE ppm_app USING (((erfasst_von = app.principal_id()) AND (stand = 'entwurf'::text)) OR ((app.principal_id() IS NULL) AND app.write_all())) CHECK -",
     "ppm.idee.idee_insert RESTRICTIVE INSERT ppm_app USING - CHECK (((erfasst_von = app.principal_id()) AND (stand = 'entwurf'::text) AND app.has_permission('idee:create'::text)) OR ((app.principal_id() IS NULL) AND app.write_all()))",
-    "ppm.idee.idee_read RESTRICTIVE SELECT ppm_app USING ((erfasst_von = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.read_all()) OR ((stand <> 'entwurf'::text) AND ((vorgesehener_sponsor = app.principal_id()) OR app.has_permission('idee:read'::text) OR ((portfolio_id IS NOT NULL) AND app.has_permission('idee:read'::text, 'portfolio'::text, portfolio_id))))) CHECK -",
+    "ppm.idee.idee_read RESTRICTIVE SELECT ppm_app USING ((erfasst_von = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.read_all()) OR ((stand <> 'entwurf'::text) AND ((vorgesehener_sponsor = app.principal_id()) OR app.has_permission('idee:read'::text) OR app.has_permission('idee:list'::text) OR ((portfolio_id IS NOT NULL) AND app.has_permission('idee:read'::text, 'portfolio'::text, portfolio_id))))) CHECK -",
     "ppm.idee.idee_update RESTRICTIVE UPDATE ppm_app USING (((erfasst_von = app.principal_id()) AND (stand = ANY (ARRAY['entwurf'::text, 'in_ergaenzung'::text])) AND app.has_permission('idee:create'::text)) OR app.has_permission('idee:write'::text)) CHECK (((erfasst_von = app.principal_id()) AND (stand = ANY (ARRAY['entwurf'::text, 'in_ergaenzung'::text, 'eingereicht'::text])) AND app.has_permission('idee:create'::text)) OR app.has_permission('idee:write'::text))",
     // Rückfragen über die Idee; stellen mit idee:write, beantworten die Antragstellenden in Ergänzung
     "ppm.idee_rueckfrage.idee_rueckfrage_insert RESTRICTIVE INSERT ppm_app USING - CHECK app.has_permission('idee:write'::text)",
-    "ppm.idee_rueckfrage.idee_rueckfrage_read RESTRICTIVE SELECT ppm_app USING (EXISTS ( SELECT 1 FROM ppm.idee i WHERE ((i.tenant_id = idee_rueckfrage.tenant_id) AND (i.id = idee_rueckfrage.idee_id)))) CHECK -",
+    "ppm.idee_rueckfrage.idee_rueckfrage_read RESTRICTIVE SELECT ppm_app USING (EXISTS ( SELECT 1 FROM ppm.idee i WHERE ((i.tenant_id = idee_rueckfrage.tenant_id) AND (i.id = idee_rueckfrage.idee_id) AND ((i.erfasst_von = app.principal_id()) OR ((app.principal_id() IS NULL) AND app.read_all()) OR app.has_permission('idee:read'::text) OR ((i.portfolio_id IS NOT NULL) AND app.has_permission('idee:read'::text, 'portfolio'::text, i.portfolio_id)))))) CHECK -",
     "ppm.idee_rueckfrage.idee_rueckfrage_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('idee:write'::text) OR (EXISTS ( SELECT 1 FROM ppm.idee i WHERE ((i.tenant_id = idee_rueckfrage.tenant_id) AND (i.id = idee_rueckfrage.idee_id) AND (i.erfasst_von = app.principal_id()) AND (i.stand = 'in_ergaenzung'::text))))) CHECK (app.has_permission('idee:write'::text) OR (EXISTS ( SELECT 1 FROM ppm.idee i WHERE ((i.tenant_id = idee_rueckfrage.tenant_id) AND (i.id = idee_rueckfrage.idee_id) AND (i.erfasst_von = app.principal_id()) AND (i.stand = 'in_ergaenzung'::text)))))",
   ],
   tags: ['Ideen'],
@@ -35,6 +35,8 @@ export const matrix: Matrix = {
     'GET /v1/ideen': () => ({ method: 'GET', url: '/v1/ideen', kind: 'list' }),
     'GET /v1/ideen/kopf': () => ({ method: 'GET', url: '/v1/ideen/kopf', kind: 'list' }),
     'GET /v1/ideen/auswahl': () => ({ method: 'GET', url: '/v1/ideen/auswahl', kind: 'list' }),
+    // ähnliche eingereichte Ideen beim Ausfüllen (AP-E8-3): nur aus der eigenen Organisation
+    'GET /v1/ideen/aehnlich': () => ({ method: 'GET', url: '/v1/ideen/aehnlich?handlungsfeldId=00000000-0000-4000-8000-0000000000ff', kind: 'list' }),
     // Bezüge auf Handlungsfelder anderer Organisationen prüft idee.test.ts (422 wie unbekannt)
     'POST /v1/ideen': () => ({ method: 'POST', url: '/v1/ideen', body: { titel: 'Idee von B' }, kind: 'create' }),
     'GET /v1/ideen/:id': i => ({ method: 'GET', url: `/v1/ideen/${i.idee}`, kind: 'foreign' }),

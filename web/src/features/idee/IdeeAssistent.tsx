@@ -9,6 +9,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNod
 import { ApiError, isConflict, newIdempotencyKey } from '../../api/index.ts';
 import { Confirm, Hinweis, Icon, TeilFehler, useToast } from '../../ui/index.ts';
 import { useAuswahl, useIdeeMutations, type IdeeAuswahl, type Loaded, type Rueckfrage } from './api.ts';
+import { AehnlicheIdeen } from './PoolAehnlich.tsx';
 import { ideePfad, MEINE_IDEEN, Verweis, type Gehe } from './stand.tsx';
 import { ideeNeuPfad } from './search.ts';
 import { PFLICHT, TI } from './texte.ts';
@@ -255,6 +256,7 @@ export function IdeeAssistent({ start, vorbelegung, schritt: schrittStart, onSch
             ladefehler={auswahl.error} erneut={() => void auswahl.refetch()}
             fragen={<Fragen fragen={fragenZu(['handlungsfeld', 'strategischesZiel', 'bereiche', 'herkunft'])} ideeId={item?.id} />} />
         ) : null}
+        {schritt === 2 || schritt === 4 ? <AehnlicheIdeen handlungsfeldId={werte.handlungsfeldId} bereiche={werte.bereiche} ausser={item?.id} /> : null}
 
         {schritt === 3 ? (
           <div className="form idee-form">

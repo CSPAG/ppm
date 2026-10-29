@@ -27,7 +27,7 @@ const projekt = (o: Record<string, unknown> = {}) => ({
   portfolio: { schluessel: 'transformation', name: 'Transformation', kategorie: 'A' }, orgEinheitId: null, handlungsfeldId: null,
   handlungsfeld: null, phase: 'P1', phasenmodellId: null, lebenszyklus: 'aktiv', vertraulich: false,
   sponsor: null, projektleitung: PL, rollen: ['pl'], version: 2, createdAt: '2026-10-01T08:00:00Z', updatedAt: '2026-10-02T08:00:00Z',
-  can: { write: true, organisation: true }, ...o,
+  can: { read: true, write: true, organisation: true }, ...o,
 });
 const eintrag = (o: Record<string, unknown>) => ({ expiresAt: null, createdAt: '2026-10-01T08:00:00Z', createdBy: 'Ursula Egli', removable: false, ...o });
 const liste = (grantable: string[]) => ({

@@ -177,7 +177,8 @@ export async function baumProjekte(tx: Tx, jahr: number): Promise<BaumProjektRow
 // ---------------------------------------------------------------- Zuordnung Projekt ↔ Ziel (PP.02.05)
 
 export async function projektSichtbar(tx: Tx, projektId: string): Promise<{ nummer: string } | null> {
-  return (await tx.query<{ nummer: string }>(`SELECT nummer FROM ${SCHEMA}.projekt WHERE id = $1`, [projektId])).rows[0] ?? null;
+  // Leserecht ausdrücklich: die Zeile allein sehen auch Mitglieder, die nur auflisten (A-73)
+  return (await tx.query<{ nummer: string }>(`SELECT nummer FROM ${SCHEMA}.projekt WHERE id = $1 AND ${SCHEMA}.projekt_lesbar(id, portfolio_id)`, [projektId])).rows[0] ?? null;
 }
 
 export interface ProjektZielRow {

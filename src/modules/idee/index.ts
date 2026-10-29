@@ -9,6 +9,7 @@ import type { FastifyInstance } from 'fastify';
 import { registriereIdee } from './freigabe.ts';
 import { registerFreigabeRoutes } from './freigabe-routes.ts';
 import { ideeTools } from './mcp.ts';
+import { registerPoolRoutes } from './pool-routes.ts';
 import { registerPruefungRoutes } from './pruefung-routes.ts';
 import { registerRoutes, TAG } from './routes.ts';
 
@@ -19,6 +20,7 @@ export const ideeModule = defineModule({
     registerRoutes(app, deps);
     registerPruefungRoutes(app, deps);
     registerFreigabeRoutes(app, deps);
+    registerPoolRoutes(app);
   },
   mcpTools: { ...ideeTools },
 });

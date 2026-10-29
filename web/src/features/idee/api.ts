@@ -24,11 +24,24 @@ export interface Loaded { item: Idee; etag: string }
 export const loaded = (item: Idee, response?: Response): Loaded => ({ item, etag: response?.headers.get('ETag') ?? ifMatch(item.version)['If-Match']! });
 
 /** «Meine Ideen»: eigene Ideen, neueste zuerst, mit «Mehr laden». */
-export function useEigeneIdeen() {
+export function useEigeneIdeen(enabled = true) {
   return useInfiniteQuery({
     queryKey: ideeKeys.eigene,
+    enabled,
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam, signal }) => (await api.GET('/v1/ideen', { params: { query: { eigene: true, cursor: pageParam, limit: 50 } }, signal })).data!,
+    getNextPageParam: last => last.nextCursor ?? undefined,
+  });
+}
+
+/** Eingereichte Ideen aller Mitglieder (Master Entscheid 14): alle Stände ausser Entwurf. */
+const EINGEREICHT = ['eingereicht', 'in_pruefung', 'in_ergaenzung', 'traktandiert', 'freigegeben', 'zurueckgestellt', 'zurueckgewiesen', 'zusammengefuehrt'] as const;
+export function useEingereichteIdeen(enabled: boolean) {
+  return useInfiniteQuery({
+    queryKey: [...ideeKeys.all, 'eingereicht'] as const,
+    enabled,
+    initialPageParam: undefined as string | undefined,
+    queryFn: async ({ pageParam, signal }) => (await api.GET('/v1/ideen', { params: { query: { stand: [...EINGEREICHT], cursor: pageParam, limit: 50 } }, signal })).data!,
     getNextPageParam: last => last.nextCursor ?? undefined,
   });
 }

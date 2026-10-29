@@ -49,7 +49,10 @@ export const Projekt = Type.Object({
   version: Type.Integer({ minimum: 1 }),
   createdAt: DateTime,
   updatedAt: DateTime,
-  can: Type.Object({ write: Type.Boolean(), organisation: Type.Boolean() }, { description: 'Was die anfragende Person damit darf.' }),
+  can: Type.Object({
+    read: Type.Boolean({ description: 'Projektakte lesen; ohne nur die Kopfdaten (Master Entscheid 14, A-73).' }),
+    write: Type.Boolean(), organisation: Type.Boolean(),
+  }, { description: 'Was die anfragende Person damit darf.' }),
 }, { $id: 'Projekt', additionalProperties: false });
 export type ProjektOut = Static<typeof Projekt>;
 
@@ -80,6 +83,7 @@ export const ListQuery = Type.Object({
   lebenszyklus: Type.Optional(Type.Array(LebenszyklusT, { maxItems: 5, description: 'Nur Projekte in diesen Zuständen.' })),
   nummer: Type.Optional(Type.String({ maxLength: 20, description: 'Genau diese Projektnummer.' })),
   q: Type.Optional(Type.String({ maxLength: 200, description: 'Suche in Name und Nummer (Teilstring).' })),
+  alle: Type.Optional(Type.Boolean({ description: 'Auch Projekte, die die Person nur auflisten darf (Kopfdaten, `projekt:list`, UI-52); ohne nur Projekte mit Leserecht.' })),
   cursor: Type.Optional(Cursor),
   limit: Type.Optional(Limit),
 }, { additionalProperties: false });

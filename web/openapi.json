@@ -5811,10 +5811,15 @@
             "description": "Was die anfragende Person damit darf.",
             "type": "object",
             "required": [
+              "read",
               "write",
               "organisation"
             ],
             "properties": {
+              "read": {
+                "description": "Projektakte lesen; ohne nur die Kopfdaten (Master Entscheid 14, A-73).",
+                "type": "boolean"
+              },
               "write": {
                 "type": "boolean"
               },
@@ -51672,7 +51677,7 @@
         "tags": [
           "Projekte"
         ],
-        "description": "Alle sichtbaren Projekte (Meine Projekte, UI-05), sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.",
+        "description": "Projekte mit Leserecht (Meine Projekte, UI-05), mit `alle` auch die nur aufgelisteten mit ihren Kopfdaten (Alle Projekte, UI-52; `projekt:list`, Master Entscheid 14); vertrauliche nur mit Rolle. Sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.",
         "parameters": [
           {
             "schema": {
@@ -51754,6 +51759,15 @@
             "name": "q",
             "required": false,
             "description": "Suche in Name und Nummer (Teilstring)."
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "alle",
+            "required": false,
+            "description": "Auch Projekte, die die Person nur auflisten darf (Kopfdaten, `projekt:list`, UI-52); ohne nur Projekte mit Leserecht."
           },
           {
             "schema": {
@@ -74515,7 +74529,7 @@
         "tags": [
           "Ideen"
         ],
-        "description": "Neueste zuerst, Cursor-Paginierung. Antragstellende sehen ihre eigenen Ideen (`eigene`), der Ideenpool (`idee:read`) alle eingereichten; Entwürfe nur, wer sie erfasst.",
+        "description": "Neueste zuerst, Cursor-Paginierung. Alle Mitglieder sehen eingereichte Ideen (`idee:list`, Master Entscheid 14), mit `eigene` nur die eigenen; Entwürfe nur, wer sie erfasst.",
         "parameters": [
           {
             "schema": {
@@ -74972,7 +74986,7 @@
         "tags": [
           "Ideen"
         ],
-        "description": "Mit Rückfragen der UE und ihren Antworten.",
+        "description": "Nach Vorlage; Rückfragen der UE und ihre Antworten nur für die Person, die die Idee erfasst hat, und mit `idee:read` (A-73).",
         "parameters": [
           {
             "schema": {
@@ -77642,6 +77656,122 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ideen/aehnlich": {
+      "get": {
+        "summary": "Ähnliche eingereichte Ideen beim Ausfüllen",
+        "tags": [
+          "Ideen"
+        ],
+        "description": "Eingereichte Ideen mit gleichem Handlungsfeld oder gemeinsamen betroffenen Bereichen, offene zuerst, höchstens 20 (UC-001 Schritt 3; Master Entscheid 14). Mit `idee:list` (alle Mitglieder) oder `idee:read`; ohne Handlungsfeld und Bereiche leer.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "handlungsfeldId",
+            "required": false
+          },
+          {
+            "schema": {
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "bereich",
+            "required": false,
+            "description": "Betroffene Bereiche (Organisationseinheiten)."
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "ausser",
+            "required": false,
+            "description": "Die eigene Idee, die nicht als ähnlich erscheinen soll."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeeAehnliche"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

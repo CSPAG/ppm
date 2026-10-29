@@ -15582,7 +15582,7 @@ export interface paths {
         };
         /**
          * Projekte auflisten
-         * @description Alle sichtbaren Projekte (Meine Projekte, UI-05), sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.
+         * @description Projekte mit Leserecht (Meine Projekte, UI-05), mit `alle` auch die nur aufgelisteten mit ihren Kopfdaten (Alle Projekte, UI-52; `projekt:list`, Master Entscheid 14); vertrauliche nur mit Rolle. Sortiert nach Nummer, mit Filtern und Cursor. `rolle` zeigt nur Projekte, in denen die anfragende Person diese Funktion hat.
          */
         get: {
             parameters: {
@@ -15599,6 +15599,8 @@ export interface paths {
                     nummer?: string;
                     /** @description Suche in Name und Nummer (Teilstring). */
                     q?: string;
+                    /** @description Auch Projekte, die die Person nur auflisten darf (Kopfdaten, `projekt:list`, UI-52); ohne nur Projekte mit Leserecht. */
+                    alle?: boolean;
                     /** @description Opaker Cursor aus `nextCursor` der vorherigen Seite. */
                     cursor?: string;
                     /** @description Seitengrösse (höchstens 200). */
@@ -35360,7 +35362,7 @@ export interface paths {
         };
         /**
          * Projektideen auflisten
-         * @description Neueste zuerst, Cursor-Paginierung. Antragstellende sehen ihre eigenen Ideen (`eigene`), der Ideenpool (`idee:read`) alle eingereichten; Entwürfe nur, wer sie erfasst.
+         * @description Neueste zuerst, Cursor-Paginierung. Alle Mitglieder sehen eingereichte Ideen (`idee:list`, Master Entscheid 14), mit `eigene` nur die eigenen; Entwürfe nur, wer sie erfasst.
          */
         get: {
             parameters: {
@@ -35727,7 +35729,7 @@ export interface paths {
         };
         /**
          * Projektidee lesen
-         * @description Mit Rückfragen der UE und ihren Antworten.
+         * @description Nach Vorlage; Rückfragen der UE und ihre Antworten nur für die Person, die die Idee erfasst hat, und mit `idee:read` (A-73).
          */
         get: {
             parameters: {
@@ -38083,6 +38085,105 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ideen/aehnlich": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ähnliche eingereichte Ideen beim Ausfüllen
+         * @description Eingereichte Ideen mit gleichem Handlungsfeld oder gemeinsamen betroffenen Bereichen, offene zuerst, höchstens 20 (UC-001 Schritt 3; Master Entscheid 14). Mit `idee:list` (alle Mitglieder) oder `idee:read`; ohne Handlungsfeld und Bereiche leer.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    handlungsfeldId?: string;
+                    /** @description Betroffene Bereiche (Organisationseinheiten). */
+                    bereich?: string[];
+                    /** @description Die eigene Idee, die nicht als ähnlich erscheinen soll. */
+                    ausser?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdeeAehnliche"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -47001,6 +47102,8 @@ export interface components {
             updatedAt: string;
             /** @description Was die anfragende Person damit darf. */
             can: {
+                /** @description Projektakte lesen; ohne nur die Kopfdaten (Master Entscheid 14, A-73). */
+                read: boolean;
                 write: boolean;
                 organisation: boolean;
             };

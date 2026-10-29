@@ -27,7 +27,7 @@ const projekt = (o: Record<string, unknown> = {}) => ({
   portfolio: { schluessel: 'transformation', name: 'Transformation', kategorie: 'A' }, orgEinheitId: null, handlungsfeldId: null,
   handlungsfeld: 'Patientenorientierung', phase: 'P1', phasenmodellId: null, lebenszyklus: 'aktiv', vertraulich: false,
   sponsor: SP, projektleitung: PL, rollen: ['pl'], version: 2, createdAt: '2026-10-01T08:00:00Z', updatedAt: '2026-10-02T08:00:00Z',
-  can: { write: true, organisation: true }, ...o,
+  can: { read: true, write: true, organisation: true }, ...o,
 });
 const organisation = (o: Record<string, unknown> = {}) => ({
   version: 1, can: { write: true }, vorschlaege: ['Kernteam', 'CTL'],
@@ -144,7 +144,7 @@ describe('Projektakte und Projektübersicht (UI-06)', () => {
 
   it('Endzustand: Banner, nur lesen (Z8, Z9)', async () => {
     stub({
-      'GET /v1/projekte': () => json({ items: [projekt({ lebenszyklus: 'abgeschlossen', can: { write: false, organisation: false } })], nextCursor: null }),
+      'GET /v1/projekte': () => json({ items: [projekt({ lebenszyklus: 'abgeschlossen', can: { read: true, write: false, organisation: false } })], nextCursor: null }),
       [`GET /v1/projekte/${ID}/organisation`]: () => json(organisation({ can: { write: false } })),
     });
     renderWithIam(akte(), PL_ME);

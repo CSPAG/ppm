@@ -79,9 +79,12 @@ function zeile(r: store.Row, c: Ctx): IdeeZeileOut {
 /** Daten für Audit und Ereignis (ohne Fähigkeiten und ohne Rückfragen). */
 const snapshot = (r: store.Row) => ({ id: r.id, nummer: r.nummer, stand: r.stand, ...felder(r), version: r.version });
 
-/** Lesen der Ideen: eigene mit `idee:create`, der Pool mit `idee:read` (an der Organisation oder an einem Portfolio). */
+/**
+ * Lesen der Ideen: eigene mit `idee:create`, eingereichte mit `idee:list` (alle Mitglieder, Master Entscheid 14), der
+ * Pool mit `idee:read` (an der Organisation oder an einem Portfolio). Was sichtbar ist, entscheidet die Lesesicht.
+ */
 async function needLesen(req: FastifyRequest): Promise<void> {
-  if (!(await req.can('idee:create'))) await req.needSomewhere('idee:read');
+  if (!(await req.can('idee:create')) && !(await req.can('idee:list'))) await req.needSomewhere('idee:read');
 }
 
 /**
@@ -134,7 +137,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   for (const s of [Rueckfrage, Idee, IdeeZeile, IdeeList, IdeeCreate, IdeePatch, RueckfrageAntwort, IdeeAuswahl, IdeeKopf]) app.addSchema(s);
 
   app.get('/v1/ideen', {
-    schema: { tags: [TAG], summary: 'Projektideen auflisten', description: 'Neueste zuerst, Cursor-Paginierung. Antragstellende sehen ihre eigenen Ideen (`eigene`), der Ideenpool (`idee:read`) alle eingereichten; Entwürfe nur, wer sie erfasst.', querystring: ListQuery, response: { 200: Type.Ref('IdeeList') } },
+    schema: { tags: [TAG], summary: 'Projektideen auflisten', description: 'Neueste zuerst, Cursor-Paginierung. Alle Mitglieder sehen eingereichte Ideen (`idee:list`, Master Entscheid 14), mit `eigene` nur die eigenen; Entwürfe nur, wer sie erfasst.', querystring: ListQuery, response: { 200: Type.Ref('IdeeList') } },
   }, async req => {
     await needLesen(req);
     const q = req.query as { stand?: Stand[]; eigene?: boolean; nummer?: number; q?: string; cursor?: string; limit?: number };
@@ -165,7 +168,7 @@ export function registerRoutes(app: FastifyInstance, deps: Deps): void {
   });
 
   app.get('/v1/ideen/:id', {
-    schema: { tags: [TAG], summary: 'Projektidee lesen', description: 'Mit Rückfragen der UE und ihren Antworten.', params: IdParams, response: { 200: Type.Ref('Idee') } },
+    schema: { tags: [TAG], summary: 'Projektidee lesen', description: 'Nach Vorlage; Rückfragen der UE und ihre Antworten nur für die Person, die die Idee erfasst hat, und mit `idee:read` (A-73).', params: IdParams, response: { 200: Type.Ref('Idee') } },
   }, async (req, reply) => {
     const { id } = req.params as { id: string };
     await needLesen(req);

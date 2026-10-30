@@ -38,8 +38,9 @@ nicht der Rollenname (I-N2); Projektrollen gelten je Projekt (UC-016 Schritt 2).
 | Administration | – | – | – | ○ Phasenmodell, Portfolios und Gremien, Vorlagen, Änderungsprotokoll | – | – | – | ● |
 | **Anzahl** | 5 | 5 | 4 | 6 | 5 | 5 | 4 | 5 |
 
-Spalten nach den Rollen des Produkts (Master Entscheid 18) mit den Akteuren des Referenzkunden. Beträge und vertrauliche
-Projekte sieht, wer am Ort eine Rolle hat, Mitglieder ohne weitere Rolle nicht (Entscheid 13). Alle Mitglieder listen
+Spalten nach den Rollen des Produkts (Master Entscheid 18) mit den Akteuren des Referenzkunden. Beträge sieht, wer am Ort eine Rolle
+hat, Mitglieder ohne weitere Rolle nicht (Entscheid 13); vertrauliche Projekte und Portfolios nur, wer daran eingetragen
+ist, und «alle Portfolios führen» (Entscheid 22). Alle Mitglieder listen
 Projekte auf und lesen eingereichte Ideen (Entscheid 14). Wer an einem Projekt oder Portfolio führt, verwaltet dort den
 Zugriff (Entscheid 16, UX-E14).
 

@@ -101,6 +101,7 @@ Das PPM führt kaum Gesundheits- oder Lohndaten; sensibel sind vor allem Persone
 | Zurückweisungs-, Ablehnungs- und Abbruchsbegründungen | Betroffene (AS bzw. PL, AG), UE, Gremium | übrige: nur der Stand |
 | Gremienunterlagen vor dem Versand, Protokollentwurf | UE | Mitglieder ab Versand; Eingeladene nur ihr Traktandum |
 | Vertrauliche Projekte und Traktanden (z. B. Reorganisation, Standortfragen) | alle mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13) | Mitglieder ohne weitere Rolle: das Projekt fehlt in jeder Liste |
+| Vertrauliche Portfolios | alle mit einer Rolle am Portfolio, an einem seiner Projekte (nur Name und eigenes Projekt) oder übergreifend (Master Entscheid 22, A-76) | Mitglieder ohne weitere Rolle: Portfolio, seine Projekte und zugeordnete Ideen fehlen überall; Auslastung und Finanzsummen zählen ohne Namen |
 | Exporte mit Personennamen (Dashboard, Protokoll) | – | Dokument trägt in der Kopfzeile «Intern · enthält Personendaten» (G12) |
 
 ## Personen

@@ -137,7 +137,7 @@ Abgeleitet aus den Use Cases. Jede Oberfläche genau einmal.
 | UI-48 | Vorlagen | UC-018 | Administration › Vorlagen | Liste + Schublade | – |
 | UI-49 | Schnittstellen mit Laufprotokoll | UC-018 | Administration › Schnittstellen | Liste + Schublade | – |
 | UI-50 | Änderungsprotokoll | UC-018 | Administration › Änderungsprotokoll | Bericht | – |
-| UI-51 | Zugriff am Projekt bzw. Portfolio (wer führt, steuert, mitliest; «Warum?») | UC-016 A2 | Projekte › Projekt › Zugriff; Portfolio › Zugriff | Liste + Schublade | – |
+| UI-51 | Zugriff am Projekt bzw. Portfolio (wer führt, steuert, mitliest; «Warum?»; Stufe, «Darf», Mitglieder; Kurzübersicht über die Schaltfläche «Zugriff» im Kopf, UX-E15) | UC-016 A2 | Projekte › Projekt › Zugriff; Portfolio › Zugriff | Liste + Schublade | – |
 | UI-52 | Alle Projekte (Kopfdaten für alle Mitglieder) | UC-014; Master Entscheid 14 | Projekte › Alle Projekte | Liste + Schublade | – |
 
 Anmerkung zu UI-06: Die Projektübersicht ist ein Bericht über ein einzelnes Projekt (Kopf mit Status, Phasenleiste,

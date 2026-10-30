@@ -7,7 +7,7 @@ eine Darstellung im Stil der Beschränkungen von Confluence und die Kennzeichnun
 | | |
 |---|---|
 | Stand | 29. Oktober 2026 |
-| Status | Vorlage; Etappe 1 (Anzeigen) ist umgesetzt, Etappe 2 (vertraulich am Portfolio) wartet auf die Übernahme. Bis dahin gelten die [Master-Entscheide](../PPM-Master.md) 13, 14, 16 und 18 und UX-E14 unverändert. |
+| Status | Übernommen am 30.10.2026 (Master Entscheid 22, UX-E15, A-76, AP-E9-1); offen K36. Etappe 1 (Anzeigen) ist umgesetzt (#213), Etappe 2 (vertraulich am Portfolio) ist das Paket AP-E9-1. |
 | Betrifft | UI-51, UI-52, UC-016 A2, Master-Entscheide 13, 14, 16, 18, A-34, A-70, A-71, A-73, [darstellung.md](darstellung.md) |
 | Vorbild | Beschränkungen in Confluence ([Doku Cloud](https://support.atlassian.com/confluence-cloud/docs/add-or-remove-page-restrictions/)): Sehen wird an Unterseiten vererbt und kann dort nur enger werden |
 
@@ -176,12 +176,14 @@ Paket mit eigenem Migrationsbereich ([fachmodell.md 7](../fachmodell.md#7-arbeit
 - [ ] Vor dem Setzen von «vertraulich» steht die Wirkung; die Änderung steht im Änderungsprotokoll.
 - [ ] Das Schloss erscheint nur bei vertraulichen Objekten.
 
-## Übernahme durch die Master-Session
+## Übernahme
 
-- **Masterdokument:** Entscheid zu «vertraulich am Portfolio» als Ergänzung zu Entscheid 13; Frage 1.
-- **UX-Schicht:** neuer Projektentscheid nach UX-E14 (Schaltfläche im Kopf, Stufe oben, Spalte «Darf»); UI-51 in
-  [informationsarchitektur.md](informationsarchitektur.md) um die Kurzübersicht ergänzen; in
-  [darstellung.md](darstellung.md) Symbol «Abgeschlossen» und unter Sensible Daten das vertrauliche Portfolio.
-- **Bauplan:** `portfolio.vertraulich` (2.4), Muster PORTFOLIO und PROJEKT (3.4), Annahme A-nn, Arbeitspaket mit
-  Migrationsbereich.
-- **Klärungsliste:** Fragen 1 und 2.
+Übernommen am 30.10.2026:
+
+- **Masterdokument:** Entscheid 22.
+- **UX-Schicht:** UX-E15; UI-51 in [informationsarchitektur.md](informationsarchitektur.md); in
+  [darstellung.md](darstellung.md) Symbol «Abgeschlossen» und unter Sensible Daten das vertrauliche Portfolio; UX-OF-13
+  ergänzt.
+- **Bauplan:** `portfolio.vertraulich` (2.4), Lesesicht (3.4), Annahme A-76 (mit den Vorschlägen zu den Fragen 2 und 5),
+  Paket AP-E9-1 mit Migrationen 470–479.
+- **Klärungsliste:** Frage 1 als K36, Vorschlag zu K32 ergänzt.

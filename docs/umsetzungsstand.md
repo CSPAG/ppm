@@ -61,6 +61,7 @@ Querschnitt: Anrede «Du» (UX-OF-1, A-24) in allen Texten der Oberfläche und F
 | AP-E8-3 | Projekte auflisten, eingereichte Ideen für alle | 440–449 | umgesetzt (440: `ppm.projekt_lesbar`, Kopfdaten aller nicht vertraulichen Projekte mit `projekt:list`, Details nur mit Leserecht; «Alle Projekte» UI-52; eingereichte Ideen mit `idee:list`, ähnliche Ideen beim Ausfüllen `GET /v1/ideen/aehnlich`) | #210 | A-73; Zählungen in Auswertungen zeigen Kopfdaten anderer Portfolios (gewollt, im Browser nicht geprüft) |
 | AP-E8-4 | Vermerk statt Sperre | 450–459 | umgesetzt (450; `vermerk*` in `vertrag`, `idee`, `statusbericht`, `abschluss`, `ziel`, `sitzung`: Gate vorlegen ohne Quality-Check und Unterschrift, Phase ohne Gate-Entscheid beginnen, Änderung vor dem Entscheid übernehmen, Initialisierung vor der Freigabe, Abschluss vor der Abnahme, Monatsabschluss mit ungeprüften Berichten, Roadmap vor der Freigabe, Traktandum mit Vermerk; Aufgaben bleiben offen, Entscheid wird nachgetragen; Bausteine `Vermerke`, `VorabAktion`) | #210 | A-74; Korrektur eines Gate-Entscheids nach vorab begonnener Phase setzt die Phase nicht zurück (G1) |
 | AP-E8-5 | Versionen statt Sperre, Verlauf am Objekt | 460–469 | umgesetzt (460–463: Statusbericht nach Einreichen und Abschluss, Sitzung und Unterlagen nach dem Versand, Jahresziele nach der Vorlage, Projekt nach dem Abschluss änderbar, markiert «geändert nach …»; Verlauf aus dem Audit je Bericht, Sitzung, Zieljahr und Projekt; Bausteine `Verlauf`, `GeaendertNach`) | #210 | A-75 (A-37 abgelöst); zurückgezogene Projekte bleiben lesend; offen: der abgenommene Abschlussbericht ist noch fest (409), G2 verlangt eine neue Fassung |
+| AP-E9-1 | Vertrauliches Portfolio (Master Entscheid 22, A-76) | 470–479 | offen; Etappe 1 der Oberfläche (Kurzübersicht, Stufe am Projekt, «Darf») vorab mit #213 |
 
 ## Business Cases
 
@@ -208,6 +209,7 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, Anrede (ab #152 maschinell geprüft) | Zielgrössen |
 |---|---|---|---|---|---|---|---|
+| #213 | – (Vorlage [ux/zugriff.md](ux/zugriff.md), Etappe 1) | Schaltfläche «Zugriff» mit Kurzübersicht (Dialog) im Kopf, Stufe und «Darf» im Bereich «Zugriff» (UI-51); Z1, Z5, Z8 | ja (Dialog mit Fokusfalle, Esc) | ohne Befund (Vitest) | nicht geprüft | ja | – |
 | #210 | AP-E8-2–AP-E8-5 | Liste + Schublade «Zugriff» (UI-51), Bericht «Alle Projekte» (UI-52); Vermerke und «geändert nach …» als Text mit Symbol (darstellung.md), Verlauf als Zeitleiste; Z1, Z2, Z5, Z7, Z8 (zurückgezogen), Z9 (Banner nach Abschluss) | ja | ohne Befund (Vitest) | nicht im Browser geprüft | ja, «Du», «Projektauftraggeber:in» | – |
 | #199 | AP-E0-0 | Querschnitt Leistung, Oberfläche unverändert | – | unverändert | unverändert | – | Start-Bundle 208,9 kB (Q-L6) |
 | #188 | AP-E0-8 | Startseite (UI-01): Zeile entfällt ohne Meilenstein bzw. Geschäft | ja (Links) | ohne Befund (Vitest, E2E `eingang.spec.ts` hell/dunkel) | 360 px im E2E; 768/1440 nicht eigens | ja, «Du» | eine Abfrage für alle Projekte der Karte |

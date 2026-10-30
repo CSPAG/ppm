@@ -160,7 +160,7 @@ nachgeführt.
 
 | Tabelle | Schlüssel und Steuerspalten | Bemerkung |
 |---|---|---|
-| `portfolio` | `id`, `kategorie` (`A`/`B`/`C`), `schluessel` (`transformation`, `geschaeftsleitung`, Kürzel der Direktion), `name`, `org_einheit_id` (bei C), `pflichten` bool (A, B: true; C: false, A-07, A-08) | **Ort** im Rechtemodell; Tabelle entsteht in AP-E0-1 |
+| `portfolio` | `id`, `kategorie` (`A`/`B`/`C`), `schluessel` (`transformation`, `geschaeftsleitung`, Kürzel der Direktion), `name`, `org_einheit_id` (bei C), `pflichten` bool (A, B: true; C: false, A-07, A-08), `vertraulich` bool (Master Entscheid 22, A-76) | **Ort** im Rechtemodell; Tabelle entsteht in AP-E0-1; `vertraulich` in AP-E9-1 |
 | `gremium` | `id`, `portfolio_id`, `kuerzel` (`prat`, `glpa`, `sns-vr`, Direktion), `name`, `art` (`entscheidend`/`extern`), `rhythmus` | extern = keine Benutzer (SNS-VR, UX-E8, A-02); ein entscheidendes Gremium je Portfolio (A-45) |
 | `gremienweg` | `portfolio_id`, `gate_code`, `gremium_id`, `zusaetzlich_gremium_id` NULL | P0, P1 bis Freigabe P2: zusätzlich SNS-VR (Q8 Kap. 5.1) |
 | `sitzungstermin` | `gremium_id`, `datum` | geplante Termine (UC-006 Vorbedingung); Sitzung entsteht daraus |
@@ -443,6 +443,12 @@ Sichtbarkeit innerhalb von Gremien: Unterlagen und Protokollentwurf vor dem Vers
 (`sitzung:read`) ab `versendet`; Eingeladene nur ihr Traktandum (Policy über `einladung.person_id = app.principal_id()`).
 Begründungen von Zurückweisung, Ablehnung und Abbruch nur für Betroffene, UE und Gremium (darstellung.md, sensible Daten).
 
+**Vertrauliches Portfolio** (Master Entscheid 22, A-76, AP-E9-1): `portfolio_read` lässt ein Portfolio mit
+`vertraulich = true` nur sehen, wer am Portfolio, an einem seiner Projekte oder übergreifend eine Rolle hat; in
+`projekt_read` gilt ein Projekt als vertraulich, wenn es selbst oder sein Portfolio vertraulich ist (Bedingung
+`projekt:list AND NOT vertraulich` bzw. die zweite Klammer des Musters PROJEKT mit beiden Spalten). Ebenso fallen für
+Mitglieder Ideen mit Zuordnung zu einem vertraulichen Portfolio (`idee:list`) und dessen Projekte in der Roadmap weg.
+
 ## 4. Aufgaben und Eingang
 
 ### 4.1 Entstehung
@@ -699,6 +705,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | **AP-E8-3** | Alle Projekte auflisten (UI-52), eingereichte Ideen für alle, ähnliche Ideen beim Ausfüllen (A-73) | `projekt` (`liste*`), `idee` (`pool*`) | diese Dateien | 440–449 | nach AP-E8-1 · AP-E8-1 | Mitglied sieht keine Details und keine vertraulichen Projekte (Test) |
 | **AP-E8-4** | Vermerk statt Sperre (A-74): Gate und Vertrag ohne Quality-Check oder Unterschrift, Phase ohne Gate-Entscheid, Änderung vor Entscheid, Initialisierung vor Entscheid, Abschluss vor Abnahme, Monatsabschluss mit ungeprüften Berichten, Roadmap vor Freigabe, Traktandum mit Vermerk | `vertrag`, `idee`, `statusbericht`, `abschluss`, `ziel`, `sitzung` (je `vermerk*`) | diese Dateien | 450–459 | nach AP-E8-1 · AP-E8-1 | je Fall ein Test «läuft weiter, Vermerk gesetzt, Aufgabe offen»; UX-DoD |
 | **AP-E8-5** | Versionen statt Sperre (A-75): Bericht nach Einreichen und Abschluss, Unterlagen nach Versand, Jahresziele nach Vorlage, Projekt nach Abschluss; Verlauf am Objekt | `statusbericht`, `sitzung`, `ziel`, `abschluss` (je `verlauf*`), `web/src/ui/` (Baustein Verlauf über die Master-Session) | diese Dateien | 460–469 | nach AP-E8-1 · AP-E8-1 | Änderung nach Versand markiert (Test); UX-DoD |
+| **AP-E9-1** | Vertrauliches Portfolio (Master Entscheid 22, A-76): `portfolio.vertraulich`, Lesesicht `portfolio`, `projekt`, Ideen und Roadmap; Route zum Setzen mit Wirkung; im Bereich «Zugriff» Stufe am Portfolio und Gruppe «über seine Projekte» ([ux/zugriff.md](ux/zugriff.md)) | `portfolio` (`vertraulich*`), `projekt` (`zugriff*`), `idee` (`pool*`), `ziel` (Roadmap) | diese Dateien, `test/app/matrix/` | 470–479 | sofort · – | Mitglied findet das Portfolio und seine Projekte nirgends; Rolle nur am Projekt sieht Projekt und Namen; «Portfolio führen» setzt es ohne `portfolio:admin` (Tests); UX-DoD |
 
 ### 7.4 Wellen (Vorschlag der Parallelität)
 
@@ -712,6 +719,7 @@ Gates, Werteströme, Codewerte und Fristen nach Q6 F6, Q8 Kap. 7–9; Leitfragen
 | 7 | AP-E3-3, AP-E4-3, AP-E5-3, AP-E6-4, AP-E7-2, AP-E7-4, AP-E7-8 |
 | 8 | AP-E5-5, AP-E7-1, AP-E7-7, danach AP-E7-5 |
 | 9 | AP-E8-1, danach AP-E8-2, AP-E8-3, AP-E8-4, AP-E8-5 |
+| 10 | AP-E9-1 |
 
 ## 8. Annahmen
 
@@ -795,6 +803,7 @@ Masterdokument wird die Annahme Entscheid oder Änderung.
 | A-73 | Master Entscheid 14 | Auflisten: Policy `projekt` mit `projekt:list` für nicht vertrauliche Projekte, `ppm.projekt_sichtbar()` prüft das Leserecht ausdrücklich; jede Detailroute prüft `projekt:read`; Kopfdaten = Nummer, Name, Portfolio, Phase, Lebenszyklus, Projektleitung, Projektauftraggeber:in; Ideen: `idee:list` liest eingereichte Ideen nach Vorlage, Rückfragen, Leitfragen und Raster nur mit `idee:read` | AP-E8-3 |
 | A-74 | Master Abschnitt 0 G1, UX-E12 | Vermerk statt Sperre: Quality-Check, Unterschrift, Freigabe, Abnahme und Entscheide sind Vermerke; ein fehlender Vermerk ergibt 200 mit Vermerk am Objekt statt 409, die Aufgabe bleibt offen; 409 bzw. 422 nur für unvollständige oder widersprüchliche Eingaben (Pflichtangaben, Begründungen, Freigabe einer PRAT-Änderung durch die Projektauftraggeber:in) | AP-E8-4 |
 | A-75 | Master Abschnitt 0 G2, UX-E13 | Versionen statt Sperre: Änderungen nach Einreichen, Versand, Vorlage oder Abschluss erzeugen eine Version mit Markierung «geändert nach …»; Verlauf am Objekt für alle mit Leserecht aus dem Audit und den `*_version`-Tabellen; gelöscht werden nur Entwürfe | AP-E8-5 |
+| A-76 | Master Entscheid 22, K36 | Vertrauliches Portfolio verbirgt nur vor Mitgliedern ohne weitere Rolle, nicht vor «alle Portfolios lesen» (keine Freigabestufen, bis K36 geklärt ist); sichtbar mit Rolle am Portfolio, an einem seiner Projekte oder übergreifend (wer nur am Projekt eine Rolle hat, sieht den Namen); Projekte darin sind vertraulich und nicht offener stellbar; Ideen mit Zuordnung zum Portfolio sehen Mitglieder nicht; Setzen über eine eigene Route mit `projekt:write` am Portfolio (`portfolio:admin` gilt nur übergreifend); Auslastung und Finanzsummen zählen die Projekte weiter, ohne Namen (K32); der Bereich «Zugriff» nennt «über seine Projekte» aus einer eigenen Abfrage, weil `/v1/access` keine Orte darunter liefert | AP-E9-1 |
 
 A-25 ist nicht vergeben (in A-24 enthalten). Annahmen A-41 bis A-47 sind technische Schnitte dieses Bauplans ohne
 Fachregel; sie kommen als Frage in die Klärungsliste, sobald eine Fachfrage daran hängt.

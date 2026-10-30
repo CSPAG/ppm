@@ -105,6 +105,7 @@ Vorschläge von CSP; heutige Vergleichswerte (Excel, Word, E-Mail) sind nicht er
 | UX-E12 | **Vermerk statt Sperre.** Fehlen Quality-Check, Unterschrift, Freigabe oder Abnahme, zeigt die Aktion vorher, was fehlt, und lässt sich trotzdem ausführen; das Objekt trägt den Vermerk sichtbar («ohne Freigabe»), die Aufgabe bleibt im Eingang, bis der Vermerk nachgetragen ist. Sperren bleiben nur für unvollständige Eingaben (Pflichtangaben, Begründungen). | Produktgrundsatz G1; eine Unterschrift oder Freigabe darf den Ablauf nicht anhalten |
 | UX-E13 | **Verlauf am Objekt statt Sperre nach Einreichen, Versand oder Abschluss.** Änderungen danach erzeugen eine Version mit Markierung («geändert nach Versand») und sind im Verlauf des Objekts für alle sichtbar, die es sehen. | Produktgrundsatz G2 |
 | UX-E14 | **Zugriff in der Projektakte und am Portfolio** als eigener Bereich «Zugriff»: wer führt, steuert, mitliest, mit «Warum?»; zentral zusätzlich in Administration › Zugänge. Die Projektorganisation wirkt nicht auf den Zugriff. | Master Entscheide 16, 18 |
+| UX-E15 | **Zugriff auf einen Blick und vertrauliches Portfolio** ([zugriff.md](zugriff.md)): Schaltfläche «Zugriff» mit Kurzübersicht im Kopf von Projektakte und Portfolio; im Bereich «Zugriff» oben die Stufe, Spalte «Darf», zuletzt «Alle Mitglieder»; «vertraulich» auch am Portfolio, vererbt auf seine Projekte; Schloss nur für «vertraulich». | Master Entscheid 22; Vorbild Beschränkungen in Confluence |
 
 ## Glossar der Oberfläche
 

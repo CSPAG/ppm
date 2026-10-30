@@ -38,8 +38,9 @@ nicht der Rollenname (I-N2); Projektrollen gelten je Projekt (UC-016 Schritt 2).
 | Administration | – | – | – | ○ Phasenmodell, Portfolios und Gremien, Vorlagen, Änderungsprotokoll | – | – | – | ● |
 | **Anzahl** | 5 | 5 | 4 | 6 | 5 | 5 | 4 | 5 |
 
-Spalten nach den Rollen des Produkts (Master Entscheid 18) mit den Akteuren des Referenzkunden. Beträge und vertrauliche
-Projekte sieht, wer am Ort eine Rolle hat, Mitglieder ohne weitere Rolle nicht (Entscheid 13). Alle Mitglieder listen
+Spalten nach den Rollen des Produkts (Master Entscheid 18) mit den Akteuren des Referenzkunden. Beträge sieht, wer am Ort eine Rolle
+hat, Mitglieder ohne weitere Rolle nicht (Entscheid 13); vertrauliche Projekte und Portfolios nur, wer daran eingetragen
+ist, und «alle Portfolios führen» (Entscheid 22). Alle Mitglieder listen
 Projekte auf und lesen eingereichte Ideen (Entscheid 14). Wer an einem Projekt oder Portfolio führt, verwaltet dort den
 Zugriff (Entscheid 16, UX-E14).
 
@@ -137,7 +138,7 @@ Abgeleitet aus den Use Cases. Jede Oberfläche genau einmal.
 | UI-48 | Vorlagen | UC-018 | Administration › Vorlagen | Liste + Schublade | – |
 | UI-49 | Schnittstellen mit Laufprotokoll | UC-018 | Administration › Schnittstellen | Liste + Schublade | – |
 | UI-50 | Änderungsprotokoll | UC-018 | Administration › Änderungsprotokoll | Bericht | – |
-| UI-51 | Zugriff am Projekt bzw. Portfolio (wer führt, steuert, mitliest; «Warum?») | UC-016 A2 | Projekte › Projekt › Zugriff; Portfolio › Zugriff | Liste + Schublade | – |
+| UI-51 | Zugriff am Projekt bzw. Portfolio (wer führt, steuert, mitliest; «Warum?»; Stufe, «Darf», Mitglieder; Kurzübersicht über die Schaltfläche «Zugriff» im Kopf, UX-E15) | UC-016 A2 | Projekte › Projekt › Zugriff; Portfolio › Zugriff | Liste + Schublade | – |
 | UI-52 | Alle Projekte (Kopfdaten für alle Mitglieder) | UC-014; Master Entscheid 14 | Projekte › Alle Projekte | Liste + Schublade | – |
 
 Anmerkung zu UI-06: Die Projektübersicht ist ein Bericht über ein einzelnes Projekt (Kopf mit Status, Phasenleiste,

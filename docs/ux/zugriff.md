@@ -7,7 +7,7 @@ eine Darstellung im Stil der Beschränkungen von Confluence und die Kennzeichnun
 | | |
 |---|---|
 | Stand | 29. Oktober 2026 |
-| Status | Vorlage; Etappe 1 (Anzeigen) ist umgesetzt, Etappe 2 (vertraulich am Portfolio) wartet auf die Übernahme. Bis dahin gelten die [Master-Entscheide](../PPM-Master.md) 13, 14, 16 und 18 und UX-E14 unverändert. |
+| Status | Übernommen am 30.10.2026 (Master Entscheid 22, UX-E15, A-76, AP-E9-1); offen K36. Etappe 1 (Anzeigen) ist umgesetzt (#213), Etappe 2 (vertraulich am Portfolio) ist das Paket AP-E9-1. |
 | Betrifft | UI-51, UI-52, UC-016 A2, Master-Entscheide 13, 14, 16, 18, A-34, A-70, A-71, A-73, [darstellung.md](darstellung.md) |
 | Vorbild | Beschränkungen in Confluence ([Doku Cloud](https://support.atlassian.com/confluence-cloud/docs/add-or-remove-page-restrictions/)): Sehen wird an Unterseiten vererbt und kann dort nur enger werden |
 
@@ -74,20 +74,40 @@ Ergänzungen zum heutigen Bereich (Seitentyp Liste + Schublade bleibt):
 - Einträge über das Portfolio oder für alle Portfolios bleiben ohne «Entfernen» und nennen, wo sie geändert werden (heute
   schon so).
 
-## 3 Vertraulich am Portfolio
+## 3 Vertraulich: nur wer eingetragen ist
 
-- **Kennzeichnung «vertraulich» auch am Portfolio.** Mitglieder ohne weitere Rolle finden das Portfolio nirgends: nicht in
-  Listen, Filtern, Suche, Befehlspalette, Roadmap und nicht bei den Ideen. Seine Projekte gelten für sie als vertraulich.
-- **Wer es weiter sieht:** alle mit einer Rolle am Portfolio, an einem seiner Projekte oder für alle Portfolios
-  (Entscheid 13 unverändert). Wer nur an einem Projekt eine Rolle hat, sieht sein Projekt und den Namen des Portfolios.
-- **Vererbung wie in Confluence, nur enger:** Ein Projekt in einem vertraulichen Portfolio ist vertraulich und kann nicht
-  offener gestellt werden. In einem nicht vertraulichen Portfolio bleibt «vertraulich» je Projekt wie heute.
+Entschieden am 30.10.2026 (Master Entscheid 22, A-76; ersetzt Frage 1 und die Freigabestufen):
+
+- **Vertraulich an Portfolio und Projekt** heisst: Es sehen nur, wer daran eine Rolle hat (direkt oder über eine Gruppe),
+  wer an einem Projekt des Portfolios eine Rolle hat (nur Projekt und Name des Portfolios) und «alle Portfolios führen»
+  (fester Kreis, damit nichts verwaist). Mitglieder und «alle Portfolios lesen» sehen es nur, wenn sie eingetragen sind,
+  z. B. «Gruppe GL · darf lesen». Für alle anderen fehlt es überall: Listen, Filter, Suche, Befehlspalette, Roadmap, Ideen.
+- **Vererbung wie in Confluence, nur enger:** Die Projekte eines vertraulichen Portfolios sind vertraulich und lassen sich
+  nicht offener stellen; Eintragungen am Portfolio gelten für alle seine Projekte.
+- **Gruppen** kommen aus Microsoft Entra ID und aus dem Tool selbst; die eigenen Gruppen liefert identity-kit
+  ([OP-21](../offene-punkte.md#op-21)). Welche Gruppe was darf, bestimmt PPM über seine Rollen.
 - **Wer es setzt:** am Portfolio, wer das Portfolio führt (Portfolio führen, alle Portfolios führen); am Projekt, wer das
-  Projekt führt (heute `projekt:write`).
-- **Wirkung vorher** (I-R1 Stufe 3, I-F5): «Mitglieder ohne Rolle sehen das Portfolio und seine 6 Projekte nicht mehr.»
-  Die Änderung steht im Änderungsprotokoll.
-- **Weiche Regel** (G1, Entscheid 16): Wer Zugriff auf ein vertrauliches Portfolio gibt, sieht denselben Hinweis wie heute
-  beim vertraulichen Projekt.
+  Projekt führt (`projekt:write`).
+- **Wirkung vorher** (I-R1 Stufe 3, I-F5): «214 Mitglieder und 7 Personen mit «alle Portfolios lesen» sehen das Portfolio
+  und seine 6 Projekte nicht mehr.», mit «Zugriff geben» für die Betroffenen (G1). Die Änderung steht im
+  Änderungsprotokoll.
+
+### Auswahl in zwei Elementen
+
+Im Zugriff steht «wer · darf …»; die Rolle dahinter heisst in der Auswahl nach ihrer Wirkung. Eigene Rollen der
+Organisation erscheinen mit ihrem Namen.
+
+| Ort | Auswahl | Rolle dahinter |
+|---|---|---|
+| Portfolio | darf lesen | Portfolio mitlesen (neu) |
+| | darf lesen und Entscheide vermerken | Portfolio steuern |
+| | Gremium (liest, entscheidet in Sitzungen) | Gremium |
+| | darf bearbeiten | Portfolio führen |
+| Projekt | darf lesen | Projekt mitlesen |
+| | darf lesen, unterzeichnen und entscheiden | Projekt steuern |
+| | darf bearbeiten | Projekt führen |
+
+Im Bereich «Zugriff» fallen die Spalten «Rolle» und «Darf» damit zu einer zusammen.
 
 ## 4 Listen
 
@@ -112,10 +132,10 @@ Ergänzungen zum heutigen Bereich (Seitentyp Liste + Schublade bleibt):
 |---|---|
 | Schaltfläche | «Zugriff» / «Zugriff · vertraulich» |
 | Dein Zugriff | «Du kannst das Projekt bearbeiten – Rolle «Projekt führen» am Projekt.» / «Du kannst das Projekt lesen – Rolle «Alle Portfolios lesen» für alle Portfolios.» / «Du kannst das Projekt lesen – Rolle «Gremium» über das Portfolio.» |
-| Stufe | «Alle Mitglieder sehen die Kopfdaten.» / «Vertraulich: Nur wer hier, am Portfolio oder für alle Portfolios eine Rolle hat, sieht das Projekt.» |
+| Stufe | «Alle Mitglieder sehen die Kopfdaten.» / «Vertraulich: Nur wer hier oder am Portfolio eingetragen ist, sieht das Projekt.» |
 | Geerbt | «Vertraulich, weil das Portfolio ‹Name› vertraulich ist.» |
 | Zeile Mitglieder | «Alle Mitglieder» · «Kopfdaten auflisten» bzw. «kein Zugriff» |
-| Wirkung | Titel «Portfolio ‹Name› vertraulich machen?»; Text «Mitglieder ohne Rolle sehen das Portfolio und seine 6 Projekte nicht mehr.»; Schaltflächen «Vertraulich machen» / «Abbrechen» |
+| Wirkung | Titel «Portfolio ‹Name› vertraulich machen?»; Text «214 Mitglieder und 7 Personen mit «alle Portfolios lesen» sehen das Portfolio und seine 6 Projekte nicht mehr.», dazu «Zugriff geben»; Schaltflächen «Vertraulich machen» / «Abbrechen» |
 | Markierung | Schloss + «vertraulich» |
 
 ## Umsetzung
@@ -157,7 +177,7 @@ Paket mit eigenem Migrationsbereich ([fachmodell.md 7](../fachmodell.md#7-arbeit
 
 | Nr. | Frage | Vorschlag | Klärt |
 |---|---|---|---|
-| 1 | Genügt «vertraulich am Portfolio» (verborgen vor Mitgliedern) für den echten Fall, oder muss ein Portfolio auch vor «alle Portfolios lesen» verborgen werden? | Zuerst «vertraulich». Reicht das nicht, sind die Freigabestufen von identity-kit der Weg (Entscheid 13): Typ `classified`, Stufe je Person, Lesen nur bei `classification <= app.clearance()`. Zu prüfen ist, ob der Baukasten das auch für einen Typ mit Kindern (Portfolio) erlaubt. | Fachseite, Master-Session |
+| 1 | Muss ein Portfolio auch vor «alle Portfolios lesen» verborgen werden? | **Entschieden 30.10.2026:** ja, vertraulich heisst «nur wer eingetragen ist»; Ausnahmen über Gruppen («Gruppe GL · darf lesen»), keine Freigabestufen (Abschnitt 3, K36) | – |
 | 2 | Sehen Mitglieder eingereichte Ideen, die einem vertraulichen Portfolio zugeordnet sind? | nein | Master-Session |
 | 3 | Kurzübersicht im Kopf, oder führt die Schaltfläche direkt in den Bereich? | Kurzübersicht; sie ist die Antwort auf «wer darf hier was», der Bereich der Ort zum Verwalten | Fachseite |
 | 4 | Symbol für «Abgeschlossen»? | Kalender mit Haken | Master-Session |
@@ -176,12 +196,14 @@ Paket mit eigenem Migrationsbereich ([fachmodell.md 7](../fachmodell.md#7-arbeit
 - [ ] Vor dem Setzen von «vertraulich» steht die Wirkung; die Änderung steht im Änderungsprotokoll.
 - [ ] Das Schloss erscheint nur bei vertraulichen Objekten.
 
-## Übernahme durch die Master-Session
+## Übernahme
 
-- **Masterdokument:** Entscheid zu «vertraulich am Portfolio» als Ergänzung zu Entscheid 13; Frage 1.
-- **UX-Schicht:** neuer Projektentscheid nach UX-E14 (Schaltfläche im Kopf, Stufe oben, Spalte «Darf»); UI-51 in
-  [informationsarchitektur.md](informationsarchitektur.md) um die Kurzübersicht ergänzen; in
-  [darstellung.md](darstellung.md) Symbol «Abgeschlossen» und unter Sensible Daten das vertrauliche Portfolio.
-- **Bauplan:** `portfolio.vertraulich` (2.4), Muster PORTFOLIO und PROJEKT (3.4), Annahme A-nn, Arbeitspaket mit
-  Migrationsbereich.
-- **Klärungsliste:** Fragen 1 und 2.
+Übernommen am 30.10.2026:
+
+- **Masterdokument:** Entscheid 22.
+- **UX-Schicht:** UX-E15; UI-51 in [informationsarchitektur.md](informationsarchitektur.md); in
+  [darstellung.md](darstellung.md) Symbol «Abgeschlossen» und unter Sensible Daten das vertrauliche Portfolio; UX-OF-13
+  ergänzt.
+- **Bauplan:** `portfolio.vertraulich` (2.4), Lesesicht (3.4), Annahme A-76 (mit den Vorschlägen zu den Fragen 2 und 5),
+  Paket AP-E9-1 mit Migrationen 470–479.
+- **Klärungsliste:** Frage 1 als K36, Vorschlag zu K32 ergänzt.

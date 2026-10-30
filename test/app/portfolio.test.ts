@@ -1,12 +1,13 @@
 /**
  * Portfolios und Gremien (BC AM.02.04; UC-017 Schritt 4, A1): Pflichten je Kategorie (A-07, A-08), ein entscheidendes
  * Gremium je Portfolio (A-45), SNS-VR als externes Gremium (A-02), Gremienweg je Gate mit «via SNS-VR» (Abnahme
- * AP-E0-5, Q8 Kap. 5.1, UC-006 A1), Sitzungstermine, Rechte (portfolio:read, portfolio:admin), ETag und Audit.
+ * AP-E0-5, Q8 Kap. 5.1, UC-006 A1), Sitzungstermine, Rechte (portfolio:read, portfolio:admin), ETag und Audit;
+ * «vertraulich» am Portfolio (Master Entscheid 22, A-76, AP-E9-1).
  */
 import assert from 'node:assert/strict';
 import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
 import { full } from './harness.ts';
-import { login, testApi, type TestApi } from './api.ts';
+import { grant, login, testApi, type TestApi } from './api.ts';
 import { entscheidendesGremium, gremienwegFuerGate, sitzungstermine } from '../../src/modules/portfolio/index.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
@@ -48,12 +49,12 @@ describe('Portfolios und Gremien', () => {
   test('Pflichten folgen der Kategorie; Kategorie und Schlüssel sind fest', async () => {
     const { a, b, c } = await governance('-1');
     assert.deepEqual([a.pflichten, b.pflichten, c.pflichten], [true, true, false]);
-    assert.deepEqual(a.can, { admin: true });
+    assert.deepEqual(a.can, { admin: true, vertraulich: true });
     assert.equal(a.version, 1);
 
     const g = await call('GET', `/v1/portfolios/${a.id}`, gl);
     assert.equal(g.statusCode, 200);
-    assert.deepEqual(g.json().can, { admin: false });
+    assert.deepEqual(g.json().can, { admin: false, vertraulich: false });
     assert.equal(g.headers.etag, 'W/"1"');
 
     const fest = await call('PATCH', `/v1/portfolios/${a.id}`, { ...ue, 'if-match': 'W/"1"' }, { kategorie: 'C' });
@@ -187,5 +188,46 @@ describe('Portfolios und Gremien', () => {
     const alle = (await call('GET', '/v1/portfolios?limit=200', gl)).json().items;
     assert.deepEqual([...first.items, ...rest.items].map((p: { id: string }) => p.id), alle.map((p: { id: string }) => p.id));
     assert.deepEqual(alle.map((p: { kategorie: string }) => p.kategorie), [...alle.map((p: { kategorie: string }) => p.kategorie)].sort());
+  });
+
+  test('Vertraulich (Master Entscheid 22, A-76): wer führt, stellt um; nur Eingetragene sehen Portfolio und Projekte', async () => {
+    const pf = await created('/v1/portfolios', { kategorie: 'A', schluessel: 'reorganisation', name: 'Reorganisation' });
+    const fuehrt = await login(api, 'demo', 'u-pf-fuehrt', 'mitglied');
+    await grant(api, tenantId, `user:${fuehrt.principalId}`, 'portfolio-fuehren', { type: 'portfolio', id: pf.id });
+    const glMit = await login(api, 'demo', 'u-gl-mitlesen', 'alle-lesen');
+    await grant(api, tenantId, `user:${glMit.principalId}`, 'portfolio-mitlesen', { type: 'portfolio', id: pf.id });
+    const mitglied = { authorization: (await login(api, 'demo', 'u-mitglied', 'mitglied')).authorization };
+    const pl = await login(api, 'demo', 'u-pl-reorg', 'mitglied');
+    const projektId = await full(api.t.runtime, tenantId, async tx => (await tx.query<{ id: string }>(
+      "INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, '2026-901', 'Standort Ost', $2) RETURNING id", [tenantId, pf.id])).rows[0]!.id);
+    await grant(api, tenantId, `user:${pl.principalId}`, 'projekt-fuehren', { type: 'projekt', id: projektId });
+
+    const wirkung = await call('GET', `/v1/portfolios/${pf.id}/vertraulich/wirkung`, { authorization: fuehrt.authorization });
+    assert.equal(wirkung.statusCode, 200, wirkung.body);
+    assert.deepEqual(wirkung.json(), { projekte: 1, ideen: 0 });
+    assert.equal((await call('PUT', `/v1/portfolios/${pf.id}/vertraulich`, { ...gl, 'if-match': 'W/"1"' }, { vertraulich: true })).statusCode, 403, 'alle Portfolios lesen');
+    const put = await call('PUT', `/v1/portfolios/${pf.id}/vertraulich`, { authorization: fuehrt.authorization, 'if-match': 'W/"1"' }, { vertraulich: true });
+    assert.equal(put.statusCode, 200, put.body);
+    assert.equal(put.json().vertraulich, true);
+    assert.deepEqual(put.json().can, { admin: false, vertraulich: true });
+    // alles Übrige am Portfolio bleibt portfolio:admin
+    assert.equal((await call('PATCH', `/v1/portfolios/${pf.id}`, { authorization: fuehrt.authorization, 'if-match': put.headers.etag as string }, { name: 'Anders' })).statusCode, 403);
+
+    const sieht = async (h: Record<string, string>) => ({
+      portfolio: (await call('GET', `/v1/portfolios/${pf.id}`, h)).statusCode === 200,
+      projekt: (await call('GET', `/v1/projekte/${projektId}`, h)).statusCode === 200,
+    });
+    assert.deepEqual(await sieht(ue), { portfolio: true, projekt: true }, 'alle Portfolios führen');
+    assert.deepEqual(await sieht(gl), { portfolio: false, projekt: false }, 'alle Portfolios lesen, nicht eingetragen');
+    assert.deepEqual(await sieht({ authorization: glMit.authorization }), { portfolio: true, projekt: true }, 'eingetragen: darf lesen');
+    assert.deepEqual(await sieht(mitglied), { portfolio: false, projekt: false }, 'Mitglied');
+    assert.deepEqual(await sieht({ authorization: pl.authorization }), { portfolio: true, projekt: true }, 'Rolle nur am Projekt');
+    assert.equal((await call('GET', `/v1/projekte/${projektId}`, ue)).json().portfolioVertraulich, true, 'das Projekt erbt die Stufe');
+
+    // wieder öffnen: Mitglieder listen das Projekt wieder auf
+    const offen = await call('PUT', `/v1/portfolios/${pf.id}/vertraulich`, { authorization: fuehrt.authorization, 'if-match': put.headers.etag as string }, { vertraulich: false });
+    assert.equal(offen.statusCode, 200, offen.body);
+    assert.equal((await call('GET', `/v1/portfolios/${pf.id}`, mitglied)).statusCode, 200);
+    assert.equal((await call('GET', `/v1/projekte/${projektId}`, ue)).json().portfolioVertraulich, false);
   });
 });

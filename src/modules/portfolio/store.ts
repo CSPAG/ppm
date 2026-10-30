@@ -20,10 +20,10 @@ const W = `${SCHEMA}.gremienweg`;
 const S = `${SCHEMA}.sitzungstermin`;
 
 export interface PortfolioRow {
-  id: string; kategorie: Kategorie; schluessel: string; name: string; pflichten: boolean; org_einheit_id: string | null; version: number;
+  id: string; kategorie: Kategorie; schluessel: string; name: string; pflichten: boolean; org_einheit_id: string | null; vertraulich: boolean; version: number;
   created_at: Date; created_by: string | null; updated_at: Date; updated_by: string | null;
 }
-const PCOLS = 'id, kategorie, schluessel, name, pflichten, org_einheit_id, version, created_at, created_by, updated_at, updated_by';
+const PCOLS = 'id, kategorie, schluessel, name, pflichten, org_einheit_id, vertraulich, version, created_at, created_by, updated_at, updated_by';
 
 /** Nach Kategorie und Name; mit `limit` eine Zeile mehr (für den Cursor). */
 export async function listPortfolios(tx: Tx, o: { after?: { kategorie: string; name: string; id: string } | null; limit: number }): Promise<PortfolioRow[]> {
@@ -51,6 +51,22 @@ export async function updatePortfolio(tx: Tx, id: string, version: number, p: { 
   if (p.name !== undefined) { args.push(p.name.trim()); sets.push(`name = $${args.length}`); }
   if (p.orgEinheitId !== undefined) { args.push(p.orgEinheitId); sets.push(`org_einheit_id = CASE WHEN kategorie = 'C' THEN $${args.length}::uuid END`); }
   return (await tx.query<PortfolioRow>(`UPDATE ${P} SET ${sets.join(', ')} WHERE id = $1 AND version = $2 RETURNING ${PCOLS}`, args)).rows[0] ?? null;
+}
+
+/**
+ * «vertraulich» umstellen bei passender Version (Master Entscheid 22, A-76); der Trigger trägt die Stufe in die Projekte.
+ * Ohne `portfolio:admin` lässt die Datenbank nur diese Spalte zu (Trigger `portfolio_nur_vertraulich`).
+ */
+export async function setVertraulich(tx: Tx, id: string, version: number, vertraulich: boolean): Promise<PortfolioRow | null> {
+  return (await tx.query<PortfolioRow>(`UPDATE ${P} SET vertraulich = $3 WHERE id = $1 AND version = $2 RETURNING ${PCOLS}`, [id, version, vertraulich])).rows[0] ?? null;
+}
+
+/** Was «vertraulich» betrifft: Projekte und eingereichte Ideen des Portfolios (Wirkung vor dem Umstellen, I-F5). */
+export async function wirkungVertraulich(tx: Tx, id: string): Promise<{ projekte: number; ideen: number }> {
+  const r = (await tx.query<{ projekte: number; ideen: number }>(
+    `SELECT (SELECT count(*)::int FROM ${SCHEMA}.projekt WHERE portfolio_id = $1) AS projekte,
+            (SELECT count(*)::int FROM ${SCHEMA}.idee WHERE portfolio_id = $1 AND stand <> 'entwurf') AS ideen`, [id])).rows[0]!;
+  return r;
 }
 
 /** Neue Version des Portfolios ohne Änderung der Felder (Gremienweg geändert). */

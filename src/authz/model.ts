@@ -161,6 +161,12 @@ export const model = defineModel({
       description: 'Mitglied des entscheidenden Gremiums: liest Projekte (auch vertrauliche), Beträge, Sitzungen, Ideen, Priorisierung und Auswertungen des Portfolios; Stammdaten, Phasenmodell und Portfolios lesen.',
       permissions: [...BASIS, 'projekt:read', 'projekt:vertraulich', 'finanzen:read', 'sitzung:read', 'idee:read', 'priorisierung:read', 'auswertung:read'],
     },
+    // Master Entscheid 22, A-76: lesen am Portfolio ohne Vermerke und Sitzungen, z. B. «Gruppe GL · darf lesen»
+    'portfolio-mitlesen': {
+      label: 'Portfolio mitlesen',
+      description: 'Liest ein Portfolio mit allen Projekten (auch vertraulichen), Beträgen, Ideen und Auswertungen, ohne Vermerke und Sitzungen; Stammdaten, Phasenmodell und Portfolios lesen.',
+      permissions: [...BASIS, 'projekt:read', 'projekt:vertraulich', 'finanzen:read', 'idee:read', 'auswertung:read'],
+    },
     // Je Projekt (Zugriff, getrennt von der Projektorganisation; Master Entscheid 16)
     'projekt-steuern': {
       label: 'Projekt steuern',
@@ -196,7 +202,7 @@ export const model = defineModel({
   types: {
     // Rollen an ihren Ort gebunden (fachmodell.md 3.3, Master Entscheid 18)
     org: { label: 'Organisation', roles: ['mitglied', 'alle-lesen', 'alle-fuehren'] },
-    portfolio: { label: 'Portfolio', parent: 'org', roles: ['portfolio-steuern', 'portfolio-fuehren', 'gremium'], read: 'projekt:read' },
+    portfolio: { label: 'Portfolio', parent: 'org', roles: ['portfolio-steuern', 'portfolio-fuehren', 'gremium', 'portfolio-mitlesen'], read: 'projekt:read' },
     projekt: { label: 'Projekt', parent: 'portfolio', roles: ['projekt-steuern', 'projekt-fuehren', 'projekt-mitlesen'], leaf: true, read: 'projekt:read', write: 'projekt:write' },
   },
   mcpTools: {

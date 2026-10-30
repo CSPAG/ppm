@@ -31,7 +31,7 @@ function out(r: store.Row, caps: Caps): ProjektOut {
     id: r.id, nummer: r.nummer, name: r.name, portfolioId: r.portfolio_id,
     portfolio: r.pf_schluessel ? { schluessel: r.pf_schluessel, name: r.pf_name!, kategorie: r.pf_kategorie! } : null,
     orgEinheitId: l ? r.org_einheit_id : null, handlungsfeldId: l ? r.handlungsfeld_id : null, handlungsfeld: l ? r.hf_label : null,
-    phase: r.phase, phasenmodellId: l ? r.phasenmodell_id : null, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich,
+    phase: r.phase, phasenmodellId: l ? r.phasenmodell_id : null, lebenszyklus: r.lebenszyklus, vertraulich: r.vertraulich, portfolioVertraulich: r.portfolio_vertraulich,
     sponsor: r.sponsor, projektleitung: r.projektleitung, rollen: r.rollen,
     geaendertNachAbschluss: l ? r.geaendert_nach_abschluss_at : null,
     version: r.version, createdAt: r.created_at, updatedAt: r.updated_at,

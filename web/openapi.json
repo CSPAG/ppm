@@ -4801,6 +4801,7 @@
           "name",
           "pflichten",
           "orgEinheitId",
+          "vertraulich",
           "version",
           "createdAt",
           "createdBy",
@@ -4859,6 +4860,10 @@
               }
             ]
           },
+          "vertraulich": {
+            "description": "Nur Eingetragene am Portfolio oder an seinen Projekten und «alle Portfolios führen» sehen es; seine Projekte sind vertraulich (Master Entscheid 22, A-76).",
+            "type": "boolean"
+          },
           "version": {
             "minimum": 1,
             "type": "integer"
@@ -4901,10 +4906,15 @@
             "description": "Was die anfragende Person damit darf.",
             "type": "object",
             "required": [
-              "admin"
+              "admin",
+              "vertraulich"
             ],
             "properties": {
               "admin": {
+                "type": "boolean"
+              },
+              "vertraulich": {
+                "description": "«vertraulich» umstellen: wer das Portfolio führt (`projekt:write` am Portfolio, Master Entscheid 22).",
                 "type": "boolean"
               }
             }
@@ -5023,6 +5033,38 @@
                 "type": "string"
               }
             ]
+          }
+        }
+      },
+      "PortfolioVertraulichPut": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "vertraulich"
+        ],
+        "properties": {
+          "vertraulich": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PortfolioWirkung": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "projekte",
+          "ideen"
+        ],
+        "properties": {
+          "projekte": {
+            "minimum": 0,
+            "description": "Projekte des Portfolios; sie werden mit ihm vertraulich.",
+            "type": "integer"
+          },
+          "ideen": {
+            "minimum": 0,
+            "description": "Eingereichte Ideen mit Zuordnung zum Portfolio.",
+            "type": "integer"
           }
         }
       },
@@ -5616,6 +5658,7 @@
           "phasenmodellId",
           "lebenszyklus",
           "vertraulich",
+          "portfolioVertraulich",
           "sponsor",
           "projektleitung",
           "rollen",
@@ -5754,7 +5797,11 @@
             "description": "`aktiv`, `sistiert` oder ein Endzustand (`abgebrochen`, `abgeschlossen`, `zurueckgezogen`)."
           },
           "vertraulich": {
-            "description": "Sichtbar nur für Personen mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13).",
+            "description": "Sichtbar nur für Eingetragene am Projekt oder an seinem Portfolio und «alle Portfolios führen» (Master Entscheid 22).",
+            "type": "boolean"
+          },
+          "portfolioVertraulich": {
+            "description": "Das Portfolio ist vertraulich; das Projekt ist es damit auch und lässt sich nicht offener stellen (A-76).",
             "type": "boolean"
           },
           "sponsor": {
@@ -51099,6 +51146,249 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolios/{id}/vertraulich": {
+      "put": {
+        "summary": "Portfolio vertraulich machen oder öffnen",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Vertraulich sehen das Portfolio und seine Projekte nur Eingetragene am Portfolio oder an seinen Projekten und «alle Portfolios führen». Recht `projekt:write` am Portfolio (Portfolio führen, alle Portfolios führen); nur mit `If-Match`. Steht im Änderungsprotokoll.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioVertraulichPut"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "description": "ETag der gelesenen Version (Pflicht)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Konflikt mit dem aktuellen Stand",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Version passt nicht (If-Match)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Zu viele Anfragen (Retry-After)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Fehler (Referenz im detail)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/portfolios/{id}/vertraulich/wirkung": {
+      "get": {
+        "summary": "Wirkung von «vertraulich» am Portfolio",
+        "tags": [
+          "Portfolios"
+        ],
+        "description": "Anzahl Projekte und eingereichte Ideen, die mit dem Portfolio vertraulich werden (Wirkung vor dem Umstellen, I-F5). Recht `projekt:write` am Portfolio.",
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioWirkung"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Anfrage, z. B. Organisation wählen (X-Tenant)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationChoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Nicht angemeldet oder Token ungültig",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nicht gefunden oder nicht sichtbar",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }

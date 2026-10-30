@@ -23,28 +23,25 @@ export function zugriffHerkunft(e: Pick<AccessEntry, 'place'>, ort: ZugriffOrt):
 }
 
 /**
- * Was eine Rolle am Projekt bzw. an den Projekten des Portfolios darf, aus ihren Rechten im Katalog; leer für Rollen
- * ausserhalb des Katalogs (z. B. Mitgliedschaft des Baukastens).
+ * Was jemand mit einer Rolle darf, als Auswahl «darf …» (Master Entscheid 22): vorgegebene Rollen nach ihrer Wirkung,
+ * eigene Rollen der Organisation mit ihrem Namen; leer ausserhalb des Katalogs (z. B. Mitgliedschaft des Baukastens).
  */
 export function zugriffDarf(authz: Authz, relation: string): string {
-  const rolle = authz.catalog?.roles.find(r => r.key === relation);
-  if (!rolle) return '';
-  const p = new Set<string>(rolle.permissions);
-  const d = T.zugriff.darf;
-  const stufe = p.has('projekt:write') ? d.bearbeiten : p.has('projekt:read') ? d.lesen : p.has('projekt:list') ? d.auflisten : '';
-  return stufe && p.has('access:admin') ? `${stufe}, ${d.verwalten}` : stufe;
+  if (Object.hasOwn(T.zugriff.darf, relation)) return T.zugriff.darf[relation]!;
+  return authz.catalog?.roles.some(r => r.key === relation) ? authz.relationLabel(relation) : '';
 }
 
-/** Stufe des Objekts als Satz (Z-3): vertraulich oder Kopfdaten für alle Mitglieder. */
-export function zugriffStufe(ort: ZugriffOrt, vertraulich?: boolean): string {
-  if (ort.type === 'portfolio') return T.zugriff.stufe.offenPortfolio;
-  return vertraulich ? T.zugriff.stufe.vertraulichProjekt : T.zugriff.stufe.offenProjekt;
+/** Stufe des Objekts als Satz (Z-3): vertraulich (auch geerbt vom Portfolio) oder Kopfdaten für alle Mitglieder. */
+export function zugriffStufe(ort: ZugriffOrt, vertraulich?: boolean, geerbt?: boolean): string {
+  const s = T.zugriff.stufe;
+  if (ort.type === 'portfolio') return vertraulich ? s.vertraulichPortfolio : s.offenPortfolio;
+  return geerbt ? s.geerbtProjekt : vertraulich ? s.vertraulichProjekt : s.offenProjekt;
 }
 
-/** Was alle Mitglieder ohne weitere Rolle hier dürfen (Master Entscheide 13, 14). */
+/** Was alle Mitglieder ohne weitere Rolle hier dürfen (Master Entscheide 13, 14, 22). */
 export function zugriffMitglieder(ort: ZugriffOrt, vertraulich?: boolean): string {
-  if (ort.type === 'portfolio') return T.zugriff.mitgliederPortfolio;
-  return vertraulich ? T.zugriff.mitgliederVertraulich : T.zugriff.mitgliederProjekt;
+  if (vertraulich) return T.zugriff.mitgliederVertraulich;
+  return ort.type === 'portfolio' ? T.zugriff.mitgliederPortfolio : T.zugriff.mitgliederProjekt;
 }
 
 /** Schaltfläche im Kopf; `bereich` ist die Adresse des Bereichs «Zugriff» (UI-51). */
@@ -71,7 +68,7 @@ function KurzUebersicht({ ort, label, vertraulich, bereich, onClose }: { ort: Zu
     const r = x.reasons[0];
     if (!r) return '.';
     const h = zugriffHerkunft(r, ort);
-    return T.zugriff.grund(authz.relationLabel(r.relation), h === 'hier' ? T.zugriff.wo[ort.type] : T.zugriff.wo[h]);
+    return T.zugriff.grund(h === 'hier' ? T.zugriff.wo[ort.type] : T.zugriff.wo[h]);
   };
   const du = schreiben.data?.allowed ? `${T.zugriff.duBearbeiten[ort.type]}${grund(schreiben.data)}`
     : lesen.data?.allowed ? `${T.zugriff.duLesen[ort.type]}${grund(lesen.data)}`
@@ -108,8 +105,7 @@ function KurzUebersicht({ ort, label, vertraulich, bereich, onClose }: { ort: Zu
                     <li key={rel}>
                       <details>
                         <summary>
-                          <span className="zk-rolle">{authz.relationLabel(rel)}</span>
-                          {darf ? <span className="muted"> · {darf}</span> : null}
+                          <span className="zk-rolle">{darf || authz.relationLabel(rel)}</span>
                           <span className="zk-n" aria-hidden="true">{es.length}</span><span className="sr"> ({T.zugriff.anzahl(es.length)})</span>
                         </summary>
                         <ul className="zk-namen">{es.map(e => <li key={e.id ?? `${e.subject.ref}:${e.place.type}`}>{e.subject.name}</li>)}</ul>

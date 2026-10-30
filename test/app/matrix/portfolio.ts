@@ -33,7 +33,10 @@ export const matrix: Matrix = {
   },
   policies: [
     // Lesesicht, Muster PORTFOLIO (fachmodell.md 3.4)
-    ...portfolioPolicies('portfolio', ['insert', 'update', 'delete']),
+    // Portfolio mit «vertraulich» (Master Entscheid 22, A-76): lesen nur Eingetragene; «vertraulich» setzt auch, wer es führt
+    "ppm.portfolio.portfolio_read RESTRICTIVE SELECT ppm_app USING ((app.has_permission('portfolio:read'::text) OR app.has_permission('portfolio:read'::text, 'portfolio'::text, id)) AND ((NOT vertraulich) OR app.write_all() OR app.has_tuple('portfolio'::text, id, app.relations_of('projekt:read'::text)) OR (EXISTS ( SELECT 1 FROM ppm.projekt p WHERE ((p.tenant_id = portfolio.tenant_id) AND (p.portfolio_id = portfolio.id)))))) CHECK -",
+    "ppm.portfolio.portfolio_update RESTRICTIVE UPDATE ppm_app USING (app.has_permission('portfolio:admin'::text) OR app.has_permission('projekt:write'::text, 'portfolio'::text, id)) CHECK (app.has_permission('portfolio:admin'::text) OR app.has_permission('projekt:write'::text, 'portfolio'::text, id))",
+    ...portfolioPolicies('portfolio', ['insert', 'delete']).slice(1),
     ...portfolioPolicies('gremium', ['insert', 'update', 'delete']),
     ...portfolioPolicies('gremienweg', ['insert', 'update', 'delete']),
     ...portfolioPolicies('sitzungstermin', ['insert', 'delete']),
@@ -58,6 +61,8 @@ export const matrix: Matrix = {
     'GET /v1/portfolios/:id': i => ({ method: 'GET', url: `/v1/portfolios/${i.portfolio}`, kind: 'foreign' }),
     'PATCH /v1/portfolios/:id': i => ({ method: 'PATCH', url: `/v1/portfolios/${i.portfolio}`, body: { name: 'gehackt' }, headers: { 'if-match': 'W/"2"' }, kind: 'foreign' }),
     'DELETE /v1/portfolios/:id': i => ({ method: 'DELETE', url: `/v1/portfolios/${i.portfolio}`, headers: { 'if-match': 'W/"2"' }, kind: 'foreign' }),
+    'PUT /v1/portfolios/:id/vertraulich': i => ({ method: 'PUT', url: `/v1/portfolios/${i.portfolio}/vertraulich`, body: { vertraulich: true }, headers: { 'if-match': 'W/"2"' }, kind: 'foreign' }),
+    'GET /v1/portfolios/:id/vertraulich/wirkung': i => ({ method: 'GET', url: `/v1/portfolios/${i.portfolio}/vertraulich/wirkung`, kind: 'foreign' }),
     'GET /v1/portfolios/:id/gremienweg': i => ({ method: 'GET', url: `/v1/portfolios/${i.portfolio}/gremienweg`, kind: 'foreign' }),
     'PUT /v1/portfolios/:id/gremienweg': i => ({ method: 'PUT', url: `/v1/portfolios/${i.portfolio}/gremienweg`, body: { schritte: [] }, headers: { 'if-match': 'W/"2"' }, kind: 'foreign' }),
     'GET /v1/gremien': i => ({ method: 'GET', url: `/v1/gremien?portfolio=${i.portfolio}`, kind: 'list' }),

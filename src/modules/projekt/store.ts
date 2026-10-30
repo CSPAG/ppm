@@ -10,7 +10,7 @@ import type { Funktion, Lebenszyklus, Phase, ProjektCreateIn, ProjektPatchIn } f
 
 export interface Row {
   id: string; nummer: string; name: string; portfolio_id: string; org_einheit_id: string | null; handlungsfeld_id: string | null;
-  phase: Phase; phasenmodell_id: string | null; lebenszyklus: Lebenszyklus; vertraulich: boolean; herkunft: Record<string, unknown>;
+  phase: Phase; phasenmodell_id: string | null; lebenszyklus: Lebenszyklus; vertraulich: boolean; portfolio_vertraulich: boolean; herkunft: Record<string, unknown>;
   version: number; created_at: Date; updated_at: Date;
   pf_schluessel: string | null; pf_name: string | null; pf_kategorie: 'A' | 'B' | 'C' | null; hf_label: string | null;
   sponsor: string | null; projektleitung: string | null; rollen: Funktion[];
@@ -22,7 +22,7 @@ export interface Row {
 
 const T = `${SCHEMA}.projekt`;
 const P = `${SCHEMA}.projekt_person`;
-const COLS = 'id, nummer, name, portfolio_id, org_einheit_id, handlungsfeld_id, phase, phasenmodell_id, lebenszyklus, vertraulich, herkunft, version, created_at, updated_at, geaendert_nach_abschluss_at';
+const COLS = 'id, nummer, name, portfolio_id, org_einheit_id, handlungsfeld_id, phase, phasenmodell_id, lebenszyklus, vertraulich, portfolio_vertraulich, herkunft, version, created_at, updated_at, geaendert_nach_abschluss_at';
 
 /** Projekt mit Portfolio, Handlungsfeld (falls sichtbar), Projektauftraggeber:in, Projektleitung und eigenen Funktionen. */
 const SELECT = `

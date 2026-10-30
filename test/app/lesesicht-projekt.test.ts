@@ -1,8 +1,9 @@
 /**
  * Lesesicht = `can` für Projekte (identity-kit 7.6, docs/fachmodell.md 3.4, Abnahme AP-E0-1): Was die Policy von
  * `ppm.projekt` je Person liefert, deckt sich mit der Entscheidung des Baukastens (`can('projekt:read')`), ergänzt um die
- * Regel «vertraulich» (A-34: nur Projektrollen, UE und Gremium des Portfolios). Ebenso Schreiben (`projekt:write`) und
- * Anlegen (`projekt:create` an org oder am Portfolio). Fälle: Rolle an der Organisation, am Portfolio, am Projekt.
+ * Regel «vertraulich» (Master Entscheid 22, A-76: nur wer am Projekt oder am Portfolio eingetragen ist, und «alle Portfolios
+ * führen»; ein vertrauliches Portfolio macht seine Projekte vertraulich). Ebenso Schreiben (`projekt:write`) und Anlegen
+ * (`projekt:create` an org oder am Portfolio). Fälle: Rolle an der Organisation, am Portfolio, am Projekt.
  */
 import assert from 'node:assert/strict';
 import { dbTests, postgresSkip } from '@vollholz/iam-testkit';
@@ -12,26 +13,33 @@ import { full, tenant } from './harness.ts';
 
 const { after, before, describe, test } = dbTests(await postgresSkip());
 
+/** Portfolios mit Kennzeichen «vertraulich» (v: vertraulich, A-76). */
+const PORTFOLIOS = { a: false, c: false, v: true } as const;
+
 /** Projekte: Portfolio und Kennzeichen «vertraulich». */
 const PROJEKTE = {
   '2026-001': { portfolio: 'a', vertraulich: false },
   '2026-002': { portfolio: 'a', vertraulich: true },
   '2026-003': { portfolio: 'c', vertraulich: false },
   '2026-004': { portfolio: 'c', vertraulich: true },
+  '2026-005': { portfolio: 'v', vertraulich: false },
 } as const;
 type Nr = keyof typeof PROJEKTE;
 
 /** Personen mit ihren Tupeln und dem, was sie lesen und ändern sollen (fachmodell.md 3.3). */
-const FAELLE: { sub: string; tupel: { rolle: string; ort: 'org' | 'portfolio:a' | 'portfolio:c' | `projekt:${Nr}` }[]; liest: Nr[]; aendert: Nr[]; legtAn: ('a' | 'c')[] }[] = [
+const FAELLE: { sub: string; tupel: { rolle: string; ort: 'org' | 'portfolio:a' | 'portfolio:c' | 'portfolio:v' | `projekt:${Nr}` }[]; liest: Nr[]; aendert: Nr[]; legtAn: ('a' | 'c')[] }[] = [
   { sub: 'ohne', tupel: [], liest: [], aendert: [], legtAn: [] },
-  { sub: 'ue', tupel: [{ rolle: 'alle-fuehren', ort: 'org' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: ['2026-001', '2026-002', '2026-003', '2026-004'], legtAn: ['a', 'c'] },
-  { sub: 'gl', tupel: [{ rolle: 'alle-lesen', ort: 'org' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: [], legtAn: [] },
+  { sub: 'ue', tupel: [{ rolle: 'alle-fuehren', ort: 'org' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004', '2026-005'], aendert: ['2026-001', '2026-002', '2026-003', '2026-004', '2026-005'], legtAn: ['a', 'c'] },
+  // «alle Portfolios lesen» sieht vertrauliche Projekte nur, wenn eingetragen (Master Entscheid 22)
+  { sub: 'gl', tupel: [{ rolle: 'alle-lesen', ort: 'org' }], liest: ['2026-001', '2026-003'], aendert: [], legtAn: [] },
+  { sub: 'gl-mitlesen-c', tupel: [{ rolle: 'alle-lesen', ort: 'org' }, { rolle: 'portfolio-mitlesen', ort: 'portfolio:c' }], liest: ['2026-001', '2026-003', '2026-004'], aendert: [], legtAn: [] },
+  { sub: 'mitlesen-v', tupel: [{ rolle: 'portfolio-mitlesen', ort: 'portfolio:v' }], liest: ['2026-005'], aendert: [], legtAn: [] },
   { sub: 'gremium-a', tupel: [{ rolle: 'gremium', ort: 'portfolio:a' }], liest: ['2026-001', '2026-002'], aendert: [], legtAn: [] },
   { sub: 'direktion-c', tupel: [{ rolle: 'portfolio-steuern', ort: 'portfolio:c' }], liest: ['2026-003', '2026-004'], aendert: [], legtAn: [] },
   { sub: 'fuehrt-c', tupel: [{ rolle: 'portfolio-fuehren', ort: 'portfolio:c' }], liest: ['2026-003', '2026-004'], aendert: ['2026-003', '2026-004'], legtAn: ['c'] },
   { sub: 'pl-002', tupel: [{ rolle: 'projekt-fuehren', ort: 'projekt:2026-002' }], liest: ['2026-002'], aendert: ['2026-002'], legtAn: [] },
   { sub: 'kt-004', tupel: [{ rolle: 'projekt-mitlesen', ort: 'projekt:2026-004' }], liest: ['2026-004'], aendert: [], legtAn: [] },
-  { sub: 'gl-sp-004', tupel: [{ rolle: 'alle-lesen', ort: 'org' }, { rolle: 'projekt-steuern', ort: 'projekt:2026-004' }], liest: ['2026-001', '2026-002', '2026-003', '2026-004'], aendert: [], legtAn: [] },
+  { sub: 'gl-sp-004', tupel: [{ rolle: 'alle-lesen', ort: 'org' }, { rolle: 'projekt-steuern', ort: 'projekt:2026-004' }], liest: ['2026-001', '2026-003', '2026-004'], aendert: [], legtAn: [] },
 ];
 
 describe('Lesesicht = can: Projekte', () => {
@@ -44,10 +52,10 @@ describe('Lesesicht = can: Projekte', () => {
     api = await testApi();
     T = await tenant(api.t.runtime, 'acme');
     await full(api.t.runtime, T, async tx => {
-      for (const k of ['a', 'c']) {
+      for (const [k, vertraulich] of Object.entries(PORTFOLIOS)) {
         portfolio[k] = (await tx.query<{ id: string }>(
-          'INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten) VALUES ($1, $2, $3, $3, $4) RETURNING id',
-          [T, k.toUpperCase(), k, k === 'a'])).rows[0]!.id;
+          'INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten, vertraulich) VALUES ($1, $2, $3, $3, $4, $5) RETURNING id',
+          [T, k === 'v' ? 'B' : k.toUpperCase(), k, k !== 'c', vertraulich])).rows[0]!.id;
       }
       for (const [nr, p] of Object.entries(PROJEKTE)) {
         projekt[nr as Nr] = (await tx.query<{ id: string }>(
@@ -72,16 +80,20 @@ describe('Lesesicht = can: Projekte', () => {
     } as unknown as Principal;
   }
 
-  /** Erwartung aus der Entscheidung: `can(projekt:read)` und Regel «vertraulich» (Projektrolle oder projekt:vertraulich an org/Portfolio). */
+  /**
+   * Erwartung aus der Entscheidung: `can(projekt:read)` und Regel «vertraulich» (Master Entscheid 22): Tupel am Projekt
+   * oder am Portfolio, oder alle Portfolios führen (`projekt:write` an der Organisation).
+   */
   async function sollLesen(p: Principal, nr: Nr): Promise<boolean> {
     const ref = { type: 'projekt', id: projekt[nr] };
     if (!await api.iam.access.can(p, 'projekt:read', ref)) return false;
-    if (!PROJEKTE[nr].vertraulich) return true;
+    const pf = PROJEKTE[nr].portfolio;
+    if (!PROJEKTE[nr].vertraulich && !PORTFOLIOS[pf]) return true;
     const rollen = api.iam.access.relationsWith('projekt:read');
-    const amProjekt = await full(api.t.runtime, T, async tx => (await tx.query(
-      `SELECT 1 FROM ppm.authz_tuple WHERE object_type = 'projekt' AND object_id = $1 AND subject = ANY ($2) AND relation = ANY ($3)
-         AND (expires_at IS NULL OR expires_at > now())`, [projekt[nr], p.subjects, rollen])).rowCount! > 0);
-    return amProjekt || await api.iam.access.can(p, 'projekt:vertraulich', { type: 'portfolio', id: portfolio[PROJEKTE[nr].portfolio] });
+    const tupel = (typ: string, id: string) => full(api.t.runtime, T, async tx => (await tx.query(
+      `SELECT 1 FROM ppm.authz_tuple WHERE object_type = $1 AND object_id = $2 AND subject = ANY ($3) AND relation = ANY ($4)
+         AND (expires_at IS NULL OR expires_at > now())`, [typ, id, p.subjects, rollen])).rowCount! > 0);
+    return await tupel('projekt', projekt[nr]) || await tupel('portfolio', portfolio[pf]!) || await api.iam.access.can(p, 'projekt:write', { type: 'org' });
   }
 
   test('Lesen, Ändern und Anlegen je Rolle wie die Entscheidung', async () => {
@@ -137,6 +149,7 @@ describe('Lesesicht = can: Projekte', () => {
         [Object.keys(projekt), Object.values(projekt)])).rows;
       assert.deepEqual(r.map(x => [x.nr, x.s, x.pf]), [
         ['2026-001', true, portfolio.a], ['2026-002', true, portfolio.a], ['2026-003', false, null], ['2026-004', false, null],
+        ['2026-005', false, null],
       ]);
     });
   });

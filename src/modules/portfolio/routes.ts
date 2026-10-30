@@ -13,8 +13,10 @@ import { record } from '../../platform.ts';
 import { schritte } from './gremienweg.ts';
 import {
   Gremienschritt, Gremienweg, GremienwegPut, GremienQuery, Gremium, GremiumCreate, GremiumList, GremiumPatch, ListQuery, Portfolio,
-  PortfolioCreate, PortfolioList, PortfolioPatch, Sitzungstermin, SitzungsterminCreate, SitzungsterminList, TermineQuery, TerminParams,
+  PortfolioCreate, PortfolioList, PortfolioPatch, PortfolioVertraulichPut, PortfolioWirkung, Sitzungstermin, SitzungsterminCreate,
+  SitzungsterminList, TermineQuery, TerminParams,
   type GremienwegPutIn, type GremiumCreateIn, type GremiumOut, type GremiumPatchIn, type PortfolioCreateIn, type PortfolioOut, type PortfolioPatchIn,
+  type PortfolioVertraulichPutIn,
 } from './schemas.ts';
 import * as store from './store.ts';
 
@@ -24,13 +26,17 @@ const TAG = 'Portfolios';
 type Can = { admin: boolean };
 const capabilities = async (req: FastifyRequest): Promise<Can> => ({ admin: await req.can('portfolio:admin') });
 
-function portfolioOut(r: store.PortfolioRow, can: Can): PortfolioOut {
+/** «vertraulich» umstellen darf, wer das Portfolio führt (`projekt:write` am Portfolio; Master Entscheid 22, A-76). */
+const ortVon = (id: string) => ({ type: 'portfolio', id });
+
+async function portfolioOut(req: FastifyRequest, r: store.PortfolioRow, can: Can): Promise<PortfolioOut> {
   return {
     id: r.id, kategorie: r.kategorie, schluessel: r.schluessel, name: r.name, pflichten: r.pflichten, orgEinheitId: r.org_einheit_id,
-    version: r.version, createdAt: r.created_at, createdBy: r.created_by, updatedAt: r.updated_at, updatedBy: r.updated_by, can,
+    vertraulich: r.vertraulich, version: r.version, createdAt: r.created_at, createdBy: r.created_by, updatedAt: r.updated_at,
+    updatedBy: r.updated_by, can: { ...can, vertraulich: await req.can('projekt:write', ortVon(r.id)) },
   };
 }
-const portfolioSnapshot = (r: store.PortfolioRow) => ({ id: r.id, kategorie: r.kategorie, schluessel: r.schluessel, name: r.name, pflichten: r.pflichten, orgEinheitId: r.org_einheit_id, version: r.version });
+const portfolioSnapshot = (r: store.PortfolioRow) => ({ id: r.id, kategorie: r.kategorie, schluessel: r.schluessel, name: r.name, pflichten: r.pflichten, orgEinheitId: r.org_einheit_id, vertraulich: r.vertraulich, version: r.version });
 
 function gremiumOut(r: store.GremiumRow, can: Can): GremiumOut {
   return {
@@ -77,7 +83,7 @@ function pruefeGremienweg(body: GremienwegPutIn, gremien: readonly store.Gremium
 }
 
 export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
-  for (const s of [Portfolio, PortfolioList, PortfolioCreate, PortfolioPatch, Gremium, GremiumList, GremiumCreate, GremiumPatch,
+  for (const s of [Portfolio, PortfolioList, PortfolioCreate, PortfolioPatch, PortfolioVertraulichPut, PortfolioWirkung, Gremium, GremiumList, GremiumCreate, GremiumPatch,
     Gremienschritt, Gremienweg, GremienwegPut, Sitzungstermin, SitzungsterminList, SitzungsterminCreate]) app.addSchema(s);
 
   // --- Portfolios ---------------------------------------------------------------------------------------------------
@@ -93,7 +99,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const page = rows.slice(0, limit);
     const can = await capabilities(req);
     const last = page[page.length - 1];
-    return { items: page.map(r => portfolioOut(r, can)), nextCursor: rows.length > limit && last ? encodeCursor({ k: last.kategorie, n: last.name, i: last.id }) : null };
+    return { items: await Promise.all(page.map(r => portfolioOut(req, r, can))), nextCursor: rows.length > limit && last ? encodeCursor({ k: last.kategorie, n: last.name, i: last.id }) : null };
   });
 
   app.get('/v1/portfolios/:id', {
@@ -104,7 +110,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
     const row = await req.tx(tx => store.getPortfolio(tx, id));
     if (!row) throw notFound('Portfolio');
     reply.header('etag', etag(row.version));
-    return portfolioOut(row, await capabilities(req));
+    return portfolioOut(req, row, await capabilities(req));
   });
 
   app.post('/v1/portfolios', {
@@ -123,7 +129,7 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       await record(tx, who, { action: 'portfolio.created', resourceType: 'portfolio', resourceId: r.id, data: portfolioSnapshot(r), event: portfolioSnapshot(r) });
       return r;
     });
-    return reply.code(201).header('location', `/v1/portfolios/${row.id}`).header('etag', etag(row.version)).send(portfolioOut(row, await capabilities(req)));
+    return reply.code(201).header('location', `/v1/portfolios/${row.id}`).header('etag', etag(row.version)).send(await portfolioOut(req, row, await capabilities(req)));
   });
 
   app.patch('/v1/portfolios/:id', {
@@ -145,7 +151,49 @@ export function registerRoutes(app: FastifyInstance, _deps: Deps): void {
       return r;
     });
     reply.header('etag', etag(row.version));
-    return portfolioOut(row, await capabilities(req));
+    return portfolioOut(req, row, await capabilities(req));
+  });
+
+  // «vertraulich» am Portfolio (Master Entscheid 22, A-76): umstellen darf, wer es führt; die Projekte folgen (Trigger)
+  app.put('/v1/portfolios/:id/vertraulich', {
+    schema: {
+      tags: [TAG], summary: 'Portfolio vertraulich machen oder öffnen',
+      description: 'Vertraulich sehen das Portfolio und seine Projekte nur Eingetragene am Portfolio oder an seinen Projekten und «alle Portfolios führen». Recht `projekt:write` am Portfolio (Portfolio führen, alle Portfolios führen); nur mit `If-Match`. Steht im Änderungsprotokoll.',
+      params: IdParams, headers: IfMatchHeaders, body: Type.Ref('PortfolioVertraulichPut'), response: { 200: Type.Ref('Portfolio') },
+    },
+  }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const version = requireIfMatch(req);
+    await req.need('projekt:write', ortVon(id));
+    const { vertraulich } = req.body as PortfolioVertraulichPutIn;
+    const who = actorOf(req);
+    const row = await req.tx(async tx => {
+      const before = await store.getPortfolio(tx, id);
+      if (!before) throw notFound('Portfolio');
+      if (before.version !== version) throw preconditionFailed(before.version);
+      if (before.vertraulich === vertraulich) return before;
+      const r = await store.setVertraulich(tx, id, version, vertraulich);
+      if (!r) throw preconditionFailed(before.version);
+      await record(tx, who, { action: 'portfolio.updated', resourceType: 'portfolio', resourceId: id, data: { before: portfolioSnapshot(before), after: portfolioSnapshot(r) }, event: portfolioSnapshot(r) });
+      return r;
+    });
+    reply.header('etag', etag(row.version));
+    return portfolioOut(req, row, await capabilities(req));
+  });
+
+  app.get('/v1/portfolios/:id/vertraulich/wirkung', {
+    schema: {
+      tags: [TAG], summary: 'Wirkung von «vertraulich» am Portfolio',
+      description: 'Anzahl Projekte und eingereichte Ideen, die mit dem Portfolio vertraulich werden (Wirkung vor dem Umstellen, I-F5). Recht `projekt:write` am Portfolio.',
+      params: IdParams, response: { 200: Type.Ref('PortfolioWirkung') },
+    },
+  }, async req => {
+    const { id } = req.params as { id: string };
+    await req.need('projekt:write', ortVon(id));
+    return req.tx(async tx => {
+      if (!(await store.getPortfolio(tx, id))) throw notFound('Portfolio');
+      return store.wirkungVertraulich(tx, id);
+    });
   });
 
   app.delete('/v1/portfolios/:id', {

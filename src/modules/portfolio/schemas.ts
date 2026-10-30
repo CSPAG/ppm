@@ -13,6 +13,10 @@ export const GateCode = Type.Union(GATES.map(g => Type.Literal(g)), { descriptio
 export const Datum = Type.String({ pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$', description: 'Datum (JJJJ-MM-TT).', examples: ['2026-11-18'] });
 
 const PortfolioCan = Type.Object({ admin: Type.Boolean() }, { description: 'Was die anfragende Person damit darf.' });
+const PortfolioObjektCan = Type.Object({
+  admin: Type.Boolean(),
+  vertraulich: Type.Boolean({ description: '«vertraulich» umstellen: wer das Portfolio führt (`projekt:write` am Portfolio, Master Entscheid 22).' }),
+}, { description: 'Was die anfragende Person damit darf.' });
 
 export const Portfolio = Type.Object({
   id: Uuid,
@@ -21,12 +25,13 @@ export const Portfolio = Type.Object({
   name: Type.String(),
   pflichten: Type.Boolean({ description: 'Vertrag, Quality-Check, Gates und Monatsbericht sind Pflicht (A und B, A-07); bei C freiwillig (A-08).' }),
   orgEinheitId: Nullable(Uuid),
+  vertraulich: Type.Boolean({ description: 'Nur Eingetragene am Portfolio oder an seinen Projekten und «alle Portfolios führen» sehen es; seine Projekte sind vertraulich (Master Entscheid 22, A-76).' }),
   version: Type.Integer({ minimum: 1 }),
   createdAt: DateTime,
   createdBy: Nullable(Uuid),
   updatedAt: DateTime,
   updatedBy: Nullable(Uuid),
-  can: PortfolioCan,
+  can: PortfolioObjektCan,
 }, { $id: 'Portfolio', additionalProperties: false });
 export type PortfolioOut = Static<typeof Portfolio>;
 
@@ -43,6 +48,16 @@ export const PortfolioPatch = Type.Object({
   orgEinheitId: Type.Optional(Nullable(Uuid)),
 }, { $id: 'PortfolioPatch', additionalProperties: false, minProperties: 1 });
 export type PortfolioPatchIn = Static<typeof PortfolioPatch>;
+
+export const PortfolioVertraulichPut = Type.Object({
+  vertraulich: Type.Boolean(),
+}, { $id: 'PortfolioVertraulichPut', additionalProperties: false });
+export type PortfolioVertraulichPutIn = Static<typeof PortfolioVertraulichPut>;
+
+export const PortfolioWirkung = Type.Object({
+  projekte: Type.Integer({ minimum: 0, description: 'Projekte des Portfolios; sie werden mit ihm vertraulich.' }),
+  ideen: Type.Integer({ minimum: 0, description: 'Eingereichte Ideen mit Zuordnung zum Portfolio.' }),
+}, { $id: 'PortfolioWirkung', additionalProperties: false });
 
 export const PortfolioList = Type.Object({ items: Type.Array(Type.Ref('Portfolio')), nextCursor: NextCursor }, { $id: 'PortfolioList', additionalProperties: false });
 

@@ -42,6 +42,10 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
         projekt[nr] = (await tx.query<{ id: string }>('INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id, vertraulich) VALUES ($1, $2, $3, $4, $5) RETURNING id',
           [tenantId, nr, `Projekt ${nr}`, pf, vertraulich])).rows[0]!.id;
       }
+      // Projekt ohne eigene Stufe in einem vertraulichen Portfolio (Master Entscheid 22)
+      const pv = (await tx.query<{ id: string }>("INSERT INTO ppm.portfolio (tenant_id, kategorie, schluessel, name, pflichten, vertraulich) VALUES ($1, 'A', 'uebernahme', 'Übernahme', true, true) RETURNING id", [tenantId])).rows[0]!.id;
+      projekt['2027-003'] = (await tx.query<{ id: string }>('INSERT INTO ppm.projekt (tenant_id, nummer, name, portfolio_id) VALUES ($1, $2, $3, $4) RETURNING id',
+        [tenantId, '2027-003', 'Projekt 2027-003', pv])).rows[0]!.id;
     });
   });
   after(async () => { await api?.close(); });
@@ -129,7 +133,7 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
     const jz = (await call('GET', '/v1/jahresziele?jahr=2027', gl)).json().items[0];
     // Zuordnung über die Datenbank (Projekte sind für die GL nur teilweise sichtbar)
     await full(api.t.runtime, tenantId, async tx => {
-      for (const nr of ['2027-001', '2027-002']) {
+      for (const nr of ['2027-001', '2027-002', '2027-003']) {
         await tx.query('INSERT INTO ppm.ziel_projekt (tenant_id, projekt_id, strategisches_ziel_id, jahresziel_id) VALUES ($1, $2, $3, $4)', [tenantId, projekt[nr], ziel21, jz.id]);
       }
     });
@@ -155,7 +159,7 @@ describe('Freigabe der Jahresziele und Roadmap', () => {
       const [wirt, inno] = r.json().inhalt.handlungsfelder;
       assert.deepEqual([wirt.label, inno.label], ['Wirtschaftlichkeit', 'Innovation']);
       const j = wirt.ziele[0].jahresziele.find((x: { nummer: string }) => x.nummer === jz.nummer);
-      assert.deepEqual(j.projekte.map((x: { nummer: string }) => x.nummer), ['2027-001'], 'vertrauliches Projekt fehlt (A-34)');
+      assert.deepEqual(j.projekte.map((x: { nummer: string }) => x.nummer), ['2027-001'], 'vertrauliches Projekt fehlt (A-34), auch im vertraulichen Portfolio (Master Entscheid 22)');
     }
     const ha = (await call('GET', '/v1/roadmap/2027', leser)).json().inhalt.handlungsfelder[0].ziele[0].jahresziele.flatMap((x: { hauptaktivitaeten: unknown[] }) => x.hauptaktivitaeten);
     assert.deepEqual(ha, [{ text: 'Rahmenverträge', verantwortlich: 'Anna Muster' }]);

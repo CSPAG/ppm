@@ -1,6 +1,7 @@
 /**
  * Datenzugriff der Roadmap (PP.04.03): Inhalt aus Zielen, Jahreszielen, Hauptaktivitäten und Vorhaben zusammenstellen
- * (Lesesicht der publizierenden Person, vertrauliche Projekte ausgenommen, A-34) und den Stand je Jahr speichern.
+ * (Lesesicht der publizierenden Person, vertrauliche Projekte ausgenommen, A-34; auch die eines vertraulichen Portfolios,
+ * Master Entscheid 22) und den Stand je Jahr speichern.
  */
 import type { Tx } from '@vollholz/platform';
 import { SCHEMA } from '../../platform.ts';
@@ -31,7 +32,7 @@ export async function inhalt(tx: Tx, jahr: number): Promise<RoadmapInhaltOut> {
     `SELECT z.strategisches_ziel_id, z.jahresziel_id, p.nummer, p.name, p.phase, p.lebenszyklus
        FROM ${SCHEMA}.ziel_projekt z JOIN ${SCHEMA}.projekt p ON p.id = z.projekt_id
        LEFT JOIN ${SCHEMA}.jahresziel j ON j.id = z.jahresziel_id
-      WHERE NOT p.vertraulich AND (z.jahresziel_id IS NULL OR j.jahr = $1)
+      WHERE NOT (p.vertraulich OR p.portfolio_vertraulich) AND (z.jahresziel_id IS NULL OR j.jahr = $1)
       ORDER BY p.nummer`, [jahr])).rows;
   const projekt = (p: PrRow) => ({ nummer: p.nummer, name: p.name, phase: p.phase, lebenszyklus: p.lebenszyklus });
   const felder = new Map<string, RoadmapInhaltOut['handlungsfelder'][number]>();

@@ -5,7 +5,10 @@ import type { Art } from './rechnen.ts';
 
 const S = SCHEMA;
 
+/** `vertraulich`: am Projekt oder geerbt vom Portfolio (Master Entscheid 22). */
 export interface ProjektRow { id: string; nummer: string; name: string; phase: string; lebenszyklus: string; portfolio_id: string; phasenmodell_id: string | null; vertraulich: boolean }
+
+const PCOLS = 'id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id, (vertraulich OR portfolio_vertraulich) AS vertraulich';
 
 /**
  * Projekte des Portfolios (bzw. alle sichtbaren) mit sichtbaren Beträgen; das Modul projekt bietet (noch) keine Abfrage
@@ -13,13 +16,13 @@ export interface ProjektRow { id: string; nummer: string; name: string; phase: s
  */
 export async function projekte(tx: Tx, o: { portfolioId?: string; alle?: boolean } = {}): Promise<ProjektRow[]> {
   return (await tx.query<ProjektRow>(
-    `SELECT id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id, vertraulich FROM ${S}.projekt p
+    `SELECT ${PCOLS} FROM ${S}.projekt p
      WHERE ($1::uuid IS NULL OR p.portfolio_id = $1) AND ($2 OR p.lebenszyklus = 'aktiv') AND ${S}.betrag_sichtbar(p.id)
      ORDER BY nummer`, [o.portfolioId ?? null, !!o.alle])).rows;
 }
 
 export async function projekt(tx: Tx, id: string): Promise<ProjektRow | null> {
-  return (await tx.query<ProjektRow>(`SELECT id, nummer, name, phase, lebenszyklus, portfolio_id, phasenmodell_id, vertraulich FROM ${S}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
+  return (await tx.query<ProjektRow>(`SELECT ${PCOLS} FROM ${S}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
 // Kostenträger (A-16)

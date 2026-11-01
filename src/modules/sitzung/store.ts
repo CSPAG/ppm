@@ -46,11 +46,10 @@ export async function termineAlle(tx: Tx, von: string, bis: string): Promise<{ g
     .map(({ datum, ...g }) => ({ gremium: g, datum }));
 }
 
-/** `vertraulich`: am Projekt oder geerbt vom Portfolio (Master Entscheid 22, 471). */
 export interface ProjektKurz { id: string; nummer: string; name: string; phase: string; portfolio_id: string; vertraulich: boolean }
 
 export async function projekt(tx: Tx, id: string): Promise<ProjektKurz | null> {
-  return (await tx.query<ProjektKurz>(`SELECT id, nummer, name, phase, portfolio_id, (vertraulich OR portfolio_vertraulich) AS vertraulich FROM ${SCHEMA}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
+  return (await tx.query<ProjektKurz>(`SELECT id, nummer, name, phase, portfolio_id, vertraulich FROM ${SCHEMA}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
 /** Projektleitung und Projektauftraggeber:in des Projekts (Einladung je Geschäft, UC-006 Schritt 2). */
@@ -166,6 +165,16 @@ const TFROM = `${T} t LEFT JOIN ${SCHEMA}.projekt p ON p.tenant_id = t.tenant_id
 
 export async function getTraktandum(tx: Tx, id: string): Promise<TraktandumRow | null> {
   return (await tx.query<TraktandumRow>(`SELECT ${TCOLS} FROM ${TFROM} WHERE t.id = $1`, [id])).rows[0] ?? null;
+}
+
+/**
+ * Lesesicht für das Protokoll (Master Entscheid 22): IDs der Traktanden der Sitzung und Nummern der genannten Projekte,
+ * die die Person sieht (ein vertrauliches Projekt nur Eingetragene).
+ */
+export async function protokollSicht(tx: Tx, sitzungId: string, nummern: readonly string[]): Promise<{ traktanden: Set<string>; projekte: Set<string> }> {
+  const t = (await tx.query<{ id: string }>(`SELECT id FROM ${T} WHERE sitzung_id = $1 OR verschoben_von = $1`, [sitzungId])).rows;
+  const p = (await tx.query<{ nummer: string }>(`SELECT nummer FROM ${SCHEMA}.projekt WHERE nummer = ANY ($1::text[])`, [nummern])).rows;
+  return { traktanden: new Set(t.map(r => r.id)), projekte: new Set(p.map(r => r.nummer)) };
 }
 
 /** Traktandenliste der Sitzung in ihrer Reihenfolge. */

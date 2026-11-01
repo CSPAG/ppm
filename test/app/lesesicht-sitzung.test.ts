@@ -101,10 +101,34 @@ describe('Lesesicht der Sitzungen bei «vertraulich»', () => {
     assert.deepEqual([s.sitzungen, s.traktanden, s.einladungen], [['v'], ['v-offen'], 1]);
   });
 
-  test('Protokoll: vertrauliche Traktanden nur in der Lesesicht', () => {
-    const t = (id: string, vertraulich: boolean) => ({ traktandumId: id, vertraulich }) as unknown as ProtokollInhalt['traktanden'][number];
-    const inhalt = { traktanden: [t('x', false), t('y', true), t('z', true)] } as unknown as ProtokollInhalt;
-    assert.deepEqual(fuerLeser(inhalt, new Set(['x', 'z'])).traktanden.map(x => x.traktandumId), ['x', 'z']);
-    assert.deepEqual(fuerLeser(inhalt, new Set()).traktanden.map(x => x.traktandumId), ['x']);
+  test('Später vertraulich: Portfolio umstellen schützt bestehende Traktanden (laufend abgeleitet)', async () => {
+    const gl = await wer('gl', [{ rolle: 'alle-lesen', ort: 'org' }]);
+    const gremiumA = await wer('gremium-a', [{ rolle: 'gremium', ort: 'portfolio:a' }]);
+    await full(api.t.runtime, T, tx => tx.query('UPDATE ppm.portfolio SET vertraulich = true WHERE id = $1', [portfolio.a]));
+    try {
+      assert.deepEqual((await sieht(gl)).traktanden, [], 'alle lesen: nichts mehr aus dem vertraulichen Portfolio');
+      assert.deepEqual((await sieht(gremiumA)).traktanden, ['a-offen', 'a-vertraulich'], 'Gremium am Portfolio weiter');
+    } finally {
+      await full(api.t.runtime, T, tx => tx.query('UPDATE ppm.portfolio SET vertraulich = false WHERE id = $1', [portfolio.a]));
+    }
+    // nur das Projekt: das Traktandum folgt, ohne dass sein eigenes Kennzeichen geändert wird
+    await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET vertraulich = true WHERE nummer = '2026-001'"));
+    try {
+      assert.deepEqual((await sieht(gl)).traktanden, [], 'alle lesen: a-offen jetzt vertraulich');
+    } finally {
+      await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.projekt SET vertraulich = false WHERE nummer = '2026-001'"));
+    }
+  });
+
+  test('Protokoll: nur Traktanden in der Lesesicht', () => {
+    const t = (id: string, vertraulich: boolean, nummer?: string) =>
+      ({ traktandumId: id, vertraulich, projekt: nummer ? { nummer, name: nummer } : null }) as unknown as ProtokollInhalt['traktanden'][number];
+    // x offen ohne Projekt, y vertraulich, z vertraulich, w offen mit Projekt (später vertraulich: Projekt nicht sichtbar)
+    const inhalt = { traktanden: [t('x', false), t('y', true, '2026-002'), t('z', true, '2026-003'), t('w', false, '2026-001')] } as unknown as ProtokollInhalt;
+    const ids = (traktanden: string[], projekte: string[]) =>
+      fuerLeser(inhalt, { traktanden: new Set(traktanden), projekte: new Set(projekte) }).traktanden.map(x => x.traktandumId);
+    assert.deepEqual(ids(['x', 'z', 'w'], ['2026-001']), ['x', 'z', 'w']);
+    assert.deepEqual(ids([], ['2026-001', '2026-002']), ['x', 'w'], 'von der Sitzung gelöst: offene mit sichtbarem Projekt');
+    assert.deepEqual(ids([], []), ['x'], 'Projekt nicht (mehr) sichtbar');
   });
 });

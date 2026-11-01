@@ -23,10 +23,11 @@ async function lesen(tx: Tx, id: string): Promise<{ s: store.SitzungRow; p: es.P
 }
 
 async function protokollOut(req: FastifyRequest, tx: Tx, s: store.SitzungRow, p: es.ProtokollRow): Promise<ProtokollOut> {
-  const sichtbar = new Set((await store.traktanden(tx, s.id)).map(t => t.id));
+  const inhalt = p.inhalt as ProtokollInhalt;
+  const sicht = await store.protokollSicht(tx, s.id, inhalt.traktanden.flatMap(t => (t.projekt ? [t.projekt.nummer] : [])));
   const versendetAm = p.versendet_at ? new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(p.versendet_at) : null;
   return {
-    sitzungId: s.id, stand: p.stand, inhalt: fuerLeser(p.inhalt as ProtokollInhalt, sichtbar),
+    sitzungId: s.id, stand: p.stand, inhalt: fuerLeser(inhalt, sicht),
     frist: await protokollfrist(tx, s, versendetAm), versendetAt: p.versendet_at, version: p.version, updatedAt: p.updated_at,
     can: { write: p.stand === 'entwurf' && await req.can('sitzung:write', ort(s.portfolio_id)) },
   };

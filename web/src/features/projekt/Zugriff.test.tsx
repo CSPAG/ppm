@@ -182,6 +182,26 @@ describe('Zugriff am Portfolio (UI-51)', () => {
     expect(await screen.findByText(TP.zugriff.portfolioUnbekannt)).toBeInTheDocument();
   });
 
+  it('Gruppe «über seine Projekte»: wer nur an einem Projekt eine Rolle hat, mit «Portfolio auflisten» (A-76)', async () => {
+    const KT_EINTRAG = eintrag({ id: 't3', subject: { ref: `user:${KT}`, kind: 'user', name: 'Peter Kern' }, relation: 'projekt-mitlesen', place: { type: 'projekt', id: ID }, via: 'direct' });
+    stub({
+      'GET /v1/portfolios': () => json({ items: [portfolio({ vertraulich: true })], nextCursor: null }),
+      'GET /v1/projekte': () => json({ items: [projekt()], nextCursor: null }),
+      'GET /v1/access': req => new URL(req.url).searchParams.get('type') === 'portfolio'
+        ? json({ ...liste([]), resource: { type: 'portfolio', id: PF } })
+        // am Projekt: Sandra Huber steht schon am Portfolio, Peter Kern nur hier; Ursula Egli ist geerbt
+        : json({ ...liste([]), items: [...liste([]).items, KT_EINTRAG] }),
+    });
+    const { container } = renderWithIam(<PortfolioZugriffPage portfolio="transformation" setPortfolio={() => {}} />, PL_ME);
+    const g = await screen.findByRole('region', { name: TP.zugriff.gruppeUeberProjekte });
+    expect(await within(g).findByText('Peter Kern')).toBeInTheDocument();
+    expect(within(g).getByText(TP.zugriff.darfAuflisten)).toBeInTheDocument();
+    expect(within(g).getByText(`${TP.zugriff.ueberProjekt('2026-014')} Digitale Patientenaufnahme`)).toBeInTheDocument();
+    expect(within(g).queryByText('Sandra Huber')).not.toBeInTheDocument();
+    expect(within(g).queryByText('Ursula Egli')).not.toBeInTheDocument();
+    await expectNoAxe(container);
+  });
+
   it('Stufe am Portfolio: wer führt, macht es nach der Wirkung vertraulich (Master Entscheid 22, A-76)', async () => {
     const api = stub({
       'GET /v1/portfolios': () => json({ items: [portfolio()], nextCursor: null }),

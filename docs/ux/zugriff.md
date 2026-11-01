@@ -7,7 +7,7 @@ eine Darstellung im Stil der Beschränkungen von Confluence und die Kennzeichnun
 | | |
 |---|---|
 | Stand | 29. Oktober 2026 |
-| Status | Übernommen am 30.10.2026 (Master Entscheid 22, UX-E15, A-76, AP-E9-1); offen K36. Etappe 1 (Anzeigen) ist umgesetzt (#213), Etappe 2 (vertraulich am Portfolio) ist mit AP-E9-1 umgesetzt, bis auf die Gruppe «über seine Projekte». |
+| Status | Übernommen am 30.10.2026 (Master Entscheid 22, UX-E15, A-76, AP-E9-1); offen K36. Etappe 1 (Anzeigen) ist umgesetzt (#213), Etappe 2 (vertraulich am Portfolio) ist mit AP-E9-1 umgesetzt; die Gruppe «über seine Projekte» steht im Bereich «Zugriff», noch nicht in der Kurzübersicht; «darf …» im Dialog «Zugriff geben» braucht den Baukasten. |
 | Betrifft | UI-51, UI-52, UC-016 A2, Master-Entscheide 13, 14, 16, 18, A-34, A-70, A-71, A-73, [darstellung.md](darstellung.md) |
 | Vorbild | Beschränkungen in Confluence ([Doku Cloud](https://support.atlassian.com/confluence-cloud/docs/add-or-remove-page-restrictions/)): Sehen wird an Unterseiten vererbt und kann dort nur enger werden |
 

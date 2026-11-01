@@ -3,7 +3,8 @@
  * steuert oder mitliest, darunter wer über das Portfolio oder übergreifend Zugriff hat, mit «Warum?». Wer am Ort
  * `access:admin` hat, gibt Zugriff (Dialog des Baukastens), befristet oder entfernt ihn; bei einem vertraulichen Projekt
  * steht der Hinweis vor der Liste (UC-016 A2.2). Die Projektorganisation wirkt nicht auf den Zugriff (A-71).
- * Im Stil von Confluence (docs/ux/zugriff.md, Z-3): oben die Stufe, je Zeile «Darf», zuletzt «Alle Mitglieder».
+ * Im Stil von Confluence (docs/ux/zugriff.md, Z-3): oben die Stufe, je Zeile «Darf», zuletzt «Alle Mitglieder»; am
+ * Portfolio dazu «über seine Projekte» (A-76).
  * Seitentyp Liste + Schublade (interaktion.md, `Datenliste`); Daten über `/v1/access` des Baukastens.
  */
 import { GrantDialog, useAccessList, useAuthz, usePatchAccess, useRevoke, WhyDialog, type AccessEntry } from '@vollholz/iam-web';
@@ -13,7 +14,7 @@ import { api } from '../../api/index.ts';
 import {
   Confirm, Datenliste, Drawer, Empty, ErrorState, Hinweis, Icon, Skelett, T, useToast, zugriffDarf, zugriffMitglieder, zugriffStufe, type Spalte,
 } from '../../ui/index.ts';
-import { portfolioWirkung, useProjektNachNummer, usePortfolioVertraulich, useProjektVertraulich, type Projekt } from './api.ts';
+import { portfolioWirkung, useProjektNachNummer, usePortfolioVertraulich, useProjektVertraulich, useUeberProjekte, type Projekt, type UeberProjekt } from './api.ts';
 import { TP } from './texte.ts';
 
 type Ort = { type: 'projekt' | 'portfolio'; id: string };
@@ -35,9 +36,12 @@ const schluessel = (e: AccessEntry) => e.id ?? `${e.via}:${e.subject.ref}:${e.re
  * Liste mit Schublade; gemeinsam für Projekt und Portfolio. `stufe` steht zuoberst (Z-3); die Mitglieder stehen in einer
  * eigenen letzten Zeile statt in der Liste, auch wenn ihre Rolle nichts lesen lässt (Master Entscheide 13, 14).
  */
-export function ZugriffListe({ ort, label, vertraulich, portfolioName, stufe }: { ort: Ort; label: string; vertraulich?: boolean; portfolioName?: string; stufe?: ReactNode }) {
+export function ZugriffListe({ ort, label, vertraulich, portfolioName, portfolioSchluessel, stufe }: {
+  ort: Ort; label: string; vertraulich?: boolean; portfolioName?: string; portfolioSchluessel?: string; stufe?: ReactNode;
+}) {
   const authz = useAuthz();
   const q = useAccessList(ort);
+  const projekte = useUeberProjekte(ort.type === 'portfolio' ? portfolioSchluessel : undefined);
   const [geben, setGeben] = useState(false);
   const [warum, setWarum] = useState(false);
   const [offen, setOffen] = useState<string | null>(null);
@@ -48,6 +52,9 @@ export function ZugriffListe({ ort, label, vertraulich, portfolioName, stufe }: 
   const hier = liste?.items.filter(e => e.via === 'direct' && e.place.type === ort.type);
   const geerbt = liste?.items.filter(e => !(e.via === 'direct' && e.place.type === ort.type) && e.subject.kind !== 'members');
   const eintrag = offen ? liste?.items.find(e => schluessel(e) === offen) ?? null : null;
+  // nur wer nicht schon am Portfolio oder darüber steht (docs/ux/zugriff.md Abschnitt 2)
+  const schonDa = new Set(liste?.items.map(e => e.subject.ref));
+  const ueberProjekte = liste && projekte.data ? projekte.data.filter(u => !schonDa.has(u.eintrag.subject.ref)) : undefined;
 
   const spalten: Spalte<AccessEntry>[] = [
     { key: 'wer', titel: TP.zugriff.wer, art: 'name', zelle: e => e.subject.name },
@@ -79,6 +86,14 @@ export function ZugriffListe({ ort, label, vertraulich, portfolioName, stufe }: 
       {liste && !darf ? <p className="muted small">{TP.zugriff.nurLesen}</p> : null}
       {gruppe(ort.type === 'projekt' ? TP.zugriff.gruppeProjekt : TP.zugriff.gruppePortfolio, hier, TP.zugriff.niemandHier)}
       {liste ? gruppe(TP.zugriff.gruppeGeerbt, geerbt, TP.zugriff.niemand) : null}
+      {liste && ort.type === 'portfolio' ? (
+        <section className="pj-zugriff-g" aria-label={TP.zugriff.gruppeUeberProjekte}>
+          <h2 className="grp-h">{TP.zugriff.gruppeUeberProjekte}</h2>
+          <Datenliste titel={TP.zugriff.gruppeUeberProjekte} spalten={spaltenProjekte} zeilen={ueberProjekte}
+            schluessel={u => `${u.nummer}:${schluessel(u.eintrag)}`} name={u => u.eintrag.subject.name}
+            laedt={projekte.isPending} fehler={projekte.error ?? undefined} erneut={() => void projekte.refetch()} leer={TP.zugriff.niemandUeberProjekte} />
+        </section>
+      ) : null}
       {liste ? (
         <section className="pj-zugriff-g" aria-label={T.zugriff.mitglieder}>
           <h2 className="grp-h">{T.zugriff.mitglieder}</h2>
@@ -96,6 +111,14 @@ export function ZugriffListe({ ort, label, vertraulich, portfolioName, stufe }: 
  * Schublade eines Eintrags: Angaben, «Warum?» für die Person, befristen und entfernen (UC-016 A2.2). Geerbte Einträge
  * ändert man am Ursprung; die Schublade nennt ihn.
  */
+/** Spalten der Gruppe «über seine Projekte»: Name, «Portfolio auflisten», das eigene Projekt (ohne Schublade). */
+const spaltenProjekte: Spalte<UeberProjekt>[] = [
+  { key: 'wer', titel: TP.zugriff.wer, art: 'name', zelle: u => u.eintrag.subject.name },
+  { key: 'darf', titel: TP.zugriff.darf, karte: true, zelle: () => TP.zugriff.darfAuflisten },
+  { key: 'ueber', titel: TP.zugriff.ueber, zelle: u => `${TP.zugriff.ueberProjekt(u.nummer)} ${u.name}` },
+  { key: 'bis', titel: TP.zugriff.befristet, karte: true, zelle: u => (u.eintrag.expiresAt ? TP.zugriff.bis(datum(u.eintrag.expiresAt)) : '–') },
+];
+
 function ZugriffDrawer({ eintrag: e, ort, label, portfolioName, onClose }: { eintrag: AccessEntry; ort: Ort; label: string; portfolioName?: string; onClose(): void }) {
   const authz = useAuthz();
   const id = useId();
@@ -297,7 +320,7 @@ export function PortfolioZugriffPage({ portfolio, setPortfolio }: { portfolio?: 
         {q.isPending ? <Skelett zeilen={4} />
           : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} />
             : !pf ? <Empty>{portfolio ? TP.zugriff.portfolioUnbekannt : TP.zugriff.keinPortfolio}</Empty>
-              : <ZugriffListe key={pf.id} ort={{ type: 'portfolio', id: pf.id }} label={pf.name} portfolioName={pf.name} vertraulich={pf.vertraulich}
+              : <ZugriffListe key={pf.id} ort={{ type: 'portfolio', id: pf.id }} label={pf.name} portfolioName={pf.name} portfolioSchluessel={pf.schluessel} vertraulich={pf.vertraulich}
                 stufe={<PortfolioStufe portfolio={pf} />} />}
       </div>
     </section>

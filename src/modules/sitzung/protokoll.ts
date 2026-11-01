@@ -68,9 +68,16 @@ export async function protokollErzeugen(tx: Tx, s: store.SitzungRow, ts: readonl
   await es.protokollAnlegen(tx, s.id, inhalt);
 }
 
-/** Vertrauliche Traktanden ohne `projekt:vertraulich` ausblenden (A-34, UX-OF-13). */
-export function fuerLeser(inhalt: ProtokollInhalt, vertraulichSichtbar: boolean): ProtokollInhalt {
-  return vertraulichSichtbar ? inhalt : { ...inhalt, traktanden: inhalt.traktanden.filter(t => !t.vertraulich) };
+/**
+ * Traktanden in der Lesesicht der Person (Master Entscheid 22, A-76, UX-OF-13): sichtbar unter RLS, sonst nur nicht als
+ * vertraulich übernommene, deren Projekt die Person sieht. So fehlen vertrauliche auch dann, wenn das Projekt oder sein
+ * Portfolio erst nach der Sitzung vertraulich wurde; nicht behandelte (von der Sitzung gelöst) bleiben für Mitglieder.
+ */
+export function fuerLeser(inhalt: ProtokollInhalt, sicht: { traktanden: ReadonlySet<string>; projekte: ReadonlySet<string> }): ProtokollInhalt {
+  return {
+    ...inhalt,
+    traktanden: inhalt.traktanden.filter(t => sicht.traktanden.has(t.traktandumId) || (!t.vertraulich && (!t.projekt || sicht.projekte.has(t.projekt.nummer)))),
+  };
 }
 
 export interface ProtokollAenderung { anwesende?: string; bemerkungen?: string; notizen?: { traktandumId: string; notiz: string }[] }

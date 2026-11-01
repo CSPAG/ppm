@@ -1,7 +1,7 @@
 /**
  * Routen des Protokolls (BC PP.04.02; UC-006 Schritte 8–9; K3 Schritt 10; AP-E2-2): lesen, bereinigen, Vorschau der
  * Empfänger und versenden. Entwurf nur mit sitzung:write, Mitglieder ab Versand (Lesesicht); vertrauliche Traktanden
- * nur mit projekt:vertraulich (A-34).
+ * nur, wer sie in der Lesesicht sieht (Master Entscheid 22, A-76).
  */
 import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
@@ -23,10 +23,11 @@ async function lesen(tx: Tx, id: string): Promise<{ s: store.SitzungRow; p: es.P
 }
 
 async function protokollOut(req: FastifyRequest, tx: Tx, s: store.SitzungRow, p: es.ProtokollRow): Promise<ProtokollOut> {
-  const vertraulich = await req.can('projekt:vertraulich', ort(s.portfolio_id));
+  const inhalt = p.inhalt as ProtokollInhalt;
+  const sicht = await store.protokollSicht(tx, s.id, inhalt.traktanden.flatMap(t => (t.projekt ? [t.projekt.nummer] : [])));
   const versendetAm = p.versendet_at ? new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(p.versendet_at) : null;
   return {
-    sitzungId: s.id, stand: p.stand, inhalt: fuerLeser(p.inhalt as ProtokollInhalt, vertraulich),
+    sitzungId: s.id, stand: p.stand, inhalt: fuerLeser(inhalt, sicht),
     frist: await protokollfrist(tx, s, versendetAm), versendetAt: p.versendet_at, version: p.version, updatedAt: p.updated_at,
     can: { write: p.stand === 'entwurf' && await req.can('sitzung:write', ort(s.portfolio_id)) },
   };

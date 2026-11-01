@@ -88,6 +88,9 @@ export const TP = {
     nurLesen: 'Den Zugriff ändert, wer hier führt.',
     vertraulich: 'Das Projekt ist vertraulich: Wer hier Zugriff erhält, sieht es mit allen Angaben, auch die Beträge.',
     gruppeProjekt: 'Am Projekt', gruppePortfolio: 'Am Portfolio', gruppeGeerbt: 'Über das Portfolio und übergreifend',
+    // Am Portfolio: wer nur an einem seiner Projekte eine Rolle hat, sieht Name und Projekt (docs/ux/zugriff.md Abschnitt 2, A-76)
+    gruppeUeberProjekte: 'Über seine Projekte', darfAuflisten: 'Portfolio auflisten', ueberProjekt: (nummer: string) => `Projekt ${nummer}`,
+    niemandUeberProjekte: 'Niemand hat nur an einem Projekt dieses Portfolios eine Rolle.',
     wer: 'Person', rolle: 'Rolle', darf: 'Darf', ueber: 'Über', befristet: 'Befristet',
     // Stufe oben (docs/ux/zugriff.md, Z-3): wer das Projekt bearbeitet, stellt «vertraulich» um (I-R1 Stufe 3)
     stufe: 'Wer sieht das Projekt', stufeOffen: 'Alle Mitglieder sehen die Kopfdaten', stufeVertraulich: 'Vertraulich',

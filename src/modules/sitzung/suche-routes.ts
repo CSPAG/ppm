@@ -2,7 +2,7 @@
  * Suche nach Sitzungen für die Befehlspalette (I-N4, docs/ux/informationsarchitektur.md): über alle Gremien, deren
  * Sitzungen die Person sieht, nach Gremium (Kürzel, Name), Datum (`2026-11`, `18.11.`, `18.11.2026`) oder Titel eines
  * Traktandums. Sichtbarkeit wie die Liste: Sitzungen nach `sitzung:read` am Portfolio, Traktanden vor dem Versand nur mit
- * `sitzung:write`, vertrauliche nur mit `projekt:vertraulich` (Lesesicht, A-34) – beides über RLS.
+ * `sitzung:write`, vertrauliche nur für Eingetragene (Lesesicht, A-76) – beides über RLS.
  */
 import { Type, type Static } from '@sinclair/typebox';
 import type { FastifyInstance } from 'fastify';

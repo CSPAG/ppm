@@ -167,6 +167,16 @@ export async function getTraktandum(tx: Tx, id: string): Promise<TraktandumRow |
   return (await tx.query<TraktandumRow>(`SELECT ${TCOLS} FROM ${TFROM} WHERE t.id = $1`, [id])).rows[0] ?? null;
 }
 
+/**
+ * Lesesicht für das Protokoll (Master Entscheid 22): IDs der Traktanden der Sitzung und Nummern der genannten Projekte,
+ * die die Person sieht (ein vertrauliches Projekt nur Eingetragene).
+ */
+export async function protokollSicht(tx: Tx, sitzungId: string, nummern: readonly string[]): Promise<{ traktanden: Set<string>; projekte: Set<string> }> {
+  const t = (await tx.query<{ id: string }>(`SELECT id FROM ${T} WHERE sitzung_id = $1 OR verschoben_von = $1`, [sitzungId])).rows;
+  const p = (await tx.query<{ nummer: string }>(`SELECT nummer FROM ${SCHEMA}.projekt WHERE nummer = ANY ($1::text[])`, [nummern])).rows;
+  return { traktanden: new Set(t.map(r => r.id)), projekte: new Set(p.map(r => r.nummer)) };
+}
+
 /** Traktandenliste der Sitzung in ihrer Reihenfolge. */
 export async function traktanden(tx: Tx, sitzungId: string): Promise<TraktandumRow[]> {
   return (await tx.query<TraktandumRow>(

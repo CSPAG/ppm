@@ -1,0 +1,25 @@
+# Ausnahmen für den OSV-Scanner (CI-Job «Abhängigkeiten»), gilt für web/package-lock.json.
+#
+# GHSA-g3hv-75wg-m249 (minimatch, mittlere Schwere, behoben ab 11.0.1): Wo die Aufrufer minimatch 11
+# vertragen, hebt `overrides` in web/package.json an (ESLint, typescript-eslint). Die beiden Versionen hier
+# sind reine Entwicklungswerkzeuge und vertragen minimatch 11 nicht, weil 11 keinen Default-Export mehr hat:
+# - 3.1.5 über eslint-plugin-jsx-a11y 6.10.2 (`minimatch(name, control)` über den Default-Export),
+# - 5.1.9 über @redocly/openapi-core 1.34.22 ← openapi-typescript 7.13.0 (`minimatch(url, pattern)`).
+# Sie laufen nur beim Linten und beim Erzeugen der Client-Typen mit Mustern aus dem Repo, nie in der
+# ausgelieferten Oberfläche. Ausnahme je Version und befristet: neu prüfen, sobald die Werkzeuge anheben.
+
+[[PackageOverrides]]
+name = "minimatch"
+version = "3.1.5"
+ecosystem = "npm"
+vulnerability.ignore = true
+effectiveUntil = 2027-02-01
+reason = "Nur Entwicklung (eslint-plugin-jsx-a11y 6.10.2); minimatch 11 ohne Default-Export, nicht verträglich"
+
+[[PackageOverrides]]
+name = "minimatch"
+version = "5.1.9"
+ecosystem = "npm"
+vulnerability.ignore = true
+effectiveUntil = 2027-02-01
+reason = "Nur Entwicklung (@redocly/openapi-core 1.34.22 über openapi-typescript); minimatch 11 ohne Default-Export, nicht verträglich"

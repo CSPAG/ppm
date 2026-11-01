@@ -38,12 +38,12 @@ describe('Berichtsaufgabe und Mitteilung «kritisch»', () => {
     const ue = await login(api, 'demo', 'u-ue', 'alle-fuehren');
     const adm = await login(api, 'demo', 'u-adm', 'org-admin');
     T = ue.tenantId;
-    // Phasenmodell nach Vorgabe in Kraft; Tag der Aufgabe auf den 1., damit der Test an jedem Tag des Monats gilt
-    // (im Entwurf: ein Phasenmodell in Kraft ist nicht mehr änderbar)
+    // Phasenmodell nach Vorgabe in Kraft; Tag der Aufgabe auf den 1., damit der Test an jedem Tag des Monats gilt. Noch
+    // im Entwurf setzen: die Fristen einer Version in Kraft ändert RLS nicht (das UPDATE träfe still keine Zeile).
     const c = await call('POST', '/v1/phasenmodelle', { authorization: ue.authorization }, { quelle: 'vorgabe' });
     assert.equal(c.statusCode, 201, c.body);
-    const n = await full(api.t.runtime, T, async tx => (await tx.query("UPDATE ppm.frist SET wert = 1 WHERE schluessel = 'bericht_aufgabe'")).rowCount);
-    assert.equal(n, 1, 'Tag der Aufgabe gesetzt');
+    const n = await full(api.t.runtime, T, tx => tx.query("UPDATE ppm.frist SET wert = 1 WHERE phasenmodell_id = $1 AND schluessel = 'bericht_aufgabe'", [c.json().id]));
+    assert.equal(n.rowCount, 1, 'Tag der Aufgabe im Entwurf gesetzt');
     const k = await call('POST', `/v1/phasenmodelle/${c.json().id}/in-kraft-setzen`, { authorization: adm.authorization, 'if-match': c.headers.etag as string });
     assert.equal(k.statusCode, 200, k.body);
 

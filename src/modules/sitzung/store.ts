@@ -46,10 +46,11 @@ export async function termineAlle(tx: Tx, von: string, bis: string): Promise<{ g
     .map(({ datum, ...g }) => ({ gremium: g, datum }));
 }
 
+/** `vertraulich`: am Projekt oder geerbt vom Portfolio (Master Entscheid 22, 471). */
 export interface ProjektKurz { id: string; nummer: string; name: string; phase: string; portfolio_id: string; vertraulich: boolean }
 
 export async function projekt(tx: Tx, id: string): Promise<ProjektKurz | null> {
-  return (await tx.query<ProjektKurz>(`SELECT id, nummer, name, phase, portfolio_id, vertraulich FROM ${SCHEMA}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
+  return (await tx.query<ProjektKurz>(`SELECT id, nummer, name, phase, portfolio_id, (vertraulich OR portfolio_vertraulich) AS vertraulich FROM ${SCHEMA}.projekt WHERE id = $1`, [id])).rows[0] ?? null;
 }
 
 /** Projektleitung und Projektauftraggeber:in des Projekts (Einladung je Geschäft, UC-006 Schritt 2). */

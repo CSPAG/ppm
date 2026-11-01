@@ -448,7 +448,9 @@ Begründungen von Zurückweisung, Ablehnung und Abbruch nur für Betroffene, UE 
 wenn es selbst oder sein Portfolio vertraulich ist. Dann lesen es nur Tupel am Projekt oder am Portfolio (direkt oder
 über eine Gruppe) und `alle-fuehren`; `alle-lesen` und `projekt:list` reichen nicht mehr. Ein vertrauliches Portfolio
 (`portfolio_read`) sieht nur, wer daran oder an einem seiner Projekte ein Tupel hat, und `alle-fuehren`. Ideen mit
-Zuordnung zu einem vertraulichen Portfolio und dessen Projekte in der Roadmap fallen für alle anderen weg.
+Zuordnung zu einem vertraulichen Portfolio und dessen Projekte in der Roadmap fallen für alle anderen weg. Sitzungen,
+Traktanden und Einladungen eines Gremiums sieht mit `sitzung:read` nur, wer dessen Portfolio sieht; ein vertrauliches
+Traktandum (Projekt oder sein Portfolio vertraulich) nur, wer das Projekt trotz «vertraulich» liest (471).
 
 ## 4. Aufgaben und Eingang
 

@@ -68,9 +68,12 @@ export async function protokollErzeugen(tx: Tx, s: store.SitzungRow, ts: readonl
   await es.protokollAnlegen(tx, s.id, inhalt);
 }
 
-/** Vertrauliche Traktanden ohne `projekt:vertraulich` ausblenden (A-34, UX-OF-13). */
-export function fuerLeser(inhalt: ProtokollInhalt, vertraulichSichtbar: boolean): ProtokollInhalt {
-  return vertraulichSichtbar ? inhalt : { ...inhalt, traktanden: inhalt.traktanden.filter(t => !t.vertraulich) };
+/**
+ * Vertrauliche Traktanden nur, wenn die Person sie in der Lesesicht sieht (`sichtbar`: IDs der Traktanden unter RLS;
+ * nur Eingetragene, Master Entscheid 22, A-76, UX-OF-13).
+ */
+export function fuerLeser(inhalt: ProtokollInhalt, sichtbar: ReadonlySet<string>): ProtokollInhalt {
+  return { ...inhalt, traktanden: inhalt.traktanden.filter(t => !t.vertraulich || sichtbar.has(t.traktandumId)) };
 }
 
 export interface ProtokollAenderung { anwesende?: string; bemerkungen?: string; notizen?: { traktandumId: string; notiz: string }[] }

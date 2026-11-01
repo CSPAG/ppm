@@ -1,5 +1,6 @@
 /** Abfragen und Änderungen der Projekte (TanStack Query über den typisierten Client). */
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { accessApi, type AccessEntry } from '@vollholz/iam-web';
 import { api, ifMatch, type Schemas } from '../../api/index.ts';
 
 export type Projekt = Schemas['Projekt'];
@@ -122,6 +123,42 @@ export function usePortfolioVertraulich() {
       (await api.PUT('/v1/portfolios/{id}/vertraulich', { params: { path: { id }, header: { 'if-match': ifMatch(version)['If-Match']! } }, body: { vertraulich } })).data!,
     // Auswahl am Portfolio, Projekte (geerbte Stufe) und Bereich «Zugriff»
     onSuccess: () => qc.invalidateQueries({ queryKey: projektKeys.all }),
+  });
+}
+
+/** Rolle direkt an einem Projekt des Portfolios (Gruppe «über seine Projekte»). */
+export interface UeberProjekt { eintrag: AccessEntry; nummer: string; name: string }
+
+/**
+ * Rollen an den Projekten eines Portfolios (docs/ux/zugriff.md Abschnitt 2, A-76): `GET /v1/access` liefert am Portfolio
+ * nur den Ort und die Orte darüber; darum je sichtbares Projekt dessen Liste, davon die direkten Rollen am Projekt.
+ * Höchstens 6 Abfragen gleichzeitig.
+ */
+export function useUeberProjekte(portfolio: string | undefined) {
+  return useQuery({
+    queryKey: [...projektKeys.all, 'zugriff', 'ueberProjekte', portfolio] as const,
+    enabled: !!portfolio,
+    staleTime: 30_000,
+    queryFn: async ({ signal }): Promise<UeberProjekt[]> => {
+      const projekte: Projekt[] = [];
+      let cursor: string | undefined;
+      do {
+        const { data } = await api.GET('/v1/projekte', { params: { query: { portfolio, cursor, limit: 200 } }, signal });
+        projekte.push(...data!.items);
+        cursor = data!.nextCursor ?? undefined;
+      } while (cursor);
+      const out: UeberProjekt[] = [];
+      for (let i = 0; i < projekte.length; i += 6) {
+        const teil = projekte.slice(i, i + 6);
+        const listen = await Promise.all(teil.map(p => accessApi.list({ type: 'projekt', id: p.id }, signal)));
+        listen.forEach((l, j) => {
+          for (const e of l.items) {
+            if (e.via === 'direct' && e.place.type === 'projekt' && e.subject.kind !== 'members') out.push({ eintrag: e, nummer: teil[j]!.nummer, name: teil[j]!.name });
+          }
+        });
+      }
+      return out;
+    },
   });
 }
 

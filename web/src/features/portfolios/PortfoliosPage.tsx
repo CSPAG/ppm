@@ -4,7 +4,7 @@
  * `?o=<schlüssel>` mit Gremien und Gremienweg, darin das Gremium über `&g=<kürzel>` mit Sitzungsterminen.
  */
 import { useSession } from '../../auth/index.ts';
-import { Datenliste, Drawer, Empty, Icon, Loading, type Spalte } from '../../ui/index.ts';
+import { Datenliste, Drawer, Empty, Icon, Loading, T, type Spalte } from '../../ui/index.ts';
 import { useGremien, usePortfolioList, type Gremium, type Portfolio } from './api.ts';
 import { GremiumDrawer } from './GremiumDrawer.tsx';
 import { PortfolioCreateDrawer, PortfolioDrawer } from './PortfolioDrawer.tsx';
@@ -13,7 +13,8 @@ import { TP } from './texte.ts';
 
 function spalten(gremien: readonly Gremium[]): Spalte<Portfolio>[] {
   return [
-    { key: 'name', titel: TP.name, art: 'name', zelle: p => p.name },
+    // Schloss nur bei vertraulichen Portfolios (Master Entscheid 22, docs/ux/zugriff.md)
+    { key: 'name', titel: TP.name, art: 'name', zelle: p => <>{p.name}{p.vertraulich ? <> <span className="merkmal merkmal-vertraulich"><Icon name="lock" />{T.zugriff.vertraulich}</span></> : null}</> },
     { key: 'kategorie', titel: TP.kategorie, karte: true, zelle: p => TP.kategorien[p.kategorie] },
     { key: 'pflichten', titel: TP.pflichten, zelle: p => TP.pflichtKurz(p.pflichten) },
     {

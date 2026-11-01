@@ -14511,6 +14511,239 @@ export interface paths {
         };
         trace?: never;
     };
+    "/v1/portfolios/{id}/vertraulich": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Portfolio vertraulich machen oder öffnen
+         * @description Vertraulich sehen das Portfolio und seine Projekte nur Eingetragene am Portfolio oder an seinen Projekten und «alle Portfolios führen». Recht `projekt:write` am Portfolio (Portfolio führen, alle Portfolios führen); nur mit `If-Match`. Steht im Änderungsprotokoll.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description ETag der gelesenen Version (Pflicht). */
+                    "if-match"?: string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PortfolioVertraulichPut"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Portfolio"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Konflikt mit dem aktuellen Stand */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Version passt nicht (If-Match) */
+                412: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["VersionConflict"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portfolios/{id}/vertraulich/wirkung": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Wirkung von «vertraulich» am Portfolio
+         * @description Anzahl Projekte und eingereichte Ideen, die mit dem Portfolio vertraulich werden (Wirkung vor dem Umstellen, I-F5). Recht `projekt:write` am Portfolio.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PortfolioWirkung"];
+                    };
+                };
+                /** @description Ungültige Anfrage, z. B. Organisation wählen (X-Tenant) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["OrganizationChoice"];
+                    };
+                };
+                /** @description Nicht angemeldet oder Token ungültig */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Keine Berechtigung (Rolle, Scope, ACL) oder CSRF-Token fehlt */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Nicht gefunden oder nicht sichtbar */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Ungültige Eingabe */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ValidationProblem"];
+                    };
+                };
+                /** @description Zu viele Anfragen (Retry-After) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+                /** @description Interner Fehler (Referenz im detail) */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Problem"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/portfolios/{id}/gremienweg": {
         parameters: {
             query?: never;
@@ -48182,6 +48415,8 @@ export interface components {
             /** @description Vertrag, Quality-Check, Gates und Monatsbericht sind Pflicht (A und B, A-07); bei C freiwillig (A-08). */
             pflichten: boolean;
             orgEinheitId: null | string;
+            /** @description Nur Eingetragene am Portfolio oder an seinen Projekten und «alle Portfolios führen» sehen es; seine Projekte sind vertraulich (Master Entscheid 22, A-76). */
+            vertraulich: boolean;
             version: number;
             /** Format: date-time */
             createdAt: string;
@@ -48192,6 +48427,8 @@ export interface components {
             /** @description Was die anfragende Person damit darf. */
             can: {
                 admin: boolean;
+                /** @description «vertraulich» umstellen: wer das Portfolio führt (`projekt:write` am Portfolio, Master Entscheid 22). */
+                vertraulich: boolean;
             };
         };
         PortfolioList: {
@@ -48211,6 +48448,15 @@ export interface components {
             /** @description Bezeichnung. */
             name?: string;
             orgEinheitId?: null | string;
+        };
+        PortfolioVertraulichPut: {
+            vertraulich: boolean;
+        };
+        PortfolioWirkung: {
+            /** @description Projekte des Portfolios; sie werden mit ihm vertraulich. */
+            projekte: number;
+            /** @description Eingereichte Ideen mit Zuordnung zum Portfolio. */
+            ideen: number;
         };
         Gremium: {
             /** Format: uuid */
@@ -48362,8 +48608,10 @@ export interface components {
              * @enum {string}
              */
             lebenszyklus: "aktiv" | "sistiert" | "abgebrochen" | "abgeschlossen" | "zurueckgezogen";
-            /** @description Sichtbar nur für Personen mit einer Rolle am Projekt, an seinem Portfolio oder übergreifend (Master Entscheid 13). */
+            /** @description Sichtbar nur für Eingetragene am Projekt oder an seinem Portfolio und «alle Portfolios führen» (Master Entscheid 22). */
             vertraulich: boolean;
+            /** @description Das Portfolio ist vertraulich; das Projekt ist es damit auch und lässt sich nicht offener stellen (A-76). */
+            portfolioVertraulich: boolean;
             sponsor: null | string;
             projektleitung: null | string;
             /** @description Eigene Funktionen der anfragenden Person in der Projektorganisation. */

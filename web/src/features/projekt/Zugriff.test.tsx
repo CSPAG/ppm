@@ -29,6 +29,9 @@ const projekt = (o: Record<string, unknown> = {}) => ({
   sponsor: null, projektleitung: PL, rollen: ['pl'], version: 2, createdAt: '2026-10-01T08:00:00Z', updatedAt: '2026-10-02T08:00:00Z',
   can: { read: true, write: true, organisation: true }, ...o,
 });
+const portfolio = (o: Record<string, unknown> = {}) => ({
+  id: PF, schluessel: 'transformation', name: 'Transformation', kategorie: 'A', vertraulich: false, version: 3, can: { admin: false, vertraulich: true }, ...o,
+});
 const eintrag = (o: Record<string, unknown>) => ({ expiresAt: null, createdAt: '2026-10-01T08:00:00Z', createdBy: 'Ursula Egli', removable: false, ...o });
 const liste = (grantable: string[]) => ({
   resource: { type: 'projekt', id: ID }, classification: null, grantable,
@@ -101,7 +104,7 @@ describe('Zugriff am Projekt (UI-51)', () => {
     const { container } = renderWithIam(<ProjektZugriffPage nummer="2026-014" />, PL_ME);
     expect(await screen.findByText(T.zugriff.stufe.offenProjekt)).toBeInTheDocument();
     const hier = await screen.findByRole('region', { name: TP.zugriff.gruppeProjekt });
-    expect(await within(hier).findByText(`${T.zugriff.darf.bearbeiten}, ${T.zugriff.darf.verwalten}`)).toBeInTheDocument();
+    expect(await within(hier).findByText('darf bearbeiten')).toBeInTheDocument();
     expect(within(screen.getByRole('region', { name: T.zugriff.mitglieder })).getByText(T.zugriff.mitgliederProjekt, { exact: false })).toBeInTheDocument();
     await expectNoAxe(container);
 
@@ -166,7 +169,7 @@ describe('Projektorganisation: Hinweis «kein Zugriff» (UX-E14)', () => {
 describe('Zugriff am Portfolio (UI-51)', () => {
   it('Auswahl im Kopf, Liste des gewählten Portfolios; unbekannter Schlüssel benannt', async () => {
     const api = stub({
-      'GET /v1/portfolios': () => json({ items: [{ id: PF, schluessel: 'transformation', name: 'Transformation', kategorie: 'A' }], nextCursor: null }),
+      'GET /v1/portfolios': () => json({ items: [portfolio()], nextCursor: null }),
       'GET /v1/access': () => json({ ...liste(['portfolio-fuehren']), resource: { type: 'portfolio', id: PF } }),
     });
     const { container, unmount } = renderWithIam(<PortfolioZugriffPage portfolio="transformation" setPortfolio={() => {}} />, PL_ME);
@@ -177,5 +180,35 @@ describe('Zugriff am Portfolio (UI-51)', () => {
     unmount();
     renderWithIam(<PortfolioZugriffPage portfolio="gibts-nicht" setPortfolio={() => {}} />, PL_ME);
     expect(await screen.findByText(TP.zugriff.portfolioUnbekannt)).toBeInTheDocument();
+  });
+
+  it('Stufe am Portfolio: wer führt, macht es nach der Wirkung vertraulich (Master Entscheid 22, A-76)', async () => {
+    const api = stub({
+      'GET /v1/portfolios': () => json({ items: [portfolio()], nextCursor: null }),
+      'GET /v1/access': () => json({ ...liste([]), resource: { type: 'portfolio', id: PF } }),
+      [`GET /v1/portfolios/${PF}/vertraulich/wirkung`]: () => json({ projekte: 6, ideen: 2 }),
+      [`PUT /v1/portfolios/${PF}/vertraulich`]: async req => json(portfolio({ ...(await req.json() as object), version: 4 })),
+    });
+    const { container } = renderWithIam(<PortfolioZugriffPage portfolio="transformation" setPortfolio={() => {}} />, PL_ME);
+    expect(await screen.findByText(T.zugriff.stufe.offenPortfolio)).toBeInTheDocument();
+    await expectNoAxe(container);
+    await userEvent.selectOptions(screen.getByLabelText(TP.zugriff.stufePortfolio), 'vertraulich');
+    const frage = await screen.findByRole('dialog', { name: TP.zugriff.vertraulichFragePortfolio('Transformation') });
+    expect(within(frage).getByText(TP.zugriff.vertraulichWirkungPortfolio(6, 2))).toBeInTheDocument();
+    await userEvent.click(within(frage).getByRole('button', { name: TP.zugriff.vertraulichMachen }));
+    await waitFor(() => expect(api.calls.some(c => c.method === 'PUT')).toBe(true));
+    const put = api.calls.find(c => c.method === 'PUT')!;
+    expect(put.headers.get('if-match')).toBe('W/"3"');
+    expect(await put.json()).toEqual({ vertraulich: true });
+  });
+
+  it('Projekt in einem vertraulichen Portfolio: Stufe geerbt, ohne Auswahl', async () => {
+    stub({
+      'GET /v1/projekte': () => json({ items: [projekt({ portfolioVertraulich: true })], nextCursor: null }),
+      'GET /v1/access': () => json(liste([])),
+    });
+    renderWithIam(<ProjektZugriffPage nummer="2026-014" />, PL_ME);
+    expect(await screen.findByText(T.zugriff.stufe.geerbtProjekt)).toBeInTheDocument();
+    expect(screen.queryByLabelText(TP.zugriff.stufe)).not.toBeInTheDocument();
   });
 });

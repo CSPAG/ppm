@@ -108,7 +108,7 @@ function ViewDrawer({ loaded: { item, etag }, onClose, onEdit, onWeg, onGremium 
         <button type="button" className="btn sm danger" onClick={() => setConfirm(true)}><Icon name="trash" />{T.common.delete}</button>
       </> : null}
       {/* Zugriff auf einen Blick, verwaltet unter Portfolio › Zugriff (docs/ux/zugriff.md, UI-51) */}
-      <ZugriffKurz ort={{ type: 'portfolio', id: item.id }} label={item.name} bereich={`/portfolio/zugriff?portfolio=${encodeURIComponent(item.schluessel)}`} />
+      <ZugriffKurz ort={{ type: 'portfolio', id: item.id }} label={item.name} vertraulich={item.vertraulich} bereich={`/portfolio/zugriff?portfolio=${encodeURIComponent(item.schluessel)}`} />
     </>}>
       <dl className="attrs">
         <dt>{TP.kategorie}</dt><dd>{TP.kategorien[item.kategorie]}</dd>

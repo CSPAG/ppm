@@ -24,8 +24,8 @@ export const matrix: Matrix = {
     },
   },
   policies: [
-    // Lesesicht, Muster PROJEKT (Blatt) mit «vertraulich» (fachmodell.md 3.4, A-34)
-    "ppm.projekt.projekt_read RESTRICTIVE SELECT ppm_app USING (((app.has_permission('projekt:list'::text) AND (NOT vertraulich)) OR ppm.projekt_lesbar(id, portfolio_id)) AND ((NOT vertraulich) OR app.has_tuple('projekt'::text, id, app.read_relations()) OR app.has_permission('projekt:vertraulich'::text) OR app.has_permission('projekt:vertraulich'::text, 'portfolio'::text, portfolio_id))) CHECK -",
+    // Lesesicht, Muster PROJEKT (Blatt) mit «vertraulich» an Projekt oder Portfolio (fachmodell.md 3.4, Master Entscheid 22, A-76)
+    "ppm.projekt.projekt_read RESTRICTIVE SELECT ppm_app USING (((app.has_permission('projekt:list'::text) AND (NOT (vertraulich OR portfolio_vertraulich))) OR ppm.projekt_lesbar(id, portfolio_id)) AND ((NOT (vertraulich OR portfolio_vertraulich)) OR ppm.vertraulich_lesbar(id, portfolio_id))) CHECK -",
     "ppm.projekt.projekt_insert RESTRICTIVE INSERT ppm_app USING - CHECK (app.has_permission('projekt:create'::text) OR app.has_permission('projekt:create'::text, 'portfolio'::text, portfolio_id))",
     "ppm.projekt.projekt_update RESTRICTIVE UPDATE ppm_app USING (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations())) CHECK (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations()))",
     "ppm.projekt.projekt_delete RESTRICTIVE DELETE ppm_app USING (app.write_all() OR (portfolio_id = ANY (app.write_types())) OR app.has_tuple('projekt'::text, id, app.write_relations())) CHECK -",

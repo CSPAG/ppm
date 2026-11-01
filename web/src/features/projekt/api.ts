@@ -109,6 +109,22 @@ export function useProjektVertraulich() {
   });
 }
 
+/** Wirkung von «vertraulich» am Portfolio: Projekte und Ideen (`GET /v1/portfolios/{id}/vertraulich/wirkung`, I-F5). */
+export async function portfolioWirkung(id: string) {
+  return (await api.GET('/v1/portfolios/{id}/vertraulich/wirkung', { params: { path: { id } } })).data!;
+}
+
+/** «vertraulich» am Portfolio umstellen (`PUT /v1/portfolios/{id}/vertraulich`, wer es führt; Master Entscheid 22). */
+export function usePortfolioVertraulich() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, version, vertraulich }: { id: string; version: number; vertraulich: boolean }) =>
+      (await api.PUT('/v1/portfolios/{id}/vertraulich', { params: { path: { id }, header: { 'if-match': ifMatch(version)['If-Match']! } }, body: { vertraulich } })).data!,
+    // Auswahl am Portfolio, Projekte (geerbte Stufe) und Bereich «Zugriff»
+    onSuccess: () => qc.invalidateQueries({ queryKey: projektKeys.all }),
+  });
+}
+
 /** Suche für die Befehlspalette (I-N4): Projekte nach Name oder Nummer, nur die sichtbaren (API). */
 /** Personen in sichtbaren Projekten für die Befehlspalette (I-N4): Name und Funktionen, ohne E-Mail. */
 export async function suchePersonen(q: string, signal: AbortSignal) {

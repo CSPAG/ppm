@@ -49,7 +49,7 @@ export function ProjektAkte({ nummer, reiter, children }: { nummer: string; reit
           </div>
           <div className="acts">
             {/* Zugriff auf einen Blick, mit Schloss bei vertraulichen Projekten (docs/ux/zugriff.md, UX-E14) */}
-            {p.can.read ? <ZugriffKurz ort={{ type: 'projekt', id: p.id }} label={`${p.nummer} ${p.name}`} vertraulich={p.vertraulich} bereich={`${basis}/zugriff`} /> : null}
+            {p.can.read ? <ZugriffKurz ort={{ type: 'projekt', id: p.id }} label={`${p.nummer} ${p.name}`} vertraulich={p.vertraulich || p.portfolioVertraulich} bereich={`${basis}/zugriff`} /> : null}
             {zurueck}
           </div>
         </div>

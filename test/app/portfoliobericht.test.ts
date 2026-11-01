@@ -161,10 +161,10 @@ describe('Risikolage und Portfoliobericht', () => {
     assert.deepEqual([g.stand, g.can.bearbeiten], ['bereitgestellt', false]);
     assert.deepEqual((await ok('GET', '/v1/portfolioberichte?portfolio=transformation', gremium)).items.map((x: { id: string }) => x.id), [id]);
     assert.equal((await call('GET', '/v1/portfolioberichte', pl)).statusCode, 403);
-    // gespeicherter Stand in der Sicht der Person: «alle Portfolios lesen» sieht auch das vertrauliche 2026-002 (Master
-    // Entscheid 13); Funnel und Matrix gezählt wie die Zeilen
+    // gespeicherter Stand in der Sicht der Person: «alle Portfolios lesen» sieht das vertrauliche 2026-002 nicht, solange
+    // die Person nicht eingetragen ist (Master Entscheid 22); Funnel und Matrix gezählt wie die Zeilen
     const l = await ok('GET', `/v1/portfolioberichte/${id}`, gl);
-    assert.ok(JSON.stringify(l).includes('2026-002'));
+    assert.ok(!JSON.stringify(l).includes('2026-002'));
     assert.equal(l.dashboard.funnel.reduce((n: number, f: { anzahl: number }) => n + f.anzahl, 0), l.dashboard.items.length);
     assert.ok(JSON.stringify(await ok('GET', `/v1/portfolioberichte/${id}`, ue)).includes('2026-002'));
   });

@@ -202,10 +202,10 @@ db.describe('Finanzen (API)', () => {
     const j = g.json();
     assert.deepEqual([j.stand, j.version, j.can.write, g.headers.etag], ['neu', 0, false, 'W/"0"']);
     assert.deepEqual(j.positionen.map((x: { nummer: string; berechnet: unknown; ohneTermine: string[] }) => [x.nummer, x.berechnet, x.ohneTermine]),
-      [['2026-001', { capex: 0, opex: 24794.52 }, []], ['2026-002', { capex: 0, opex: 0 }, ['P1']], ['2026-003', { capex: 0, opex: 50000 }, []]]);
-    // Wer alle Portfolios liest, sieht auch das vertrauliche Projekt mit Namen (Master Entscheid 13); eine Summe ohne Namen
-    // gibt es nur noch für Projekte, die die Person nicht sieht
-    assert.deepEqual([j.vertraulich, j.summe], [null, { capex: 0, opex: 74794.52 }]);
+      [['2026-001', { capex: 0, opex: 24794.52 }, []], ['2026-002', { capex: 0, opex: 0 }, ['P1']]]);
+    // Wer alle Portfolios liest, aber nicht eingetragen ist, sieht das vertrauliche Projekt nicht (Master Entscheid 22); es
+    // zählt als Summe ohne Namen mit (K32)
+    assert.deepEqual([j.vertraulich, j.summe], [{ anzahl: 1, capex: 0, opex: 50000 }, { capex: 0, opex: 74794.52 }]);
     assert.equal((await call('gl', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [] })).statusCode, 403, 'übergeben FI');
     assert.equal((await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.a, capex: 1, opex: null }, { projektId: p.a, capex: 2, opex: null }] })).statusCode, 422);
     const k = await call('fi', 'PUT', '/v1/budgetuebergaben/2027', { korrekturen: [{ projektId: p.b, capex: 0, opex: 8000, bemerkung: 'Termine folgen' }, { projektId: p.a, capex: null, opex: null }] });

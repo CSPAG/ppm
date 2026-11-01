@@ -13,7 +13,7 @@ import { api } from '../../api/index.ts';
 import {
   Confirm, Datenliste, Drawer, Empty, ErrorState, Hinweis, Icon, Skelett, T, useToast, zugriffDarf, zugriffMitglieder, zugriffStufe, type Spalte,
 } from '../../ui/index.ts';
-import { useProjektNachNummer, useProjektVertraulich, type Projekt } from './api.ts';
+import { portfolioWirkung, useProjektNachNummer, usePortfolioVertraulich, useProjektVertraulich, type Projekt } from './api.ts';
 import { TP } from './texte.ts';
 
 type Ort = { type: 'projekt' | 'portfolio'; id: string };
@@ -51,8 +51,8 @@ export function ZugriffListe({ ort, label, vertraulich, portfolioName, stufe }: 
 
   const spalten: Spalte<AccessEntry>[] = [
     { key: 'wer', titel: TP.zugriff.wer, art: 'name', zelle: e => e.subject.name },
-    { key: 'rolle', titel: TP.zugriff.rolle, karte: true, zelle: e => authz.relationLabel(e.relation) },
-    { key: 'darf', titel: TP.zugriff.darf, karte: true, zelle: e => zugriffDarf(authz, e.relation) || '–' },
+    // «wer · darf …» (Master Entscheid 22): die Rolle heisst nach ihrer Wirkung; der Name steht in der Schublade
+    { key: 'darf', titel: TP.zugriff.darf, karte: true, zelle: e => zugriffDarf(authz, e.relation) || authz.relationLabel(e.relation) },
     { key: 'ueber', titel: TP.zugriff.ueber, zelle: e => ueber(e, ort, portfolioName) },
     { key: 'bis', titel: TP.zugriff.befristet, karte: true, zelle: e => (e.expiresAt ? TP.zugriff.bis(datum(e.expiresAt)) : '–') },
   ];
@@ -169,8 +169,10 @@ function ProjektStufe({ projekt: p }: { projekt: Projekt }) {
   });
   return (
     <div className="pj-zugriff-stufe">
-      <p className="zg-stufe"><Icon name={p.vertraulich ? 'lock' : 'users'} />{zugriffStufe({ type: 'projekt', id: p.id }, p.vertraulich)}</p>
-      {p.can.write ? (
+      <p className="zg-stufe"><Icon name={p.vertraulich || p.portfolioVertraulich ? 'lock' : 'users'} />
+        {zugriffStufe({ type: 'projekt', id: p.id }, p.vertraulich, p.portfolioVertraulich)}</p>
+      {/* geerbt vom Portfolio: nicht offener stellbar (A-76), darum ohne Auswahl */}
+      {p.can.write && !p.portfolioVertraulich ? (
         <span className="pj-filter">
           <label htmlFor={id}>{TP.zugriff.stufe}</label>
           <select id={id} value={p.vertraulich ? 'vertraulich' : 'offen'} disabled={aendern.isPending}
@@ -197,8 +199,57 @@ export function ProjektZugriffPage({ nummer }: { nummer: string }) {
   if (q.error) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   const p = q.data;
   if (!p) return <Empty>{TP.akte.nichtGefunden}</Empty>;
-  return <ZugriffListe ort={{ type: 'projekt', id: p.id }} label={`${p.nummer} ${p.name}`} vertraulich={p.vertraulich} portfolioName={p.portfolio?.name}
-    stufe={<ProjektStufe projekt={p} />} />;
+  return <ZugriffListe ort={{ type: 'projekt', id: p.id }} label={`${p.nummer} ${p.name}`} vertraulich={p.vertraulich || p.portfolioVertraulich}
+    portfolioName={p.portfolio?.name} stufe={<ProjektStufe projekt={p} />} />;
+}
+
+interface PortfolioEintrag { id: string; schluessel: string; name: string; kategorie: string; vertraulich: boolean; version: number; darf: boolean }
+
+/**
+ * Stufe des Portfolios oben im Bereich (Master Entscheid 22, A-76): wer es führt, macht es vertraulich oder öffnet es,
+ * nach der Wirkung mit Anzahl Projekte und Ideen (I-R1 Stufe 3, I-F5); die Projekte folgen.
+ */
+function PortfolioStufe({ portfolio: pf }: { portfolio: PortfolioEintrag }) {
+  const id = useId();
+  const toast = useToast();
+  const aendern = usePortfolioVertraulich();
+  const [frage, setFrage] = useState<{ ziel: boolean; text: string } | null>(null);
+  const [laedt, setLaedt] = useState(false);
+  const [fehler, setFehler] = useState<unknown>(null);
+  const ort = { type: 'portfolio' as const, id: pf.id };
+  const waehlen = async (ziel: boolean) => {
+    if (!ziel) { setFrage({ ziel, text: TP.zugriff.offenWirkungPortfolio }); return; }
+    setLaedt(true); setFehler(null);
+    try {
+      const w = await portfolioWirkung(pf.id);
+      setFrage({ ziel, text: TP.zugriff.vertraulichWirkungPortfolio(w.projekte, w.ideen) });
+    } catch (e) { setFehler(e); } finally { setLaedt(false); }
+  };
+  const umstellen = (ziel: boolean) => aendern.mutate({ id: pf.id, version: pf.version, vertraulich: ziel }, {
+    onSuccess: () => { toast.show(ziel ? TP.zugriff.vertraulichGespeichertPortfolio : TP.zugriff.offenGespeichertPortfolio); setFrage(null); },
+    onError: () => setFrage(null),
+  });
+  return (
+    <div className="pj-zugriff-stufe">
+      <p className="zg-stufe"><Icon name={pf.vertraulich ? 'lock' : 'users'} />{zugriffStufe(ort, pf.vertraulich)}</p>
+      {pf.darf ? (
+        <span className="pj-filter">
+          <label htmlFor={id}>{TP.zugriff.stufePortfolio}</label>
+          <select id={id} value={pf.vertraulich ? 'vertraulich' : 'offen'} disabled={aendern.isPending || laedt}
+            onChange={e => void waehlen(e.target.value === 'vertraulich')}>
+            <option value="offen">{TP.zugriff.stufePortfolioOffen}</option>
+            <option value="vertraulich">{TP.zugriff.stufeVertraulich}</option>
+          </select>
+        </span>
+      ) : null}
+      {fehler || aendern.error ? <ErrorState error={fehler ?? aendern.error} /> : null}
+      {frage ? (
+        <Confirm title={frage.ziel ? TP.zugriff.vertraulichFragePortfolio(pf.name) : TP.zugriff.offenFragePortfolio(pf.name)} text={frage.text}
+          confirm={frage.ziel ? TP.zugriff.vertraulichMachen : TP.zugriff.offenMachen} busy={aendern.isPending}
+          onClose={() => setFrage(null)} onConfirm={() => umstellen(frage.ziel)} />
+      ) : null}
+    </div>
+  );
 }
 
 /** Portfolios, die die Person sieht, für die Auswahl am Portfolio › Zugriff. */
@@ -207,11 +258,13 @@ function usePortfolioListe() {
     queryKey: ['projekt', 'zugriff', 'portfolios'] as const,
     staleTime: 60_000,
     queryFn: async ({ signal }) => {
-      const out: { id: string; schluessel: string; name: string; kategorie: string }[] = [];
+      const out: PortfolioEintrag[] = [];
       let cursor: string | undefined;
       do {
         const { data } = await api.GET('/v1/portfolios', { params: { query: { cursor, limit: 200 } }, signal });
-        out.push(...data!.items.map(p => ({ id: p.id, schluessel: p.schluessel, name: p.name, kategorie: p.kategorie })));
+        out.push(...data!.items.map(p => ({
+          id: p.id, schluessel: p.schluessel, name: p.name, kategorie: p.kategorie, vertraulich: p.vertraulich, version: p.version, darf: p.can.vertraulich,
+        })));
         cursor = data!.nextCursor ?? undefined;
       } while (cursor);
       return out.sort((a, b) => a.kategorie.localeCompare(b.kategorie) || a.name.localeCompare(b.name, 'de-CH'));
@@ -244,7 +297,8 @@ export function PortfolioZugriffPage({ portfolio, setPortfolio }: { portfolio?: 
         {q.isPending ? <Skelett zeilen={4} />
           : q.error ? <ErrorState error={q.error} onRetry={() => void q.refetch()} />
             : !pf ? <Empty>{portfolio ? TP.zugriff.portfolioUnbekannt : TP.zugriff.keinPortfolio}</Empty>
-              : <ZugriffListe key={pf.id} ort={{ type: 'portfolio', id: pf.id }} label={pf.name} portfolioName={pf.name} />}
+              : <ZugriffListe key={pf.id} ort={{ type: 'portfolio', id: pf.id }} label={pf.name} portfolioName={pf.name} vertraulich={pf.vertraulich}
+                stufe={<PortfolioStufe portfolio={pf} />} />}
       </div>
     </section>
   );

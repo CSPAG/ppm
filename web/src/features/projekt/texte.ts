@@ -36,7 +36,7 @@ export const TP = {
     aktiv: 'entwurf', sistiert: 'ruhend', abgebrochen: 'negativ', abgeschlossen: 'positiv', zurueckgezogen: 'ruhend',
   } satisfies Record<Lebenszyklus, StandFamilie>,
   vertraulich: 'vertraulich',
-  vertraulichHinweis: 'Vertraulich: sichtbar nur für die Projektrollen, die Programmleitung und das Gremium des Portfolios.',
+  vertraulichHinweis: 'Vertraulich: sichtbar nur für Eingetragene am Projekt oder am Portfolio und für alle, die alle Portfolios führen.',
   keinePl: 'keine Projektleitung',
   // Projektakte (Rahmen)
   akte: {
@@ -97,6 +97,14 @@ export const TP = {
     offenFrage: 'Vertraulichkeit aufheben?',
     offenWirkung: 'Alle Mitglieder sehen danach die Kopfdaten: Nummer, Name, Portfolio, Phase, Projektleitung und Projektauftraggeber:in.',
     offenMachen: 'Vertraulichkeit aufheben', offenGespeichert: 'Alle Mitglieder sehen jetzt die Kopfdaten.',
+    // Portfolio (Master Entscheid 22, A-76): wer es führt, stellt um; die Projekte folgen
+    stufePortfolio: 'Wer sieht das Portfolio', stufePortfolioOffen: 'Alle Mitglieder sehen das Portfolio',
+    vertraulichFragePortfolio: (name: string) => `Portfolio «${name}» vertraulich machen?`,
+    vertraulichWirkungPortfolio: (projekte: number, ideen: number) =>
+      `Das Portfolio und ${projekte === 1 ? 'sein Projekt' : `seine ${projekte} Projekte`}${ideen ? ` samt ${ideen === 1 ? '1 Idee' : `${ideen} Ideen`}` : ''} sehen danach nur noch Eingetragene am Portfolio oder an den Projekten und wer alle Portfolios führt. Mitglieder und «alle Portfolios lesen» verlieren den Zugriff; wer weiter lesen soll, erhält ihn hier mit «Zugriff geben».`,
+    offenFragePortfolio: (name: string) => `Vertraulichkeit von «${name}» aufheben?`,
+    offenWirkungPortfolio: 'Alle Mitglieder sehen danach das Portfolio und die Kopfdaten seiner nicht vertraulichen Projekte.',
+    vertraulichGespeichertPortfolio: 'Das Portfolio ist jetzt vertraulich.', offenGespeichertPortfolio: 'Alle Mitglieder sehen das Portfolio jetzt.',
     amProjekt: 'Projekt', amPortfolio: 'Portfolio', ueberPortfolio: (name: string) => `Portfolio ${name}`, ueberPortfolioOhne: 'Portfolio',
     uebergreifend: 'übergreifend', anderes: 'anderer Ort',
     niemand: 'Niemand hat über das Portfolio oder übergreifend Zugriff.',

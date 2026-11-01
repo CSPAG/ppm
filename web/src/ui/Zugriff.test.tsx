@@ -60,11 +60,13 @@ function stub(darfSchreiben: boolean) {
 afterEach(() => { window.history.replaceState(null, '', '/'); });
 
 describe('Darf', () => {
-  it('übersetzt die Rechte der Rolle in auflisten, lesen, bearbeiten und «verwaltet Zugriff»', () => {
+  it('vorgegebene Rollen nach ihrer Wirkung, eigene Rollen mit ihrem Namen (Master Entscheid 22)', () => {
     const authz = makeAuthz(CATALOG);
-    expect(zugriffDarf(authz, 'projekt-fuehren')).toBe(`${T.zugriff.darf.bearbeiten}, ${T.zugriff.darf.verwalten}`);
-    expect(zugriffDarf(authz, 'projekt-mitlesen')).toBe(T.zugriff.darf.lesen);
-    expect(zugriffDarf(authz, 'mitglied')).toBe(T.zugriff.darf.auflisten);
+    expect(zugriffDarf(authz, 'projekt-fuehren')).toBe('darf bearbeiten');
+    expect(zugriffDarf(authz, 'portfolio-steuern')).toBe('darf lesen und Entscheide vermerken');
+    expect(zugriffDarf(authz, 'projekt-mitlesen')).toBe('darf lesen');
+    expect(zugriffDarf(authz, 'mitglied')).toBe('darf auflisten');
+    expect(zugriffDarf(authz, 'gl')).toBe('Geschäftsleitung');
     expect(zugriffDarf(authz, 'unbekannt')).toBe('');
   });
 });
@@ -87,11 +89,11 @@ describe('Zugriff auf einen Blick', () => {
     await userEvent.click(screen.getByRole('button', { name: T.zugriff.schaltflaeche }));
     const dialog = await screen.findByRole('dialog', { name: T.zugriff.titel('2026-014 Digitale Patientenaufnahme') });
 
-    expect(await within(dialog).findByText(`${T.zugriff.duBearbeiten.projekt}${T.zugriff.grund('Projekt führen', T.zugriff.wo.projekt)}`)).toBeInTheDocument();
+    expect(await within(dialog).findByText(`${T.zugriff.duBearbeiten.projekt}${T.zugriff.grund(T.zugriff.wo.projekt)}`)).toBeInTheDocument();
     expect(within(dialog).getByText(T.zugriff.stufe.offenProjekt)).toBeInTheDocument();
 
     const hier = await within(dialog).findByRole('region', { name: T.zugriff.gruppe.projekt });
-    expect(within(hier).getByText('Projekt mitlesen')).toBeInTheDocument();
+    expect(within(hier).getByText('darf lesen')).toBeInTheDocument();
     expect(within(hier).getByText(`(${T.zugriff.anzahl(2)})`)).toBeInTheDocument();
     expect(within(hier).getByText('Peter Kern')).toBeInTheDocument();
     expect(within(within(dialog).getByRole('region', { name: T.zugriff.gruppe.ueberPortfolio })).getByText('PRAT')).toBeInTheDocument();
@@ -111,7 +113,7 @@ describe('Zugriff auf einen Blick', () => {
     render(<StaticIam><ZugriffKurz ort={{ type: 'projekt', id: ID }} label="2026-014" vertraulich bereich="/projekte/2026-014/zugriff" /></StaticIam>);
     await userEvent.click(screen.getByRole('button', { name: T.zugriff.schaltflaecheVertraulich }));
     const dialog = await screen.findByRole('dialog');
-    expect(await within(dialog).findByText(`${T.zugriff.duLesen.projekt}${T.zugriff.grund('Alle Portfolios lesen', T.zugriff.wo.org)}`)).toBeInTheDocument();
+    expect(await within(dialog).findByText(`${T.zugriff.duLesen.projekt}${T.zugriff.grund(T.zugriff.wo.org)}`)).toBeInTheDocument();
     expect(within(dialog).getByText(T.zugriff.stufe.vertraulichProjekt)).toBeInTheDocument();
     expect(await within(dialog).findByText(T.zugriff.mitgliederVertraulich)).toBeInTheDocument();
   });

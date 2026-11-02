@@ -126,6 +126,28 @@ describe('Projektakte und Projektübersicht (UI-06)', () => {
     await expectNoAxe(container);
   });
 
+  it('Strategiebezug verlinkt auf das Ziel im Arbeitsraum Ziele (K6-2, PP.02.05); ohne ziel:read keine Zeile', async () => {
+    stub({
+      'GET /v1/projekte': () => json({ items: [projekt()], nextCursor: null }),
+      [`GET /v1/projekte/${ID}/organisation`]: () => json(organisation()),
+      [`GET /v1/projekte/${ID}/ziele`]: () => json({ items: [{
+        id: '00000000-0000-4000-8000-0000000000c1', projektId: ID, createdAt: '2026-10-01T08:00:00Z',
+        strategischesZiel: { id: '00000000-0000-4000-8000-0000000000c2', nummer: '2', text: 'Patientenerlebnis verbessern' },
+        jahresziel: { id: '00000000-0000-4000-8000-0000000000c3', jahr: 2027, nummer: '2.1', text: 'Wartezeit am Empfang halbieren' },
+        link: '/ziele/2027?o=ziel:2.1',
+      }], can: { write: false } }),
+    });
+    const { container, unmount } = renderWithIam(akte(), { ...PL_ME, permissions: [...PL_ME.permissions!, 'ziel:read'] });
+    const link = await screen.findByRole('link', { name: '2.1 Wartezeit am Empfang halbieren' });
+    expect(link).toHaveAttribute('href', expect.stringContaining('/ziele/2027?o=ziel:2.1'));
+    expect(screen.getByText(/zu 2 Patientenerlebnis verbessern/)).toBeInTheDocument();
+    await expectNoAxe(container);
+    unmount();
+    renderWithIam(akte(), PL_ME);
+    expect(await screen.findByText('Kernteam')).toBeInTheDocument();
+    expect(screen.queryByText(TP.uebersicht.strategiebezug)).not.toBeInTheDocument();
+  });
+
   it('weitere Reiter der Pakete erscheinen mit Recht', async () => {
     stub({
       'GET /v1/projekte': () => json({ items: [projekt()], nextCursor: null }),

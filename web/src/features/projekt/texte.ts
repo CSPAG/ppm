@@ -52,7 +52,9 @@ export const TP = {
   // Projektübersicht (UI-06, Bericht)
   uebersicht: {
     phasen: 'Phasen', angaben: 'Angaben', portfolio: 'Portfolio', kategorie: (k: string) => `Kategorie ${k}`, handlungsfeld: 'Handlungsfeld',
-    keinHandlungsfeld: 'kein Handlungsfeld zugeordnet', phase: 'Phase', stand: 'Stand', erledigt: 'erledigt', aktuell: 'aktuell', offen: 'folgt',
+    keinHandlungsfeld: 'kein Handlungsfeld zugeordnet',
+    strategiebezug: 'Strategiebezug', keinZiel: 'keinem Ziel zugeordnet', zuZiel: (nr: string, text: string) => `zu ${nr} ${text}`,
+    phase: 'Phase', stand: 'Stand', erledigt: 'erledigt', aktuell: 'aktuell', offen: 'folgt',
   },
   // Projektorganisation (PP.04.04, UC-002 Schritt 2)
   org: {

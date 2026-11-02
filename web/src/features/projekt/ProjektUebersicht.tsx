@@ -1,12 +1,13 @@
 /**
- * Projektübersicht (UI-06, UC-014 A1; Seitentyp Bericht): Phasenleiste P0–P4, Angaben und Projektorganisation (PP.04.04)
- * mit Bearbeiten in der Schublade für Sponsor, Projektleitung und Programmleitung (`can.organisation`). Meilensteine,
+ * Projektübersicht (UI-06, UC-014 A1; Seitentyp Bericht): Phasenleiste P0–P4, Angaben mit Strategiebezug (PP.02.05, K6-2)
+ * und Projektorganisation (PP.04.04) mit Bearbeiten in der Schublade für Sponsor, Projektleitung und Programmleitung (`can.organisation`). Meilensteine,
  * Status und letzte Entscheide ergänzen die Pakete der Register und der Gremien (projektdaten, sitzung).
  */
 import { PersonName, useAccessList, useIamConfig } from '@vollholz/iam-web';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '../../api/index.ts';
+import { useSession } from '../../auth/index.ts';
 import { ErrorState, fmtPhase, Icon, Loading, Verlauf, type Phase } from '../../ui/index.ts';
 import { useOrganisation, useProjektNachNummer, type Organisation, type Projekt } from './api.ts';
 import { OrganisationDrawer } from './OrganisationDrawer.tsx';
@@ -83,11 +84,45 @@ function OrganisationListe({ org, projekt }: { org: Organisation; projekt: Proje
   );
 }
 
+/**
+ * Strategiebezug (K6-2: vom Projekt zum Ziel mit einem Klick, G3): Jahresziele und strategische Ziele, zu denen das
+ * Projekt beiträgt, verlinkt in den Arbeitsraum Ziele. Ohne `ziel:read` oder bei einem Fehler entfällt die Zeile.
+ */
+function Strategiebezug({ id }: { id: string }) {
+  const { router: { Link } } = useIamConfig();
+  const { canSomewhere } = useSession();
+  const darf = canSomewhere('ziel:read');
+  const q = useQuery({
+    queryKey: ['projekt', 'ziele', id] as const,
+    queryFn: async ({ signal }) => (await api.GET('/v1/projekte/{id}/ziele', { params: { path: { id } }, signal })).data!.items,
+    enabled: darf,
+  });
+  if (!darf || !q.data) return null;
+  return (
+    <>
+      <dt>{TP.uebersicht.strategiebezug}</dt>
+      <dd>
+        {q.data.length ? (
+          <ul className="pj-ziele">
+            {q.data.map(z => (
+              <li key={z.id}>
+                <Link to={z.link}>{z.jahresziel ? `${z.jahresziel.nummer} ${z.jahresziel.text}` : `${z.strategischesZiel.nummer} ${z.strategischesZiel.text}`}</Link>
+                {z.jahresziel ? <span className="muted small"> · {TP.uebersicht.zuZiel(z.strategischesZiel.nummer, z.strategischesZiel.text)}</span> : null}
+              </li>
+            ))}
+          </ul>
+        ) : <span className="empty">{TP.uebersicht.keinZiel}</span>}
+      </dd>
+    </>
+  );
+}
+
 function Angaben({ p }: { p: Projekt }) {
   return (
     <dl className="attrs">
       <dt>{TP.uebersicht.portfolio}</dt><dd>{p.portfolio ? `${p.portfolio.name} · ${TP.uebersicht.kategorie(p.portfolio.kategorie)}` : ''}</dd>
       <dt>{TP.uebersicht.handlungsfeld}</dt><dd>{p.handlungsfeld ?? <span className="empty">{TP.uebersicht.keinHandlungsfeld}</span>}</dd>
+      <Strategiebezug id={p.id} />
       <dt>{TP.uebersicht.stand}</dt><dd>{TP.lebenszyklus[p.lebenszyklus]}{p.vertraulich ? ` · ${TP.vertraulichHinweis}` : ''}</dd>
     </dl>
   );

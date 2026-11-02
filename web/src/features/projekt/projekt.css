@@ -17,6 +17,7 @@
 .pj-aktuell{border:2px solid var(--fg)}
 .pj-offen{border-style:dashed;color:var(--fg-2)}
 .pj-org ul{margin:0;padding:0;list-style:none}
+.pj-ziele{margin:0;padding:0;list-style:none}
 .pj-org-g{display:contents}
 .pj-zeile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0 0 10px;display:grid;gap:8px;position:relative}
 .pj-entfernen{justify-self:end}

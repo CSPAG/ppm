@@ -95,7 +95,7 @@ UC = Nummer des Use Case (UC-0nn). Etappe nach [Fahrplan](ux/fahrplan.md).
 | PP.02.02 | Vorhaben priorisieren | 008 | E5 | AP-E5-2 | umgesetzt als Entwurf der UE (Rangfolge mit Begründung); entschieden mit dem Priorisierungsentscheid #134 | #83, #88, #134 |
 | PP.02.03 | Abhängigkeiten zwischen Vorhaben erfassen | 002, 008 | E0, E5 | AP-E0-6, AP-E5-2 | umgesetzt (Register AP-E0-6; Linien in der Matrix, «Abhängigkeit hinzufügen», Warnung in der Rangfolge) | #29, #51, #83, #88 |
 | PP.02.04 | Projektkategorie zuordnen | 001 | E4 | AP-E4-2 | umgesetzt | #70 |
-| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus umgesetzt (AP-E6-1, API und Oberfläche); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1); Strategiebezug in der Projektübersicht mit Link ins Ziel (K6-2) | #28, #38, #43, #49, #PR |
+| PP.02.05 | Vorhaben mit strategischen Zielen verknüpfen | 002 | E3, E6 | AP-E3-1, AP-E6-1 | Zuordnung im Zielzyklus umgesetzt (AP-E6-1, API und Oberfläche); aus Vertrag Kap. 2 bei der Baseline über `projektZuordnen` (AP-E3-1); Strategiebezug in der Projektübersicht mit Link ins Ziel (K6-2) | #28, #38, #43, #49, #219 |
 | PP.03.01 | Portfolioszenario erstellen | 008 | E5 | AP-E5-3 | umgesetzt | #92, #116 |
 | PP.03.02 | Szenario gegen Budget und Kapazität prüfen | 008 | E5 | AP-E5-3 | umgesetzt (Auslastung je Szenario über `ressource`) | #92, #116 |
 | PP.03.03 | Szenarien vergleichen | 008 | E5 | AP-E5-3 | umgesetzt | #92, #116 |
@@ -197,7 +197,7 @@ Zielgrössen aus [ux/ablaeufe/](ux/ablaeufe/); Messung in der Abnahme der Etappe
 | K5-3 | Entscheidungsvorlage ohne Dateien | 0 Dateien | Aufgabentest | AP-E5-5 | beim Aufgabentest zu messen (Vorlage, Folgeentscheide und Traktandum im System, Entscheid übernimmt den Ist-Stand, Test `priorisierung-entscheid.test.ts`) |
 | K5-4 | Projekte unter der Wasserlinie und Engpass nennen | ≥ 90 % | Aufgabentest | AP-E5-3 | beim Aufgabentest zu messen (Wasserlinie als eigene Zeile mit Regel, Engpässe je Quartal und Rolle, Vergleich bis drei Szenarien #116) |
 | K6-1 | Jahresziel mit Metrik und Hauptaktivität | ≤ 3 Min. | Aufgabentest | AP-E6-1 | beim Aufgabentest zu messen (Ablauf im E2E web/e2e/zielzyklus.spec.ts) |
-| K6-2 | Projekt ↔ strategisches Ziel | ≤ 2 Klicks | Test | AP-E6-1 | Ziel → Projekt 1 Klick (ZielzyklusPage.test.tsx, #49); Projekt → Ziel 1 Klick: Strategiebezug in der Projektübersicht verlinkt ins Ziel (Projekt.test.tsx, #PR) |
+| K6-2 | Projekt ↔ strategisches Ziel | ≤ 2 Klicks | Test | AP-E6-1 | Ziel → Projekt 1 Klick (ZielzyklusPage.test.tsx, #49); Projekt → Ziel 1 Klick: Strategiebezug in der Projektübersicht verlinkt ins Ziel (Projekt.test.tsx, #219) |
 | K6-3 | Zielerreichung 30 Ziele | ≤ 20 Min. | Aufgabentest | AP-E6-3 | beim Aufgabentest zu messen |
 | K6-4 | Entwurf Quartalsreporting | ≤ 30 Min., ohne Dateien | Aufgabentest | AP-E6-4 | beim Aufgabentest zu messen (Entwurf auf Knopfdruck aus Zielerreichung und Portfolioberichten, Dokument aus dem System) |
 | E0 | Q-L1, Q-L6, Q-B1–B6 auf allen Bausteinen; G1 je Rolle | wie qualitaetsziele.md | CI, Review | AP-E0-0, AP-E0-8 | offen |
@@ -209,7 +209,7 @@ Jeder PR mit Oberfläche trägt die Checkliste aus [pruefung.md](ux/rahmen/pruef
 
 | PR | AP | Seitentyp und Zustände | Tastatur | axe hell/dunkel | 360/768/1440 px | Texte zentral, Anrede (ab #152 maschinell geprüft) | Zielgrössen |
 |---|---|---|---|---|---|---|---|
-| #PR | AP-E0-4, AP-E6-1 | Bericht (UI-06): Zeile «Strategiebezug» in den Angaben mit Links ins Ziel; ohne Ziel leer mit Text, ohne `ziel:read` oder bei Fehler ohne Zeile | ja (Links) | ohne Befund (Vitest) | nicht im Browser geprüft | ja, «Du» | K6-2 Projekt → Ziel 1 Klick |
+| #219 | AP-E0-4, AP-E6-1 | Bericht (UI-06): Zeile «Strategiebezug» in den Angaben mit Links ins Ziel; ohne Ziel leer mit Text, ohne `ziel:read` oder bei Fehler ohne Zeile | ja (Links) | ohne Befund (Vitest) | nicht im Browser geprüft | ja, «Du» | K6-2 Projekt → Ziel 1 Klick |
 | #213 | – (Vorlage [ux/zugriff.md](ux/zugriff.md), Etappe 1) | Schaltfläche «Zugriff» mit Kurzübersicht (Dialog) im Kopf, Stufe und «Darf» im Bereich «Zugriff» (UI-51); Z1, Z5, Z8 | ja (Dialog mit Fokusfalle, Esc) | ohne Befund (Vitest) | nicht geprüft | ja | – |
 | #210 | AP-E8-2–AP-E8-5 | Liste + Schublade «Zugriff» (UI-51), Bericht «Alle Projekte» (UI-52); Vermerke und «geändert nach …» als Text mit Symbol (darstellung.md), Verlauf als Zeitleiste; Z1, Z2, Z5, Z7, Z8 (zurückgezogen), Z9 (Banner nach Abschluss) | ja | ohne Befund (Vitest) | nicht im Browser geprüft | ja, «Du», «Projektauftraggeber:in» | – |
 | #199 | AP-E0-0 | Querschnitt Leistung, Oberfläche unverändert | – | unverändert | unverändert | – | Start-Bundle 208,9 kB (Q-L6) |
